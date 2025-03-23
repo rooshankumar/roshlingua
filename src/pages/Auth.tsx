@@ -15,7 +15,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/components/ui/use-toast";
 import { Eye, EyeOff, Mail } from "lucide-react";
 import { useAuth } from "@/providers/AuthProvider";
-import { supabase } from "@/utils/supabaseClient"; // Assuming supabase client is initialized here
+import { supabase } from "@/integrations/supabase/client"; // Assuming supabase client is initialized here
 
 
 const Auth = () => {
