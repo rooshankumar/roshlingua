@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { 
@@ -22,23 +21,23 @@ const Auth = () => {
   const defaultTab = searchParams.get("mode") === "signup" ? "signup" : "login";
   const [activeTab, setActiveTab] = useState(defaultTab);
   const [showPassword, setShowPassword] = useState(false);
-  
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
-  
+
   const { toast } = useToast();
   const navigate = useNavigate();
   const { login, signup, loginWithGoogle } = useAuth();
-  
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     try {
       if (email && password) {
         await login(email, password);
         navigate("/onboarding");
-        
+
         toast({
           title: "Login successful",
           description: "Welcome back to Languagelandia!",
@@ -58,15 +57,15 @@ const Auth = () => {
       });
     }
   };
-  
+
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     try {
       if (email && password && name) {
         await signup(email, password);
         navigate("/onboarding");
-        
+
         toast({
           title: "Account created",
           description: "Welcome to Languagelandia!",
@@ -86,7 +85,7 @@ const Auth = () => {
       });
     }
   };
-  
+
   const handleGoogleAuth = async () => {
     try {
       await loginWithGoogle();
@@ -99,7 +98,7 @@ const Auth = () => {
       });
     }
   };
-  
+
   return (
     <Card className="w-full animate-scale-in shadow-lg">
       <Tabs value={activeTab} onValueChange={setActiveTab}>
@@ -107,7 +106,7 @@ const Auth = () => {
           <TabsTrigger value="login">Login</TabsTrigger>
           <TabsTrigger value="signup">Sign Up</TabsTrigger>
         </TabsList>
-        
+
         <TabsContent value="login">
           <form onSubmit={handleLogin}>
             <CardHeader>
@@ -148,6 +147,7 @@ const Auth = () => {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
+                    autoComplete="current-password"
                   />
                   <Button 
                     type="button"
@@ -207,7 +207,7 @@ const Auth = () => {
             </CardFooter>
           </form>
         </TabsContent>
-        
+
         <TabsContent value="signup">
           <form onSubmit={handleSignup}>
             <CardHeader>
@@ -253,6 +253,7 @@ const Auth = () => {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
+                    autoComplete="current-password"
                   />
                   <Button 
                     type="button"
