@@ -31,16 +31,19 @@ const queryClient = new QueryClient();
 const App = () => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [isOnboardingComplete, setIsOnboardingComplete] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   
   // For demo purposes, manually set authentication status
   // In a real app, this would come from an auth provider/context
   useEffect(() => {
     const checkAuthStatus = () => {
+      setIsLoading(true);
       const token = localStorage.getItem("auth_token");
       setIsAuthenticated(!!token);
       
       const onboardingStatus = localStorage.getItem("onboarding_complete");
       setIsOnboardingComplete(!!onboardingStatus);
+      setIsLoading(false);
     };
     
     checkAuthStatus();
@@ -53,13 +56,26 @@ const App = () => {
   
   const handleLogout = () => {
     localStorage.removeItem("auth_token");
+    localStorage.removeItem("onboarding_complete");
     setIsAuthenticated(false);
+    setIsOnboardingComplete(false);
   };
   
   const completeOnboarding = () => {
     localStorage.setItem("onboarding_complete", "true");
     setIsOnboardingComplete(true);
   };
+
+  if (isLoading) {
+    return (
+      <div className="h-screen w-full flex items-center justify-center">
+        <div className="animate-pulse flex flex-col items-center gap-4">
+          <div className="h-12 w-12 rounded-full bg-primary/20"></div>
+          <div className="h-2 w-24 rounded-full bg-primary/20"></div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -77,14 +93,20 @@ const App = () => {
               
               {/* Auth routes */}
               <Route path="/auth" element={
-                <AuthLayout>
-                  <Auth onLogin={handleLogin} />
-                </AuthLayout>
+                isAuthenticated ? 
+                  <Navigate to={isOnboardingComplete ? "/dashboard" : "/onboarding"} replace /> :
+                  <AuthLayout>
+                    <Auth onLogin={handleLogin} />
+                  </AuthLayout>
               } />
               
               {/* Onboarding route - accessible only if authenticated but onboarding not complete */}
               <Route path="/onboarding" element={
-                <ProtectedRoute isAuthenticated={isAuthenticated}>
+                <ProtectedRoute 
+                  isAuthenticated={isAuthenticated} 
+                  isOnboardingComplete={true} // We don't check onboarding here since this IS the onboarding page
+                  requiresOnboarding={false} // Don't require onboarding to be complete for this route
+                >
                   {isOnboardingComplete ? 
                     <Navigate to="/dashboard" replace /> : 
                     <Onboarding onComplete={completeOnboarding} />
@@ -94,7 +116,10 @@ const App = () => {
               
               {/* Protected routes - accessible only if authenticated and onboarding complete */}
               <Route path="/dashboard" element={
-                <ProtectedRoute isAuthenticated={isAuthenticated && isOnboardingComplete}>
+                <ProtectedRoute 
+                  isAuthenticated={isAuthenticated} 
+                  isOnboardingComplete={isOnboardingComplete}
+                >
                   <DashboardLayout onLogout={handleLogout}>
                     <Dashboard />
                   </DashboardLayout>
@@ -102,7 +127,10 @@ const App = () => {
               } />
               
               <Route path="/community" element={
-                <ProtectedRoute isAuthenticated={isAuthenticated && isOnboardingComplete}>
+                <ProtectedRoute 
+                  isAuthenticated={isAuthenticated} 
+                  isOnboardingComplete={isOnboardingComplete}
+                >
                   <DashboardLayout onLogout={handleLogout}>
                     <Community />
                   </DashboardLayout>
@@ -110,7 +138,10 @@ const App = () => {
               } />
               
               <Route path="/profile/:id" element={
-                <ProtectedRoute isAuthenticated={isAuthenticated && isOnboardingComplete}>
+                <ProtectedRoute 
+                  isAuthenticated={isAuthenticated} 
+                  isOnboardingComplete={isOnboardingComplete}
+                >
                   <DashboardLayout onLogout={handleLogout}>
                     <Profile />
                   </DashboardLayout>
@@ -118,7 +149,10 @@ const App = () => {
               } />
               
               <Route path="/chat/:id" element={
-                <ProtectedRoute isAuthenticated={isAuthenticated && isOnboardingComplete}>
+                <ProtectedRoute 
+                  isAuthenticated={isAuthenticated} 
+                  isOnboardingComplete={isOnboardingComplete}
+                >
                   <DashboardLayout onLogout={handleLogout}>
                     <Chat />
                   </DashboardLayout>
@@ -126,7 +160,10 @@ const App = () => {
               } />
               
               <Route path="/settings" element={
-                <ProtectedRoute isAuthenticated={isAuthenticated && isOnboardingComplete}>
+                <ProtectedRoute 
+                  isAuthenticated={isAuthenticated} 
+                  isOnboardingComplete={isOnboardingComplete}
+                >
                   <DashboardLayout onLogout={handleLogout}>
                     <Settings onLogout={handleLogout} />
                   </DashboardLayout>

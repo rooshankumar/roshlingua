@@ -1,16 +1,27 @@
 
 User-agent: *
-Allow: /
 
+# Allow public pages
+Allow: /
+Allow: /privacy-policy
+Allow: /terms
+Allow: /contact
+
+# Disallow authenticated/private pages
 Disallow: /auth
 Disallow: /dashboard
 Disallow: /chat
 Disallow: /settings
+Disallow: /onboarding
+Disallow: /profile
+Disallow: /community
 
-# Allow legal and public pages
-Allow: /privacy-policy
-Allow: /terms
-Allow: /contact
+# Allow search engines to crawl static assets
+Allow: /*.js$
+Allow: /*.css$
+Allow: /*.png$
+Allow: /*.jpg$
+Allow: /*.svg$
 
 # Sitemaps
 Sitemap: https://languagelandia.com/sitemap.xml
