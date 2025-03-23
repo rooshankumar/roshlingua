@@ -1,3 +1,4 @@
+
 import { Navigate } from "react-router-dom";
 import { useAuth } from "@/providers/AuthProvider";
 
@@ -19,12 +20,10 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
     );
   }
 
-  // If user is not authenticated, redirect to auth page
   if (!user) {
     return <Navigate to="/auth" replace />;
   }
 
-  // If authentication requirements are satisfied, render children
   return <>{children}</>;
 };
 
