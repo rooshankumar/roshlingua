@@ -15,12 +15,9 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { Eye, EyeOff, Mail } from "lucide-react";
+import { useAuth } from "@/providers/AuthProvider";
 
-interface AuthProps {
-  onLogin: () => void;
-}
-
-const Auth = ({ onLogin }: AuthProps) => {
+const Auth = () => {
   const [searchParams] = useSearchParams();
   const defaultTab = searchParams.get("mode") === "signup" ? "signup" : "login";
   const [activeTab, setActiveTab] = useState(defaultTab);
@@ -32,58 +29,75 @@ const Auth = ({ onLogin }: AuthProps) => {
   
   const { toast } = useToast();
   const navigate = useNavigate();
+  const { login, signup, loginWithGoogle } = useAuth();
   
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // In a real app, this would be an API call to the backend
-    if (email && password) {
-      onLogin();
-      navigate("/onboarding");
-      
-      toast({
-        title: "Login successful",
-        description: "Welcome back to Languagelandia!",
-      });
-    } else {
+    try {
+      if (email && password) {
+        await login(email, password);
+        navigate("/onboarding");
+        
+        toast({
+          title: "Login successful",
+          description: "Welcome back to Languagelandia!",
+        });
+      } else {
+        toast({
+          variant: "destructive",
+          title: "Login failed",
+          description: "Please enter both email and password.",
+        });
+      }
+    } catch (error) {
       toast({
         variant: "destructive",
         title: "Login failed",
-        description: "Please enter both email and password.",
+        description: "Please check your credentials and try again.",
       });
     }
   };
   
-  const handleSignup = (e: React.FormEvent) => {
+  const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // In a real app, this would be an API call to the backend
-    if (email && password && name) {
-      onLogin();
-      navigate("/onboarding");
-      
-      toast({
-        title: "Account created",
-        description: "Welcome to Languagelandia!",
-      });
-    } else {
+    try {
+      if (email && password && name) {
+        await signup(email, password);
+        navigate("/onboarding");
+        
+        toast({
+          title: "Account created",
+          description: "Welcome to Languagelandia!",
+        });
+      } else {
+        toast({
+          variant: "destructive",
+          title: "Signup failed",
+          description: "Please fill in all fields.",
+        });
+      }
+    } catch (error) {
       toast({
         variant: "destructive",
         title: "Signup failed",
-        description: "Please fill in all fields.",
+        description: "There was an error creating your account.",
       });
     }
   };
   
-  const handleGoogleAuth = () => {
-    // In a real app, this would redirect to Google OAuth
-    onLogin();
-    navigate("/onboarding");
-    
-    toast({
-      title: "Google authentication successful",
-      description: "Welcome to Languagelandia!",
-    });
+  const handleGoogleAuth = async () => {
+    try {
+      await loginWithGoogle();
+      // The page will be redirected by Google OAuth, so no need to navigate here
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Authentication failed",
+        description: "There was an error with Google authentication.",
+      });
+    }
   };
   
   return (

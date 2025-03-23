@@ -4,8 +4,8 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { useState, useEffect } from "react";
 import { ThemeProvider } from "@/components/theme-provider";
+import { AuthProvider } from "@/providers/AuthProvider";
 
 // Pages
 import Home from "./pages/Home";
@@ -25,46 +25,23 @@ import NotFound from "./pages/NotFound";
 import AuthLayout from "./components/layouts/AuthLayout";
 import DashboardLayout from "./components/layouts/DashboardLayout";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
+import { useAuth } from "./providers/AuthProvider";
 
 const queryClient = new QueryClient();
 
-const App = () => {
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
-  const [isOnboardingComplete, setIsOnboardingComplete] = useState<boolean>(false);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+// Auth callback handler component
+const AuthCallback = () => {
+  const { isAuthenticated, isOnboardingComplete } = useAuth();
   
-  // For demo purposes, manually set authentication status
-  // In a real app, this would come from an auth provider/context
-  useEffect(() => {
-    const checkAuthStatus = () => {
-      setIsLoading(true);
-      const token = localStorage.getItem("auth_token");
-      setIsAuthenticated(!!token);
-      
-      const onboardingStatus = localStorage.getItem("onboarding_complete");
-      setIsOnboardingComplete(!!onboardingStatus);
-      setIsLoading(false);
-    };
-    
-    checkAuthStatus();
-  }, []);
+  if (isAuthenticated) {
+    return <Navigate to={isOnboardingComplete ? "/dashboard" : "/onboarding"} replace />;
+  }
   
-  const handleLogin = () => {
-    localStorage.setItem("auth_token", "demo_token");
-    setIsAuthenticated(true);
-  };
-  
-  const handleLogout = () => {
-    localStorage.removeItem("auth_token");
-    localStorage.removeItem("onboarding_complete");
-    setIsAuthenticated(false);
-    setIsOnboardingComplete(false);
-  };
-  
-  const completeOnboarding = () => {
-    localStorage.setItem("onboarding_complete", "true");
-    setIsOnboardingComplete(true);
-  };
+  return <Navigate to="/auth" replace />;
+};
+
+const AppRoutes = () => {
+  const { isAuthenticated, isOnboardingComplete, isLoading, logout, completeOnboarding } = useAuth();
 
   if (isLoading) {
     return (
@@ -78,103 +55,114 @@ const App = () => {
   }
 
   return (
+    <Routes>
+      {/* Public routes */}
+      <Route path="/" element={<Home />} />
+      <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+      <Route path="/terms" element={<Terms />} />
+      <Route path="/contact" element={<Contact />} />
+      
+      {/* Auth callback route for OAuth */}
+      <Route path="/auth/callback" element={<AuthCallback />} />
+      
+      {/* Auth routes */}
+      <Route path="/auth" element={
+        isAuthenticated ? 
+          <Navigate to={isOnboardingComplete ? "/dashboard" : "/onboarding"} replace /> :
+          <AuthLayout>
+            <Auth />
+          </AuthLayout>
+      } />
+      
+      {/* Onboarding route - accessible only if authenticated but onboarding not complete */}
+      <Route path="/onboarding" element={
+        <ProtectedRoute 
+          isAuthenticated={isAuthenticated} 
+          isOnboardingComplete={true} // We don't check onboarding here since this IS the onboarding page
+          requiresOnboarding={false} // Don't require onboarding to be complete for this route
+        >
+          {isOnboardingComplete ? 
+            <Navigate to="/dashboard" replace /> : 
+            <Onboarding onComplete={completeOnboarding} />
+          }
+        </ProtectedRoute>
+      } />
+      
+      {/* Protected routes - accessible only if authenticated and onboarding complete */}
+      <Route path="/dashboard" element={
+        <ProtectedRoute 
+          isAuthenticated={isAuthenticated} 
+          isOnboardingComplete={isOnboardingComplete}
+        >
+          <DashboardLayout onLogout={logout}>
+            <Dashboard />
+          </DashboardLayout>
+        </ProtectedRoute>
+      } />
+      
+      <Route path="/community" element={
+        <ProtectedRoute 
+          isAuthenticated={isAuthenticated} 
+          isOnboardingComplete={isOnboardingComplete}
+        >
+          <DashboardLayout onLogout={logout}>
+            <Community />
+          </DashboardLayout>
+        </ProtectedRoute>
+      } />
+      
+      <Route path="/profile/:id" element={
+        <ProtectedRoute 
+          isAuthenticated={isAuthenticated} 
+          isOnboardingComplete={isOnboardingComplete}
+        >
+          <DashboardLayout onLogout={logout}>
+            <Profile />
+          </DashboardLayout>
+        </ProtectedRoute>
+      } />
+      
+      <Route path="/chat/:id" element={
+        <ProtectedRoute 
+          isAuthenticated={isAuthenticated} 
+          isOnboardingComplete={isOnboardingComplete}
+        >
+          <DashboardLayout onLogout={logout}>
+            <Chat />
+          </DashboardLayout>
+        </ProtectedRoute>
+      } />
+      
+      <Route path="/settings" element={
+        <ProtectedRoute 
+          isAuthenticated={isAuthenticated} 
+          isOnboardingComplete={isOnboardingComplete}
+        >
+          <DashboardLayout onLogout={logout}>
+            <Settings onLogout={logout} />
+          </DashboardLayout>
+        </ProtectedRoute>
+      } />
+      
+      {/* Catch all for 404 */}
+      <Route path="*" element={<NotFound />} />
+    </Routes>
+  );
+};
+
+const App = () => {
+  return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider defaultTheme="light">
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
-            <Routes>
-              {/* Public routes */}
-              <Route path="/" element={<Home />} />
-              <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-              <Route path="/terms" element={<Terms />} />
-              <Route path="/contact" element={<Contact />} />
-              
-              {/* Auth routes */}
-              <Route path="/auth" element={
-                isAuthenticated ? 
-                  <Navigate to={isOnboardingComplete ? "/dashboard" : "/onboarding"} replace /> :
-                  <AuthLayout>
-                    <Auth onLogin={handleLogin} />
-                  </AuthLayout>
-              } />
-              
-              {/* Onboarding route - accessible only if authenticated but onboarding not complete */}
-              <Route path="/onboarding" element={
-                <ProtectedRoute 
-                  isAuthenticated={isAuthenticated} 
-                  isOnboardingComplete={true} // We don't check onboarding here since this IS the onboarding page
-                  requiresOnboarding={false} // Don't require onboarding to be complete for this route
-                >
-                  {isOnboardingComplete ? 
-                    <Navigate to="/dashboard" replace /> : 
-                    <Onboarding onComplete={completeOnboarding} />
-                  }
-                </ProtectedRoute>
-              } />
-              
-              {/* Protected routes - accessible only if authenticated and onboarding complete */}
-              <Route path="/dashboard" element={
-                <ProtectedRoute 
-                  isAuthenticated={isAuthenticated} 
-                  isOnboardingComplete={isOnboardingComplete}
-                >
-                  <DashboardLayout onLogout={handleLogout}>
-                    <Dashboard />
-                  </DashboardLayout>
-                </ProtectedRoute>
-              } />
-              
-              <Route path="/community" element={
-                <ProtectedRoute 
-                  isAuthenticated={isAuthenticated} 
-                  isOnboardingComplete={isOnboardingComplete}
-                >
-                  <DashboardLayout onLogout={handleLogout}>
-                    <Community />
-                  </DashboardLayout>
-                </ProtectedRoute>
-              } />
-              
-              <Route path="/profile/:id" element={
-                <ProtectedRoute 
-                  isAuthenticated={isAuthenticated} 
-                  isOnboardingComplete={isOnboardingComplete}
-                >
-                  <DashboardLayout onLogout={handleLogout}>
-                    <Profile />
-                  </DashboardLayout>
-                </ProtectedRoute>
-              } />
-              
-              <Route path="/chat/:id" element={
-                <ProtectedRoute 
-                  isAuthenticated={isAuthenticated} 
-                  isOnboardingComplete={isOnboardingComplete}
-                >
-                  <DashboardLayout onLogout={handleLogout}>
-                    <Chat />
-                  </DashboardLayout>
-                </ProtectedRoute>
-              } />
-              
-              <Route path="/settings" element={
-                <ProtectedRoute 
-                  isAuthenticated={isAuthenticated} 
-                  isOnboardingComplete={isOnboardingComplete}
-                >
-                  <DashboardLayout onLogout={handleLogout}>
-                    <Settings onLogout={handleLogout} />
-                  </DashboardLayout>
-                </ProtectedRoute>
-              } />
-              
-              {/* Catch all for 404 */}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </BrowserRouter>
-        </TooltipProvider>
+        <AuthProvider>
+          <TooltipProvider>
+            <Toaster />
+            <Sonner />
+            <BrowserRouter>
+              <AppRoutes />
+            </BrowserRouter>
+          </TooltipProvider>
+        </AuthProvider>
       </ThemeProvider>
     </QueryClientProvider>
   );
