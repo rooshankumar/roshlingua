@@ -15,12 +15,15 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/components/ui/use-toast";
 import { Eye, EyeOff, Mail } from "lucide-react";
 import { useAuth } from "@/providers/AuthProvider";
+import { supabase } from "@/utils/supabaseClient"; // Assuming supabase client is initialized here
+
 
 const Auth = () => {
   const [searchParams] = useSearchParams();
   const defaultTab = searchParams.get("mode") === "signup" ? "signup" : "login";
   const [activeTab, setActiveTab] = useState(defaultTab);
   const [showPassword, setShowPassword] = useState(false);
+  const [confirmPassword, setConfirmPassword] = useState(""); // Added confirm password state
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -28,7 +31,7 @@ const Auth = () => {
 
   const { toast } = useToast();
   const navigate = useNavigate();
-  const { login, signup, loginWithGoogle } = useAuth();
+  const { login, loginWithGoogle } = useAuth(); // Removed signup from useAuth
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -62,10 +65,25 @@ const Auth = () => {
     e.preventDefault();
 
     try {
-      if (email && password && name) {
-        await signup(email, password);
-        navigate("/onboarding");
+      if (password !== confirmPassword) {
+        toast({
+          variant: "destructive",
+          title: "Passwords do not match",
+          description: "Please make sure your passwords match.",
+        });
+        return;
+      }
 
+      const { error } = await supabase.auth.signUp({
+        email,
+        password,
+      });
+
+      if (error) throw error;
+
+      if (email && password && name) {
+        //Further actions after successful signup with Supabase might be needed here.  For instance, profile creation.
+        navigate("/onboarding");
         toast({
           title: "Account created",
           description: "Welcome to Languagelandia!",
@@ -272,6 +290,17 @@ const Auth = () => {
                 <p className="text-xs text-muted-foreground">
                   Must be at least 8 characters long.
                 </p>
+              </div>
+              <div className="space-y-2"> {/* Added input for confirm password */}
+                <Label htmlFor="confirm-password">Confirm Password</Label>
+                <Input
+                  id="confirm-password"
+                  type={showPassword ? "text" : "password"}
+                  placeholder="••••••••"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  required
+                />
               </div>
             </CardContent>
             <CardFooter className="flex flex-col space-y-4">
