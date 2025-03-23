@@ -11,6 +11,7 @@ import AuthCallback from "./pages/AuthCallback";
 import Dashboard from "./pages/Dashboard";
 import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
+import Onboarding from "./pages/Onboarding";
 
 // Components
 import ProtectedRoute from "./components/auth/ProtectedRoute";
@@ -43,6 +44,12 @@ const AppRoutes = () => {
       <Route path="/auth/callback" element={<AuthCallback />} />
 
       {/* Protected routes */}
+      <Route path="/onboarding" element={
+        <ProtectedRoute>
+          <Onboarding onComplete={() => {}} />
+        </ProtectedRoute>
+      } />
+      
       <Route path="/dashboard" element={
         <ProtectedRoute>
           <Dashboard />
