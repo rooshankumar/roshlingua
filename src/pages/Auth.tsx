@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useNavigate, useSearchParams, useLocation } from "react-router-dom";
 import { 
   Card, 
   CardContent, 
@@ -15,15 +15,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/components/ui/use-toast";
 import { Eye, EyeOff, Mail } from "lucide-react";
 import { useAuth } from "@/providers/AuthProvider";
-import { supabase } from "@/integrations/supabase/client"; // Assuming supabase client is initialized here
-
 
 const Auth = () => {
   const [searchParams] = useSearchParams();
   const defaultTab = searchParams.get("mode") === "signup" ? "signup" : "login";
   const [activeTab, setActiveTab] = useState(defaultTab);
   const [showPassword, setShowPassword] = useState(false);
-  const [confirmPassword, setConfirmPassword] = useState(""); // Added confirm password state
+  const [confirmPassword, setConfirmPassword] = useState("");
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -31,7 +29,16 @@ const Auth = () => {
 
   const { toast } = useToast();
   const navigate = useNavigate();
-  const { login, loginWithGoogle } = useAuth(); // Removed signup from useAuth
+  const location = useLocation();
+  const { login, signup, loginWithGoogle, user } = useAuth();
+
+  const from = (location.state as any)?.from || "/dashboard";
+
+  useEffect(() => {
+    if (user) {
+      navigate(from, { replace: true });
+    }
+  }, [user, navigate, from]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -39,12 +46,6 @@ const Auth = () => {
     try {
       if (email && password) {
         await login(email, password);
-        navigate("/onboarding");
-
-        toast({
-          title: "Login successful",
-          description: "Welcome back to Languagelandia!",
-        });
       } else {
         toast({
           variant: "destructive",
@@ -53,11 +54,7 @@ const Auth = () => {
         });
       }
     } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "Login failed",
-        description: "Please check your credentials and try again.",
-      });
+      console.error("Login error in component:", error);
     }
   };
 
@@ -74,20 +71,8 @@ const Auth = () => {
         return;
       }
 
-      const { error } = await supabase.auth.signUp({
-        email,
-        password,
-      });
-
-      if (error) throw error;
-
       if (email && password && name) {
-        //Further actions after successful signup with Supabase might be needed here.  For instance, profile creation.
-        navigate("/onboarding");
-        toast({
-          title: "Account created",
-          description: "Welcome to Languagelandia!",
-        });
+        await signup(email, password, name);
       } else {
         toast({
           variant: "destructive",
@@ -96,25 +81,15 @@ const Auth = () => {
         });
       }
     } catch (error) {
-      console.error("Signup error:", error);
-      toast({
-        variant: "destructive",
-        title: "Signup failed",
-        description: error.message || "There was an error creating your account.",
-      });
+      console.error("Signup error in component:", error);
     }
   };
 
   const handleGoogleAuth = async () => {
     try {
       await loginWithGoogle();
-      // The page will be redirected by Google OAuth, so no need to navigate here
     } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "Authentication failed",
-        description: "There was an error with Google authentication.",
-      });
+      console.error("Google auth error in component:", error);
     }
   };
 
@@ -291,7 +266,7 @@ const Auth = () => {
                   Must be at least 8 characters long.
                 </p>
               </div>
-              <div className="space-y-2"> {/* Added input for confirm password */}
+              <div className="space-y-2">
                 <Label htmlFor="confirm-password">Confirm Password</Label>
                 <Input
                   id="confirm-password"

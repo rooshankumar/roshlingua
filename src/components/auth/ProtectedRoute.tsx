@@ -1,5 +1,5 @@
 
-import { Navigate } from "react-router-dom";
+import { Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/providers/AuthProvider";
 
 interface ProtectedRouteProps {
@@ -8,6 +8,7 @@ interface ProtectedRouteProps {
 
 const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
   const { user, isLoading } = useAuth();
+  const location = useLocation();
 
   if (isLoading) {
     return (
@@ -21,7 +22,8 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
   }
 
   if (!user) {
-    return <Navigate to="/auth" replace />;
+    // Redirect to login page with the return url
+    return <Navigate to="/auth" state={{ from: location.pathname }} replace />;
   }
 
   return <>{children}</>;

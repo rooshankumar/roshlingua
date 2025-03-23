@@ -1,3 +1,4 @@
+
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "@/providers/AuthProvider";
 import { Toaster } from "@/components/ui/toaster";
@@ -12,6 +13,8 @@ import Dashboard from "./pages/Dashboard";
 import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
 import Onboarding from "./pages/Onboarding";
+import Community from "./pages/Community";
+import Chat from "./pages/Chat";
 
 // Components
 import ProtectedRoute from "./components/auth/ProtectedRoute";
@@ -46,7 +49,7 @@ const AppRoutes = () => {
       {/* Protected routes */}
       <Route path="/onboarding" element={
         <ProtectedRoute>
-          <Onboarding onComplete={() => {}} />
+          <Onboarding />
         </ProtectedRoute>
       } />
       
@@ -62,6 +65,18 @@ const AppRoutes = () => {
         </ProtectedRoute>
       } />
 
+      <Route path="/community" element={
+        <ProtectedRoute>
+          <Community />
+        </ProtectedRoute>
+      } />
+
+      <Route path="/chat/:id" element={
+        <ProtectedRoute>
+          <Chat />
+        </ProtectedRoute>
+      } />
+
       {/* Catch all for 404 */}
       <Route path="*" element={<NotFound />} />
     </Routes>
@@ -72,12 +87,12 @@ const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider defaultTheme="light">
-        <AuthProvider>
-          <Toaster />
-          <BrowserRouter>
+        <BrowserRouter>
+          <AuthProvider>
+            <Toaster />
             <AppRoutes />
-          </BrowserRouter>
-        </AuthProvider>
+          </AuthProvider>
+        </BrowserRouter>
       </ThemeProvider>
     </QueryClientProvider>
   );
