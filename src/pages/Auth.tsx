@@ -78,10 +78,11 @@ const Auth = () => {
         });
       }
     } catch (error) {
+      console.error("Signup error:", error);
       toast({
         variant: "destructive",
         title: "Signup failed",
-        description: "There was an error creating your account.",
+        description: error.message || "There was an error creating your account.",
       });
     }
   };
