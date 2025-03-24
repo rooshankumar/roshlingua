@@ -21,16 +21,16 @@ const Chat = () => {
     const fetchChats = async () => {
       try {
         const { data, error } = await supabase
-          .from('chats')
+          .from('messages')
           .select(`
             id,
-            sender_id,
-            receiver_id,
-            message,
+            content,
             created_at,
+            sender_id,
+            conversation_id,
             profiles!sender_id(username, avatar_url)
           `)
-          .or(`sender_id.eq.${user?.id},receiver_id.eq.${user?.id}`)
+          .eq('conversation_id', id)
           .order('created_at', { ascending: true });
 
         if (error) throw error;
@@ -126,7 +126,7 @@ const Chat = () => {
               <Avatar className="h-8 w-8">
                 <AvatarImage src={chat.profiles?.avatar_url || "/placeholder.svg"} />
                 <AvatarFallback>
-                  {chat.profiles?.username?.[0]?.toUpperCase()}
+                  {chat.profiles?.username?.[0]?.toUpperCase() || '?'}
                 </AvatarFallback>
               </Avatar>
               <div className={`rounded-lg p-3 ${
@@ -134,7 +134,7 @@ const Chat = () => {
                   ? 'bg-primary text-primary-foreground' 
                   : 'bg-muted'
               }`}>
-                <p className="text-sm">{chat.message}</p>
+                <p className="text-sm">{chat.content}</p> {/* Changed message to content */}
                 <span className="text-xs opacity-70">
                   {new Date(chat.created_at).toLocaleTimeString()}
                 </span>
