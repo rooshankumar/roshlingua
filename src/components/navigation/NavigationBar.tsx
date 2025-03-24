@@ -1,5 +1,4 @@
-
-import { Home, MessageSquare, Users, Settings } from "lucide-react";
+import { Home, MessageSquare, Users, Settings, User } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 
@@ -7,12 +6,13 @@ const navigation = [
   { name: "Dashboard", href: "/dashboard", icon: Home },
   { name: "Chat", href: "/chat", icon: MessageSquare },
   { name: "Community", href: "/community", icon: Users },
+  { name: "Profile", href: "/profile", icon: User }, // Added Profile link
   { name: "Settings", href: "/settings", icon: Settings }
 ];
 
 export const NavigationBar = () => {
   const location = useLocation();
-  
+
   const isActive = (path: string) => {
     if (path === "/dashboard" && location.pathname === "/dashboard") {
       return true;
