@@ -1,6 +1,5 @@
-
 import { useState, useEffect } from "react";
-import { useParams, Link } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { 
   Calendar, 
   Flame, 
@@ -25,28 +24,20 @@ import {
 } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/components/ui/use-toast";
+import { useAuth } from "@/providers/AuthProvider";
+import { supabase } from "@/integrations/supabase/client";
 
 interface UserProfile {
-  id: number;
-  name: string;
-  age: number;
-  location: string;
+  id: string;
+  username: string;
   bio: string;
-  nativeLanguage: string;
-  learningLanguage: string;
-  proficiencyLevel: string;
-  streak: number;
-  joinDate: string;
-  interests: string[];
-  avatar: string;
-  likes: number;
-  liked: boolean;
-  learning: {
-    vocabulary: number;
-    grammar: number;
-    speaking: number;
-    listening: number;
-  };
+  avatar_url: string;
+  native_language: string;
+  learning_language: string;
+  proficiency_level: string;
+  streak_count: number;
+  likes_count: number;
+  created_at: string;
   achievements: {
     title: string;
     description: string;
@@ -56,87 +47,97 @@ interface UserProfile {
 }
 
 const Profile = () => {
-  const { id } = useParams<{ id: string }>();
+  const { user } = useAuth();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
-  
+
   useEffect(() => {
-    // Simulate fetching user profile data
-    setTimeout(() => {
-      const mockProfile: UserProfile = {
-        id: parseInt(id || "1"),
-        name: "Sarah Johnson",
-        age: 28,
-        location: "San Francisco, CA",
-        bio: "Software engineer passionate about learning Spanish for my upcoming trip to Mexico. I've been studying for about 6 months now and I'm looking for conversation partners to practice with. I can help with English in return!",
-        nativeLanguage: "English",
-        learningLanguage: "Spanish",
-        proficiencyLevel: "Intermediate (B1)",
-        streak: 15,
-        joinDate: "2023-08-15",
-        interests: ["Travel", "Technology", "Cinema", "Cooking", "Hiking"],
-        avatar: "/placeholder.svg",
-        likes: 42,
-        liked: false,
-        learning: {
-          vocabulary: 75,
-          grammar: 60,
-          speaking: 45,
-          listening: 70
-        },
-        achievements: [
-          {
-            title: "Week One Warrior",
-            description: "Completed 7 consecutive days of language learning",
-            date: "2023-08-22",
-            icon: "🔥"
-          },
-          {
-            title: "Conversation Starter",
-            description: "Initiated first language exchange conversation",
-            date: "2023-08-25",
-            icon: "💬"
-          },
-          {
-            title: "Grammar Guru",
-            description: "Mastered basic verb conjugations",
-            date: "2023-09-10",
-            icon: "📚"
-          }
-        ]
-      };
-      
-      setProfile(mockProfile);
-      setLoading(false);
-    }, 1000);
-  }, [id]);
-  
-  const handleLike = () => {
-    if (!profile) return;
-    
-    const newLiked = !profile.liked;
-    setProfile({
-      ...profile,
-      liked: newLiked,
-      likes: newLiked ? profile.likes + 1 : profile.likes - 1
-    });
-    
-    toast({
-      title: newLiked ? "Profile liked" : "Like removed",
-      description: newLiked 
-        ? `You've liked ${profile.name}'s profile` 
-        : `You've removed your like from ${profile.name}'s profile`,
-    });
+    const fetchProfile = async () => {
+      if (!user) return;
+
+      try {
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', user.id)
+          .single();
+
+        if (error) throw error;
+
+        // For now, we'll hardcode achievements since they're not in DB yet
+        const profileData = {
+          ...data,
+          achievements: [
+            {
+              title: "Week One Warrior",
+              description: "Completed 7 consecutive days of language learning",
+              date: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
+              icon: "🔥"
+            },
+            {
+              title: "Conversation Starter",
+              description: "Initiated first language exchange conversation",
+              date: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString(),
+              icon: "💬"
+            }
+          ]
+        };
+
+        setProfile(profileData);
+      } catch (error) {
+        console.error('Error fetching profile:', error);
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Failed to load profile data",
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProfile();
+  }, [user]);
+
+  const handleLike = async () => {
+    if (!profile || !user) return;
+
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({ 
+          likes_count: profile.likes_count + 1 
+        })
+        .eq('id', profile.id);
+
+      if (error) throw error;
+
+      setProfile({
+        ...profile,
+        likes_count: profile.likes_count + 1
+      });
+
+      toast({
+        title: "Profile liked",
+        description: "Thanks for the support!",
+      });
+    } catch (error) {
+      console.error('Error updating likes:', error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to update likes",
+      });
+    }
   };
-  
+
   const calculateJoinedTime = (dateString: string) => {
     const joinDate = new Date(dateString);
     const now = new Date();
-    
     const diffTime = Math.abs(now.getTime() - joinDate.getTime());
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    
+
     if (diffDays < 30) {
       return `${diffDays} days ago`;
     } else {
@@ -144,17 +145,15 @@ const Profile = () => {
       return diffMonths === 1 ? "1 month ago" : `${diffMonths} months ago`;
     }
   };
-  
+
   const handleShare = () => {
-    // In a real app, this would share the profile
     navigator.clipboard.writeText(window.location.href);
-    
     toast({
-      title: "Link copied to clipboard",
-      description: "You can now share this profile with others",
+      title: "Link copied",
+      description: "Profile link copied to clipboard",
     });
   };
-  
+
   if (loading) {
     return (
       <div className="container flex items-center justify-center min-h-[50vh]">
@@ -165,13 +164,13 @@ const Profile = () => {
       </div>
     );
   }
-  
+
   if (!profile) {
     return (
       <div className="container py-12 text-center">
-        <h2 className="text-2xl font-bold mb-2">User not found</h2>
+        <h2 className="text-2xl font-bold mb-2">Profile not found</h2>
         <p className="text-muted-foreground mb-6">
-          The profile you're looking for doesn't exist or has been removed.
+          We couldn't find your profile information.
         </p>
         <Button asChild>
           <Link to="/community">Back to Community</Link>
@@ -179,7 +178,7 @@ const Profile = () => {
       </div>
     );
   }
-  
+
   return (
     <div className="container pb-12 animate-fade-in">
       {/* Profile Header */}
@@ -189,71 +188,55 @@ const Profile = () => {
             <DialogTrigger asChild>
               <Button variant="ghost" className="p-0 h-auto hover:bg-transparent">
                 <Avatar className="h-24 w-24 cursor-pointer hover:ring-2 hover:ring-primary/50 transition-all">
-                  <AvatarImage src={profile.avatar} alt={profile.name} />
-                  <AvatarFallback className="text-2xl">{profile.name.charAt(0)}</AvatarFallback>
+                  <AvatarImage src={profile.avatar_url || "/placeholder.svg"} alt={profile.username} />
+                  <AvatarFallback className="text-2xl">{profile.username?.[0]?.toUpperCase()}</AvatarFallback>
                 </Avatar>
               </Button>
             </DialogTrigger>
             <DialogContent className="max-w-md">
               <DialogHeader>
-                <DialogTitle>{profile.name}</DialogTitle>
+                <DialogTitle>{profile.username}</DialogTitle>
                 <DialogDescription>Profile picture</DialogDescription>
               </DialogHeader>
               <div className="flex justify-center p-4">
                 <img 
-                  src={profile.avatar} 
-                  alt={profile.name} 
+                  src={profile.avatar_url || "/placeholder.svg"}
+                  alt={profile.username} 
                   className="max-w-full max-h-[60vh] object-contain rounded-md"
                 />
               </div>
             </DialogContent>
           </Dialog>
-          
+
           <div>
-            <h1 className="text-3xl font-bold">{profile.name}</h1>
-            <div className="flex items-center space-x-2 mt-1">
-              <User className="h-4 w-4 text-muted-foreground" />
-              <span className="text-muted-foreground">{profile.age} years old</span>
-              
-              <span className="text-muted-foreground">•</span>
-              
-              <MapPin className="h-4 w-4 text-muted-foreground" />
-              <span className="text-muted-foreground">{profile.location}</span>
-            </div>
+            <h1 className="text-3xl font-bold">{profile.username}</h1>
             <div className="flex items-center space-x-2 mt-1">
               <Calendar className="h-4 w-4 text-muted-foreground" />
               <span className="text-muted-foreground">
-                Joined {calculateJoinedTime(profile.joinDate)}
+                Joined {calculateJoinedTime(profile.created_at)}
               </span>
             </div>
           </div>
         </div>
-        
+
         <div className="flex space-x-2">
           <Button 
-            variant={profile.liked ? "default" : "outline"} 
+            variant="outline"
             size="sm" 
-            className={`button-hover ${profile.liked ? "bg-red-500 hover:bg-red-600 text-white" : ""}`}
+            className="button-hover"
             onClick={handleLike}
           >
-            <Heart className={`h-4 w-4 mr-2 ${profile.liked ? "fill-white" : ""}`} />
-            {profile.likes}
+            <Heart className="h-4 w-4 mr-2" />
+            {profile.likes_count}
           </Button>
-          
+
           <Button variant="outline" size="sm" className="button-hover" onClick={handleShare}>
             <Share2 className="h-4 w-4 mr-2" />
             Share
           </Button>
-          
-          <Button asChild size="sm" className="button-hover">
-            <Link to={`/chat/${profile.id}`}>
-              <MessageCircle className="h-4 w-4 mr-2" />
-              Message
-            </Link>
-          </Button>
         </div>
       </div>
-      
+
       {/* Language Info */}
       <Card className="mb-8 glass-card">
         <CardContent className="p-6">
@@ -264,132 +247,48 @@ const Profile = () => {
                 <div className="flex items-center space-x-2">
                   <Languages className="h-4 w-4 text-muted-foreground" />
                   <span className="text-muted-foreground">Native language:</span>
-                  <Badge variant="secondary">{profile.nativeLanguage}</Badge>
+                  <Badge variant="secondary">{profile.native_language}</Badge>
                 </div>
                 <div className="flex items-center space-x-2">
                   <Languages className="h-4 w-4 text-primary" />
                   <span className="text-muted-foreground">Learning:</span>
-                  <Badge>{profile.learningLanguage}</Badge>
-                  <span className="text-xs text-muted-foreground">({profile.proficiencyLevel})</span>
+                  <Badge>{profile.learning_language}</Badge>
+                  <span className="text-xs text-muted-foreground">({profile.proficiency_level})</span>
                 </div>
               </div>
             </div>
-            
+
             <div className="flex items-center space-x-4">
               <div className="flex flex-col items-center">
                 <div className="flex items-center space-x-1">
                   <Flame className="h-5 w-5 text-primary" />
-                  <span className="text-2xl font-bold">{profile.streak}</span>
+                  <span className="text-2xl font-bold">{profile.streak_count}</span>
                 </div>
                 <span className="text-xs text-muted-foreground">day streak</span>
-              </div>
-              
-              <div className="h-12 w-px bg-border"></div>
-              
-              <div>
-                <h4 className="text-sm font-medium mb-1">Study Progress</h4>
-                <div className="grid grid-cols-4 gap-2">
-                  <div className="flex flex-col items-center">
-                    <div className="relative w-10 h-10">
-                      <svg className="w-10 h-10" viewBox="0 0 36 36">
-                        <circle cx="18" cy="18" r="16" fill="none" className="stroke-muted stroke-2" />
-                        <circle 
-                          cx="18" cy="18" r="16" fill="none" 
-                          className="stroke-primary stroke-2" 
-                          strokeDasharray="100" 
-                          strokeDashoffset={100 - profile.learning.vocabulary} 
-                          transform="rotate(-90 18 18)" 
-                        />
-                      </svg>
-                      <div className="absolute inset-0 flex items-center justify-center text-xs font-medium">
-                        {profile.learning.vocabulary}%
-                      </div>
-                    </div>
-                    <span className="text-xs text-muted-foreground mt-1">Vocab</span>
-                  </div>
-                  
-                  <div className="flex flex-col items-center">
-                    <div className="relative w-10 h-10">
-                      <svg className="w-10 h-10" viewBox="0 0 36 36">
-                        <circle cx="18" cy="18" r="16" fill="none" className="stroke-muted stroke-2" />
-                        <circle 
-                          cx="18" cy="18" r="16" fill="none" 
-                          className="stroke-primary stroke-2" 
-                          strokeDasharray="100" 
-                          strokeDashoffset={100 - profile.learning.grammar} 
-                          transform="rotate(-90 18 18)" 
-                        />
-                      </svg>
-                      <div className="absolute inset-0 flex items-center justify-center text-xs font-medium">
-                        {profile.learning.grammar}%
-                      </div>
-                    </div>
-                    <span className="text-xs text-muted-foreground mt-1">Grammar</span>
-                  </div>
-                  
-                  <div className="flex flex-col items-center">
-                    <div className="relative w-10 h-10">
-                      <svg className="w-10 h-10" viewBox="0 0 36 36">
-                        <circle cx="18" cy="18" r="16" fill="none" className="stroke-muted stroke-2" />
-                        <circle 
-                          cx="18" cy="18" r="16" fill="none" 
-                          className="stroke-primary stroke-2" 
-                          strokeDasharray="100" 
-                          strokeDashoffset={100 - profile.learning.speaking} 
-                          transform="rotate(-90 18 18)" 
-                        />
-                      </svg>
-                      <div className="absolute inset-0 flex items-center justify-center text-xs font-medium">
-                        {profile.learning.speaking}%
-                      </div>
-                    </div>
-                    <span className="text-xs text-muted-foreground mt-1">Speaking</span>
-                  </div>
-                  
-                  <div className="flex flex-col items-center">
-                    <div className="relative w-10 h-10">
-                      <svg className="w-10 h-10" viewBox="0 0 36 36">
-                        <circle cx="18" cy="18" r="16" fill="none" className="stroke-muted stroke-2" />
-                        <circle 
-                          cx="18" cy="18" r="16" fill="none" 
-                          className="stroke-primary stroke-2" 
-                          strokeDasharray="100" 
-                          strokeDashoffset={100 - profile.learning.listening} 
-                          transform="rotate(-90 18 18)" 
-                        />
-                      </svg>
-                      <div className="absolute inset-0 flex items-center justify-center text-xs font-medium">
-                        {profile.learning.listening}%
-                      </div>
-                    </div>
-                    <span className="text-xs text-muted-foreground mt-1">Listening</span>
-                  </div>
-                </div>
               </div>
             </div>
           </div>
         </CardContent>
       </Card>
-      
+
       {/* Profile Tabs */}
       <Tabs defaultValue="about" className="mb-8">
-        <TabsList className="grid grid-cols-3 mb-6">
+        <TabsList className="grid grid-cols-2 mb-6">
           <TabsTrigger value="about">About</TabsTrigger>
           <TabsTrigger value="achievements">Achievements</TabsTrigger>
-          <TabsTrigger value="interests">Interests</TabsTrigger>
         </TabsList>
-        
+
         <TabsContent value="about" className="mt-0">
           <Card>
             <CardHeader>
-              <CardTitle>About {profile.name}</CardTitle>
+              <CardTitle>About {profile.username}</CardTitle>
             </CardHeader>
             <CardContent>
               <p className="text-muted-foreground">{profile.bio}</p>
             </CardContent>
           </Card>
         </TabsContent>
-        
+
         <TabsContent value="achievements" className="mt-0">
           <Card>
             <CardHeader>
@@ -415,39 +314,7 @@ const Profile = () => {
             </CardContent>
           </Card>
         </TabsContent>
-        
-        <TabsContent value="interests" className="mt-0">
-          <Card>
-            <CardHeader>
-              <CardTitle>Interests</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex flex-wrap gap-2">
-                {profile.interests.map((interest, index) => (
-                  <Badge key={index} variant="secondary" className="py-1.5">
-                    {interest}
-                  </Badge>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
       </Tabs>
-      
-      {/* Action buttons */}
-      <div className="flex justify-center space-x-4">
-        <Button asChild variant="outline" className="button-hover">
-          <Link to="/community">
-            Back to Community
-          </Link>
-        </Button>
-        <Button asChild className="button-hover">
-          <Link to={`/chat/${profile.id}`}>
-            <MessageCircle className="h-4 w-4 mr-2" />
-            Start Conversation
-          </Link>
-        </Button>
-      </div>
     </div>
   );
 };
