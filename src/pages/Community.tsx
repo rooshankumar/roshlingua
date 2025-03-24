@@ -276,7 +276,7 @@ const Community = () => {
                   <SelectValue placeholder="Filter by language" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Languages</SelectItem>
+                  <SelectItem value="all">All Languages</SelectItem>
                   {languages.map(lang => (
                     <SelectItem key={lang} value={lang}>{lang}</SelectItem>
                   ))}
