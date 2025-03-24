@@ -18,7 +18,7 @@ const Home = () => {
       <header className="w-full py-4 px-6 border-b border-border sticky top-0 bg-background/80 backdrop-blur-sm z-50">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           <Link to="/" className="text-2xl font-bold text-gradient">
-            Languagelandia
+            rosLingua
           </Link>
           
           <div className="flex items-center space-x-4">
