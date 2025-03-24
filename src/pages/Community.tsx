@@ -297,42 +297,42 @@ const Community = () => {
       </Card>
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {filteredUsers.map((user) => (
-              <div key={user.id} className="flex flex-col p-4 rounded-lg border">
-                <div className="flex items-center space-x-3 mb-3">
-                  <Avatar>
-                    <AvatarImage src={user.avatar} />
-                    <AvatarFallback>{user.name[0]}</AvatarFallback>
-                  </Avatar>
-                  <div>
-                    <h3 className="font-medium">{user.name}</h3>
-                    <p className="text-sm text-muted-foreground">{user.bio}</p>
-                  </div>
-                </div>
-                <div className="flex justify-between items-center mt-auto">
-                  <Button 
-                    variant="outline" 
-                    size="sm"
-                    onClick={() => handleLike(user.id)}
-                  >
-                    <Heart className={cn(
-                      "h-4 w-4 mr-2",
-                      user.liked && "fill-current text-red-500"
-                    )} />
-                    {user.likes}
-                  </Button>
-                  <Button 
-                    size="sm"
-                    asChild
-                  >
-                    <Link to={`/chat/${user.id}`}>
-                      <MessageCircle className="h-4 w-4 mr-2" />
-                      Chat
-                    </Link>
-                  </Button>
-                </div>
+        {filteredUsers.length > 0 && filteredUsers.map((user) => (
+          <div key={user.id} className="flex flex-col p-4 rounded-lg border">
+            <div className="flex items-center space-x-3 mb-3">
+              <Avatar>
+                <AvatarImage src={user.avatar} />
+                <AvatarFallback>{user.name?.[0]}</AvatarFallback>
+              </Avatar>
+              <div>
+                <h3 className="font-medium">{user.name}</h3>
+                <p className="text-sm text-muted-foreground">{user.bio}</p>
               </div>
-            ))}
+            </div>
+            <div className="flex justify-between items-center mt-auto">
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => handleLike(user.id)}
+              >
+                <Heart className={cn(
+                  "h-4 w-4 mr-2",
+                  user.liked && "fill-current text-red-500"
+                )} />
+                {user.likes}
+              </Button>
+              <Button 
+                size="sm"
+                asChild
+              >
+                <Link to={`/chat/${user.id}`}>
+                  <MessageCircle className="h-4 w-4 mr-2" />
+                  Chat
+                </Link>
+              </Button>
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );
