@@ -1,7 +1,7 @@
 
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
-import { RealtimeChannel, RealtimeSubscription } from '@supabase/supabase-js';
+import { RealtimeChannel } from '@supabase/supabase-js';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
 import { Loader2 } from 'lucide-react';

@@ -33,13 +33,6 @@ export type Database = {
             referencedRelation: "conversations"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "conversation_participants_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
         ]
       }
       conversations: {
@@ -87,13 +80,6 @@ export type Database = {
             referencedRelation: "messages"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "message_reactions_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
         ]
       }
       messages: {
@@ -129,13 +115,6 @@ export type Database = {
             referencedRelation: "conversations"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "messages_sender_id_fkey"
-            columns: ["sender_id"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
         ]
       }
       onboarding_status: {
@@ -157,21 +136,12 @@ export type Database = {
           updated_at?: string | null
           user_id?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "onboarding_status_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: true
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       profiles: {
         Row: {
           bio: string | null
           created_at: string | null
-          email: string | null
           id: string
           is_online: boolean | null
           likes_count: number | null
@@ -181,7 +151,6 @@ export type Database = {
         Insert: {
           bio?: string | null
           created_at?: string | null
-          email?: string | null
           id: string
           is_online?: boolean | null
           likes_count?: number | null
@@ -191,22 +160,13 @@ export type Database = {
         Update: {
           bio?: string | null
           created_at?: string | null
-          email?: string | null
           id?: string
           is_online?: boolean | null
           likes_count?: number | null
           updated_at?: string | null
           username?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "profiles_id_fkey"
-            columns: ["id"]
-            isOneToOne: true
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       user_likes: {
         Row: {
@@ -224,22 +184,7 @@ export type Database = {
           liked_id?: string
           liker_id?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "user_likes_liked_id_fkey"
-            columns: ["liked_id"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "user_likes_liker_id_fkey"
-            columns: ["liker_id"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       users: {
         Row: {
@@ -266,12 +211,12 @@ export type Database = {
           email: string
           full_name: string
           gender?: string | null
-          id?: string
+          id: string
           last_login?: string | null
           learning_goal?: string | null
-          learning_language: string
-          native_language: string
-          proficiency_level: string
+          learning_language?: string
+          native_language?: string
+          proficiency_level?: string
           streak_count?: number | null
           streak_last_date?: string | null
           updated_at?: string | null
