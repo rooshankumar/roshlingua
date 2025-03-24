@@ -50,7 +50,7 @@ export const getCurrentUser = async () => {
   return session?.user || null;
 };
 
-// New function to create user record manually in the users table
+// Function to create user record manually in the users table
 export const createUserRecord = async (userId: string, email: string, fullName: string) => {
   try {
     // Call the create_user_with_onboarding function to properly set up the user

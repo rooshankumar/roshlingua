@@ -171,6 +171,7 @@ export type Database = {
         Row: {
           bio: string | null
           created_at: string | null
+          email: string | null
           id: string
           is_online: boolean | null
           likes_count: number | null
@@ -180,6 +181,7 @@ export type Database = {
         Insert: {
           bio?: string | null
           created_at?: string | null
+          email?: string | null
           id: string
           is_online?: boolean | null
           likes_count?: number | null
@@ -189,6 +191,7 @@ export type Database = {
         Update: {
           bio?: string | null
           created_at?: string | null
+          email?: string | null
           id?: string
           is_online?: boolean | null
           likes_count?: number | null
@@ -297,19 +300,27 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      create_user_with_onboarding: {
-        Args: {
-          p_user_id: string
-          p_email: string
-          p_full_name: string
-          p_native_language?: string
-          p_learning_language?: string
-          p_proficiency_level?: string
-        }
-        Returns: {
-          is_new_user: boolean
-        }[]
-      }
+      create_user_with_onboarding:
+        | {
+            Args: {
+              new_user_id: string
+              new_email: string
+            }
+            Returns: undefined
+          }
+        | {
+            Args: {
+              p_user_id: string
+              p_email: string
+              p_full_name: string
+              p_native_language?: string
+              p_learning_language?: string
+              p_proficiency_level?: string
+            }
+            Returns: {
+              is_new_user: boolean
+            }[]
+          }
     }
     Enums: {
       [_ in never]: never

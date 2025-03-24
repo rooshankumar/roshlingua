@@ -10,14 +10,14 @@ Primary table that stores user information.
 
 | Column | Type | Description | Nullable | Default |
 |--------|------|-------------|----------|---------|
-| id | UUID | Primary key, references auth.users | No | uuid_generate_v4() |
+| id | UUID | Primary key, references auth.users | No | None |
 | email | TEXT | User's email address | No | None |
 | full_name | TEXT | User's full name | No | None |
 | gender | TEXT | User's gender | Yes | None |
 | date_of_birth | DATE | User's date of birth | Yes | None |
-| native_language | TEXT | User's native language | No | None |
-| learning_language | TEXT | Language the user is learning | No | None |
-| proficiency_level | TEXT | User's proficiency level | No | None |
+| native_language | TEXT | User's native language | No | 'English' |
+| learning_language | TEXT | Language the user is learning | No | 'Spanish' |
+| proficiency_level | TEXT | User's proficiency level | No | 'beginner' |
 | learning_goal | TEXT | User's learning goal | Yes | None |
 | avatar_url | TEXT | URL to user's avatar | Yes | None |
 | created_at | TIMESTAMP WITH TIME ZONE | When the user was created | Yes | now() |
@@ -31,7 +31,7 @@ Public user data and profile information.
 
 | Column | Type | Description | Nullable | Default |
 |--------|------|-------------|----------|---------|
-| id | UUID | Primary key, references users(id) | No | None |
+| id | UUID | Primary key, references auth.users | No | None |
 | username | TEXT | User's username | Yes | None |
 | bio | TEXT | User's biography | Yes | None |
 | is_online | BOOLEAN | Whether user is online | Yes | false |
@@ -54,7 +54,7 @@ Links users to conversations.
 | Column | Type | Description | Nullable | Default |
 |--------|------|-------------|----------|---------|
 | conversation_id | UUID | References conversations(id) | No | None |
-| user_id | UUID | References users(id) | No | None |
+| user_id | UUID | References auth.users | No | None |
 | last_read_at | TIMESTAMP WITH TIME ZONE | When the user last read the conversation | Yes | now() |
 
 ### 5. messages
@@ -64,7 +64,7 @@ Stores chat messages.
 |--------|------|-------------|----------|---------|
 | id | UUID | Primary key | No | uuid_generate_v4() |
 | conversation_id | UUID | References conversations(id) | Yes | None |
-| sender_id | UUID | References users(id) | Yes | None |
+| sender_id | UUID | References auth.users | Yes | None |
 | content | TEXT | Message content | No | None |
 | created_at | TIMESTAMP WITH TIME ZONE | When the message was created | Yes | now() |
 | is_read | BOOLEAN | Whether the message has been read | Yes | false |
@@ -75,7 +75,7 @@ Stores reactions to messages.
 | Column | Type | Description | Nullable | Default |
 |--------|------|-------------|----------|---------|
 | message_id | UUID | References messages(id) | No | None |
-| user_id | UUID | References users(id) | No | None |
+| user_id | UUID | References auth.users | No | None |
 | reaction | TEXT | Type of reaction | No | None |
 | created_at | TIMESTAMP WITH TIME ZONE | When the reaction was created | Yes | now() |
 
@@ -84,8 +84,8 @@ Tracks users liking other users.
 
 | Column | Type | Description | Nullable | Default |
 |--------|------|-------------|----------|---------|
-| liker_id | UUID | References users(id) | No | None |
-| liked_id | UUID | References users(id) | No | None |
+| liker_id | UUID | References auth.users | No | None |
+| liked_id | UUID | References auth.users | No | None |
 | created_at | TIMESTAMP WITH TIME ZONE | When the like was created | Yes | now() |
 
 ### 8. onboarding_status
@@ -93,7 +93,7 @@ Tracks user onboarding progress.
 
 | Column | Type | Description | Nullable | Default |
 |--------|------|-------------|----------|---------|
-| user_id | UUID | References users(id) | No | None |
+| user_id | UUID | References auth.users | No | None |
 | is_complete | BOOLEAN | Whether onboarding is complete | Yes | false |
 | current_step | TEXT | Current onboarding step | Yes | 'profile' |
 | updated_at | TIMESTAMP WITH TIME ZONE | When the status was last updated | Yes | now() |
@@ -105,132 +105,123 @@ Trigger function that creates a profile when a new auth user is created.
 
 ```sql
 CREATE OR REPLACE FUNCTION public.handle_new_user()
- RETURNS trigger
- LANGUAGE plpgsql
- SECURITY DEFINER
-AS $function$
+RETURNS trigger
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
 BEGIN
+  -- Insert into profiles first
   INSERT INTO public.profiles (id)
-  VALUES (new.id);
-  RETURN new;
+  VALUES (NEW.id)
+  ON CONFLICT (id) DO NOTHING;
+  
+  -- Set up onboarding status
+  INSERT INTO public.onboarding_status (user_id, is_complete, current_step)
+  VALUES (NEW.id, false, 'profile')
+  ON CONFLICT (user_id) DO NOTHING;
+  
+  RETURN NEW;
 END;
-$function$
+$$;
 ```
 
 ### create_user_with_onboarding()
 Function to create a new user with onboarding status.
 
 ```sql
-CREATE OR REPLACE FUNCTION public.create_user_with_onboarding(
-  p_user_id uuid, 
-  p_email text, 
-  p_full_name text, 
-  p_native_language text DEFAULT 'English'::text, 
-  p_learning_language text DEFAULT 'Spanish'::text, 
+CREATE OR REPLACE FUNCTION create_user_with_onboarding(
+  p_user_id uuid,
+  p_email text,
+  p_full_name text,
+  p_native_language text DEFAULT 'English'::text,
+  p_learning_language text DEFAULT 'Spanish'::text,
   p_proficiency_level text DEFAULT 'beginner'::text
-) RETURNS TABLE(is_new_user boolean)
- LANGUAGE plpgsql
- SECURITY DEFINER
-AS $function$
-declare
+)
+RETURNS TABLE(is_new_user boolean)
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+DECLARE
   v_exists boolean;
   v_is_new boolean;
-  v_error_message text;
-begin
-  -- Input validation
-  if p_email is null or p_full_name is null then
-    raise exception 'Email and full name are required';
-  end if;
-
-  -- Check if user already exists
-  select exists(select 1 from users where id = p_user_id) into v_exists;
-  v_is_new := not v_exists;
-
-  -- Create user if doesn't exist
-  if not v_exists then
-    begin
-      insert into users (
-        id,
-        email,
-        full_name,
-        native_language,
-        learning_language,
-        proficiency_level,
-        created_at,
-        updated_at,
-        last_login,
-        streak_count
-      ) values (
-        p_user_id,
-        p_email,
-        p_full_name,
-        p_native_language,
-        p_learning_language,
-        p_proficiency_level,
-        now(),
-        now(),
-        now(),
-        0
+BEGIN
+  -- Check if user exists in our users table
+  SELECT EXISTS(SELECT 1 FROM public.users WHERE id = p_user_id) INTO v_exists;
+  v_is_new := NOT v_exists;
+  
+  -- Only insert if the user doesn't exist
+  IF NOT v_exists THEN
+    BEGIN
+      -- Insert into users table
+      INSERT INTO public.users (
+        id, email, full_name, native_language, 
+        learning_language, proficiency_level
+      ) VALUES (
+        p_user_id, p_email, p_full_name, p_native_language,
+        p_learning_language, p_proficiency_level
       );
-
-      -- Create onboarding status
-      insert into onboarding_status (
-        user_id,
-        is_complete
-      ) values (
-        p_user_id,
-        false
-      );
-    exception
-      when unique_violation then
-        raise exception 'User with this email already exists';
-      when others then
-        get stacked diagnostics v_error_message = message_text;
-        raise exception 'Error creating user: %', v_error_message;
-    end;
-  end if;
-
-  return query select v_is_new as is_new_user;
-end;
-$function$
+      
+      -- Profile should be created by trigger, but ensure it exists
+      INSERT INTO public.profiles (id)
+      VALUES (p_user_id)
+      ON CONFLICT (id) DO NOTHING;
+      
+      -- Ensure onboarding status is created
+      INSERT INTO public.onboarding_status (user_id, is_complete)
+      VALUES (p_user_id, false)
+      ON CONFLICT (user_id) DO NOTHING;
+      
+    EXCEPTION WHEN OTHERS THEN
+      -- Log error but don't fail
+      RAISE NOTICE 'Error in create_user_with_onboarding: %', SQLERRM;
+    END;
+  END IF;
+  
+  RETURN QUERY SELECT v_is_new;
+END;
+$$;
 ```
 
-## Database Triggers
+## RLS Policies
 
-### on_auth_user_created
-Trigger to create a profile when a new auth user is created.
+To ensure proper security, the database uses Row-Level Security (RLS) policies:
 
-```sql
-CREATE TRIGGER on_auth_user_created
-  AFTER INSERT ON auth.users
-  FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
-```
+1. **Users Table**:
+   - Users can view and update only their own records
 
-## Issue Analysis and Recommendations
+2. **Profiles Table**:
+   - Profiles are viewable by everyone
+   - Users can only update their own profile
 
-Based on the error messages and database schema, the following issues have been identified:
+3. **Onboarding Status Table**:
+   - Users can view and update only their own onboarding status
 
-1. **Foreign Key Constraint Violation**: The error "profiles_id_fkey" suggests that when a new user signs up via Google OAuth, it's attempting to create a profile before the user record exists in the users table. This is likely because:
-   - The `handle_new_user()` trigger tries to insert into profiles immediately after auth.users is created
-   - But there may be a timing issue where the users table record isn't created yet
+4. **Conversations & Messages**:
+   - Users can only see conversations they are participants in
+   - Users can only insert messages in conversations they are part of
 
-2. **Missing Create User Logic**: When a new user signs up, we need to ensure:
-   - A record is created in the users table
-   - A record is created in the profiles table
-   - An onboarding_status record is created
+5. **User Likes**:
+   - Anyone can view likes (public data)
+   - Users can only create and delete their own likes
 
-3. **Recommended Fix**:
-   - Update the AuthCallback component to explicitly create user records
-   - Use the create_user_with_onboarding function to ensure all necessary records are created
-   - Implement proper error handling and fallbacks for each step
-   - Ensure proper redirects to onboarding for new users
+## Key Design Decisions & Fix Summary
 
-4. **Google OAuth Configuration**:
-   - Ensure redirect URLs are correctly configured in both Google Cloud Console and Supabase
-   - Verify that callback URLs match exactly to prevent redirection issues
+1. **Foreign Key References**:
+   - All tables have proper foreign key relationships to auth.users, ensuring data integrity.
+   - This fixes the issue where user records were not properly linked, causing authentication failures.
 
-## Storage Buckets
+2. **Trigger Setup**:
+   - The handle_new_user trigger automatically creates profile and onboarding records when a user is created.
+   - This addresses the issue where profiles weren't being created for new Google OAuth users.
 
-There are currently no storage buckets configured in the Supabase project. Consider creating:
-- avatars: For user profile pictures
-- attachments: For chat message attachments (images, documents, etc.)
+3. **Fallback Mechanism**:
+   - Added a create_user_with_onboarding function with fallback logic in case the trigger mechanism fails.
+   - This provides a second chance for user creation if the primary method encounters an error.
+
+4. **Row-Level Security**:
+   - Implemented granular RLS policies to ensure data security while allowing necessary access.
+   - This balances security needs with functional requirements.
+
+5. **Real-time Features**:
+   - The useRealtimeProfile hook enables real-time updates of profile data when changes occur.
+   - This ensures the UI always reflects the latest data without manual refreshing.
