@@ -1,7 +1,7 @@
 
 import { createContext, useContext, useEffect, useState } from "react";
 import { Session, User } from "@supabase/supabase-js";
-import { supabase } from "@/lib/supabase";
+import { supabase, createUserRecord } from "@/lib/supabase";
 import { useToast } from "@/hooks/use-toast";
 
 interface AuthContextType {
@@ -103,6 +103,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       });
 
       if (error) throw error;
+      
+      // Create the user record in the users table
+      if (data.user) {
+        await createUserRecord(data.user.id, email, name);
+      }
       
       toast({
         title: "Account created",

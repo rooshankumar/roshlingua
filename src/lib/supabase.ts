@@ -49,3 +49,70 @@ export const getCurrentUser = async () => {
   const session = await getCurrentSession();
   return session?.user || null;
 };
+
+// New function to create user record manually in the users table
+export const createUserRecord = async (userId: string, email: string, fullName: string) => {
+  try {
+    // Call the create_user_with_onboarding function to properly set up the user
+    const { data, error } = await supabase.rpc('create_user_with_onboarding', {
+      p_user_id: userId,
+      p_email: email,
+      p_full_name: fullName
+    });
+    
+    if (error) {
+      console.error("Failed to create user record:", error);
+      
+      // Fallback: Try direct insert if RPC fails
+      try {
+        // 1. Try to insert into users table first
+        const usersInsert = await supabase
+          .from('users')
+          .insert({
+            id: userId,
+            email: email,
+            full_name: fullName,
+            native_language: 'English',
+            learning_language: 'Spanish',
+            proficiency_level: 'beginner'
+          })
+          .select();
+          
+        if (usersInsert.error) throw usersInsert.error;
+        
+        // 2. Then insert into profiles
+        const profilesInsert = await supabase
+          .from('profiles')
+          .insert({
+            id: userId
+          })
+          .select();
+          
+        if (profilesInsert.error) throw profilesInsert.error;
+        
+        // 3. Finally insert into onboarding_status
+        const onboardingInsert = await supabase
+          .from('onboarding_status')
+          .insert({
+            user_id: userId,
+            is_complete: false
+          })
+          .select();
+          
+        if (onboardingInsert.error) throw onboardingInsert.error;
+        
+        console.log("Created user record through fallback method");
+        return true;
+      } catch (fallbackError) {
+        console.error("Fallback user creation also failed:", fallbackError);
+        return false;
+      }
+    }
+    
+    console.log("Created user record successfully:", data);
+    return true;
+  } catch (error) {
+    console.error("Error in createUserRecord:", error);
+    return false;
+  }
+};

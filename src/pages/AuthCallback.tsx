@@ -1,156 +1,86 @@
 
 import { useEffect, useState } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
-import { supabase } from "@/lib/supabase";
-import { useToast } from "@/hooks/use-toast";
+import { supabase, createUserRecord } from "@/lib/supabase";
+import { Loader2 } from "lucide-react";
 
 const AuthCallback = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
-  const { toast } = useToast();
 
   useEffect(() => {
     const handleAuthCallback = async () => {
       try {
-        console.log("Processing auth callback");
-        
         // Process the OAuth callback
         const { data, error } = await supabase.auth.getSession();
         
         if (error) {
-          console.error("Auth callback error:", error);
           throw error;
         }
-        
-        if (data.session) {
-          console.log("Auth successful, checking user data");
-          const userId = data.session.user.id;
-          const userEmail = data.session.user.email;
-          const userName = data.session.user.user_metadata?.full_name || 
-                          data.session.user.user_metadata?.name || 
-                          'New User';
+
+        // If we have a session, create the user record
+        if (data.session?.user) {
+          const user = data.session.user;
+          console.log("User authenticated:", user.id);
           
-          // First check if user already exists in the users table
-          const { data: userData, error: userError } = await supabase
-            .from('users')
-            .select('id')
-            .eq('id', userId)
-            .single();
-          
-          if (userError && userError.code !== 'PGRST116') {
-            console.error("Error checking user:", userError);
-            // Continue with auth flow, we'll try to create the user
-          }
-          
-          // If user doesn't exist, create the user record first
-          if (!userData) {
-            console.log("Creating new user record");
+          // Check if this might be a new user from Google OAuth
+          try {
+            // Extract user information from the user object
+            const email = user.email || '';
+            const fullName = user.user_metadata.full_name || user.user_metadata.name || email.split('@')[0];
             
-            try {
-              // Call the Supabase function to create a user with onboarding status
-              const { data: funcData, error: funcError } = await supabase.rpc(
-                'create_user_with_onboarding',
-                {
-                  p_user_id: userId,
-                  p_email: userEmail,
-                  p_full_name: userName
-                }
-              );
-              
-              if (funcError) {
-                console.error("Error creating user with function:", funcError);
-                // Try direct insert as fallback
-                const { error: insertError } = await supabase
-                  .from('users')
-                  .insert({
-                    id: userId,
-                    email: userEmail,
-                    full_name: userName,
-                    native_language: 'English',
-                    learning_language: 'Spanish',
-                    proficiency_level: 'Beginner (A1)'
-                  });
-                
-                if (insertError) {
-                  console.error("Error creating user record:", insertError);
-                  throw insertError;
-                }
-                
-                // Create onboarding record
-                const { error: onboardingError } = await supabase
-                  .from('onboarding_status')
-                  .insert({
-                    user_id: userId,
-                    is_complete: false,
-                    current_step: 'profile'
-                  });
-                
-                if (onboardingError) {
-                  console.error("Error creating onboarding status:", onboardingError);
-                  // Continue anyway, we don't want to block the user
-                }
-              } else {
-                console.log("User created with function:", funcData);
-              }
-              
-              // Redirect to onboarding
-              toast({
-                title: "Account created",
-                description: "Welcome to Languagelandia! Let's set up your profile.",
-              });
-              
-              navigate('/onboarding', { replace: true });
-              return;
-              
-            } catch (createError) {
-              console.error("Error in user creation:", createError);
-              // Continue with auth flow, try redirect to dashboard
+            // Create user record in our database tables
+            const success = await createUserRecord(user.id, email, fullName);
+            
+            if (success) {
+              console.log("User record created successfully");
+            } else {
+              console.warn("Failed to create user record, but proceeding with auth");
             }
-          }
-          
-          // Check if user needs onboarding
-          const { data: onboardingData, error: onboardingError } = await supabase
-            .from('onboarding_status')
-            .select('*')
-            .eq('user_id', userId)
-            .single();
-          
-          if (onboardingError && onboardingError.code !== 'PGRST116') {
-            console.error("Error checking onboarding status:", onboardingError);
-          }
-          
-          toast({
-            title: "Login successful",
-            description: "Welcome to Languagelandia!",
-          });
-          
-          if (onboardingData && !onboardingData.is_complete) {
-            navigate('/onboarding', { replace: true });
-          } else {
+            
+            // After signing in, redirect to onboarding for new users or dashboard for existing
+            // Check if onboarding is complete for this user
+            const { data: onboardingData } = await supabase
+              .from('onboarding_status')
+              .select('is_complete')
+              .eq('user_id', user.id)
+              .single();
+              
+            if (onboardingData && onboardingData.is_complete) {
+              // Redirect to dashboard if onboarding is complete
+              navigate('/dashboard', { replace: true });
+            } else {
+              // Redirect to onboarding if not complete
+              navigate('/onboarding', { replace: true });
+            }
+          } catch (err) {
+            console.error("Error in user record creation:", err);
+            // Even if user record creation fails, continue with auth
             navigate('/dashboard', { replace: true });
           }
         } else {
-          console.error("No session found after authentication");
-          setError("Authentication failed. Please try again.");
+          // No session, redirect to login
+          navigate('/auth', { replace: true });
         }
-      } catch (err: any) {
+        
+        setIsLoading(false);
+      } catch (err) {
         console.error("Auth callback error:", err);
         setError(err.message || "Authentication failed");
-      } finally {
         setIsLoading(false);
       }
     };
 
     handleAuthCallback();
-  }, [navigate, toast]);
+  }, [navigate]);
 
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-pulse flex flex-col items-center gap-4">
-          <div className="h-12 w-12 rounded-full bg-primary/20"></div>
-          <div className="h-2 w-24 rounded-full bg-primary/20"></div>
+        <div className="flex flex-col items-center gap-4">
+          <Loader2 className="h-12 w-12 animate-spin text-primary" />
+          <p className="text-lg font-medium">Completing authentication...</p>
         </div>
       </div>
     );
@@ -170,8 +100,15 @@ const AuthCallback = () => {
     );
   }
 
-  // If for some reason we get here (we should have redirected already)
-  return <Navigate to="/dashboard" replace />;
+  // Let the useEffect handle the navigation
+  return (
+    <div className="flex items-center justify-center min-h-screen">
+      <div className="flex flex-col items-center gap-4">
+        <Loader2 className="h-12 w-12 animate-spin text-primary" />
+        <p className="text-lg font-medium">Redirecting you...</p>
+      </div>
+    </div>
+  );
 };
 
 export default AuthCallback;
