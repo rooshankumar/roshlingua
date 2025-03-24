@@ -1,0 +1,85 @@
+Setting up auth state listener
+2AuthProvider.tsx:39 Auth state changed: SIGNED_IN 03acf9bb-a68a-4a64-8e9b-8746bf32db45
+AuthProvider.tsx:39 Auth state changed: INITIAL_SESSION 03acf9bb-a68a-4a64-8e9b-8746bf32db45
+AuthProvider.tsx:55 Initial session: 03acf9bb-a68a-4a64-8e9b-8746bf32db45
+2@radix-ui_react-select.js?v=2681c77a:872 Uncaught Error: A <Select.Item /> must have a value prop that is not an empty string. This is because the Select value can be set to an empty string to clear the selection and show the placeholder.
+    at @radix-ui_react-select.js?v=2681c77a:872:13
+    at renderWithHooks (chunk-W6L2VRDA.js?v=2681c77a:11548:26)
+    at updateForwardRef (chunk-W6L2VRDA.js?v=2681c77a:14325:28)
+    at beginWork (chunk-W6L2VRDA.js?v=2681c77a:15946:22)
+    at HTMLUnknownElement.callCallback2 (chunk-W6L2VRDA.js?v=2681c77a:3674:22)
+    at Object.invokeGuardedCallbackDev (chunk-W6L2VRDA.js?v=2681c77a:3699:24)
+    at invokeGuardedCallback (chunk-W6L2VRDA.js?v=2681c77a:3733:39)
+    at beginWork$1 (chunk-W6L2VRDA.js?v=2681c77a:19765:15)
+    at performUnitOfWork (chunk-W6L2VRDA.js?v=2681c77a:19198:20)
+    at workLoopSync (chunk-W6L2VRDA.js?v=2681c77a:19137:13)Understand this errorAI
+chunk-W6L2VRDA.js?v=2681c77a:14032 The above error occurred in the <SelectItem> component:
+
+    at https://332423d4-762d-4ed6-9155-7f9348e040a6-00-5cevsfif4jc4.pike.replit.dev/node_modules/.vite/deps/@radix-ui_react-select.js?v=2681c77a:845:7
+    at _c8 (https://332423d4-762d-4ed6-9155-7f9348e040a6-00-5cevsfif4jc4.pike.replit.dev/src/components/ui/select.tsx:223:60)
+    at div
+    at https://332423d4-762d-4ed6-9155-7f9348e040a6-00-5cevsfif4jc4.pike.replit.dev/node_modules/.vite/deps/chunk-LTXT6CEX.js?v=2681c77a:41:13
+    at https://332423d4-762d-4ed6-9155-7f9348e040a6-00-5cevsfif4jc4.pike.replit.dev/node_modules/.vite/deps/chunk-D3CTYCI6.js?v=2681c77a:52:11
+    at https://332423d4-762d-4ed6-9155-7f9348e040a6-00-5cevsfif4jc4.pike.replit.dev/node_modules/.vite/deps/chunk-D3CTYCI6.js?v=2681c77a:33:11
+    at https://332423d4-762d-4ed6-9155-7f9348e040a6-00-5cevsfif4jc4.pike.replit.dev/node_modules/.vite/deps/chunk-LP3SNE3I.js?v=2681c77a:98:15
+    at https://332423d4-762d-4ed6-9155-7f9348e040a6-00-5cevsfif4jc4.pike.replit.dev/node_modules/.vite/deps/@radix-ui_react-select.js?v=2681c77a:756:13
+    at div
+    at https://332423d4-762d-4ed6-9155-7f9348e040a6-00-5cevsfif4jc4.pike.replit.dev/node_modules/.vite/deps/chunk-D3CTYCI6.js?v=2681c77a:52:11
+    at https://332423d4-762d-4ed6-9155-7f9348e040a6-00-5cevsfif4jc4.pike.replit.dev/node_modules/.vite/deps/chunk-D3CTYCI6.js?v=2681c77a:33:11
+    at https://332423d4-762d-4ed6-9155-7f9348e040a6-00-5cevsfif4jc4.pike.replit.dev/node_modules/.vite/deps/chunk-LP3SNE3I.js?v=2681c77a:98:15
+    at Provider (https://332423d4-762d-4ed6-9155-7f9348e040a6-00-5cevsfif4jc4.pike.replit.dev/node_modules/.vite/deps/chunk-ICA7ZJMY.js?v=2681c77a:38:15)
+    at https://332423d4-762d-4ed6-9155-7f9348e040a6-00-5cevsfif4jc4.pike.replit.dev/node_modules/.vite/deps/@radix-ui_react-select.js?v=2681c77a:300:58
+    at https://332423d4-762d-4ed6-9155-7f9348e040a6-00-5cevsfif4jc4.pike.replit.dev/node_modules/.vite/deps/chunk-D3CTYCI6.js?v=2681c77a:52:11
+    at https://332423d4-762d-4ed6-9155-7f9348e040a6-00-5cevsfif4jc4.pike.replit.dev/node_modules/.vite/deps/chunk-D3CTYCI6.js?v=2681c77a:33:11
+    at https://332423d4-762d-4ed6-9155-7f9348e040a6-00-5cevsfif4jc4.pike.replit.dev/node_modules/.vite/deps/chunk-LTXT6CEX.js?v=2681c77a:41:13
+    at https://332423d4-762d-4ed6-9155-7f9348e040a6-00-5cevsfif4jc4.pike.replit.dev/node_modules/.vite/deps/chunk-WAAVKW3J.js?v=2681c77a:260:22
+    at SelectPortal
+    at _c4 (https://332423d4-762d-4ed6-9155-7f9348e040a6-00-5cevsfif4jc4.pike.replit.dev/src/components/ui/select.tsx:130:63)
+    at Provider (https://332423d4-762d-4ed6-9155-7f9348e040a6-00-5cevsfif4jc4.pike.replit.dev/node_modules/.vite/deps/chunk-ICA7ZJMY.js?v=2681c77a:38:15)
+    at Provider (https://332423d4-762d-4ed6-9155-7f9348e040a6-00-5cevsfif4jc4.pike.replit.dev/node_modules/.vite/deps/chunk-LP3SNE3I.js?v=2681c77a:28:15)
+    at CollectionProvider (https://332423d4-762d-4ed6-9155-7f9348e040a6-00-5cevsfif4jc4.pike.replit.dev/node_modules/.vite/deps/chunk-LP3SNE3I.js?v=2681c77a:89:13)
+    at Provider (https://332423d4-762d-4ed6-9155-7f9348e040a6-00-5cevsfif4jc4.pike.replit.dev/node_modules/.vite/deps/chunk-ICA7ZJMY.js?v=2681c77a:38:15)
+    at Provider (https://332423d4-762d-4ed6-9155-7f9348e040a6-00-5cevsfif4jc4.pike.replit.dev/node_modules/.vite/deps/chunk-WNUSBTM2.js?v=2681c77a:1905:15)
+    at Popper (https://332423d4-762d-4ed6-9155-7f9348e040a6-00-5cevsfif4jc4.pike.replit.dev/node_modules/.vite/deps/chunk-WNUSBTM2.js?v=2681c77a:1962:11)
+    at Select (https://332423d4-762d-4ed6-9155-7f9348e040a6-00-5cevsfif4jc4.pike.replit.dev/node_modules/.vite/deps/@radix-ui_react-select.js?v=2681c77a:88:5)
+    at div
+    at div
+    at div
+    at _c8 (https://332423d4-762d-4ed6-9155-7f9348e040a6-00-5cevsfif4jc4.pike.replit.dev/src/components/ui/card.tsx:84:61)
+    at div
+    at _c (https://332423d4-762d-4ed6-9155-7f9348e040a6-00-5cevsfif4jc4.pike.replit.dev/src/components/ui/card.tsx:12:53)
+    at div
+    at Community (https://332423d4-762d-4ed6-9155-7f9348e040a6-00-5cevsfif4jc4.pike.replit.dev/src/pages/Community.tsx?t=1742792880407:448:31)
+    at ProtectedRoute (https://332423d4-762d-4ed6-9155-7f9348e040a6-00-5cevsfif4jc4.pike.replit.dev/src/components/auth/ProtectedRoute.tsx:13:27)
+    at RenderedRoute (https://332423d4-762d-4ed6-9155-7f9348e040a6-00-5cevsfif4jc4.pike.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=2681c77a:4069:5)
+    at Routes (https://332423d4-762d-4ed6-9155-7f9348e040a6-00-5cevsfif4jc4.pike.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=2681c77a:4508:5)
+    at div
+    at div
+    at AppRoutes (https://332423d4-762d-4ed6-9155-7f9348e040a6-00-5cevsfif4jc4.pike.replit.dev/src/App.tsx?t=1742792880407:34:33)
+    at AuthProvider (https://332423d4-762d-4ed6-9155-7f9348e040a6-00-5cevsfif4jc4.pike.replit.dev/src/providers/AuthProvider.tsx:23:32)
+    at Router (https://332423d4-762d-4ed6-9155-7f9348e040a6-00-5cevsfif4jc4.pike.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=2681c77a:4451:15)
+    at BrowserRouter (https://332423d4-762d-4ed6-9155-7f9348e040a6-00-5cevsfif4jc4.pike.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=2681c77a:5196:5)
+    at ThemeProvider (https://332423d4-762d-4ed6-9155-7f9348e040a6-00-5cevsfif4jc4.pike.replit.dev/src/components/theme-provider.tsx:17:33)
+    at QueryClientProvider (https://332423d4-762d-4ed6-9155-7f9348e040a6-00-5cevsfif4jc4.pike.replit.dev/node_modules/.vite/deps/@tanstack_react-query.js?v=2681c77a:2794:3)
+    at App
+
+Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://reactjs.org/link/error-boundaries to learn more about error boundaries.
+logCapturedError @ chunk-W6L2VRDA.js?v=2681c77a:14032Understand this errorAI
+chunk-W6L2VRDA.js?v=2681c77a:9129 Uncaught Error: A <Select.Item /> must have a value prop that is not an empty string. This is because the Select value can be set to an empty string to clear the selection and show the placeholder.
+    at @radix-ui_react-select.js?v=2681c77a:872:13
+    at renderWithHooks (chunk-W6L2VRDA.js?v=2681c77a:11548:26)
+    at updateForwardRef (chunk-W6L2VRDA.js?v=2681c77a:14325:28)
+    at beginWork (chunk-W6L2VRDA.js?v=2681c77a:15946:22)
+    at beginWork$1 (chunk-W6L2VRDA.js?v=2681c77a:19753:22)
+    at performUnitOfWork (chunk-W6L2VRDA.js?v=2681c77a:19198:20)
+    at workLoopSync (chunk-W6L2VRDA.js?v=2681c77a:19137:13)
+    at renderRootSync (chunk-W6L2VRDA.js?v=2681c77a:19116:15)
+    at recoverFromConcurrentError (chunk-W6L2VRDA.js?v=2681c77a:18736:28)
+    at performSyncWorkOnRoot (chunk-W6L2VRDA.js?v=2681c77a:18879:28)Understand this errorAI
+yekzyvdjjozhhatdefsq.supabase.co/rest/v1/profiles?select=id%2Cusername%2Cavatar_url%2Cnative_language%2Clearning_language%2Cproficiency_level%2Cbio%2Cis_online%2Clikes_count%2Cstreak_count:1 
+            
+            
+           Failed to load resource: the server responded with a status of 400 ()Understand this errorAI
+Community.tsx:106 Error fetching users: Object
+fetchUsers @ Community.tsx:106Understand this errorAI
