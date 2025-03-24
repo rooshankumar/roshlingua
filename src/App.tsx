@@ -27,6 +27,9 @@ const AppRoutes = () => {
   const { user, isLoading } = useAuth();
   const location = useLocation();
   const showNavigation = user && !location.pathname.startsWith("/auth");
+  
+  // Check if user needs onboarding (you can add more conditions)
+  const needsOnboarding = user && !user.user_metadata?.onboarded;
 
   if (isLoading) {
     return (
@@ -40,9 +43,16 @@ const AppRoutes = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background relative">
       {showNavigation && <NavigationBar />}
-      <div className={cn("min-h-screen", showNavigation && "md:pl-64 pb-16 md:pb-0")}>
+      <div className={cn(
+        "min-h-screen transition-all duration-200",
+        showNavigation && "md:pl-64 pb-16 md:pb-0"
+      )}>
+        {/* Redirect authenticated users without onboarding */}
+        {needsOnboarding && location.pathname !== "/onboarding" && (
+          <Navigate to="/onboarding" replace />
+        )}
 
   return (
     <Routes>

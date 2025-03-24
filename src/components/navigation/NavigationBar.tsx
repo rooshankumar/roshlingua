@@ -23,8 +23,8 @@ export const NavigationBar = () => {
   return (
     <>
       {/* Desktop Sidebar */}
-      <div className="hidden md:flex md:w-64 md:flex-col fixed h-full">
-        <div className="flex flex-col flex-grow pt-5 overflow-y-auto border-r border-border bg-card">
+      <div className="hidden md:flex md:w-64 md:flex-col fixed h-full left-0 top-0 z-50">
+        <div className="flex flex-col flex-grow pt-5 overflow-y-auto border-r border-border bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/75">
           <div className="flex items-center flex-shrink-0 px-4 mb-8">
             <Link to="/" className="flex items-center">
               <span className="text-2xl font-semibold text-gradient">App</span>
@@ -56,7 +56,7 @@ export const NavigationBar = () => {
       </div>
 
       {/* Mobile Bottom Navigation */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 border-t border-border bg-card">
+      <div className="md:hidden fixed bottom-0 left-0 right-0 border-t border-border bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/75 z-50">
         <nav className="flex justify-around py-2">
           {navigation.map((item) => (
             <Link
