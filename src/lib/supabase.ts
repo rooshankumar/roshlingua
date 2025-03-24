@@ -14,10 +14,14 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
 });
 
 export const signInWithGoogle = async () => {
+  const redirectUrl = window.location.origin + '/auth/callback';
+  
+  console.log("Redirecting to Google OAuth with redirectUrl:", redirectUrl);
+  
   return await supabase.auth.signInWithOAuth({
     provider: 'google',
     options: {
-      redirectTo: `${window.location.origin}/auth/callback`,
+      redirectTo: redirectUrl,
       queryParams: {
         access_type: 'offline',
         prompt: 'consent',

@@ -24,19 +24,107 @@ const AuthCallback = () => {
         }
         
         if (data.session) {
-          console.log("Auth successful, redirecting to dashboard");
+          console.log("Auth successful, checking user data");
+          const userId = data.session.user.id;
+          const userEmail = data.session.user.email;
+          const userName = data.session.user.user_metadata?.full_name || 
+                          data.session.user.user_metadata?.name || 
+                          'New User';
+          
+          // First check if user already exists in the users table
+          const { data: userData, error: userError } = await supabase
+            .from('users')
+            .select('id')
+            .eq('id', userId)
+            .single();
+          
+          if (userError && userError.code !== 'PGRST116') {
+            console.error("Error checking user:", userError);
+            // Continue with auth flow, we'll try to create the user
+          }
+          
+          // If user doesn't exist, create the user record first
+          if (!userData) {
+            console.log("Creating new user record");
+            
+            try {
+              // Call the Supabase function to create a user with onboarding status
+              const { data: funcData, error: funcError } = await supabase.rpc(
+                'create_user_with_onboarding',
+                {
+                  p_user_id: userId,
+                  p_email: userEmail,
+                  p_full_name: userName
+                }
+              );
+              
+              if (funcError) {
+                console.error("Error creating user with function:", funcError);
+                // Try direct insert as fallback
+                const { error: insertError } = await supabase
+                  .from('users')
+                  .insert({
+                    id: userId,
+                    email: userEmail,
+                    full_name: userName,
+                    native_language: 'English',
+                    learning_language: 'Spanish',
+                    proficiency_level: 'Beginner (A1)'
+                  });
+                
+                if (insertError) {
+                  console.error("Error creating user record:", insertError);
+                  throw insertError;
+                }
+                
+                // Create onboarding record
+                const { error: onboardingError } = await supabase
+                  .from('onboarding_status')
+                  .insert({
+                    user_id: userId,
+                    is_complete: false,
+                    current_step: 'profile'
+                  });
+                
+                if (onboardingError) {
+                  console.error("Error creating onboarding status:", onboardingError);
+                  // Continue anyway, we don't want to block the user
+                }
+              } else {
+                console.log("User created with function:", funcData);
+              }
+              
+              // Redirect to onboarding
+              toast({
+                title: "Account created",
+                description: "Welcome to Languagelandia! Let's set up your profile.",
+              });
+              
+              navigate('/onboarding', { replace: true });
+              return;
+              
+            } catch (createError) {
+              console.error("Error in user creation:", createError);
+              // Continue with auth flow, try redirect to dashboard
+            }
+          }
+          
+          // Check if user needs onboarding
+          const { data: onboardingData, error: onboardingError } = await supabase
+            .from('onboarding_status')
+            .select('*')
+            .eq('user_id', userId)
+            .single();
+          
+          if (onboardingError && onboardingError.code !== 'PGRST116') {
+            console.error("Error checking onboarding status:", onboardingError);
+          }
+          
           toast({
             title: "Login successful",
             description: "Welcome to Languagelandia!",
           });
           
-          // Check if user needs onboarding
-          const { data: onboardingData } = await supabase
-            .from('onboarding_status')
-            .select('*')
-            .eq('user_id', data.session.user.id)
-            .single();
-            
           if (onboardingData && !onboardingData.is_complete) {
             navigate('/onboarding', { replace: true });
           } else {

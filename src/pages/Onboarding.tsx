@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
@@ -39,6 +38,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/lib/supabase";
 
 interface OnboardingProps {
   onComplete: () => void;
@@ -57,6 +57,7 @@ type OnboardingFormData = {
 
 const Onboarding = ({ onComplete }: OnboardingProps) => {
   const [step, setStep] = useState(1);
+  const [isLoading, setIsLoading] = useState(false);
   const form = useForm<OnboardingFormData>({
     defaultValues: {
       name: "",
@@ -119,21 +120,130 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
     }
   };
   
-  const handleSubmit = () => {
-    const formData = form.getValues();
-    // In a real app, this would be an API call to save the user profile
-    console.log("Onboarding data:", formData);
-    
-    // Simulate saving the data
-    setTimeout(() => {
-      onComplete();
-      navigate("/dashboard");
+  const handleSubmit = async () => {
+    try {
+      setIsLoading(true);
+      const formData = form.getValues();
+      console.log("Submitting onboarding data:", formData);
+      
+      // Get the current user
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session || !session.user) {
+        toast({
+          variant: "destructive",
+          title: "Authentication error",
+          description: "You must be logged in to complete onboarding.",
+        });
+        navigate("/auth");
+        return;
+      }
+      
+      const userId = session.user.id;
+      
+      // Update the users table
+      const { error: userError } = await supabase
+        .from('users')
+        .update({
+          full_name: formData.name,
+          gender: formData.gender,
+          date_of_birth: formData.dob ? new Date(formData.dob).toISOString() : null,
+          native_language: formData.nativeLanguage,
+          learning_language: formData.learningLanguage,
+          proficiency_level: formData.proficiencyLevel,
+          learning_goal: formData.learningGoal,
+          avatar_url: formData.avatarUrl || null,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', userId);
+        
+      if (userError) {
+        console.error("Error updating user data:", userError);
+        toast({
+          variant: "destructive",
+          title: "Error updating profile",
+          description: userError.message || "Failed to update your profile information.",
+        });
+        return;
+      }
+      
+      // Update onboarding status
+      const { error: onboardingError } = await supabase
+        .from('onboarding_status')
+        .update({
+          is_complete: true,
+          current_step: 'completed',
+          updated_at: new Date().toISOString()
+        })
+        .eq('user_id', userId);
+        
+      if (onboardingError) {
+        console.error("Error updating onboarding status:", onboardingError);
+        // Continue anyway, don't block the user
+      }
+      
+      // Check if profile exists, create if it doesn't
+      const { data: profileData, error: profileCheckError } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('id', userId)
+        .single();
+        
+      if (profileCheckError && profileCheckError.code !== 'PGRST116') {
+        console.error("Error checking profile:", profileCheckError);
+      }
+      
+      if (!profileData) {
+        // Create profile if it doesn't exist
+        const { error: profileCreateError } = await supabase
+          .from('profiles')
+          .insert({
+            id: userId,
+            username: formData.name.toLowerCase().replace(/\s+/g, '_'),
+            bio: formData.learningGoal
+          });
+          
+        if (profileCreateError) {
+          console.error("Error creating profile:", profileCreateError);
+          // Continue anyway, don't block the user
+        }
+      } else {
+        // Update profile
+        const { error: profileUpdateError } = await supabase
+          .from('profiles')
+          .update({
+            username: formData.name.toLowerCase().replace(/\s+/g, '_'),
+            bio: formData.learningGoal,
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', userId);
+          
+        if (profileUpdateError) {
+          console.error("Error updating profile:", profileUpdateError);
+          // Continue anyway, don't block the user
+        }
+      }
       
       toast({
         title: "Profile created",
         description: "Your profile has been successfully set up!",
       });
-    }, 1000);
+      
+      // Call onComplete prop
+      onComplete();
+      
+      // Navigate to dashboard
+      navigate("/dashboard");
+    } catch (error) {
+      console.error("Onboarding error:", error);
+      toast({
+        variant: "destructive",
+        title: "Error completing onboarding",
+        description: "There was an error setting up your profile. Please try again.",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
   
   const uploadAvatar = () => {
