@@ -1,7 +1,9 @@
 
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { AuthProvider, useAuth } from "@/providers/AuthProvider";
 import { Toaster } from "@/components/ui/toaster";
+import { NavigationBar } from "@/components/navigation/NavigationBar";
+import { cn } from "@/lib/utils";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ThemeProvider } from "@/components/theme-provider";
 
@@ -23,6 +25,8 @@ const queryClient = new QueryClient();
 
 const AppRoutes = () => {
   const { user, isLoading } = useAuth();
+  const location = useLocation();
+  const showNavigation = user && !location.pathname.startsWith("/auth");
 
   if (isLoading) {
     return (
@@ -34,6 +38,11 @@ const AppRoutes = () => {
       </div>
     );
   }
+
+  return (
+    <div className="min-h-screen bg-background">
+      {showNavigation && <NavigationBar />}
+      <div className={cn("min-h-screen", showNavigation && "md:pl-64 pb-16 md:pb-0")}>
 
   return (
     <Routes>
@@ -78,8 +87,10 @@ const AppRoutes = () => {
       } />
 
       {/* Catch all for 404 */}
-      <Route path="*" element={<NotFound />} />
-    </Routes>
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </div>
+    </div>
   );
 };
 
