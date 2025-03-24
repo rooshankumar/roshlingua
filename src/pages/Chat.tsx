@@ -1,54 +1,65 @@
-import { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
-import { useAuth } from "@/providers/AuthProvider";
-import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/components/ui/use-toast";
+import { useState, useEffect, useRef } from "react";
+import { Link, useParams } from "react-router-dom";
+import { ArrowLeft, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Send } from "lucide-react";
-
-interface Message {
-  id: string;
-  content: string;
-  created_at: string;
-  sender_id: string;
-  conversation_id: string;
-  sender?: {
-    username: string;
-    avatar_url: string;
-  };
-}
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useToast } from "@/components/ui/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/providers/AuthProvider";
 
 const Chat = () => {
-  const { id } = useParams();
+  const { id } = useParams<{ id: string }>();
   const { user } = useAuth();
-  const { toast } = useToast();
+  const [chats, setChats] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [sending, setSending] = useState(false);
   const [message, setMessage] = useState("");
-  const [chats, setChats] = useState<Message[]>([]);
+  const messagesEndRef = useRef(null);
+  const { toast } = useToast();
 
   useEffect(() => {
-    const fetchChats = async () => {
-      try {
-        setLoading(true);
-        const { data, error } = await supabase
-          .from("messages")
-          .select(`
-            id,
-            content,
-            created_at,
-            sender_id,
-            conversation_id,
-            sender:profiles(username, avatar_url)
-          `)
-          .eq("conversation_id", id)
-          .order("created_at", { ascending: true });
+    const initializeChat = async () => {
+      if (!user || !id) return;
 
-        if (error) throw error;
+      // First check if conversation exists
+      const { data: conversationData } = await supabase
+        .from('conversations')
+        .select('id')
+        .eq('id', id)
+        .single();
+
+      // If conversation doesn't exist, create it
+      if (!conversationData) {
+        const { error: createError } = await supabase
+          .from('conversations')
+          .insert({ id });
+        
+        if (createError) throw createError;
+
+        // Add participants
+        await supabase
+          .from('conversation_participants')
+          .insert([{ conversation_id: id, user_id: user.id }]);
+      }
+
+      // Now fetch messages
+      const { data, error } = await supabase
+        .from('messages')
+        .select(`
+          id,
+          content,
+          created_at,
+          sender_id,
+          conversation_id,
+          sender:profiles!sender_id(username, avatar_url)
+        `)
+        .eq('conversation_id', id)
+        .order('created_at', { ascending: true });
+
+      if (error) throw error;
         setChats(data || []);
       } catch (error) {
-        console.error("Error fetching chats:", error);
+        console.error('Error fetching chats:', error);
         toast({
           variant: "destructive",
           title: "Error",
@@ -59,100 +70,130 @@ const Chat = () => {
       }
     };
 
-    // Initial fetch
-    fetchChats();
+    if (user) {
+      initializeChat().catch(error => {
+        console.error('Error initializing chat:', error);
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Failed to initialize chat"
+        });
+      });
+      // Subscribe to new chat messages
+      const channel = supabase
+        .channel('chats')
+        .on('postgres_changes', {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'chats',
+          filter: `sender_id=eq.${user.id},receiver_id=eq.${user.id}`,
+        }, payload => {
+          setChats(current => [...current, payload.new]);
+        })
+        .subscribe();
 
-    // Set up realtime subscription
-    const channel = supabase
-      .channel(`chat:${id}`)
-      .on(
-        "postgres_changes",
-        {
-          event: "*",
-          schema: "public",
-          table: "messages",
-          filter: `conversation_id=eq.${id}`
-        },
-        (payload) => {
-          if (payload.eventType === "INSERT") {
-            setChats((current) => [...current, payload.new as Message]);
-          }
-        }
-      )
-      .subscribe();
+      return () => {
+        supabase.removeChannel(channel);
+      };
+    }
+  }, [user, id]);
 
-    return () => {
-      channel.unsubscribe();
-    };
-  }, [id, toast]);
-
-  const handleSend = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const sendMessage = async () => {
     if (!message.trim() || !user) return;
 
     try {
-      setSending(true);
-      const { error } = await supabase.from("messages").insert({
-        content: message,
-        conversation_id: id,
-        sender_id: user.id
-      });
+      const { error } = await supabase
+        .from('chats')
+        .insert({
+          sender_id: user.id,
+          receiver_id: id,
+          message: message.trim()
+        });
 
       if (error) throw error;
       setMessage("");
     } catch (error) {
-      console.error("Error sending message:", error);
+      console.error('Error sending message:', error);
       toast({
         variant: "destructive",
         title: "Error",
         description: "Failed to send message"
       });
-    } finally {
-      setSending(false);
     }
   };
 
   if (loading) {
-    return <div className="flex items-center justify-center p-4">Loading...</div>;
+    return (
+      <div className="container flex items-center justify-center min-h-[50vh]">
+        <div className="flex flex-col items-center">
+          <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spinner"></div>
+          <p className="mt-4 text-muted-foreground">Loading chats...</p>
+        </div>
+      </div>
+    );
   }
 
   return (
-    <div className="container mx-auto p-4 h-[calc(100vh-4rem)] flex flex-col">
-      <div className="flex-1 overflow-y-auto space-y-4 mb-4">
+    <div className="container h-full max-h-[calc(100vh-8rem)] flex flex-col">
+      <div className="flex justify-between items-center p-4 border-b">
+        <Button asChild variant="ghost" size="sm">
+          <Link to="/community">
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back
+          </Link>
+        </Button>
+      </div>
+
+      <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {chats.map((chat) => (
           <div
             key={chat.id}
-            className={`flex ${
-              chat.sender_id === user?.id ? "justify-end" : "justify-start"
-            }`}
+            className={`flex ${chat.sender_id === user?.id ? 'justify-end' : 'justify-start'}`}
           >
-            <div
-              className={`max-w-[70%] rounded-lg p-3 ${
-                chat.sender_id === user?.id
-                  ? "bg-primary text-primary-foreground"
-                  : "bg-muted"
-              }`}
-            >
-              <p className="text-sm font-medium mb-1">
-                {chat.sender?.username || "User"}
-              </p>
-              <p>{chat.content}</p>
+            <div className={`flex items-start space-x-2 max-w-[70%] ${
+              chat.sender_id === user?.id ? 'flex-row-reverse' : 'flex-row'
+            }`}>
+              <Avatar className="h-8 w-8">
+                <AvatarImage src={chat.profiles?.avatar_url || "/placeholder.svg"} />
+                <AvatarFallback>
+                  {chat.profiles?.username?.[0]?.toUpperCase() || '?'}
+                </AvatarFallback>
+              </Avatar>
+              <div className={`rounded-lg p-3 ${
+                chat.sender_id === user?.id 
+                  ? 'bg-primary text-primary-foreground' 
+                  : 'bg-muted'
+              }`}>
+                <p className="text-sm">{chat.content}</p> {/* Changed message to content */}
+                <span className="text-xs opacity-70">
+                  {new Date(chat.created_at).toLocaleTimeString()}
+                </span>
+              </div>
             </div>
           </div>
         ))}
+        <div ref={messagesEndRef} />
       </div>
 
-      <form onSubmit={handleSend} className="flex gap-2">
-        <Input
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
-          placeholder="Type your message..."
-          disabled={sending}
-        />
-        <Button type="submit" disabled={sending || !message.trim()}>
-          <Send className="h-4 w-4" />
-        </Button>
-      </form>
+      <div className="p-4 border-t">
+        <form 
+          className="flex space-x-2"
+          onSubmit={(e) => {
+            e.preventDefault();
+            sendMessage();
+          }}
+        >
+          <Input
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+            placeholder="Type your message..."
+            className="flex-1"
+          />
+          <Button type="submit" size="icon">
+            <Send className="h-4 w-4" />
+          </Button>
+        </form>
+      </div>
     </div>
   );
 };
