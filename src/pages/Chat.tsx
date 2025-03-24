@@ -18,22 +18,45 @@ const Chat = () => {
   const { toast } = useToast();
 
   useEffect(() => {
-    const fetchChats = async () => {
-      try {
-        const { data, error } = await supabase
-          .from('messages')
-          .select(`
-            id,
-            content,
-            created_at,
-            sender_id,
-            conversation_id,
-            profiles!sender_id(username, avatar_url)
-          `)
-          .eq('conversation_id', id)
-          .order('created_at', { ascending: true });
+    const initializeChat = async () => {
+      if (!user || !id) return;
 
-        if (error) throw error;
+      // First check if conversation exists
+      const { data: conversationData } = await supabase
+        .from('conversations')
+        .select('id')
+        .eq('id', id)
+        .single();
+
+      // If conversation doesn't exist, create it
+      if (!conversationData) {
+        const { error: createError } = await supabase
+          .from('conversations')
+          .insert({ id });
+        
+        if (createError) throw createError;
+
+        // Add participants
+        await supabase
+          .from('conversation_participants')
+          .insert([{ conversation_id: id, user_id: user.id }]);
+      }
+
+      // Now fetch messages
+      const { data, error } = await supabase
+        .from('messages')
+        .select(`
+          id,
+          content,
+          created_at,
+          sender_id,
+          conversation_id,
+          sender:profiles!sender_id(username, avatar_url)
+        `)
+        .eq('conversation_id', id)
+        .order('created_at', { ascending: true });
+
+      if (error) throw error;
         setChats(data || []);
       } catch (error) {
         console.error('Error fetching chats:', error);
@@ -48,7 +71,14 @@ const Chat = () => {
     };
 
     if (user) {
-      fetchChats();
+      initializeChat().catch(error => {
+        console.error('Error initializing chat:', error);
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Failed to initialize chat"
+        });
+      });
       // Subscribe to new chat messages
       const channel = supabase
         .channel('chats')
