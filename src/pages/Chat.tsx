@@ -33,7 +33,7 @@ const Chat = () => {
         const { error: createError } = await supabase
           .from('conversations')
           .insert({ id });
-        
+
         if (createError) throw createError;
 
         // Add participants
@@ -43,20 +43,21 @@ const Chat = () => {
       }
 
       // Now fetch messages
-      const { data, error } = await supabase
-        .from('messages')
-        .select(`
-          id,
-          content,
-          created_at,
-          sender_id,
-          conversation_id,
-          sender:profiles!sender_id(username, avatar_url)
-        `)
-        .eq('conversation_id', id)
-        .order('created_at', { ascending: true });
+      try {
+        const { data, error } = await supabase
+          .from('messages')
+          .select(`
+            id,
+            content,
+            created_at,
+            sender_id,
+            conversation_id,
+            sender:profiles!sender_id(username, avatar_url)
+          `)
+          .eq('conversation_id', id)
+          .order('created_at', { ascending: true });
 
-      if (error) throw error;
+        if (error) throw error;
         setChats(data || []);
       } catch (error) {
         console.error('Error fetching chats:', error);
