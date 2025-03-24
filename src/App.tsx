@@ -49,7 +49,7 @@ const AppRoutes = () => {
       {/* Protected routes */}
       <Route path="/onboarding" element={
         <ProtectedRoute>
-          <Onboarding />
+          <Onboarding onComplete={() => console.log("Onboarding completed")} />
         </ProtectedRoute>
       } />
       

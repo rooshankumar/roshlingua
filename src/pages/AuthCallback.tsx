@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
 import { supabase } from "@/lib/supabase";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 
 const AuthCallback = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -46,7 +46,7 @@ const AuthCallback = () => {
           console.error("No session found after authentication");
           setError("Authentication failed. Please try again.");
         }
-      } catch (err) {
+      } catch (err: any) {
         console.error("Auth callback error:", err);
         setError(err.message || "Authentication failed");
       } finally {

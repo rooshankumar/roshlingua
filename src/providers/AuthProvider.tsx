@@ -2,7 +2,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/lib/supabase";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 
 interface AuthContextType {
   user: User | null;
@@ -78,7 +78,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       if (error) throw error;
       
-      return data;
+      // We now handle setting the user state via the onAuthStateChange listener
     } catch (error) {
       console.error("Login error:", error);
       toast({
@@ -109,7 +109,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         description: "Please check your email to confirm your account.",
       });
       
-      return data;
+      // We now handle setting the user state via the onAuthStateChange listener
     } catch (error) {
       console.error("Signup error:", error);
       toast({
@@ -131,6 +131,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       });
       
       if (error) throw error;
+      // We now handle setting the user state via the onAuthStateChange listener
     } catch (error) {
       console.error("Google login error:", error);
       toast({
@@ -147,10 +148,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
       
-      // Clear user and session state
-      setUser(null);
-      setSession(null);
-      
       toast({
         title: "Logged out",
         description: "You have been successfully logged out.",
@@ -166,7 +163,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const value = {
+  const value: AuthContextType = {
     user,
     session,
     isLoading,

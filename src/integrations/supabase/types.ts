@@ -297,7 +297,19 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      create_user_with_onboarding: {
+        Args: {
+          p_user_id: string
+          p_email: string
+          p_full_name: string
+          p_native_language?: string
+          p_learning_language?: string
+          p_proficiency_level?: string
+        }
+        Returns: {
+          is_new_user: boolean
+        }[]
+      }
     }
     Enums: {
       [_ in never]: never
