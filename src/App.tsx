@@ -17,6 +17,7 @@ import NotFound from "./pages/NotFound";
 import Onboarding from "./pages/Onboarding";
 import Community from "./pages/Community";
 import Chat from "./pages/Chat";
+import Settings from "./pages/Settings";
 
 // Components
 import ProtectedRoute from "./components/auth/ProtectedRoute";
@@ -93,6 +94,12 @@ const AppRoutes = () => {
       <Route path="/chat/:id" element={
         <ProtectedRoute>
           <Chat />
+        </ProtectedRoute>
+      } />
+
+      <Route path="/settings" element={
+        <ProtectedRoute>
+          <Settings />
         </ProtectedRoute>
       } />
 

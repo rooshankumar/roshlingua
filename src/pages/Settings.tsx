@@ -647,3 +647,37 @@ const Settings = ({ onLogout }: SettingsProps) => {
 };
 
 export default Settings;
+import { Button } from "@/components/ui/button";
+import { useAuth } from "@/providers/AuthProvider";
+import { useNavigate } from "react-router-dom";
+
+const Settings = () => {
+  const { logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    await logout();
+    navigate("/auth");
+  };
+
+  return (
+    <div className="container mx-auto p-6">
+      <h1 className="text-2xl font-bold mb-6">Settings</h1>
+      
+      <div className="space-y-6">
+        <div className="bg-card p-6 rounded-lg border">
+          <h2 className="text-xl font-semibold mb-4">Account Settings</h2>
+          <Button 
+            variant="destructive" 
+            onClick={handleLogout}
+            className="w-full sm:w-auto"
+          >
+            Logout
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Settings;
