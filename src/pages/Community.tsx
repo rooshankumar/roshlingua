@@ -92,15 +92,11 @@ const Community = () => {
         .select(`
           id,
           username,
-          avatar_url,
-          native_language,
-          learning_language,
-          proficiency_level,
           bio,
           is_online,
-          likes_count,
-          streak_count
-        `);
+          likes_count
+        `)
+        .order('created_at', { ascending: false });
 
       if (error) {
         console.error('Error fetching users:', error);
