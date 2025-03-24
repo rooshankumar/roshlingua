@@ -53,6 +53,11 @@ const Settings = () => {
   const { logout } = useAuth();
   const navigate = useNavigate();
 
+  const handleLogout = async () => {
+    await logout();
+    navigate("/auth");
+  };
+
   const [profileData, setProfileData] = useState({
     name: "Sarah Johnson",
     bio: "Software engineer passionate about learning Spanish for my upcoming trip to Mexico.",
@@ -145,14 +150,6 @@ const Settings = () => {
     });
   };
 
-  const handleLogout = async () => {
-    await logout();
-    toast({
-      title: "Logging out",
-      description: "You have been successfully logged out.",
-    });
-    navigate("/auth");
-  };
 
   return (
     <div className="container pb-12 animate-fade-in">
