@@ -6,6 +6,7 @@ import { NavigationBar } from "@/components/navigation/NavigationBar";
 import { cn } from "@/lib/utils";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ThemeProvider } from "@/components/theme-provider";
+import RealtimeStatus from "@/components/RealtimeStatus";
 
 // Pages
 import Home from "./pages/Home";
@@ -29,9 +30,6 @@ const AppRoutes = () => {
   const location = useLocation();
   const showNavigation = user && !location.pathname.startsWith("/auth");
   
-  // Check if user needs onboarding (you can add more conditions)
-  const needsOnboarding = user && !user.user_metadata?.onboarded;
-
   if (isLoading) {
     return (
       <div className="h-screen w-full flex items-center justify-center">
@@ -45,65 +43,66 @@ const AppRoutes = () => {
 
   return (
     <div className="min-h-screen bg-background relative">
+      {user && <RealtimeStatus />}
       {showNavigation && <NavigationBar />}
       <div className={cn(
         "min-h-screen transition-all duration-200",
         showNavigation && "md:pl-64 pb-16 md:pb-0"
       )}>
-        {/* Redirect authenticated users without onboarding */}
-        {needsOnboarding && location.pathname !== "/onboarding" && (
-          <Navigate to="/onboarding" replace />
-        )}
+        <Routes>
+          {/* Public routes */}
+          <Route path="/" element={<Home />} />
+          <Route path="/auth" element={
+            user ? <Navigate to="/dashboard" replace /> : <Auth />
+          } />
 
-  return (
-    <Routes>
-      {/* Public routes */}
-      <Route path="/" element={<Home />} />
-      <Route path="/auth" element={
-        user ? <Navigate to="/dashboard" replace /> : <Auth />
-      } />
+          {/* Auth callback route for OAuth */}
+          <Route path="/auth/callback" element={<AuthCallback />} />
 
-      {/* Auth callback route for OAuth */}
-      <Route path="/auth/callback" element={<AuthCallback />} />
+          {/* Protected routes */}
+          <Route path="/onboarding" element={
+            <ProtectedRoute>
+              <Onboarding onComplete={() => console.log("Onboarding completed")} />
+            </ProtectedRoute>
+          } />
+          
+          <Route path="/dashboard" element={
+            <ProtectedRoute>
+              <Dashboard />
+            </ProtectedRoute>
+          } />
 
-      {/* Protected routes */}
-      <Route path="/onboarding" element={
-        <ProtectedRoute>
-          <Onboarding onComplete={() => console.log("Onboarding completed")} />
-        </ProtectedRoute>
-      } />
-      
-      <Route path="/dashboard" element={
-        <ProtectedRoute>
-          <Dashboard />
-        </ProtectedRoute>
-      } />
+          <Route path="/profile" element={
+            <ProtectedRoute>
+              <Profile />
+            </ProtectedRoute>
+          } />
+          
+          <Route path="/profile/:id" element={
+            <ProtectedRoute>
+              <Profile />
+            </ProtectedRoute>
+          } />
 
-      <Route path="/profile" element={
-        <ProtectedRoute>
-          <Profile />
-        </ProtectedRoute>
-      } />
+          <Route path="/community" element={
+            <ProtectedRoute>
+              <Community />
+            </ProtectedRoute>
+          } />
 
-      <Route path="/community" element={
-        <ProtectedRoute>
-          <Community />
-        </ProtectedRoute>
-      } />
+          <Route path="/chat/:id" element={
+            <ProtectedRoute>
+              <Chat />
+            </ProtectedRoute>
+          } />
 
-      <Route path="/chat/:id" element={
-        <ProtectedRoute>
-          <Chat />
-        </ProtectedRoute>
-      } />
+          <Route path="/settings" element={
+            <ProtectedRoute>
+              <Settings />
+            </ProtectedRoute>
+          } />
 
-      <Route path="/settings" element={
-        <ProtectedRoute>
-          <Settings />
-        </ProtectedRoute>
-      } />
-
-      {/* Catch all for 404 */}
+          {/* Catch all for 404 */}
           <Route path="*" element={<NotFound />} />
         </Routes>
       </div>
@@ -111,19 +110,17 @@ const AppRoutes = () => {
   );
 };
 
-const App = () => {
-  return (
-    <QueryClientProvider client={queryClient}>
-      <ThemeProvider defaultTheme="light">
-        <BrowserRouter>
-          <AuthProvider>
-            <Toaster />
-            <AppRoutes />
-          </AuthProvider>
-        </BrowserRouter>
-      </ThemeProvider>
-    </QueryClientProvider>
-  );
-};
+const App = () => (
+  <QueryClientProvider client={queryClient}>
+    <ThemeProvider defaultTheme="light">
+      <BrowserRouter>
+        <AuthProvider>
+          <Toaster />
+          <AppRoutes />
+        </AuthProvider>
+      </BrowserRouter>
+    </ThemeProvider>
+  </QueryClientProvider>
+);
 
 export default App;

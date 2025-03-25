@@ -1,100 +1,106 @@
 
-import { useEffect, useState } from 'react';
-import { supabase } from '@/lib/supabase';
-import { RealtimeChannel } from '@supabase/supabase-js';
-import { Button } from './ui/button';
-import { Badge } from './ui/badge';
-import { Loader2 } from 'lucide-react';
+import { useEffect } from 'react';
+import { supabase, updateOnlineStatus, updateUserStreak } from '@/lib/supabase';
+import { useAuth } from '@/providers/AuthProvider';
 
 const RealtimeStatus = () => {
-  const [status, setStatus] = useState<'connecting' | 'connected' | 'disconnected'>('connecting');
-  const [lastMessage, setLastMessage] = useState<string | null>(null);
-  
+  const { user } = useAuth();
+
   useEffect(() => {
-    let channel: RealtimeChannel;
-    
-    const setupChannel = () => {
-      channel = supabase.channel('realtime-status', {
-        config: {
-          broadcast: {
-            self: true
-          }
+    if (!user) return;
+
+    // Update user's online status and streak when they access the app
+    const setUserOnline = async () => {
+      try {
+        await updateOnlineStatus(user.id, true);
+        
+        // Try to update streak, but don't throw if it fails
+        try {
+          await updateUserStreak(user.id);
+        } catch (streakError) {
+          console.error("Error updating streak:", streakError);
+          // Don't fail the whole operation if streak update fails
         }
-      });
-
-      channel
-        .on('broadcast', { event: 'test' }, (payload) => {
-          setLastMessage(JSON.stringify(payload));
-        })
-        .on('presence', { event: 'sync' }, () => {
-          setStatus('connected');
-        })
-        .subscribe((status) => {
-          console.log('Realtime subscription status:', status);
-          if (status === 'SUBSCRIBED') {
-            setStatus('connected');
-          } else if (status === 'CLOSED' || status === 'CHANNEL_ERROR') {
-            setStatus('disconnected');
-          } else {
-            setStatus('connecting');
-          }
-        });
-    };
-
-    setupChannel();
-
-    return () => {
-      if (channel) {
-        channel.unsubscribe();
+      } catch (error) {
+        console.error("Error updating online status:", error);
       }
     };
-  }, []);
 
-  const testConnection = () => {
-    const channel = supabase.channel('realtime-status');
-    channel.send({
-      type: 'broadcast',
-      event: 'test',
-      payload: { message: 'Testing realtime connection', timestamp: new Date().toISOString() }
-    });
-  };
+    setUserOnline();
 
-  return (
-    <div className="flex flex-col gap-2 p-4 border rounded-md">
-      <div className="flex items-center gap-2">
-        <span>Realtime Status:</span>
-        {status === 'connecting' && (
-          <Badge variant="outline" className="bg-yellow-100 text-yellow-800">
-            <Loader2 className="h-3 w-3 animate-spin mr-1" /> Connecting...
-          </Badge>
-        )}
-        {status === 'connected' && (
-          <Badge variant="outline" className="bg-green-100 text-green-800">Connected</Badge>
-        )}
-        {status === 'disconnected' && (
-          <Badge variant="outline" className="bg-red-100 text-red-800">Disconnected</Badge>
-        )}
-      </div>
+    // Set up event listeners for page visibility changes
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        updateOnlineStatus(user.id, true).catch(err => 
+          console.error("Error updating online status on visibility change:", err)
+        );
+      } else {
+        updateOnlineStatus(user.id, false).catch(err => 
+          console.error("Error updating offline status on visibility change:", err)
+        );
+      }
+    };
+
+    // Set up event listeners for window focus/blur
+    const handleFocus = () => updateOnlineStatus(user.id, true)
+      .catch(err => console.error("Error updating online status on focus:", err));
       
-      <Button 
-        size="sm" 
-        variant="outline" 
-        onClick={testConnection}
-        disabled={status !== 'connected'}
-      >
-        Test Connection
-      </Button>
+    const handleBlur = () => updateOnlineStatus(user.id, false)
+      .catch(err => console.error("Error updating offline status on blur:", err));
+
+    // Add event listeners
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('focus', handleFocus);
+    window.addEventListener('blur', handleBlur);
+
+    // Set up heartbeat to maintain online status
+    const heartbeatInterval = setInterval(() => {
+      if (document.visibilityState === 'visible') {
+        updateOnlineStatus(user.id, true)
+          .catch(err => console.error("Error updating online status on heartbeat:", err));
+      }
+    }, 60000); // every minute
+
+    // Set up beforeunload handler to mark user as offline when leaving
+    const handleBeforeUnload = () => {
+      // Use navigator.sendBeacon for asynchronous request that works during page unload
+      if (navigator.sendBeacon) {
+        const headers = new Headers();
+        headers.append('Content-Type', 'application/json');
+        headers.append('apikey', import.meta.env.VITE_SUPABASE_ANON_KEY);
+        headers.append('Authorization', `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`);
+        
+        const data = JSON.stringify({ is_online: false });
+        const url = `${import.meta.env.VITE_SUPABASE_URL}/rest/v1/profiles?id=eq.${user.id}`;
+        
+        navigator.sendBeacon(url, new Blob([data], { type: 'application/json' }));
+      } else {
+        // Fallback for browsers without sendBeacon support
+        updateOnlineStatus(user.id, false).catch(err => 
+          console.error("Error updating online status on unload:", err)
+        );
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
+    // Clean up
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('focus', handleFocus);
+      window.removeEventListener('blur', handleBlur);
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+      clearInterval(heartbeatInterval);
       
-      {lastMessage && (
-        <div className="mt-2">
-          <p className="text-xs text-gray-500">Last Message:</p>
-          <pre className="text-xs bg-gray-50 p-2 rounded overflow-x-auto">
-            {lastMessage}
-          </pre>
-        </div>
-      )}
-    </div>
-  );
+      // Mark user as offline when component unmounts
+      updateOnlineStatus(user.id, false).catch(error => 
+        console.error("Error updating offline status on unmount:", error)
+      );
+    };
+  }, [user]);
+
+  // This component doesn't render anything
+  return null;
 };
 
 export default RealtimeStatus;

@@ -1,320 +1,511 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
-import { 
-  Calendar, 
-  Flame, 
-  Heart, 
-  Languages, 
-  MapPin, 
-  MessageCircle, 
-  Share2, 
-  User 
-} from "lucide-react";
+import { useParams, useNavigate } from "react-router-dom";
+import { Edit, Heart, MessageCircle, User, ArrowLeft, Calendar, Flag, Rocket, Check, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { 
-  Dialog, 
-  DialogContent, 
-  DialogDescription, 
-  DialogHeader, 
-  DialogTitle, 
-  DialogTrigger 
-} from "@/components/ui/dialog";
+import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useToast } from "@/components/ui/use-toast";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useAuth } from "@/providers/AuthProvider";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase, toggleProfileLike, hasUserLikedProfile } from "@/lib/supabase";
+import { useToast } from "@/hooks/use-toast";
+import { Profile as ProfileType, User as UserType } from "@/types/schema";
+import { useRealtimeProfile } from "@/hooks/useRealtimeProfile";
+import { Label } from "@/components/ui/label";
 
-interface UserProfile {
+interface UserProfileData {
   id: string;
-  username: string;
-  bio: string;
-  avatar_url: string;
+  email: string;
+  full_name: string;
   native_language: string;
   learning_language: string;
   proficiency_level: string;
+  gender?: string;
+  date_of_birth?: string;
+  learning_goal?: string;
+  avatar_url?: string;
   streak_count: number;
+  username?: string;
+  bio?: string;
   likes_count: number;
-  created_at: string;
-  achievements: {
-    title: string;
-    description: string;
-    date: string;
-    icon: string;
-  }[];
+  is_online: boolean;
 }
 
 const Profile = () => {
+  const { id: profileId } = useParams<{ id: string }>();
   const { user } = useAuth();
-  const [profile, setProfile] = useState<UserProfile | null>(null);
-  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
   const { toast } = useToast();
+  const [isCurrentUser, setIsCurrentUser] = useState(false);
+  const [profileData, setProfileData] = useState<UserProfileData | null>(null);
+  const [isEditing, setIsEditing] = useState(false);
+  const [hasLiked, setHasLiked] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isLikeLoading, setIsLikeLoading] = useState(false);
+  const [editForm, setEditForm] = useState({
+    username: "",
+    bio: "",
+    learning_goal: "",
+    avatar_url: "",
+  });
+
+  const [channel, setChannel] = useState<any>(null);
 
   useEffect(() => {
-    const fetchProfile = async () => {
-      if (!user) return;
-
+    const targetId = profileId || (user?.id ?? '');
+    setIsCurrentUser(!profileId || profileId === user?.id);
+    
+    const fetchProfileData = async () => {
       try {
-        const { data, error } = await supabase
+        setIsLoading(true);
+        
+        const { data: profileData, error: profileError } = await supabase
           .from('profiles')
           .select('*')
-          .eq('id', user.id)
+          .eq('id', targetId)
           .single();
+        
+        if (profileError) {
+          console.error("Error fetching profile:", profileError);
+          throw profileError;
+        }
+        
+        const { data: userData, error: userError } = await supabase
+          .from('users')
+          .select('*')
+          .eq('id', targetId)
+          .single();
+        
+        if (userError) {
+          console.error("Error fetching user details:", userError);
+          throw userError;
+        }
 
-        if (error) throw error;
-
-        // For now, we'll hardcode achievements since they're not in DB yet
-        const profileData = {
-          ...data,
-          achievements: [
-            {
-              title: "Week One Warrior",
-              description: "Completed 7 consecutive days of language learning",
-              date: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
-              icon: "🔥"
-            },
-            {
-              title: "Conversation Starter",
-              description: "Initiated first language exchange conversation",
-              date: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString(),
-              icon: "💬"
-            }
-          ]
+        if (!isCurrentUser && user) {
+          const isLiked = await hasUserLikedProfile(user.id, targetId);
+          setHasLiked(isLiked);
+        }
+        
+        const profileObj = profileData as Record<string, any> || {};
+        const userObj = userData as Record<string, any> || {};
+        
+        const combinedData: UserProfileData = {
+          id: targetId,
+          email: userObj.email || '',
+          full_name: userObj.full_name || '',
+          native_language: userObj.native_language || 'English',
+          learning_language: userObj.learning_language || 'Spanish',
+          proficiency_level: userObj.proficiency_level || 'beginner',
+          gender: userObj.gender || undefined,
+          date_of_birth: userObj.date_of_birth || undefined,
+          learning_goal: userObj.learning_goal || undefined,
+          avatar_url: userObj.avatar_url || undefined,
+          streak_count: userObj.streak_count || 0,
+          username: profileObj.username || '',
+          bio: profileObj.bio || '',
+          likes_count: profileObj.likes_count || 0,
+          is_online: profileObj.is_online || false,
         };
-
-        setProfile(profileData);
+        
+        setProfileData(combinedData);
+        setEditForm({
+          username: combinedData.username || '',
+          bio: combinedData.bio || '',
+          learning_goal: combinedData.learning_goal || '',
+          avatar_url: combinedData.avatar_url || '',
+        });
+        
+        setIsLoading(false);
       } catch (error) {
-        console.error('Error fetching profile:', error);
+        console.error("Error in fetchProfileData:", error);
         toast({
           variant: "destructive",
-          title: "Error",
-          description: "Failed to load profile data",
+          title: "Error loading profile",
+          description: "Could not load the profile data. Please try again."
         });
-      } finally {
-        setLoading(false);
+        if (!profileId) {
+          navigate('/dashboard');
+        }
+        setIsLoading(false);
       }
     };
 
-    fetchProfile();
-  }, [user]);
+    fetchProfileData();
+    setupRealtimeSubscription(targetId);
 
-  const handleLike = async () => {
-    if (!profile || !user) return;
+    return () => {
+      if (channel) {
+        supabase.removeChannel(channel);
+      }
+    };
+  }, [profileId, user, navigate, toast]);
+
+  const setupRealtimeSubscription = (userId: string) => {
+    const newChannel = supabase
+      .channel(`profile:${userId}`)
+      .on('postgres_changes', 
+        {
+          event: '*',
+          schema: 'public',
+          table: 'profiles',
+          filter: `id=eq.${userId}`
+        }, 
+        (payload) => {
+          console.log('Profile update:', payload);
+          
+          if (profileData && payload.new) {
+            setProfileData(prev => {
+              if (!prev) return prev;
+              
+              const newData = payload.new as Record<string, any>;
+              return {
+                ...prev,
+                username: newData?.username !== undefined ? newData.username : prev.username,
+                bio: newData?.bio !== undefined ? newData.bio : prev.bio,
+                likes_count: newData?.likes_count !== undefined ? newData.likes_count : prev.likes_count,
+                is_online: newData?.is_online !== undefined ? newData.is_online : prev.is_online
+              };
+            });
+          }
+        }
+      )
+      .on('postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'users',
+          filter: `id=eq.${userId}`
+        },
+        (payload) => {
+          console.log('User update:', payload);
+          
+          if (profileData && payload.new) {
+            setProfileData(prev => {
+              if (!prev) return prev;
+              
+              const newData = payload.new as Record<string, any>;
+              return {
+                ...prev,
+                full_name: newData?.full_name !== undefined ? newData.full_name : prev.full_name,
+                native_language: newData?.native_language !== undefined ? newData.native_language : prev.native_language,
+                learning_language: newData?.learning_language !== undefined ? newData.learning_language : prev.learning_language,
+                proficiency_level: newData?.proficiency_level !== undefined ? newData.proficiency_level : prev.proficiency_level,
+                gender: newData?.gender !== undefined ? newData.gender : prev.gender,
+                date_of_birth: newData?.date_of_birth !== undefined ? newData.date_of_birth : prev.date_of_birth,
+                learning_goal: newData?.learning_goal !== undefined ? newData.learning_goal : prev.learning_goal,
+                avatar_url: newData?.avatar_url !== undefined ? newData.avatar_url : prev.avatar_url,
+                streak_count: newData?.streak_count !== undefined ? newData.streak_count : prev.streak_count
+              };
+            });
+          }
+        }
+      )
+      .subscribe();
+    
+    setChannel(newChannel);
+  };
+
+  const handleSave = async () => {
+    if (!user || !profileData) return;
 
     try {
-      const { error } = await supabase
+      setIsLoading(true);
+
+      const { error: profileUpdateError } = await supabase
         .from('profiles')
-        .update({ 
-          likes_count: profile.likes_count + 1 
+        .update({
+          username: editForm.username,
+          bio: editForm.bio,
+          avatar_url: editForm.avatar_url,
         })
-        .eq('id', profile.id);
+        .eq('id', user.id);
 
-      if (error) throw error;
+      if (profileUpdateError) {
+        console.error("Error updating profile:", profileUpdateError);
+        throw profileUpdateError;
+      }
 
-      setProfile({
-        ...profile,
-        likes_count: profile.likes_count + 1
+      const { error: userUpdateError } = await supabase
+        .from('users')
+        .update({
+          learning_goal: editForm.learning_goal,
+        })
+        .eq('id', user.id);
+
+      if (userUpdateError) {
+        console.error("Error updating user:", userUpdateError);
+        throw userUpdateError;
+      }
+
+      setProfileData(prev => {
+        if (!prev) return prev;
+        return {
+          ...prev,
+          username: editForm.username,
+          bio: editForm.bio,
+          learning_goal: editForm.learning_goal,
+          avatar_url: editForm.avatar_url,
+        };
       });
 
       toast({
-        title: "Profile liked",
-        description: "Thanks for the support!",
+        title: "Profile updated",
+        description: "Your profile has been updated successfully.",
       });
+      setIsEditing(false);
     } catch (error) {
-      console.error('Error updating likes:', error);
+      console.error("Error updating profile:", error);
+      toast({
+        variant: "destructive",
+        title: "Error updating profile",
+        description: "Could not update profile. Please try again.",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleToggleLike = async () => {
+    if (!user || !profileData) return;
+
+    try {
+      setIsLikeLoading(true);
+      const success = await toggleProfileLike(user.id, profileData.id);
+
+      if (success) {
+        setHasLiked(!hasLiked);
+        setProfileData(prev => {
+          if (!prev) return prev;
+          return {
+            ...prev,
+            likes_count: hasLiked ? prev.likes_count - 1 : prev.likes_count + 1,
+          };
+        });
+      } else {
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Failed to update like status. Please try again.",
+        });
+      }
+    } catch (error) {
+      console.error("Error toggling like:", error);
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Failed to update likes",
+        description: "An error occurred while updating like status.",
       });
+    } finally {
+      setIsLikeLoading(false);
     }
   };
 
-  const calculateJoinedTime = (dateString: string) => {
-    const joinDate = new Date(dateString);
-    const now = new Date();
-    const diffTime = Math.abs(now.getTime() - joinDate.getTime());
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-    if (diffDays < 30) {
-      return `${diffDays} days ago`;
-    } else {
-      const diffMonths = Math.floor(diffDays / 30);
-      return diffMonths === 1 ? "1 month ago" : `${diffMonths} months ago`;
-    }
-  };
-
-  const handleShare = () => {
-    navigator.clipboard.writeText(window.location.href);
-    toast({
-      title: "Link copied",
-      description: "Profile link copied to clipboard",
-    });
-  };
-
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="container flex items-center justify-center min-h-[50vh]">
         <div className="flex flex-col items-center">
-          <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spinner"></div>
+          <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
           <p className="mt-4 text-muted-foreground">Loading profile...</p>
         </div>
       </div>
     );
   }
 
-  if (!profile) {
+  if (!profileData) {
     return (
-      <div className="container py-12 text-center">
-        <h2 className="text-2xl font-bold mb-2">Profile not found</h2>
-        <p className="text-muted-foreground mb-6">
-          We couldn't find your profile information.
-        </p>
-        <Button asChild>
-          <Link to="/community">Back to Community</Link>
-        </Button>
+      <div className="container flex items-center justify-center min-h-[50vh]">
+        <div className="flex flex-col items-center">
+          <X className="w-10 h-10 text-red-500" />
+          <p className="mt-4 text-muted-foreground">Profile not found.</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="container pb-12 animate-fade-in">
-      {/* Profile Header */}
-      <div className="flex justify-between items-start mb-8">
-        <div className="flex items-center space-x-4">
-          <Dialog>
-            <DialogTrigger asChild>
-              <Button variant="ghost" className="p-0 h-auto hover:bg-transparent">
-                <Avatar className="h-24 w-24 cursor-pointer hover:ring-2 hover:ring-primary/50 transition-all">
-                  <AvatarImage src={profile.avatar_url || "/placeholder.svg"} alt={profile.username} />
-                  <AvatarFallback className="text-2xl">{profile.username?.[0]?.toUpperCase()}</AvatarFallback>
-                </Avatar>
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="max-w-md">
-              <DialogHeader>
-                <DialogTitle>{profile.username}</DialogTitle>
-                <DialogDescription>Profile picture</DialogDescription>
-              </DialogHeader>
-              <div className="flex justify-center p-4">
-                <img 
-                  src={profile.avatar_url || "/placeholder.svg"}
-                  alt={profile.username} 
-                  className="max-w-full max-h-[60vh] object-contain rounded-md"
-                />
-              </div>
-            </DialogContent>
-          </Dialog>
-
-          <div>
-            <h1 className="text-3xl font-bold">{profile.username}</h1>
-            <div className="flex items-center space-x-2 mt-1">
-              <Calendar className="h-4 w-4 text-muted-foreground" />
-              <span className="text-muted-foreground">
-                Joined {calculateJoinedTime(profile.created_at)}
-              </span>
-            </div>
-          </div>
+    <div className="container py-6 animate-fade-in">
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <Button variant="ghost" size="icon" onClick={() => navigate(-1)}>
+            <ArrowLeft className="h-4 w-4" />
+          </Button>
         </div>
-
-        <div className="flex space-x-2">
-          <Button 
-            variant="outline"
-            size="sm" 
-            className="button-hover"
-            onClick={handleLike}
-          >
-            <Heart className="h-4 w-4 mr-2" />
-            {profile.likes_count}
-          </Button>
-
-          <Button variant="outline" size="sm" className="button-hover" onClick={handleShare}>
-            <Share2 className="h-4 w-4 mr-2" />
-            Share
-          </Button>
+        <h1 className="text-2xl font-bold tracking-tight">
+          {isCurrentUser ? "Your Profile" : profileData.username}
+        </h1>
+        <div>
+          {isCurrentUser ? (
+            <Button variant="outline" size="sm" onClick={() => setIsEditing(true)}>
+              <Edit className="h-4 w-4 mr-2" />
+              Edit Profile
+            </Button>
+          ) : (
+            <Button variant="outline" size="sm" onClick={handleToggleLike} disabled={isLikeLoading}>
+              {isLikeLoading ? (
+                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+              ) : (
+                <>
+                  <Heart className={`h-4 w-4 mr-2 ${hasLiked ? "fill-red-500" : ""}`} />
+                  {profileData.likes_count} Likes
+                </>
+              )}
+            </Button>
+          )}
         </div>
       </div>
 
-      {/* Language Info */}
-      <Card className="mb-8 glass-card">
-        <CardContent className="p-6">
-          <div className="flex flex-col md:flex-row md:justify-between">
-            <div className="mb-4 md:mb-0">
-              <h3 className="text-lg font-semibold">Language Skills</h3>
-              <div className="flex flex-col space-y-2 mt-2">
-                <div className="flex items-center space-x-2">
-                  <Languages className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-muted-foreground">Native language:</span>
-                  <Badge variant="secondary">{profile.native_language}</Badge>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Languages className="h-4 w-4 text-primary" />
-                  <span className="text-muted-foreground">Learning:</span>
-                  <Badge>{profile.learning_language}</Badge>
-                  <span className="text-xs text-muted-foreground">({profile.proficiency_level})</span>
-                </div>
-              </div>
-            </div>
-
-            <div className="flex items-center space-x-4">
-              <div className="flex flex-col items-center">
-                <div className="flex items-center space-x-1">
-                  <Flame className="h-5 w-5 text-primary" />
-                  <span className="text-2xl font-bold">{profile.streak_count}</span>
-                </div>
-                <span className="text-xs text-muted-foreground">day streak</span>
-              </div>
+      <Card className="glass-card">
+        <CardHeader>
+          <div className="flex items-center space-x-4">
+            <Avatar className="h-16 w-16">
+              <AvatarImage src={profileData.avatar_url || "/placeholder.svg"} alt={profileData.full_name} />
+              <AvatarFallback>{profileData.full_name?.[0]?.toUpperCase() || '?'}</AvatarFallback>
+            </Avatar>
+            <div>
+              <CardTitle className="text-lg font-semibold">{profileData.full_name}</CardTitle>
+              <CardDescription className="text-sm text-muted-foreground">
+                {profileData.username && `@${profileData.username}`}
+              </CardDescription>
             </div>
           </div>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <p className="text-sm font-medium">Native Language:</p>
+              <p className="text-muted-foreground">{profileData.native_language}</p>
+            </div>
+            <div>
+              <p className="text-sm font-medium">Learning Language:</p>
+              <p className="text-muted-foreground">{profileData.learning_language} ({profileData.proficiency_level})</p>
+            </div>
+            <div>
+              <p className="text-sm font-medium">Streak:</p>
+              <div className="flex items-center">
+                <Rocket className="h-4 w-4 mr-1 text-primary" />
+                <p className="text-muted-foreground">{profileData.streak_count} days</p>
+              </div>
+            </div>
+            <div>
+              <p className="text-sm font-medium">Online Status:</p>
+              <div className="flex items-center">
+                {profileData.is_online ? (
+                  <>
+                    <Check className="h-4 w-4 mr-1 text-green-500" />
+                    <p className="text-green-500">Online</p>
+                  </>
+                ) : (
+                  <>
+                    <X className="h-4 w-4 mr-1 text-gray-500" />
+                    <p className="text-gray-500">Offline</p>
+                  </>
+                )}
+              </div>
+            </div>
+            {profileData.gender && (
+              <div>
+                <p className="text-sm font-medium">Gender:</p>
+                <p className="text-muted-foreground">{profileData.gender}</p>
+              </div>
+            )}
+            {profileData.date_of_birth && (
+              <div>
+                <p className="text-sm font-medium">Date of Birth:</p>
+                <p className="text-muted-foreground">{profileData.date_of_birth}</p>
+              </div>
+            )}
+          </div>
+          <Separator className="my-4" />
+          <div>
+            <p className="text-sm font-medium">Bio:</p>
+            <p className="text-muted-foreground">{profileData.bio}</p>
+          </div>
+          {profileData.learning_goal && (
+            <>
+              <Separator className="my-4" />
+              <div>
+                <p className="text-sm font-medium">Learning Goal:</p>
+                <p className="text-muted-foreground">{profileData.learning_goal}</p>
+              </div>
+            </>
+          )}
         </CardContent>
+        {!isCurrentUser && (
+          <CardFooter className="justify-between">
+            <Button variant="ghost">
+              <Heart className="h-4 w-4 mr-2" />
+              {profileData.likes_count} Likes
+            </Button>
+            <Button asChild variant="outline">
+              <a href={`/chat/${profileData.id}`}>
+                <MessageCircle className="h-4 w-4 mr-2" />
+                Start Chat
+              </a>
+            </Button>
+          </CardFooter>
+        )}
       </Card>
 
-      {/* Profile Tabs */}
-      <Tabs defaultValue="about" className="mb-8">
-        <TabsList className="grid grid-cols-2 mb-6">
-          <TabsTrigger value="about">About</TabsTrigger>
-          <TabsTrigger value="achievements">Achievements</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="about" className="mt-0">
-          <Card>
+      {isEditing && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <Card className="max-w-md w-full">
             <CardHeader>
-              <CardTitle>About {profile.username}</CardTitle>
+              <CardTitle>Edit Profile</CardTitle>
+              <CardDescription>Update your profile information.</CardDescription>
             </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground">{profile.bio}</p>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="achievements" className="mt-0">
-          <Card>
-            <CardHeader>
-              <CardTitle>Achievements</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {profile.achievements.map((achievement, index) => (
-                  <div key={index} className="flex items-start space-x-4 p-4 rounded-lg border border-border">
-                    <div className="w-10 h-10 flex items-center justify-center bg-primary/10 rounded-full text-xl">
-                      {achievement.icon}
-                    </div>
-                    <div>
-                      <h4 className="font-medium">{achievement.title}</h4>
-                      <p className="text-sm text-muted-foreground">{achievement.description}</p>
-                      <p className="text-xs text-muted-foreground mt-1">
-                        Achieved on {new Date(achievement.date).toLocaleDateString()}
-                      </p>
-                    </div>
-                  </div>
-                ))}
+            <CardContent className="grid gap-4">
+              <div className="grid gap-2">
+                <Label htmlFor="username">Username</Label>
+                <Input
+                  id="username"
+                  value={editForm.username}
+                  onChange={(e) => setEditForm({ ...editForm, username: e.target.value })}
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="bio">Bio</Label>
+                <Textarea
+                  id="bio"
+                  value={editForm.bio}
+                  onChange={(e) => setEditForm({ ...editForm, bio: e.target.value })}
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="learning_goal">Learning Goal</Label>
+                <Input
+                  id="learning_goal"
+                  value={editForm.learning_goal}
+                  onChange={(e) => setEditForm({ ...editForm, learning_goal: e.target.value })}
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="avatar_url">Avatar URL</Label>
+                <Input
+                  id="avatar_url"
+                  value={editForm.avatar_url}
+                  onChange={(e) => setEditForm({ ...editForm, avatar_url: e.target.value })}
+                />
               </div>
             </CardContent>
+            <CardFooter className="flex justify-end gap-2">
+              <Button variant="secondary" onClick={() => setIsEditing(false)}>
+                Cancel
+              </Button>
+              <Button onClick={handleSave} disabled={isLoading}>
+                {isLoading ? (
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                ) : (
+                  "Save"
+                )}
+              </Button>
+            </CardFooter>
           </Card>
-        </TabsContent>
-      </Tabs>
+        </div>
+      )}
     </div>
   );
 };
