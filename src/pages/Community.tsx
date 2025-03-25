@@ -1,7 +1,7 @@
 
 import { useEffect, useState } from 'react';
 import { Link } from "react-router-dom";
-import { Search, Filter, Languages, Flame, MessageCircle, Heart, User, Calendar } from "lucide-react";
+import { Search, Filter, Languages, Flame, MessageCircle, Heart } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -13,8 +13,6 @@ import { supabase, toggleProfileLike, hasUserLikedProfile } from '@/lib/supabase
 import { useAuth } from "@/providers/AuthProvider";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from '@/lib/utils';
-import { Slider } from "@/components/ui/slider";
-import { RealtimeChannel } from '@supabase/supabase-js';
 
 interface UserProfile {
   id: string;
@@ -27,8 +25,6 @@ interface UserProfile {
   streak_count: number;
   likes_count: number;
   is_online: boolean;
-  gender?: string;
-  age?: number;
   liked: boolean; // Whether the current user has liked this profile
 }
 
@@ -73,26 +69,6 @@ const UserCard = ({
               <div className="text-xs text-muted-foreground">
                 {user.proficiency_level}
               </div>
-
-              {user.gender && (
-                <>
-                  <div className="w-1 h-1 rounded-full bg-muted-foreground"></div>
-                  <div className="flex items-center text-xs text-muted-foreground">
-                    <User className="h-3 w-3 mr-1" />
-                    <span>{user.gender}</span>
-                  </div>
-                </>
-              )}
-
-              {user.age && (
-                <>
-                  <div className="w-1 h-1 rounded-full bg-muted-foreground"></div>
-                  <div className="flex items-center text-xs text-muted-foreground">
-                    <Calendar className="h-3 w-3 mr-1" />
-                    <span>{user.age}</span>
-                  </div>
-                </>
-              )}
             </div>
           </div>
         </div>
@@ -131,11 +107,8 @@ const Community = () => {
   const [filteredProfiles, setFilteredProfiles] = useState<UserProfile[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [languageFilter, setLanguageFilter] = useState("");
-  const [genderFilter, setGenderFilter] = useState("");
-  const [ageRange, setAgeRange] = useState<[number, number]>([18, 80]);
   const [onlineOnly, setOnlineOnly] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [channels, setChannels] = useState<RealtimeChannel[]>([]);
 
   // Fetch profiles and handle real-time updates
   useEffect(() => {
@@ -143,7 +116,6 @@ const Community = () => {
 
     const fetchProfiles = async () => {
       try {
-        setLoading(true);
         // Get all profiles except the current user
         const { data: profilesData, error } = await supabase
           .from('profiles')
@@ -155,13 +127,10 @@ const Community = () => {
             is_online,
             likes_count,
             users!inner (
-              id,
               native_language,
               learning_language,
               proficiency_level,
-              streak_count,
-              gender,
-              date_of_birth
+              streak_count
             )
           `)
           .neq('id', user.id);
@@ -182,154 +151,112 @@ const Community = () => {
           likes.forEach(like => likedProfiles.add(like.liked_id));
         }
 
-        // Format profiles data with age calculation
-        const formattedProfiles = profilesData.map(profile => {
-          let age = null;
-          if (profile.users.date_of_birth) {
-            const birthDate = new Date(profile.users.date_of_birth);
-            const today = new Date();
-            age = today.getFullYear() - birthDate.getFullYear();
-            const m = today.getMonth() - birthDate.getMonth();
-            if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
-              age--;
-            }
-          }
-
-          return {
-            id: profile.id,
-            username: profile.username || 'Anonymous',
-            bio: profile.bio || 'No bio available',
-            avatar_url: profile.avatar_url,
-            native_language: profile.users.native_language,
-            learning_language: profile.users.learning_language,
-            proficiency_level: profile.users.proficiency_level,
-            streak_count: profile.users.streak_count || 0,
-            likes_count: profile.likes_count || 0,
-            is_online: profile.is_online || false,
-            gender: profile.users.gender,
-            age: age,
-            liked: likedProfiles.has(profile.id)
-          };
-        });
+        // Format profiles data
+        const formattedProfiles = profilesData.map(profile => ({
+          id: profile.id,
+          username: profile.username || 'Anonymous',
+          bio: profile.bio || 'No bio available',
+          avatar_url: profile.avatar_url,
+          native_language: profile.users.native_language,
+          learning_language: profile.users.learning_language,
+          proficiency_level: profile.users.proficiency_level,
+          streak_count: profile.users.streak_count || 0,
+          likes_count: profile.likes_count || 0,
+          is_online: profile.is_online || false,
+          liked: likedProfiles.has(profile.id)
+        }));
 
         setProfiles(formattedProfiles);
         setFilteredProfiles(formattedProfiles);
-        setLoading(false);
       } catch (error) {
         console.error('Error in fetchProfiles:', error);
+      } finally {
         setLoading(false);
       }
     };
 
     fetchProfiles();
 
-    // Set up real-time subscription for various changes
-    const setupRealtimeSubscriptions = () => {
-      // Channel for profiles changes
-      const profilesChannel = supabase
-        .channel('public:profiles')
-        .on('postgres_changes', 
-          { 
-            event: '*', 
-            schema: 'public', 
-            table: 'profiles',
-            filter: `id=neq.${user.id}`
-          }, 
-          (payload) => {
-            console.log('Profile change detected:', payload);
-            // Update profiles state based on the change
-            setProfiles(currentProfiles => {
-              // Find if this profile exists in our current state
-              const index = currentProfiles.findIndex(p => p.id === payload.new.id);
-              
-              // Handle different event types
-              if (payload.eventType === 'DELETE') {
-                // Remove the profile if it was deleted
-                return currentProfiles.filter(p => p.id !== payload.old.id);
-              } else if (index >= 0) {
-                // Update existing profile
-                const updatedProfiles = [...currentProfiles];
-                updatedProfiles[index] = {
-                  ...updatedProfiles[index],
-                  username: payload.new.username || updatedProfiles[index].username,
-                  bio: payload.new.bio || updatedProfiles[index].bio,
-                  avatar_url: payload.new.avatar_url,
-                  likes_count: payload.new.likes_count || 0,
-                  is_online: payload.new.is_online || false
-                };
-                return updatedProfiles;
-              } else if (payload.eventType === 'INSERT') {
-                // We need to fetch the complete profile data for new insertions
-                fetchProfiles();
-                return currentProfiles;
-              }
-              
+    // Set up real-time subscription for profiles changes
+    const profilesChannel = supabase
+      .channel('public:profiles')
+      .on('postgres_changes', 
+        { 
+          event: '*', 
+          schema: 'public', 
+          table: 'profiles',
+          filter: `id=neq.${user.id}`
+        }, 
+        (payload) => {
+          // Update profiles state based on the change
+          setProfiles(currentProfiles => {
+            // Find if this profile exists in our current state
+            const index = currentProfiles.findIndex(p => p.id === payload.new.id);
+            
+            // Handle different event types
+            if (payload.eventType === 'DELETE') {
+              // Remove the profile if it was deleted
+              return currentProfiles.filter(p => p.id !== payload.old.id);
+            } else if (index >= 0) {
+              // Update existing profile
+              const updatedProfiles = [...currentProfiles];
+              updatedProfiles[index] = {
+                ...updatedProfiles[index],
+                username: payload.new.username || updatedProfiles[index].username,
+                bio: payload.new.bio || updatedProfiles[index].bio,
+                avatar_url: payload.new.avatar_url,
+                likes_count: payload.new.likes_count || 0,
+                is_online: payload.new.is_online || false
+              };
+              return updatedProfiles;
+            } else if (payload.eventType === 'INSERT') {
+              // We need to fetch the complete profile data for new insertions
+              fetchProfiles();
               return currentProfiles;
-            });
-          }
-        )
-        .subscribe();
+            }
+            
+            return currentProfiles;
+          });
+        }
+      )
+      .subscribe();
 
-      // Channel for user_likes changes
-      const likesChannel = supabase
-        .channel('public:user_likes')
-        .on('postgres_changes', 
-          { 
-            event: '*', 
-            schema: 'public', 
-            table: 'user_likes',
-            filter: `liker_id=eq.${user.id}`
-          }, 
-          (payload) => {
-            console.log('User like change detected:', payload);
-            // Update the liked status for profiles
-            setProfiles(currentProfiles => {
-              if (payload.eventType === 'INSERT') {
-                return currentProfiles.map(profile => 
-                  profile.id === payload.new.liked_id 
-                    ? { ...profile, liked: true } 
-                    : profile
-                );
-              } else if (payload.eventType === 'DELETE') {
-                return currentProfiles.map(profile => 
-                  profile.id === payload.old.liked_id 
-                    ? { ...profile, liked: false } 
-                    : profile
-                );
-              }
-              return currentProfiles;
-            });
-          }
-        )
-        .subscribe();
-
-      // Channel for users changes
-      const usersChannel = supabase
-        .channel('public:users')
-        .on('postgres_changes', 
-          { 
-            event: 'UPDATE', 
-            schema: 'public', 
-            table: 'users'
-          }, 
-          (payload) => {
-            console.log('User data change detected:', payload);
-            // We need to refetch all profiles since user data changed
-            fetchProfiles();
-          }
-        )
-        .subscribe();
-
-      setChannels([profilesChannel, likesChannel, usersChannel]);
-    };
-
-    setupRealtimeSubscriptions();
+    // Set up real-time subscription for user_likes changes
+    const likesChannel = supabase
+      .channel('public:user_likes')
+      .on('postgres_changes', 
+        { 
+          event: '*', 
+          schema: 'public', 
+          table: 'user_likes',
+          filter: `liker_id=eq.${user.id}`
+        }, 
+        (payload) => {
+          // Update the liked status for profiles
+          setProfiles(currentProfiles => {
+            if (payload.eventType === 'INSERT') {
+              return currentProfiles.map(profile => 
+                profile.id === payload.new.liked_id 
+                  ? { ...profile, liked: true } 
+                  : profile
+              );
+            } else if (payload.eventType === 'DELETE') {
+              return currentProfiles.map(profile => 
+                profile.id === payload.old.liked_id 
+                  ? { ...profile, liked: false } 
+                  : profile
+              );
+            }
+            return currentProfiles;
+          });
+        }
+      )
+      .subscribe();
 
     // Clean up subscriptions on unmount
     return () => {
-      channels.forEach(channel => {
-        supabase.removeChannel(channel);
-      });
+      supabase.removeChannel(profilesChannel);
+      supabase.removeChannel(likesChannel);
     };
   }, [user]);
 
@@ -356,24 +283,12 @@ const Community = () => {
       );
     }
 
-    if (genderFilter && genderFilter !== 'all') {
-      filtered = filtered.filter(profile =>
-        profile.gender === genderFilter
-      );
-    }
-
-    if (ageRange[0] !== 18 || ageRange[1] !== 80) {
-      filtered = filtered.filter(profile =>
-        profile.age ? (profile.age >= ageRange[0] && profile.age <= ageRange[1]) : true
-      );
-    }
-
     if (onlineOnly) {
       filtered = filtered.filter(profile => profile.is_online);
     }
 
     setFilteredProfiles(filtered);
-  }, [profiles, searchQuery, languageFilter, genderFilter, ageRange, onlineOnly]);
+  }, [profiles, searchQuery, languageFilter, onlineOnly]);
 
   // Handle like functionality
   const handleLike = async (profileId: string) => {
@@ -448,9 +363,6 @@ const Community = () => {
     "Arabic", "Hindi", "Dutch", "Swedish", "Finnish"
   ];
 
-  // Gender options
-  const genders = ["Male", "Female", "Non-binary", "Other"];
-
   return (
     <div className="container animate-fade-in py-6">
       <div className="space-y-2 mb-8">
@@ -462,7 +374,7 @@ const Community = () => {
 
       <Card className="glass-card mb-8">
         <CardContent className="pt-6">
-          <div className="flex flex-col space-y-4">
+          <div className="flex flex-col space-y-4 md:flex-row md:space-y-0 md:space-x-4">
             <div className="relative flex-grow">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground h-4 w-4" />
               <Input
@@ -472,10 +384,10 @@ const Community = () => {
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
             </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+
+            <div className="flex flex-col space-y-2 md:flex-row md:space-y-0 md:space-x-2">
               <Select value={languageFilter} onValueChange={setLanguageFilter}>
-                <SelectTrigger>
+                <SelectTrigger className="w-full md:w-[180px]">
                   <SelectValue placeholder="Filter by language" />
                 </SelectTrigger>
                 <SelectContent>
@@ -485,30 +397,6 @@ const Community = () => {
                   ))}
                 </SelectContent>
               </Select>
-
-              <Select value={genderFilter} onValueChange={setGenderFilter}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Filter by gender" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Genders</SelectItem>
-                  {genders.map(gender => (
-                    <SelectItem key={gender} value={gender}>{gender}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-
-              <div className="space-y-2">
-                <p className="text-sm text-muted-foreground">Age Range: {ageRange[0]} - {ageRange[1]}</p>
-                <Slider
-                  value={[ageRange[0], ageRange[1]]}
-                  min={18}
-                  max={80}
-                  step={1}
-                  onValueChange={(value) => setAgeRange([value[0], value[1]])}
-                  className="py-2"
-                />
-              </div>
 
               <div className="flex items-center space-x-2 bg-card p-2 rounded-md border">
                 <Switch

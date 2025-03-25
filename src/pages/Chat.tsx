@@ -1,7 +1,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { Link, useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, Send, User, Info, MoreVertical, Users } from "lucide-react";
+import { ArrowLeft, Send, User, Info, MoreVertical } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -14,14 +14,12 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/providers/AuthProvider";
-import { Loader2 } from "lucide-react";
 
 interface Message {
   id: string;
   content: string;
   created_at: string;
   sender_id: string;
-  is_read: boolean;
   sender?: {
     username: string;
     avatar_url: string;
@@ -47,7 +45,6 @@ const Chat = () => {
   const [loading, setLoading] = useState(true);
   const [loadingProfile, setLoadingProfile] = useState(true);
   const [messageText, setMessageText] = useState("");
-  const [notFound, setNotFound] = useState(false);
   
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -61,7 +58,6 @@ const Chat = () => {
     const fetchPartnerProfile = async () => {
       if (!partnerId) {
         setLoadingProfile(false);
-        setNotFound(true);
         return;
       }
 
@@ -72,16 +68,16 @@ const Chat = () => {
           .eq('id', partnerId)
           .single();
 
-        if (error) {
-          console.error('Error fetching partner profile:', error);
-          setNotFound(true);
-          return;
-        }
+        if (error) throw error;
 
         setPartner(data as ChatProfile);
       } catch (error) {
         console.error('Error fetching partner profile:', error);
-        setNotFound(true);
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Failed to load profile information"
+        });
       } finally {
         setLoadingProfile(false);
       }
@@ -162,7 +158,6 @@ const Chat = () => {
             content,
             created_at,
             sender_id,
-            is_read,
             sender:profiles!sender_id(username, avatar_url)
           `)
           .eq('conversation_id', foundConversationId)
@@ -186,15 +181,14 @@ const Chat = () => {
     initializeChat();
 
     // Set up real-time subscription for new messages
-    let subscription;
-    if (conversationId) {
-      subscription = supabase
-        .channel(`messages:${conversationId}`)
+    const messageSubscription = () => {
+      return supabase
+        .channel('public:messages')
         .on('postgres_changes', {
           event: 'INSERT',
           schema: 'public',
           table: 'messages',
-          filter: `conversation_id=eq.${conversationId}`,
+          filter: conversationId ? `conversation_id=eq.${conversationId}` : undefined,
         }, async (payload) => {
           // Fetch sender profile for the new message
           const { data: senderProfile } = await supabase
@@ -211,16 +205,20 @@ const Chat = () => {
           setMessages(current => [...current, newMessage]);
         })
         .subscribe();
-    }
-    
-    return () => {
-      if (subscription) supabase.removeChannel(subscription);
     };
+
+    if (conversationId) {
+      const subscription = messageSubscription();
+      
+      return () => {
+        supabase.removeChannel(subscription);
+      };
+    }
   }, [user, partnerId, conversationId, toast]);
 
   // Mark messages as read when viewed
   useEffect(() => {
-    if (!user || !conversationId || messages.length === 0 || !partnerId) return;
+    if (!user || !conversationId || messages.length === 0) return;
 
     const markMessagesAsRead = async () => {
       try {
@@ -265,7 +263,6 @@ const Chat = () => {
         id: `temp-${Date.now()}`,
         ...newMessage,
         created_at: new Date().toISOString(),
-        is_read: false,
         sender: {
           username: "You",
           avatar_url: "" // We don't have this readily available
@@ -276,12 +273,26 @@ const Chat = () => {
       setMessageText("");
 
       // Actually send the message
-      const { error } = await supabase
+      const { error, data } = await supabase
         .from('messages')
-        .insert(newMessage);
+        .insert(newMessage)
+        .select()
+        .single();
 
       if (error) throw error;
 
+      // Remove optimistic message and add real one
+      setMessages(current => 
+        current
+          .filter(msg => msg.id !== optimisticMessage.id)
+          .concat({
+            ...data,
+            sender: {
+              username: "You",
+              avatar_url: "" // We'll get this from the subscription
+            }
+          })
+      );
     } catch (error) {
       console.error('Error sending message:', error);
       toast({
@@ -340,28 +351,8 @@ const Chat = () => {
     return (
       <div className="container flex items-center justify-center min-h-[50vh]">
         <div className="flex flex-col items-center">
-          <Loader2 className="h-12 w-12 animate-spin text-primary" />
+          <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
           <p className="mt-4 text-muted-foreground">Loading chat...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (notFound) {
-    return (
-      <div className="container flex flex-col items-center justify-center min-h-[50vh] gap-4">
-        <div className="bg-muted p-8 rounded-lg flex flex-col items-center text-center max-w-md">
-          <Users className="h-16 w-16 text-muted-foreground mb-4" />
-          <h2 className="text-2xl font-bold mb-2">No conversation found</h2>
-          <p className="text-muted-foreground mb-6">
-            This user may not exist or the conversation could have been deleted.
-          </p>
-          <Button asChild>
-            <Link to="/community">
-              <Users className="h-4 w-4 mr-2" />
-              Browse Community
-            </Link>
-          </Button>
         </div>
       </div>
     );
