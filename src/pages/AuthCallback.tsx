@@ -1,6 +1,6 @@
 
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 import { supabase, createUserRecord } from "@/lib/supabase";
 import { Loader2 } from "lucide-react";
 
@@ -35,12 +35,6 @@ const AuthCallback = () => {
             
             if (success) {
               console.log("User record created successfully");
-              
-              // Also update online status for returning users
-              await supabase
-                .from('profiles')
-                .update({ is_online: true })
-                .eq('id', user.id);
             } else {
               console.warn("Failed to create user record, but proceeding with auth");
             }

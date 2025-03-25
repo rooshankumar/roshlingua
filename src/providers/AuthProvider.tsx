@@ -3,7 +3,6 @@ import { createContext, useContext, useEffect, useState } from "react";
 import { Session, User } from "@supabase/supabase-js";
 import { supabase, createUserRecord } from "@/lib/supabase";
 import { useToast } from "@/hooks/use-toast";
-import { useNavigate, useLocation } from "react-router-dom";
 
 interface AuthContextType {
   user: User | null;
@@ -12,8 +11,7 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<void>;
   signup: (email: string, password: string, name: string) => Promise<void>;
   loginWithGoogle: () => Promise<void>;
-  logout: () => Promise<void>;
-  signOut: () => Promise<void>; // Keeping for backward compatibility
+  signOut: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -23,7 +21,6 @@ const AuthContext = createContext<AuthContextType>({
   login: async () => {},
   signup: async () => {},
   loginWithGoogle: async () => {},
-  logout: async () => {},
   signOut: async () => {},
 });
 
@@ -32,50 +29,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
-  const navigate = useNavigate();
-  const location = useLocation();
-
-  // Handle routing based on authentication state and onboarding status
-  useEffect(() => {
-    const checkOnboardingAndRedirect = async () => {
-      if (!user || isLoading) return;
-      
-      try {
-        // Only proceed with routing logic if we're not already on auth pages
-        if (!location.pathname.includes('/auth')) {
-          // Check if onboarding is complete
-          const { data: onboardingData, error } = await supabase
-            .from('onboarding_status')
-            .select('is_complete')
-            .eq('user_id', user.id)
-            .single();
-            
-          if (error) {
-            console.error("Error checking onboarding status:", error);
-            return;
-          }
-          
-          // If user is on the home page, redirect based on onboarding status
-          if (location.pathname === '/') {
-            if (onboardingData?.is_complete) {
-              navigate('/dashboard', { replace: true });
-            } else {
-              navigate('/onboarding', { replace: true });
-            }
-          }
-          
-          // If user needs onboarding but isn't on the onboarding page
-          else if (!onboardingData?.is_complete && location.pathname !== '/onboarding') {
-            navigate('/onboarding', { replace: true });
-          }
-        }
-      } catch (error) {
-        console.error("Error in routing logic:", error);
-      }
-    };
-    
-    checkOnboardingAndRedirect();
-  }, [user, isLoading, location.pathname, navigate]);
 
   useEffect(() => {
     console.log("Setting up auth state listener");
@@ -125,7 +78,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       if (error) throw error;
       
-      // Routing will be handled by the useEffect
+      // We now handle setting the user state via the onAuthStateChange listener
     } catch (error) {
       console.error("Login error:", error);
       toast({
@@ -158,10 +111,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       
       toast({
         title: "Account created",
-        description: "Your account has been successfully created.",
+        description: "Please check your email to confirm your account.",
       });
       
-      // Routing will be handled by the useEffect
+      // We now handle setting the user state via the onAuthStateChange listener
     } catch (error) {
       console.error("Signup error:", error);
       toast({
@@ -187,7 +140,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       });
       
       if (error) throw error;
-      // Routing after OAuth callback will be handled separately
+      // We now handle setting the user state via the onAuthStateChange listener
     } catch (error) {
       console.error("Google login error:", error);
       toast({
@@ -199,16 +152,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
   
-  const logout = async () => {
+  const signOut = async () => {
     try {
-      // Update online status first
-      if (user) {
-        await supabase
-          .from('profiles')
-          .update({ is_online: false })
-          .eq('id', user.id);
-      }
-      
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
       
@@ -216,9 +161,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         title: "Logged out",
         description: "You have been successfully logged out.",
       });
-      
-      // Redirect to home page after logout
-      navigate('/', { replace: true });
     } catch (error) {
       console.error("Signout error:", error);
       toast({
@@ -237,8 +179,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     login,
     signup,
     loginWithGoogle,
-    logout,
-    signOut: logout, // Alias for backward compatibility
+    signOut,
   };
 
   return (
