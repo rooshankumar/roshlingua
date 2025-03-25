@@ -32,6 +32,16 @@ interface UserProfile {
   liked: boolean; // Whether the current user has liked this profile
 }
 
+interface UserData {
+  id: string;
+  native_language: string;
+  learning_language: string;
+  proficiency_level: string;
+  streak_count: number;
+  gender?: string;
+  date_of_birth?: string;
+}
+
 const UserCard = ({ 
   user, 
   onLike, 
@@ -144,49 +154,52 @@ const Community = () => {
     const fetchProfiles = async () => {
       try {
         setLoading(true);
-        // Get all profiles except the current user
-        const { data: profilesData, error } = await supabase
+        console.log("Fetching profiles for user:", user.id);
+        
+        // First get all profiles except the current user
+        const { data: profilesData, error: profilesError } = await supabase
           .from('profiles')
-          .select(`
-            id,
-            username,
-            bio,
-            avatar_url,
-            is_online,
-            likes_count,
-            users!inner (
-              id,
-              native_language,
-              learning_language,
-              proficiency_level,
-              streak_count,
-              gender,
-              date_of_birth
-            )
-          `)
+          .select('id, username, bio, avatar_url, is_online, likes_count')
           .neq('id', user.id);
 
-        if (error) {
-          console.error('Error fetching profiles:', error);
+        if (profilesError) {
+          console.error('Error fetching profiles:', profilesError);
+          return;
+        }
+        
+        // Then get all users data
+        const { data: usersData, error: usersError } = await supabase
+          .from('users')
+          .select('id, native_language, learning_language, proficiency_level, streak_count, gender, date_of_birth');
+          
+        if (usersError) {
+          console.error('Error fetching users data:', usersError);
           return;
         }
 
         // Check which profiles the current user has liked
-        const likedProfiles = new Set<string>();
-        const { data: likes } = await supabase
+        const { data: likes, error: likesError } = await supabase
           .from('user_likes')
           .select('liked_id')
           .eq('liker_id', user.id);
 
+        if (likesError) {
+          console.error('Error fetching likes:', likesError);
+          return;
+        }
+
+        const likedProfiles = new Set<string>();
         if (likes) {
           likes.forEach(like => likedProfiles.add(like.liked_id));
         }
 
-        // Format profiles data with age calculation
+        // Join profiles with user data
         const formattedProfiles = profilesData.map(profile => {
+          const userData = usersData.find(u => u.id === profile.id);
+          
           let age = null;
-          if (profile.users.date_of_birth) {
-            const birthDate = new Date(profile.users.date_of_birth);
+          if (userData?.date_of_birth) {
+            const birthDate = new Date(userData.date_of_birth);
             const today = new Date();
             age = today.getFullYear() - birthDate.getFullYear();
             const m = today.getMonth() - birthDate.getMonth();
@@ -200,13 +213,13 @@ const Community = () => {
             username: profile.username || 'Anonymous',
             bio: profile.bio || 'No bio available',
             avatar_url: profile.avatar_url,
-            native_language: profile.users.native_language,
-            learning_language: profile.users.learning_language,
-            proficiency_level: profile.users.proficiency_level,
-            streak_count: profile.users.streak_count || 0,
+            native_language: userData?.native_language || 'Unknown',
+            learning_language: userData?.learning_language || 'Unknown',
+            proficiency_level: userData?.proficiency_level || 'beginner',
+            streak_count: userData?.streak_count || 0,
             likes_count: profile.likes_count || 0,
             is_online: profile.is_online || false,
-            gender: profile.users.gender,
+            gender: userData?.gender,
             age: age,
             liked: likedProfiles.has(profile.id)
           };

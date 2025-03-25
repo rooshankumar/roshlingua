@@ -69,27 +69,31 @@ const Profile = () => {
 
     const fetchProfile = async () => {
       try {
-        // Fetch profile with joined user data
-        const { data, error } = await supabase
+        console.log("Fetching profile for:", profileId);
+        
+        // First get profile data
+        const { data: profileData, error: profileError } = await supabase
           .from('profiles')
-          .select(`
-            id,
-            username,
-            bio,
-            avatar_url,
-            likes_count,
-            created_at,
-            users!inner (
-              native_language,
-              learning_language,
-              proficiency_level,
-              streak_count
-            )
-          `)
+          .select('id, username, bio, avatar_url, likes_count, created_at')
           .eq('id', profileId)
           .single();
 
-        if (error) throw error;
+        if (profileError) {
+          console.error('Error fetching profile:', profileError);
+          throw profileError;
+        }
+
+        // Then get user data
+        const { data: userData, error: userError } = await supabase
+          .from('users')
+          .select('native_language, learning_language, proficiency_level, streak_count')
+          .eq('id', profileId)
+          .single();
+
+        if (userError) {
+          console.error('Error fetching user data:', userError);
+          throw userError;
+        }
 
         // Check if current user has liked this profile
         let isLiked = false;
@@ -98,14 +102,17 @@ const Profile = () => {
         }
 
         // For now, we'll hardcode achievements since they're not in DB yet
-        const profileData = {
-          ...data,
-          username: data.username || 'User',
-          bio: data.bio || 'No bio available',
-          native_language: data.users.native_language,
-          learning_language: data.users.learning_language,
-          proficiency_level: data.users.proficiency_level,
-          streak_count: data.users.streak_count || 0,
+        const profileData2: ProfileData = {
+          id: profileData.id,
+          username: profileData.username || 'User',
+          bio: profileData.bio || 'No bio available',
+          avatar_url: profileData.avatar_url,
+          native_language: userData.native_language,
+          learning_language: userData.learning_language,
+          proficiency_level: userData.proficiency_level,
+          streak_count: userData.streak_count || 0,
+          likes_count: profileData.likes_count || 0,
+          created_at: profileData.created_at,
           isLiked,
           achievements: [
             {
@@ -123,9 +130,9 @@ const Profile = () => {
           ]
         };
 
-        setProfile(profileData);
-        setEditedBio(profileData.bio);
-        setEditedUsername(profileData.username);
+        setProfile(profileData2);
+        setEditedBio(profileData2.bio);
+        setEditedUsername(profileData2.username);
       } catch (error) {
         console.error('Error fetching profile:', error);
         toast({
