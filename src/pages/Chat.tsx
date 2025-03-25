@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useRef } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { ArrowLeft, Send, User } from "lucide-react";
@@ -217,7 +218,8 @@ const Chat = () => {
           content,
           created_at,
           sender_id,
-          is_read
+          is_read,
+          conversation_id
         `)
         .eq("conversation_id", conversationId)
         .order("created_at", { ascending: true });
@@ -252,7 +254,7 @@ const Chat = () => {
             avatar_url: null
           }
         };
-      });
+      }) as Message[];
 
       setMessages(messagesWithSenders);
       
@@ -305,7 +307,12 @@ const Chat = () => {
         
         // Add the new message to the state
         const newMessageData: Message = {
-          ...payload.new,
+          id: payload.new.id,
+          conversation_id: payload.new.conversation_id,
+          sender_id: payload.new.sender_id,
+          content: payload.new.content,
+          created_at: payload.new.created_at,
+          is_read: payload.new.is_read,
           sender: {
             username: senderProfile?.username || 'Unknown User',
             avatar_url: senderProfile?.avatar_url

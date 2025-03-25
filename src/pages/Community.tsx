@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from 'react';
 import { Link } from "react-router-dom";
 import { Search, Filter, Languages, Flame, MessageCircle, Heart, User, Calendar } from "lucide-react";
@@ -215,18 +216,22 @@ const Community = () => {
               }
             }
 
+            // Safely convert data to the required type
+            const profileRecord = profile as Record<string, any>;
+            const userRecord = userData as Record<string, any> || {};
+
             return {
               id: profileId,
-              username: profile.username as string || 'Anonymous',
-              bio: profile.bio as string || 'No bio available',
-              avatar_url: profile.avatar_url as string || '',
-              native_language: userData?.native_language as string || 'Unknown',
-              learning_language: userData?.learning_language as string || 'Unknown',
-              proficiency_level: userData?.proficiency_level as string || 'beginner',
-              streak_count: userData?.streak_count as number || 0,
-              likes_count: profile.likes_count as number || 0,
-              is_online: profile.is_online as boolean || false,
-              gender: userData?.gender as string | undefined,
+              username: profileRecord.username as string || 'Anonymous',
+              bio: profileRecord.bio as string || 'No bio available',
+              avatar_url: profileRecord.avatar_url as string || '',
+              native_language: userRecord.native_language as string || 'Unknown',
+              learning_language: userRecord.learning_language as string || 'Unknown',
+              proficiency_level: userRecord.proficiency_level as string || 'beginner',
+              streak_count: userRecord.streak_count as number || 0,
+              likes_count: profileRecord.likes_count as number || 0,
+              is_online: profileRecord.is_online as boolean || false,
+              gender: userRecord.gender as string | undefined,
               age,
               liked: likedProfiles.has(profileId)
             };

@@ -15,6 +15,7 @@ import { supabase, toggleProfileLike, hasUserLikedProfile } from "@/lib/supabase
 import { useToast } from "@/hooks/use-toast";
 import { Profile as ProfileType, User as UserType } from "@/types/schema";
 import { useRealtimeProfile } from "@/hooks/useRealtimeProfile";
+import { Label } from "@/components/ui/label";
 
 interface UserProfileData {
   id: string;
@@ -52,7 +53,6 @@ const Profile = () => {
     avatar_url: "",
   });
 
-  // New state for real-time subscription
   const [channel, setChannel] = useState<any>(null);
 
   useEffect(() => {
@@ -63,7 +63,6 @@ const Profile = () => {
       try {
         setIsLoading(true);
         
-        // Fetch profile data
         const { data: profileData, error: profileError } = await supabase
           .from('profiles')
           .select('*')
@@ -75,7 +74,6 @@ const Profile = () => {
           throw profileError;
         }
         
-        // Fetch user data
         const { data: userData, error: userError } = await supabase
           .from('users')
           .select('*')
@@ -87,29 +85,30 @@ const Profile = () => {
           throw userError;
         }
 
-        // Check if the current user has liked this profile
         if (!isCurrentUser && user) {
           const isLiked = await hasUserLikedProfile(user.id, targetId);
           setHasLiked(isLiked);
         }
         
-        // Combine profile and user data
+        const profileObj = profileData as Record<string, any> || {};
+        const userObj = userData as Record<string, any> || {};
+        
         const combinedData: UserProfileData = {
           id: targetId,
-          email: userData.email || '',
-          full_name: userData.full_name || '',
-          native_language: userData.native_language || 'English',
-          learning_language: userData.learning_language || 'Spanish',
-          proficiency_level: userData.proficiency_level || 'beginner',
-          gender: userData.gender || undefined,
-          date_of_birth: userData.date_of_birth || undefined,
-          learning_goal: userData.learning_goal || undefined,
-          avatar_url: userData.avatar_url || undefined,
-          streak_count: userData.streak_count || 0,
-          username: profileData?.username || '',
-          bio: profileData?.bio || '',
-          likes_count: profileData?.likes_count || 0,
-          is_online: profileData?.is_online || false,
+          email: userObj.email || '',
+          full_name: userObj.full_name || '',
+          native_language: userObj.native_language || 'English',
+          learning_language: userObj.learning_language || 'Spanish',
+          proficiency_level: userObj.proficiency_level || 'beginner',
+          gender: userObj.gender || undefined,
+          date_of_birth: userObj.date_of_birth || undefined,
+          learning_goal: userObj.learning_goal || undefined,
+          avatar_url: userObj.avatar_url || undefined,
+          streak_count: userObj.streak_count || 0,
+          username: profileObj.username || '',
+          bio: profileObj.bio || '',
+          likes_count: profileObj.likes_count || 0,
+          is_online: profileObj.is_online || false,
         };
         
         setProfileData(combinedData);
@@ -139,7 +138,6 @@ const Profile = () => {
     setupRealtimeSubscription(targetId);
 
     return () => {
-      // Clean up subscription
       if (channel) {
         supabase.removeChannel(channel);
       }
@@ -147,7 +145,6 @@ const Profile = () => {
   }, [profileId, user, navigate, toast]);
 
   const setupRealtimeSubscription = (userId: string) => {
-    // Set up realtime subscription for profile changes
     const newChannel = supabase
       .channel(`profile:${userId}`)
       .on('postgres_changes', 
@@ -214,7 +211,6 @@ const Profile = () => {
     try {
       setIsLoading(true);
 
-      // Update profile data
       const { error: profileUpdateError } = await supabase
         .from('profiles')
         .update({
@@ -229,7 +225,6 @@ const Profile = () => {
         throw profileUpdateError;
       }
 
-      // Update user data
       const { error: userUpdateError } = await supabase
         .from('users')
         .update({
@@ -242,7 +237,6 @@ const Profile = () => {
         throw userUpdateError;
       }
 
-      // Optimistically update the local state
       setProfileData(prev => {
         if (!prev) return prev;
         return {
@@ -330,7 +324,6 @@ const Profile = () => {
 
   return (
     <div className="container py-6 animate-fade-in">
-      {/* Header Section */}
       <div className="flex items-center justify-between mb-6">
         <div>
           <Button variant="ghost" size="icon" onClick={() => navigate(-1)}>
@@ -453,7 +446,6 @@ const Profile = () => {
         )}
       </Card>
 
-      {/* Edit Profile Modal */}
       {isEditing && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
           <Card className="max-w-md w-full">

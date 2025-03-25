@@ -49,16 +49,22 @@ const RealtimeStatus = () => {
 
     // Set up beforeunload handler to mark user as offline when leaving
     const handleBeforeUnload = () => {
-      try {
-        // Using a synchronous approach since beforeunload doesn't wait for async
-        const xhr = new XMLHttpRequest();
-        xhr.open('POST', `${import.meta.env.VITE_SUPABASE_URL}/rest/v1/profiles?id=eq.${user.id}`, false);
-        xhr.setRequestHeader('Content-Type', 'application/json');
-        xhr.setRequestHeader('apikey', import.meta.env.VITE_SUPABASE_ANON_KEY);
-        xhr.setRequestHeader('Authorization', `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`);
-        xhr.send(JSON.stringify({ is_online: false }));
-      } catch (error) {
-        console.error("Error in beforeunload handler:", error);
+      // Use navigator.sendBeacon for asynchronous request that works during page unload
+      if (navigator.sendBeacon) {
+        const headers = new Headers();
+        headers.append('Content-Type', 'application/json');
+        headers.append('apikey', import.meta.env.VITE_SUPABASE_ANON_KEY);
+        headers.append('Authorization', `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`);
+        
+        const data = JSON.stringify({ is_online: false });
+        const url = `${import.meta.env.VITE_SUPABASE_URL}/rest/v1/profiles?id=eq.${user.id}`;
+        
+        navigator.sendBeacon(url, new Blob([data], { type: 'application/json' }));
+      } else {
+        // Fallback for browsers without sendBeacon support
+        updateOnlineStatus(user.id, false).catch(err => 
+          console.error("Error updating online status on unload:", err)
+        );
       }
     };
 
