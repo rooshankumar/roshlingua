@@ -92,8 +92,27 @@ export const updateUserStreak = async (userId: string) => {
       .single();
       
     if (userError) {
-      console.error("Failed to get user streak data:", userError);
-      return false;
+      // Handle case where the user doesn't exist yet in the users table
+      if (userError.code === 'PGRST116') {
+        console.log("New user, initializing streak");
+        // Initialize streak for new user
+        const { error: initError } = await supabase
+          .from('users')
+          .upsert({ 
+            id: userId,
+            streak_count: 1,
+            streak_last_date: today
+          });
+          
+        if (initError) {
+          console.error("Failed to initialize user streak:", initError);
+          return false;
+        }
+        return true;
+      } else {
+        console.error("Failed to get user streak data:", userError);
+        return false;
+      }
     }
     
     // Check if we need to update the streak

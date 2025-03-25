@@ -2,7 +2,6 @@
 import { useEffect } from 'react';
 import { supabase, updateOnlineStatus, updateUserStreak } from '@/lib/supabase';
 import { useAuth } from '@/providers/AuthProvider';
-import { RealtimeChannel } from '@supabase/supabase-js';
 
 const RealtimeStatus = () => {
   const { user } = useAuth();
@@ -14,9 +13,16 @@ const RealtimeStatus = () => {
     const setUserOnline = async () => {
       try {
         await updateOnlineStatus(user.id, true);
-        await updateUserStreak(user.id);
+        
+        // Try to update streak, but don't throw if it fails
+        try {
+          await updateUserStreak(user.id);
+        } catch (streakError) {
+          console.error("Error updating streak:", streakError);
+          // Don't fail the whole operation if streak update fails
+        }
       } catch (error) {
-        console.error("Error updating online status or streak:", error);
+        console.error("Error updating online status:", error);
       }
     };
 
@@ -25,15 +31,22 @@ const RealtimeStatus = () => {
     // Set up event listeners for page visibility changes
     const handleVisibilityChange = () => {
       if (document.visibilityState === 'visible') {
-        updateOnlineStatus(user.id, true);
+        updateOnlineStatus(user.id, true).catch(err => 
+          console.error("Error updating online status on visibility change:", err)
+        );
       } else {
-        updateOnlineStatus(user.id, false);
+        updateOnlineStatus(user.id, false).catch(err => 
+          console.error("Error updating offline status on visibility change:", err)
+        );
       }
     };
 
     // Set up event listeners for window focus/blur
-    const handleFocus = () => updateOnlineStatus(user.id, true);
-    const handleBlur = () => updateOnlineStatus(user.id, false);
+    const handleFocus = () => updateOnlineStatus(user.id, true)
+      .catch(err => console.error("Error updating online status on focus:", err));
+      
+    const handleBlur = () => updateOnlineStatus(user.id, false)
+      .catch(err => console.error("Error updating offline status on blur:", err));
 
     // Add event listeners
     document.addEventListener('visibilitychange', handleVisibilityChange);
@@ -43,7 +56,8 @@ const RealtimeStatus = () => {
     // Set up heartbeat to maintain online status
     const heartbeatInterval = setInterval(() => {
       if (document.visibilityState === 'visible') {
-        updateOnlineStatus(user.id, true);
+        updateOnlineStatus(user.id, true)
+          .catch(err => console.error("Error updating online status on heartbeat:", err));
       }
     }, 60000); // every minute
 

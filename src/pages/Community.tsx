@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react';
 import { Link } from "react-router-dom";
 import { Search, Filter, Languages, Flame, MessageCircle, Heart, User, Calendar } from "lucide-react";
@@ -198,15 +197,24 @@ const Community = () => {
         const formattedProfiles = profilesData
           .filter(profile => profile !== null)
           .map(profile => {
-            if (!profile || typeof profile !== 'object' || !('id' in profile)) {
+            if (!profile || typeof profile !== 'object') {
               return null;
             }
             
-            const profileId = profile.id as string;
-            const userData = usersData.find(u => u && typeof u === 'object' && 'id' in u && u.id === profileId);
+            const profileRecord = profile as Record<string, any>;
+            if (!('id' in profileRecord)) {
+              return null;
+            }
+            
+            const profileId = profileRecord.id as string;
+            const userData = usersData?.find(user => {
+              if (!user || typeof user !== 'object') return false;
+              const userRecord = user as Record<string, any>;
+              return 'id' in userRecord && userRecord.id === profileId;
+            });
             
             let age = null;
-            if (userData && 'date_of_birth' in userData && userData.date_of_birth) {
+            if (userData && typeof userData === 'object' && 'date_of_birth' in userData && userData.date_of_birth) {
               const birthDate = new Date(userData.date_of_birth as string);
               const today = new Date();
               age = today.getFullYear() - birthDate.getFullYear();
@@ -216,9 +224,9 @@ const Community = () => {
               }
             }
 
-            // Safely convert data to the required type
-            const profileRecord = profile as Record<string, any>;
-            const userRecord = userData as Record<string, any> || {};
+            const userRecord = (userData && typeof userData === 'object') 
+              ? userData as Record<string, any> 
+              : {};
 
             return {
               id: profileId,
