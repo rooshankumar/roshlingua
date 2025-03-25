@@ -32,7 +32,7 @@ export const signInWithGoogle = async () => {
 
 export const signOut = async () => {
   // Update online status before signing out
-  const user = (await supabase.auth.getUser()).data.user;
+  const { data: { user } } = await supabase.auth.getUser();
   if (user) {
     await supabase
       .from('profiles')
@@ -61,6 +61,11 @@ export const getCurrentUser = async () => {
 
 // Function to update user's online status
 export const updateOnlineStatus = async (userId: string, isOnline: boolean) => {
+  if (!userId) {
+    console.error("No user ID provided for updating online status");
+    return false;
+  }
+  
   try {
     const { error } = await supabase
       .from('profiles')
@@ -68,12 +73,39 @@ export const updateOnlineStatus = async (userId: string, isOnline: boolean) => {
       .eq('id', userId);
       
     if (error) {
+      // If this is a row-level security error, check if the profile exists
+      if (error.code === '42501') {
+        const { data: profile, error: profileCheckError } = await supabase
+          .from('profiles')
+          .select('id')
+          .eq('id', userId)
+          .maybeSingle();
+          
+        if (profileCheckError) {
+          console.error("Error checking profile:", profileCheckError);
+          return false;
+        }
+        
+        // If profile doesn't exist, create it
+        if (!profile) {
+          const { error: insertError } = await supabase
+            .from('profiles')
+            .insert({ id: userId, is_online: isOnline });
+            
+          if (insertError) {
+            console.error("Failed to create profile:", insertError);
+            return false;
+          }
+          return true;
+        }
+      }
+      
       console.error("Failed to update online status:", error);
       return false;
     }
     
     return true;
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error updating online status:", error);
     return false;
   }
@@ -81,6 +113,11 @@ export const updateOnlineStatus = async (userId: string, isOnline: boolean) => {
 
 // Function to update user streak
 export const updateUserStreak = async (userId: string) => {
+  if (!userId) {
+    console.error("No user ID provided for updating streak");
+    return false;
+  }
+  
   try {
     const today = new Date().toISOString().split('T')[0];
     
@@ -89,26 +126,35 @@ export const updateUserStreak = async (userId: string) => {
       .from('users')
       .select('streak_count, streak_last_date')
       .eq('id', userId)
-      .single();
+      .maybeSingle();
       
     if (userError) {
       // Handle case where the user doesn't exist yet in the users table
       if (userError.code === 'PGRST116') {
         console.log("New user, initializing streak");
         // Initialize streak for new user
-        const { error: initError } = await supabase
-          .from('users')
-          .upsert({ 
-            id: userId,
-            streak_count: 1,
-            streak_last_date: today
-          });
-          
-        if (initError) {
-          console.error("Failed to initialize user streak:", initError);
+        try {
+          const { error: initError } = await supabase
+            .from('users')
+            .upsert({ 
+              id: userId,
+              streak_count: 1,
+              streak_last_date: today,
+              native_language: 'English',  // Provide default values required by the schema
+              learning_language: 'Spanish',
+              proficiency_level: 'beginner',
+              full_name: 'New User'
+            });
+            
+          if (initError) {
+            console.error("Failed to initialize user streak:", initError);
+            return false;
+          }
+          return true;
+        } catch (err) {
+          console.error("Failed to initialize user streak:", err);
           return false;
         }
-        return true;
       } else {
         console.error("Failed to get user streak data:", userError);
         return false;
@@ -137,7 +183,7 @@ export const updateUserStreak = async (userId: string) => {
     }
     
     return true;
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error updating user streak:", error);
     return false;
   }
@@ -153,13 +199,23 @@ function isYesterday(dateString: string) {
 
 // Function to create user record manually in the users table
 export const createUserRecord = async (userId: string, email: string, fullName: string) => {
+  if (!userId || !email) {
+    console.error("Missing required fields for user creation");
+    return false;
+  }
+  
   try {
     // Check if the user already exists
-    const { data: existingUser } = await supabase
+    const { data: existingUser, error: checkError } = await supabase
       .from('users')
       .select('id')
       .eq('id', userId)
-      .single();
+      .maybeSingle();
+      
+    if (checkError && checkError.code !== 'PGRST116') {
+      console.error("Error checking for existing user:", checkError);
+      return false;
+    }
       
     if (existingUser) {
       console.log("User already exists, updating online status");
@@ -168,76 +224,81 @@ export const createUserRecord = async (userId: string, email: string, fullName: 
       return true;
     }
     
-    // Call the create_user_with_onboarding function to properly set up the user
-    const { data, error } = await supabase.rpc('create_user_with_onboarding', {
-      p_user_id: userId,
-      p_email: email,
-      p_full_name: fullName
-    });
-    
-    if (error) {
-      console.error("Failed to create user record:", error);
+    // Try to call the create_user_with_onboarding function
+    try {
+      const { data, error } = await supabase.rpc('create_user_with_onboarding', {
+        p_user_id: userId,
+        p_email: email,
+        p_full_name: fullName
+      });
+      
+      if (error) {
+        throw error;
+      }
+      
+      console.log("Created user record successfully:", data);
+      
+      // Update online status
+      await updateOnlineStatus(userId, true);
+      return true;
+    } catch (rpcError: any) {
+      console.error("Failed to create user with RPC:", rpcError);
       
       // Fallback: Try direct insert if RPC fails
-      try {
-        const today = new Date().toISOString().split('T')[0];
+      const today = new Date().toISOString().split('T')[0];
+      
+      // 1. Try to insert into users table first
+      const { error: usersError } = await supabase
+        .from('users')
+        .insert({
+          id: userId,
+          email: email,
+          full_name: fullName,
+          native_language: 'English',
+          learning_language: 'Spanish',
+          proficiency_level: 'beginner',
+          streak_count: 1,
+          streak_last_date: today
+        });
         
-        // 1. Try to insert into users table first
-        const usersInsert = await supabase
-          .from('users')
-          .insert({
-            id: userId,
-            email: email,
-            full_name: fullName,
-            native_language: 'English',
-            learning_language: 'Spanish',
-            proficiency_level: 'beginner',
-            streak_count: 1,
-            streak_last_date: today
-          })
-          .select();
-          
-        if (usersInsert.error) throw usersInsert.error;
-        
-        // 2. Then insert into profiles
-        const username = fullName.toLowerCase().replace(/\s+/g, '_');
-        const profilesInsert = await supabase
-          .from('profiles')
-          .insert({
-            id: userId,
-            username: username,
-            bio: `Hi! I'm ${fullName} and I'm learning a new language.`,
-            is_online: true
-          })
-          .select();
-          
-        if (profilesInsert.error) throw profilesInsert.error;
-        
-        // 3. Finally insert into onboarding_status
-        const onboardingInsert = await supabase
-          .from('onboarding_status')
-          .insert({
-            user_id: userId,
-            is_complete: false
-          })
-          .select();
-          
-        if (onboardingInsert.error) throw onboardingInsert.error;
-        
-        console.log("Created user record through fallback method");
-        return true;
-      } catch (fallbackError) {
-        console.error("Fallback user creation also failed:", fallbackError);
+      if (usersError) {
+        console.error("Failed to create user:", usersError);
         return false;
       }
+      
+      // 2. Then insert into profiles
+      const username = fullName.toLowerCase().replace(/\s+/g, '_');
+      const { error: profilesError } = await supabase
+        .from('profiles')
+        .insert({
+          id: userId,
+          username: username,
+          bio: `Hi! I'm ${fullName} and I'm learning a new language.`,
+          is_online: true
+        });
+        
+      if (profilesError) {
+        console.error("Failed to create profile:", profilesError);
+        // Don't return false - try to continue with onboarding status
+      }
+      
+      // 3. Finally insert into onboarding_status
+      const { error: onboardingError } = await supabase
+        .from('onboarding_status')
+        .insert({
+          user_id: userId,
+          is_complete: false
+        });
+        
+      if (onboardingError) {
+        console.error("Failed to create onboarding status:", onboardingError);
+        // Don't return false - the critical part (user record) is created
+      }
+      
+      console.log("Created user record through fallback method");
+      return true;
     }
-    
-    console.log("Created user record successfully:", data);
-    
-    // Update online status
-    await updateOnlineStatus(userId, true);
-    return true;
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error in createUserRecord:", error);
     return false;
   }
@@ -252,7 +313,7 @@ export const toggleProfileLike = async (loggedInUserId: string, profileId: strin
       .select('*')
       .eq('liker_id', loggedInUserId)
       .eq('liked_id', profileId)
-      .single();
+      .maybeSingle();
       
     if (checkError && checkError.code !== 'PGRST116') { // PGRST116 is "not found" error which is expected if not liked
       console.error("Error checking existing like:", checkError);
@@ -316,7 +377,7 @@ export const toggleProfileLike = async (loggedInUserId: string, profileId: strin
     }
     
     return success;
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error toggling profile like:", error);
     return false;
   }
@@ -330,7 +391,7 @@ export const hasUserLikedProfile = async (loggedInUserId: string, profileId: str
       .select('*')
       .eq('liker_id', loggedInUserId)
       .eq('liked_id', profileId)
-      .single();
+      .maybeSingle();
       
     if (error && error.code !== 'PGRST116') { // PGRST116 is "not found" error
       console.error("Error checking if user liked profile:", error);
@@ -338,7 +399,7 @@ export const hasUserLikedProfile = async (loggedInUserId: string, profileId: str
     }
     
     return !!data;
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error in hasUserLikedProfile:", error);
     return false;
   }
