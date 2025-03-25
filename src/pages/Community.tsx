@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react';
 import { Link } from "react-router-dom";
 import { Search, Filter, Languages, Flame, MessageCircle, Heart, User, Calendar } from "lucide-react";
@@ -148,7 +147,7 @@ const Community = () => {
         
         const { data: profilesData, error: profilesError } = await supabase
           .from('profiles')
-          .select('id, username, bio, is_online, likes_count')
+          .select('id, username, bio, avatar_url, is_online, likes_count')
           .neq('id', user.id);
 
         if (profilesError) {
@@ -208,19 +207,15 @@ const Community = () => {
             }
             
             const profileId = profileRecord.id as string;
-            
-            // Type guard for the user data to ensure we have a valid object with an id
             const userData = usersData?.find(user => {
               if (!user || typeof user !== 'object') return false;
-              return 'id' in user && user.id === profileId;
-            });
-            
-            // Ensure userData is a proper object with expected properties
-            const userDataObj = userData as Record<string, any> | undefined;
+              const userRecord = user as Record<string, any>;
+              return 'id' in userRecord && userRecord.id === profileId;
+            }) as Record<string, any> | undefined;
             
             let age = null;
-            if (userDataObj && 'date_of_birth' in userDataObj && userDataObj.date_of_birth) {
-              const birthDate = new Date(userDataObj.date_of_birth as string);
+            if (userData && 'date_of_birth' in userData && userData.date_of_birth) {
+              const birthDate = new Date(userData.date_of_birth as string);
               const today = new Date();
               age = today.getFullYear() - birthDate.getFullYear();
               const m = today.getMonth() - birthDate.getMonth();
@@ -234,13 +229,13 @@ const Community = () => {
               username: profileRecord.username as string || 'Anonymous',
               bio: profileRecord.bio as string || 'No bio available',
               avatar_url: profileRecord.avatar_url as string || '',
-              native_language: userDataObj?.native_language as string || 'Unknown',
-              learning_language: userDataObj?.learning_language as string || 'Unknown',
-              proficiency_level: userDataObj?.proficiency_level as string || 'beginner',
-              streak_count: userDataObj?.streak_count as number || 0,
+              native_language: userData?.native_language as string || 'Unknown',
+              learning_language: userData?.learning_language as string || 'Unknown',
+              proficiency_level: userData?.proficiency_level as string || 'beginner',
+              streak_count: userData?.streak_count as number || 0,
               likes_count: profileRecord.likes_count as number || 0,
               is_online: profileRecord.is_online as boolean || false,
-              gender: userDataObj?.gender as string | undefined,
+              gender: userData?.gender as string | undefined,
               age,
               liked: likedProfiles.has(profileId)
             };
