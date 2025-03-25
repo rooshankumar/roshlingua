@@ -1,337 +1,312 @@
-
 import { useState, useEffect } from "react";
-import { Link, useParams } from "react-router-dom";
-import { 
-  Calendar, 
-  Flame, 
-  Heart, 
-  Languages, 
-  User, 
-  MessageCircle, 
-  Share2, 
-  Edit,
-  Check,
-  X
-} from "lucide-react";
+import { useParams, useNavigate } from "react-router-dom";
+import { Edit, Heart, MessageCircle, User, ArrowLeft, Calendar, Flag, Rocket, Check, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { 
-  Dialog, 
-  DialogContent, 
-  DialogDescription, 
-  DialogHeader, 
-  DialogTitle, 
-  DialogTrigger 
-} from "@/components/ui/dialog";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useToast } from "@/hooks/use-toast";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useAuth } from "@/providers/AuthProvider";
 import { supabase, toggleProfileLike, hasUserLikedProfile } from "@/lib/supabase";
+import { useToast } from "@/hooks/use-toast";
+import { Profile as ProfileType, User as UserType } from "@/types/schema";
+import { useRealtimeProfile } from "@/hooks/useRealtimeProfile";
 
-interface ProfileData {
+interface UserProfileData {
   id: string;
-  username: string;
-  bio: string;
-  avatar_url: string;
+  email: string;
+  full_name: string;
   native_language: string;
   learning_language: string;
   proficiency_level: string;
+  gender?: string;
+  date_of_birth?: string;
+  learning_goal?: string;
+  avatar_url?: string;
   streak_count: number;
+  username?: string;
+  bio?: string;
   likes_count: number;
-  created_at: string;
-  isLiked: boolean;
-  achievements: {
-    title: string;
-    description: string;
-    date: string;
-    icon: string;
-  }[];
+  is_online: boolean;
 }
 
 const Profile = () => {
-  const { id } = useParams<{ id: string }>();
+  const { id: profileId } = useParams<{ id: string }>();
   const { user } = useAuth();
-  const [profile, setProfile] = useState<ProfileData | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [editing, setEditing] = useState(false);
-  const [editedBio, setEditedBio] = useState("");
-  const [editedUsername, setEditedUsername] = useState("");
+  const navigate = useNavigate();
   const { toast } = useToast();
+  const [isCurrentUser, setIsCurrentUser] = useState(false);
+  const [profileData, setProfileData] = useState<UserProfileData | null>(null);
+  const [isEditing, setIsEditing] = useState(false);
+  const [hasLiked, setHasLiked] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isLikeLoading, setIsLikeLoading] = useState(false);
+  const [editForm, setEditForm] = useState({
+    username: "",
+    bio: "",
+    learning_goal: "",
+    avatar_url: "",
+  });
 
-  // Get profile details and handle real-time updates
+  // New state for real-time subscription
+  const [channel, setChannel] = useState<any>(null);
+
   useEffect(() => {
-    const profileId = id || user?.id;
-    if (!profileId) return;
-
-    const fetchProfile = async () => {
+    const targetId = profileId || (user?.id ?? '');
+    setIsCurrentUser(!profileId || profileId === user?.id);
+    
+    const fetchProfileData = async () => {
       try {
-        console.log("Fetching profile for:", profileId);
+        setIsLoading(true);
         
-        // First get profile data
+        // Fetch profile data
         const { data: profileData, error: profileError } = await supabase
           .from('profiles')
-          .select('id, username, bio, avatar_url, likes_count, created_at')
-          .eq('id', profileId)
+          .select('*')
+          .eq('id', targetId)
           .single();
-
+        
         if (profileError) {
-          console.error('Error fetching profile:', profileError);
+          console.error("Error fetching profile:", profileError);
           throw profileError;
         }
-
-        // Then get user data
+        
+        // Fetch user data
         const { data: userData, error: userError } = await supabase
           .from('users')
-          .select('native_language, learning_language, proficiency_level, streak_count')
-          .eq('id', profileId)
+          .select('*')
+          .eq('id', targetId)
           .single();
-
+        
         if (userError) {
-          console.error('Error fetching user data:', userError);
+          console.error("Error fetching user details:", userError);
           throw userError;
         }
 
-        // Check if current user has liked this profile
-        let isLiked = false;
-        if (user && user.id !== profileId) {
-          isLiked = await hasUserLikedProfile(user.id, profileId);
+        // Check if the current user has liked this profile
+        if (!isCurrentUser && user) {
+          const isLiked = await hasUserLikedProfile(user.id, targetId);
+          setHasLiked(isLiked);
         }
-
-        // For now, we'll hardcode achievements since they're not in DB yet
-        const profileData2: ProfileData = {
-          id: profileData.id,
-          username: profileData.username || 'User',
-          bio: profileData.bio || 'No bio available',
-          avatar_url: profileData.avatar_url,
-          native_language: userData.native_language,
-          learning_language: userData.learning_language,
-          proficiency_level: userData.proficiency_level,
+        
+        // Combine profile and user data
+        const combinedData: UserProfileData = {
+          id: targetId,
+          email: userData.email || '',
+          full_name: userData.full_name || '',
+          native_language: userData.native_language || 'English',
+          learning_language: userData.learning_language || 'Spanish',
+          proficiency_level: userData.proficiency_level || 'beginner',
+          gender: userData.gender || undefined,
+          date_of_birth: userData.date_of_birth || undefined,
+          learning_goal: userData.learning_goal || undefined,
+          avatar_url: userData.avatar_url || undefined,
           streak_count: userData.streak_count || 0,
-          likes_count: profileData.likes_count || 0,
-          created_at: profileData.created_at,
-          isLiked,
-          achievements: [
-            {
-              title: "Week One Warrior",
-              description: "Completed 7 consecutive days of language learning",
-              date: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
-              icon: "🔥"
-            },
-            {
-              title: "Conversation Starter",
-              description: "Initiated first language exchange conversation",
-              date: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString(),
-              icon: "💬"
-            }
-          ]
+          username: profileData?.username || '',
+          bio: profileData?.bio || '',
+          likes_count: profileData?.likes_count || 0,
+          is_online: profileData?.is_online || false,
         };
-
-        setProfile(profileData2);
-        setEditedBio(profileData2.bio);
-        setEditedUsername(profileData2.username);
+        
+        setProfileData(combinedData);
+        setEditForm({
+          username: combinedData.username || '',
+          bio: combinedData.bio || '',
+          learning_goal: combinedData.learning_goal || '',
+          avatar_url: combinedData.avatar_url || '',
+        });
+        
+        setIsLoading(false);
       } catch (error) {
-        console.error('Error fetching profile:', error);
+        console.error("Error in fetchProfileData:", error);
         toast({
           variant: "destructive",
-          title: "Error",
-          description: "Failed to load profile data",
+          title: "Error loading profile",
+          description: "Could not load the profile data. Please try again."
         });
-      } finally {
-        setLoading(false);
+        if (!profileId) {
+          navigate('/dashboard');
+        }
+        setIsLoading(false);
       }
     };
 
-    fetchProfile();
-
-    // Set up real-time subscription for profile changes
-    const channel = supabase
-      .channel(`profile:${profileId}`)
-      .on('postgres_changes', {
-        event: '*',
-        schema: 'public',
-        table: 'profiles',
-        filter: `id=eq.${profileId}`,
-      }, (payload) => {
-        // Update profile state based on the change
-        setProfile(currentProfile => {
-          if (!currentProfile) return currentProfile;
-          
-          return {
-            ...currentProfile,
-            username: payload.new.username || currentProfile.username,
-            bio: payload.new.bio || currentProfile.bio,
-            avatar_url: payload.new.avatar_url,
-            likes_count: payload.new.likes_count || 0
-          };
-        });
-      })
-      .subscribe();
-
-    // Set up real-time subscription for user likes changes
-    if (user && profileId !== user.id) {
-      const likesChannel = supabase
-        .channel(`likes:${user.id}-${profileId}`)
-        .on('postgres_changes', {
-          event: '*',
-          schema: 'public',
-          table: 'user_likes',
-          filter: `liker_id=eq.${user.id} AND liked_id=eq.${profileId}`,
-        }, async () => {
-          // Check if the profile is liked by the current user
-          const isLiked = await hasUserLikedProfile(user.id, profileId);
-          
-          setProfile(currentProfile => {
-            if (!currentProfile) return currentProfile;
-            return {
-              ...currentProfile,
-              isLiked
-            };
-          });
-        })
-        .subscribe();
-        
-      return () => {
-        supabase.removeChannel(channel);
-        supabase.removeChannel(likesChannel);
-      };
-    }
+    fetchProfileData();
+    setupRealtimeSubscription(targetId);
 
     return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [id, user, toast]);
-
-  const handleLike = async () => {
-    if (!profile || !user) return;
-    
-    if (user.id === profile.id) {
-      toast({
-        title: "Not allowed",
-        description: "You cannot like your own profile",
-      });
-      return;
-    }
-
-    try {
-      // Optimistic UI update
-      setProfile(prev => prev ? {
-        ...prev,
-        isLiked: !prev.isLiked,
-        likes_count: prev.isLiked ? prev.likes_count - 1 : prev.likes_count + 1
-      } : null);
-
-      // Perform the actual toggle like operation
-      const success = await toggleProfileLike(user.id, profile.id);
-      
-      if (!success) {
-        // Revert the optimistic update if operation failed
-        setProfile(prev => prev ? {
-          ...prev,
-          isLiked: !prev.isLiked,
-          likes_count: !prev.isLiked ? prev.likes_count - 1 : prev.likes_count + 1
-        } : null);
-        
-        toast({
-          variant: "destructive",
-          title: "Error",
-          description: "Failed to update like status",
-        });
+      // Clean up subscription
+      if (channel) {
+        supabase.removeChannel(channel);
       }
-    } catch (error) {
-      console.error('Error updating likes:', error);
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to update likes",
-      });
-    }
+    };
+  }, [profileId, user, navigate, toast]);
+
+  const setupRealtimeSubscription = (userId: string) => {
+    // Set up realtime subscription for profile changes
+    const newChannel = supabase
+      .channel(`profile:${userId}`)
+      .on('postgres_changes', 
+        {
+          event: '*',
+          schema: 'public',
+          table: 'profiles',
+          filter: `id=eq.${userId}`
+        }, 
+        (payload) => {
+          console.log('Profile update:', payload);
+          
+          if (profileData && payload.new) {
+            setProfileData(prev => {
+              if (!prev) return prev;
+              return {
+                ...prev,
+                username: payload.new.username || prev.username,
+                bio: payload.new.bio || prev.bio,
+                likes_count: payload.new.likes_count || prev.likes_count,
+                is_online: payload.new.is_online || false
+              };
+            });
+          }
+        }
+      )
+      .on('postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'users',
+          filter: `id=eq.${userId}`
+        },
+        (payload) => {
+          console.log('User update:', payload);
+          
+          if (profileData && payload.new) {
+            setProfileData(prev => {
+              if (!prev) return prev;
+              return {
+                ...prev,
+                full_name: payload.new.full_name || prev.full_name,
+                native_language: payload.new.native_language || prev.native_language,
+                learning_language: payload.new.learning_language || prev.learning_language,
+                proficiency_level: payload.new.proficiency_level || prev.proficiency_level,
+                gender: payload.new.gender,
+                date_of_birth: payload.new.date_of_birth,
+                learning_goal: payload.new.learning_goal,
+                avatar_url: payload.new.avatar_url,
+                streak_count: payload.new.streak_count || 0
+              };
+            });
+          }
+        }
+      )
+      .subscribe();
+    
+    setChannel(newChannel);
   };
 
-  const handleSaveProfile = async () => {
-    if (!user || !profile) return;
-    
-    // Only allow users to edit their own profile
-    if (user.id !== profile.id) {
-      toast({
-        variant: "destructive",
-        title: "Not allowed",
-        description: "You can only edit your own profile",
-      });
-      return;
-    }
+  const handleSave = async () => {
+    if (!user || !profileData) return;
 
     try {
-      const { error } = await supabase
+      setIsLoading(true);
+
+      // Update profile data
+      const { error: profileUpdateError } = await supabase
         .from('profiles')
-        .update({ 
-          username: editedUsername,
-          bio: editedBio
+        .update({
+          username: editForm.username,
+          bio: editForm.bio,
+          avatar_url: editForm.avatar_url,
         })
         .eq('id', user.id);
 
-      if (error) throw error;
+      if (profileUpdateError) {
+        console.error("Error updating profile:", profileUpdateError);
+        throw profileUpdateError;
+      }
 
-      // Update local state
-      setProfile(prev => prev ? {
-        ...prev,
-        username: editedUsername,
-        bio: editedBio
-      } : null);
+      // Update user data
+      const { error: userUpdateError } = await supabase
+        .from('users')
+        .update({
+          learning_goal: editForm.learning_goal,
+        })
+        .eq('id', user.id);
+
+      if (userUpdateError) {
+        console.error("Error updating user:", userUpdateError);
+        throw userUpdateError;
+      }
+
+      // Optimistically update the local state
+      setProfileData(prev => {
+        if (!prev) return prev;
+        return {
+          ...prev,
+          username: editForm.username,
+          bio: editForm.bio,
+          learning_goal: editForm.learning_goal,
+          avatar_url: editForm.avatar_url,
+        };
+      });
 
       toast({
         title: "Profile updated",
-        description: "Your profile has been successfully updated",
+        description: "Your profile has been updated successfully.",
       });
-      
-      setEditing(false);
+      setIsEditing(false);
     } catch (error) {
-      console.error('Error updating profile:', error);
+      console.error("Error updating profile:", error);
+      toast({
+        variant: "destructive",
+        title: "Error updating profile",
+        description: "Could not update profile. Please try again.",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleToggleLike = async () => {
+    if (!user || !profileData) return;
+
+    try {
+      setIsLikeLoading(true);
+      const success = await toggleProfileLike(user.id, profileData.id);
+
+      if (success) {
+        setHasLiked(!hasLiked);
+        setProfileData(prev => {
+          if (!prev) return prev;
+          return {
+            ...prev,
+            likes_count: hasLiked ? prev.likes_count - 1 : prev.likes_count + 1,
+          };
+        });
+      } else {
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Failed to update like status. Please try again.",
+        });
+      }
+    } catch (error) {
+      console.error("Error toggling like:", error);
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Failed to update profile",
+        description: "An error occurred while updating like status.",
       });
+    } finally {
+      setIsLikeLoading(false);
     }
   };
 
-  const cancelEditing = () => {
-    if (profile) {
-      setEditedBio(profile.bio);
-      setEditedUsername(profile.username);
-    }
-    setEditing(false);
-  };
-
-  const calculateJoinedTime = (dateString: string) => {
-    const joinDate = new Date(dateString);
-    const now = new Date();
-    const diffTime = Math.abs(now.getTime() - joinDate.getTime());
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-    if (diffDays < 30) {
-      return `${diffDays} days ago`;
-    } else {
-      const diffMonths = Math.floor(diffDays / 30);
-      return diffMonths === 1 ? "1 month ago" : `${diffMonths} months ago`;
-    }
-  };
-
-  const handleShare = () => {
-    navigator.clipboard.writeText(window.location.href);
-    toast({
-      title: "Link copied",
-      description: "Profile link copied to clipboard",
-    });
-  };
-
-  // Check if viewing own profile
-  const isOwnProfile = user && profile && user.id === profile.id;
-
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="container flex items-center justify-center min-h-[50vh]">
         <div className="flex flex-col items-center">
@@ -342,220 +317,199 @@ const Profile = () => {
     );
   }
 
-  if (!profile) {
+  if (!profileData) {
     return (
-      <div className="container py-12 text-center">
-        <h2 className="text-2xl font-bold mb-2">Profile not found</h2>
-        <p className="text-muted-foreground mb-6">
-          We couldn't find the profile information you're looking for.
-        </p>
-        <Button asChild>
-          <Link to="/community">Back to Community</Link>
-        </Button>
+      <div className="container flex items-center justify-center min-h-[50vh]">
+        <div className="flex flex-col items-center">
+          <X className="w-10 h-10 text-red-500" />
+          <p className="mt-4 text-muted-foreground">Profile not found.</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="container pb-12 animate-fade-in">
-      {/* Profile Header */}
-      <div className="flex justify-between items-start mb-8">
-        <div className="flex items-center space-x-4">
-          <Dialog>
-            <DialogTrigger asChild>
-              <Button variant="ghost" className="p-0 h-auto hover:bg-transparent">
-                <Avatar className="h-24 w-24 cursor-pointer hover:ring-2 hover:ring-primary/50 transition-all">
-                  <AvatarImage src={profile.avatar_url || "/placeholder.svg"} alt={profile.username} />
-                  <AvatarFallback className="text-2xl">{profile.username?.[0]?.toUpperCase()}</AvatarFallback>
-                </Avatar>
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="max-w-md">
-              <DialogHeader>
-                <DialogTitle>{profile.username}</DialogTitle>
-                <DialogDescription>Profile picture</DialogDescription>
-              </DialogHeader>
-              <div className="flex justify-center p-4">
-                <img 
-                  src={profile.avatar_url || "/placeholder.svg"}
-                  alt={profile.username} 
-                  className="max-w-full max-h-[60vh] object-contain rounded-md"
-                />
-              </div>
-            </DialogContent>
-          </Dialog>
-
-          <div>
-            {editing ? (
-              <Input
-                value={editedUsername}
-                onChange={(e) => setEditedUsername(e.target.value)}
-                className="text-2xl font-bold mb-2"
-                placeholder="Your name"
-              />
-            ) : (
-              <h1 className="text-3xl font-bold">{profile.username}</h1>
-            )}
-            <div className="flex items-center space-x-2 mt-1">
-              <Calendar className="h-4 w-4 text-muted-foreground" />
-              <span className="text-muted-foreground">
-                Joined {calculateJoinedTime(profile.created_at)}
-              </span>
-            </div>
-          </div>
+    <div className="container py-6 animate-fade-in">
+      {/* Header Section */}
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <Button variant="ghost" size="icon" onClick={() => navigate(-1)}>
+            <ArrowLeft className="h-4 w-4" />
+          </Button>
         </div>
-
-        <div className="flex space-x-2">
-          {isOwnProfile ? (
-            editing ? (
-              <>
-                <Button 
-                  variant="outline"
-                  size="sm"
-                  onClick={cancelEditing}
-                >
-                  <X className="h-4 w-4 mr-2" />
-                  Cancel
-                </Button>
-                <Button 
-                  variant="default"
-                  size="sm"
-                  onClick={handleSaveProfile}
-                >
-                  <Check className="h-4 w-4 mr-2" />
-                  Save
-                </Button>
-              </>
-            ) : (
-              <Button 
-                variant="outline"
-                size="sm"
-                onClick={() => setEditing(true)}
-              >
-                <Edit className="h-4 w-4 mr-2" />
-                Edit Profile
-              </Button>
-            )
+        <h1 className="text-2xl font-bold tracking-tight">
+          {isCurrentUser ? "Your Profile" : profileData.username}
+        </h1>
+        <div>
+          {isCurrentUser ? (
+            <Button variant="outline" size="sm" onClick={() => setIsEditing(true)}>
+              <Edit className="h-4 w-4 mr-2" />
+              Edit Profile
+            </Button>
           ) : (
-            <>
-              <Button 
-                variant="outline"
-                size="sm" 
-                className={profile.isLiked ? "text-red-500" : ""}
-                onClick={handleLike}
-              >
-                <Heart className={`h-4 w-4 mr-2 ${profile.isLiked ? "fill-red-500" : ""}`} />
-                {profile.likes_count}
-              </Button>
-
-              <Button 
-                variant="outline" 
-                size="sm" 
-                className="button-hover"
-                asChild
-              >
-                <Link to={`/chat/${profile.id}`}>
-                  <MessageCircle className="h-4 w-4 mr-2" />
-                  Message
-                </Link>
-              </Button>
-
-              <Button variant="outline" size="sm" className="button-hover" onClick={handleShare}>
-                <Share2 className="h-4 w-4 mr-2" />
-                Share
-              </Button>
-            </>
+            <Button variant="outline" size="sm" onClick={handleToggleLike} disabled={isLikeLoading}>
+              {isLikeLoading ? (
+                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+              ) : (
+                <>
+                  <Heart className={`h-4 w-4 mr-2 ${hasLiked ? "fill-red-500" : ""}`} />
+                  {profileData.likes_count} Likes
+                </>
+              )}
+            </Button>
           )}
         </div>
       </div>
 
-      {/* Language Info */}
-      <Card className="mb-8 glass-card">
-        <CardContent className="p-6">
-          <div className="flex flex-col md:flex-row md:justify-between">
-            <div className="mb-4 md:mb-0">
-              <h3 className="text-lg font-semibold">Language Skills</h3>
-              <div className="flex flex-col space-y-2 mt-2">
-                <div className="flex items-center space-x-2">
-                  <Languages className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-muted-foreground">Native language:</span>
-                  <Badge variant="secondary">{profile.native_language}</Badge>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Languages className="h-4 w-4 text-primary" />
-                  <span className="text-muted-foreground">Learning:</span>
-                  <Badge>{profile.learning_language}</Badge>
-                  <span className="text-xs text-muted-foreground">({profile.proficiency_level})</span>
-                </div>
-              </div>
-            </div>
-
-            <div className="flex items-center space-x-4">
-              <div className="flex flex-col items-center">
-                <div className="flex items-center space-x-1">
-                  <Flame className="h-5 w-5 text-primary" />
-                  <span className="text-2xl font-bold">{profile.streak_count}</span>
-                </div>
-                <span className="text-xs text-muted-foreground">day streak</span>
-              </div>
+      <Card className="glass-card">
+        <CardHeader>
+          <div className="flex items-center space-x-4">
+            <Avatar className="h-16 w-16">
+              <AvatarImage src={profileData.avatar_url || "/placeholder.svg"} alt={profileData.full_name} />
+              <AvatarFallback>{profileData.full_name?.[0]?.toUpperCase() || '?'}</AvatarFallback>
+            </Avatar>
+            <div>
+              <CardTitle className="text-lg font-semibold">{profileData.full_name}</CardTitle>
+              <CardDescription className="text-sm text-muted-foreground">
+                {profileData.username && `@${profileData.username}`}
+              </CardDescription>
             </div>
           </div>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <p className="text-sm font-medium">Native Language:</p>
+              <p className="text-muted-foreground">{profileData.native_language}</p>
+            </div>
+            <div>
+              <p className="text-sm font-medium">Learning Language:</p>
+              <p className="text-muted-foreground">{profileData.learning_language} ({profileData.proficiency_level})</p>
+            </div>
+            <div>
+              <p className="text-sm font-medium">Streak:</p>
+              <div className="flex items-center">
+                <Rocket className="h-4 w-4 mr-1 text-primary" />
+                <p className="text-muted-foreground">{profileData.streak_count} days</p>
+              </div>
+            </div>
+            <div>
+              <p className="text-sm font-medium">Online Status:</p>
+              <div className="flex items-center">
+                {profileData.is_online ? (
+                  <>
+                    <Check className="h-4 w-4 mr-1 text-green-500" />
+                    <p className="text-green-500">Online</p>
+                  </>
+                ) : (
+                  <>
+                    <X className="h-4 w-4 mr-1 text-gray-500" />
+                    <p className="text-gray-500">Offline</p>
+                  </>
+                )}
+              </div>
+            </div>
+            {profileData.gender && (
+              <div>
+                <p className="text-sm font-medium">Gender:</p>
+                <p className="text-muted-foreground">{profileData.gender}</p>
+              </div>
+            )}
+            {profileData.date_of_birth && (
+              <div>
+                <p className="text-sm font-medium">Date of Birth:</p>
+                <p className="text-muted-foreground">{profileData.date_of_birth}</p>
+              </div>
+            )}
+          </div>
+          <Separator className="my-4" />
+          <div>
+            <p className="text-sm font-medium">Bio:</p>
+            <p className="text-muted-foreground">{profileData.bio}</p>
+          </div>
+          {profileData.learning_goal && (
+            <>
+              <Separator className="my-4" />
+              <div>
+                <p className="text-sm font-medium">Learning Goal:</p>
+                <p className="text-muted-foreground">{profileData.learning_goal}</p>
+              </div>
+            </>
+          )}
         </CardContent>
+        {!isCurrentUser && (
+          <CardFooter className="justify-between">
+            <Button variant="ghost">
+              <Heart className="h-4 w-4 mr-2" />
+              {profileData.likes_count} Likes
+            </Button>
+            <Button asChild variant="outline">
+              <a href={`/chat/${profileData.id}`}>
+                <MessageCircle className="h-4 w-4 mr-2" />
+                Start Chat
+              </a>
+            </Button>
+          </CardFooter>
+        )}
       </Card>
 
-      {/* Profile Tabs */}
-      <Tabs defaultValue="about" className="mb-8">
-        <TabsList className="grid grid-cols-2 mb-6">
-          <TabsTrigger value="about">About</TabsTrigger>
-          <TabsTrigger value="achievements">Achievements</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="about" className="mt-0">
-          <Card>
+      {/* Edit Profile Modal */}
+      {isEditing && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <Card className="max-w-md w-full">
             <CardHeader>
-              <CardTitle>About {profile.username}</CardTitle>
+              <CardTitle>Edit Profile</CardTitle>
+              <CardDescription>Update your profile information.</CardDescription>
             </CardHeader>
-            <CardContent>
-              {editing ? (
-                <Textarea
-                  value={editedBio}
-                  onChange={(e) => setEditedBio(e.target.value)}
-                  className="min-h-[120px]"
-                  placeholder="Tell others about yourself..."
+            <CardContent className="grid gap-4">
+              <div className="grid gap-2">
+                <Label htmlFor="username">Username</Label>
+                <Input
+                  id="username"
+                  value={editForm.username}
+                  onChange={(e) => setEditForm({ ...editForm, username: e.target.value })}
                 />
-              ) : (
-                <p className="text-muted-foreground">{profile.bio}</p>
-              )}
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="achievements" className="mt-0">
-          <Card>
-            <CardHeader>
-              <CardTitle>Achievements</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {profile.achievements.map((achievement, index) => (
-                  <div key={index} className="flex items-start space-x-4 p-4 rounded-lg border border-border">
-                    <div className="w-10 h-10 flex items-center justify-center bg-primary/10 rounded-full text-xl">
-                      {achievement.icon}
-                    </div>
-                    <div>
-                      <h4 className="font-medium">{achievement.title}</h4>
-                      <p className="text-sm text-muted-foreground">{achievement.description}</p>
-                      <p className="text-xs text-muted-foreground mt-1">
-                        Achieved on {new Date(achievement.date).toLocaleDateString()}
-                      </p>
-                    </div>
-                  </div>
-                ))}
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="bio">Bio</Label>
+                <Textarea
+                  id="bio"
+                  value={editForm.bio}
+                  onChange={(e) => setEditForm({ ...editForm, bio: e.target.value })}
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="learning_goal">Learning Goal</Label>
+                <Input
+                  id="learning_goal"
+                  value={editForm.learning_goal}
+                  onChange={(e) => setEditForm({ ...editForm, learning_goal: e.target.value })}
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="avatar_url">Avatar URL</Label>
+                <Input
+                  id="avatar_url"
+                  value={editForm.avatar_url}
+                  onChange={(e) => setEditForm({ ...editForm, avatar_url: e.target.value })}
+                />
               </div>
             </CardContent>
+            <CardFooter className="flex justify-end gap-2">
+              <Button variant="secondary" onClick={() => setIsEditing(false)}>
+                Cancel
+              </Button>
+              <Button onClick={handleSave} disabled={isLoading}>
+                {isLoading ? (
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                ) : (
+                  "Save"
+                )}
+              </Button>
+            </CardFooter>
           </Card>
-        </TabsContent>
-      </Tabs>
+        </div>
+      )}
     </div>
   );
 };

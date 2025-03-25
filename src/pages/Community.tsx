@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react';
 import { Link } from "react-router-dom";
 import { Search, Filter, Languages, Flame, MessageCircle, Heart, User, Calendar } from "lucide-react";
@@ -15,6 +14,7 @@ import { useToast } from "@/hooks/use-toast";
 import { cn } from '@/lib/utils';
 import { Slider } from "@/components/ui/slider";
 import { RealtimeChannel } from '@supabase/supabase-js';
+import { Profile, User as UserType } from '@/types/schema';
 
 interface UserProfile {
   id: string;
@@ -30,16 +30,6 @@ interface UserProfile {
   gender?: string;
   age?: number;
   liked: boolean; // Whether the current user has liked this profile
-}
-
-interface UserData {
-  id: string;
-  native_language: string;
-  learning_language: string;
-  proficiency_level: string;
-  streak_count: number;
-  gender?: string;
-  date_of_birth?: string;
 }
 
 const UserCard = ({ 
@@ -147,7 +137,6 @@ const Community = () => {
   const [loading, setLoading] = useState(true);
   const [channels, setChannels] = useState<RealtimeChannel[]>([]);
 
-  // Fetch profiles and handle real-time updates
   useEffect(() => {
     if (!user) return;
 
@@ -156,7 +145,6 @@ const Community = () => {
         setLoading(true);
         console.log("Fetching profiles for user:", user.id);
         
-        // First get all profiles except the current user
         const { data: profilesData, error: profilesError } = await supabase
           .from('profiles')
           .select('id, username, bio, avatar_url, is_online, likes_count')
@@ -164,20 +152,30 @@ const Community = () => {
 
         if (profilesError) {
           console.error('Error fetching profiles:', profilesError);
+          toast({
+            variant: "destructive",
+            title: "Failed to load community profiles",
+            description: "Please try again later."
+          });
+          setLoading(false);
           return;
         }
         
-        // Then get all users data
         const { data: usersData, error: usersError } = await supabase
           .from('users')
           .select('id, native_language, learning_language, proficiency_level, streak_count, gender, date_of_birth');
           
         if (usersError) {
           console.error('Error fetching users data:', usersError);
+          toast({
+            variant: "destructive",
+            title: "Failed to load user details",
+            description: "Please try again later."
+          });
+          setLoading(false);
           return;
         }
 
-        // Check which profiles the current user has liked
         const { data: likes, error: likesError } = await supabase
           .from('user_likes')
           .select('liked_id')
@@ -185,45 +183,55 @@ const Community = () => {
 
         if (likesError) {
           console.error('Error fetching likes:', likesError);
-          return;
         }
 
         const likedProfiles = new Set<string>();
         if (likes) {
-          likes.forEach(like => likedProfiles.add(like.liked_id));
+          likes.forEach(like => {
+            if (like && typeof like === 'object' && 'liked_id' in like) {
+              likedProfiles.add(like.liked_id as string);
+            }
+          });
         }
 
-        // Join profiles with user data
-        const formattedProfiles = profilesData.map(profile => {
-          const userData = usersData.find(u => u.id === profile.id);
-          
-          let age = null;
-          if (userData?.date_of_birth) {
-            const birthDate = new Date(userData.date_of_birth);
-            const today = new Date();
-            age = today.getFullYear() - birthDate.getFullYear();
-            const m = today.getMonth() - birthDate.getMonth();
-            if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
-              age--;
+        const formattedProfiles = profilesData
+          .filter(profile => profile !== null)
+          .map(profile => {
+            if (!profile || typeof profile !== 'object' || !('id' in profile)) {
+              return null;
             }
-          }
+            
+            const profileId = profile.id as string;
+            const userData = usersData.find(u => u && typeof u === 'object' && 'id' in u && u.id === profileId);
+            
+            let age = null;
+            if (userData && 'date_of_birth' in userData && userData.date_of_birth) {
+              const birthDate = new Date(userData.date_of_birth as string);
+              const today = new Date();
+              age = today.getFullYear() - birthDate.getFullYear();
+              const m = today.getMonth() - birthDate.getMonth();
+              if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+                age--;
+              }
+            }
 
-          return {
-            id: profile.id,
-            username: profile.username || 'Anonymous',
-            bio: profile.bio || 'No bio available',
-            avatar_url: profile.avatar_url,
-            native_language: userData?.native_language || 'Unknown',
-            learning_language: userData?.learning_language || 'Unknown',
-            proficiency_level: userData?.proficiency_level || 'beginner',
-            streak_count: userData?.streak_count || 0,
-            likes_count: profile.likes_count || 0,
-            is_online: profile.is_online || false,
-            gender: userData?.gender,
-            age: age,
-            liked: likedProfiles.has(profile.id)
-          };
-        });
+            return {
+              id: profileId,
+              username: profile.username as string || 'Anonymous',
+              bio: profile.bio as string || 'No bio available',
+              avatar_url: profile.avatar_url as string || '',
+              native_language: userData?.native_language as string || 'Unknown',
+              learning_language: userData?.learning_language as string || 'Unknown',
+              proficiency_level: userData?.proficiency_level as string || 'beginner',
+              streak_count: userData?.streak_count as number || 0,
+              likes_count: profile.likes_count as number || 0,
+              is_online: profile.is_online as boolean || false,
+              gender: userData?.gender as string | undefined,
+              age,
+              liked: likedProfiles.has(profileId)
+            };
+          })
+          .filter(Boolean) as UserProfile[];
 
         setProfiles(formattedProfiles);
         setFilteredProfiles(formattedProfiles);
@@ -231,14 +239,17 @@ const Community = () => {
       } catch (error) {
         console.error('Error in fetchProfiles:', error);
         setLoading(false);
+        toast({
+          variant: "destructive",
+          title: "Failed to load community",
+          description: "An unexpected error occurred. Please try again."
+        });
       }
     };
 
     fetchProfiles();
 
-    // Set up real-time subscription for various changes
     const setupRealtimeSubscriptions = () => {
-      // Channel for profiles changes
       const profilesChannel = supabase
         .channel('public:profiles')
         .on('postgres_changes', 
@@ -250,17 +261,12 @@ const Community = () => {
           }, 
           (payload) => {
             console.log('Profile change detected:', payload);
-            // Update profiles state based on the change
             setProfiles(currentProfiles => {
-              // Find if this profile exists in our current state
               const index = currentProfiles.findIndex(p => p.id === payload.new.id);
               
-              // Handle different event types
               if (payload.eventType === 'DELETE') {
-                // Remove the profile if it was deleted
                 return currentProfiles.filter(p => p.id !== payload.old.id);
               } else if (index >= 0) {
-                // Update existing profile
                 const updatedProfiles = [...currentProfiles];
                 updatedProfiles[index] = {
                   ...updatedProfiles[index],
@@ -272,7 +278,6 @@ const Community = () => {
                 };
                 return updatedProfiles;
               } else if (payload.eventType === 'INSERT') {
-                // We need to fetch the complete profile data for new insertions
                 fetchProfiles();
                 return currentProfiles;
               }
@@ -283,7 +288,6 @@ const Community = () => {
         )
         .subscribe();
 
-      // Channel for user_likes changes
       const likesChannel = supabase
         .channel('public:user_likes')
         .on('postgres_changes', 
@@ -295,7 +299,6 @@ const Community = () => {
           }, 
           (payload) => {
             console.log('User like change detected:', payload);
-            // Update the liked status for profiles
             setProfiles(currentProfiles => {
               if (payload.eventType === 'INSERT') {
                 return currentProfiles.map(profile => 
@@ -316,7 +319,6 @@ const Community = () => {
         )
         .subscribe();
 
-      // Channel for users changes
       const usersChannel = supabase
         .channel('public:users')
         .on('postgres_changes', 
@@ -327,7 +329,6 @@ const Community = () => {
           }, 
           (payload) => {
             console.log('User data change detected:', payload);
-            // We need to refetch all profiles since user data changed
             fetchProfiles();
           }
         )
@@ -338,15 +339,13 @@ const Community = () => {
 
     setupRealtimeSubscriptions();
 
-    // Clean up subscriptions on unmount
     return () => {
       channels.forEach(channel => {
         supabase.removeChannel(channel);
       });
     };
-  }, [user]);
+  }, [user, toast]);
 
-  // Update filtered profiles when filters change
   useEffect(() => {
     if (!profiles.length) return;
     
@@ -388,7 +387,6 @@ const Community = () => {
     setFilteredProfiles(filtered);
   }, [profiles, searchQuery, languageFilter, genderFilter, ageRange, onlineOnly]);
 
-  // Handle like functionality
   const handleLike = async (profileId: string) => {
     if (!user) {
       toast({
@@ -400,7 +398,6 @@ const Community = () => {
     }
 
     try {
-      // Optimistic UI update
       setProfiles(currentProfiles => 
         currentProfiles.map(profile => {
           if (profile.id === profileId) {
@@ -417,11 +414,9 @@ const Community = () => {
         })
       );
 
-      // Perform the actual toggle like operation
       const success = await toggleProfileLike(user.id, profileId);
       
       if (!success) {
-        // Revert the optimistic update if operation failed
         setProfiles(currentProfiles => 
           currentProfiles.map(profile => {
             if (profile.id === profileId) {
@@ -454,14 +449,12 @@ const Community = () => {
     }
   };
 
-  // Get list of languages for the filter
   const languages = [
     "English", "Spanish", "French", "German", "Italian",
     "Portuguese", "Chinese", "Japanese", "Korean", "Russian",
     "Arabic", "Hindi", "Dutch", "Swedish", "Finnish"
   ];
 
-  // Gender options
   const genders = ["Male", "Female", "Non-binary", "Other"];
 
   return (

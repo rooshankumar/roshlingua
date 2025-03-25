@@ -12,8 +12,12 @@ const RealtimeStatus = () => {
 
     // Update user's online status and streak when they access the app
     const setUserOnline = async () => {
-      await updateOnlineStatus(user.id, true);
-      await updateUserStreak(user.id);
+      try {
+        await updateOnlineStatus(user.id, true);
+        await updateUserStreak(user.id);
+      } catch (error) {
+        console.error("Error updating online status or streak:", error);
+      }
     };
 
     setUserOnline();
@@ -45,13 +49,17 @@ const RealtimeStatus = () => {
 
     // Set up beforeunload handler to mark user as offline when leaving
     const handleBeforeUnload = () => {
-      // Using a synchronous approach since beforeunload doesn't wait for async
-      const xhr = new XMLHttpRequest();
-      xhr.open('POST', `${import.meta.env.VITE_SUPABASE_URL}/rest/v1/profiles?id=eq.${user.id}`, false);
-      xhr.setRequestHeader('Content-Type', 'application/json');
-      xhr.setRequestHeader('apikey', import.meta.env.VITE_SUPABASE_ANON_KEY);
-      xhr.setRequestHeader('Authorization', `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`);
-      xhr.send(JSON.stringify({ is_online: false }));
+      try {
+        // Using a synchronous approach since beforeunload doesn't wait for async
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', `${import.meta.env.VITE_SUPABASE_URL}/rest/v1/profiles?id=eq.${user.id}`, false);
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        xhr.setRequestHeader('apikey', import.meta.env.VITE_SUPABASE_ANON_KEY);
+        xhr.setRequestHeader('Authorization', `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`);
+        xhr.send(JSON.stringify({ is_online: false }));
+      } catch (error) {
+        console.error("Error in beforeunload handler:", error);
+      }
     };
 
     window.addEventListener('beforeunload', handleBeforeUnload);
@@ -65,7 +73,9 @@ const RealtimeStatus = () => {
       clearInterval(heartbeatInterval);
       
       // Mark user as offline when component unmounts
-      updateOnlineStatus(user.id, false);
+      updateOnlineStatus(user.id, false).catch(error => 
+        console.error("Error updating offline status on unmount:", error)
+      );
     };
   }, [user]);
 

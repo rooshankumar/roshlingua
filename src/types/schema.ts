@@ -27,6 +27,11 @@ export interface Profile {
   likes_count: number;
   created_at: string;
   updated_at: string;
+  avatar_url?: string; // Adding this field to match the database
+}
+
+export interface UserWithProfile extends User {
+  profile?: Profile;
 }
 
 export interface Conversation {
@@ -48,6 +53,10 @@ export interface Message {
   content: string;
   created_at: string;
   is_read: boolean;
+  sender?: {
+    username?: string;
+    avatar_url?: string;
+  };
 }
 
 export interface MessageReaction {
