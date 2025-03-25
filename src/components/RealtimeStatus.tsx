@@ -47,10 +47,10 @@ const RealtimeStatus = () => {
     const handleBeforeUnload = () => {
       // Using a synchronous approach since beforeunload doesn't wait for async
       const xhr = new XMLHttpRequest();
-      xhr.open('POST', `${import.meta.env.VITE_SUPABASE_URL}/rest/v1/profiles?id=eq.${user.id}`, false);
+      xhr.open('POST', `${supabase.url}/rest/v1/profiles?id=eq.${user.id}`, false);
       xhr.setRequestHeader('Content-Type', 'application/json');
-      xhr.setRequestHeader('apikey', import.meta.env.VITE_SUPABASE_ANON_KEY);
-      xhr.setRequestHeader('Authorization', `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`);
+      xhr.setRequestHeader('apikey', supabase.supabaseKey);
+      xhr.setRequestHeader('Authorization', `Bearer ${supabase.supabaseKey}`);
       xhr.send(JSON.stringify({ is_online: false }));
     };
 

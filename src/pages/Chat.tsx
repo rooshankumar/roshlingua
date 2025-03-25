@@ -1,16 +1,20 @@
 
 import { useState, useEffect, useRef } from "react";
-import { useParams, Link, useNavigate } from "react-router-dom";
-import { ArrowLeft, Send, User } from "lucide-react";
+import { Link, useParams, useNavigate } from "react-router-dom";
+import { ArrowLeft, Send, User, Info, MoreVertical, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
-import { Separator } from "@/components/ui/separator";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useToast } from "@/hooks/use-toast";
-import { useAuth } from "@/providers/AuthProvider";
+import { 
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger
+} from "@/components/ui/dropdown-menu";
 import { supabase } from "@/lib/supabase";
-import { format } from "date-fns";
-import { RealtimeChannel } from "@supabase/supabase-js";
+import { useAuth } from "@/providers/AuthProvider";
+import { Loader2 } from "lucide-react";
 
 interface Message {
   id: string;
@@ -24,480 +28,476 @@ interface Message {
   };
 }
 
-interface Conversation {
+interface ChatProfile {
   id: string;
-  created_at: string;
-  participants: {
-    id: string;
-    username: string;
-    avatar_url: string | null;
-    is_online: boolean;
-  }[];
+  username: string;
+  avatar_url: string;
+  is_online: boolean;
 }
 
 const Chat = () => {
-  const { id: otherUserId } = useParams<{ id: string }>();
+  const { id: partnerId } = useParams<{ id: string }>();
   const { user } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
+  
   const [messages, setMessages] = useState<Message[]>([]);
-  const [newMessage, setNewMessage] = useState("");
-  const [conversation, setConversation] = useState<Conversation | null>(null);
+  const [conversationId, setConversationId] = useState<string | null>(null);
+  const [partner, setPartner] = useState<ChatProfile | null>(null);
   const [loading, setLoading] = useState(true);
-  const [recipient, setRecipient] = useState<{
-    id: string;
-    username: string;
-    avatar_url: string | null;
-    is_online: boolean;
-  } | null>(null);
-  const endOfMessagesRef = useRef<HTMLDivElement>(null);
-  const [channel, setChannel] = useState<RealtimeChannel | null>(null);
+  const [loadingProfile, setLoadingProfile] = useState(true);
+  const [messageText, setMessageText] = useState("");
+  const [notFound, setNotFound] = useState(false);
+  
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
+  // Scroll to bottom on new messages
   useEffect(() => {
-    if (!user || !otherUserId) return;
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
 
-    const fetchOrCreateConversation = async () => {
+  // Fetch partner profile information
+  useEffect(() => {
+    const fetchPartnerProfile = async () => {
+      if (!partnerId) {
+        setLoadingProfile(false);
+        setNotFound(true);
+        return;
+      }
+
       try {
-        setLoading(true);
-
-        // First, get the recipient's profile
-        const { data: recipientData, error: recipientError } = await supabase
-          .from("profiles")
-          .select("id, username, avatar_url, is_online")
-          .eq("id", otherUserId)
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('id, username, avatar_url, is_online')
+          .eq('id', partnerId)
           .single();
 
-        if (recipientError) {
-          console.error("Error fetching recipient profile:", recipientError);
-          toast({
-            variant: "destructive",
-            title: "Error",
-            description: "Could not find the user you're trying to chat with.",
-          });
-          navigate("/community");
+        if (error) {
+          console.error('Error fetching partner profile:', error);
+          setNotFound(true);
           return;
         }
 
-        setRecipient(recipientData);
-
-        // Check if conversation exists between these two users
-        const { data: participantData, error: participantError } = await supabase
-          .from("conversation_participants")
-          .select("conversation_id")
-          .eq("user_id", user.id);
-
-        if (participantError) {
-          console.error("Error checking for existing conversation:", participantError);
-          throw participantError;
-        }
-
-        const conversationIds = participantData.map(p => p.conversation_id);
-
-        if (conversationIds.length > 0) {
-          const { data: otherParticipantsData, error: otherError } = await supabase
-            .from("conversation_participants")
-            .select("conversation_id")
-            .eq("user_id", otherUserId)
-            .in("conversation_id", conversationIds);
-
-          if (otherError) {
-            console.error("Error checking other participant:", otherError);
-            throw otherError;
-          }
-
-          // If there's a match, we found an existing conversation
-          if (otherParticipantsData.length > 0) {
-            const existingConversationId = otherParticipantsData[0].conversation_id;
-            
-            // Fetch the conversation details
-            const { data: convData, error: convError } = await supabase
-              .from("conversations")
-              .select("id, created_at")
-              .eq("id", existingConversationId)
-              .single();
-
-            if (convError) {
-              console.error("Error fetching conversation:", convError);
-              throw convError;
-            }
-
-            // Get all participants
-            const { data: allParticipants, error: partError } = await supabase
-              .from("conversation_participants")
-              .select("user_id")
-              .eq("conversation_id", existingConversationId);
-
-            if (partError) {
-              console.error("Error fetching participants:", partError);
-              throw partError;
-            }
-
-            // Get profiles for all participants
-            const { data: profiles, error: profilesError } = await supabase
-              .from("profiles")
-              .select("id, username, avatar_url, is_online")
-              .in("id", allParticipants.map(p => p.user_id));
-
-            if (profilesError) {
-              console.error("Error fetching participant profiles:", profilesError);
-              throw profilesError;
-            }
-
-            setConversation({
-              id: convData.id,
-              created_at: convData.created_at,
-              participants: profiles
-            });
-
-            // Fetch messages for this conversation
-            fetchMessages(convData.id);
-            setupRealtimeSubscription(convData.id);
-            return;
-          }
-        }
-
-        // No existing conversation found, create a new one
-        const { data: newConversation, error: createError } = await supabase
-          .from("conversations")
-          .insert({})
-          .select("id, created_at")
-          .single();
-
-        if (createError) {
-          console.error("Error creating conversation:", createError);
-          throw createError;
-        }
-
-        // Add both users as participants
-        const { error: addParticipantsError } = await supabase
-          .from("conversation_participants")
-          .insert([
-            { conversation_id: newConversation.id, user_id: user.id },
-            { conversation_id: newConversation.id, user_id: otherUserId }
-          ]);
-
-        if (addParticipantsError) {
-          console.error("Error adding participants:", addParticipantsError);
-          throw addParticipantsError;
-        }
-
-        setConversation({
-          id: newConversation.id,
-          created_at: newConversation.created_at,
-          participants: [
-            {
-              id: user.id,
-              username: 'You', // Placeholder until we fetch current user's profile
-              avatar_url: null,
-              is_online: true
-            },
-            recipientData
-          ]
-        });
-
-        // Set up realtime subscription for the new conversation
-        setupRealtimeSubscription(newConversation.id);
-
+        setPartner(data as ChatProfile);
       } catch (error) {
-        console.error("Error setting up conversation:", error);
+        console.error('Error fetching partner profile:', error);
+        setNotFound(true);
+      } finally {
+        setLoadingProfile(false);
+      }
+    };
+
+    fetchPartnerProfile();
+  }, [partnerId, toast]);
+
+  // Initialize conversation and fetch messages
+  useEffect(() => {
+    if (!user || !partnerId) return;
+
+    const initializeChat = async () => {
+      try {
+        // 1. Check if conversation exists between these users
+        const { data: participantsData, error: participantsError } = await supabase
+          .from('conversation_participants')
+          .select('conversation_id')
+          .eq('user_id', user.id)
+          .order('conversation_id', { ascending: false });
+
+        if (participantsError) throw participantsError;
+
+        let foundConversationId: string | null = null;
+
+        if (participantsData.length > 0) {
+          // Get all conversations where current user is a participant
+          const userConversationIds = participantsData.map(p => p.conversation_id);
+          
+          // Find conversations where partner is also a participant
+          const { data: partnerParticipations, error: partnerError } = await supabase
+            .from('conversation_participants')
+            .select('conversation_id')
+            .eq('user_id', partnerId)
+            .in('conversation_id', userConversationIds);
+
+          if (partnerError) throw partnerError;
+
+          if (partnerParticipations.length > 0) {
+            // Conversation exists
+            foundConversationId = partnerParticipations[0].conversation_id;
+          }
+        }
+
+        // If no conversation exists, create one
+        if (!foundConversationId) {
+          // Create new conversation
+          const { data: newConversation, error: createError } = await supabase
+            .from('conversations')
+            .insert({})
+            .select()
+            .single();
+
+          if (createError) throw createError;
+
+          foundConversationId = newConversation.id;
+
+          // Add participants
+          const participants = [
+            { conversation_id: foundConversationId, user_id: user.id },
+            { conversation_id: foundConversationId, user_id: partnerId }
+          ];
+
+          const { error: participantsInsertError } = await supabase
+            .from('conversation_participants')
+            .insert(participants);
+
+          if (participantsInsertError) throw participantsInsertError;
+        }
+
+        setConversationId(foundConversationId);
+
+        // 2. Now fetch messages for this conversation
+        const { data: messagesData, error: messagesError } = await supabase
+          .from('messages')
+          .select(`
+            id,
+            content,
+            created_at,
+            sender_id,
+            is_read,
+            sender:profiles!sender_id(username, avatar_url)
+          `)
+          .eq('conversation_id', foundConversationId)
+          .order('created_at', { ascending: true });
+
+        if (messagesError) throw messagesError;
+        
+        setMessages(messagesData || []);
+      } catch (error) {
+        console.error('Error initializing chat:', error);
         toast({
           variant: "destructive",
           title: "Error",
-          description: "Failed to set up the conversation. Please try again.",
+          description: "Failed to load chat messages"
         });
       } finally {
         setLoading(false);
       }
     };
 
-    fetchOrCreateConversation();
+    initializeChat();
 
+    // Set up real-time subscription for new messages
+    let subscription;
+    if (conversationId) {
+      subscription = supabase
+        .channel(`messages:${conversationId}`)
+        .on('postgres_changes', {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'messages',
+          filter: `conversation_id=eq.${conversationId}`,
+        }, async (payload) => {
+          // Fetch sender profile for the new message
+          const { data: senderProfile } = await supabase
+            .from('profiles')
+            .select('username, avatar_url')
+            .eq('id', payload.new.sender_id)
+            .single();
+
+          const newMessage = {
+            ...payload.new as Message,
+            sender: senderProfile
+          };
+
+          setMessages(current => [...current, newMessage]);
+        })
+        .subscribe();
+    }
+    
     return () => {
-      // Clean up realtime subscription
-      if (channel) {
-        supabase.removeChannel(channel);
+      if (subscription) supabase.removeChannel(subscription);
+    };
+  }, [user, partnerId, conversationId, toast]);
+
+  // Mark messages as read when viewed
+  useEffect(() => {
+    if (!user || !conversationId || messages.length === 0 || !partnerId) return;
+
+    const markMessagesAsRead = async () => {
+      try {
+        // Only mark messages from the partner as read
+        const unreadMessages = messages
+          .filter(msg => msg.sender_id === partnerId && !msg.is_read)
+          .map(msg => msg.id);
+
+        if (unreadMessages.length > 0) {
+          await supabase
+            .from('messages')
+            .update({ is_read: true })
+            .in('id', unreadMessages);
+        }
+
+        // Update the last_read_at timestamp
+        await supabase
+          .from('conversation_participants')
+          .update({ last_read_at: new Date().toISOString() })
+          .eq('conversation_id', conversationId)
+          .eq('user_id', user.id);
+      } catch (error) {
+        console.error('Error marking messages as read:', error);
       }
     };
-  }, [user, otherUserId, navigate, toast]);
 
-  const fetchMessages = async (conversationId: string) => {
-    try {
-      const { data, error } = await supabase
-        .from("messages")
-        .select(`
-          id,
-          content,
-          created_at,
-          sender_id,
-          is_read
-        `)
-        .eq("conversation_id", conversationId)
-        .order("created_at", { ascending: true });
+    markMessagesAsRead();
+  }, [user, conversationId, messages, partnerId]);
 
-      if (error) {
-        console.error("Error fetching messages:", error);
-        throw error;
-      }
-
-      // Get sender details for messages
-      const senderIds = [...new Set(data.map(message => message.sender_id))];
-      const { data: profiles, error: profilesError } = await supabase
-        .from("profiles")
-        .select("id, username, avatar_url")
-        .in("id", senderIds);
-
-      if (profilesError) {
-        console.error("Error fetching sender profiles:", profilesError);
-        throw profilesError;
-      }
-
-      // Map profiles to messages
-      const messagesWithSenders = data.map(message => {
-        const senderProfile = profiles.find(profile => profile.id === message.sender_id);
-        return {
-          ...message,
-          sender: senderProfile ? {
-            username: senderProfile.username || 'Unknown User',
-            avatar_url: senderProfile.avatar_url
-          } : {
-            username: 'Unknown User',
-            avatar_url: null
-          }
-        };
-      });
-
-      setMessages(messagesWithSenders);
-      
-      // Mark messages as read if they're from the other user
-      const unreadMessages = data
-        .filter(msg => msg.sender_id === otherUserId && !msg.is_read)
-        .map(msg => msg.id);
-        
-      if (unreadMessages.length > 0) {
-        await supabase
-          .from("messages")
-          .update({ is_read: true })
-          .in("id", unreadMessages);
-      }
-
-      // Scroll to bottom
-      scrollToBottom();
-    } catch (error) {
-      console.error("Error in fetchMessages:", error);
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to load messages. Please try refreshing.",
-      });
-    }
-  };
-
-  const setupRealtimeSubscription = (conversationId: string) => {
-    const newChannel = supabase
-      .channel(`messages:${conversationId}`)
-      .on('postgres_changes', {
-        event: 'INSERT',
-        schema: 'public',
-        table: 'messages',
-        filter: `conversation_id=eq.${conversationId}`
-      }, async (payload) => {
-        console.log('New message received:', payload);
-        
-        // Fetch the sender's profile
-        const { data: senderProfile, error: profileError } = await supabase
-          .from("profiles")
-          .select("username, avatar_url")
-          .eq("id", payload.new.sender_id)
-          .single();
-          
-        if (profileError) {
-          console.error("Error fetching sender profile:", profileError);
-          return;
-        }
-        
-        // Add the new message to the state
-        const newMessage = {
-          ...payload.new,
-          sender: {
-            username: senderProfile.username || 'Unknown User',
-            avatar_url: senderProfile.avatar_url
-          }
-        };
-        
-        setMessages(prev => [...prev, newMessage]);
-        
-        // If the message is from the other user, mark it as read
-        if (payload.new.sender_id === otherUserId) {
-          await supabase
-            .from("messages")
-            .update({ is_read: true })
-            .eq("id", payload.new.id);
-        }
-        
-        // Scroll to the bottom when a new message arrives
-        scrollToBottom();
-      })
-      .subscribe();
-      
-    setChannel(newChannel);
-  };
-
-  const sendMessage = async (e?: React.FormEvent) => {
-    if (e) e.preventDefault();
-    if (!newMessage.trim() || !conversation || !user) return;
+  const sendMessage = async () => {
+    if (!messageText.trim() || !user || !conversationId) return;
 
     try {
+      const newMessage = {
+        conversation_id: conversationId,
+        sender_id: user.id,
+        content: messageText.trim()
+      };
+
+      // Optimistically add message to UI
+      const optimisticMessage = {
+        id: `temp-${Date.now()}`,
+        ...newMessage,
+        created_at: new Date().toISOString(),
+        is_read: false,
+        sender: {
+          username: "You",
+          avatar_url: "" // We don't have this readily available
+        }
+      };
+
+      setMessages(current => [...current, optimisticMessage]);
+      setMessageText("");
+
+      // Actually send the message
       const { error } = await supabase
-        .from("messages")
-        .insert({
-          conversation_id: conversation.id,
-          sender_id: user.id,
-          content: newMessage.trim(),
-          is_read: false
-        });
+        .from('messages')
+        .insert(newMessage);
 
-      if (error) {
-        console.error("Error sending message:", error);
-        throw error;
-      }
+      if (error) throw error;
 
-      // Clear the input field
-      setNewMessage("");
     } catch (error) {
-      console.error("Error in sendMessage:", error);
+      console.error('Error sending message:', error);
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Failed to send your message. Please try again.",
+        description: "Failed to send message"
       });
     }
   };
 
-  const scrollToBottom = () => {
-    setTimeout(() => {
-      endOfMessagesRef.current?.scrollIntoView({ behavior: 'smooth' });
-    }, 100);
+  const deleteConversation = async () => {
+    if (!conversationId || !user) return;
+
+    try {
+      // First delete all messages
+      const { error: messagesError } = await supabase
+        .from('messages')
+        .delete()
+        .eq('conversation_id', conversationId);
+
+      if (messagesError) throw messagesError;
+
+      // Then delete participants
+      const { error: participantsError } = await supabase
+        .from('conversation_participants')
+        .delete()
+        .eq('conversation_id', conversationId);
+
+      if (participantsError) throw participantsError;
+
+      // Finally delete conversation
+      const { error: conversationError } = await supabase
+        .from('conversations')
+        .delete()
+        .eq('id', conversationId);
+
+      if (conversationError) throw conversationError;
+
+      toast({
+        title: "Conversation deleted",
+        description: "The conversation has been deleted"
+      });
+
+      navigate('/community');
+    } catch (error) {
+      console.error('Error deleting conversation:', error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to delete conversation"
+      });
+    }
   };
 
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
-
-  if (loading) {
+  if (loading || loadingProfile) {
     return (
       <div className="container flex items-center justify-center min-h-[50vh]">
         <div className="flex flex-col items-center">
-          <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
-          <p className="mt-4 text-muted-foreground">Setting up your conversation...</p>
+          <Loader2 className="h-12 w-12 animate-spin text-primary" />
+          <p className="mt-4 text-muted-foreground">Loading chat...</p>
         </div>
       </div>
     );
   }
 
-  if (!recipient) {
+  if (notFound) {
     return (
-      <div className="container py-12 text-center">
-        <h2 className="text-2xl font-bold mb-2">User not found</h2>
-        <p className="text-muted-foreground mb-6">
-          We couldn't find the user you're trying to chat with.
-        </p>
-        <Button asChild>
-          <Link to="/community">Back to Community</Link>
-        </Button>
+      <div className="container flex flex-col items-center justify-center min-h-[50vh] gap-4">
+        <div className="bg-muted p-8 rounded-lg flex flex-col items-center text-center max-w-md">
+          <Users className="h-16 w-16 text-muted-foreground mb-4" />
+          <h2 className="text-2xl font-bold mb-2">No conversation found</h2>
+          <p className="text-muted-foreground mb-6">
+            This user may not exist or the conversation could have been deleted.
+          </p>
+          <Button asChild>
+            <Link to="/community">
+              <Users className="h-4 w-4 mr-2" />
+              Browse Community
+            </Link>
+          </Button>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="container py-4 h-[calc(100vh-4rem)] flex flex-col">
-      {/* Chat Header */}
-      <div className="flex items-center space-x-4 pb-4">
-        <Button size="icon" variant="ghost" asChild>
-          <Link to="/community">
-            <ArrowLeft className="h-4 w-4" />
-          </Link>
-        </Button>
-        
-        <div className="flex items-center flex-1">
-          <Avatar className="h-10 w-10 mr-3">
-            <AvatarImage src={recipient.avatar_url || "/placeholder.svg"} alt={recipient.username} />
-            <AvatarFallback><User className="h-5 w-5" /></AvatarFallback>
-          </Avatar>
-          
-          <div>
-            <h2 className="font-semibold">{recipient.username}</h2>
-            <p className="text-xs text-muted-foreground flex items-center">
-              <span className={`inline-block w-2 h-2 rounded-full mr-1 ${recipient.is_online ? 'bg-green-500' : 'bg-gray-400'}`}></span>
-              {recipient.is_online ? 'Online' : 'Offline'}
-            </p>
-          </div>
-        </div>
-      </div>
-      
-      <Separator />
-      
-      {/* Messages Area */}
-      <div className="flex-1 overflow-y-auto pb-4 pt-4 space-y-4">
-        {messages.length === 0 ? (
-          <div className="text-center py-8 text-muted-foreground">
-            <p>No messages yet. Send a message to start the conversation!</p>
-          </div>
-        ) : (
-          messages.map((message) => {
-            const isCurrentUser = message.sender_id === user?.id;
-            
-            return (
-              <div
-                key={message.id}
-                className={`flex ${isCurrentUser ? 'justify-end' : 'justify-start'}`}
-              >
-                <div className="flex items-end max-w-[70%]">
-                  {!isCurrentUser && (
-                    <Avatar className="h-8 w-8 mr-2 mb-1 flex-shrink-0">
-                      <AvatarImage 
-                        src={message.sender?.avatar_url || "/placeholder.svg"} 
-                        alt={message.sender?.username || "User"} 
-                      />
-                      <AvatarFallback><User className="h-4 w-4" /></AvatarFallback>
-                    </Avatar>
-                  )}
-                  <div
-                    className={`px-4 py-2 rounded-lg ${
-                      isCurrentUser
-                        ? 'bg-primary text-primary-foreground'
-                        : 'bg-muted'
-                    }`}
-                  >
-                    <p>{message.content}</p>
-                    <p className={`text-xs mt-1 ${isCurrentUser ? 'text-primary-foreground/80' : 'text-muted-foreground'}`}>
-                      {format(new Date(message.created_at), 'h:mm a')}
-                    </p>
-                  </div>
+    <div className="container h-full max-h-[calc(100vh-8rem)] flex flex-col">
+      {/* Chat header */}
+      <div className="flex justify-between items-center p-4 border-b">
+        <div className="flex items-center">
+          <Button asChild variant="ghost" size="sm" className="mr-2">
+            <Link to="/community">
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Back
+            </Link>
+          </Button>
+
+          {partner && (
+            <div className="flex items-center">
+              <Avatar className="h-8 w-8 mr-2">
+                <AvatarImage src={partner.avatar_url || "/placeholder.svg"} />
+                <AvatarFallback>
+                  {partner.username?.[0]?.toUpperCase() || '?'}
+                </AvatarFallback>
+              </Avatar>
+              <div>
+                <div className="font-medium">{partner.username}</div>
+                <div className="text-xs text-muted-foreground flex items-center">
+                  <div className={`h-2 w-2 rounded-full mr-1 ${partner.is_online ? 'bg-green-500' : 'bg-gray-400'}`}></div>
+                  {partner.is_online ? 'Online' : 'Offline'}
                 </div>
               </div>
-            );
-          })
-        )}
-        <div ref={endOfMessagesRef} />
+            </div>
+          )}
+        </div>
+
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" size="icon">
+              <MoreVertical className="h-5 w-5" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem asChild>
+              <Link to={`/profile/${partnerId}`} className="cursor-pointer">
+                <User className="h-4 w-4 mr-2" />
+                View Profile
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem className="text-destructive" onClick={deleteConversation}>
+              Delete Conversation
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
-      
-      {/* Message Input */}
-      <Separator className="my-4" />
-      <form onSubmit={sendMessage} className="flex items-center space-x-2">
-        <Input
-          placeholder="Type your message..."
-          value={newMessage}
-          onChange={(e) => setNewMessage(e.target.value)}
-          className="flex-1"
-        />
-        <Button 
-          type="submit" 
-          size="icon"
-          disabled={!newMessage.trim()}
+
+      {/* Message area */}
+      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+        {messages.length === 0 ? (
+          <div className="flex flex-col items-center justify-center h-full text-center text-muted-foreground">
+            <Info className="h-12 w-12 mb-2 opacity-50" />
+            <h3 className="text-lg font-medium">No messages yet</h3>
+            <p className="max-w-md">
+              Send a message to start the conversation!
+            </p>
+          </div>
+        ) : (
+          messages.map((message) => (
+            <div
+              key={message.id}
+              className={`flex ${message.sender_id === user?.id ? 'justify-end' : 'justify-start'}`}
+            >
+              <div 
+                className={`flex items-start space-x-2 max-w-[70%] ${
+                  message.sender_id === user?.id ? 'flex-row-reverse space-x-reverse' : 'flex-row'
+                }`}
+              >
+                <Avatar className="h-8 w-8">
+                  <AvatarImage 
+                    src={
+                      message.sender_id === user?.id
+                        ? "" // We don't have the current user's avatar readily available
+                        : message.sender?.avatar_url || "/placeholder.svg"
+                    } 
+                  />
+                  <AvatarFallback>
+                    {message.sender_id === user?.id 
+                      ? user.email?.[0]?.toUpperCase() || '?' 
+                      : message.sender?.username?.[0]?.toUpperCase() || '?'
+                    }
+                  </AvatarFallback>
+                </Avatar>
+                <div 
+                  className={`rounded-lg p-3 ${
+                    message.sender_id === user?.id 
+                      ? 'bg-primary text-primary-foreground' 
+                      : 'bg-muted'
+                  }`}
+                >
+                  <p className="text-sm whitespace-pre-wrap break-words">{message.content}</p>
+                  <span className="text-xs opacity-70 block mt-1">
+                    {new Date(message.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                  </span>
+                </div>
+              </div>
+            </div>
+          ))
+        )}
+        <div ref={messagesEndRef} />
+      </div>
+
+      {/* Message input */}
+      <div className="p-4 border-t">
+        <form 
+          className="flex space-x-2"
+          onSubmit={(e) => {
+            e.preventDefault();
+            sendMessage();
+          }}
         >
-          <Send className="h-4 w-4" />
-        </Button>
-      </form>
+          <Input
+            value={messageText}
+            onChange={(e) => setMessageText(e.target.value)}
+            placeholder="Type your message..."
+            className="flex-1"
+            autoComplete="off"
+          />
+          <Button 
+            type="submit" 
+            size="icon"
+            disabled={!messageText.trim()}
+          >
+            <Send className="h-4 w-4" />
+          </Button>
+        </form>
+      </div>
     </div>
   );
 };
