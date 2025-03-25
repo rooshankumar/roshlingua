@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from 'react';
 import { Link } from "react-router-dom";
 import { Search, Filter, Languages, Flame, MessageCircle, Heart, User, Calendar } from "lucide-react";
@@ -147,7 +148,7 @@ const Community = () => {
         
         const { data: profilesData, error: profilesError } = await supabase
           .from('profiles')
-          .select('id, username, bio, is_online, likes_count, avatar_url')
+          .select('id, username, bio, is_online, likes_count')
           .neq('id', user.id);
 
         if (profilesError) {
@@ -195,18 +196,27 @@ const Community = () => {
         }
 
         const formattedProfiles = profilesData
-          .filter((profile): profile is Record<string, any> => {
-            return profile !== null && typeof profile === 'object' && 'id' in profile;
-          })
+          .filter(profile => profile !== null)
           .map(profile => {
-            const profileId = profile.id as string;
+            if (!profile || typeof profile !== 'object') {
+              return null;
+            }
             
+            const profileRecord = profile as Record<string, any>;
+            if (!('id' in profileRecord)) {
+              return null;
+            }
+            
+            const profileId = profileRecord.id as string;
+            
+            // Type guard for the user data to ensure we have a valid object with an id
             const userData = usersData?.find(user => {
               if (!user || typeof user !== 'object') return false;
               return 'id' in user && user.id === profileId;
             });
             
-            const userDataObj = userData ? userData as Record<string, any> : undefined;
+            // Ensure userData is a proper object with expected properties
+            const userDataObj = userData as Record<string, any> | undefined;
             
             let age = null;
             if (userDataObj && 'date_of_birth' in userDataObj && userDataObj.date_of_birth) {
@@ -221,20 +231,21 @@ const Community = () => {
 
             return {
               id: profileId,
-              username: profile.username as string || 'Anonymous',
-              bio: profile.bio as string || 'No bio available',
-              avatar_url: profile.avatar_url as string || '',
+              username: profileRecord.username as string || 'Anonymous',
+              bio: profileRecord.bio as string || 'No bio available',
+              avatar_url: profileRecord.avatar_url as string || '',
               native_language: userDataObj?.native_language as string || 'Unknown',
               learning_language: userDataObj?.learning_language as string || 'Unknown',
               proficiency_level: userDataObj?.proficiency_level as string || 'beginner',
               streak_count: userDataObj?.streak_count as number || 0,
-              likes_count: profile.likes_count as number || 0,
-              is_online: profile.is_online as boolean || false,
+              likes_count: profileRecord.likes_count as number || 0,
+              is_online: profileRecord.is_online as boolean || false,
               gender: userDataObj?.gender as string | undefined,
               age,
               liked: likedProfiles.has(profileId)
             };
-          });
+          })
+          .filter(Boolean) as UserProfile[];
 
         setProfiles(formattedProfiles);
         setFilteredProfiles(formattedProfiles);

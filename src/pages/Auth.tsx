@@ -120,7 +120,7 @@ const Auth = () => {
             <CardHeader>
               <CardTitle>Welcome back</CardTitle>
               <CardDescription>
-                Sign in to your rosLingua account
+                Sign in to your Languagelandia account
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">

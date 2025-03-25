@@ -48,9 +48,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             .from('onboarding_status')
             .select('is_complete')
             .eq('user_id', user.id)
-            .maybeSingle(); // Using maybeSingle to handle potential empty results
+            .single();
             
-          if (error && error.code !== 'PGRST116') { // Ignore "not found" errors
+          if (error) {
             console.error("Error checking onboarding status:", error);
             return;
           }
@@ -65,7 +65,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           }
           
           // If user needs onboarding but isn't on the onboarding page
-          else if (onboardingData && !onboardingData.is_complete && location.pathname !== '/onboarding') {
+          else if (!onboardingData?.is_complete && location.pathname !== '/onboarding') {
             navigate('/onboarding', { replace: true });
           }
         }
@@ -126,7 +126,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (error) throw error;
       
       // Routing will be handled by the useEffect
-    } catch (error: any) {
+    } catch (error) {
       console.error("Login error:", error);
       toast({
         variant: "destructive",
@@ -162,7 +162,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       });
       
       // Routing will be handled by the useEffect
-    } catch (error: any) {
+    } catch (error) {
       console.error("Signup error:", error);
       toast({
         variant: "destructive",
@@ -188,7 +188,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       
       if (error) throw error;
       // Routing after OAuth callback will be handled separately
-    } catch (error: any) {
+    } catch (error) {
       console.error("Google login error:", error);
       toast({
         variant: "destructive",
@@ -219,7 +219,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       
       // Redirect to home page after logout
       navigate('/', { replace: true });
-    } catch (error: any) {
+    } catch (error) {
       console.error("Signout error:", error);
       toast({
         variant: "destructive",
