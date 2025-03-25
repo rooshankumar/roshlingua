@@ -160,14 +160,12 @@ const Profile = () => {
           if (profileData && payload.new) {
             setProfileData(prev => {
               if (!prev) return prev;
-              
-              const newData = payload.new as Record<string, any>;
               return {
                 ...prev,
-                username: newData?.username !== undefined ? newData.username : prev.username,
-                bio: newData?.bio !== undefined ? newData.bio : prev.bio,
-                likes_count: newData?.likes_count !== undefined ? newData.likes_count : prev.likes_count,
-                is_online: newData?.is_online !== undefined ? newData.is_online : prev.is_online
+                username: payload.new.username || prev.username,
+                bio: payload.new.bio || prev.bio,
+                likes_count: payload.new.likes_count || prev.likes_count,
+                is_online: payload.new.is_online || false
               };
             });
           }
@@ -186,19 +184,17 @@ const Profile = () => {
           if (profileData && payload.new) {
             setProfileData(prev => {
               if (!prev) return prev;
-              
-              const newData = payload.new as Record<string, any>;
               return {
                 ...prev,
-                full_name: newData?.full_name !== undefined ? newData.full_name : prev.full_name,
-                native_language: newData?.native_language !== undefined ? newData.native_language : prev.native_language,
-                learning_language: newData?.learning_language !== undefined ? newData.learning_language : prev.learning_language,
-                proficiency_level: newData?.proficiency_level !== undefined ? newData.proficiency_level : prev.proficiency_level,
-                gender: newData?.gender !== undefined ? newData.gender : prev.gender,
-                date_of_birth: newData?.date_of_birth !== undefined ? newData.date_of_birth : prev.date_of_birth,
-                learning_goal: newData?.learning_goal !== undefined ? newData.learning_goal : prev.learning_goal,
-                avatar_url: newData?.avatar_url !== undefined ? newData.avatar_url : prev.avatar_url,
-                streak_count: newData?.streak_count !== undefined ? newData.streak_count : prev.streak_count
+                full_name: payload.new.full_name || prev.full_name,
+                native_language: payload.new.native_language || prev.native_language,
+                learning_language: payload.new.learning_language || prev.learning_language,
+                proficiency_level: payload.new.proficiency_level || prev.proficiency_level,
+                gender: payload.new.gender,
+                date_of_birth: payload.new.date_of_birth,
+                learning_goal: payload.new.learning_goal,
+                avatar_url: payload.new.avatar_url,
+                streak_count: payload.new.streak_count || 0
               };
             });
           }
