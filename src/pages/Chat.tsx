@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useRef } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { ArrowLeft, Send, User } from "lucide-react";
@@ -10,7 +11,18 @@ import { useAuth } from "@/providers/AuthProvider";
 import { supabase } from "@/lib/supabase";
 import { format } from "date-fns";
 import { RealtimeChannel } from "@supabase/supabase-js";
-import { Message } from "@/types/schema";
+
+interface Message {
+  id: string;
+  content: string;
+  created_at: string;
+  sender_id: string;
+  is_read: boolean;
+  sender?: {
+    username: string;
+    avatar_url: string;
+  };
+}
 
 interface Conversation {
   id: string;
@@ -304,15 +316,15 @@ const Chat = () => {
         }
         
         // Add the new message to the state
-        const newMessageData: Message = {
+        const newMessage = {
           ...payload.new,
           sender: {
-            username: senderProfile?.username || 'Unknown User',
-            avatar_url: senderProfile?.avatar_url
+            username: senderProfile.username || 'Unknown User',
+            avatar_url: senderProfile.avatar_url
           }
         };
         
-        setMessages(prev => [...prev, newMessageData]);
+        setMessages(prev => [...prev, newMessage]);
         
         // If the message is from the other user, mark it as read
         if (payload.new.sender_id === otherUserId) {
