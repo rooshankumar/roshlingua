@@ -1,18 +1,23 @@
+
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { 
   Calendar, 
   Flame, 
   Heart, 
   Languages, 
-  MapPin, 
+  User, 
   MessageCircle, 
   Share2, 
-  User 
+  Edit,
+  Check,
+  X
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { 
   Dialog, 
@@ -23,11 +28,11 @@ import {
   DialogTrigger 
 } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/providers/AuthProvider";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase, toggleProfileLike, hasUserLikedProfile } from "@/lib/supabase";
 
-interface UserProfile {
+interface ProfileData {
   id: string;
   username: string;
   bio: string;
@@ -38,6 +43,7 @@ interface UserProfile {
   streak_count: number;
   likes_count: number;
   created_at: string;
+  isLiked: boolean;
   achievements: {
     title: string;
     description: string;
@@ -47,27 +53,60 @@ interface UserProfile {
 }
 
 const Profile = () => {
+  const { id } = useParams<{ id: string }>();
   const { user } = useAuth();
-  const [profile, setProfile] = useState<UserProfile | null>(null);
+  const [profile, setProfile] = useState<ProfileData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [editing, setEditing] = useState(false);
+  const [editedBio, setEditedBio] = useState("");
+  const [editedUsername, setEditedUsername] = useState("");
   const { toast } = useToast();
 
+  // Get profile details and handle real-time updates
   useEffect(() => {
-    const fetchProfile = async () => {
-      if (!user) return;
+    const profileId = id || user?.id;
+    if (!profileId) return;
 
+    const fetchProfile = async () => {
       try {
+        // Fetch profile with joined user data
         const { data, error } = await supabase
           .from('profiles')
-          .select('*')
-          .eq('id', user.id)
+          .select(`
+            id,
+            username,
+            bio,
+            avatar_url,
+            likes_count,
+            created_at,
+            users!inner (
+              native_language,
+              learning_language,
+              proficiency_level,
+              streak_count
+            )
+          `)
+          .eq('id', profileId)
           .single();
 
         if (error) throw error;
 
+        // Check if current user has liked this profile
+        let isLiked = false;
+        if (user && user.id !== profileId) {
+          isLiked = await hasUserLikedProfile(user.id, profileId);
+        }
+
         // For now, we'll hardcode achievements since they're not in DB yet
         const profileData = {
           ...data,
+          username: data.username || 'User',
+          bio: data.bio || 'No bio available',
+          native_language: data.users.native_language,
+          learning_language: data.users.learning_language,
+          proficiency_level: data.users.proficiency_level,
+          streak_count: data.users.streak_count || 0,
+          isLiked,
           achievements: [
             {
               title: "Week One Warrior",
@@ -85,6 +124,8 @@ const Profile = () => {
         };
 
         setProfile(profileData);
+        setEditedBio(profileData.bio);
+        setEditedUsername(profileData.username);
       } catch (error) {
         console.error('Error fetching profile:', error);
         toast({
@@ -98,30 +139,101 @@ const Profile = () => {
     };
 
     fetchProfile();
-  }, [user]);
+
+    // Set up real-time subscription for profile changes
+    const channel = supabase
+      .channel(`profile:${profileId}`)
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'profiles',
+        filter: `id=eq.${profileId}`,
+      }, (payload) => {
+        // Update profile state based on the change
+        setProfile(currentProfile => {
+          if (!currentProfile) return currentProfile;
+          
+          return {
+            ...currentProfile,
+            username: payload.new.username || currentProfile.username,
+            bio: payload.new.bio || currentProfile.bio,
+            avatar_url: payload.new.avatar_url,
+            likes_count: payload.new.likes_count || 0
+          };
+        });
+      })
+      .subscribe();
+
+    // Set up real-time subscription for user likes changes
+    if (user && profileId !== user.id) {
+      const likesChannel = supabase
+        .channel(`likes:${user.id}-${profileId}`)
+        .on('postgres_changes', {
+          event: '*',
+          schema: 'public',
+          table: 'user_likes',
+          filter: `liker_id=eq.${user.id} AND liked_id=eq.${profileId}`,
+        }, async () => {
+          // Check if the profile is liked by the current user
+          const isLiked = await hasUserLikedProfile(user.id, profileId);
+          
+          setProfile(currentProfile => {
+            if (!currentProfile) return currentProfile;
+            return {
+              ...currentProfile,
+              isLiked
+            };
+          });
+        })
+        .subscribe();
+        
+      return () => {
+        supabase.removeChannel(channel);
+        supabase.removeChannel(likesChannel);
+      };
+    }
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [id, user, toast]);
 
   const handleLike = async () => {
     if (!profile || !user) return;
+    
+    if (user.id === profile.id) {
+      toast({
+        title: "Not allowed",
+        description: "You cannot like your own profile",
+      });
+      return;
+    }
 
     try {
-      const { error } = await supabase
-        .from('profiles')
-        .update({ 
-          likes_count: profile.likes_count + 1 
-        })
-        .eq('id', profile.id);
+      // Optimistic UI update
+      setProfile(prev => prev ? {
+        ...prev,
+        isLiked: !prev.isLiked,
+        likes_count: prev.isLiked ? prev.likes_count - 1 : prev.likes_count + 1
+      } : null);
 
-      if (error) throw error;
-
-      setProfile({
-        ...profile,
-        likes_count: profile.likes_count + 1
-      });
-
-      toast({
-        title: "Profile liked",
-        description: "Thanks for the support!",
-      });
+      // Perform the actual toggle like operation
+      const success = await toggleProfileLike(user.id, profile.id);
+      
+      if (!success) {
+        // Revert the optimistic update if operation failed
+        setProfile(prev => prev ? {
+          ...prev,
+          isLiked: !prev.isLiked,
+          likes_count: !prev.isLiked ? prev.likes_count - 1 : prev.likes_count + 1
+        } : null);
+        
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Failed to update like status",
+        });
+      }
     } catch (error) {
       console.error('Error updating likes:', error);
       toast({
@@ -130,6 +242,61 @@ const Profile = () => {
         description: "Failed to update likes",
       });
     }
+  };
+
+  const handleSaveProfile = async () => {
+    if (!user || !profile) return;
+    
+    // Only allow users to edit their own profile
+    if (user.id !== profile.id) {
+      toast({
+        variant: "destructive",
+        title: "Not allowed",
+        description: "You can only edit your own profile",
+      });
+      return;
+    }
+
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({ 
+          username: editedUsername,
+          bio: editedBio
+        })
+        .eq('id', user.id);
+
+      if (error) throw error;
+
+      // Update local state
+      setProfile(prev => prev ? {
+        ...prev,
+        username: editedUsername,
+        bio: editedBio
+      } : null);
+
+      toast({
+        title: "Profile updated",
+        description: "Your profile has been successfully updated",
+      });
+      
+      setEditing(false);
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to update profile",
+      });
+    }
+  };
+
+  const cancelEditing = () => {
+    if (profile) {
+      setEditedBio(profile.bio);
+      setEditedUsername(profile.username);
+    }
+    setEditing(false);
   };
 
   const calculateJoinedTime = (dateString: string) => {
@@ -154,11 +321,14 @@ const Profile = () => {
     });
   };
 
+  // Check if viewing own profile
+  const isOwnProfile = user && profile && user.id === profile.id;
+
   if (loading) {
     return (
       <div className="container flex items-center justify-center min-h-[50vh]">
         <div className="flex flex-col items-center">
-          <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spinner"></div>
+          <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
           <p className="mt-4 text-muted-foreground">Loading profile...</p>
         </div>
       </div>
@@ -170,7 +340,7 @@ const Profile = () => {
       <div className="container py-12 text-center">
         <h2 className="text-2xl font-bold mb-2">Profile not found</h2>
         <p className="text-muted-foreground mb-6">
-          We couldn't find your profile information.
+          We couldn't find the profile information you're looking for.
         </p>
         <Button asChild>
           <Link to="/community">Back to Community</Link>
@@ -209,7 +379,16 @@ const Profile = () => {
           </Dialog>
 
           <div>
-            <h1 className="text-3xl font-bold">{profile.username}</h1>
+            {editing ? (
+              <Input
+                value={editedUsername}
+                onChange={(e) => setEditedUsername(e.target.value)}
+                className="text-2xl font-bold mb-2"
+                placeholder="Your name"
+              />
+            ) : (
+              <h1 className="text-3xl font-bold">{profile.username}</h1>
+            )}
             <div className="flex items-center space-x-2 mt-1">
               <Calendar className="h-4 w-4 text-muted-foreground" />
               <span className="text-muted-foreground">
@@ -220,20 +399,66 @@ const Profile = () => {
         </div>
 
         <div className="flex space-x-2">
-          <Button 
-            variant="outline"
-            size="sm" 
-            className="button-hover"
-            onClick={handleLike}
-          >
-            <Heart className="h-4 w-4 mr-2" />
-            {profile.likes_count}
-          </Button>
+          {isOwnProfile ? (
+            editing ? (
+              <>
+                <Button 
+                  variant="outline"
+                  size="sm"
+                  onClick={cancelEditing}
+                >
+                  <X className="h-4 w-4 mr-2" />
+                  Cancel
+                </Button>
+                <Button 
+                  variant="default"
+                  size="sm"
+                  onClick={handleSaveProfile}
+                >
+                  <Check className="h-4 w-4 mr-2" />
+                  Save
+                </Button>
+              </>
+            ) : (
+              <Button 
+                variant="outline"
+                size="sm"
+                onClick={() => setEditing(true)}
+              >
+                <Edit className="h-4 w-4 mr-2" />
+                Edit Profile
+              </Button>
+            )
+          ) : (
+            <>
+              <Button 
+                variant="outline"
+                size="sm" 
+                className={profile.isLiked ? "text-red-500" : ""}
+                onClick={handleLike}
+              >
+                <Heart className={`h-4 w-4 mr-2 ${profile.isLiked ? "fill-red-500" : ""}`} />
+                {profile.likes_count}
+              </Button>
 
-          <Button variant="outline" size="sm" className="button-hover" onClick={handleShare}>
-            <Share2 className="h-4 w-4 mr-2" />
-            Share
-          </Button>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="button-hover"
+                asChild
+              >
+                <Link to={`/chat/${profile.id}`}>
+                  <MessageCircle className="h-4 w-4 mr-2" />
+                  Message
+                </Link>
+              </Button>
+
+              <Button variant="outline" size="sm" className="button-hover" onClick={handleShare}>
+                <Share2 className="h-4 w-4 mr-2" />
+                Share
+              </Button>
+            </>
+          )}
         </div>
       </div>
 
@@ -284,7 +509,16 @@ const Profile = () => {
               <CardTitle>About {profile.username}</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-muted-foreground">{profile.bio}</p>
+              {editing ? (
+                <Textarea
+                  value={editedBio}
+                  onChange={(e) => setEditedBio(e.target.value)}
+                  className="min-h-[120px]"
+                  placeholder="Tell others about yourself..."
+                />
+              ) : (
+                <p className="text-muted-foreground">{profile.bio}</p>
+              )}
             </CardContent>
           </Card>
         </TabsContent>
