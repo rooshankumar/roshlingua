@@ -2,6 +2,7 @@
 import { useEffect } from 'react';
 import { supabase, updateOnlineStatus, updateUserStreak } from '@/lib/supabase';
 import { useAuth } from '@/providers/AuthProvider';
+import { RealtimeChannel } from '@supabase/supabase-js';
 
 const RealtimeStatus = () => {
   const { user } = useAuth();
