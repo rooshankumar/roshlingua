@@ -211,10 +211,10 @@ const Community = () => {
               if (!user || typeof user !== 'object') return false;
               const userRecord = user as Record<string, any>;
               return 'id' in userRecord && userRecord.id === profileId;
-            });
+            }) as Record<string, any> | undefined;
             
             let age = null;
-            if (userData && typeof userData === 'object' && 'date_of_birth' in userData && userData.date_of_birth) {
+            if (userData && 'date_of_birth' in userData && userData.date_of_birth) {
               const birthDate = new Date(userData.date_of_birth as string);
               const today = new Date();
               age = today.getFullYear() - birthDate.getFullYear();
@@ -224,22 +224,18 @@ const Community = () => {
               }
             }
 
-            const userRecord = (userData && typeof userData === 'object') 
-              ? userData as Record<string, any> 
-              : {};
-
             return {
               id: profileId,
               username: profileRecord.username as string || 'Anonymous',
               bio: profileRecord.bio as string || 'No bio available',
               avatar_url: profileRecord.avatar_url as string || '',
-              native_language: userRecord.native_language as string || 'Unknown',
-              learning_language: userRecord.learning_language as string || 'Unknown',
-              proficiency_level: userRecord.proficiency_level as string || 'beginner',
-              streak_count: userRecord.streak_count as number || 0,
+              native_language: userData?.native_language as string || 'Unknown',
+              learning_language: userData?.learning_language as string || 'Unknown',
+              proficiency_level: userData?.proficiency_level as string || 'beginner',
+              streak_count: userData?.streak_count as number || 0,
               likes_count: profileRecord.likes_count as number || 0,
               is_online: profileRecord.is_online as boolean || false,
-              gender: userRecord.gender as string | undefined,
+              gender: userData?.gender as string | undefined,
               age,
               liked: likedProfiles.has(profileId)
             };
