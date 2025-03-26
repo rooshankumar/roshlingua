@@ -362,10 +362,3 @@ const Community = () => {
 };
 
 export default Community;
-export default function Community() {
-  return (
-    <div className="container mx-auto py-6">
-      <h1 className="text-3xl font-bold">Community</h1>
-    </div>
-  )
-}
