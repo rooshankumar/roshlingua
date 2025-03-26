@@ -212,20 +212,21 @@ const Community = () => {
             
             const profileId = profileRecord.id as string;
             
-            // Find the matching user data - Fix the type error by ensuring userData is not undefined
+            // Find the matching user data
             const userData = usersData?.find(user => {
               if (!user || typeof user !== 'object') return false;
               return 'id' in user && user.id === profileId;
             }) || {};
             
-            // Now userData is guaranteed to be an object (either with values or empty)
-            // We need to safely access properties with type checking
+            // Fix for TypeScript error - Safely check if userData has the required properties
+            const hasRequiredProperties = (obj: any): obj is { id: string, native_language?: string, learning_language?: string, proficiency_level?: string, streak_count?: number, gender?: string, date_of_birth?: string } => {
+              return obj && typeof obj === 'object' && 'id' in obj;
+            };
+            
+            // Calculate age if date_of_birth exists
             let age = null;
-            if (userData && 
-                typeof userData === 'object' && 
-                'date_of_birth' in userData && 
-                userData.date_of_birth) {
-              const birthDate = new Date(userData.date_of_birth as string);
+            if (hasRequiredProperties(userData) && userData.date_of_birth) {
+              const birthDate = new Date(userData.date_of_birth);
               const today = new Date();
               age = today.getFullYear() - birthDate.getFullYear();
               const m = today.getMonth() - birthDate.getMonth();
@@ -239,23 +240,23 @@ const Community = () => {
               username: profileRecord.username as string || 'Anonymous',
               bio: profileRecord.bio as string || 'No bio available',
               avatar_url: profileRecord.avatar_url as string || null,
-              native_language: typeof userData === 'object' && 
-                               'native_language' in userData ? 
-                               (userData.native_language as string) : 'Unknown',
-              learning_language: typeof userData === 'object' && 
-                                 'learning_language' in userData ? 
-                                 (userData.learning_language as string) : 'Unknown',
-              proficiency_level: typeof userData === 'object' && 
-                                 'proficiency_level' in userData ? 
-                                 (userData.proficiency_level as string) : 'beginner',
-              streak_count: typeof userData === 'object' && 
-                            'streak_count' in userData ? 
-                            (userData.streak_count as number) : 0,
+              native_language: hasRequiredProperties(userData) && userData.native_language 
+                ? userData.native_language 
+                : 'Unknown',
+              learning_language: hasRequiredProperties(userData) && userData.learning_language 
+                ? userData.learning_language 
+                : 'Unknown',
+              proficiency_level: hasRequiredProperties(userData) && userData.proficiency_level 
+                ? userData.proficiency_level 
+                : 'beginner',
+              streak_count: hasRequiredProperties(userData) && userData.streak_count !== undefined 
+                ? userData.streak_count 
+                : 0,
               likes_count: profileRecord.likes_count as number || 0,
               is_online: profileRecord.is_online as boolean || false,
-              gender: typeof userData === 'object' && 
-                      'gender' in userData ? 
-                      (userData.gender as string) : undefined,
+              gender: hasRequiredProperties(userData) && userData.gender 
+                ? userData.gender 
+                : undefined,
               age,
               liked: likedProfiles.has(profileId)
             };
