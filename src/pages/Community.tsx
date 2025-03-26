@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { 
@@ -54,7 +53,7 @@ const Community = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [languageFilter, setLanguageFilter] = useState("");
   const [onlineOnly, setOnlineOnly] = useState(false);
-  
+
   useEffect(() => {
     const fetchUsers = async () => {
       const { data: users, error } = await supabase
@@ -98,6 +97,8 @@ const Community = () => {
     };
 
     fetchUsers();
+
+    const mockUsers = [
       {
         id: 1,
         name: "Sarah Johnson",
@@ -203,15 +204,15 @@ const Community = () => {
         liked: false
       }
     ];
-    
+
     setUsers(mockUsers);
     setFilteredUsers(mockUsers);
   }, []);
-  
+
   // Apply filters and search
   useEffect(() => {
     let result = [...users];
-    
+
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
       result = result.filter(
@@ -222,7 +223,7 @@ const Community = () => {
           user.learningLanguage.toLowerCase().includes(query)
       );
     }
-    
+
     if (languageFilter) {
       result = result.filter(
         user => 
@@ -230,14 +231,14 @@ const Community = () => {
           user.learningLanguage === languageFilter
       );
     }
-    
+
     if (onlineOnly) {
       result = result.filter(user => user.online);
     }
-    
+
     setFilteredUsers(result);
   }, [users, searchQuery, languageFilter, onlineOnly]);
-  
+
   const handleLike = (userId: number) => {
     setUsers(users.map(user => {
       if (user.id === userId) {
@@ -251,12 +252,12 @@ const Community = () => {
       return user;
     }));
   };
-  
+
   const languages = [
     "English", "Spanish", "French", "German", "Italian",
     "Portuguese", "Chinese", "Japanese", "Korean", "Russian"
   ];
-  
+
   return (
     <div className="container animate-fade-in">
       <div className="space-y-2 mb-8">
@@ -265,7 +266,7 @@ const Community = () => {
           Discover language partners from around the world
         </p>
       </div>
-      
+
       {/* Filters and Search */}
       <Card className="glass-card mb-8">
         <CardContent className="pt-6">
@@ -279,7 +280,7 @@ const Community = () => {
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
             </div>
-            
+
             <div className="flex space-x-2">
               <Select
                 value={languageFilter}
@@ -297,7 +298,7 @@ const Community = () => {
                   ))}
                 </SelectContent>
               </Select>
-              
+
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="outline" className="flex items-center">
@@ -318,7 +319,7 @@ const Community = () => {
           </div>
         </CardContent>
       </Card>
-      
+
       {/* User grid */}
       {filteredUsers.length > 0 ? (
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 mb-8">
@@ -331,37 +332,37 @@ const Community = () => {
                     <AvatarImage src={user.avatar} alt={user.name} />
                     <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
                   </Avatar>
-                  
+
                   <div className="flex-1 min-w-0">
                     <Link to={`/profile/${user.id}`} className="hover:underline">
                       <h3 className="font-semibold text-lg truncate">{user.name}</h3>
                     </Link>
-                    
+
                     <div className="flex items-center space-x-1 mt-1">
                       <Badge variant="outline" className="text-xs font-normal">
                         {user.nativeLanguage} <span className="mx-1">→</span> {user.learningLanguage}
                       </Badge>
                     </div>
-                    
+
                     <div className="flex items-center space-x-2 mt-2">
                       <div className="flex items-center text-xs text-muted-foreground">
                         <Flame className="h-3 w-3 mr-1 text-primary" />
                         <span>{user.streak} day streak</span>
                       </div>
-                      
+
                       <div className="w-1 h-1 rounded-full bg-muted-foreground"></div>
-                      
+
                       <div className="text-xs text-muted-foreground">
                         {user.proficiencyLevel}
                       </div>
                     </div>
                   </div>
                 </div>
-                
+
                 <p className="text-sm text-muted-foreground mt-4 line-clamp-2">
                   {user.bio}
                 </p>
-                
+
                 <div className="flex justify-between mt-4 pt-3 border-t border-border">
                   <Button
                     variant="ghost"
@@ -372,7 +373,7 @@ const Community = () => {
                     <Heart className={`h-4 w-4 ${user.liked ? "fill-red-500" : ""}`} />
                     <span>{user.likes}</span>
                   </Button>
-                  
+
                   <Button asChild variant="outline" size="sm" className="button-hover">
                     <Link to={`/chat/${user.id}`}>
                       <MessageCircle className="h-4 w-4 mr-2" />
