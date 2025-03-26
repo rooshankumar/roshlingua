@@ -480,10 +480,3 @@ const Chat = () => {
 };
 
 export default Chat;
-export default function Chat() {
-  return (
-    <div className="container mx-auto py-6">
-      <h1 className="text-3xl font-bold">Chat</h1>
-    </div>
-  )
-}
