@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import { 
   Calendar, 
   Flame, 
@@ -24,10 +24,11 @@ import {
 } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/components/ui/use-toast";
-import { supabase } from "@/lib/supabaseClient"; //Corrected import path
+import { supabase } from "@/lib/supabaseClient";
+import { useAuth } from "@/contex/AuthContext";
 
 interface UserProfile {
-  id: number;
+  id: string;
   name: string;
   age: number;
   location: string;
@@ -60,18 +61,35 @@ const Profile = () => {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
+  const { user: currentUser } = useAuth();
+  const navigate = useNavigate();
 
   useEffect(() => {
+    let isMounted = true;
+
     const fetchProfile = async () => {
-      if (!id) return;
+      if (!id) {
+        if (isMounted) {
+          setLoading(false);
+          navigate('/community');
+        }
+        return;
+      }
 
       setLoading(true);
       try {
-        const { data, error } = await supabase
+        // Fetch profile data
+        const { data: profileData, error: profileError } = await supabase
           .from('profiles')
           .select(`
-            *,
-            achievements (
+            id,
+            username,
+            bio,
+            avatar_url,
+            likes_count,
+            is_online,
+            created_at,
+            achievements:user_achievements (
               title,
               description,
               date,
@@ -81,70 +99,147 @@ const Profile = () => {
           .eq('id', id)
           .single();
 
-        if (error) throw error;
+        if (profileError) throw profileError;
 
-        // Set profile with real data and fallbacks for missing values
-        setProfile({
-          id: data?.id || parseInt(id),
-          name: data?.name || "New Language Learner",
-          age: data?.age || 25,
-          location: data?.location || "Earth",
-          bio: data?.bio || "Excited to start my language learning journey!",
-          nativeLanguage: data?.native_language || "English",
-          learningLanguage: data?.learning_language || "Spanish",
-          proficiencyLevel: data?.proficiency_level || "Beginner (A1)",
-          streak: data?.streak || 0,
-          joinDate: data?.join_date || new Date().toISOString().split('T')[0],
-          interests: data?.interests || ["Language Learning", "Travel", "Culture"],
-          avatar: data?.avatar_url || "/placeholder.svg",
-          likes: data?.likes_count || 0,
-          liked: data?.is_liked || false,
-          learning: {
-            vocabulary: data?.learning_progress?.vocabulary || 10,
-            grammar: data?.learning_progress?.grammar || 10,
-            speaking: data?.learning_progress?.speaking || 10,
-            listening: data?.learning_progress?.listening || 10
-          },
-          achievements: data?.achievements || [
-            {
-              title: "Getting Started",
-              description: "Started your language learning journey",
-              date: new Date().toISOString().split('T')[0],
-              icon: "🌟"
-            }
-          ]
-        });
+        // Fetch user data
+        const { data: userData, error: userError } = await supabase
+          .from('users')
+          .select(`
+            full_name,
+            native_language,
+            learning_language,
+            proficiency_level,
+            streak_count,
+            date_of_birth,
+            created_at
+          `)
+          .eq('id', id)
+          .single();
+
+        if (userError) throw userError;
+
+        // Check if current user has liked this profile
+        let isLiked = false;
+        if (currentUser) {
+          const { data: likeData } = await supabase
+            .from('user_likes')
+            .select()
+            .eq('liker_id', currentUser.id)
+            .eq('liked_id', id)
+            .single();
+          isLiked = !!likeData;
+        }
+
+        if (isMounted && profileData) {
+          const age = userData?.date_of_birth 
+            ? new Date().getFullYear() - new Date(userData.date_of_birth).getFullYear()
+            : 25;
+
+          setProfile({
+            id: profileData.id,
+            name: userData?.full_name || profileData.username || `User_${id.slice(0, 5)}`,
+            age,
+            location: "Unknown", // Default since not in your schema
+            bio: profileData.bio || "Hello! I'm learning languages",
+            nativeLanguage: userData?.native_language || "Not specified",
+            learningLanguage: userData?.learning_language || "Not specified",
+            proficiencyLevel: userData?.proficiency_level || "Beginner",
+            streak: userData?.streak_count || 0,
+            joinDate: userData?.created_at || profileData.created_at || new Date().toISOString(),
+            interests: ["Language Learning"], // Default since not in your schema
+            avatar: profileData.avatar_url || "/placeholder.svg",
+            likes: profileData.likes_count || 0,
+            liked: isLiked,
+            learning: {
+              vocabulary: 25, // Default values
+              grammar: 25,
+              speaking: 25,
+              listening: 25
+            },
+            achievements: profileData.achievements || [
+              {
+                title: "Getting Started",
+                description: "Joined the platform",
+                date: userData?.created_at || profileData.created_at || new Date().toISOString(),
+                icon: "🌟"
+              }
+            ]
+          });
+        }
       } catch (err) {
         console.error("Error fetching profile:", err);
-        toast({
-          title: "Error",
-          description: "Failed to load profile data",
-          variant: "destructive"
-        });
+        if (isMounted) {
+          toast({
+            title: "Error",
+            description: "Failed to load profile data",
+            variant: "destructive"
+          });
+          setProfile(null);
+        }
       } finally {
-        setLoading(false);
+        if (isMounted) setLoading(false);
       }
     };
 
     fetchProfile();
-  }, [id, toast]);
 
-  const handleLike = () => {
-    if (!profile) return;
+    return () => {
+      isMounted = false;
+    };
+  }, [id, toast, navigate, currentUser]);
 
-    const newLiked = !profile.liked;
-    setProfile({
-      ...profile,
-      liked: newLiked,
-      likes: newLiked ? profile.likes + 1 : profile.likes - 1
-    });
+  const handleLike = async () => {
+    if (!profile || !currentUser) return;
 
-    toast({
-      title: newLiked ? "Profile liked" : "Like removed",
-      description: newLiked 
-        ? `You've liked ${profile.name}'s profile` 
-        : `You've removed your like from ${profile.name}'s profile`,
-    });
+    try {
+      const newLiked = !profile.liked;
+      const newLikes = newLiked ? profile.likes + 1 : profile.likes - 1;
+
+      // Update in database
+      const { error } = await supabase
+        .from('profiles')
+        .update({ likes_count: newLikes })
+        .eq('id', profile.id);
+
+      if (error) throw error;
+
+      // Update user_likes table
+      if (newLiked) {
+        await supabase
+          .from('user_likes')
+          .insert({
+            liker_id: currentUser.id,
+            liked_id: profile.id,
+            created_at: new Date().toISOString()
+          });
+      } else {
+        await supabase
+          .from('user_likes')
+          .delete()
+          .eq('liker_id', currentUser.id)
+          .eq('liked_id', profile.id);
+      }
+
+      setProfile({
+        ...profile,
+        liked: newLiked,
+        likes: newLikes
+      });
+
+      toast({
+        title: newLiked ? "Profile liked" : "Like removed",
+        description: newLiked 
+          ? `You've liked ${profile.name}'s profile` 
+          : `You've removed your like from ${profile.name}'s profile`,
+      });
+    } catch (error) {
+      console.error("Error updating like:", error);
+      toast({
+        title: "Error",
+        description: "Failed to update like",
+        variant: "destructive"
+      });
+    }
   };
 
   const calculateJoinedTime = (dateString: string) => {
@@ -163,9 +258,7 @@ const Profile = () => {
   };
 
   const handleShare = () => {
-    // In a real app, this would share the profile
     navigator.clipboard.writeText(window.location.href);
-
     toast({
       title: "Link copied to clipboard",
       description: "You can now share this profile with others",
@@ -176,7 +269,7 @@ const Profile = () => {
     return (
       <div className="container flex items-center justify-center min-h-[50vh]">
         <div className="flex flex-col items-center">
-          <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spinner"></div>
+          <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
           <p className="mt-4 text-muted-foreground">Loading profile...</p>
         </div>
       </div>
@@ -199,7 +292,6 @@ const Profile = () => {
 
   return (
     <div className="container pb-12 animate-fade-in">
-      {/* Profile Header */}
       <div className="flex justify-between items-start mb-8">
         <div className="flex items-center space-x-4">
           <Dialog>
@@ -222,14 +314,6 @@ const Profile = () => {
                   alt={profile.name} 
                   className="max-w-full max-h-[60vh] object-contain rounded-md"
                 />
-                {/* This section needs auth context */}
-                {/* {profile.id === auth.currentUser?.id && (
-                  <AvatarUpload
-                    url={profile.avatar}
-                    onUpload={(url) => setProfile(prev => prev ? {...prev, avatar: url} : null)}
-                    userId={profile.id}
-                  />
-                )} */}
               </div>
             </DialogContent>
           </Dialog>
@@ -239,9 +323,7 @@ const Profile = () => {
             <div className="flex items-center space-x-2 mt-1">
               <User className="h-4 w-4 text-muted-foreground" />
               <span className="text-muted-foreground">{profile.age} years old</span>
-
               <span className="text-muted-foreground">•</span>
-
               <MapPin className="h-4 w-4 text-muted-foreground" />
               <span className="text-muted-foreground">{profile.location}</span>
             </div>
@@ -279,7 +361,6 @@ const Profile = () => {
         </div>
       </div>
 
-      {/* Language Info */}
       <Card className="mb-8 glass-card">
         <CardContent className="p-6">
           <div className="flex flex-col md:flex-row md:justify-between">
@@ -396,7 +477,6 @@ const Profile = () => {
         </CardContent>
       </Card>
 
-      {/* Profile Tabs */}
       <Tabs defaultValue="about" className="mb-8">
         <TabsList className="grid grid-cols-3 mb-6">
           <TabsTrigger value="about">About</TabsTrigger>
@@ -459,7 +539,6 @@ const Profile = () => {
         </TabsContent>
       </Tabs>
 
-      {/* Action buttons */}
       <div className="flex justify-center space-x-4">
         <Button asChild variant="outline" className="button-hover">
           <Link to="/community">

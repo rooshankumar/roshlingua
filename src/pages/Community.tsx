@@ -11,7 +11,6 @@ import {
 import { 
   Card, 
   CardContent, 
-  CardDescription, 
   CardHeader, 
   CardTitle 
 } from "@/components/ui/card";
@@ -32,9 +31,11 @@ import {
   DropdownMenuCheckboxItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useToast } from "@/components/ui/use-toast";
+import { supabase } from "@/lib/supabaseClient";
 
 interface User {
-  id: number;
+  id: string;
   name: string;
   nativeLanguage: string;
   learningLanguage: string;
@@ -42,9 +43,11 @@ interface User {
   streak: number;
   bio: string;
   online: boolean;
-  avatar: string;
+  avatar: string | null;
   likes: number;
   liked: boolean;
+  username: string;
+  age?: number;
 }
 
 const Community = () => {
@@ -53,161 +56,105 @@ const Community = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [languageFilter, setLanguageFilter] = useState("");
   const [onlineOnly, setOnlineOnly] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
 
   useEffect(() => {
     const fetchUsers = async () => {
-      const { data: users, error } = await supabase
-        .from('users')
-        .select(`
-          id,
-          full_name,
-          native_language,
-          learning_language,
-          proficiency_level,
-          streak_count,
-          profiles (
-            bio,
-            is_online,
-            likes_count,
-            username
-          )
-        `);
+      try {
+        setLoading(true);
 
-      if (error) {
+        // Fetch users with their profile data
+        const { data: usersData, error } = await supabase
+          .from('users')
+          .select(`
+            id,
+            full_name,
+            native_language,
+            learning_language,
+            proficiency_level,
+            streak_count,
+            date_of_birth,
+            profiles (
+              username,
+              bio,
+              is_online,
+              likes_count,
+              avatar_url
+            )
+          `)
+          .order('created_at', { ascending: false });
+
+        if (error) throw error;
+
+        // Format users with fallback values
+        const formattedUsers = usersData.map((user: any) => ({
+          id: user.id,
+          name: user.full_name || `User_${user.id.slice(0, 5)}`,
+          nativeLanguage: user.native_language || 'Not specified',
+          learningLanguage: user.learning_language || 'Not specified',
+          proficiencyLevel: user.proficiency_level || 'Beginner',
+          streak: user.streak_count || 0,
+          bio: user.profiles?.bio || 'Hello! I love learning languages',
+          online: user.profiles?.is_online || false,
+          avatar: user.profiles?.avatar_url || null,
+          likes: user.profiles?.likes_count || 0,
+          liked: false,
+          username: user.profiles?.username || '',
+          age: user.date_of_birth 
+            ? new Date().getFullYear() - new Date(user.date_of_birth).getFullYear()
+            : undefined
+        }));
+
+        setUsers(formattedUsers);
+        setFilteredUsers(formattedUsers);
+      } catch (error) {
         console.error('Error fetching users:', error);
-        return;
+        toast({
+          title: "Error",
+          description: error instanceof Error ? error.message : "Failed to load users",
+          variant: "destructive"
+        });
+      } finally {
+        setLoading(false);
       }
-
-      const formattedUsers: User[] = users.map(user => ({
-        id: user.id,
-        name: user.full_name,
-        nativeLanguage: user.native_language,
-        learningLanguage: user.learning_language,
-        proficiencyLevel: user.proficiency_level,
-        streak: user.streak_count,
-        bio: user.profiles.bio,
-        online: user.profiles.is_online,
-        avatar: "/placeholder.svg", // You'll need to handle avatar storage separately
-        likes: user.profiles.likes_count,
-        liked: false // You'll need to implement a likes system
-      }));
-
-      setUsers(formattedUsers);
-      setFilteredUsers(formattedUsers);
     };
 
     fetchUsers();
 
-    const mockUsers = [
-      {
-        id: 1,
-        name: "Sarah Johnson",
-        nativeLanguage: "English",
-        learningLanguage: "Spanish",
-        proficiencyLevel: "Intermediate (B1)",
-        streak: 15,
-        bio: "Software engineer passionate about learning Spanish for my upcoming trip to Mexico.",
-        online: true,
-        avatar: "/placeholder.svg",
-        likes: 42,
-        liked: false
-      },
-      {
-        id: 2,
-        name: "Miguel Torres",
-        nativeLanguage: "Spanish",
-        learningLanguage: "English",
-        proficiencyLevel: "Advanced (C1)",
-        streak: 23,
-        bio: "University student studying international relations. I love helping others learn Spanish!",
-        online: true,
-        avatar: "/placeholder.svg",
-        likes: 31,
-        liked: true
-      },
-      {
-        id: 3,
-        name: "Akiko Yamamoto",
-        nativeLanguage: "Japanese",
-        learningLanguage: "French",
-        proficiencyLevel: "Beginner (A2)",
-        streak: 9,
-        bio: "Graphic designer from Tokyo. Love French cinema and want to watch without subtitles someday.",
-        online: false,
-        avatar: "/placeholder.svg",
-        likes: 19,
-        liked: false
-      },
-      {
-        id: 4,
-        name: "James Wilson",
-        nativeLanguage: "English",
-        learningLanguage: "Japanese",
-        proficiencyLevel: "Intermediate (B2)",
-        streak: 31,
-        bio: "Tech entrepreneur fascinated by Japanese culture and language. Happy to help with English!",
-        online: true,
-        avatar: "/placeholder.svg",
-        likes: 27,
-        liked: false
-      },
-      {
-        id: 5,
-        name: "Sophia Chen",
-        nativeLanguage: "Chinese",
-        learningLanguage: "German",
-        proficiencyLevel: "Elementary (A2)",
-        streak: 7,
-        bio: "Medical student planning to do residency in Berlin. Looking for language exchange partners.",
-        online: false,
-        avatar: "/placeholder.svg",
-        likes: 15,
-        liked: false
-      },
-      {
-        id: 6,
-        name: "Pierre Dupont",
-        nativeLanguage: "French",
-        learningLanguage: "Russian",
-        proficiencyLevel: "Beginner (A1)",
-        streak: 4,
-        bio: "Journalist interested in Eastern European politics. Can help with French or English.",
-        online: true,
-        avatar: "/placeholder.svg",
-        likes: 9,
-        liked: false
-      },
-      {
-        id: 7,
-        name: "Anna Petrova",
-        nativeLanguage: "Russian",
-        learningLanguage: "Spanish",
-        proficiencyLevel: "Upper Intermediate (B2)",
-        streak: 19,
-        bio: "Literature professor specializing in Latin American authors. Happy to chat in Russian!",
-        online: false,
-        avatar: "/placeholder.svg",
-        likes: 23,
-        liked: false
-      },
-      {
-        id: 8,
-        name: "Marco Rossi",
-        nativeLanguage: "Italian",
-        learningLanguage: "English",
-        proficiencyLevel: "Advanced (C1)",
-        streak: 25,
-        bio: "Chef and food blogger. Want to perfect my English for my upcoming cookbook.",
-        online: true,
-        avatar: "/placeholder.svg",
-        likes: 38,
-        liked: false
-      }
-    ];
+    // Real-time subscription for profile changes
+    const subscription = supabase
+      .channel('profiles_changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'profiles'
+        },
+        (payload) => {
+          setUsers(prevUsers => 
+            prevUsers.map(user => 
+              user.id === payload.new.id 
+                ? { 
+                    ...user, 
+                    bio: payload.new.bio || user.bio,
+                    online: payload.new.is_online || user.online,
+                    avatar: payload.new.avatar_url || user.avatar,
+                    likes: payload.new.likes_count || user.likes,
+                    username: payload.new.username || user.username
+                  } 
+                : user
+            )
+          );
+        }
+      )
+      .subscribe();
 
-    setUsers(mockUsers);
-    setFilteredUsers(mockUsers);
-  }, []);
+    return () => {
+      supabase.removeChannel(subscription);
+    };
+  }, [toast]);
 
   // Apply filters and search
   useEffect(() => {
@@ -215,20 +162,19 @@ const Community = () => {
 
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
-      result = result.filter(
-        user => 
-          user.name.toLowerCase().includes(query) || 
-          user.bio.toLowerCase().includes(query) ||
-          user.nativeLanguage.toLowerCase().includes(query) ||
-          user.learningLanguage.toLowerCase().includes(query)
+      result = result.filter(user => 
+        user.name.toLowerCase().includes(query) || 
+        user.bio.toLowerCase().includes(query) ||
+        user.nativeLanguage.toLowerCase().includes(query) ||
+        user.learningLanguage.toLowerCase().includes(query) ||
+        user.username.toLowerCase().includes(query)
       );
     }
 
-    if (languageFilter) {
-      result = result.filter(
-        user => 
-          user.nativeLanguage === languageFilter || 
-          user.learningLanguage === languageFilter
+    if (languageFilter && languageFilter !== "all-languages") {
+      result = result.filter(user => 
+        user.nativeLanguage === languageFilter || 
+        user.learningLanguage === languageFilter
       );
     }
 
@@ -239,24 +185,55 @@ const Community = () => {
     setFilteredUsers(result);
   }, [users, searchQuery, languageFilter, onlineOnly]);
 
-  const handleLike = (userId: number) => {
-    setUsers(users.map(user => {
-      if (user.id === userId) {
-        const liked = !user.liked;
-        return {
-          ...user,
-          liked,
-          likes: liked ? user.likes + 1 : user.likes - 1
-        };
-      }
-      return user;
-    }));
+  const handleLike = async (userId: string) => {
+    try {
+      // Find the user to get current likes count
+      const user = users.find(u => u.id === userId);
+      if (!user) return;
+
+      const newLikes = user.liked ? user.likes - 1 : user.likes + 1;
+
+      // Update in database
+      const { error } = await supabase
+        .from('profiles')
+        .update({ likes_count: newLikes })
+        .eq('id', userId);
+
+      if (error) throw error;
+
+      // Update local state
+      setUsers(prevUsers => 
+        prevUsers.map(user => 
+          user.id === userId 
+            ? { ...user, liked: !user.liked, likes: newLikes } 
+            : user
+        )
+      );
+    } catch (error) {
+      console.error('Error updating like:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update like",
+        variant: "destructive"
+      });
+    }
   };
 
   const languages = [
     "English", "Spanish", "French", "German", "Italian",
     "Portuguese", "Chinese", "Japanese", "Korean", "Russian"
   ];
+
+  if (loading) {
+    return (
+      <div className="container flex items-center justify-center min-h-[50vh]">
+        <div className="flex flex-col items-center">
+          <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+          <p className="mt-4 text-muted-foreground">Loading community...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="container animate-fade-in">
@@ -268,7 +245,7 @@ const Community = () => {
       </div>
 
       {/* Filters and Search */}
-      <Card className="glass-card mb-8">
+      <Card className="mb-8">
         <CardContent className="pt-6">
           <div className="flex flex-col space-y-4 md:flex-row md:space-y-0 md:space-x-4">
             <div className="relative flex-grow">
@@ -329,7 +306,7 @@ const Community = () => {
               <CardContent className="p-6">
                 <div className="flex space-x-4">
                   <Avatar className="h-16 w-16">
-                    <AvatarImage src={user.avatar} alt={user.name} />
+                    <AvatarImage src={user.avatar || undefined} alt={user.name} />
                     <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
                   </Avatar>
 
@@ -337,10 +314,13 @@ const Community = () => {
                     <Link to={`/profile/${user.id}`} className="hover:underline">
                       <h3 className="font-semibold text-lg truncate">{user.name}</h3>
                     </Link>
+                    {user.username && (
+                      <p className="text-sm text-muted-foreground truncate">@{user.username}</p>
+                    )}
 
                     <div className="flex items-center space-x-1 mt-1">
                       <Badge variant="outline" className="text-xs font-normal">
-                        {user.nativeLanguage} <span className="mx-1">→</span> {user.learningLanguage}
+                        {user.nativeLanguage} → {user.learningLanguage}
                       </Badge>
                     </div>
 
@@ -349,8 +329,6 @@ const Community = () => {
                         <Flame className="h-3 w-3 mr-1 text-primary" />
                         <span>{user.streak} day streak</span>
                       </div>
-
-                      <div className="w-1 h-1 rounded-full bg-muted-foreground"></div>
 
                       <div className="text-xs text-muted-foreground">
                         {user.proficiencyLevel}
@@ -374,7 +352,7 @@ const Community = () => {
                     <span>{user.likes}</span>
                   </Button>
 
-                  <Button asChild variant="outline" size="sm" className="button-hover">
+                  <Button asChild variant="outline" size="sm">
                     <Link to={`/chat/${user.id}`}>
                       <MessageCircle className="h-4 w-4 mr-2" />
                       Start Chat
@@ -393,7 +371,9 @@ const Community = () => {
             </div>
             <h3 className="text-lg font-medium mb-2">No users found</h3>
             <p className="text-muted-foreground max-w-md">
-              We couldn't find any users matching your search criteria. Try adjusting your filters or search query.
+              {users.length === 0 
+                ? "The community is empty right now." 
+                : "No users match your search criteria. Try adjusting your filters."}
             </p>
           </CardContent>
         </Card>
