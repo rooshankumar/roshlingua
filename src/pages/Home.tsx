@@ -18,7 +18,7 @@ const Home = () => {
       <header className="w-full py-4 px-6 border-b border-border sticky top-0 bg-background/80 backdrop-blur-sm z-50">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           <Link to="/" className="text-2xl font-bold text-gradient">
-            Languagelandia
+            roshLingua
           </Link>
           
           <div className="flex items-center space-x-4">
@@ -95,7 +95,7 @@ const Home = () => {
       <section className="py-20 px-6 bg-secondary/50">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold mb-4">How Languagelandia Works</h2>
+            <h2 className="text-3xl font-bold mb-4">How roshLingua Works</h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">
               Our platform combines social networking with proven language learning techniques to help you achieve fluency faster.
             </p>
@@ -151,7 +151,7 @@ const Home = () => {
           <div className="text-center mb-16">
             <h2 className="text-3xl font-bold mb-4">Success Stories</h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">
-              See how Languagelandia has helped people achieve their language learning goals.
+              See how roshLingua has helped people achieve their language learning goals.
             </p>
           </div>
           
