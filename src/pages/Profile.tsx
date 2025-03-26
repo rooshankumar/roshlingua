@@ -222,13 +222,14 @@ const Profile = () => {
                   alt={profile.name} 
                   className="max-w-full max-h-[60vh] object-contain rounded-md"
                 />
-                {profile.id === auth.currentUser?.id && (
+                {/* This section needs auth context */}
+                {/* {profile.id === auth.currentUser?.id && (
                   <AvatarUpload
                     url={profile.avatar}
                     onUpload={(url) => setProfile(prev => prev ? {...prev, avatar: url} : null)}
                     userId={profile.id}
                   />
-                )}
+                )} */}
               </div>
             </DialogContent>
           </Dialog>
