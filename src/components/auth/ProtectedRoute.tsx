@@ -9,6 +9,9 @@ interface ProtectedRouteProps {
 const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
   const { user, isLoading } = useAuth();
   const location = useLocation();
+  
+  // Check if user has completed onboarding - you'll need to implement this check
+  const hasCompletedOnboarding = localStorage.getItem("onboarding_completed") === "true";
 
   if (isLoading) {
     return (
@@ -22,8 +25,17 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
   }
 
   if (!user) {
-    // Redirect to login page with the return url
     return <Navigate to="/auth" state={{ from: location.pathname }} replace />;
+  }
+
+  // Redirect to onboarding if not completed, except if already on onboarding page
+  if (!hasCompletedOnboarding && location.pathname !== "/onboarding") {
+    return <Navigate to="/onboarding" replace />;
+  }
+
+  // If on onboarding page but has completed it, redirect to dashboard
+  if (hasCompletedOnboarding && location.pathname === "/onboarding") {
+    return <Navigate to="/dashboard" replace />;
   }
 
   return <>{children}</>;

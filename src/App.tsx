@@ -18,6 +18,8 @@ import Chat from "./pages/Chat";
 
 // Components
 import ProtectedRoute from "./components/auth/ProtectedRoute";
+import AppLayout from "./components/layouts/AppLayout";
+import AuthLayout from "./components/layouts/AuthLayout";
 
 const queryClient = new QueryClient();
 
@@ -40,13 +42,15 @@ const AppRoutes = () => {
       {/* Public routes */}
       <Route path="/" element={<Home />} />
       <Route path="/auth" element={
-        user ? <Navigate to="/dashboard" replace /> : <Auth />
+        <AuthLayout>
+          {user ? <Navigate to="/dashboard" replace /> : <Auth />}
+        </AuthLayout>
       } />
 
       {/* Auth callback route for OAuth */}
       <Route path="/auth/callback" element={<AuthCallback />} />
 
-      {/* Protected routes */}
+      {/* Protected routes with AppLayout */}
       <Route path="/onboarding" element={
         <ProtectedRoute>
           <Onboarding onComplete={() => console.log("Onboarding completed")} />
@@ -55,25 +59,33 @@ const AppRoutes = () => {
       
       <Route path="/dashboard" element={
         <ProtectedRoute>
-          <Dashboard />
+          <AppLayout>
+            <Dashboard />
+          </AppLayout>
         </ProtectedRoute>
       } />
 
       <Route path="/profile" element={
         <ProtectedRoute>
-          <Profile />
+          <AppLayout>
+            <Profile />
+          </AppLayout>
         </ProtectedRoute>
       } />
 
       <Route path="/community" element={
         <ProtectedRoute>
-          <Community />
+          <AppLayout>
+            <Community />
+          </AppLayout>
         </ProtectedRoute>
       } />
 
       <Route path="/chat/:id" element={
         <ProtectedRoute>
-          <Chat />
+          <AppLayout>
+            <Chat />
+          </AppLayout>
         </ProtectedRoute>
       } />
 
