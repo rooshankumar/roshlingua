@@ -16,21 +16,49 @@ const RealtimeStatus = () => {
     // Update user's online status and streak when they access the app
     const setUserOnline = async () => {
       try {
-        // First ensure the profile exists and is marked as online
-        const { error: profileError } = await supabase
+        console.log("Setting user online:", user.id);
+        
+        // First check if the profile exists
+        const { data: existingProfile, error: checkError } = await supabase
           .from('profiles')
-          .upsert({
-            id: user.id,
-            is_online: true,
-            updated_at: new Date().toISOString()
-          }, { 
-            onConflict: 'id',
-            ignoreDuplicates: false
-          });
-
-        if (profileError) {
-          console.error("Error updating online status:", profileError);
-          throw profileError;
+          .select('id')
+          .eq('id', user.id)
+          .maybeSingle();
+          
+        if (checkError) {
+          console.error("Error checking profile existence:", checkError);
+          // Continue anyway to attempt update
+        }
+        
+        // If profile doesn't exist, insert it
+        if (!existingProfile) {
+          console.log("Profile doesn't exist, creating it");
+          const { error: insertError } = await supabase
+            .from('profiles')
+            .insert({
+              id: user.id,
+              is_online: true,
+              updated_at: new Date().toISOString()
+            });
+            
+          if (insertError) {
+            console.error("Error creating profile:", insertError);
+            throw insertError;
+          }
+        } else {
+          // Profile exists, update it
+          const { error: updateError } = await supabase
+            .from('profiles')
+            .update({
+              is_online: true,
+              updated_at: new Date().toISOString()
+            })
+            .eq('id', user.id);
+            
+          if (updateError) {
+            console.error("Error updating online status:", updateError);
+            throw updateError;
+          }
         }
         
         // Try to update streak
@@ -44,8 +72,8 @@ const RealtimeStatus = () => {
         console.error("Error in RealtimeStatus:", error);
         toast({
           variant: "destructive",
-          title: "Connection error",
-          description: "Failed to update online status. Please refresh the page.",
+          title: "Connection status",
+          description: "Online status may not be updated correctly.",
         });
       }
     };
@@ -59,28 +87,22 @@ const RealtimeStatus = () => {
       if (document.visibilityState === 'visible') {
         supabase
           .from('profiles')
-          .upsert({
-            id: user.id,
+          .update({
             is_online: true,
             updated_at: new Date().toISOString()
-          }, { 
-            onConflict: 'id',
-            ignoreDuplicates: false
           })
+          .eq('id', user.id)
           .then(({ error }) => {
             if (error) console.error("Error updating online status:", error);
           });
       } else {
         supabase
           .from('profiles')
-          .upsert({
-            id: user.id,
+          .update({
             is_online: false,
             updated_at: new Date().toISOString()
-          }, { 
-            onConflict: 'id',
-            ignoreDuplicates: false
           })
+          .eq('id', user.id)
           .then(({ error }) => {
             if (error) console.error("Error updating offline status:", error);
           });
@@ -93,14 +115,11 @@ const RealtimeStatus = () => {
       
       supabase
         .from('profiles')
-        .upsert({
-          id: user.id,
+        .update({
           is_online: true,
           updated_at: new Date().toISOString()
-        }, { 
-          onConflict: 'id',
-          ignoreDuplicates: false
         })
+        .eq('id', user.id)
         .then(({ error }) => {
           if (error) console.error("Error updating online status on focus:", error);
         });
@@ -111,14 +130,11 @@ const RealtimeStatus = () => {
       
       supabase
         .from('profiles')
-        .upsert({
-          id: user.id,
+        .update({
           is_online: false,
           updated_at: new Date().toISOString()
-        }, { 
-          onConflict: 'id',
-          ignoreDuplicates: false
         })
+        .eq('id', user.id)
         .then(({ error }) => {
           if (error) console.error("Error updating offline status on blur:", error);
         });
@@ -135,14 +151,11 @@ const RealtimeStatus = () => {
       
       supabase
         .from('profiles')
-        .upsert({
-          id: user.id,
+        .update({
           is_online: true,
           updated_at: new Date().toISOString()
-        }, { 
-          onConflict: 'id',
-          ignoreDuplicates: false
         })
+        .eq('id', user.id)
         .then(({ error }) => {
           if (error) console.error("Error updating online status on heartbeat:", error);
         });
@@ -153,39 +166,19 @@ const RealtimeStatus = () => {
       if (!user) return;
       
       // Use navigator.sendBeacon for asynchronous request that works during page unload
-      if (navigator.sendBeacon) {
-        try {
-          const headers = new Headers();
-          headers.append('Content-Type', 'application/json');
-          headers.append('apikey', import.meta.env.VITE_SUPABASE_ANON_KEY || "");
-          headers.append('Authorization', `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY || ""}`);
-          
-          const data = JSON.stringify({ 
-            id: user.id,
+      try {
+        supabase
+          .from('profiles')
+          .update({
             is_online: false,
             updated_at: new Date().toISOString()
+          })
+          .eq('id', user.id)
+          .then(({ error }) => {
+            if (error) console.error("Error updating offline status on unload:", error);
           });
-          const url = `${import.meta.env.VITE_SUPABASE_URL || ""}/rest/v1/profiles?id=eq.${user.id}`;
-          
-          navigator.sendBeacon(url, new Blob([data], { type: 'application/json' }));
-        } catch (error) {
-          console.error("Error with sendBeacon:", error);
-        }
-      } else {
-        // Fallback for browsers without sendBeacon support
-        fetch(`${import.meta.env.VITE_SUPABASE_URL || ""}/rest/v1/profiles?id=eq.${user.id}`, {
-          method: 'PATCH',
-          headers: {
-            'Content-Type': 'application/json',
-            'apikey': import.meta.env.VITE_SUPABASE_ANON_KEY || "",
-            'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY || ""}`
-          },
-          body: JSON.stringify({ 
-            is_online: false,
-            updated_at: new Date().toISOString()
-          }),
-          keepalive: true
-        }).catch(err => console.error("Error updating online status on unload:", err));
+      } catch (error) {
+        console.error("Error updating offline status on unload:", error);
       }
     };
 
@@ -203,14 +196,11 @@ const RealtimeStatus = () => {
       if (user) {
         supabase
           .from('profiles')
-          .upsert({
-            id: user.id,
+          .update({
             is_online: false,
             updated_at: new Date().toISOString()
-          }, { 
-            onConflict: 'id',
-            ignoreDuplicates: false
           })
+          .eq('id', user.id)
           .then(({ error }) => {
             if (error) console.error("Error updating offline status on unmount:", error);
           });

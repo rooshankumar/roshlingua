@@ -16,12 +16,13 @@ import { cn } from '@/lib/utils';
 import { Slider } from "@/components/ui/slider";
 import { RealtimeChannel } from '@supabase/supabase-js';
 import { Profile, User as UserType } from '@/types/schema';
+import UserAvatar from '@/components/UserAvatar';
 
 interface UserProfile {
   id: string;
   username: string;
   bio: string;
-  avatar_url: string;
+  avatar_url: string | null;
   native_language: string;
   learning_language: string;
   proficiency_level: string;
@@ -47,10 +48,12 @@ const UserCard = ({
       <div className={`h-2 ${user.is_online ? "bg-green-500" : "bg-gray-300"}`}></div>
       <CardContent className="p-6">
         <div className="flex space-x-4">
-          <Avatar className="h-16 w-16">
-            <AvatarImage src={user.avatar_url || "/placeholder.svg"} alt={user.username} />
-            <AvatarFallback>{user.username?.[0]?.toUpperCase() || '?'}</AvatarFallback>
-          </Avatar>
+          <UserAvatar 
+            src={user.avatar_url} 
+            fallback={user.username} 
+            size="lg"
+            status={user.is_online ? "online" : "offline"}
+          />
 
           <div className="flex-1 min-w-0">
             <Link to={`/profile/${user.id}`} className="hover:underline">
@@ -148,7 +151,7 @@ const Community = () => {
         
         const { data: profilesData, error: profilesError } = await supabase
           .from('profiles')
-          .select('id, username, bio, is_online, likes_count')
+          .select('id, username, bio, is_online, likes_count, avatar_url')
           .neq('id', user.id);
 
         if (profilesError) {
@@ -209,18 +212,20 @@ const Community = () => {
             
             const profileId = profileRecord.id as string;
             
-            // Type guard for the user data to ensure we have a valid object with an id
+            // Find the matching user data
             const userData = usersData?.find(user => {
-              if (!user || typeof user !== 'object') return false;
-              return 'id' in user && user.id === profileId;
-            });
+              if (!user || typeof user !== 'object' || !('id' in user)) return false;
+              return user.id === profileId;
+            }) || {};
             
-            // Ensure userData is a proper object with expected properties
-            const userDataObj = userData as Record<string, any> | undefined;
-            
+            // Now userData is guaranteed to be an object (either with values or empty)
+            // We need to safely access properties with type checking
             let age = null;
-            if (userDataObj && 'date_of_birth' in userDataObj && userDataObj.date_of_birth) {
-              const birthDate = new Date(userDataObj.date_of_birth as string);
+            if (userData && 
+                typeof userData === 'object' && 
+                'date_of_birth' in userData && 
+                userData.date_of_birth) {
+              const birthDate = new Date(userData.date_of_birth as string);
               const today = new Date();
               age = today.getFullYear() - birthDate.getFullYear();
               const m = today.getMonth() - birthDate.getMonth();
@@ -233,14 +238,19 @@ const Community = () => {
               id: profileId,
               username: profileRecord.username as string || 'Anonymous',
               bio: profileRecord.bio as string || 'No bio available',
-              avatar_url: profileRecord.avatar_url as string || '',
-              native_language: userDataObj?.native_language as string || 'Unknown',
-              learning_language: userDataObj?.learning_language as string || 'Unknown',
-              proficiency_level: userDataObj?.proficiency_level as string || 'beginner',
-              streak_count: userDataObj?.streak_count as number || 0,
+              avatar_url: profileRecord.avatar_url as string || null,
+              native_language: userData && typeof userData === 'object' && 'native_language' in userData ? 
+                userData.native_language as string : 'Unknown',
+              learning_language: userData && typeof userData === 'object' && 'learning_language' in userData ? 
+                userData.learning_language as string : 'Unknown',
+              proficiency_level: userData && typeof userData === 'object' && 'proficiency_level' in userData ? 
+                userData.proficiency_level as string : 'beginner',
+              streak_count: userData && typeof userData === 'object' && 'streak_count' in userData ? 
+                userData.streak_count as number : 0,
               likes_count: profileRecord.likes_count as number || 0,
               is_online: profileRecord.is_online as boolean || false,
-              gender: userDataObj?.gender as string | undefined,
+              gender: userData && typeof userData === 'object' && 'gender' in userData ? 
+                userData.gender as string : undefined,
               age,
               liked: likedProfiles.has(profileId)
             };
