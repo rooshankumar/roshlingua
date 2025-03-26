@@ -1,4 +1,6 @@
 
+// This file provides TypeScript interfaces for our database schema
+
 export interface Database {
   public: {
     Tables: {
@@ -7,18 +9,18 @@ export interface Database {
           id: string;
           email: string;
           full_name: string;
-          gender: string | null;
-          date_of_birth: string | null;
+          gender?: string;
+          date_of_birth?: string;
           native_language: string;
           learning_language: string;
           proficiency_level: string;
-          learning_goal: string | null;
-          avatar_url: string | null;
+          learning_goal?: string;
+          avatar_url?: string;
           created_at: string;
           updated_at: string;
           last_login: string;
           streak_count: number;
-          streak_last_date: string | null;
+          streak_last_date?: string;
         };
         Insert: {
           id?: string;
@@ -58,12 +60,15 @@ export interface Database {
       profiles: {
         Row: {
           id: string;
-          username: string | null;
-          bio: string | null;
+          username?: string;
+          bio?: string;
           is_online: boolean;
           likes_count: number;
           created_at: string;
           updated_at: string;
+          avatar_url?: string;
+          streak_count?: number;
+          last_active_date?: string;
         };
         Insert: {
           id: string;
@@ -73,6 +78,9 @@ export interface Database {
           likes_count?: number;
           created_at?: string;
           updated_at?: string;
+          avatar_url?: string | null;
+          streak_count?: number;
+          last_active_date?: string | null;
         };
         Update: {
           id?: string;
@@ -82,6 +90,9 @@ export interface Database {
           likes_count?: number;
           created_at?: string;
           updated_at?: string;
+          avatar_url?: string | null;
+          streak_count?: number;
+          last_active_date?: string | null;
         };
       };
       conversations: {
@@ -213,3 +224,29 @@ export type Conversation = Database['public']['Tables']['conversations']['Row'] 
   participants?: Profile[];
   last_message?: Message;
 };
+export type OnboardingStatus = Database['public']['Tables']['onboarding_status']['Row'];
+
+// Helper functions for type checking
+export function isProfile(obj: any): obj is Profile {
+  return obj && typeof obj === 'object' && 'id' in obj;
+}
+
+export function isUser(obj: any): obj is User {
+  return obj && typeof obj === 'object' && 'id' in obj && 'email' in obj;
+}
+
+export function isConversation(obj: any): obj is Conversation {
+  return obj && typeof obj === 'object' && 'id' in obj && 'created_at' in obj;
+}
+
+export function isMessage(obj: any): obj is Message {
+  return obj && typeof obj === 'object' && 'id' in obj && 'content' in obj && 'sender_id' in obj;
+}
+
+export function hasRequiredProfileFields(obj: any): boolean {
+  return (
+    obj && 
+    typeof obj === 'object' && 
+    'id' in obj
+  );
+}

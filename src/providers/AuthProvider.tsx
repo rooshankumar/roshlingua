@@ -46,27 +46,51 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           // Check if onboarding is complete
           const { data: onboardingData, error } = await supabase
             .from('onboarding_status')
-            .select('is_complete')
+            .select('is_complete, current_step')
             .eq('user_id', user.id)
-            .single();
+            .maybeSingle(); // Changed from single() to maybeSingle()
             
-          if (error) {
+          if (error && error.code !== 'PGRST116') { // PGRST116 is "not found" error
             console.error("Error checking onboarding status:", error);
-            return;
+            // Don't return here, proceed with default behavior
           }
           
-          // If user is on the home page, redirect based on onboarding status
-          if (location.pathname === '/') {
-            if (onboardingData?.is_complete) {
-              navigate('/dashboard', { replace: true });
-            } else {
-              navigate('/onboarding', { replace: true });
+          // If no onboarding record exists, create one
+          if (!onboardingData) {
+            try {
+              await supabase
+                .from('onboarding_status')
+                .insert({
+                  user_id: user.id,
+                  is_complete: false,
+                  current_step: 'profile'
+                });
+                
+              // If user is on the home page, redirect to onboarding
+              if (location.pathname === '/') {
+                navigate('/onboarding', { replace: true });
+                return;
+              }
+            } catch (insertError) {
+              console.error("Error creating onboarding record:", insertError);
+              // Continue with default behavior
             }
-          }
-          
-          // If user needs onboarding but isn't on the onboarding page
-          else if (!onboardingData?.is_complete && location.pathname !== '/onboarding') {
-            navigate('/onboarding', { replace: true });
+          } else {
+            // If user is on the home page, redirect based on onboarding status
+            if (location.pathname === '/') {
+              if (onboardingData.is_complete) {
+                navigate('/dashboard', { replace: true });
+              } else {
+                navigate('/onboarding', { replace: true });
+              }
+              return;
+            }
+            
+            // If user needs onboarding but isn't on the onboarding page
+            else if (!onboardingData.is_complete && location.pathname !== '/onboarding') {
+              navigate('/onboarding', { replace: true });
+              return;
+            }
           }
         }
       } catch (error) {
@@ -87,6 +111,42 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setSession(currentSession);
         setUser(currentSession?.user ?? null);
         setIsLoading(false);
+        
+        // If user just signed in, update their online status
+        if (event === 'SIGNED_IN' && currentSession?.user) {
+          try {
+            await supabase
+              .from('profiles')
+              .upsert({
+                id: currentSession.user.id,
+                is_online: true,
+                updated_at: new Date().toISOString()
+              }, { 
+                onConflict: 'id',
+                ignoreDuplicates: false
+              });
+          } catch (error) {
+            console.error("Error updating online status on sign in:", error);
+          }
+        }
+        
+        // If user just signed out, ensure they're marked as offline
+        if (event === 'SIGNED_OUT' && user) {
+          try {
+            await supabase
+              .from('profiles')
+              .upsert({
+                id: user.id,
+                is_online: false,
+                updated_at: new Date().toISOString()
+              }, { 
+                onConflict: 'id',
+                ignoreDuplicates: false
+              });
+          } catch (error) {
+            console.error("Error updating online status on sign out:", error);
+          }
+        }
       }
     );
 
@@ -102,6 +162,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         console.log("Initial session:", data.session?.user?.id);
         setSession(data.session);
         setUser(data.session?.user ?? null);
+        
+        // Update online status for the user if logged in
+        if (data.session?.user) {
+          try {
+            await supabase
+              .from('profiles')
+              .upsert({
+                id: data.session.user.id,
+                is_online: true,
+                updated_at: new Date().toISOString()
+              }, { 
+                onConflict: 'id',
+                ignoreDuplicates: false
+              });
+          } catch (updateError) {
+            console.error("Error updating online status on initial session:", updateError);
+          }
+        }
       } catch (error) {
         console.error("Unexpected error getting session:", error);
       } finally {

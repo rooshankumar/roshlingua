@@ -1,4 +1,3 @@
-
 import { createClient } from '@supabase/supabase-js';
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || "https://yekzyvdjjozhhatdefsq.supabase.co";
@@ -341,5 +340,187 @@ export const hasUserLikedProfile = async (loggedInUserId: string, profileId: str
   } catch (error) {
     console.error("Error in hasUserLikedProfile:", error);
     return false;
+  }
+};
+
+// Function to create a new conversation
+export const createConversation = async (participantIds: string[]) => {
+  try {
+    if (!participantIds || participantIds.length < 2) {
+      throw new Error("At least two participants are required for a conversation");
+    }
+    
+    // Check if the current user is authenticated
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      throw new Error("User not authenticated");
+    }
+    
+    // Check if participants include the current user
+    if (!participantIds.includes(user.id)) {
+      participantIds.push(user.id); // Add current user if not included
+    }
+    
+    // Check if a conversation between these users already exists
+    const { data: existingConversations, error: existingConvError } = await supabase
+      .from('conversation_participants')
+      .select('conversation_id')
+      .in('user_id', participantIds)
+      .order('conversation_id');
+      
+    if (existingConvError) {
+      console.error("Error checking existing conversations:", existingConvError);
+      throw existingConvError;
+    }
+    
+    // Count occurrences of each conversation_id
+    const conversationCounts = existingConversations.reduce((acc, { conversation_id }) => {
+      acc[conversation_id] = (acc[conversation_id] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
+    
+    // Find conversations with all participants
+    const existingConversationIds = Object.entries(conversationCounts)
+      .filter(([_, count]) => count === participantIds.length)
+      .map(([id, _]) => id);
+    
+    // If a conversation with all these participants exists, return it
+    if (existingConversationIds.length > 0) {
+      return {
+        conversation_id: existingConversationIds[0],
+        isNew: false
+      };
+    }
+    
+    // Create a new conversation
+    const { data: newConversation, error: conversationError } = await supabase
+      .from('conversations')
+      .insert({})
+      .select()
+      .single();
+      
+    if (conversationError) {
+      console.error("Error creating conversation:", conversationError);
+      throw conversationError;
+    }
+    
+    // Add participants to the conversation
+    const participantsData = participantIds.map(userId => ({
+      conversation_id: newConversation.id,
+      user_id: userId
+    }));
+    
+    const { error: participantsError } = await supabase
+      .from('conversation_participants')
+      .insert(participantsData);
+      
+    if (participantsError) {
+      console.error("Error adding participants to conversation:", participantsError);
+      // If we failed to add participants, clean up by deleting the conversation
+      await supabase
+        .from('conversations')
+        .delete()
+        .eq('id', newConversation.id);
+      throw participantsError;
+    }
+    
+    return {
+      conversation_id: newConversation.id,
+      isNew: true
+    };
+  } catch (error) {
+    console.error("Error in createConversation:", error);
+    throw error;
+  }
+};
+
+// Function to fetch conversations for a user
+export const getUserConversations = async (userId: string) => {
+  try {
+    // First get all conversation IDs the user is part of
+    const { data: userConversations, error: conversationsError } = await supabase
+      .from('conversation_participants')
+      .select('conversation_id')
+      .eq('user_id', userId);
+      
+    if (conversationsError) {
+      console.error("Error fetching user conversations:", conversationsError);
+      throw conversationsError;
+    }
+    
+    if (!userConversations || userConversations.length === 0) {
+      return [];
+    }
+    
+    const conversationIds = userConversations.map(c => c.conversation_id);
+    
+    // Get basic conversation data
+    const { data: conversations, error: convDataError } = await supabase
+      .from('conversations')
+      .select('id, created_at, updated_at')
+      .in('id', conversationIds)
+      .order('updated_at', { ascending: false });
+      
+    if (convDataError) {
+      console.error("Error fetching conversation data:", convDataError);
+      throw convDataError;
+    }
+    
+    // For each conversation, get the last message and other participants
+    const conversationsWithDetails = await Promise.all(conversations.map(async (conversation) => {
+      // Get last message
+      const { data: lastMessage, error: messageError } = await supabase
+        .from('messages')
+        .select('id, content, created_at, sender_id')
+        .eq('conversation_id', conversation.id)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+        
+      if (messageError && messageError.code !== 'PGRST116') {
+        console.error(`Error fetching last message for conversation ${conversation.id}:`, messageError);
+      }
+      
+      // Get other participants (excluding current user)
+      const { data: participants, error: participantsError } = await supabase
+        .from('conversation_participants')
+        .select('user_id')
+        .eq('conversation_id', conversation.id)
+        .neq('user_id', userId);
+        
+      if (participantsError) {
+        console.error(`Error fetching participants for conversation ${conversation.id}:`, participantsError);
+        // Continue with whatever data we have
+      }
+      
+      // Get profile data for other participants
+      const otherParticipantIds = participants?.map(p => p.user_id) || [];
+      let participantProfiles = [];
+      
+      if (otherParticipantIds.length > 0) {
+        const { data: profiles, error: profilesError } = await supabase
+          .from('profiles')
+          .select('id, username, avatar_url, is_online')
+          .in('id', otherParticipantIds);
+          
+        if (profilesError) {
+          console.error(`Error fetching profiles for conversation ${conversation.id}:`, profilesError);
+          // Continue with empty profiles
+        } else {
+          participantProfiles = profiles || [];
+        }
+      }
+      
+      return {
+        ...conversation,
+        last_message: lastMessage || null,
+        participants: participantProfiles
+      };
+    }));
+    
+    return conversationsWithDetails;
+  } catch (error) {
+    console.error("Error in getUserConversations:", error);
+    throw error;
   }
 };
