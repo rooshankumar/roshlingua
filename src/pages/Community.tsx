@@ -212,10 +212,10 @@ const Community = () => {
             
             const profileId = profileRecord.id as string;
             
-            // Find the matching user data
+            // Find the matching user data - Fix the type error by ensuring userData is not undefined
             const userData = usersData?.find(user => {
-              if (!user || typeof user !== 'object' || !('id' in user)) return false;
-              return user.id === profileId;
+              if (!user || typeof user !== 'object') return false;
+              return 'id' in user && user.id === profileId;
             }) || {};
             
             // Now userData is guaranteed to be an object (either with values or empty)
