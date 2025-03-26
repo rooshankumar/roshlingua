@@ -216,12 +216,19 @@ const Profile = () => {
                 <DialogTitle>{profile.name}</DialogTitle>
                 <DialogDescription>Profile picture</DialogDescription>
               </DialogHeader>
-              <div className="flex justify-center p-4">
+              <div className="flex flex-col items-center gap-4 p-4">
                 <img 
                   src={profile.avatar} 
                   alt={profile.name} 
                   className="max-w-full max-h-[60vh] object-contain rounded-md"
                 />
+                {profile.id === auth.currentUser?.id && (
+                  <AvatarUpload
+                    url={profile.avatar}
+                    onUpload={(url) => setProfile(prev => prev ? {...prev, avatar: url} : null)}
+                    userId={profile.id}
+                  />
+                )}
               </div>
             </DialogContent>
           </Dialog>
