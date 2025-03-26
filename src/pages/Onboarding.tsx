@@ -229,11 +229,14 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
         description: "Your profile has been successfully set up!",
       });
       
+      // Update local storage for immediate effect
+      localStorage.setItem("onboarding_completed", "true");
+      
       // Call onComplete prop
       onComplete();
       
-      // Navigate to dashboard
-      navigate("/dashboard");
+      // Force reload to trigger ProtectedRoute check
+      window.location.href = "/dashboard";
     } catch (error) {
       console.error("Onboarding error:", error);
       toast({

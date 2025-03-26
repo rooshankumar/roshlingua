@@ -1,6 +1,8 @@
 
+import { useEffect, useState } from "react";
 import { Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/providers/AuthProvider";
+import { supabase } from "@/lib/supabase";
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -9,11 +11,29 @@ interface ProtectedRouteProps {
 const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
   const { user, isLoading } = useAuth();
   const location = useLocation();
-  
-  // Check if user has completed onboarding - you'll need to implement this check
-  const hasCompletedOnboarding = localStorage.getItem("onboarding_completed") === "true";
+  const [isCheckingOnboarding, setIsCheckingOnboarding] = useState(true);
+  const [hasCompletedOnboarding, setHasCompletedOnboarding] = useState(false);
 
-  if (isLoading) {
+  useEffect(() => {
+    const checkOnboardingStatus = async () => {
+      if (!user) return;
+
+      const { data, error } = await supabase
+        .from('onboarding_status')
+        .select('is_complete')
+        .eq('user_id', user.id)
+        .single();
+
+      if (!error && data) {
+        setHasCompletedOnboarding(data.is_complete);
+      }
+      setIsCheckingOnboarding(false);
+    };
+
+    checkOnboardingStatus();
+  }, [user]);
+
+  if (isLoading || isCheckingOnboarding) {
     return (
       <div className="h-screen w-full flex items-center justify-center">
         <div className="animate-pulse flex flex-col items-center gap-4">
