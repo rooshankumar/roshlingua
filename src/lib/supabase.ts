@@ -1,4 +1,3 @@
-
 import { createClient } from '@supabase/supabase-js';
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || "https://yekzyvdjjozhhatdefsq.supabase.co";
@@ -15,9 +14,9 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
 
 export const signInWithGoogle = async () => {
   const redirectUrl = window.location.origin + '/auth/callback';
-  
+
   console.log("Redirecting to Google OAuth with redirectUrl:", redirectUrl);
-  
+
   return await supabase.auth.signInWithOAuth({
     provider: 'google',
     options: {
@@ -34,7 +33,6 @@ export const signOut = async () => {
   return await supabase.auth.signOut();
 };
 
-// Helper function to get current session
 export const getCurrentSession = async () => {
   const { data, error } = await supabase.auth.getSession();
   if (error) {
@@ -44,28 +42,23 @@ export const getCurrentSession = async () => {
   return data.session;
 };
 
-// Helper function to get current user
 export const getCurrentUser = async () => {
   const session = await getCurrentSession();
   return session?.user || null;
 };
 
-// Function to create user record manually in the users table
 export const createUserRecord = async (userId: string, email: string, fullName: string) => {
   try {
-    // Call the create_user_with_onboarding function to properly set up the user
     const { data, error } = await supabase.rpc('create_user_with_onboarding', {
       p_user_id: userId,
       p_email: email,
       p_full_name: fullName
     });
-    
+
     if (error) {
       console.error("Failed to create user record:", error);
-      
-      // Fallback: Try direct insert if RPC fails
+
       try {
-        // 1. Try to insert into users table first
         const usersInsert = await supabase
           .from('users')
           .insert({
@@ -77,20 +70,18 @@ export const createUserRecord = async (userId: string, email: string, fullName: 
             proficiency_level: 'beginner'
           })
           .select();
-          
+
         if (usersInsert.error) throw usersInsert.error;
-        
-        // 2. Then insert into profiles
+
         const profilesInsert = await supabase
           .from('profiles')
           .insert({
             id: userId
           })
           .select();
-          
+
         if (profilesInsert.error) throw profilesInsert.error;
-        
-        // 3. Finally insert into onboarding_status
+
         const onboardingInsert = await supabase
           .from('onboarding_status')
           .insert({
@@ -98,9 +89,9 @@ export const createUserRecord = async (userId: string, email: string, fullName: 
             is_complete: false
           })
           .select();
-          
+
         if (onboardingInsert.error) throw onboardingInsert.error;
-        
+
         console.log("Created user record through fallback method");
         return true;
       } catch (fallbackError) {
@@ -108,7 +99,7 @@ export const createUserRecord = async (userId: string, email: string, fullName: 
         return false;
       }
     }
-    
+
     console.log("Created user record successfully:", data);
     return true;
   } catch (error) {
@@ -116,9 +107,3 @@ export const createUserRecord = async (userId: string, email: string, fullName: 
     return false;
   }
 };
-import { createClient } from '@supabase/supabase-js';
-
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
