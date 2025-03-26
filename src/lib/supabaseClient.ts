@@ -9,3 +9,26 @@ if (!supabaseUrl || !supabaseKey) {
 }
 
 export const supabase = createClient(supabaseUrl, supabaseKey);
+
+export const createUserRecord = async (userId: string, email: string, name: string) => {
+  try {
+    const { data, error } = await supabase
+      .from('profiles')
+      .insert([
+        {
+          id: userId,
+          email,
+          name,
+          created_at: new Date().toISOString(),
+        }
+      ])
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  } catch (error) {
+    console.error('Error creating user record:', error);
+    throw error;
+  }
+};
