@@ -1,215 +1,100 @@
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
-import { useAuth } from '@/providers/AuthProvider';
-import { useUpdateStreak } from '@/hooks/useProfiles';
-import { useToast } from '@/hooks/use-toast';
+import { RealtimeChannel } from '@supabase/supabase-js';
+import { Button } from './ui/button';
+import { Badge } from './ui/badge';
+import { Loader2 } from 'lucide-react';
 
 const RealtimeStatus = () => {
-  const { user } = useAuth();
-  const updateStreak = useUpdateStreak();
-  const { toast } = useToast();
-
+  const [status, setStatus] = useState<'connecting' | 'connected' | 'disconnected'>('connecting');
+  const [lastMessage, setLastMessage] = useState<string | null>(null);
+  
   useEffect(() => {
-    if (!user) return;
-
-    // Update user's online status and streak when they access the app
-    const setUserOnline = async () => {
-      try {
-        console.log("Setting user online:", user.id);
-        
-        // First check if the profile exists
-        const { data: existingProfile, error: checkError } = await supabase
-          .from('profiles')
-          .select('id')
-          .eq('id', user.id)
-          .maybeSingle();
-          
-        if (checkError) {
-          console.error("Error checking profile existence:", checkError);
-          // Continue anyway to attempt update
-        }
-        
-        // If profile doesn't exist, insert it
-        if (!existingProfile) {
-          console.log("Profile doesn't exist, creating it");
-          const { error: insertError } = await supabase
-            .from('profiles')
-            .insert({
-              id: user.id,
-              is_online: true,
-              updated_at: new Date().toISOString()
-            });
-            
-          if (insertError) {
-            console.error("Error creating profile:", insertError);
-            throw insertError;
-          }
-        } else {
-          // Profile exists, update it
-          const { error: updateError } = await supabase
-            .from('profiles')
-            .update({
-              is_online: true,
-              updated_at: new Date().toISOString()
-            })
-            .eq('id', user.id);
-            
-          if (updateError) {
-            console.error("Error updating online status:", updateError);
-            throw updateError;
+    let channel: RealtimeChannel;
+    
+    const setupChannel = () => {
+      channel = supabase.channel('realtime-status', {
+        config: {
+          broadcast: {
+            self: true
           }
         }
-        
-        // Try to update streak
-        try {
-          await updateStreak.mutateAsync(user.id);
-        } catch (streakError) {
-          console.error("Error updating streak:", streakError);
-          // Don't fail the whole operation if streak update fails
-        }
-      } catch (error) {
-        console.error("Error in RealtimeStatus:", error);
-        toast({
-          variant: "destructive",
-          title: "Connection status",
-          description: "Online status may not be updated correctly.",
-        });
-      }
-    };
+      });
 
-    setUserOnline();
-
-    // Set up event listeners for page visibility changes
-    const handleVisibilityChange = () => {
-      if (!user) return;
-      
-      if (document.visibilityState === 'visible') {
-        supabase
-          .from('profiles')
-          .update({
-            is_online: true,
-            updated_at: new Date().toISOString()
-          })
-          .eq('id', user.id)
-          .then(({ error }) => {
-            if (error) console.error("Error updating online status:", error);
-          });
-      } else {
-        supabase
-          .from('profiles')
-          .update({
-            is_online: false,
-            updated_at: new Date().toISOString()
-          })
-          .eq('id', user.id)
-          .then(({ error }) => {
-            if (error) console.error("Error updating offline status:", error);
-          });
-      }
-    };
-
-    // Set up event listeners for window focus/blur
-    const handleFocus = () => {
-      if (!user) return;
-      
-      supabase
-        .from('profiles')
-        .update({
-          is_online: true,
-          updated_at: new Date().toISOString()
+      channel
+        .on('broadcast', { event: 'test' }, (payload) => {
+          setLastMessage(JSON.stringify(payload));
         })
-        .eq('id', user.id)
-        .then(({ error }) => {
-          if (error) console.error("Error updating online status on focus:", error);
-        });
-    };
-      
-    const handleBlur = () => {
-      if (!user) return;
-      
-      supabase
-        .from('profiles')
-        .update({
-          is_online: false,
-          updated_at: new Date().toISOString()
+        .on('presence', { event: 'sync' }, () => {
+          setStatus('connected');
         })
-        .eq('id', user.id)
-        .then(({ error }) => {
-          if (error) console.error("Error updating offline status on blur:", error);
+        .subscribe((status) => {
+          console.log('Realtime subscription status:', status);
+          if (status === 'SUBSCRIBED') {
+            setStatus('connected');
+          } else if (status === 'CLOSED' || status === 'CHANNEL_ERROR') {
+            setStatus('disconnected');
+          } else {
+            setStatus('connecting');
+          }
         });
     };
 
-    // Add event listeners
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-    window.addEventListener('focus', handleFocus);
-    window.addEventListener('blur', handleBlur);
+    setupChannel();
 
-    // Set up heartbeat to maintain online status
-    const heartbeatInterval = setInterval(() => {
-      if (!user || document.visibilityState !== 'visible') return;
-      
-      supabase
-        .from('profiles')
-        .update({
-          is_online: true,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', user.id)
-        .then(({ error }) => {
-          if (error) console.error("Error updating online status on heartbeat:", error);
-        });
-    }, 60000); // every minute
-
-    // Set up beforeunload handler to mark user as offline when leaving
-    const handleBeforeUnload = () => {
-      if (!user) return;
-      
-      // Use navigator.sendBeacon for asynchronous request that works during page unload
-      try {
-        supabase
-          .from('profiles')
-          .update({
-            is_online: false,
-            updated_at: new Date().toISOString()
-          })
-          .eq('id', user.id)
-          .then(({ error }) => {
-            if (error) console.error("Error updating offline status on unload:", error);
-          });
-      } catch (error) {
-        console.error("Error updating offline status on unload:", error);
-      }
-    };
-
-    window.addEventListener('beforeunload', handleBeforeUnload);
-
-    // Clean up
     return () => {
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-      window.removeEventListener('focus', handleFocus);
-      window.removeEventListener('blur', handleBlur);
-      window.removeEventListener('beforeunload', handleBeforeUnload);
-      clearInterval(heartbeatInterval);
-      
-      // Mark user as offline when component unmounts
-      if (user) {
-        supabase
-          .from('profiles')
-          .update({
-            is_online: false,
-            updated_at: new Date().toISOString()
-          })
-          .eq('id', user.id)
-          .then(({ error }) => {
-            if (error) console.error("Error updating offline status on unmount:", error);
-          });
+      if (channel) {
+        channel.unsubscribe();
       }
     };
-  }, [user, updateStreak, toast]);
+  }, []);
 
-  // This component doesn't render anything
-  return null;
+  const testConnection = () => {
+    const channel = supabase.channel('realtime-status');
+    channel.send({
+      type: 'broadcast',
+      event: 'test',
+      payload: { message: 'Testing realtime connection', timestamp: new Date().toISOString() }
+    });
+  };
+
+  return (
+    <div className="flex flex-col gap-2 p-4 border rounded-md">
+      <div className="flex items-center gap-2">
+        <span>Realtime Status:</span>
+        {status === 'connecting' && (
+          <Badge variant="outline" className="bg-yellow-100 text-yellow-800">
+            <Loader2 className="h-3 w-3 animate-spin mr-1" /> Connecting...
+          </Badge>
+        )}
+        {status === 'connected' && (
+          <Badge variant="outline" className="bg-green-100 text-green-800">Connected</Badge>
+        )}
+        {status === 'disconnected' && (
+          <Badge variant="outline" className="bg-red-100 text-red-800">Disconnected</Badge>
+        )}
+      </div>
+      
+      <Button 
+        size="sm" 
+        variant="outline" 
+        onClick={testConnection}
+        disabled={status !== 'connected'}
+      >
+        Test Connection
+      </Button>
+      
+      {lastMessage && (
+        <div className="mt-2">
+          <p className="text-xs text-gray-500">Last Message:</p>
+          <pre className="text-xs bg-gray-50 p-2 rounded overflow-x-auto">
+            {lastMessage}
+          </pre>
+        </div>
+      )}
+    </div>
+  );
 };
 
 export default RealtimeStatus;

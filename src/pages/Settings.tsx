@@ -1,633 +1,647 @@
 
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 import { 
-  Cog, User, Lock, Palette, LogOut, ChevronRight,
-  Moon, Sun, Monitor, Smartphone, Globe, Bell, Shield,
-  Clock, Target, BookOpen, Languages, BatteryFull
+  Bell, 
+  Globe, 
+  Key, 
+  Lock, 
+  LogOut, 
+  Mail, 
+  Moon, 
+  Save, 
+  Shield, 
+  Sun, 
+  User, 
+  Wallet 
 } from "lucide-react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
-import { Slider } from "@/components/ui/slider";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
-import { Separator } from "@/components/ui/separator";
+import { Label } from "@/components/ui/label";
+import { 
+  Select, 
+  SelectContent, 
+  SelectItem, 
+  SelectTrigger, 
+  SelectValue 
+} from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { signOut } from "@/lib/supabase";
-import { useAuth } from "@/providers/AuthProvider";
+import { Switch } from "@/components/ui/switch";
+import { Separator } from "@/components/ui/separator";
 import { useTheme } from "@/components/theme-provider";
 import { useToast } from "@/hooks/use-toast";
-import { cn } from "@/lib/utils";
-import { supabase } from "@/lib/supabase";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/components/ui/tabs";
 
-interface SettingsCategoryProps {
-  title: string;
-  description: string;
-  icon: React.ReactNode;
-  onClick: () => void;
+interface SettingsProps {
+  onLogout: () => void;
 }
 
-const SettingsCategory = ({ title, description, icon, onClick }: SettingsCategoryProps) => (
-  <Card className="cursor-pointer transition-all hover:shadow-md" onClick={onClick}>
-    <CardHeader className="flex flex-row items-center justify-between pb-2 pt-4 space-y-0">
-      <CardTitle className="text-base font-medium">{title}</CardTitle>
-      {icon}
-    </CardHeader>
-    <CardContent>
-      <CardDescription className="text-xs">{description}</CardDescription>
-      <div className="flex justify-end mt-4">
-        <Button variant="ghost" size="sm">
-          <ChevronRight className="h-4 w-4" />
-        </Button>
-      </div>
-    </CardContent>
-  </Card>
-);
-
-const ThemeSelector = () => {
+const Settings = ({ onLogout }: SettingsProps) => {
   const { theme, setTheme } = useTheme();
-
-  return (
-    <div className="space-y-4">
-      <h3 className="text-lg font-medium">Theme Preference</h3>
-      <RadioGroup
-        defaultValue={theme}
-        onValueChange={(value) => setTheme(value as "light" | "dark" | "system")}
-        className="grid grid-cols-1 md:grid-cols-3 gap-4"
-      >
-        <div>
-          <RadioGroupItem
-            value="light"
-            id="light"
-            className="sr-only"
-          />
-          <Label
-            htmlFor="light"
-            className={cn(
-              "flex flex-col items-center justify-between rounded-md border-2 border-muted p-4 hover:border-accent cursor-pointer",
-              theme === "light" && "border-primary"
-            )}
-          >
-            <Sun className="h-6 w-6 mb-2" />
-            <span className="text-sm font-medium">Light</span>
-          </Label>
-        </div>
-        <div>
-          <RadioGroupItem
-            value="dark"
-            id="dark"
-            className="sr-only"
-          />
-          <Label
-            htmlFor="dark"
-            className={cn(
-              "flex flex-col items-center justify-between rounded-md border-2 border-muted p-4 hover:border-accent cursor-pointer",
-              theme === "dark" && "border-primary"
-            )}
-          >
-            <Moon className="h-6 w-6 mb-2" />
-            <span className="text-sm font-medium">Dark</span>
-          </Label>
-        </div>
-        <div>
-          <RadioGroupItem
-            value="system"
-            id="system"
-            className="sr-only"
-          />
-          <Label
-            htmlFor="system"
-            className={cn(
-              "flex flex-col items-center justify-between rounded-md border-2 border-muted p-4 hover:border-accent cursor-pointer",
-              theme === "system" && "border-primary"
-            )}
-          >
-            <Monitor className="h-6 w-6 mb-2" />
-            <span className="text-sm font-medium">System</span>
-          </Label>
-        </div>
-      </RadioGroup>
-    </div>
-  );
-};
-
-const NotificationSettings = () => {
-  const [emailNotifications, setEmailNotifications] = useState(true);
-  const [pushNotifications, setPushNotifications] = useState(true);
-  const [streakReminders, setStreakReminders] = useState(true);
-  const [reminderTime, setReminderTime] = useState("18:00");
-
-  const handleSaveNotifications = async () => {
-    // Implementation for saving notification settings to Supabase would go here
-    console.log("Saving notification settings:", {
-      emailNotifications,
-      pushNotifications,
-      streakReminders,
-      reminderTime
-    });
-  };
-
-  return (
-    <div className="space-y-6">
-      <h3 className="text-lg font-medium">Notification Settings</h3>
-      
-      <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <div className="space-y-0.5">
-            <Label htmlFor="email-notifications">Email Notifications</Label>
-            <p className="text-sm text-muted-foreground">
-              Receive notifications about your progress via email
-            </p>
-          </div>
-          <Switch
-            id="email-notifications"
-            checked={emailNotifications}
-            onCheckedChange={setEmailNotifications}
-          />
-        </div>
-        
-        <div className="flex items-center justify-between">
-          <div className="space-y-0.5">
-            <Label htmlFor="push-notifications">Push Notifications</Label>
-            <p className="text-sm text-muted-foreground">
-              Receive notifications on your device
-            </p>
-          </div>
-          <Switch
-            id="push-notifications"
-            checked={pushNotifications}
-            onCheckedChange={setPushNotifications}
-          />
-        </div>
-        
-        <div className="flex items-center justify-between">
-          <div className="space-y-0.5">
-            <Label htmlFor="streak-reminders">Streak Reminders</Label>
-            <p className="text-sm text-muted-foreground">
-              Get reminded to maintain your learning streak
-            </p>
-          </div>
-          <Switch
-            id="streak-reminders"
-            checked={streakReminders}
-            onCheckedChange={setStreakReminders}
-          />
-        </div>
-        
-        {streakReminders && (
-          <div className="space-y-2">
-            <Label htmlFor="reminder-time">Daily Reminder Time</Label>
-            <Input
-              id="reminder-time"
-              type="time"
-              value={reminderTime}
-              onChange={(e) => setReminderTime(e.target.value)}
-            />
-          </div>
-        )}
-      </div>
-      
-      <Button onClick={handleSaveNotifications}>Save Notification Settings</Button>
-    </div>
-  );
-};
-
-const LearningPreferences = () => {
-  const [dailyGoal, setDailyGoal] = useState<number>(15);
-  const [difficulty, setDifficulty] = useState<string>("medium");
+  const { toast } = useToast();
   
-  const handleSaveLearningPreferences = async () => {
-    // Implementation for saving learning preferences to Supabase would go here
-    console.log("Saving learning preferences:", {
-      dailyGoal,
-      difficulty
+  const [profileData, setProfileData] = useState({
+    name: "Sarah Johnson",
+    bio: "Software engineer passionate about learning Spanish for my upcoming trip to Mexico.",
+    email: "sarah.johnson@example.com",
+    avatar: "/placeholder.svg",
+    nativeLanguage: "English",
+    learningLanguage: "Spanish",
+    proficiencyLevel: "Intermediate (B1)",
+  });
+  
+  const [privacySettings, setPrivacySettings] = useState({
+    showOnlineStatus: true,
+    showLastActive: true,
+    allowMessages: true,
+    showProfileInSearch: true,
+  });
+  
+  const [notificationSettings, setNotificationSettings] = useState({
+    newMessages: true,
+    profileViews: true,
+    learningReminders: true,
+    streakReminders: true,
+    marketingEmails: false,
+  });
+  
+  const languages = [
+    "English", "Spanish", "French", "German", "Italian",
+    "Portuguese", "Chinese", "Japanese", "Korean", "Russian",
+    "Arabic", "Hindi", "Turkish", "Dutch", "Swedish"
+  ];
+  
+  const proficiencyLevels = [
+    "Beginner (A1)", "Elementary (A2)", "Intermediate (B1)", 
+    "Upper Intermediate (B2)", "Advanced (C1)", "Proficient (C2)"
+  ];
+  
+  const handleProfileChange = (field: string, value: string) => {
+    setProfileData(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
+  
+  const handlePrivacyChange = (field: string, value: boolean) => {
+    setPrivacySettings(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
+  
+  const handleNotificationChange = (field: string, value: boolean) => {
+    setNotificationSettings(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
+  
+  const handleSaveProfile = () => {
+    // In a real app, this would save to a backend
+    toast({
+      title: "Profile updated",
+      description: "Your profile information has been saved.",
     });
   };
-
+  
+  const handleSavePrivacy = () => {
+    toast({
+      title: "Privacy settings updated",
+      description: "Your privacy preferences have been saved.",
+    });
+  };
+  
+  const handleSaveNotifications = () => {
+    toast({
+      title: "Notification settings updated",
+      description: "Your notification preferences have been saved.",
+    });
+  };
+  
+  const handleChangePassword = () => {
+    toast({
+      title: "Password change requested",
+      description: "We've sent a password reset link to your email.",
+    });
+  };
+  
+  const handleUploadAvatar = () => {
+    // In a real app, this would open a file picker
+    toast({
+      title: "Feature coming soon",
+      description: "Avatar upload functionality will be available in the next update.",
+    });
+  };
+  
+  const handleLogout = () => {
+    toast({
+      title: "Logging out",
+      description: "You have been successfully logged out.",
+    });
+    onLogout();
+  };
+  
   return (
-    <div className="space-y-6">
-      <h3 className="text-lg font-medium">Learning Preferences</h3>
-      
-      <div className="space-y-4">
-        <div className="space-y-2">
-          <div className="flex items-center justify-between">
-            <Label htmlFor="daily-goal">Daily Learning Goal</Label>
-            <span className="text-sm font-medium">{dailyGoal} minutes</span>
-          </div>
-          <Slider
-            id="daily-goal"
-            min={5}
-            max={60}
-            step={5}
-            value={[dailyGoal]}
-            onValueChange={(values) => setDailyGoal(values[0])}
-          />
-          <p className="text-sm text-muted-foreground">
-            Set how much time you want to spend learning each day
-          </p>
-        </div>
-        
-        <div className="space-y-2">
-          <Label htmlFor="difficulty">Lesson Difficulty</Label>
-          <Select value={difficulty} onValueChange={setDifficulty}>
-            <SelectTrigger>
-              <SelectValue placeholder="Select difficulty" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="easy">Easy</SelectItem>
-              <SelectItem value="medium">Medium</SelectItem>
-              <SelectItem value="hard">Hard</SelectItem>
-            </SelectContent>
-          </Select>
-          <p className="text-sm text-muted-foreground">
-            Adjust the difficulty level of your lessons
-          </p>
-        </div>
+    <div className="container pb-12 animate-fade-in">
+      <div className="space-y-2 mb-8">
+        <h1 className="text-3xl font-bold tracking-tight">Settings</h1>
+        <p className="text-muted-foreground">
+          Manage your account preferences and settings
+        </p>
       </div>
       
-      <Button onClick={handleSaveLearningPreferences}>Save Learning Preferences</Button>
-    </div>
-  );
-};
-
-const ProfileSettings = () => {
-  const { user } = useAuth();
-  const { toast } = useToast();
-  const [formData, setFormData] = useState({
-    username: "",
-    bio: "",
-    avatar_url: "",
-    learning_language: "Spanish",
-    native_language: "English",
-    proficiency_level: "beginner"
-  });
-  const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    const fetchProfileData = async () => {
-      if (!user) return;
-      
-      try {
-        setLoading(true);
+      <Tabs defaultValue="profile" className="mb-8">
+        <TabsList className="grid grid-cols-4 mb-8">
+          <TabsTrigger value="profile" className="flex items-center">
+            <User className="h-4 w-4 mr-2" />
+            <span className="hidden sm:inline">Profile</span>
+          </TabsTrigger>
+          <TabsTrigger value="privacy" className="flex items-center">
+            <Shield className="h-4 w-4 mr-2" />
+            <span className="hidden sm:inline">Privacy</span>
+          </TabsTrigger>
+          <TabsTrigger value="notifications" className="flex items-center">
+            <Bell className="h-4 w-4 mr-2" />
+            <span className="hidden sm:inline">Notifications</span>
+          </TabsTrigger>
+          <TabsTrigger value="account" className="flex items-center">
+            <Key className="h-4 w-4 mr-2" />
+            <span className="hidden sm:inline">Account</span>
+          </TabsTrigger>
+        </TabsList>
         
-        // Fetch profile data
-        const { data: profileData, error: profileError } = await supabase
-          .from('profiles')
-          .select('username, bio, avatar_url')
-          .eq('id', user.id)
-          .single();
-          
-        if (profileError) {
-          console.error("Error fetching profile:", profileError);
-          throw profileError;
-        }
-        
-        // Fetch user data
-        const { data: userData, error: userError } = await supabase
-          .from('users')
-          .select('learning_language, native_language, proficiency_level')
-          .eq('id', user.id)
-          .single();
-          
-        if (userError) {
-          console.error("Error fetching user data:", userError);
-          throw userError;
-        }
-        
-        setFormData({
-          username: profileData.username || "",
-          bio: profileData.bio || "",
-          avatar_url: profileData.avatar_url || "",
-          learning_language: userData.learning_language || "Spanish",
-          native_language: userData.native_language || "English",
-          proficiency_level: userData.proficiency_level || "beginner"
-        });
-      } catch (error) {
-        console.error("Error loading profile data:", error);
-        toast({
-          variant: "destructive",
-          title: "Failed to load profile data",
-          description: "Please try again later"
-        });
-      } finally {
-        setLoading(false);
-      }
-    };
-    
-    fetchProfileData();
-  }, [user, toast]);
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-  };
-
-  const handleSaveProfile = async () => {
-    if (!user) return;
-    
-    try {
-      setLoading(true);
-      
-      // Update profile data
-      const { error: profileError } = await supabase
-        .from('profiles')
-        .update({
-          username: formData.username,
-          bio: formData.bio,
-          avatar_url: formData.avatar_url
-        })
-        .eq('id', user.id);
-        
-      if (profileError) {
-        console.error("Error updating profile:", profileError);
-        throw profileError;
-      }
-      
-      // Update user data
-      const { error: userError } = await supabase
-        .from('users')
-        .update({
-          learning_language: formData.learning_language,
-          native_language: formData.native_language,
-          proficiency_level: formData.proficiency_level
-        })
-        .eq('id', user.id);
-        
-      if (userError) {
-        console.error("Error updating user data:", userError);
-        throw userError;
-      }
-      
-      toast({
-        title: "Profile updated",
-        description: "Your profile has been successfully updated"
-      });
-    } catch (error) {
-      console.error("Error saving profile:", error);
-      toast({
-        variant: "destructive",
-        title: "Failed to update profile",
-        description: "Please try again later"
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const languageOptions = [
-    "English", "Spanish", "French", "German", "Italian", 
-    "Portuguese", "Chinese", "Japanese", "Korean", "Russian", 
-    "Arabic", "Hindi", "Dutch", "Swedish", "Finnish"
-  ];
-
-  return (
-    <div className="space-y-6">
-      <h3 className="text-lg font-medium">Profile Settings</h3>
-      
-      <div className="space-y-4">
-        <div className="space-y-2">
-          <Label htmlFor="username">Username</Label>
-          <Input
-            id="username"
-            name="username"
-            value={formData.username}
-            onChange={handleInputChange}
-            placeholder="Your display name"
-          />
-        </div>
-        
-        <div className="space-y-2">
-          <Label htmlFor="bio">Bio</Label>
-          <Textarea
-            id="bio"
-            name="bio"
-            value={formData.bio}
-            onChange={handleInputChange}
-            placeholder="Tell others about yourself..."
-            rows={3}
-          />
-        </div>
-        
-        <div className="space-y-2">
-          <Label htmlFor="avatar_url">Avatar URL</Label>
-          <Input
-            id="avatar_url"
-            name="avatar_url"
-            value={formData.avatar_url}
-            onChange={handleInputChange}
-            placeholder="https://example.com/your-avatar.jpg"
-          />
-        </div>
-        
-        <Separator />
-        
-        <div className="space-y-2">
-          <Label htmlFor="native_language">Native Language</Label>
-          <Select 
-            name="native_language" 
-            value={formData.native_language} 
-            onValueChange={(value) => setFormData(prev => ({ ...prev, native_language: value }))}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Select your native language" />
-            </SelectTrigger>
-            <SelectContent>
-              {languageOptions.map(lang => (
-                <SelectItem key={lang} value={lang}>{lang}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-        
-        <div className="space-y-2">
-          <Label htmlFor="learning_language">Learning Language</Label>
-          <Select 
-            name="learning_language" 
-            value={formData.learning_language} 
-            onValueChange={(value) => setFormData(prev => ({ ...prev, learning_language: value }))}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Select language you're learning" />
-            </SelectTrigger>
-            <SelectContent>
-              {languageOptions.map(lang => (
-                <SelectItem key={lang} value={lang}>{lang}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-        
-        <div className="space-y-2">
-          <Label htmlFor="proficiency_level">Proficiency Level</Label>
-          <Select 
-            name="proficiency_level" 
-            value={formData.proficiency_level} 
-            onValueChange={(value) => setFormData(prev => ({ ...prev, proficiency_level: value }))}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Select your proficiency level" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="beginner">Beginner</SelectItem>
-              <SelectItem value="intermediate">Intermediate</SelectItem>
-              <SelectItem value="advanced">Advanced</SelectItem>
-              <SelectItem value="native">Native</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-      </div>
-      
-      <Button 
-        onClick={handleSaveProfile} 
-        disabled={loading}
-        className="w-full"
-      >
-        {loading ? 'Saving...' : 'Save Profile'}
-      </Button>
-    </div>
-  );
-};
-
-const Settings = () => {
-  const { user } = useAuth();
-  const { toast } = useToast();
-  const navigate = useNavigate();
-  const [selectedSetting, setSelectedSetting] = useState<string | null>(null);
-
-  const handleSignOut = async () => {
-    try {
-      await signOut();
-      navigate('/auth');
-    } catch (error) {
-      console.error('Error signing out:', error);
-      toast({
-        variant: "destructive",
-        title: "Error signing out",
-        description: "Please try again later"
-      });
-    }
-  };
-
-  // List of setting categories
-  const settingsCategories = [
-    {
-      id: "account",
-      title: "Account Settings",
-      description: "Manage your account details and preferences",
-      icon: <User className="h-5 w-5 text-primary" />,
-    },
-    {
-      id: "privacy",
-      title: "Privacy & Security",
-      description: "Control who can see your profile and activity",
-      icon: <Shield className="h-5 w-5 text-primary" />,
-    },
-    {
-      id: "appearance",
-      title: "Appearance",
-      description: "Customize the look and feel of the application",
-      icon: <Palette className="h-5 w-5 text-primary" />,
-    },
-    {
-      id: "notifications",
-      title: "Notifications",
-      description: "Set your notification preferences",
-      icon: <Bell className="h-5 w-5 text-primary" />,
-    },
-    {
-      id: "language",
-      title: "Language & Region",
-      description: "Change your language and regional settings",
-      icon: <Globe className="h-5 w-5 text-primary" />,
-    },
-    {
-      id: "learning",
-      title: "Learning Preferences",
-      description: "Customize your learning experience",
-      icon: <BookOpen className="h-5 w-5 text-primary" />,
-    }
-  ];
-
-  const renderSelectedSettings = () => {
-    switch (selectedSetting) {
-      case "appearance":
-        return <ThemeSelector />;
-      case "notifications":
-        return <NotificationSettings />;
-      case "learning":
-        return <LearningPreferences />;
-      case "account":
-        return <ProfileSettings />;
-      default:
-        return (
-          <div className="text-center py-12">
-            <Cog className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-            <h3 className="text-xl font-medium mb-2">Settings under construction</h3>
-            <p className="text-muted-foreground max-w-md mx-auto">
-              This settings section is currently being developed. Check back soon for updates!
-            </p>
-            <Button 
-              className="mt-4" 
-              variant="outline" 
-              onClick={() => setSelectedSetting(null)}
-            >
-              Back to Settings
-            </Button>
-          </div>
-        );
-    }
-  };
-
-  return (
-    <div className="container py-8 animate-fade-in">
-      <div className="flex justify-between items-center mb-8">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Settings</h1>
-          <p className="text-muted-foreground">
-            Customize your experience and manage your account
-          </p>
-        </div>
-        <Button variant="destructive" onClick={handleSignOut}>
-          <LogOut className="h-4 w-4 mr-2" />
-          Sign out
-        </Button>
-      </div>
-
-      {!selectedSetting ? (
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {settingsCategories.map((category) => (
-            <SettingsCategory
-              key={category.id}
-              title={category.title}
-              description={category.description}
-              icon={category.icon}
-              onClick={() => setSelectedSetting(category.id)}
-            />
-          ))}
-        </div>
-      ) : (
-        <Card className="animate-fade-in">
-          <CardHeader className="flex flex-row items-center justify-between border-b">
-            <div>
-              <CardTitle>
-                {settingsCategories.find(c => c.id === selectedSetting)?.title}
-              </CardTitle>
+        {/* Profile Settings */}
+        <TabsContent value="profile" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Profile Information</CardTitle>
               <CardDescription>
-                {settingsCategories.find(c => c.id === selectedSetting)?.description}
+                Update your personal information and language preferences
               </CardDescription>
-            </div>
-            <Button variant="ghost" size="sm" onClick={() => setSelectedSetting(null)}>
-              Back to Settings
-            </Button>
-          </CardHeader>
-          <CardContent className="pt-6">
-            {renderSelectedSettings()}
-          </CardContent>
-        </Card>
-      )}
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="flex flex-col md:flex-row md:space-x-6">
+                <div className="flex flex-col items-center space-y-4 mb-6 md:mb-0">
+                  <Avatar className="h-24 w-24">
+                    <AvatarImage src={profileData.avatar} alt={profileData.name} />
+                    <AvatarFallback>{profileData.name.charAt(0)}</AvatarFallback>
+                  </Avatar>
+                  <Button variant="outline" onClick={handleUploadAvatar}>
+                    Change Avatar
+                  </Button>
+                </div>
+                
+                <div className="flex-1 space-y-4">
+                  <div className="grid gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="name">Full Name</Label>
+                      <Input 
+                        id="name" 
+                        value={profileData.name}
+                        onChange={(e) => handleProfileChange("name", e.target.value)}
+                      />
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label htmlFor="email">Email</Label>
+                      <Input 
+                        id="email" 
+                        type="email" 
+                        value={profileData.email}
+                        onChange={(e) => handleProfileChange("email", e.target.value)}
+                      />
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label htmlFor="bio">Bio</Label>
+                      <Textarea 
+                        id="bio" 
+                        value={profileData.bio}
+                        onChange={(e) => handleProfileChange("bio", e.target.value)}
+                        className="min-h-[100px]"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <Separator />
+              
+              <div className="space-y-4">
+                <h3 className="text-lg font-medium">Language Settings</h3>
+                
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div className="space-y-2">
+                    <Label htmlFor="nativeLanguage">Native Language</Label>
+                    <Select
+                      value={profileData.nativeLanguage}
+                      onValueChange={(value) => handleProfileChange("nativeLanguage", value)}
+                    >
+                      <SelectTrigger id="nativeLanguage">
+                        <SelectValue placeholder="Select language" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {languages.map((language) => (
+                          <SelectItem key={language} value={language}>
+                            {language}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="learningLanguage">Learning Language</Label>
+                    <Select
+                      value={profileData.learningLanguage}
+                      onValueChange={(value) => handleProfileChange("learningLanguage", value)}
+                    >
+                      <SelectTrigger id="learningLanguage">
+                        <SelectValue placeholder="Select language" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {languages
+                          .filter((lang) => lang !== profileData.nativeLanguage)
+                          .map((language) => (
+                            <SelectItem key={language} value={language}>
+                              {language}
+                            </SelectItem>
+                          ))
+                        }
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  
+                  <div className="space-y-2 sm:col-span-2">
+                    <Label htmlFor="proficiencyLevel">Proficiency Level</Label>
+                    <Select
+                      value={profileData.proficiencyLevel}
+                      onValueChange={(value) => handleProfileChange("proficiencyLevel", value)}
+                    >
+                      <SelectTrigger id="proficiencyLevel">
+                        <SelectValue placeholder="Select level" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {proficiencyLevels.map((level) => (
+                          <SelectItem key={level} value={level}>
+                            {level}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+            <CardFooter>
+              <Button onClick={handleSaveProfile} className="button-hover">
+                <Save className="h-4 w-4 mr-2" />
+                Save Changes
+              </Button>
+            </CardFooter>
+          </Card>
+        </TabsContent>
+        
+        {/* Privacy Settings */}
+        <TabsContent value="privacy" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Privacy Preferences</CardTitle>
+              <CardDescription>
+                Control who can see your information and how they can interact with you
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className="space-y-0.5">
+                    <Label htmlFor="showOnlineStatus">Show online status</Label>
+                    <p className="text-sm text-muted-foreground">
+                      Allow others to see when you're active on the platform
+                    </p>
+                  </div>
+                  <Switch
+                    id="showOnlineStatus"
+                    checked={privacySettings.showOnlineStatus}
+                    onCheckedChange={(value) => handlePrivacyChange("showOnlineStatus", value)}
+                  />
+                </div>
+                
+                <Separator />
+                
+                <div className="flex items-center justify-between">
+                  <div className="space-y-0.5">
+                    <Label htmlFor="showLastActive">Show last active time</Label>
+                    <p className="text-sm text-muted-foreground">
+                      Allow others to see when you were last active
+                    </p>
+                  </div>
+                  <Switch
+                    id="showLastActive"
+                    checked={privacySettings.showLastActive}
+                    onCheckedChange={(value) => handlePrivacyChange("showLastActive", value)}
+                  />
+                </div>
+                
+                <Separator />
+                
+                <div className="flex items-center justify-between">
+                  <div className="space-y-0.5">
+                    <Label htmlFor="allowMessages">Allow messages</Label>
+                    <p className="text-sm text-muted-foreground">
+                      Allow other users to send you direct messages
+                    </p>
+                  </div>
+                  <Switch
+                    id="allowMessages"
+                    checked={privacySettings.allowMessages}
+                    onCheckedChange={(value) => handlePrivacyChange("allowMessages", value)}
+                  />
+                </div>
+                
+                <Separator />
+                
+                <div className="flex items-center justify-between">
+                  <div className="space-y-0.5">
+                    <Label htmlFor="showProfileInSearch">Show profile in search</Label>
+                    <p className="text-sm text-muted-foreground">
+                      Allow your profile to appear in search results
+                    </p>
+                  </div>
+                  <Switch
+                    id="showProfileInSearch"
+                    checked={privacySettings.showProfileInSearch}
+                    onCheckedChange={(value) => handlePrivacyChange("showProfileInSearch", value)}
+                  />
+                </div>
+              </div>
+            </CardContent>
+            <CardFooter>
+              <Button onClick={handleSavePrivacy} className="button-hover">
+                <Save className="h-4 w-4 mr-2" />
+                Save Preferences
+              </Button>
+            </CardFooter>
+          </Card>
+        </TabsContent>
+        
+        {/* Notification Settings */}
+        <TabsContent value="notifications" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Notification Settings</CardTitle>
+              <CardDescription>
+                Choose which notifications you'd like to receive
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className="space-y-0.5">
+                    <Label htmlFor="newMessages">New messages</Label>
+                    <p className="text-sm text-muted-foreground">
+                      Get notified when you receive new messages
+                    </p>
+                  </div>
+                  <Switch
+                    id="newMessages"
+                    checked={notificationSettings.newMessages}
+                    onCheckedChange={(value) => handleNotificationChange("newMessages", value)}
+                  />
+                </div>
+                
+                <Separator />
+                
+                <div className="flex items-center justify-between">
+                  <div className="space-y-0.5">
+                    <Label htmlFor="profileViews">Profile views</Label>
+                    <p className="text-sm text-muted-foreground">
+                      Get notified when someone views your profile
+                    </p>
+                  </div>
+                  <Switch
+                    id="profileViews"
+                    checked={notificationSettings.profileViews}
+                    onCheckedChange={(value) => handleNotificationChange("profileViews", value)}
+                  />
+                </div>
+                
+                <Separator />
+                
+                <div className="flex items-center justify-between">
+                  <div className="space-y-0.5">
+                    <Label htmlFor="learningReminders">Learning reminders</Label>
+                    <p className="text-sm text-muted-foreground">
+                      Get daily reminders to practice your language
+                    </p>
+                  </div>
+                  <Switch
+                    id="learningReminders"
+                    checked={notificationSettings.learningReminders}
+                    onCheckedChange={(value) => handleNotificationChange("learningReminders", value)}
+                  />
+                </div>
+                
+                <Separator />
+                
+                <div className="flex items-center justify-between">
+                  <div className="space-y-0.5">
+                    <Label htmlFor="streakReminders">Streak reminders</Label>
+                    <p className="text-sm text-muted-foreground">
+                      Get reminded to maintain your daily streak
+                    </p>
+                  </div>
+                  <Switch
+                    id="streakReminders"
+                    checked={notificationSettings.streakReminders}
+                    onCheckedChange={(value) => handleNotificationChange("streakReminders", value)}
+                  />
+                </div>
+                
+                <Separator />
+                
+                <div className="flex items-center justify-between">
+                  <div className="space-y-0.5">
+                    <Label htmlFor="marketingEmails">Marketing emails</Label>
+                    <p className="text-sm text-muted-foreground">
+                      Receive updates about new features and offers
+                    </p>
+                  </div>
+                  <Switch
+                    id="marketingEmails"
+                    checked={notificationSettings.marketingEmails}
+                    onCheckedChange={(value) => handleNotificationChange("marketingEmails", value)}
+                  />
+                </div>
+              </div>
+            </CardContent>
+            <CardFooter>
+              <Button onClick={handleSaveNotifications} className="button-hover">
+                <Save className="h-4 w-4 mr-2" />
+                Save Preferences
+              </Button>
+            </CardFooter>
+          </Card>
+        </TabsContent>
+        
+        {/* Account Settings */}
+        <TabsContent value="account" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Account Settings</CardTitle>
+              <CardDescription>
+                Manage your account security and preferences
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-8">
+              <div className="space-y-4">
+                <h3 className="text-lg font-medium">Security</h3>
+                
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h4 className="font-medium">Password</h4>
+                      <p className="text-sm text-muted-foreground">
+                        Change your account password
+                      </p>
+                    </div>
+                    <Button variant="outline" onClick={handleChangePassword}>
+                      <Lock className="h-4 w-4 mr-2" />
+                      Change
+                    </Button>
+                  </div>
+                  
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h4 className="font-medium">Email</h4>
+                      <p className="text-sm text-muted-foreground">
+                        {profileData.email}
+                      </p>
+                    </div>
+                    <Button variant="outline">
+                      <Mail className="h-4 w-4 mr-2" />
+                      Update
+                    </Button>
+                  </div>
+                </div>
+              </div>
+              
+              <Separator />
+              
+              <div className="space-y-4">
+                <h3 className="text-lg font-medium">Appearance</h3>
+                
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h4 className="font-medium">Theme</h4>
+                      <p className="text-sm text-muted-foreground">
+                        Choose your preferred appearance
+                      </p>
+                    </div>
+                    <div className="flex space-x-2">
+                      <Button
+                        variant={theme === "light" ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => setTheme("light")}
+                      >
+                        <Sun className="h-4 w-4 mr-2" />
+                        Light
+                      </Button>
+                      <Button
+                        variant={theme === "dark" ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => setTheme("dark")}
+                      >
+                        <Moon className="h-4 w-4 mr-2" />
+                        Dark
+                      </Button>
+                      <Button
+                        variant={theme === "system" ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => setTheme("system")}
+                      >
+                        <Globe className="h-4 w-4 mr-2" />
+                        System
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <Separator />
+              
+              <div className="space-y-4">
+                <h3 className="text-lg font-medium">Subscription</h3>
+                
+                <div className="bg-muted/50 rounded-lg p-4">
+                  <div className="flex justify-between items-center mb-4">
+                    <div>
+                      <h4 className="font-medium">Free Plan</h4>
+                      <p className="text-sm text-muted-foreground">
+                        You're currently on the free plan
+                      </p>
+                    </div>
+                    <Button>
+                      <Wallet className="h-4 w-4 mr-2" />
+                      Upgrade
+                    </Button>
+                  </div>
+                  <ul className="text-sm space-y-2">
+                    <li className="flex items-center">
+                      <svg className="h-4 w-4 mr-2 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                      Basic conversation features
+                    </li>
+                    <li className="flex items-center">
+                      <svg className="h-4 w-4 mr-2 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                      Community access
+                    </li>
+                    <li className="flex items-center text-muted-foreground">
+                      <svg className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                      Advanced learning tools (Premium)
+                    </li>
+                    <li className="flex items-center text-muted-foreground">
+                      <svg className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                      AI-powered conversation practice (Premium)
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </CardContent>
+            <CardFooter className="flex justify-between">
+              <Button variant="outline" className="text-destructive">
+                Delete Account
+              </Button>
+              <Button variant="destructive" onClick={handleLogout}>
+                <LogOut className="h-4 w-4 mr-2" />
+                Logout
+              </Button>
+            </CardFooter>
+          </Card>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };

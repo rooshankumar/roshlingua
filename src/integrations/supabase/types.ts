@@ -109,13 +109,6 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "fk_sender"
-            columns: ["sender_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
             foreignKeyName: "messages_conversation_id_fkey"
             columns: ["conversation_id"]
             isOneToOne: false
@@ -147,7 +140,6 @@ export type Database = {
       }
       profiles: {
         Row: {
-          avatar_url: string | null
           bio: string | null
           created_at: string | null
           id: string
@@ -157,7 +149,6 @@ export type Database = {
           username: string | null
         }
         Insert: {
-          avatar_url?: string | null
           bio?: string | null
           created_at?: string | null
           id: string
@@ -167,7 +158,6 @@ export type Database = {
           username?: string | null
         }
         Update: {
-          avatar_url?: string | null
           bio?: string | null
           created_at?: string | null
           id?: string
