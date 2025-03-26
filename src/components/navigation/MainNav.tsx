@@ -1,4 +1,3 @@
-
 import * as React from "react"
 import { NavLink } from "react-router-dom"
 import { Menu } from "lucide-react"
@@ -84,3 +83,5 @@ export function MainNav() {
     </div>
   )
 }
+
+export default MainNav;
