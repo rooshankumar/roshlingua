@@ -27,7 +27,9 @@ export interface Profile {
   likes_count: number;
   created_at: string;
   updated_at: string;
-  avatar_url?: string; // Adding this field to match the database
+  avatar_url?: string; 
+  streak_count?: number;
+  last_active_date?: string;
 }
 
 export interface UserWithProfile extends User {

@@ -198,6 +198,19 @@ const Community = () => {
           });
         }
 
+        // Type guard to check if an object has required properties
+        const hasRequiredProperties = (obj: any): obj is { 
+          id: string; 
+          native_language?: string; 
+          learning_language?: string; 
+          proficiency_level?: string; 
+          streak_count?: number; 
+          gender?: string; 
+          date_of_birth?: string; 
+        } => {
+          return obj && typeof obj === 'object' && 'id' in obj;
+        };
+
         const formattedProfiles = profilesData
           .filter(profile => profile !== null)
           .map(profile => {
@@ -215,13 +228,8 @@ const Community = () => {
             // Find the matching user data
             const userData = usersData?.find(user => {
               if (!user || typeof user !== 'object') return false;
-              return 'id' in user && user.id === profileId;
+              return hasRequiredProperties(user) && user.id === profileId;
             }) || {};
-            
-            // Fix for TypeScript error - Safely check if userData has the required properties
-            const hasRequiredProperties = (obj: any): obj is { id: string, native_language?: string, learning_language?: string, proficiency_level?: string, streak_count?: number, gender?: string, date_of_birth?: string } => {
-              return obj && typeof obj === 'object' && 'id' in obj;
-            };
             
             // Calculate age if date_of_birth exists
             let age = null;
