@@ -239,18 +239,23 @@ const Community = () => {
               username: profileRecord.username as string || 'Anonymous',
               bio: profileRecord.bio as string || 'No bio available',
               avatar_url: profileRecord.avatar_url as string || null,
-              native_language: userData && typeof userData === 'object' && 'native_language' in userData ? 
-                userData.native_language as string : 'Unknown',
-              learning_language: userData && typeof userData === 'object' && 'learning_language' in userData ? 
-                userData.learning_language as string : 'Unknown',
-              proficiency_level: userData && typeof userData === 'object' && 'proficiency_level' in userData ? 
-                userData.proficiency_level as string : 'beginner',
-              streak_count: userData && typeof userData === 'object' && 'streak_count' in userData ? 
-                userData.streak_count as number : 0,
+              native_language: typeof userData === 'object' && 
+                               'native_language' in userData ? 
+                               (userData.native_language as string) : 'Unknown',
+              learning_language: typeof userData === 'object' && 
+                                 'learning_language' in userData ? 
+                                 (userData.learning_language as string) : 'Unknown',
+              proficiency_level: typeof userData === 'object' && 
+                                 'proficiency_level' in userData ? 
+                                 (userData.proficiency_level as string) : 'beginner',
+              streak_count: typeof userData === 'object' && 
+                            'streak_count' in userData ? 
+                            (userData.streak_count as number) : 0,
               likes_count: profileRecord.likes_count as number || 0,
               is_online: profileRecord.is_online as boolean || false,
-              gender: userData && typeof userData === 'object' && 'gender' in userData ? 
-                userData.gender as string : undefined,
+              gender: typeof userData === 'object' && 
+                      'gender' in userData ? 
+                      (userData.gender as string) : undefined,
               age,
               liked: likedProfiles.has(profileId)
             };
