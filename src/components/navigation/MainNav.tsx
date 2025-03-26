@@ -1,6 +1,6 @@
 import * as React from "react"
 import { NavLink, useLocation } from "react-router-dom";
-import { Home, Users, MessageSquare, Settings } from "lucide-react";
+import { Home, Users, MessageSquare, Settings, User } from "lucide-react";
 
 const routes = [
   {
@@ -17,6 +17,11 @@ const routes = [
     path: "/chat",
     label: "Chat",
     icon: MessageSquare
+  },
+  {
+    path: "/profile",
+    label: "Profile",
+    icon: User
   },
   {
     path: "/settings",
