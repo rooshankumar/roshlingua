@@ -1,36 +1,86 @@
 
-import { Link, useLocation } from "react-router-dom";
+import * as React from "react"
+import { NavLink } from "react-router-dom"
+import { Menu } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import {
+  Sheet,
+  SheetContent,
+  SheetTrigger,
+} from "@/components/ui/sheet"
+import { cn } from "@/lib/utils"
 
-const MainNav = () => {
-  const location = useLocation();
-  
-  const navItems = [
-    { path: "/dashboard", label: "Dashboard" },
-    { path: "/community", label: "Community" },
-    { path: "/profile", label: "Profile" },
-  ];
+const routes = [
+  {
+    path: "/dashboard",
+    label: "Dashboard"
+  },
+  {
+    path: "/chat",
+    label: "Chat"
+  },
+  {
+    path: "/community",
+    label: "Community"
+  },
+  {
+    path: "/profile",
+    label: "Profile"
+  },
+  {
+    path: "/settings",
+    label: "Settings"
+  }
+]
 
+export function MainNav() {
   return (
-    <nav className="fixed bottom-0 left-0 w-full bg-background border-t md:relative md:border-t-0 md:border-r">
-      <div className="md:sticky md:top-0 md:w-64 md:h-screen">
-        <div className="flex md:flex-col gap-2 p-4">
-          {navItems.map((item) => (
-            <Link
-              key={item.path}
-              to={item.path}
-              className={`flex-1 p-3 rounded-lg transition-colors ${
-                location.pathname === item.path
-                  ? "bg-primary text-primary-foreground"
-                  : "hover:bg-muted"
-              }`}
-            >
-              {item.label}
-            </Link>
-          ))}
-        </div>
-      </div>
-    </nav>
-  );
-};
+    <div className="flex items-center">
+      {/* Mobile Navigation */}
+      <Sheet>
+        <SheetTrigger asChild className="lg:hidden">
+          <Button variant="ghost" size="icon" className="mr-2">
+            <Menu className="h-5 w-5" />
+            <span className="sr-only">Toggle menu</span>
+          </Button>
+        </SheetTrigger>
+        <SheetContent side="left" className="w-[240px] sm:w-[300px]">
+          <nav className="flex flex-col gap-4">
+            {routes.map((route) => (
+              <NavLink
+                key={route.path}
+                to={route.path}
+                className={({ isActive }) =>
+                  cn(
+                    "text-sm font-medium transition-colors hover:text-primary",
+                    isActive ? "text-primary" : "text-muted-foreground"
+                  )
+                }
+              >
+                {route.label}
+              </NavLink>
+            ))}
+          </nav>
+        </SheetContent>
+      </Sheet>
 
-export default MainNav;
+      {/* Desktop Navigation */}
+      <nav className="hidden lg:flex items-center gap-6 mx-6">
+        {routes.map((route) => (
+          <NavLink
+            key={route.path}
+            to={route.path}
+            className={({ isActive }) =>
+              cn(
+                "text-sm font-medium transition-colors hover:text-primary",
+                isActive ? "text-primary" : "text-muted-foreground"
+              )
+            }
+          >
+            {route.label}
+          </NavLink>
+        ))}
+      </nav>
+    </div>
+  )
+}

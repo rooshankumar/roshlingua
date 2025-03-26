@@ -1,4 +1,3 @@
-
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "@/providers/AuthProvider";
 import { Toaster } from "@/components/ui/toaster";
@@ -15,6 +14,7 @@ import NotFound from "./pages/NotFound";
 import Onboarding from "./pages/Onboarding";
 import Community from "./pages/Community";
 import Chat from "./pages/Chat";
+import Settings from "./pages/Settings"; // Added
 
 // Components
 import ProtectedRoute from "./components/auth/ProtectedRoute";
@@ -56,7 +56,7 @@ const AppRoutes = () => {
           <Onboarding onComplete={() => console.log("Onboarding completed")} />
         </ProtectedRoute>
       } />
-      
+
       <Route path="/dashboard" element={
         <ProtectedRoute>
           <AppLayout>
@@ -72,7 +72,6 @@ const AppRoutes = () => {
           </AppLayout>
         </ProtectedRoute>
       } />
-
       <Route path="/community" element={
         <ProtectedRoute>
           <AppLayout>
@@ -80,14 +79,21 @@ const AppRoutes = () => {
           </AppLayout>
         </ProtectedRoute>
       } />
-
-      <Route path="/chat/:id" element={
+      <Route path="/chat" element={
         <ProtectedRoute>
           <AppLayout>
             <Chat />
           </AppLayout>
         </ProtectedRoute>
       } />
+      <Route path="/settings" element={
+        <ProtectedRoute>
+          <AppLayout>
+            <Settings />
+          </AppLayout>
+        </ProtectedRoute>
+      } />
+
 
       {/* Catch all for 404 */}
       <Route path="*" element={<NotFound />} />
