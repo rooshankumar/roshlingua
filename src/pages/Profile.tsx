@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { 
@@ -25,6 +24,7 @@ import {
 } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/components/ui/use-toast";
+import { supabase } from "@/utils/supabaseClient";
 
 interface UserProfile {
   id: number;
@@ -60,68 +60,85 @@ const Profile = () => {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
-  
+
   useEffect(() => {
-    // Simulate fetching user profile data
-    setTimeout(() => {
-      const mockProfile: UserProfile = {
-        id: parseInt(id || "1"),
-        name: "Sarah Johnson",
-        age: 28,
-        location: "San Francisco, CA",
-        bio: "Software engineer passionate about learning Spanish for my upcoming trip to Mexico. I've been studying for about 6 months now and I'm looking for conversation partners to practice with. I can help with English in return!",
-        nativeLanguage: "English",
-        learningLanguage: "Spanish",
-        proficiencyLevel: "Intermediate (B1)",
-        streak: 15,
-        joinDate: "2023-08-15",
-        interests: ["Travel", "Technology", "Cinema", "Cooking", "Hiking"],
-        avatar: "/placeholder.svg",
-        likes: 42,
-        liked: false,
-        learning: {
-          vocabulary: 75,
-          grammar: 60,
-          speaking: 45,
-          listening: 70
-        },
-        achievements: [
-          {
-            title: "Week One Warrior",
-            description: "Completed 7 consecutive days of language learning",
-            date: "2023-08-22",
-            icon: "🔥"
+    const fetchProfile = async () => {
+      if (!id) return;
+
+      setLoading(true);
+      try {
+        const { data, error } = await supabase
+          .from('profiles')
+          .select(`
+            *,
+            achievements (
+              title,
+              description,
+              date,
+              icon
+            )
+          `)
+          .eq('id', id)
+          .single();
+
+        if (error) throw error;
+
+        // Set profile with real data and fallbacks for missing values
+        setProfile({
+          id: data?.id || parseInt(id),
+          name: data?.name || "New Language Learner",
+          age: data?.age || 25,
+          location: data?.location || "Earth",
+          bio: data?.bio || "Excited to start my language learning journey!",
+          nativeLanguage: data?.native_language || "English",
+          learningLanguage: data?.learning_language || "Spanish",
+          proficiencyLevel: data?.proficiency_level || "Beginner (A1)",
+          streak: data?.streak || 0,
+          joinDate: data?.join_date || new Date().toISOString().split('T')[0],
+          interests: data?.interests || ["Language Learning", "Travel", "Culture"],
+          avatar: data?.avatar_url || "/placeholder.svg",
+          likes: data?.likes_count || 0,
+          liked: data?.is_liked || false,
+          learning: {
+            vocabulary: data?.learning_progress?.vocabulary || 10,
+            grammar: data?.learning_progress?.grammar || 10,
+            speaking: data?.learning_progress?.speaking || 10,
+            listening: data?.learning_progress?.listening || 10
           },
-          {
-            title: "Conversation Starter",
-            description: "Initiated first language exchange conversation",
-            date: "2023-08-25",
-            icon: "💬"
-          },
-          {
-            title: "Grammar Guru",
-            description: "Mastered basic verb conjugations",
-            date: "2023-09-10",
-            icon: "📚"
-          }
-        ]
-      };
-      
-      setProfile(mockProfile);
-      setLoading(false);
-    }, 1000);
-  }, [id]);
-  
+          achievements: data?.achievements || [
+            {
+              title: "Getting Started",
+              description: "Started your language learning journey",
+              date: new Date().toISOString().split('T')[0],
+              icon: "🌟"
+            }
+          ]
+        });
+      } catch (err) {
+        console.error("Error fetching profile:", err);
+        toast({
+          title: "Error",
+          description: "Failed to load profile data",
+          variant: "destructive"
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProfile();
+  }, [id, toast]);
+
   const handleLike = () => {
     if (!profile) return;
-    
+
     const newLiked = !profile.liked;
     setProfile({
       ...profile,
       liked: newLiked,
       likes: newLiked ? profile.likes + 1 : profile.likes - 1
     });
-    
+
     toast({
       title: newLiked ? "Profile liked" : "Like removed",
       description: newLiked 
@@ -129,14 +146,14 @@ const Profile = () => {
         : `You've removed your like from ${profile.name}'s profile`,
     });
   };
-  
+
   const calculateJoinedTime = (dateString: string) => {
     const joinDate = new Date(dateString);
     const now = new Date();
-    
+
     const diffTime = Math.abs(now.getTime() - joinDate.getTime());
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    
+
     if (diffDays < 30) {
       return `${diffDays} days ago`;
     } else {
@@ -144,17 +161,17 @@ const Profile = () => {
       return diffMonths === 1 ? "1 month ago" : `${diffMonths} months ago`;
     }
   };
-  
+
   const handleShare = () => {
     // In a real app, this would share the profile
     navigator.clipboard.writeText(window.location.href);
-    
+
     toast({
       title: "Link copied to clipboard",
       description: "You can now share this profile with others",
     });
   };
-  
+
   if (loading) {
     return (
       <div className="container flex items-center justify-center min-h-[50vh]">
@@ -165,7 +182,7 @@ const Profile = () => {
       </div>
     );
   }
-  
+
   if (!profile) {
     return (
       <div className="container py-12 text-center">
@@ -179,7 +196,7 @@ const Profile = () => {
       </div>
     );
   }
-  
+
   return (
     <div className="container pb-12 animate-fade-in">
       {/* Profile Header */}
@@ -208,15 +225,15 @@ const Profile = () => {
               </div>
             </DialogContent>
           </Dialog>
-          
+
           <div>
             <h1 className="text-3xl font-bold">{profile.name}</h1>
             <div className="flex items-center space-x-2 mt-1">
               <User className="h-4 w-4 text-muted-foreground" />
               <span className="text-muted-foreground">{profile.age} years old</span>
-              
+
               <span className="text-muted-foreground">•</span>
-              
+
               <MapPin className="h-4 w-4 text-muted-foreground" />
               <span className="text-muted-foreground">{profile.location}</span>
             </div>
@@ -228,7 +245,7 @@ const Profile = () => {
             </div>
           </div>
         </div>
-        
+
         <div className="flex space-x-2">
           <Button 
             variant={profile.liked ? "default" : "outline"} 
@@ -239,12 +256,12 @@ const Profile = () => {
             <Heart className={`h-4 w-4 mr-2 ${profile.liked ? "fill-white" : ""}`} />
             {profile.likes}
           </Button>
-          
+
           <Button variant="outline" size="sm" className="button-hover" onClick={handleShare}>
             <Share2 className="h-4 w-4 mr-2" />
             Share
           </Button>
-          
+
           <Button asChild size="sm" className="button-hover">
             <Link to={`/chat/${profile.id}`}>
               <MessageCircle className="h-4 w-4 mr-2" />
@@ -253,7 +270,7 @@ const Profile = () => {
           </Button>
         </div>
       </div>
-      
+
       {/* Language Info */}
       <Card className="mb-8 glass-card">
         <CardContent className="p-6">
@@ -274,7 +291,7 @@ const Profile = () => {
                 </div>
               </div>
             </div>
-            
+
             <div className="flex items-center space-x-4">
               <div className="flex flex-col items-center">
                 <div className="flex items-center space-x-1">
@@ -283,9 +300,9 @@ const Profile = () => {
                 </div>
                 <span className="text-xs text-muted-foreground">day streak</span>
               </div>
-              
+
               <div className="h-12 w-px bg-border"></div>
-              
+
               <div>
                 <h4 className="text-sm font-medium mb-1">Study Progress</h4>
                 <div className="grid grid-cols-4 gap-2">
@@ -307,7 +324,7 @@ const Profile = () => {
                     </div>
                     <span className="text-xs text-muted-foreground mt-1">Vocab</span>
                   </div>
-                  
+
                   <div className="flex flex-col items-center">
                     <div className="relative w-10 h-10">
                       <svg className="w-10 h-10" viewBox="0 0 36 36">
@@ -326,7 +343,7 @@ const Profile = () => {
                     </div>
                     <span className="text-xs text-muted-foreground mt-1">Grammar</span>
                   </div>
-                  
+
                   <div className="flex flex-col items-center">
                     <div className="relative w-10 h-10">
                       <svg className="w-10 h-10" viewBox="0 0 36 36">
@@ -345,7 +362,7 @@ const Profile = () => {
                     </div>
                     <span className="text-xs text-muted-foreground mt-1">Speaking</span>
                   </div>
-                  
+
                   <div className="flex flex-col items-center">
                     <div className="relative w-10 h-10">
                       <svg className="w-10 h-10" viewBox="0 0 36 36">
@@ -370,7 +387,7 @@ const Profile = () => {
           </div>
         </CardContent>
       </Card>
-      
+
       {/* Profile Tabs */}
       <Tabs defaultValue="about" className="mb-8">
         <TabsList className="grid grid-cols-3 mb-6">
@@ -378,7 +395,7 @@ const Profile = () => {
           <TabsTrigger value="achievements">Achievements</TabsTrigger>
           <TabsTrigger value="interests">Interests</TabsTrigger>
         </TabsList>
-        
+
         <TabsContent value="about" className="mt-0">
           <Card>
             <CardHeader>
@@ -389,7 +406,7 @@ const Profile = () => {
             </CardContent>
           </Card>
         </TabsContent>
-        
+
         <TabsContent value="achievements" className="mt-0">
           <Card>
             <CardHeader>
@@ -415,7 +432,7 @@ const Profile = () => {
             </CardContent>
           </Card>
         </TabsContent>
-        
+
         <TabsContent value="interests" className="mt-0">
           <Card>
             <CardHeader>
@@ -433,7 +450,7 @@ const Profile = () => {
           </Card>
         </TabsContent>
       </Tabs>
-      
+
       {/* Action buttons */}
       <div className="flex justify-center space-x-4">
         <Button asChild variant="outline" className="button-hover">
