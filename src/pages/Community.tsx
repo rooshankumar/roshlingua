@@ -56,8 +56,48 @@ const Community = () => {
   const [onlineOnly, setOnlineOnly] = useState(false);
   
   useEffect(() => {
-    // Mock data for community users
-    const mockUsers: User[] = [
+    const fetchUsers = async () => {
+      const { data: users, error } = await supabase
+        .from('users')
+        .select(`
+          id,
+          full_name,
+          native_language,
+          learning_language,
+          proficiency_level,
+          streak_count,
+          profiles (
+            bio,
+            is_online,
+            likes_count,
+            username
+          )
+        `);
+
+      if (error) {
+        console.error('Error fetching users:', error);
+        return;
+      }
+
+      const formattedUsers: User[] = users.map(user => ({
+        id: user.id,
+        name: user.full_name,
+        nativeLanguage: user.native_language,
+        learningLanguage: user.learning_language,
+        proficiencyLevel: user.proficiency_level,
+        streak: user.streak_count,
+        bio: user.profiles.bio,
+        online: user.profiles.is_online,
+        avatar: "/placeholder.svg", // You'll need to handle avatar storage separately
+        likes: user.profiles.likes_count,
+        liked: false // You'll need to implement a likes system
+      }));
+
+      setUsers(formattedUsers);
+      setFilteredUsers(formattedUsers);
+    };
+
+    fetchUsers();
       {
         id: 1,
         name: "Sarah Johnson",
