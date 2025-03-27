@@ -48,14 +48,16 @@ const Community = () => {
         return;
       }
 
-      // Add default values for missing user info
+      // Use data directly from users table with defaults
       const usersWithDefaults = (data || []).map(user => ({
         ...user,
+        username: user.username || user.full_name,
         full_name: user.full_name || 'Anonymous User',
         avatar_url: user.avatar_url || '/placeholder.svg',
         bio: user.bio || 'No bio available',
-        native_language: user.native_language || 'Not specified',
-        learning_language: user.learning_language || 'Not specified',
+        native_language: user.native_language || 'English',
+        learning_language: user.learning_language || 'Spanish',
+        proficiency_level: user.proficiency_level || 'beginner',
         is_online: user.is_online || false
       }));
 
