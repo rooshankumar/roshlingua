@@ -285,8 +285,8 @@ const Settings = () => {
                           <SelectValue placeholder="Select gender" />
                         </SelectTrigger>
                         <SelectContent>
-                          {genders.map((gender) => (
-                            <SelectItem key={gender} value={gender.toLowerCase()}>
+                          {genderOptions.map((gender) => (
+                            <SelectItem key={gender} value={gender}>
                               {gender}
                             </SelectItem>
                           ))}
@@ -592,9 +592,9 @@ const Settings = () => {
                       <SelectValue placeholder="Select gender" />
                     </SelectTrigger>
                     <SelectContent>
-                      {["Male", "Female", "Rather not say"].map((option) => (
-                        <SelectItem key={option} value={option} >
-                          {option}
+                      {genderOptions.map((gender) => (
+                        <SelectItem key={gender} value={gender} >
+                          {gender}
                         </SelectItem>
                       ))}
                     </SelectContent>
