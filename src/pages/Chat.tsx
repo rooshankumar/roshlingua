@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom'; // Added import for useNavigate
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/providers/AuthProvider';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -11,7 +12,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { MoreVertical, Ban, Flag, Send } from 'lucide-react';
+import { MoreVertical, Ban, Flag, Send, ArrowLeft } from 'lucide-react'; // Added ArrowLeft import
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 
@@ -19,6 +20,7 @@ export default function Chat() {
   const { id: conversationId } = useParams();
   const { user } = useAuth();
   const { toast } = useToast();
+  const navigate = useNavigate(); // Added useNavigate hook
   const [message, setMessage] = useState('');
   const [messages, setMessages] = useState([]);
   const [otherUser, setOtherUser] = useState(null);
@@ -124,6 +126,14 @@ export default function Chat() {
       {/* Chat Header */}
       <div className="flex items-center justify-between p-4 border-b">
         <div className="flex items-center gap-3">
+          <Button 
+            variant="ghost" 
+            size="icon"
+            onClick={() => navigate(-1)} // Changed navigation to go back one page
+            className="mr-2"
+          >
+            <ArrowLeft className="h-4 w-4" />
+          </Button>
           <Avatar>
             <AvatarImage src={otherUser?.avatar_url} />
             <AvatarFallback>
