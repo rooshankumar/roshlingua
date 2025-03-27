@@ -174,6 +174,8 @@ const Settings = () => {
     }
   };
 
+  const genderOptions = ["Male", "Female", "Rather not say"];
+
   return (
     <div className="container pb-12 animate-fade-in">
       <div className="space-y-2 mb-8">
@@ -571,34 +573,51 @@ const Settings = () => {
             </CardHeader>
             <CardContent className="space-y-8">
               <div className="space-y-4">
-                <h3 className="text-lg font-medium">Security</h3>
-
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h4 className="font-medium">Password</h4>
-                      <p className="text-sm text-muted-foreground">
-                        Change your account password
-                      </p>
-                    </div>
-                    <Button variant="outline" onClick={handleChangePassword}>
-                      <Lock className="h-4 w-4 mr-2" />
-                      Change
-                    </Button>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h4 className="font-medium">Gender</h4>
+                    <p className="text-sm text-muted-foreground">Select your gender</p>
                   </div>
+                  <Select value={profile?.gender || ""} onValueChange={(value) => handleProfileChange("gender", value)}>
+                    <SelectTrigger className="w-[180px]">
+                      <SelectValue placeholder="Select gender" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {genderOptions.map((option) => (
+                        <SelectItem key={option} value={option.toLowerCase()}>
+                          {option}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
 
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h4 className="font-medium">Email</h4>
-                      <p className="text-sm text-muted-foreground">
-                        {profile?.email || ""}
-                      </p>
-                    </div>
-                    <Button variant="outline">
-                      <Mail className="h-4 w-4 mr-2" />
-                      Update
-                    </Button>
+                <Separator />
+
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h4 className="font-medium">Password</h4>
+                    <p className="text-sm text-muted-foreground">
+                      Change your account password
+                    </p>
                   </div>
+                  <Button variant="outline" onClick={handleChangePassword}>
+                    <Lock className="h-4 w-4 mr-2" />
+                    Change
+                  </Button>
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h4 className="font-medium">Email</h4>
+                    <p className="text-sm text-muted-foreground">
+                      {profile?.email || ""}
+                    </p>
+                  </div>
+                  <Button variant="outline">
+                    <Mail className="h-4 w-4 mr-2" />
+                    Update
+                  </Button>
                 </div>
               </div>
 

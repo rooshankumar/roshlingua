@@ -12,6 +12,7 @@ CREATE TABLE public.profiles (
   full_name TEXT,
   avatar_url TEXT,
   bio TEXT,
+  gender TEXT CHECK (gender IN ('Male', 'Female', 'Rather not say')),
   is_online BOOLEAN DEFAULT false,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
