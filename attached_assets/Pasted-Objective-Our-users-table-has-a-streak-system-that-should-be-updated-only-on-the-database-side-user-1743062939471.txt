@@ -1,0 +1,94 @@
+Objective:
+Our users table has a streak system that should be updated only on the database side—users should not be able to modify their streak manually. The streak logic should follow these rules:
+
+Default Streak: Every new user should have a streak count of 1.
+
+Streak Increases: If the user logged in yesterday, their streak_count should increase by 1.
+
+Streak Resets: If the user misses a day, their streak resets to 1.
+
+Database-Managed Updates: Users should not be able to update streak_count or streak_last_date manually. These should update only when last_login changes.
+
+Necessary Database Changes (if not already implemented):
+Ensure the streak update trigger exists and is correctly defined.
+
+Prevent users from directly modifying streak_count and streak_last_date.
+
+Automatically set the default streak to 1 when a new user is created.
+
+SQL Changes Required:
+Ensure streak update function exists
+
+sql
+Copy
+Edit
+CREATE OR REPLACE FUNCTION update_streak()
+RETURNS TRIGGER AS $$
+BEGIN
+  -- Set default streak to 1 for new users
+  IF OLD.streak_count IS NULL THEN
+    NEW.streak_count = 1;
+  -- If last login was yesterday, increase streak
+  ELSIF OLD.last_login::date = CURRENT_DATE - INTERVAL '1 day' THEN
+    NEW.streak_count = OLD.streak_count + 1;
+  ELSE
+    -- Otherwise, reset streak
+    NEW.streak_count = 1;
+  END IF;
+
+  -- Update streak last date
+  NEW.streak_last_date = CURRENT_DATE;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+Ensure the trigger exists and is linked to users table
+
+sql
+Copy
+Edit
+CREATE TRIGGER streak_update_trigger
+BEFORE UPDATE ON users
+FOR EACH ROW
+WHEN (NEW.last_login IS DISTINCT FROM OLD.last_login)
+EXECUTE FUNCTION update_streak();
+Restrict direct user modification
+
+sql
+Copy
+Edit
+ALTER TABLE users
+ALTER COLUMN streak_count SET DEFAULT 1,
+ALTER COLUMN streak_count SET NOT NULL;
+
+REVOKE UPDATE (streak_count, streak_last_date) ON users FROM public;
+Codebase Changes (if needed)
+Ensure that whenever a user logs in, last_login is updated in the database.
+
+Do not allow the frontend or API to update streak_count directly.
+
+API should only trigger a login event by updating last_login.
+
+Example API Call for Login Update:
+
+javascript
+Copy
+Edit
+const { data, error } = await supabase
+  .from('users')
+  .update({ last_login: new Date().toISOString() })
+  .eq('id', userId);
+Expected Outcome
+Users cannot manually change their streak.
+
+Streak updates automatically when last_login changes.
+
+Default streak is 1 for new users.
+
+Backend handles everything—no manual updates needed from the client-side.
+
+Action for Replit AI
+Check if the SQL changes exist; if not, apply them.
+
+Verify that API and frontend do not allow direct streak modification.
+
+Ensure last_login updates when a user logs in.
