@@ -1,186 +1,195 @@
-import { useState, useEffect, useRef } from 'react';
-import { useParams, Link } from 'react-router-dom';
+
+import { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/providers/AuthProvider';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { ArrowLeft, User } from "lucide-react";
+import { Button } from '@/components/ui/button';
+import { UserStatus } from '@/components/UserStatus';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { MoreVertical, Ban, Flag, Send } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { useToast } from '@/hooks/use-toast';
 
 export default function Chat() {
-  const { conversationId } = useParams();
+  const { id: conversationId } = useParams();
   const { user } = useAuth();
+  const { toast } = useToast();
+  const [message, setMessage] = useState('');
   const [messages, setMessages] = useState([]);
-  const [newMessage, setNewMessage] = useState('');
-  const [loading, setLoading] = useState(true);
   const [otherUser, setOtherUser] = useState(null);
-  const messagesEndRef = useRef(null);
-
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
 
   useEffect(() => {
-    if (!conversationId || !user) return;
+    const fetchConversationDetails = async () => {
+      try {
+        const { data: participants } = await supabase
+          .from('conversation_participants')
+          .select(`
+            conversations (id),
+            profiles:user_id (
+              id,
+              username,
+              avatar_url,
+              is_online,
+              last_seen
+            )
+          `)
+          .eq('conversation_id', conversationId);
 
-    const fetchMessages = async () => {
-      const { data: messages, error } = await supabase
-        .from('messages')
-        .select(`
-          *,
-          sender:sender_id (
-            id,
-            username,
-            avatar_url,
-            native_language,
-            learning_language,
-            streak_count
-          )
-        `)
-        .eq('conversation_id', conversationId)
-        .order('created_at', { ascending: true });
+        const otherParticipant = participants?.find(
+          p => p.profiles.id !== user?.id
+        );
+        setOtherUser(otherParticipant?.profiles);
 
-      if (error) {
-        console.error('Error fetching messages:', error);
-        return;
+        // Fetch messages
+        const { data: messages } = await supabase
+          .from('messages')
+          .select('*')
+          .eq('conversation_id', conversationId)
+          .order('created_at', { ascending: true });
+
+        setMessages(messages || []);
+      } catch (error) {
+        console.error('Error fetching conversation:', error);
       }
-
-      // Get other participant's info
-      const { data: participants } = await supabase
-        .from('conversation_participants')
-        .select(`
-          profiles:user_id (
-            id,
-            username,
-            avatar_url,
-            native_language,
-            learning_language,
-            streak_count
-          )
-        `)
-        .eq('conversation_id', conversationId);
-
-      const otherParticipant = participants?.find(p => p.profiles.id !== user.id);
-      setOtherUser(otherParticipant?.profiles);
-      setMessages(messages || []);
-      setLoading(false);
-      scrollToBottom();
     };
 
-    fetchMessages();
+    fetchConversationDetails();
 
     // Subscribe to new messages
-    const subscription = supabase
-      .channel(`chat:${conversationId}`)
+    const channel = supabase
+      .channel(`conversation:${conversationId}`)
       .on('postgres_changes', {
         event: 'INSERT',
         schema: 'public',
         table: 'messages',
         filter: `conversation_id=eq.${conversationId}`
       }, payload => {
-        setMessages(current => [...current, payload.new]);
-        scrollToBottom();
+        setMessages(prev => [...prev, payload.new]);
       })
       .subscribe();
 
     return () => {
-      subscription.unsubscribe();
+      channel.unsubscribe();
     };
-  }, [conversationId, user]);
+  }, [conversationId, user?.id]);
 
-  const sendMessage = async (e) => {
+  const handleSendMessage = async (e) => {
     e.preventDefault();
-    if (!newMessage.trim()) return;
+    if (!message.trim()) return;
 
-    const message = {
-      conversation_id: conversationId,
-      sender_id: user.id,
-      content: newMessage.trim()
-    };
+    try {
+      const { error } = await supabase
+        .from('messages')
+        .insert({
+          conversation_id: conversationId,
+          sender_id: user?.id,
+          content: message,
+        });
 
-    const { error } = await supabase
-      .from('messages')
-      .insert(message);
-
-    if (error) {
+      if (error) throw error;
+      setMessage('');
+    } catch (error) {
       console.error('Error sending message:', error);
-      return;
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to send message",
+      });
     }
+  };
 
-    setNewMessage('');
+  const handleBlockUser = async () => {
+    // Implement block user functionality
+    toast({
+      title: "User Blocked",
+      description: "You have blocked this user",
+    });
+  };
+
+  const handleReportUser = async () => {
+    // Implement report user functionality
+    toast({
+      title: "User Reported",
+      description: "Thank you for your report",
+    });
   };
 
   return (
-    <div className="flex flex-col h-screen max-h-screen overflow-hidden">
+    <div className="container max-w-4xl mx-auto p-4 h-[calc(100vh-4rem)] flex flex-col">
       {/* Chat Header */}
-      <div className="flex items-center gap-4 p-4 border-b">
-        <Link to="/chat" className="text-muted-foreground hover:text-foreground flex items-center gap-2">
-          <ArrowLeft className="h-5 w-5" />
-          <span>All Chats</span>
-        </Link>
-        {otherUser && (
-          <div className="flex items-center gap-3">
-            <Avatar>
-              <AvatarImage src={otherUser.avatar_url} />
-              <AvatarFallback><User /></AvatarFallback>
-            </Avatar>
-            <div className="flex gap-2 items-center">
-              <div>
-                <h3 className="font-medium">{otherUser.username}</h3>
-                <p className="text-sm text-muted-foreground">
-                  Native: {otherUser.native_language} • Learning: {otherUser.learning_language}
-                  {otherUser.streak_count > 0 && ` • ${otherUser.streak_count} day streak`}
-                </p>
-              </div>
-              <Button variant="outline" size="sm" asChild>
-                <Link to={`/profile/${otherUser.id}`}>View Profile</Link>
-              </Button>
-            </div>
+      <div className="flex items-center justify-between p-4 border-b">
+        <div className="flex items-center gap-3">
+          <Avatar>
+            <AvatarImage src={otherUser?.avatar_url} />
+            <AvatarFallback>
+              {otherUser?.username?.[0]?.toUpperCase() || '?'}
+            </AvatarFallback>
+          </Avatar>
+          <div>
+            <h2 className="font-semibold">{otherUser?.username}</h2>
+            <UserStatus
+              isOnline={otherUser?.is_online}
+              lastSeen={otherUser?.last_seen}
+            />
           </div>
-        )}
-      </div>div>
+        </div>
+        
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" size="icon">
+              <MoreVertical className="h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem onClick={handleBlockUser}>
+              <Ban className="h-4 w-4 mr-2" />
+              Block User
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={handleReportUser}>
+              <Flag className="h-4 w-4 mr-2" />
+              Report User
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
 
-      {/* Messages */}
+      {/* Messages Container */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
-        {messages.map((message) => (
+        {messages.map((msg) => (
           <div
-            key={message.id}
-            className={`flex ${message.sender_id === user.id ? 'justify-end' : 'justify-start'}`}
+            key={msg.id}
+            className={`flex ${msg.sender_id === user?.id ? 'justify-end' : 'justify-start'}`}
           >
             <div
-              className={`max-w-[70%] break-words rounded-lg p-3 ${
-                message.sender_id === user.id
-                  ? 'bg-blue-500 text-white'
-                  : 'bg-gray-100 dark:bg-gray-800'
+              className={`max-w-[70%] rounded-lg p-3 ${
+                msg.sender_id === user?.id
+                  ? 'bg-primary text-primary-foreground'
+                  : 'bg-muted'
               }`}
             >
-              {message.content}
-              <div className="text-xs mt-1 opacity-70">
-                {new Date(message.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-              </div>
+              {msg.content}
             </div>
           </div>
         ))}
-        <div ref={messagesEndRef} />
       </div>
 
       {/* Message Input */}
-      <form onSubmit={sendMessage} className="px-4 py-3 border-t bg-white dark:bg-gray-900">
-        <div className="flex gap-2">
-          <Input
-            value={newMessage}
-            onChange={(e) => setNewMessage(e.target.value)}
-            placeholder="Type a message..."
-            className="flex-1 bg-gray-100 dark:bg-gray-800 border-0"
-          />
-          <Button 
-            type="submit" 
-            disabled={!newMessage.trim()}
-            className="bg-blue-500 hover:bg-blue-600 text-white"
-          >
-            Send
-          </Button>
-        </div>
+      <form onSubmit={handleSendMessage} className="p-4 border-t flex gap-2">
+        <Input
+          value={message}
+          onChange={(e) => setMessage(e.target.value)}
+          placeholder="Type a message..."
+          className="flex-1"
+        />
+        <Button type="submit">
+          <Send className="h-4 w-4" />
+        </Button>
       </form>
     </div>
   );

@@ -1,18 +1,28 @@
 
-import { Badge } from "@/components/ui/badge";
+import { formatDistanceToNow } from 'date-fns';
 
 interface UserStatusProps {
-  isOnline: boolean;
-  lastSeen?: string;
+  isOnline?: boolean;
+  lastSeen?: string | null;
 }
 
 export function UserStatus({ isOnline, lastSeen }: UserStatusProps) {
-  return (
-    <div className="flex items-center gap-2">
-      <Badge variant={isOnline ? "success" : "secondary"} className="h-2 w-2 rounded-full" />
-      <span className="text-sm text-muted-foreground">
-        {isOnline ? "Online" : lastSeen ? `Last seen ${new Date(lastSeen).toLocaleDateString()}` : "Offline"}
-      </span>
-    </div>
-  );
+  if (isOnline) {
+    return (
+      <div className="flex items-center text-sm">
+        <div className="w-2 h-2 rounded-full bg-green-500 mr-2" />
+        <span className="text-green-600">Online</span>
+      </div>
+    );
+  }
+
+  if (lastSeen) {
+    return (
+      <div className="text-sm text-muted-foreground">
+        Last seen {formatDistanceToNow(new Date(lastSeen))} ago
+      </div>
+    );
+  }
+
+  return null;
 }
