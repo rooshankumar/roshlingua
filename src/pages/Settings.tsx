@@ -42,7 +42,7 @@ const Settings = () => {
     if (!profile?.id) return;
     try {
       const { data, error } = await supabase
-        .from('profiles')
+        .from('users')
         .update({ [field]: value })
         .eq('id', profile.id);
       
