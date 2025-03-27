@@ -583,7 +583,7 @@ const Settings = () => {
                       <SelectValue placeholder="Select gender" />
                     </SelectTrigger>
                     <SelectContent>
-                      {genderOptions.map((option) => (
+                      {["Male", "Female", "Rather not say"].map((option) => (
                         <SelectItem key={option} value={option}>
                           {option}
                         </SelectItem>
