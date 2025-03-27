@@ -14,9 +14,11 @@ import {
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { Heart, MessageCircle, Search } from 'lucide-react';
+import { Heart, MessageCircle, Search, Filter, Flame } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import { Badge } from "@/components/ui/badge";
+
 
 interface User {
   id: string;
@@ -29,6 +31,7 @@ interface User {
   bio: string;
   is_online: boolean;
   likes_count: number;
+  username: string;
 }
 
 const Community = () => {
@@ -37,6 +40,8 @@ const Community = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [languageFilter, setLanguageFilter] = useState("");
   const [onlineOnly, setOnlineOnly] = useState(false);
+  const [showMoreFilters, setShowMoreFilters] = useState(false); // Added state for more filters
+
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -60,7 +65,9 @@ const Community = () => {
           native_language: user.native_language || 'English',
           learning_language: user.learning_language || 'Spanish',
           proficiency_level: user.proficiency_level || 'beginner',
-          is_online: user.is_online || false
+          is_online: user.is_online || false,
+          streak_count: user.streak_count || 0, //Added streak_count default
+          likes_count: user.likes_count || 0 //Added likes_count default
         }));
 
         setUsers(usersWithDefaults);
@@ -160,18 +167,19 @@ const Community = () => {
         </p>
       </div>
 
-      <Card>
-        <CardContent className="p-6">
-          <div className="flex flex-col md:flex-row gap-4">
-            <div className="flex-1">
-              <Input
-                placeholder="Search by name, language, or interests..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full"
-              />
-            </div>
+      <div className="bg-card rounded-lg p-4 mb-6">
+        <div className="flex flex-col md:flex-row gap-4 items-center">
+          <div className="flex-1 relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Search by name, language, or interests..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-9"
+            />
+          </div>
 
+          <div className="flex items-center gap-2">
             <Select value={languageFilter} onValueChange={setLanguageFilter}>
               <SelectTrigger className="w-[180px]">
                 <SelectValue placeholder="Filter by language" />
@@ -189,6 +197,14 @@ const Community = () => {
               </SelectContent>
             </Select>
 
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={() => setShowMoreFilters(!showMoreFilters)}
+            >
+              <Filter className="h-4 w-4" />
+            </Button>
+
             <div className="flex items-center space-x-2">
               <Switch
                 id="online-mode"
@@ -198,58 +214,69 @@ const Community = () => {
               <Label htmlFor="online-mode">Online only</Label>
             </div>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
       {filteredUsers.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {filteredUsers.map((user) => (
-            <Card key={user.id}>
-              <CardContent className="p-6">
-                <div className="flex items-center space-x-4 mb-4">
-                  <Avatar className="h-12 w-12">
-                    <AvatarImage src={user.avatar_url} />
-                    <AvatarFallback>
-                      {user.full_name?.charAt(0) || '?'}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div>
-                    <h3 className="font-medium">{user.full_name}</h3>
-                    <p className="text-sm text-muted-foreground">
-                      {user.native_language} → {user.learning_language}
-                    </p>
+            <div key={user.id} className="relative">
+              <div className="absolute top-0 left-0 right-0 h-1 bg-primary rounded-t-lg" />
+              <Card>
+                <CardContent className="p-6">
+                  <div className="flex items-center space-x-4 mb-4">
+                    <Avatar className="h-12 w-12">
+                      <AvatarImage src={user.avatar_url} />
+                      <AvatarFallback>{user.username?.charAt(0)}</AvatarFallback>
+                    </Avatar>
+                    <div className="flex-1">
+                      <div className="flex items-center justify-between">
+                        <h3 className="font-medium">{user.username || user.full_name}</h3>
+                        {user.is_online && (
+                          <Badge variant="success" className="ml-2">Online</Badge>
+                        )}
+                      </div>
+                      <p className="text-sm text-muted-foreground flex items-center gap-2">
+                        {user.native_language} → {user.learning_language}
+                        <span className="text-xs px-2 py-0.5 rounded bg-muted">
+                          {user.proficiency_level || 'Beginner'}
+                        </span>
+                      </p>
+                    </div>
                   </div>
-                  {user.is_online && (
-                    <div className="ml-auto">
-                      <span className="inline-block w-2 h-2 bg-green-500 rounded-full" />
+
+                  {user.streak_count > 0 && (
+                    <div className="flex items-center gap-2 mb-2 text-xs text-muted-foreground">
+                      <Flame className="h-4 w-4 text-orange-500" />
+                      <span>{user.streak_count} day streak</span>
                     </div>
                   )}
-                </div>
 
-                <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
-                  {user.bio}
-                </p>
+                  <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
+                    {user.bio || 'No bio available.'}
+                  </p>
 
-                <div className="flex justify-between mt-4 pt-3 border-t border-border">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="flex items-center space-x-1"
-                    onClick={() => handleLike(user.id)}
-                  >
-                    <Heart className="h-4 w-4" />
-                    <span>{user.likes_count || 0}</span>
-                  </Button>
+                  <div className="flex justify-between mt-4 pt-3 border-t border-border">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="flex items-center space-x-1"
+                      onClick={() => handleLike(user.id)}
+                    >
+                      <Heart className="h-4 w-4" />
+                      <span>{user.likes_count || 0}</span>
+                    </Button>
 
-                  <Button asChild variant="outline" size="sm">
-                    <Link to={`/chat/${user.id}`}>
-                      <MessageCircle className="h-4 w-4 mr-2" />
-                      Start Chat
-                    </Link>
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
+                    <Button asChild variant="outline" size="sm">
+                      <Link to={`/chat/${user.id}`}>
+                        <MessageCircle className="h-4 w-4 mr-2" />
+                        Start Chat
+                      </Link>
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
           ))}
         </div>
       ) : (
