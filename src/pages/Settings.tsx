@@ -576,9 +576,14 @@ const Settings = () => {
                     </p>
                   </div>
                 </div>
+                
+                <div className="flex items-center justify-between">
                   <div>
                     <h4 className="font-medium">Password</h4>
                     <p className="text-sm text-muted-foreground">
+                      Change your account password
+                    </p>
+                  </div>
                       Change your account password
                     </p>
                   </div>
