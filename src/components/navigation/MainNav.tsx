@@ -14,7 +14,7 @@ const routes = [
     icon: Users
   },
   {
-    path: "/chat",
+    path: "/Chat",
     label: "Chat",
     icon: MessageSquare
   },
