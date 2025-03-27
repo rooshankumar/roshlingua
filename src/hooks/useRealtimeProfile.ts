@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import { type Profile } from '@/lib/database.types';
@@ -47,8 +46,11 @@ export const useRealtimeProfile = (userId: string | undefined) => {
 
   const updateProfile = async (updates: Partial<Profile>) => {
     const { error } = await supabase
-      .from('profiles')
-      .update(updates)
+      .from('users')
+      .update({
+        native_language: updates.nativeLanguage,
+        learning_language: updates.learningLanguage
+      })
       .eq('id', userId);
 
     if (error) {
