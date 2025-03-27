@@ -1,0 +1,110 @@
+[
+  {
+    "schema_name": "public",
+    "table_name": "conversation_participants",
+    "index_name": "conversation_participants_pkey",
+    "index_definition": "CREATE UNIQUE INDEX conversation_participants_pkey ON public.conversation_participants USING btree (conversation_id, user_id)"
+  },
+  {
+    "schema_name": "public",
+    "table_name": "conversation_participants",
+    "index_name": "idx_conversation_participants_user_id",
+    "index_definition": "CREATE INDEX idx_conversation_participants_user_id ON public.conversation_participants USING btree (user_id)"
+  },
+  {
+    "schema_name": "public",
+    "table_name": "conversations",
+    "index_name": "conversations_pkey",
+    "index_definition": "CREATE UNIQUE INDEX conversations_pkey ON public.conversations USING btree (id)"
+  },
+  {
+    "schema_name": "public",
+    "table_name": "message_reactions",
+    "index_name": "message_reactions_pkey",
+    "index_definition": "CREATE UNIQUE INDEX message_reactions_pkey ON public.message_reactions USING btree (message_id, user_id)"
+  },
+  {
+    "schema_name": "public",
+    "table_name": "messages",
+    "index_name": "idx_messages_conversation_id",
+    "index_definition": "CREATE INDEX idx_messages_conversation_id ON public.messages USING btree (conversation_id)"
+  },
+  {
+    "schema_name": "public",
+    "table_name": "messages",
+    "index_name": "idx_messages_sender_id",
+    "index_definition": "CREATE INDEX idx_messages_sender_id ON public.messages USING btree (sender_id)"
+  },
+  {
+    "schema_name": "public",
+    "table_name": "messages",
+    "index_name": "messages_pkey",
+    "index_definition": "CREATE UNIQUE INDEX messages_pkey ON public.messages USING btree (id)"
+  },
+  {
+    "schema_name": "public",
+    "table_name": "onboarding_status",
+    "index_name": "onboarding_status_pkey",
+    "index_definition": "CREATE UNIQUE INDEX onboarding_status_pkey ON public.onboarding_status USING btree (user_id)"
+  },
+  {
+    "schema_name": "public",
+    "table_name": "profiles",
+    "index_name": "idx_profiles_id",
+    "index_definition": "CREATE INDEX idx_profiles_id ON public.profiles USING btree (id)"
+  },
+  {
+    "schema_name": "public",
+    "table_name": "profiles",
+    "index_name": "profiles_id_idx",
+    "index_definition": "CREATE INDEX profiles_id_idx ON public.profiles USING btree (id)"
+  },
+  {
+    "schema_name": "public",
+    "table_name": "profiles",
+    "index_name": "profiles_is_online_idx",
+    "index_definition": "CREATE INDEX profiles_is_online_idx ON public.profiles USING btree (is_online)"
+  },
+  {
+    "schema_name": "public",
+    "table_name": "profiles",
+    "index_name": "profiles_pkey",
+    "index_definition": "CREATE UNIQUE INDEX profiles_pkey ON public.profiles USING btree (id)"
+  },
+  {
+    "schema_name": "public",
+    "table_name": "profiles",
+    "index_name": "profiles_username_key",
+    "index_definition": "CREATE UNIQUE INDEX profiles_username_key ON public.profiles USING btree (username)"
+  },
+  {
+    "schema_name": "public",
+    "table_name": "user_likes",
+    "index_name": "idx_user_likes",
+    "index_definition": "CREATE INDEX idx_user_likes ON public.user_likes USING btree (liker_id, liked_id)"
+  },
+  {
+    "schema_name": "public",
+    "table_name": "user_likes",
+    "index_name": "idx_user_likes_liked_id",
+    "index_definition": "CREATE INDEX idx_user_likes_liked_id ON public.user_likes USING btree (liked_id)"
+  },
+  {
+    "schema_name": "public",
+    "table_name": "user_likes",
+    "index_name": "user_likes_pkey",
+    "index_definition": "CREATE UNIQUE INDEX user_likes_pkey ON public.user_likes USING btree (liker_id, liked_id)"
+  },
+  {
+    "schema_name": "public",
+    "table_name": "users",
+    "index_name": "users_email_key",
+    "index_definition": "CREATE UNIQUE INDEX users_email_key ON public.users USING btree (email)"
+  },
+  {
+    "schema_name": "public",
+    "table_name": "users",
+    "index_name": "users_pkey",
+    "index_definition": "CREATE UNIQUE INDEX users_pkey ON public.users USING btree (id)"
+  }
+]
