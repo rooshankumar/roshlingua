@@ -49,8 +49,19 @@ const Community = () => {
         return;
       }
 
-      setUsers(data || []);
-      setFilteredUsers(data || []);
+      // Add default values for missing user info
+      const usersWithDefaults = (data || []).map(user => ({
+        ...user,
+        full_name: user.full_name || 'Anonymous User',
+        avatar_url: user.avatar_url || '/placeholder.svg',
+        bio: user.bio || 'No bio available',
+        native_language: user.native_language || 'Not specified',
+        learning_language: user.learning_language || 'Not specified',
+        is_online: user.is_online || false
+      }));
+
+      setUsers(usersWithDefaults);
+      setFilteredUsers(usersWithDefaults);
     };
 
     fetchUsers();
