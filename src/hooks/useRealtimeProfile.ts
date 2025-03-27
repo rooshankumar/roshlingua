@@ -48,8 +48,8 @@ export const useRealtimeProfile = (userId: string | undefined) => {
     const { error } = await supabase
       .from('users')
       .update({
-        native_language: updates.nativeLanguage,
-        learning_language: updates.learningLanguage
+        native_language: updates.native_language,
+        learning_language: updates.learning_language
       })
       .eq('id', userId);
 
