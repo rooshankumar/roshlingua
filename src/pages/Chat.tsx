@@ -1,12 +1,12 @@
+
 import { useState, useEffect, useRef } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import { supabase } from '@/lib/supabase';
-import { useAuth } from '@/hooks/useAuth';
+import { useAuth } from '@/providers/AuthProvider';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { ArrowLeft, User } from "lucide-react"; // Added imports from original file
-import { Link } from "react-router-dom"; // Added imports from original file
+import { ArrowLeft, User } from "lucide-react";
 
 export default function Chat() {
   const { conversationId } = useParams();
@@ -14,6 +14,7 @@ export default function Chat() {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
   const [loading, setLoading] = useState(true);
+  const [otherUser, setOtherUser] = useState(null);
   const messagesEndRef = useRef(null);
 
   const scrollToBottom = () => {
@@ -24,14 +25,17 @@ export default function Chat() {
     if (!conversationId || !user) return;
 
     const fetchMessages = async () => {
-      const { data, error } = await supabase
+      const { data: messages, error } = await supabase
         .from('messages')
         .select(`
           *,
           sender:sender_id (
             id,
             username,
-            avatar_url
+            avatar_url,
+            native_language,
+            learning_language,
+            streak_count
           )
         `)
         .eq('conversation_id', conversationId)
@@ -42,7 +46,24 @@ export default function Chat() {
         return;
       }
 
-      setMessages(data || []);
+      // Get other participant's info
+      const { data: participants } = await supabase
+        .from('conversation_participants')
+        .select(`
+          profiles:user_id (
+            id,
+            username,
+            avatar_url,
+            native_language,
+            learning_language,
+            streak_count
+          )
+        `)
+        .eq('conversation_id', conversationId);
+
+      const otherParticipant = participants?.find(p => p.profiles.id !== user.id);
+      setOtherUser(otherParticipant?.profiles);
+      setMessages(messages || []);
       setLoading(false);
       scrollToBottom();
     };
@@ -50,34 +71,37 @@ export default function Chat() {
     fetchMessages();
 
     // Subscribe to new messages
-    const channel = supabase
+    const subscription = supabase
       .channel(`chat:${conversationId}`)
       .on('postgres_changes', {
-        event: '*',
+        event: 'INSERT',
         schema: 'public',
         table: 'messages',
         filter: `conversation_id=eq.${conversationId}`
-      }, (payload) => {
-        fetchMessages();
+      }, payload => {
+        setMessages(current => [...current, payload.new]);
+        scrollToBottom();
       })
       .subscribe();
 
     return () => {
-      channel.unsubscribe();
+      subscription.unsubscribe();
     };
   }, [conversationId, user]);
 
   const sendMessage = async (e) => {
     e.preventDefault();
-    if (!newMessage.trim() || !conversationId) return;
+    if (!newMessage.trim()) return;
+
+    const message = {
+      conversation_id: conversationId,
+      sender_id: user.id,
+      content: newMessage.trim()
+    };
 
     const { error } = await supabase
       .from('messages')
-      .insert({
-        content: newMessage.trim(),
-        conversation_id: conversationId,
-        sender_id: user?.id
-      });
+      .insert(message);
 
     if (error) {
       console.error('Error sending message:', error);
@@ -87,37 +111,40 @@ export default function Chat() {
     setNewMessage('');
   };
 
-  if (loading) {
-    return <div className="flex justify-center p-4">Loading messages...</div>;
-  }
-
   return (
-    <div className="flex flex-col h-[calc(100vh-4rem)]">
-      <div className="flex items-center justify-between p-4 border-b border-border"> {/* Added header from original */}
-        <Button asChild variant="ghost" size="icon"> {/* Added back button from original */}
-          <Link to="/chat/inbox">
-            <ArrowLeft className="h-5 w-5" />
-          </Link>
-        </Button>
-        <div> {/* Placeholder for user info -  Original's complex structure omitted for simplicity */} </div>
-      </div> {/* End of added header */}
+    <div className="flex flex-col h-screen max-h-screen overflow-hidden">
+      {/* Chat Header */}
+      <div className="flex items-center gap-4 p-4 border-b">
+        <Link to="/chat" className="text-muted-foreground hover:text-foreground">
+          <ArrowLeft className="h-5 w-5" />
+        </Link>
+        {otherUser && (
+          <div className="flex items-center gap-3">
+            <Avatar>
+              <AvatarImage src={otherUser.avatar_url} />
+              <AvatarFallback><User /></AvatarFallback>
+            </Avatar>
+            <div>
+              <h3 className="font-medium">{otherUser.username}</h3>
+              <p className="text-sm text-muted-foreground">
+                Native: {otherUser.native_language} • Learning: {otherUser.learning_language}
+                {otherUser.streak_count > 0 && ` • ${otherUser.streak_count} day streak`}
+              </p>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Messages */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {messages.map((message) => (
           <div
             key={message.id}
-            className={`flex items-start gap-2 ${
-              message.sender.id === user?.id ? 'flex-row-reverse' : ''
-            }`}
+            className={`flex ${message.sender_id === user.id ? 'justify-end' : 'justify-start'}`}
           >
-            <Avatar>
-              <AvatarImage src={message.sender.avatar_url} />
-              <AvatarFallback>
-                {message.sender.username?.[0]?.toUpperCase() || '?'}
-              </AvatarFallback>
-            </Avatar>
             <div
-              className={`rounded-lg p-3 max-w-[70%] ${
-                message.sender.id === user?.id
+              className={`max-w-[70%] break-words rounded-lg p-3 ${
+                message.sender_id === user.id
                   ? 'bg-primary text-primary-foreground'
                   : 'bg-muted'
               }`}
@@ -129,6 +156,7 @@ export default function Chat() {
         <div ref={messagesEndRef} />
       </div>
 
+      {/* Message Input */}
       <form onSubmit={sendMessage} className="p-4 border-t">
         <div className="flex gap-2">
           <Input
@@ -137,7 +165,9 @@ export default function Chat() {
             placeholder="Type a message..."
             className="flex-1"
           />
-          <Button type="submit">Send</Button>
+          <Button type="submit" disabled={!newMessage.trim()}>
+            Send
+          </Button>
         </div>
       </form>
     </div>
