@@ -123,27 +123,6 @@ export default function Chat() {
 
   const { id } = useParams();
 
-  useEffect(() => {
-    const fetchUser = async () => {
-      const { data, error } = await supabase
-        .from('users')
-        .select('*')
-        .eq('id', id)
-        .single();
-
-      if (error) {
-        console.error('Error fetching user:', error);
-        return;
-      }
-
-      setOtherUser(data);
-    };
-
-    if (id) {
-      fetchUser();
-    }
-  }, [id]);
-
 
   return (
     <div className="container max-w-4xl mx-auto p-4 h-[calc(100vh-4rem)] flex flex-col">
