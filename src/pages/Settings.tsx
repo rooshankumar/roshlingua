@@ -7,7 +7,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/providers/AuthProvider";
 import { useRealtimeProfile } from "@/hooks/useRealtimeProfile";
 import {
-  Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle
+  Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
@@ -25,6 +25,7 @@ const Settings = () => {
   const { user } = useAuth();
   const { profile, updateProfile } = useRealtimeProfile(user?.id);
   const navigate = useNavigate();
+  const [localBio, setLocalBio] = useState(profile?.bio || ""); // Added local state for bio
 
   const languages = [
     "English", "Spanish", "French", "German", "Italian",
@@ -56,6 +57,10 @@ const Settings = () => {
         .eq('id', profile.id);
 
       if (error) throw error;
+      if (field === 'bio') {
+        await updateProfile({...profile, bio: value}); //added to update realtime profile
+      }
+
     } catch (error) {
       console.error("Error updating profile:", error);
       toast({
@@ -269,10 +274,22 @@ const Settings = () => {
                       <Label htmlFor="bio">Bio</Label>
                       <Textarea 
                         id="bio" 
-                        value={profile?.bio || ""}
-                        onChange={(e) => handleProfileChange("bio", e.target.value)}
+                        value={localBio || profile?.bio || ""}
+                        onChange={(e) => setLocalBio(e.target.value)}
                         className="min-h-[100px]"
                       />
+                      <Button 
+                        onClick={async () => {
+                          if (localBio !== profile?.bio) {
+                            await handleProfileChange('bio', localBio);
+                            setLocalBio('');
+                          }
+                        }}
+                        className="mt-2"
+                        disabled={!localBio || localBio === profile?.bio}
+                      >
+                        Save Bio
+                      </Button>
                     </div>
 
                     <div className="space-y-2">
