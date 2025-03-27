@@ -26,6 +26,12 @@ const Settings = () => {
   const { profile, updateProfile } = useRealtimeProfile(user?.id);
   const navigate = useNavigate();
   const [localBio, setLocalBio] = useState(profile?.bio || "");
+  const [notificationSettings, setNotificationSettings] = useState({
+    newMessages: true,
+    streakReminders: true,
+    profileViews: false,
+    learningReminders: true,
+  });
 
   const languages = [
     "English", "Spanish", "French", "German", "Italian",
@@ -41,8 +47,6 @@ const Settings = () => {
   const handleProfileChange = async (field: string, value: string) => {
     if (!user?.id) return;
     try {
-
-      // Update user data
       const { error } = await supabase
         .from('users')
         .update({ 
@@ -53,7 +57,7 @@ const Settings = () => {
 
       if (error) throw error;
       if (field === 'bio') {
-        await updateProfile({...profile, bio: value}); //added to update realtime profile
+        await updateProfile({...profile, bio: value});
       }
 
     } catch (error) {
@@ -66,96 +70,8 @@ const Settings = () => {
     }
   };
 
-  const handleUploadAvatar = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!e.target.files || !e.target.files[0]) return;
-    const file = e.target.files[0];
-    const fileExt = file.name.split('.').pop();
-    const fileName = `${Date.now()}.${fileExt}`;
-    const filePath = `${user?.id}/${fileName}`;
-
-    try {
-      const { error: uploadError } = await supabase.storage
-        .from('avatars')
-        .upload(filePath, file);
-
-      if (uploadError) throw uploadError;
-
-      const { data: { publicUrl } } = supabase.storage
-        .from('avatars')
-        .getPublicUrl(filePath);
-
-      await updateProfile({ ...profile, avatar_url: publicUrl });
-
-      toast({
-        title: "Avatar updated",
-        description: "Your profile picture has been updated successfully.",
-      });
-    } catch (error) {
-      console.error('Error uploading avatar:', error);
-      toast({
-        title: "Error",
-        description: "Failed to upload avatar. Please try again.",
-        variant: "destructive"
-      });
-    }
-  };
-
-  const handleSaveProfile = async () => {
-    if (localBio !== profile?.bio) {
-      await handleProfileChange("bio", localBio);
-    }
-    try {
-      if (!profile?.id) return;
-      await updateProfile(profile);
-      toast({
-        title: "Profile updated",
-        description: "Your profile has been successfully updated.",
-      });
-    } catch (error) {
-      console.error("Error saving profile:", error);
-      toast({
-        variant: "destructive",
-        title: "Save failed",
-        description: "Could not save profile changes. Please try again.",
-      });
-    }
-  };
-
-  const [privacySettings, setPrivacySettings] = useState({
-    showOnlineStatus: true,
-    showLastActive: true,
-    allowMessages: true,
-    showProfileInSearch: true,
-  });
-
-  const handlePrivacyChange = (field: string, value: boolean) => {
-    setPrivacySettings(prev => ({
-      ...prev,
-      [field]: value
-    }));
-  };
-
-  const handleSavePrivacy = () => {
-    toast({
-      title: "Privacy settings updated",
-      description: "Your privacy preferences have been saved.",
-    });
-  };
-
-
-  const [notificationSettings, setNotificationSettings] = useState({
-    newMessages: true,
-    profileViews: true,
-    learningReminders: true,
-    streakReminders: true,
-    marketingEmails: false,
-  });
-
-  const handleNotificationChange = (field: string, value: boolean) => {
-    setNotificationSettings(prev => ({
-      ...prev,
-      [field]: value
-    }));
+  const handleNotificationChange = (setting: string, value: boolean) => {
+    setNotificationSettings(prev => ({ ...prev, [setting]: value }));
   };
 
   const handleSaveNotifications = () => {
@@ -186,8 +102,6 @@ const Settings = () => {
     }
   };
 
-  const genderOptions = ["Male", "Female", "Rather not say"];
-
   return (
     <div className="container pb-12 animate-fade-in">
       <div className="space-y-2 mb-8">
@@ -197,93 +111,45 @@ const Settings = () => {
         </p>
       </div>
 
-      <Tabs defaultValue="profile" className="mb-8">
-        <TabsList className="grid grid-cols-4 mb-8">
-          <TabsTrigger value="profile" className="flex items-center">
-            <User className="h-4 w-4 mr-2" />
-            <span className="hidden sm:inline">Profile</span>
-          </TabsTrigger>
-          <TabsTrigger value="privacy" className="flex items-center">
-            <Shield className="h-4 w-4 mr-2" />
-            <span className="hidden sm:inline">Privacy</span>
-          </TabsTrigger>
-          <TabsTrigger value="notifications" className="flex items-center">
-            <Bell className="h-4 w-4 mr-2" />
-            <span className="hidden sm:inline">Notifications</span>
-          </TabsTrigger>
-          <TabsTrigger value="account" className="flex items-center">
-            <Key className="h-4 w-4 mr-2" />
-            <span className="hidden sm:inline">Account</span>
-          </TabsTrigger>
+      <Tabs defaultValue="account" className="space-y-4">
+        <TabsList>
+          <TabsTrigger value="account">Account</TabsTrigger>
+          <TabsTrigger value="notifications">Notifications</TabsTrigger>
+          <TabsTrigger value="appearance">Appearance</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="profile" className="space-y-6">
+        <TabsContent value="account" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Profile Information</CardTitle>
+              <CardTitle>Account Settings</CardTitle>
               <CardDescription>
-                Update your personal information and language preferences
+                Update your account information and preferences
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="flex flex-col md:flex-row md:space-x-6">
-                <div className="flex flex-col items-center space-y-4 mb-6 md:mb-0">
-                  <Avatar className="h-24 w-24">
-                    <AvatarImage src={profile?.avatar_url} alt={profile?.full_name} />
-                    <AvatarFallback>{profile?.full_name?.charAt(0)}</AvatarFallback>
-                  </Avatar>
-                  <div className="flex flex-col items-center gap-2">
-                    <input
-                      type="file"
-                      id="avatar"
-                      accept="image/*"
-                      className="hidden"
-                      onChange={handleUploadAvatar}
+            <CardContent className="space-y-8">
+              <div className="space-y-4">
+                <h3 className="text-lg font-medium">Profile</h3>
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="username">Username</Label>
+                    <Input
+                      id="username"
+                      value={profile?.username || ""}
+                      onChange={(e) => handleProfileChange("username", e.target.value)}
                     />
-                    <Button variant="outline" onClick={() => document.getElementById('avatar')?.click()}>
-                      Change Avatar
-                    </Button>
                   </div>
-                </div>
 
-                <div className="flex-1 space-y-4">
-                  <div className="grid gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="name">Full Name</Label>
-                      <Input 
-                        id="name" 
-                        value={profile?.full_name || ""}
-                        onChange={(e) => handleProfileChange("full_name", e.target.value)}
-                      />
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="email">Email</Label>
-                      <Input 
-                        id="email" 
-                        type="email" 
-                        value={profile?.email || ""}
-                        disabled
-                        className="bg-muted"
-                      />
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="bio">Bio</Label>
-                      <Textarea 
-                        id="bio" 
-                        value={profile?.bio || ""}
-                        onChange={(e) => handleProfileChange("bio", e.target.value)}
-                        className="min-h-[100px]"
-                      />
-                    </div>
-
-                    
+                  <div className="space-y-2">
+                    <Label htmlFor="bio">Bio</Label>
+                    <Textarea
+                      id="bio"
+                      value={localBio}
+                      onChange={(e) => setLocalBio(e.target.value)}
+                      onBlur={() => handleProfileChange("bio", localBio)}
+                    />
                   </div>
                 </div>
               </div>
-
-              <Separator />
 
               <div className="space-y-4">
                 <h3 className="text-lg font-medium">Language Settings</h3>
@@ -326,7 +192,7 @@ const Settings = () => {
                     </Select>
                   </div>
 
-                  <div className="space-y-2 sm:col-span-2">
+                  <div className="space-y-2">
                     <Label htmlFor="proficiencyLevel">Proficiency Level</Label>
                     <Select
                       value={profile?.proficiency_level || ""}
@@ -345,126 +211,67 @@ const Settings = () => {
                     </Select>
                   </div>
                 </div>
-
-                <div className="space-y-2">
-                  <h4 className="font-medium text-sm text-muted-foreground">Streak Information</h4>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <Label>Current Streak</Label>
-                      <p className="text-sm">{profile?.streak_count || 0} days</p>
-                    </div>
-                    <div>
-                      <Label>Last Active</Label>
-                      <p className="text-sm">
-                        {profile?.streak_last_date ? new Date(profile.streak_last_date).toLocaleDateString() : 'Never'}
-                      </p>
-                    </div>
-                  </div>
-                </div>
               </div>
             </CardContent>
-            <CardFooter className="flex justify-between">
-              <Button variant="outline" onClick={() => navigate(-1)}>
-                Cancel
-              </Button>
-              <Button onClick={handleSaveProfile} className="button-hover">
-                <Save className="h-4 w-4 mr-2" />
-                Save Changes
-              </Button>
-            </CardFooter>
           </Card>
-        </TabsContent>
 
-        {/* Privacy Settings */}
-        <TabsContent value="privacy" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Privacy Preferences</CardTitle>
+              <CardTitle>Email</CardTitle>
               <CardDescription>
-                Control who can see your information and how they can interact with you
+                Update your email preferences
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label htmlFor="showOnlineStatus">Show online status</Label>
-                    <p className="text-sm text-muted-foreground">
-                      Allow others to see when you're active on the platform
-                    </p>
-                  </div>
-                  <Switch
-                    id="showOnlineStatus"
-                    checked={privacySettings.showOnlineStatus}
-                    onCheckedChange={(value) => handlePrivacyChange("showOnlineStatus", value)}
-                  />
-                </div>
-
-                <Separator />
-
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label htmlFor="showLastActive">Show last active time</Label>
-                    <p className="text-sm text-muted-foreground">
-                      Allow others to see when you were last active
-                    </p>
-                  </div>
-                  <Switch
-                    id="showLastActive"
-                    checked={privacySettings.showLastActive}
-                    onCheckedChange={(value) => handlePrivacyChange("showLastActive", value)}
-                  />
-                </div>
-
-                <Separator />
-
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label htmlFor="allowMessages">Allow messages</Label>
-                    <p className="text-sm text-muted-foreground">
-                      Allow other users to send you direct messages
-                    </p>
-                  </div>
-                  <Switch
-                    id="allowMessages"
-                    checked={privacySettings.allowMessages}
-                    onCheckedChange={(value) => handlePrivacyChange("allowMessages", value)}
-                  />
-                </div>
-
-                <Separator />
-
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label htmlFor="showProfileInSearch">Show profile in search</Label>
-                    <p className="text-sm text-muted-foreground">
-                      Allow your profile to appear in search results
-                    </p>
-                  </div>
-                  <Switch
-                    id="showProfileInSearch"
-                    checked={privacySettings.showProfileInSearch}
-                    onCheckedChange={(value) => handlePrivacyChange("showProfileInSearch", value)}
-                  />
-                </div>
+                <Label htmlFor="email">Email address</Label>
+                <Input
+                  id="email"
+                  value={user?.email || ""}
+                  disabled
+                  type="email"
+                />
               </div>
             </CardContent>
-            <CardFooter>
-              <Button onClick={handleSavePrivacy} className="button-hover">
-                <Save className="h-4 w-4 mr-2" />
-                Save Preferences
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Password</CardTitle>
+              <CardDescription>
+                Change your password
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <Button variant="outline" onClick={handleChangePassword}>
+                <Lock className="h-4 w-4 mr-2" />
+                Change Password
               </Button>
-            </CardFooter>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Danger Zone</CardTitle>
+              <CardDescription>
+                Delete account or sign out
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <Button variant="destructive" onClick={handleLogout}>
+                <LogOut className="h-4 w-4 mr-2" />
+                Sign out
+              </Button>
+            </CardContent>
           </Card>
         </TabsContent>
 
-        {/* Notification Settings */}
         <TabsContent value="notifications" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Notification Settings</CardTitle>
+              <CardTitle>Notification Preferences</CardTitle>
               <CardDescription>
-                Choose which notifications you'd like to receive
+                Choose what notifications you'd like to receive
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -480,6 +287,22 @@ const Settings = () => {
                     id="newMessages"
                     checked={notificationSettings.newMessages}
                     onCheckedChange={(value) => handleNotificationChange("newMessages", value)}
+                  />
+                </div>
+
+                <Separator />
+
+                <div className="flex items-center justify-between">
+                  <div className="space-y-0.5">
+                    <Label htmlFor="streakReminders">Streak reminders</Label>
+                    <p className="text-sm text-muted-foreground">
+                      Get reminded to maintain your daily streak
+                    </p>
+                  </div>
+                  <Switch
+                    id="streakReminders"
+                    checked={notificationSettings.streakReminders}
+                    onCheckedChange={(value) => handleNotificationChange("streakReminders", value)}
                   />
                 </div>
 
@@ -514,193 +337,64 @@ const Settings = () => {
                     onCheckedChange={(value) => handleNotificationChange("learningReminders", value)}
                   />
                 </div>
-
-                <Separator />
-
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label htmlFor="streakReminders">Streak reminders</Label>
-                    <p className="text-sm text-muted-foreground">
-                      Get reminded to maintain your daily streak
-                    </p>
-                  </div>
-                  <Switch
-                    id="streakReminders"
-                    checked={notificationSettings.streakReminders}
-                    onCheckedChange={(value) => handleNotificationChange("streakReminders", value)}
-                  />
-                </div>
-
-                <Separator />
-
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label htmlFor="marketingEmails">Marketing emails</Label>
-                    <p className="text-sm text-muted-foreground">
-                      Receive updates about new features and offers
-                    </p>
-                  </div>
-                  <Switch
-                    id="marketingEmails"
-                    checked={notificationSettings.marketingEmails}
-                    onCheckedChange={(value) => handleNotificationChange("marketingEmails", value)}
-                  />
-                </div>
               </div>
             </CardContent>
             <CardFooter>
-              <Button onClick={handleSaveNotifications} className="button-hover">
+              <Button onClick={handleSaveNotifications}>
                 <Save className="h-4 w-4 mr-2" />
-                Save Preferences
+                Save changes
               </Button>
             </CardFooter>
           </Card>
         </TabsContent>
 
-        {/* Account Settings */}
-        <TabsContent value="account" className="space-y-6">
+        <TabsContent value="appearance" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Account Settings</CardTitle>
+              <CardTitle>Appearance</CardTitle>
               <CardDescription>
-                Manage your account security and preferences
+                Customize how the app looks and feels
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-8">
               <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                 
-        
-
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h4 className="font-medium">Password</h4>
-                    <p className="text-sm text-muted-foreground">
-                      Change your account password
-                    </p>
-                  </div>
-                  <Button variant="outline" onClick={handleChangePassword}>
-                    <Lock className="h-4 w-4 mr-2" />
-                    Change
+                <div className="space-y-2">
+                  <h3 className="text-lg font-medium">Theme</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Choose your preferred appearance
+                  </p>
+                </div>
+                <div className="flex flex-col sm:flex-row gap-2">
+                  <Button
+                    variant={theme === "light" ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setTheme("light")}
+                    className="w-full sm:w-auto justify-center"
+                  >
+                    <Sun className="h-4 w-4 mr-2" />
+                    Light
                   </Button>
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h4 className="font-medium">Email</h4>
-                    <p className="text-sm text-muted-foreground">
-                      {profile?.email || ""}
-                    </p>
-                  </div>
-                  <Button variant="outline">
-                    <Mail className="h-4 w-4 mr-2" />
-                    Update
+                  <Button
+                    variant={theme === "dark" ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setTheme("dark")}
+                    className="w-full sm:w-auto justify-center"
+                  >
+                    <Moon className="h-4 w-4 mr-2" />
+                    Dark
                   </Button>
-                </div>
-              </div>
-
-              <Separator />
-
-              <div className="space-y-4">
-                <h3 className="text-lg font-medium">Appearance</h3>
-
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h4 className="font-medium">Theme</h4>
-                      <p className="text-sm text-muted-foreground">
-                        Choose your preferred appearance
-                      </p>
-                    </div>
-                    <div className="flex flex-col sm:flex-row gap-2">
-                      <Button
-                        variant={theme === "light" ? "default" : "outline"}
-                        size="sm"
-                        onClick={() => setTheme("light")}
-                        className="w-full sm:w-auto justify-center"
-                      >
-                        <Sun className="h-4 w-4 mr-2" />
-                        Light
-                      </Button>
-                      <Button
-                        variant={theme === "dark" ? "default" : "outline"}
-                        size="sm"
-                        onClick={() => setTheme("dark")}
-                        className="w-full sm:w-auto justify-center"
-                      >
-                        <Moon className="h-4 w-4 mr-2" />
-                        Dark
-                      </Button>
-                      <Button
-                        variant={theme === "system" ? "default" : "outline"}
-                        size="sm"
-                        onClick={() => setTheme("system")}
-                        className="w-full sm:w-auto justify-center"
-                      >
-                        <Globe className="h-4 w-4 mr-2" />
-                        System
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <Separator />
-
-              <div className="space-y-4">
-                <h3 className="text-lg font-medium">Subscription</h3>
-
-                <div className="bg-muted/50 rounded-lg p-4">
-                  <div className="flex justify-between items-center mb-4">
-                    <div>
-                      <h4 className="font-medium">Free Plan</h4>
-                      <p className="text-sm text-muted-foreground">
-                        You're currently on the free plan
-                      </p>
-                    </div>
-                    <Button>
-                      <Wallet className="h-4 w-4 mr-2" />
-                      Upgrade
-                    </Button>
-                  </div>
-                  <ul className="text-sm space-y-2">
-                    <li className="flex items-center">
-                      <svg className="h-4 w-4 mr-2 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                      </svg>
-                      Basic conversation features
-                    </li>
-                    <li className="flex items-center">
-                      <svg className="h-4 w-4 mr-2 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                      </svg>
-                      Community access
-                    </li>
-                    <li className="flex items-center text-muted-foreground">
-                      <svg className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                      </svg>
-                      Advanced learning tools (Premium)
-                    </li>
-                    <li className="flex items-center text-muted-foreground">
-                      <svg className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                      </svg>
-                      AI-powered conversation practice (Premium)
-                    </li>
-                  </ul>
+                  <Button
+                    variant={theme === "system" ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setTheme("system")}
+                    className="w-full sm:w-auto justify-center"
+                  >
+                    <Globe className="h-4 w-4 mr-2" />
+                    System
+                  </Button>
                 </div>
               </div>
             </CardContent>
-            <CardFooter className="flex justify-between">
-              <Button variant="outline" className="text-destructive">
-                Delete Account
-              </Button>
-              <Button variant="destructive" onClick={handleLogout}>
-                <LogOut className="h-4 w-4 mr-2" />
-                Logout
-              </Button>
-            </CardFooter>
           </Card>
         </TabsContent>
       </Tabs>
