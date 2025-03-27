@@ -41,12 +41,12 @@ const Settings = () => {
   const handleProfileChange = async (field: string, value: string) => {
     if (!profile?.id) return;
     try {
-      const updatedProfile = {
-        ...profile,
-        [field]: value,
-        updated_at: new Date().toISOString()
-      };
-      await updateProfile(updatedProfile);
+      const { data, error } = await supabase
+        .from('profiles')
+        .update({ [field]: value })
+        .eq('id', profile.id);
+      
+      if (error) throw error;
     } catch (error) {
       console.error("Error updating profile:", error);
       toast({
