@@ -569,10 +569,13 @@ const Settings = () => {
             <CardContent className="space-y-8">
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                 
-        
-
-                <div className="flex items-center justify-between">
+                  <div>
+                    <h4 className="font-medium">Account Security</h4>
+                    <p className="text-sm text-muted-foreground">
+                      Manage your account security settings
+                    </p>
+                  </div>
+                </div>
                   <div>
                     <h4 className="font-medium">Password</h4>
                     <p className="text-sm text-muted-foreground">
