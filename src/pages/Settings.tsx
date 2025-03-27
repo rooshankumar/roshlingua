@@ -55,7 +55,7 @@ const Settings = ({ onLogout }: SettingsProps) => {
   const { theme, setTheme } = useTheme();
   const { toast } = useToast();
   const { user } = useAuth();
-  const { profile, updateProfile } = useRealtimeProfile(user?.id);
+  const { profile, updateProfile, setProfile } = useRealtimeProfile(user?.id);
 
 
   const [privacySettings, setPrivacySettings] = useState({
@@ -85,7 +85,25 @@ const Settings = ({ onLogout }: SettingsProps) => {
   ];
 
   const handleProfileChange = async (field: string, value: string) => {
-    await updateProfile({...profile, [field]: value});
+    const { error } = await supabase
+      .from('profiles')
+      .update({ [field]: value })
+      .eq('id', profile?.id);
+
+    if (error) {
+      console.error('Error updating profile:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update profile",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // Update local state
+    if (profile) {
+      setProfile({ ...profile, [field]: value });
+    }
   };
 
   const handlePrivacyChange = (field: string, value: boolean) => {
@@ -105,9 +123,9 @@ const Settings = ({ onLogout }: SettingsProps) => {
   const handleSaveProfile = async () => {
     try {
       if (!profile || !user) return;
-      
+
       await updateProfile(profile);
-      
+
       toast({
         title: "Profile updated",
         description: "Your profile information has been saved.",
@@ -145,7 +163,7 @@ const Settings = ({ onLogout }: SettingsProps) => {
 
   const handleUploadAvatar = async (event: React.ChangeEvent<HTMLInputElement>) => {
     if (!event.target.files || !event.target.files[0]) return;
-    
+
     const file = event.target.files[0];
     const fileExt = file.name.split('.').pop();
     const fileName = `${Date.now()}.${fileExt}`;
