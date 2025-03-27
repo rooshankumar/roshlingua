@@ -4,7 +4,7 @@ import { Home, Users, MessageSquare, Settings, User } from "lucide-react";
 
 const routes = [
   {
-    path: "/",
+    path: "/Dashboard",
     label: "Dashboard",
     icon: Home
   },
@@ -17,11 +17,6 @@ const routes = [
     path: "/chat",
     label: "Chat",
     icon: MessageSquare
-  },
-  {
-    path: "/profile",
-    label: "Profile",
-    icon: User
   },
   {
     path: "/settings",
