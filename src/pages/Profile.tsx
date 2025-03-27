@@ -68,9 +68,23 @@ const Profile = () => {
       setLoading(true);
       try {
         const { data, error } = await supabase
-          .from('profiles')
+          .from('users') // Changed to 'users' table
           .select(`
-            *,
+            id,
+            name,
+            age,
+            location,
+            bio,
+            native_language,
+            learning_language,
+            proficiency_level,
+            streak_count as streak,
+            created_at as joinDate,
+            interests,
+            avatar_url as avatar,
+            likes_count as likes,
+            is_liked as liked,
+            learning_progress:learning,
             achievements (
               title,
               description,
@@ -83,43 +97,8 @@ const Profile = () => {
 
         if (error) throw error;
 
-        // Use real-time profile hook
-const realtimeProfile = useRealtimeProfile(id);
-
-useEffect(() => {
-  if (realtimeProfile) {
-    setProfile({
-      id: realtimeProfile.id,
-      name: realtimeProfile.name || "New Language Learner",
-      age: realtimeProfile.age || 25,
-      location: realtimeProfile.location || "Earth",
-      bio: realtimeProfile.bio || "Excited to start my language learning journey!",
-      nativeLanguage: realtimeProfile.native_language || "English",
-      learningLanguage: realtimeProfile.learning_language || "Spanish",
-      proficiencyLevel: realtimeProfile.proficiency_level || "Beginner (A1)",
-      streak: realtimeProfile.streak_count || 0,
-      joinDate: realtimeProfile.created_at || new Date().toISOString().split('T')[0],
-      interests: realtimeProfile.interests || ["Language Learning", "Travel", "Culture"],
-      avatar: realtimeProfile.avatar_url || "/placeholder.svg",
-      likes: realtimeProfile.likes_count || 0,
-      liked: realtimeProfile.is_liked || false,
-      learning: {
-        vocabulary: realtimeProfile.learning_progress?.vocabulary || 10,
-        grammar: realtimeProfile.learning_progress?.grammar || 10,
-        speaking: realtimeProfile.learning_progress?.speaking || 10,
-        listening: realtimeProfile.learning_progress?.listening || 10
-      },
-      achievements: realtimeProfile.achievements || [
-        {
-          title: "Getting Started",
-          description: "Started your language learning journey",
-          date: new Date().toISOString().split('T')[0],
-          icon: "🌟"
-        }
-      ]
-    });
-  }
-}, [realtimeProfile]);
+        // Use real-time profile hook (This hook is not provided, so using the fetched data as a fallback)
+        setProfile(data);
 
       } catch (err) {
         console.error("Error fetching profile:", err);

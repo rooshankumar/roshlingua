@@ -14,7 +14,7 @@ export const useRealtimeProfile = (userId: string) => {
     const fetchProfile = async () => {
       try {
         const { data, error } = await supabase
-          .from('profiles')
+          .from('users')
           .select('*')
           .eq('id', userId)
           .single();
@@ -31,13 +31,13 @@ export const useRealtimeProfile = (userId: string) => {
 
     // Set up realtime subscription
     const profileSubscription = supabase
-      .channel('profile_changes')
+      .channel('user_changes')
       .on(
         'postgres_changes',
         {
           event: '*',
           schema: 'public',
-          table: 'profiles',
+          table: 'users',
           filter: `id=eq.${userId}`,
         },
         (payload) => {
