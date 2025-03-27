@@ -126,15 +126,38 @@ const Community = () => {
   }, [users, searchQuery, languageFilter, onlineOnly]);
 
   const handleLike = async (userId: string) => {
-    const { error } = await supabase
+    const currentUser = (await supabase.auth.getUser()).data.user?.id;
+    
+    // Check if already liked
+    const { data: existingLike } = await supabase
       .from('user_likes')
-      .insert([
-        { liker_id: (await supabase.auth.getUser()).data.user?.id, liked_id: userId }
-      ]);
+      .select()
+      .eq('liker_id', currentUser)
+      .eq('liked_id', userId)
+      .single();
 
-    if (error) {
-      console.error('Error liking user:', error);
-      return;
+    if (existingLike) {
+      // Unlike if already liked
+      const { error } = await supabase
+        .from('user_likes')
+        .delete()
+        .eq('liker_id', currentUser)
+        .eq('liked_id', userId);
+
+      if (error) {
+        console.error('Error unliking user:', error);
+        return;
+      }
+    } else {
+      // Like if not already liked
+      const { error } = await supabase
+        .from('user_likes')
+        .insert([{ liker_id: currentUser, liked_id: userId }]);
+
+      if (error) {
+        console.error('Error liking user:', error);
+        return;
+      }
     }
 
     // Refresh users to get updated likes count
