@@ -38,15 +38,9 @@ const Settings = () => {
     "Upper Intermediate (B2)", "Advanced (C1)", "Proficient (C2)"
   ];
 
-  const genders = ["Male", "Female", "Rather not say"];
-
   const handleProfileChange = async (field: string, value: string) => {
     if (!user?.id) return;
     try {
-      // Validate gender values
-      if (field === "gender" && !["Male", "Female", "Rather not say"].includes(value)) {
-        throw new Error("Invalid gender value");
-      }
 
       // Update user data
       const { error } = await supabase
@@ -284,24 +278,7 @@ const Settings = () => {
                       />
                     </div>
 
-                    <div className="space-y-2">
-                      <Label htmlFor="gender">Gender</Label>
-                      <Select 
-                        value={profile?.gender || ""}
-                        onValueChange={(value) => handleProfileChange("gender", value)}
-                      >
-                        <SelectTrigger id="gender">
-                          <SelectValue placeholder="Select gender" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {genderOptions.map((gender) => (
-                            <SelectItem key={gender} value={gender}>
-                              {gender}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
+                    
                   </div>
                 </div>
               </div>
@@ -635,11 +612,12 @@ const Settings = () => {
                         Choose your preferred appearance
                       </p>
                     </div>
-                    <div className="flex space-x-2">
+                    <div className="flex flex-col sm:flex-row gap-2">
                       <Button
                         variant={theme === "light" ? "default" : "outline"}
                         size="sm"
                         onClick={() => setTheme("light")}
+                        className="w-full sm:w-auto justify-center"
                       >
                         <Sun className="h-4 w-4 mr-2" />
                         Light
@@ -648,6 +626,7 @@ const Settings = () => {
                         variant={theme === "dark" ? "default" : "outline"}
                         size="sm"
                         onClick={() => setTheme("dark")}
+                        className="w-full sm:w-auto justify-center"
                       >
                         <Moon className="h-4 w-4 mr-2" />
                         Dark
@@ -656,6 +635,7 @@ const Settings = () => {
                         variant={theme === "system" ? "default" : "outline"}
                         size="sm"
                         onClick={() => setTheme("system")}
+                        className="w-full sm:w-auto justify-center"
                       >
                         <Globe className="h-4 w-4 mr-2" />
                         System
