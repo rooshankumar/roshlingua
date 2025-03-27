@@ -1,0 +1,35 @@
+th state changed: SIGNED_IN 7bad0693-9053-423f-a2f0-a61c20b9cbf4
+AuthProvider.tsx:39 Auth state changed: INITIAL_SESSION 7bad0693-9053-423f-a2f0-a61c20b9cbf4
+AuthProvider.tsx:55 Initial session: 7bad0693-9053-423f-a2f0-a61c20b9cbf4
+@supabase_supabase-js.js?v=188d5fb6:3900 
+            
+            
+           PATCH https://yekzyvdjjozhhatdefsq.supabase.co/rest/v1/profiles?id=eq.7bad0693-9053-423f-a2f0-a61c20b9cbf4 404 (Not Found)
+(anonymous) @ @supabase_supabase-js.js?v=188d5fb6:3900
+(anonymous) @ @supabase_supabase-js.js?v=188d5fb6:3921
+fulfilled @ @supabase_supabase-js.js?v=188d5fb6:3873
+Promise.then
+step @ @supabase_supabase-js.js?v=188d5fb6:3886
+(anonymous) @ @supabase_supabase-js.js?v=188d5fb6:3888
+__awaiter6 @ @supabase_supabase-js.js?v=188d5fb6:3870
+(anonymous) @ @supabase_supabase-js.js?v=188d5fb6:3911
+then @ @supabase_supabase-js.js?v=188d5fb6:89Understand this errorAI
+Settings.tsx:65 Error updating profile: {}[[Prototype]]: Object
+handleProfileChange @ Settings.tsx:65
+await in handleProfileChange
+handleSaveProfile @ Settings.tsx:110
+callCallback2 @ chunk-W6L2VRDA.js?v=188d5fb6:3674
+invokeGuardedCallbackDev @ chunk-W6L2VRDA.js?v=188d5fb6:3699
+invokeGuardedCallback @ chunk-W6L2VRDA.js?v=188d5fb6:3733
+invokeGuardedCallbackAndCatchFirstError @ chunk-W6L2VRDA.js?v=188d5fb6:3736
+executeDispatch @ chunk-W6L2VRDA.js?v=188d5fb6:7014
+processDispatchQueueItemsInOrder @ chunk-W6L2VRDA.js?v=188d5fb6:7034
+processDispatchQueue @ chunk-W6L2VRDA.js?v=188d5fb6:7043
+dispatchEventsForPlugins @ chunk-W6L2VRDA.js?v=188d5fb6:7051
+(anonymous) @ chunk-W6L2VRDA.js?v=188d5fb6:7174
+batchedUpdates$1 @ chunk-W6L2VRDA.js?v=188d5fb6:18913
+batchedUpdates @ chunk-W6L2VRDA.js?v=188d5fb6:3579
+dispatchEventForPluginEventSystem @ chunk-W6L2VRDA.js?v=188d5fb6:7173
+dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay @ chunk-W6L2VRDA.js?v=188d5fb6:5478
+dispatchEvent @ chunk-W6L2VRDA.js?v=188d5fb6:5472
+dispatchDiscreteEvent @ chunk-W6L2VRDA.js?v=188d5fb6:5449Understand this errorAI
