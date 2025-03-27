@@ -120,7 +120,7 @@ const Auth = () => {
             <CardHeader>
               <CardTitle>Welcome back</CardTitle>
               <CardDescription>
-                Sign in to your roshLingua account
+                Sign in to your Languagelandia account
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -245,7 +245,7 @@ const Auth = () => {
             <CardHeader>
               <CardTitle>Create an account</CardTitle>
               <CardDescription>
-                Join roshLingua's global community today
+                Join Languagelandia's global community today
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -253,7 +253,7 @@ const Auth = () => {
                 <Label htmlFor="name">Full Name</Label>
                 <Input 
                   id="name" 
-                  placeholder="Roshan Kumar"
+                  placeholder="John Doe" 
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   required 
@@ -267,7 +267,7 @@ const Auth = () => {
                   <Input 
                     id="email-signup" 
                     type="email" 
-                    placeholder="name@gmail.com" 
+                    placeholder="name@example.com" 
                     className="pl-10"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
