@@ -46,6 +46,7 @@ import {
 import { useAuth } from "@/providers/AuthProvider";
 import { useRealtimeProfile } from "@/hooks/useRealtimeProfile";
 import { supabase } from "@/lib/supabase";
+import { useNavigate } from 'react-router-dom';
 
 interface SettingsProps {
   onLogout: () => void;
@@ -56,6 +57,7 @@ const Settings = ({ onLogout }: SettingsProps) => {
   const { toast } = useToast();
   const { user } = useAuth();
   const { profile, updateProfile, setProfile } = useRealtimeProfile(user?.id);
+  const navigate = useNavigate();
 
 
   const [privacySettings, setPrivacySettings] = useState({
@@ -223,12 +225,18 @@ const Settings = ({ onLogout }: SettingsProps) => {
     }
   };
 
-  const handleLogout = () => {
-    toast({
-      title: "Logging out",
-      description: "You have been successfully logged out.",
-    });
-    onLogout();
+  const handleLogout = async () => {
+    try {
+      await supabase.auth.signOut();
+      navigate('/');
+    } catch (error) {
+      console.error('Error logging out:', error);
+      toast({
+        title: "Error",
+        description: "Failed to log out. Please try again.",
+        variant: "destructive"
+      });
+    }
   };
 
   return (
