@@ -1,0 +1,116 @@
+INITIAL_SESSION 7bad0693-9053-423f-a2f0-a61c20b9cbf4
+AuthProvider.tsx:55 Initial session: 7bad0693-9053-423f-a2f0-a61c20b9cbf4
+chunk-W6L2VRDA.js?v=5ee70186:377 [Violation] 'message' handler took 184ms
+Settings.tsx:88 Uncaught (in promise) TypeError: updateProfile is not a function
+    at handleProfileChange (Settings.tsx:88:11)
+    at onChange (Settings.tsx:254:42)
+    at HTMLUnknownElement.callCallback2 (chunk-W6L2VRDA.js?v=5ee70186:3674:22)
+    at Object.invokeGuardedCallbackDev (chunk-W6L2VRDA.js?v=5ee70186:3699:24)
+    at invokeGuardedCallback (chunk-W6L2VRDA.js?v=5ee70186:3733:39)
+    at invokeGuardedCallbackAndCatchFirstError (chunk-W6L2VRDA.js?v=5ee70186:3736:33)
+    at executeDispatch (chunk-W6L2VRDA.js?v=5ee70186:7014:11)
+    at processDispatchQueueItemsInOrder (chunk-W6L2VRDA.js?v=5ee70186:7034:15)
+    at processDispatchQueue (chunk-W6L2VRDA.js?v=5ee70186:7043:13)
+    at dispatchEventsForPlugins (chunk-W6L2VRDA.js?v=5ee70186:7051:11)
+handleProfileChange @ Settings.tsx:88
+onChange @ Settings.tsx:254
+callCallback2 @ chunk-W6L2VRDA.js?v=5ee70186:3674
+invokeGuardedCallbackDev @ chunk-W6L2VRDA.js?v=5ee70186:3699
+invokeGuardedCallback @ chunk-W6L2VRDA.js?v=5ee70186:3733
+invokeGuardedCallbackAndCatchFirstError @ chunk-W6L2VRDA.js?v=5ee70186:3736
+executeDispatch @ chunk-W6L2VRDA.js?v=5ee70186:7014
+processDispatchQueueItemsInOrder @ chunk-W6L2VRDA.js?v=5ee70186:7034
+processDispatchQueue @ chunk-W6L2VRDA.js?v=5ee70186:7043
+dispatchEventsForPlugins @ chunk-W6L2VRDA.js?v=5ee70186:7051
+(anonymous) @ chunk-W6L2VRDA.js?v=5ee70186:7174
+batchedUpdates$1 @ chunk-W6L2VRDA.js?v=5ee70186:18913
+batchedUpdates @ chunk-W6L2VRDA.js?v=5ee70186:3579
+dispatchEventForPluginEventSystem @ chunk-W6L2VRDA.js?v=5ee70186:7173
+dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay @ chunk-W6L2VRDA.js?v=5ee70186:5478
+dispatchEvent @ chunk-W6L2VRDA.js?v=5ee70186:5472
+dispatchDiscreteEvent @ chunk-W6L2VRDA.js?v=5ee70186:5449Understand this errorAI
+5Settings.tsx:88 Uncaught (in promise) TypeError: updateProfile is not a function
+    at handleProfileChange (Settings.tsx:88:11)
+    at onChange (Settings.tsx:273:42)
+    at HTMLUnknownElement.callCallback2 (chunk-W6L2VRDA.js?v=5ee70186:3674:22)
+    at Object.invokeGuardedCallbackDev (chunk-W6L2VRDA.js?v=5ee70186:3699:24)
+    at invokeGuardedCallback (chunk-W6L2VRDA.js?v=5ee70186:3733:39)
+    at invokeGuardedCallbackAndCatchFirstError (chunk-W6L2VRDA.js?v=5ee70186:3736:33)
+    at executeDispatch (chunk-W6L2VRDA.js?v=5ee70186:7014:11)
+    at processDispatchQueueItemsInOrder (chunk-W6L2VRDA.js?v=5ee70186:7034:15)
+    at processDispatchQueue (chunk-W6L2VRDA.js?v=5ee70186:7043:13)
+    at dispatchEventsForPlugins (chunk-W6L2VRDA.js?v=5ee70186:7051:11)
+handleProfileChange @ Settings.tsx:88
+onChange @ Settings.tsx:273
+callCallback2 @ chunk-W6L2VRDA.js?v=5ee70186:3674
+invokeGuardedCallbackDev @ chunk-W6L2VRDA.js?v=5ee70186:3699
+invokeGuardedCallback @ chunk-W6L2VRDA.js?v=5ee70186:3733
+invokeGuardedCallbackAndCatchFirstError @ chunk-W6L2VRDA.js?v=5ee70186:3736
+executeDispatch @ chunk-W6L2VRDA.js?v=5ee70186:7014
+processDispatchQueueItemsInOrder @ chunk-W6L2VRDA.js?v=5ee70186:7034
+processDispatchQueue @ chunk-W6L2VRDA.js?v=5ee70186:7043
+dispatchEventsForPlugins @ chunk-W6L2VRDA.js?v=5ee70186:7051
+(anonymous) @ chunk-W6L2VRDA.js?v=5ee70186:7174
+batchedUpdates$1 @ chunk-W6L2VRDA.js?v=5ee70186:18913
+batchedUpdates @ chunk-W6L2VRDA.js?v=5ee70186:3579
+dispatchEventForPluginEventSystem @ chunk-W6L2VRDA.js?v=5ee70186:7173
+dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay @ chunk-W6L2VRDA.js?v=5ee70186:5478
+dispatchEvent @ chunk-W6L2VRDA.js?v=5ee70186:5472
+dispatchDiscreteEvent @ chunk-W6L2VRDA.js?v=5ee70186:5449Understand this errorAI
+Settings.tsx:156 
+            
+            
+           POST https://yekzyvdjjozhhatdefsq.supabase.co/storage/v1/object/avatars/7bad0693-9053-423f-a2f0-a61c20b9cbf4-0.8087517023344539.png 500 (Internal Server Error)
+(anonymous) @ @supabase_supabase-js.js?v=12fba40b:3900
+(anonymous) @ @supabase_supabase-js.js?v=12fba40b:3921
+fulfilled @ @supabase_supabase-js.js?v=12fba40b:3873
+Promise.then
+step @ @supabase_supabase-js.js?v=12fba40b:3886
+(anonymous) @ @supabase_supabase-js.js?v=12fba40b:3888
+__awaiter6 @ @supabase_supabase-js.js?v=12fba40b:3870
+(anonymous) @ @supabase_supabase-js.js?v=12fba40b:3911
+(anonymous) @ @supabase_supabase-js.js?v=12fba40b:2987
+(anonymous) @ @supabase_supabase-js.js?v=12fba40b:2987
+(anonymous) @ @supabase_supabase-js.js?v=12fba40b:3188
+(anonymous) @ @supabase_supabase-js.js?v=12fba40b:3125
+__awaiter4 @ @supabase_supabase-js.js?v=12fba40b:3107
+uploadOrUpdate @ @supabase_supabase-js.js?v=12fba40b:3156
+(anonymous) @ @supabase_supabase-js.js?v=12fba40b:3215
+(anonymous) @ @supabase_supabase-js.js?v=12fba40b:3125
+__awaiter4 @ @supabase_supabase-js.js?v=12fba40b:3107
+upload @ @supabase_supabase-js.js?v=12fba40b:3214
+handleUploadAvatar @ Settings.tsx:156
+callCallback2 @ chunk-W6L2VRDA.js?v=5ee70186:3674
+invokeGuardedCallbackDev @ chunk-W6L2VRDA.js?v=5ee70186:3699
+invokeGuardedCallback @ chunk-W6L2VRDA.js?v=5ee70186:3733
+invokeGuardedCallbackAndCatchFirstError @ chunk-W6L2VRDA.js?v=5ee70186:3736
+executeDispatch @ chunk-W6L2VRDA.js?v=5ee70186:7014
+processDispatchQueueItemsInOrder @ chunk-W6L2VRDA.js?v=5ee70186:7034
+processDispatchQueue @ chunk-W6L2VRDA.js?v=5ee70186:7043
+dispatchEventsForPlugins @ chunk-W6L2VRDA.js?v=5ee70186:7051
+(anonymous) @ chunk-W6L2VRDA.js?v=5ee70186:7174
+batchedUpdates$1 @ chunk-W6L2VRDA.js?v=5ee70186:18913
+batchedUpdates @ chunk-W6L2VRDA.js?v=5ee70186:3579
+dispatchEventForPluginEventSystem @ chunk-W6L2VRDA.js?v=5ee70186:7173
+dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay @ chunk-W6L2VRDA.js?v=5ee70186:5478
+dispatchEvent @ chunk-W6L2VRDA.js?v=5ee70186:5472
+dispatchDiscreteEvent @ chunk-W6L2VRDA.js?v=5ee70186:5449Understand this errorAI
+Settings.tsx:171 Error uploading avatar: {statusCode: '500', code: 'DatabaseError', error: 'DatabaseError', message: 'insert into "objects" ("bucket_id", "metadata", "n…53-423f-a2f0-a61c20b9cbf4-0.8087517023344539.png"'}code: "DatabaseError"error: "DatabaseError"message: "insert into \"objects\" (\"bucket_id\", \"metadata\", \"name\", \"owner\", \"owner_id\", \"user_metadata\", \"version\") values ($1, DEFAULT, $2, $3, $4, DEFAULT, $5) - invalid input syntax for type uuid: \"7bad0693-9053-423f-a2f0-a61c20b9cbf4-0.8087517023344539.png\""statusCode: "500"[[Prototype]]: Object
+handleUploadAvatar @ Settings.tsx:171
+await in handleUploadAvatar
+callCallback2 @ chunk-W6L2VRDA.js?v=5ee70186:3674
+invokeGuardedCallbackDev @ chunk-W6L2VRDA.js?v=5ee70186:3699
+invokeGuardedCallback @ chunk-W6L2VRDA.js?v=5ee70186:3733
+invokeGuardedCallbackAndCatchFirstError @ chunk-W6L2VRDA.js?v=5ee70186:3736
+executeDispatch @ chunk-W6L2VRDA.js?v=5ee70186:7014
+processDispatchQueueItemsInOrder @ chunk-W6L2VRDA.js?v=5ee70186:7034
+processDispatchQueue @ chunk-W6L2VRDA.js?v=5ee70186:7043
+dispatchEventsForPlugins @ chunk-W6L2VRDA.js?v=5ee70186:7051
+(anonymous) @ chunk-W6L2VRDA.js?v=5ee70186:7174
+batchedUpdates$1 @ chunk-W6L2VRDA.js?v=5ee70186:18913
+batchedUpdates @ chunk-W6L2VRDA.js?v=5ee70186:3579
+dispatchEventForPluginEventSystem @ chunk-W6L2VRDA.js?v=5ee70186:7173
+dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay @ chunk-W6L2VRDA.js?v=5ee70186:5478
+dispatchEvent @ chunk-W6L2VRDA.js?v=5ee70186:5472
+dispatchDiscreteEvent @ chunk-W6L2VRDA.js?v=5ee70186:5449Understand this errorAI
+chunk-W6L2VRDA.js?v=5ee70186:377 [Violation] 'message' handler took 155ms
