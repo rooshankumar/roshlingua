@@ -57,14 +57,14 @@ const Settings = () => {
 
       if (!existingProfile) {
         // Create profile if it doesn't exist
-        const { error: createError } = await supabase
+        const { error: insertError } = await supabase
           .from('profiles')
           .insert([{ 
             id: user.id,
             [field]: value,
             updated_at: new Date().toISOString()
           }]);
-        if (createError) throw createError;
+        if (insertError) throw insertError;
       } else {
         // Update existing profile
         const { error } = await supabase
@@ -77,7 +77,6 @@ const Settings = () => {
         if (error) throw error;
       }
 
-      if (error) throw error;
       if (field === 'bio') {
         await updateProfile({...profile, bio: value}); //added to update realtime profile
       }
