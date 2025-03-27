@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import { RealtimeChannel } from '@supabase/supabase-js';
@@ -52,32 +51,43 @@ export function useRealtimeUsers() {
         });
     };
 
+    const setupSubscription = () => {
+      channel = supabase
+        .channel('online-users')
+        .on('presence', { event: 'sync' }, () => {
+          // Handle presence sync
+          const presenceState = channel.presenceState();
+          const onlineUserIds = Object.keys(presenceState);
+
+          setUsers(prevUsers => 
+            prevUsers.map(user => ({
+              ...user,
+              is_online: onlineUserIds.includes(user.id)
+            }))
+          );
+        })
+        .subscribe(async (status) => {
+          if (status === 'SUBSCRIBED') {
+            // Track user's presence
+            await channel.track({
+              user_id: supabase.auth.user()?.id,
+              online_at: new Date().toISOString(),
+            });
+          }
+        });
+    };
+
+    // Initial fetch and subscription setup
     fetchUsers();
     setupRealtimeSubscription();
+    setupSubscription();
 
-    // Cleanup subscription when component unmounts
     return () => {
-      if (channel) channel.unsubscribe();
+      if (channel) {
+        channel.unsubscribe();
+      }
     };
   }, []);
 
-  const refreshUsers = async () => {
-    try {
-      setLoading(true);
-      const { data, error } = await supabase
-        .from('users')
-        .select('*, profiles(*)')
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-      setUsers(data || []);
-    } catch (err) {
-      console.error('Error refreshing users:', err);
-      setError(err.message || 'Failed to refresh users');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  return { users, loading, error, refreshUsers };
+  return { users, loading, error };
 }
