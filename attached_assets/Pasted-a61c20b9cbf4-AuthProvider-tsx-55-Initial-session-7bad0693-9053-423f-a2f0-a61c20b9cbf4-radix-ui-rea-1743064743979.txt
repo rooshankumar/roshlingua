@@ -1,0 +1,204 @@
+a61c20b9cbf4
+AuthProvider.tsx:55 Initial session: 7bad0693-9053-423f-a2f0-a61c20b9cbf4
+@radix-ui_react-select.js?v=188d5fb6:872 Uncaught Error: A <Select.Item /> must have a value prop that is not an empty string. This is because the Select value can be set to an empty string to clear the selection and show the placeholder.
+    at @radix-ui_react-select.js?v=188d5fb6:872:13
+    at renderWithHooks (chunk-W6L2VRDA.js?v=188d5fb6:11548:26)
+    at updateForwardRef (chunk-W6L2VRDA.js?v=188d5fb6:14325:28)
+    at beginWork (chunk-W6L2VRDA.js?v=188d5fb6:15946:22)
+    at HTMLUnknownElement.callCallback2 (chunk-W6L2VRDA.js?v=188d5fb6:3674:22)
+    at Object.invokeGuardedCallbackDev (chunk-W6L2VRDA.js?v=188d5fb6:3699:24)
+    at invokeGuardedCallback (chunk-W6L2VRDA.js?v=188d5fb6:3733:39)
+    at beginWork$1 (chunk-W6L2VRDA.js?v=188d5fb6:19765:15)
+    at performUnitOfWork (chunk-W6L2VRDA.js?v=188d5fb6:19198:20)
+    at workLoopSync (chunk-W6L2VRDA.js?v=188d5fb6:19137:13)
+(anonymous) @ @radix-ui_react-select.js?v=188d5fb6:872
+renderWithHooks @ chunk-W6L2VRDA.js?v=188d5fb6:11548
+updateForwardRef @ chunk-W6L2VRDA.js?v=188d5fb6:14325
+beginWork @ chunk-W6L2VRDA.js?v=188d5fb6:15946
+callCallback2 @ chunk-W6L2VRDA.js?v=188d5fb6:3674
+invokeGuardedCallbackDev @ chunk-W6L2VRDA.js?v=188d5fb6:3699
+invokeGuardedCallback @ chunk-W6L2VRDA.js?v=188d5fb6:3733
+beginWork$1 @ chunk-W6L2VRDA.js?v=188d5fb6:19765
+performUnitOfWork @ chunk-W6L2VRDA.js?v=188d5fb6:19198
+workLoopSync @ chunk-W6L2VRDA.js?v=188d5fb6:19137
+renderRootSync @ chunk-W6L2VRDA.js?v=188d5fb6:19116
+performSyncWorkOnRoot @ chunk-W6L2VRDA.js?v=188d5fb6:18874
+flushSyncCallbacks @ chunk-W6L2VRDA.js?v=188d5fb6:9119
+commitRootImpl @ chunk-W6L2VRDA.js?v=188d5fb6:19432
+commitRoot @ chunk-W6L2VRDA.js?v=188d5fb6:19277
+finishConcurrentRender @ chunk-W6L2VRDA.js?v=188d5fb6:18805
+performConcurrentWorkOnRoot @ chunk-W6L2VRDA.js?v=188d5fb6:18718
+workLoop @ chunk-W6L2VRDA.js?v=188d5fb6:197
+flushWork @ chunk-W6L2VRDA.js?v=188d5fb6:176
+performWorkUntilDeadline @ chunk-W6L2VRDA.js?v=188d5fb6:384Understand this errorAI
+@radix-ui_react-select.js?v=188d5fb6:872 Uncaught Error: A <Select.Item /> must have a value prop that is not an empty string. This is because the Select value can be set to an empty string to clear the selection and show the placeholder.
+    at @radix-ui_react-select.js?v=188d5fb6:872:13
+    at renderWithHooks (chunk-W6L2VRDA.js?v=188d5fb6:11548:26)
+    at updateForwardRef (chunk-W6L2VRDA.js?v=188d5fb6:14325:28)
+    at beginWork (chunk-W6L2VRDA.js?v=188d5fb6:15946:22)
+    at HTMLUnknownElement.callCallback2 (chunk-W6L2VRDA.js?v=188d5fb6:3674:22)
+    at Object.invokeGuardedCallbackDev (chunk-W6L2VRDA.js?v=188d5fb6:3699:24)
+    at invokeGuardedCallback (chunk-W6L2VRDA.js?v=188d5fb6:3733:39)
+    at beginWork$1 (chunk-W6L2VRDA.js?v=188d5fb6:19765:15)
+    at performUnitOfWork (chunk-W6L2VRDA.js?v=188d5fb6:19198:20)
+    at workLoopSync (chunk-W6L2VRDA.js?v=188d5fb6:19137:13)
+(anonymous) @ @radix-ui_react-select.js?v=188d5fb6:872
+renderWithHooks @ chunk-W6L2VRDA.js?v=188d5fb6:11548
+updateForwardRef @ chunk-W6L2VRDA.js?v=188d5fb6:14325
+beginWork @ chunk-W6L2VRDA.js?v=188d5fb6:15946
+callCallback2 @ chunk-W6L2VRDA.js?v=188d5fb6:3674
+invokeGuardedCallbackDev @ chunk-W6L2VRDA.js?v=188d5fb6:3699
+invokeGuardedCallback @ chunk-W6L2VRDA.js?v=188d5fb6:3733
+beginWork$1 @ chunk-W6L2VRDA.js?v=188d5fb6:19765
+performUnitOfWork @ chunk-W6L2VRDA.js?v=188d5fb6:19198
+workLoopSync @ chunk-W6L2VRDA.js?v=188d5fb6:19137
+renderRootSync @ chunk-W6L2VRDA.js?v=188d5fb6:19116
+recoverFromConcurrentError @ chunk-W6L2VRDA.js?v=188d5fb6:18736
+performSyncWorkOnRoot @ chunk-W6L2VRDA.js?v=188d5fb6:18879
+flushSyncCallbacks @ chunk-W6L2VRDA.js?v=188d5fb6:9119
+commitRootImpl @ chunk-W6L2VRDA.js?v=188d5fb6:19432
+commitRoot @ chunk-W6L2VRDA.js?v=188d5fb6:19277
+finishConcurrentRender @ chunk-W6L2VRDA.js?v=188d5fb6:18805
+performConcurrentWorkOnRoot @ chunk-W6L2VRDA.js?v=188d5fb6:18718
+workLoop @ chunk-W6L2VRDA.js?v=188d5fb6:197
+flushWork @ chunk-W6L2VRDA.js?v=188d5fb6:176
+performWorkUntilDeadline @ chunk-W6L2VRDA.js?v=188d5fb6:384Understand this errorAI
+chunk-W6L2VRDA.js?v=188d5fb6:14032 The above error occurred in the <SelectItem> component:
+
+    at https://58c6a7e9-0967-4052-aa84-af21abc44ae2-00-1behv1j5ksb9u.pike.replit.dev/node_modules/.vite/deps/@radix-ui_react-select.js?v=188d5fb6:845:7
+    at _c8 (https://58c6a7e9-0967-4052-aa84-af21abc44ae2-00-1behv1j5ksb9u.pike.replit.dev/src/components/ui/select.tsx:223:60)
+    at div
+    at https://58c6a7e9-0967-4052-aa84-af21abc44ae2-00-1behv1j5ksb9u.pike.replit.dev/node_modules/.vite/deps/chunk-LTXT6CEX.js?v=188d5fb6:41:13
+    at Provider (https://58c6a7e9-0967-4052-aa84-af21abc44ae2-00-1behv1j5ksb9u.pike.replit.dev/node_modules/.vite/deps/chunk-ICA7ZJMY.js?v=188d5fb6:38:15)
+    at https://58c6a7e9-0967-4052-aa84-af21abc44ae2-00-1behv1j5ksb9u.pike.replit.dev/node_modules/.vite/deps/@radix-ui_react-select.js?v=188d5fb6:825:13
+    at div
+    at https://58c6a7e9-0967-4052-aa84-af21abc44ae2-00-1behv1j5ksb9u.pike.replit.dev/node_modules/.vite/deps/chunk-LTXT6CEX.js?v=188d5fb6:41:13
+    at https://58c6a7e9-0967-4052-aa84-af21abc44ae2-00-1behv1j5ksb9u.pike.replit.dev/node_modules/.vite/deps/chunk-D3CTYCI6.js?v=188d5fb6:52:11
+    at https://58c6a7e9-0967-4052-aa84-af21abc44ae2-00-1behv1j5ksb9u.pike.replit.dev/node_modules/.vite/deps/chunk-D3CTYCI6.js?v=188d5fb6:33:11
+    at https://58c6a7e9-0967-4052-aa84-af21abc44ae2-00-1behv1j5ksb9u.pike.replit.dev/node_modules/.vite/deps/chunk-LP3SNE3I.js?v=188d5fb6:98:15
+    at https://58c6a7e9-0967-4052-aa84-af21abc44ae2-00-1behv1j5ksb9u.pike.replit.dev/node_modules/.vite/deps/@radix-ui_react-select.js?v=188d5fb6:756:13
+    at div
+    at https://58c6a7e9-0967-4052-aa84-af21abc44ae2-00-1behv1j5ksb9u.pike.replit.dev/node_modules/.vite/deps/chunk-D3CTYCI6.js?v=188d5fb6:52:11
+    at https://58c6a7e9-0967-4052-aa84-af21abc44ae2-00-1behv1j5ksb9u.pike.replit.dev/node_modules/.vite/deps/chunk-D3CTYCI6.js?v=188d5fb6:33:11
+    at https://58c6a7e9-0967-4052-aa84-af21abc44ae2-00-1behv1j5ksb9u.pike.replit.dev/node_modules/.vite/deps/chunk-LP3SNE3I.js?v=188d5fb6:98:15
+    at Provider (https://58c6a7e9-0967-4052-aa84-af21abc44ae2-00-1behv1j5ksb9u.pike.replit.dev/node_modules/.vite/deps/chunk-ICA7ZJMY.js?v=188d5fb6:38:15)
+    at https://58c6a7e9-0967-4052-aa84-af21abc44ae2-00-1behv1j5ksb9u.pike.replit.dev/node_modules/.vite/deps/@radix-ui_react-select.js?v=188d5fb6:300:58
+    at https://58c6a7e9-0967-4052-aa84-af21abc44ae2-00-1behv1j5ksb9u.pike.replit.dev/node_modules/.vite/deps/chunk-D3CTYCI6.js?v=188d5fb6:52:11
+    at https://58c6a7e9-0967-4052-aa84-af21abc44ae2-00-1behv1j5ksb9u.pike.replit.dev/node_modules/.vite/deps/chunk-D3CTYCI6.js?v=188d5fb6:33:11
+    at https://58c6a7e9-0967-4052-aa84-af21abc44ae2-00-1behv1j5ksb9u.pike.replit.dev/node_modules/.vite/deps/chunk-LTXT6CEX.js?v=188d5fb6:41:13
+    at https://58c6a7e9-0967-4052-aa84-af21abc44ae2-00-1behv1j5ksb9u.pike.replit.dev/node_modules/.vite/deps/chunk-WAAVKW3J.js?v=188d5fb6:260:22
+    at SelectPortal
+    at _c4 (https://58c6a7e9-0967-4052-aa84-af21abc44ae2-00-1behv1j5ksb9u.pike.replit.dev/src/components/ui/select.tsx:130:63)
+    at Provider (https://58c6a7e9-0967-4052-aa84-af21abc44ae2-00-1behv1j5ksb9u.pike.replit.dev/node_modules/.vite/deps/chunk-ICA7ZJMY.js?v=188d5fb6:38:15)
+    at Provider (https://58c6a7e9-0967-4052-aa84-af21abc44ae2-00-1behv1j5ksb9u.pike.replit.dev/node_modules/.vite/deps/chunk-LP3SNE3I.js?v=188d5fb6:28:15)
+    at CollectionProvider (https://58c6a7e9-0967-4052-aa84-af21abc44ae2-00-1behv1j5ksb9u.pike.replit.dev/node_modules/.vite/deps/chunk-LP3SNE3I.js?v=188d5fb6:89:13)
+    at Provider (https://58c6a7e9-0967-4052-aa84-af21abc44ae2-00-1behv1j5ksb9u.pike.replit.dev/node_modules/.vite/deps/chunk-ICA7ZJMY.js?v=188d5fb6:38:15)
+    at Provider (https://58c6a7e9-0967-4052-aa84-af21abc44ae2-00-1behv1j5ksb9u.pike.replit.dev/node_modules/.vite/deps/chunk-WNUSBTM2.js?v=188d5fb6:1905:15)
+    at Popper (https://58c6a7e9-0967-4052-aa84-af21abc44ae2-00-1behv1j5ksb9u.pike.replit.dev/node_modules/.vite/deps/chunk-WNUSBTM2.js?v=188d5fb6:1962:11)
+    at Select (https://58c6a7e9-0967-4052-aa84-af21abc44ae2-00-1behv1j5ksb9u.pike.replit.dev/node_modules/.vite/deps/@radix-ui_react-select.js?v=188d5fb6:88:5)
+    at div
+    at div
+    at _c8 (https://58c6a7e9-0967-4052-aa84-af21abc44ae2-00-1behv1j5ksb9u.pike.replit.dev/src/components/ui/card.tsx:84:61)
+    at div
+    at _c (https://58c6a7e9-0967-4052-aa84-af21abc44ae2-00-1behv1j5ksb9u.pike.replit.dev/src/components/ui/card.tsx:12:53)
+    at div
+    at Community (https://58c6a7e9-0967-4052-aa84-af21abc44ae2-00-1behv1j5ksb9u.pike.replit.dev/src/pages/Community.tsx?t=1743064698722:24:31)
+    at main
+    at div
+    at AppLayout (https://58c6a7e9-0967-4052-aa84-af21abc44ae2-00-1behv1j5ksb9u.pike.replit.dev/src/components/layouts/AppLayout.tsx:11:22)
+    at ProtectedRoute (https://58c6a7e9-0967-4052-aa84-af21abc44ae2-00-1behv1j5ksb9u.pike.replit.dev/src/components/auth/ProtectedRoute.tsx:15:27)
+    at RenderedRoute (https://58c6a7e9-0967-4052-aa84-af21abc44ae2-00-1behv1j5ksb9u.pike.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=188d5fb6:4069:5)
+    at Routes (https://58c6a7e9-0967-4052-aa84-af21abc44ae2-00-1behv1j5ksb9u.pike.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=188d5fb6:4508:5)
+    at AppRoutes (https://58c6a7e9-0967-4052-aa84-af21abc44ae2-00-1behv1j5ksb9u.pike.replit.dev/src/App.tsx?t=1743064698722:34:33)
+    at AuthProvider (https://58c6a7e9-0967-4052-aa84-af21abc44ae2-00-1behv1j5ksb9u.pike.replit.dev/src/providers/AuthProvider.tsx:23:32)
+    at Router (https://58c6a7e9-0967-4052-aa84-af21abc44ae2-00-1behv1j5ksb9u.pike.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=188d5fb6:4451:15)
+    at BrowserRouter (https://58c6a7e9-0967-4052-aa84-af21abc44ae2-00-1behv1j5ksb9u.pike.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=188d5fb6:5196:5)
+    at ThemeProvider (https://58c6a7e9-0967-4052-aa84-af21abc44ae2-00-1behv1j5ksb9u.pike.replit.dev/src/components/theme-provider.tsx:17:33)
+    at QueryClientProvider (https://58c6a7e9-0967-4052-aa84-af21abc44ae2-00-1behv1j5ksb9u.pike.replit.dev/node_modules/.vite/deps/@tanstack_react-query.js?v=188d5fb6:2794:3)
+    at App
+
+Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://reactjs.org/link/error-boundaries to learn more about error boundaries.
+logCapturedError @ chunk-W6L2VRDA.js?v=188d5fb6:14032
+update.callback @ chunk-W6L2VRDA.js?v=188d5fb6:14052
+callCallback @ chunk-W6L2VRDA.js?v=188d5fb6:11248
+commitUpdateQueue @ chunk-W6L2VRDA.js?v=188d5fb6:11265
+commitLayoutEffectOnFiber @ chunk-W6L2VRDA.js?v=188d5fb6:17093
+commitLayoutMountEffects_complete @ chunk-W6L2VRDA.js?v=188d5fb6:17980
+commitLayoutEffects_begin @ chunk-W6L2VRDA.js?v=188d5fb6:17969
+commitLayoutEffects @ chunk-W6L2VRDA.js?v=188d5fb6:17920
+commitRootImpl @ chunk-W6L2VRDA.js?v=188d5fb6:19353
+commitRoot @ chunk-W6L2VRDA.js?v=188d5fb6:19277
+performSyncWorkOnRoot @ chunk-W6L2VRDA.js?v=188d5fb6:18895
+flushSyncCallbacks @ chunk-W6L2VRDA.js?v=188d5fb6:9119
+commitRootImpl @ chunk-W6L2VRDA.js?v=188d5fb6:19432
+commitRoot @ chunk-W6L2VRDA.js?v=188d5fb6:19277
+finishConcurrentRender @ chunk-W6L2VRDA.js?v=188d5fb6:18805
+performConcurrentWorkOnRoot @ chunk-W6L2VRDA.js?v=188d5fb6:18718
+workLoop @ chunk-W6L2VRDA.js?v=188d5fb6:197
+flushWork @ chunk-W6L2VRDA.js?v=188d5fb6:176
+performWorkUntilDeadline @ chunk-W6L2VRDA.js?v=188d5fb6:384Understand this errorAI
+chunk-W6L2VRDA.js?v=188d5fb6:9129 Uncaught Error: A <Select.Item /> must have a value prop that is not an empty string. This is because the Select value can be set to an empty string to clear the selection and show the placeholder.
+    at @radix-ui_react-select.js?v=188d5fb6:872:13
+    at renderWithHooks (chunk-W6L2VRDA.js?v=188d5fb6:11548:26)
+    at updateForwardRef (chunk-W6L2VRDA.js?v=188d5fb6:14325:28)
+    at beginWork (chunk-W6L2VRDA.js?v=188d5fb6:15946:22)
+    at beginWork$1 (chunk-W6L2VRDA.js?v=188d5fb6:19753:22)
+    at performUnitOfWork (chunk-W6L2VRDA.js?v=188d5fb6:19198:20)
+    at workLoopSync (chunk-W6L2VRDA.js?v=188d5fb6:19137:13)
+    at renderRootSync (chunk-W6L2VRDA.js?v=188d5fb6:19116:15)
+    at recoverFromConcurrentError (chunk-W6L2VRDA.js?v=188d5fb6:18736:28)
+    at performSyncWorkOnRoot (chunk-W6L2VRDA.js?v=188d5fb6:18879:28)
+(anonymous) @ @radix-ui_react-select.js?v=188d5fb6:872
+renderWithHooks @ chunk-W6L2VRDA.js?v=188d5fb6:11548
+updateForwardRef @ chunk-W6L2VRDA.js?v=188d5fb6:14325
+beginWork @ chunk-W6L2VRDA.js?v=188d5fb6:15946
+beginWork$1 @ chunk-W6L2VRDA.js?v=188d5fb6:19753
+performUnitOfWork @ chunk-W6L2VRDA.js?v=188d5fb6:19198
+workLoopSync @ chunk-W6L2VRDA.js?v=188d5fb6:19137
+renderRootSync @ chunk-W6L2VRDA.js?v=188d5fb6:19116
+recoverFromConcurrentError @ chunk-W6L2VRDA.js?v=188d5fb6:18736
+performSyncWorkOnRoot @ chunk-W6L2VRDA.js?v=188d5fb6:18879
+flushSyncCallbacks @ chunk-W6L2VRDA.js?v=188d5fb6:9119
+commitRootImpl @ chunk-W6L2VRDA.js?v=188d5fb6:19432
+commitRoot @ chunk-W6L2VRDA.js?v=188d5fb6:19277
+finishConcurrentRender @ chunk-W6L2VRDA.js?v=188d5fb6:18805
+performConcurrentWorkOnRoot @ chunk-W6L2VRDA.js?v=188d5fb6:18718
+workLoop @ chunk-W6L2VRDA.js?v=188d5fb6:197
+flushWork @ chunk-W6L2VRDA.js?v=188d5fb6:176
+performWorkUntilDeadline @ chunk-W6L2VRDA.js?v=188d5fb6:384Understand this errorAI
+chunk-W6L2VRDA.js?v=188d5fb6:377 [Violation] 'message' handler took 153ms
+@supabase_supabase-js.js?v=188d5fb6:3900 
+            
+            
+           GET https://yekzyvdjjozhhatdefsq.supabase.co/rest/v1/profiles?select=* 404 (Not Found)
+(anonymous) @ @supabase_supabase-js.js?v=188d5fb6:3900
+(anonymous) @ @supabase_supabase-js.js?v=188d5fb6:3921
+fulfilled @ @supabase_supabase-js.js?v=188d5fb6:3873
+Promise.then
+step @ @supabase_supabase-js.js?v=188d5fb6:3886
+(anonymous) @ @supabase_supabase-js.js?v=188d5fb6:3888
+__awaiter6 @ @supabase_supabase-js.js?v=188d5fb6:3870
+(anonymous) @ @supabase_supabase-js.js?v=188d5fb6:3911
+then @ @supabase_supabase-js.js?v=188d5fb6:89Understand this errorAI
+Community.tsx:47 Error fetching users: {code: '42P01', details: null, hint: null, message: 'relation "public.profiles" does not exist'}
+fetchUsers @ Community.tsx:47
+await in fetchUsers
+(anonymous) @ Community.tsx:68
+commitHookEffectListMount @ chunk-W6L2VRDA.js?v=188d5fb6:16915
+commitPassiveMountOnFiber @ chunk-W6L2VRDA.js?v=188d5fb6:18156
+commitPassiveMountEffects_complete @ chunk-W6L2VRDA.js?v=188d5fb6:18129
+commitPassiveMountEffects_begin @ chunk-W6L2VRDA.js?v=188d5fb6:18119
+commitPassiveMountEffects @ chunk-W6L2VRDA.js?v=188d5fb6:18109
+flushPassiveEffectsImpl @ chunk-W6L2VRDA.js?v=188d5fb6:19490
+flushPassiveEffects @ chunk-W6L2VRDA.js?v=188d5fb6:19447
+performSyncWorkOnRoot @ chunk-W6L2VRDA.js?v=188d5fb6:18868
+flushSyncCallbacks @ chunk-W6L2VRDA.js?v=188d5fb6:9119
+commitRootImpl @ chunk-W6L2VRDA.js?v=188d5fb6:19432
+commitRoot @ chunk-W6L2VRDA.js?v=188d5fb6:19277
+finishConcurrentRender @ chunk-W6L2VRDA.js?v=188d5fb6:18805
+performConcurrentWorkOnRoot @ chunk-W6L2VRDA.js?v=188d5fb6:18718
+workLoop @ chunk-W6L2VRDA.js?v=188d5fb6:197
+flushWork @ chunk-W6L2VRDA.js?v=188d5fb6:176
+performWorkUntilDeadline @ chunk-W6L2VRDA.js?v=188d5fb6:384Understand this errorAI
+client:614 [vite] connected.
