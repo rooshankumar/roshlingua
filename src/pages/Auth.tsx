@@ -131,7 +131,7 @@ const Auth = () => {
                   <Input 
                     id="email" 
                     type="email" 
-                    placeholder="name@example.com" 
+                    placeholder="name@gmail.com" 
                     className="pl-10"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
@@ -245,7 +245,7 @@ const Auth = () => {
             <CardHeader>
               <CardTitle>Create an account</CardTitle>
               <CardDescription>
-                Join Languagelandia's global community today
+                Join roshLingua's global community today
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -267,7 +267,7 @@ const Auth = () => {
                   <Input 
                     id="email-signup" 
                     type="email" 
-                    placeholder="name@example.com" 
+                    placeholder="name@gmail.com" 
                     className="pl-10"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
