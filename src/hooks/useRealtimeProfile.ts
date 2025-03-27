@@ -1,42 +1,55 @@
-
-import { useEffect } from 'react';
-import { useQueryClient } from '@tanstack/react-query';
-import { RealtimeChannel } from '@supabase/supabase-js';
+import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
-import { useProfile } from './useProfiles';
+import { useAuth } from '@/providers/AuthProvider';
 
 export const useRealtimeProfile = (userId: string) => {
-  const queryClient = useQueryClient();
-  const { data: profile, isLoading, error } = useProfile(userId);
+  const [realtimeProfile, setRealtimeProfile] = useState(null);
+  const [error, setError] = useState(null);
+  const { user } = useAuth();
 
   useEffect(() => {
-    let channel: RealtimeChannel;
+    if (!userId) return;
 
-    const setupRealtimeProfile = () => {
-      channel = supabase
-        .channel(`profile:${userId}`)
-        .on('postgres_changes', {
+    // Initial fetch
+    const fetchProfile = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', userId)
+          .single();
+
+        if (error) throw error;
+        setRealtimeProfile(data);
+      } catch (err) {
+        console.error('Error fetching profile:', err);
+        setError(err);
+      }
+    };
+
+    fetchProfile();
+
+    // Set up realtime subscription
+    const profileSubscription = supabase
+      .channel('profile_changes')
+      .on(
+        'postgres_changes',
+        {
           event: '*',
           schema: 'public',
           table: 'profiles',
           filter: `id=eq.${userId}`,
-        }, (payload) => {
-          // Immediately update the cache with new data
-          queryClient.setQueryData(['profile', userId], payload.new);
-          // Then invalidate to refetch in background
-          queryClient.invalidateQueries({ queryKey: ['profile', userId] });
-        })
-        .subscribe();
-    };
-
-    if (userId) {
-      setupRealtimeProfile();
-    }
+        },
+        (payload) => {
+          setRealtimeProfile(payload.new);
+        }
+      )
+      .subscribe();
 
     return () => {
-      if (channel) channel.unsubscribe();
+      profileSubscription.unsubscribe();
     };
-  }, [userId, queryClient]);
+  }, [userId]);
 
-  return { profile, isLoading, error };
+  return { realtimeProfile, error };
 };
