@@ -25,6 +25,7 @@ const Settings = () => {
   const { user } = useAuth();
   const { profile, updateProfile } = useRealtimeProfile(user?.id);
   const navigate = useNavigate();
+  const [localBio, setLocalBio] = useState(profile?.bio || "");
 
   const languages = [
     "English", "Spanish", "French", "German", "Italian",
@@ -105,6 +106,9 @@ const Settings = () => {
   };
 
   const handleSaveProfile = async () => {
+    if (localBio !== profile?.bio) {
+      await handleProfileChange("bio", localBio);
+    }
     try {
       if (!profile?.id) return;
       await updateProfile(profile);
@@ -273,8 +277,8 @@ const Settings = () => {
                       <Label htmlFor="bio">Bio</Label>
                       <Textarea 
                         id="bio" 
-                        value={profile?.bio || ""}
-                        onChange={(e) => handleProfileChange("bio", e.target.value)}
+                        value={localBio}
+                        onChange={(e) => setLocalBio(e.target.value)}
                         className="min-h-[100px]"
                       />
                     </div>
