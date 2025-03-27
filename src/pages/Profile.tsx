@@ -83,38 +83,43 @@ const Profile = () => {
 
         if (error) throw error;
 
-        // Set profile with real data and fallbacks for missing values
-        setProfile({
-          id: data?.id || parseInt(id),
-          name: data?.name || "New Language Learner",
-          age: data?.age || 25,
-          location: data?.location || "Earth",
-          bio: data?.bio || "Excited to start my language learning journey!",
-          nativeLanguage: data?.native_language || "English",
-          learningLanguage: data?.learning_language || "Spanish",
-          proficiencyLevel: data?.proficiency_level || "Beginner (A1)",
-          streak: data?.streak || 0,
-          joinDate: data?.join_date || new Date().toISOString().split('T')[0],
-          interests: data?.interests || ["Language Learning", "Travel", "Culture"],
-          avatar: data?.avatar_url || "/placeholder.svg",
-          likes: data?.likes_count || 0,
-          liked: data?.is_liked || false,
-          learning: {
-            vocabulary: data?.learning_progress?.vocabulary || 10,
-            grammar: data?.learning_progress?.grammar || 10,
-            speaking: data?.learning_progress?.speaking || 10,
-            listening: data?.learning_progress?.listening || 10
-          },
-          achievements: data?.achievements || [
-            {
-              title: "Getting Started",
-              description: "Started your language learning journey",
-              date: new Date().toISOString().split('T')[0],
-              icon: "🌟"
-            }
-          ]
-        });
-      } catch (err) {
+        // Use real-time profile hook
+const realtimeProfile = useRealtimeProfile(id);
+
+useEffect(() => {
+  if (realtimeProfile) {
+    setProfile({
+      id: realtimeProfile.id,
+      name: realtimeProfile.name || "New Language Learner",
+      age: realtimeProfile.age || 25,
+      location: realtimeProfile.location || "Earth",
+      bio: realtimeProfile.bio || "Excited to start my language learning journey!",
+      nativeLanguage: realtimeProfile.native_language || "English",
+      learningLanguage: realtimeProfile.learning_language || "Spanish",
+      proficiencyLevel: realtimeProfile.proficiency_level || "Beginner (A1)",
+      streak: realtimeProfile.streak_count || 0,
+      joinDate: realtimeProfile.created_at || new Date().toISOString().split('T')[0],
+      interests: realtimeProfile.interests || ["Language Learning", "Travel", "Culture"],
+      avatar: realtimeProfile.avatar_url || "/placeholder.svg",
+      likes: realtimeProfile.likes_count || 0,
+      liked: realtimeProfile.is_liked || false,
+      learning: {
+        vocabulary: realtimeProfile.learning_progress?.vocabulary || 10,
+        grammar: realtimeProfile.learning_progress?.grammar || 10,
+        speaking: realtimeProfile.learning_progress?.speaking || 10,
+        listening: realtimeProfile.learning_progress?.listening || 10
+      },
+      achievements: realtimeProfile.achievements || [
+        {
+          title: "Getting Started",
+          description: "Started your language learning journey",
+          date: new Date().toISOString().split('T')[0],
+          icon: "🌟"
+        }
+      ]
+    });
+  }
+}, [realtimeProfile]);) {
         console.error("Error fetching profile:", err);
         toast({
           title: "Error",

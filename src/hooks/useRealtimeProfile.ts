@@ -7,7 +7,7 @@ import { useProfile } from './useProfiles';
 
 export const useRealtimeProfile = (userId: string) => {
   const queryClient = useQueryClient();
-  const { data: profile } = useProfile(userId);
+  const { data: profile, isLoading, error } = useProfile(userId);
 
   useEffect(() => {
     let channel: RealtimeChannel;
@@ -21,17 +21,22 @@ export const useRealtimeProfile = (userId: string) => {
           table: 'profiles',
           filter: `id=eq.${userId}`,
         }, (payload) => {
+          // Immediately update the cache with new data
+          queryClient.setQueryData(['profile', userId], payload.new);
+          // Then invalidate to refetch in background
           queryClient.invalidateQueries({ queryKey: ['profile', userId] });
         })
         .subscribe();
     };
 
-    setupRealtimeProfile();
+    if (userId) {
+      setupRealtimeProfile();
+    }
 
     return () => {
       if (channel) channel.unsubscribe();
     };
   }, [userId, queryClient]);
 
-  return profile;
+  return { profile, isLoading, error };
 };
