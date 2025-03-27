@@ -41,20 +41,41 @@ const Settings = () => {
   const genders = ["Male", "Female", "Rather not say"];
 
   const handleProfileChange = async (field: string, value: string) => {
-    if (!profile?.id) return;
+    if (!user?.id) return;
     try {
       // Validate gender values
       if (field === "gender" && !["Male", "Female", "Rather not say"].includes(value)) {
         throw new Error("Invalid gender value");
       }
 
-      const { data, error } = await supabase
+      // Check if profile exists
+      const { data: existingProfile } = await supabase
         .from('profiles')
-        .update({ 
-          [field]: value,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', profile.id);
+        .select('id')
+        .eq('id', user.id)
+        .single();
+
+      if (!existingProfile) {
+        // Create profile if it doesn't exist
+        const { error: createError } = await supabase
+          .from('profiles')
+          .insert([{ 
+            id: user.id,
+            [field]: value,
+            updated_at: new Date().toISOString()
+          }]);
+        if (createError) throw createError;
+      } else {
+        // Update existing profile
+        const { error } = await supabase
+          .from('profiles')
+          .update({ 
+            [field]: value,
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', user.id);
+        if (error) throw error;
+      }
 
       if (error) throw error;
       if (field === 'bio') {
