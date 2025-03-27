@@ -124,16 +124,21 @@ export default function Chat() {
               <AvatarImage src={otherUser.avatar_url} />
               <AvatarFallback><User /></AvatarFallback>
             </Avatar>
-            <div>
-              <h3 className="font-medium">{otherUser.username}</h3>
-              <p className="text-sm text-muted-foreground">
-                Native: {otherUser.native_language} • Learning: {otherUser.learning_language}
-                {otherUser.streak_count > 0 && ` • ${otherUser.streak_count} day streak`}
-              </p>
+            <div className="flex gap-2 items-center">
+              <div>
+                <h3 className="font-medium">{otherUser.username}</h3>
+                <p className="text-sm text-muted-foreground">
+                  Native: {otherUser.native_language} • Learning: {otherUser.learning_language}
+                  {otherUser.streak_count > 0 && ` • ${otherUser.streak_count} day streak`}
+                </p>
+              </div>
+              <Button variant="outline" size="sm" asChild>
+                <Link to={`/profile/${otherUser.id}`}>View Profile</Link>
+              </Button>
             </div>
           </div>
         )}
-      </div>
+      </div>div>
 
       {/* Messages */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
@@ -145,11 +150,14 @@ export default function Chat() {
             <div
               className={`max-w-[70%] break-words rounded-lg p-3 ${
                 message.sender_id === user.id
-                  ? 'bg-primary text-primary-foreground'
-                  : 'bg-muted'
+                  ? 'bg-blue-500 text-white'
+                  : 'bg-gray-100 dark:bg-gray-800'
               }`}
             >
               {message.content}
+              <div className="text-xs mt-1 opacity-70">
+                {new Date(message.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+              </div>
             </div>
           </div>
         ))}
@@ -157,15 +165,19 @@ export default function Chat() {
       </div>
 
       {/* Message Input */}
-      <form onSubmit={sendMessage} className="p-4 border-t">
+      <form onSubmit={sendMessage} className="px-4 py-3 border-t bg-white dark:bg-gray-900">
         <div className="flex gap-2">
           <Input
             value={newMessage}
             onChange={(e) => setNewMessage(e.target.value)}
             placeholder="Type a message..."
-            className="flex-1"
+            className="flex-1 bg-gray-100 dark:bg-gray-800 border-0"
           />
-          <Button type="submit" disabled={!newMessage.trim()}>
+          <Button 
+            type="submit" 
+            disabled={!newMessage.trim()}
+            className="bg-blue-500 hover:bg-blue-600 text-white"
+          >
             Send
           </Button>
         </div>
