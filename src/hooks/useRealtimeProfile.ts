@@ -1,10 +1,10 @@
-import { useEffect, useState } from 'react';
+
+import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
-import { useAuth } from '@/providers/AuthProvider';
+import { type Profile } from '@/lib/database.types';
 
 export const useRealtimeProfile = (userId: string | undefined) => {
   const [profile, setProfile] = useState<Profile | null>(null);
-  const { supabase } = useSupabase(); // Assuming useSupabase is defined elsewhere and provides supabase client
 
   useEffect(() => {
     if (!userId) return;
@@ -28,7 +28,7 @@ export const useRealtimeProfile = (userId: string | undefined) => {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [userId, supabase]);
+  }, [userId]);
 
   const fetchProfile = async () => {
     const { data, error } = await supabase
