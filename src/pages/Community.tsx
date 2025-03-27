@@ -172,12 +172,13 @@ const Community = () => {
             </div>
 
             <Select value={languageFilter} onValueChange={setLanguageFilter}>
-              <SelectTrigger className="w-full md:w-[200px]">
+              <SelectTrigger className="w-[180px]">
                 <SelectValue placeholder="Filter by language" />
               </SelectTrigger>
               <SelectContent>
                 <SelectGroup>
-                  <SelectItem value="">All Languages</SelectItem>
+                  <SelectLabel>Languages</SelectLabel>
+                  <SelectItem value="all">All Languages</SelectItem>
                   {availableLanguages.map((language) => (
                     <SelectItem key={language} value={language}>
                       {language}
