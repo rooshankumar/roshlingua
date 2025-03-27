@@ -278,8 +278,8 @@ const Settings = () => {
                       <Label htmlFor="bio">Bio</Label>
                       <Textarea 
                         id="bio" 
-                        value={localBio}
-                        onChange={(e) => setLocalBio(e.target.value)}
+                        value={profile?.bio || ""}
+                        onChange={(e) => handleProfileChange("bio", e.target.value)}
                         className="min-h-[100px]"
                       />
                     </div>
