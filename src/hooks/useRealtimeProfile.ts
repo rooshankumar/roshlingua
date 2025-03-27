@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import { type Profile } from '@/lib/database.types';
@@ -8,20 +9,33 @@ export const useRealtimeProfile = (userId: string | undefined) => {
   useEffect(() => {
     if (!userId) return;
 
-    // Initial fetch
+    const fetchProfile = async () => {
+      const { data, error } = await supabase
+        .from('users')
+        .select('*')
+        .eq('id', userId)
+        .single();
+
+      if (error) {
+        console.error('Error fetching profile:', error);
+        return;
+      }
+
+      setProfile(data);
+    };
+
     fetchProfile();
 
-    // Set up realtime subscription
     const channel = supabase
-      .channel('profiles')
-      .on('postgres_changes', 
-        { event: '*', schema: 'public', table: 'profiles' },
-        (payload) => {
-          if (payload.new.id === userId) {
-            setProfile(payload.new as Profile);
-          }
-        }
-      )
+      .channel('profile-changes')
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'users',
+        filter: `id=eq.${userId}`,
+      }, (payload) => {
+        setProfile(payload.new as Profile);
+      })
       .subscribe();
 
     return () => {
@@ -29,35 +43,17 @@ export const useRealtimeProfile = (userId: string | undefined) => {
     };
   }, [userId]);
 
-  const fetchProfile = async () => {
-    const { data, error } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('id', userId)
-      .single();
-
-    if (error) {
-      console.error('Error fetching profile:', error);
-      return;
-    }
-
-    setProfile(data);
-  };
-
   const updateProfile = async (updates: Partial<Profile>) => {
+    if (!userId) return;
+
     const { error } = await supabase
       .from('users')
-      .update({
-        native_language: updates.native_language,
-        learning_language: updates.learning_language
-      })
+      .update(updates)
       .eq('id', userId);
 
     if (error) {
       throw error;
     }
-
-    return fetchProfile();
   };
 
   return { profile, updateProfile };
