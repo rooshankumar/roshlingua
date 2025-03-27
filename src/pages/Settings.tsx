@@ -42,6 +42,11 @@ const Settings = () => {
   const handleProfileChange = async (field: string, value: string) => {
     if (!profile?.id) return;
     try {
+      // Validate gender values
+      if (field === "gender" && !["Male", "Female", "Rather not say"].includes(value)) {
+        throw new Error("Invalid gender value");
+      }
+
       const { data, error } = await supabase
         .from('users')
         .update({ 
@@ -50,8 +55,6 @@ const Settings = () => {
         })
         .eq('id', profile.id);
 
-      if (error) throw error;
-      
       if (error) throw error;
     } catch (error) {
       console.error("Error updating profile:", error);
