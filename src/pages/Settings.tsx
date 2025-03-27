@@ -593,7 +593,7 @@ const Settings = () => {
                     </SelectTrigger>
                     <SelectContent>
                       {["Male", "Female", "Rather not say"].map((option) => (
-                        <SelectItem key={option} value={option}>
+                        <SelectItem key={option} value={option} >
                           {option}
                         </SelectItem>
                       ))}
