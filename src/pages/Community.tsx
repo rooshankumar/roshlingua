@@ -39,41 +39,45 @@ const Community = () => {
 
   useEffect(() => {
     const fetchUsers = async () => {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('*');
+      try {
+        const { data, error } = await supabase
+          .from('users')
+          .select('*');
 
-      if (error) {
-        console.error('Error fetching users:', error);
-        return;
+        if (error) {
+          console.error("Error fetching users:", error);
+          return;
+        }
+
+        // Use data directly from users table with defaults
+        const usersWithDefaults = (data || []).map(user => ({
+          ...user,
+          username: user.username || user.full_name,
+          full_name: user.full_name || 'Anonymous User',
+          avatar_url: user.avatar_url || '/placeholder.svg',
+          bio: user.bio || 'No bio available',
+          native_language: user.native_language || 'English',
+          learning_language: user.learning_language || 'Spanish',
+          proficiency_level: user.proficiency_level || 'beginner',
+          is_online: user.is_online || false
+        }));
+
+        setUsers(usersWithDefaults);
+        setFilteredUsers(usersWithDefaults);
+      } catch (error) {
+        console.error("Error fetching users:", error);
       }
-
-      // Use data directly from users table with defaults
-      const usersWithDefaults = (data || []).map(user => ({
-        ...user,
-        username: user.username || user.full_name,
-        full_name: user.full_name || 'Anonymous User',
-        avatar_url: user.avatar_url || '/placeholder.svg',
-        bio: user.bio || 'No bio available',
-        native_language: user.native_language || 'English',
-        learning_language: user.learning_language || 'Spanish',
-        proficiency_level: user.proficiency_level || 'beginner',
-        is_online: user.is_online || false
-      }));
-
-      setUsers(usersWithDefaults);
-      setFilteredUsers(usersWithDefaults);
     };
 
     fetchUsers();
 
     const channel = supabase
-      .channel('public:profiles')
+      .channel('public:users')
       .on('postgres_changes', 
         {
           event: '*',
           schema: 'public',
-          table: 'profiles'
+          table: 'users'
         }, 
         payload => {
           console.log('Real-time update:', payload);
@@ -127,7 +131,7 @@ const Community = () => {
 
     // Refresh users to get updated likes count
     const { data: updatedUsers, error: fetchError } = await supabase
-      .from('profiles')
+      .from('users')
       .select('*');
 
     if (fetchError) {
