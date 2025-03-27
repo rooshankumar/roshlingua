@@ -148,7 +148,8 @@ const Settings = ({ onLogout }: SettingsProps) => {
     
     const file = event.target.files[0];
     const fileExt = file.name.split('.').pop();
-    const filePath = `${user?.id}-${Math.random()}.${fileExt}`;
+    const fileName = `${Date.now()}.${fileExt}`;
+    const filePath = `${user?.id}/${fileName}`;
 
     try {
       const { error: uploadError } = await supabase.storage

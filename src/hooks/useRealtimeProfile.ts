@@ -2,54 +2,61 @@ import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/providers/AuthProvider';
 
-export const useRealtimeProfile = (userId: string) => {
-  const [realtimeProfile, setRealtimeProfile] = useState(null);
-  const [error, setError] = useState(null);
-  const { user } = useAuth();
+export const useRealtimeProfile = (userId: string | undefined) => {
+  const [profile, setProfile] = useState<Profile | null>(null);
+  const { supabase } = useSupabase(); // Assuming useSupabase is defined elsewhere and provides supabase client
 
   useEffect(() => {
     if (!userId) return;
 
     // Initial fetch
-    const fetchProfile = async () => {
-      try {
-        const { data, error } = await supabase
-          .from('users')
-          .select('*')
-          .eq('id', userId)
-          .single();
-
-        if (error) throw error;
-        setRealtimeProfile(data);
-      } catch (err) {
-        console.error('Error fetching profile:', err);
-        setError(err);
-      }
-    };
-
     fetchProfile();
 
     // Set up realtime subscription
-    const profileSubscription = supabase
-      .channel('user_changes')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'users',
-          filter: `id=eq.${userId}`,
-        },
+    const channel = supabase
+      .channel('profiles')
+      .on('postgres_changes', 
+        { event: '*', schema: 'public', table: 'profiles' },
         (payload) => {
-          setRealtimeProfile(payload.new);
+          if (payload.new.id === userId) {
+            setProfile(payload.new as Profile);
+          }
         }
       )
       .subscribe();
 
     return () => {
-      profileSubscription.unsubscribe();
+      supabase.removeChannel(channel);
     };
-  }, [userId]);
+  }, [userId, supabase]);
 
-  return { realtimeProfile, error };
+  const fetchProfile = async () => {
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', userId)
+      .single();
+
+    if (error) {
+      console.error('Error fetching profile:', error);
+      return;
+    }
+
+    setProfile(data);
+  };
+
+  const updateProfile = async (updates: Partial<Profile>) => {
+    const { error } = await supabase
+      .from('profiles')
+      .update(updates)
+      .eq('id', userId);
+
+    if (error) {
+      throw error;
+    }
+
+    return fetchProfile();
+  };
+
+  return { profile, updateProfile };
 };
