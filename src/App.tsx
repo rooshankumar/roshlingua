@@ -15,6 +15,7 @@ import Onboarding from "./pages/Onboarding";
 import Community from "./pages/Community";
 import Chat from "./pages/Chat";
 import Settings from "./pages/Settings"; // Added
+import ChatList from "./pages/ChatList"; // Added
 
 // Components
 import ProtectedRoute from "./components/auth/ProtectedRoute";
@@ -82,11 +83,11 @@ const AppRoutes = () => {
       <Route path="/chat" element={
         <ProtectedRoute>
           <AppLayout>
-            <Chat />
+            <ChatList /> {/* Updated */}
           </AppLayout>
         </ProtectedRoute>
       } />
-      <Route path="/chat/:id" element={
+      <Route path="/chat/:conversationId" element={
         <ProtectedRoute>
           <AppLayout>
             <Chat />
