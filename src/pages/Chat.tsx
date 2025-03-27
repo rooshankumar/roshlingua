@@ -114,8 +114,9 @@ export default function Chat() {
     <div className="flex flex-col h-screen max-h-screen overflow-hidden">
       {/* Chat Header */}
       <div className="flex items-center gap-4 p-4 border-b">
-        <Link to="/chat" className="text-muted-foreground hover:text-foreground">
+        <Link to="/chat" className="text-muted-foreground hover:text-foreground flex items-center gap-2">
           <ArrowLeft className="h-5 w-5" />
+          <span>All Chats</span>
         </Link>
         {otherUser && (
           <div className="flex items-center gap-3">

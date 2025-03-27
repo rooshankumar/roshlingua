@@ -75,7 +75,8 @@ export default function ChatList() {
       </div>
 
       <div className="space-y-2">
-        {conversations.map((conversation) => {
+        {conversations.length > 0 ? (
+          conversations.map((conversation) => {
           const otherParticipants = conversation.participants
             .filter(p => p.profiles.id !== user?.id)
             .map(p => p.profiles);
@@ -102,7 +103,15 @@ export default function ChatList() {
               </div>
             </Link>
           );
-        })}
+        })
+        ) : (
+          <div className="text-center py-8">
+            <p className="text-muted-foreground mb-4">No conversations yet</p>
+            <Button asChild>
+              <Link to="/community">Find Users</Link>
+            </Button>
+          </div>
+        )}
       </div>
     </div>
   );
