@@ -1,60 +1,80 @@
 
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { useToast } from '@/hooks/use-toast';
+import { Database } from '@/lib/database.types';
 import { supabase } from '@/lib/supabase';
-import { type Profile } from '@/lib/database.types';
 
-export const useRealtimeProfile = (userId: string | undefined) => {
-  const [profile, setProfile] = useState<Profile | null>(null);
+type User = Database['public']['Tables']['users']['Row'];
+
+export function useRealtimeProfile(userId: string | undefined) {
+  const [profile, setProfile] = useState<User | null>(null);
+  const { toast } = useToast();
 
   useEffect(() => {
     if (!userId) return;
 
     const fetchProfile = async () => {
-      const { data, error } = await supabase
-        .from('users')
-        .select('*')
-        .eq('id', userId)
-        .single();
+      try {
+        const { data, error } = await supabase
+          .from('users')
+          .select('*')
+          .eq('id', userId)
+          .single();
 
-      if (error) {
-        console.error('Error fetching profile:', error);
-        return;
+        if (error) throw error;
+        setProfile(data);
+      } catch (err) {
+        console.error("Error fetching profile:", err);
+        toast({
+          title: "Error",
+          description: "Failed to fetch profile data.",
+          variant: "destructive"
+        });
       }
-
-      setProfile(data);
     };
 
     fetchProfile();
 
-    const channel = supabase
-      .channel('profile-changes')
+    // Set up realtime subscription
+    const userSubscription = supabase
+      .channel(`user:${userId}`)
       .on('postgres_changes', {
         event: '*',
         schema: 'public',
         table: 'users',
-        filter: `id=eq.${userId}`,
+        filter: `id=eq.${userId}`
       }, (payload) => {
-        setProfile(payload.new as Profile);
+        setProfile(payload.new as User);
       })
       .subscribe();
 
     return () => {
-      supabase.removeChannel(channel);
+      userSubscription.unsubscribe();
     };
-  }, [userId]);
+  }, [userId, toast]);
 
-  const updateProfile = async (updates: Partial<Profile>) => {
-    if (!userId) return;
+  const updateProfile = async (updates: Partial<User>) => {
+    try {
+      const { error } = await supabase
+        .from('users')
+        .update(updates)
+        .eq('id', userId);
 
-    const { error } = await supabase
-      .from('users')
-      .update(updates)
-      .eq('id', userId);
+      if (error) throw error;
 
-    if (error) {
-      throw error;
+      toast({
+        title: "Success",
+        description: "Profile updated successfully.",
+      });
+    } catch (err) {
+      console.error("Error updating profile:", err);
+      toast({
+        title: "Error",
+        description: "Failed to update profile.",
+        variant: "destructive"
+      });
     }
   };
 
-  return { profile, updateProfile };
-};
+  return { profile, updateProfile, setProfile };
+}

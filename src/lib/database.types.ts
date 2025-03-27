@@ -1,4 +1,3 @@
-
 export interface Database {
   public: {
     Tables: {
@@ -7,16 +6,20 @@ export interface Database {
           id: string;
           email: string;
           full_name: string;
-          gender: string | null;
+          username: string;
+          bio: string;
+          gender: string;
           date_of_birth: string | null;
           native_language: string;
           learning_language: string;
           proficiency_level: string;
           learning_goal: string | null;
           avatar_url: string | null;
+          is_online: boolean;
+          likes_count: number;
           created_at: string;
           updated_at: string;
-          last_login: string;
+          last_seen: string | null;
           streak_count: number;
           streak_last_date: string | null;
         };
@@ -24,16 +27,20 @@ export interface Database {
           id?: string;
           email: string;
           full_name: string;
-          gender?: string | null;
+          username?: string;
+          bio?: string;
+          gender?: string;
           date_of_birth?: string | null;
-          native_language: string;
-          learning_language: string;
-          proficiency_level: string;
+          native_language?: string;
+          learning_language?: string;
+          proficiency_level?: string;
           learning_goal?: string | null;
           avatar_url?: string | null;
+          is_online?: boolean;
+          likes_count?: number;
           created_at?: string;
           updated_at?: string;
-          last_login?: string;
+          last_seen?: string | null;
           streak_count?: number;
           streak_last_date?: string | null;
         };
@@ -41,47 +48,22 @@ export interface Database {
           id?: string;
           email?: string;
           full_name?: string;
-          gender?: string | null;
+          username?: string;
+          bio?: string;
+          gender?: string;
           date_of_birth?: string | null;
           native_language?: string;
           learning_language?: string;
           proficiency_level?: string;
           learning_goal?: string | null;
           avatar_url?: string | null;
+          is_online?: boolean;
+          likes_count?: number;
           created_at?: string;
           updated_at?: string;
-          last_login?: string;
+          last_seen?: string | null;
           streak_count?: number;
           streak_last_date?: string | null;
-        };
-      };
-      profiles: {
-        Row: {
-          id: string;
-          username: string | null;
-          bio: string | null;
-          is_online: boolean;
-          likes_count: number;
-          created_at: string;
-          updated_at: string;
-        };
-        Insert: {
-          id: string;
-          username?: string | null;
-          bio?: string | null;
-          is_online?: boolean;
-          likes_count?: number;
-          created_at?: string;
-          updated_at?: string;
-        };
-        Update: {
-          id?: string;
-          username?: string | null;
-          bio?: string | null;
-          is_online?: boolean;
-          likes_count?: number;
-          created_at?: string;
-          updated_at?: string;
         };
       };
       conversations: {
@@ -105,17 +87,17 @@ export interface Database {
         Row: {
           conversation_id: string;
           user_id: string;
-          last_read_at: string;
+          last_read_at: string | null;
         };
         Insert: {
           conversation_id: string;
           user_id: string;
-          last_read_at?: string;
+          last_read_at?: string | null;
         };
         Update: {
           conversation_id?: string;
           user_id?: string;
-          last_read_at?: string;
+          last_read_at?: string | null;
         };
       };
       messages: {
@@ -207,9 +189,8 @@ export interface Database {
 
 // Type shortcuts
 export type User = Database['public']['Tables']['users']['Row'];
-export type Profile = Database['public']['Tables']['profiles']['Row'];
 export type Message = Database['public']['Tables']['messages']['Row'];
 export type Conversation = Database['public']['Tables']['conversations']['Row'] & {
-  participants?: Profile[];
+  participants?: User[];
   last_message?: Message;
 };
