@@ -49,7 +49,7 @@ const Settings = () => {
       }
 
       const { data, error } = await supabase
-        .from('users')
+        .from('profiles')
         .update({ 
           [field]: value,
           updated_at: new Date().toISOString()
