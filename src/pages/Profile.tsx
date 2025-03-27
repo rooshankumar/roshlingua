@@ -119,7 +119,9 @@ useEffect(() => {
       ]
     });
   }
-}, [realtimeProfile]);) {
+}, [realtimeProfile]);
+
+      } catch (err) {
         console.error("Error fetching profile:", err);
         toast({
           title: "Error",
