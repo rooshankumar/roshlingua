@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { supabase } from "@/lib/supabase";
 import { useTheme } from "@/components/theme-provider";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
@@ -43,8 +44,13 @@ const Settings = () => {
     try {
       const { data, error } = await supabase
         .from('users')
-        .update({ [field]: value })
+        .update({ 
+          [field]: value,
+          updated_at: new Date().toISOString()
+        })
         .eq('id', profile.id);
+
+      if (error) throw error;
       
       if (error) throw error;
     } catch (error) {
