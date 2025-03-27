@@ -85,24 +85,38 @@ const Settings = ({ onLogout }: SettingsProps) => {
   ];
 
   const handleProfileChange = async (field: string, value: string) => {
-    const { error } = await supabase
-      .from('profiles')
-      .update({ [field]: value })
-      .eq('id', profile?.id);
+    try {
+      if (!profile?.id) return;
 
-    if (error) {
+      const updates = {
+        username: field === 'username' ? value : profile.username,
+        bio: field === 'bio' ? value : profile.bio,
+        native_language: field === 'nativeLanguage' ? value : profile.native_language,
+        learning_language: field === 'learningLanguage' ? value : profile.learning_language,
+        proficiency_level: field === 'proficiencyLevel' ? value : profile.proficiency_level,
+      };
+
+      const { error } = await supabase
+        .from('profiles')
+        .update(updates)
+        .eq('id', profile.id);
+
+      if (error) throw error;
+
+      // Update local state through the hook's update function
+      await updateProfile(updates);
+
+      toast({
+        title: "Success",
+        description: "Profile updated successfully",
+      });
+    } catch (error) {
       console.error('Error updating profile:', error);
       toast({
         title: "Error",
         description: "Failed to update profile",
         variant: "destructive"
       });
-      return;
-    }
-
-    // Update local state
-    if (profile) {
-      setProfile({ ...profile, [field]: value });
     }
   };
 
