@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom'; // Added import for useNavigate
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/providers/AuthProvider';
@@ -121,51 +121,53 @@ export default function Chat() {
     });
   };
 
+  const [otherUser, setOtherUser] = useState(null);
+  const { id } = useParams();
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      const { data, error } = await supabase
+        .from('users')
+        .select('*')
+        .eq('id', id)
+        .single();
+
+      if (error) {
+        console.error('Error fetching user:', error);
+        return;
+      }
+
+      setOtherUser(data);
+    };
+
+    if (id) {
+      fetchUser();
+    }
+  }, [id]);
+
+
   return (
     <div className="container max-w-4xl mx-auto p-4 h-[calc(100vh-4rem)] flex flex-col">
-      {/* Chat Header */}
-      <div className="flex items-center justify-between p-4 border-b">
-        <div className="flex items-center gap-3">
-          <Button 
-            variant="ghost" 
-            size="icon"
-            onClick={() => navigate(-1)} // Changed navigation to go back one page
-            className="mr-2"
-          >
-            <ArrowLeft className="h-4 w-4" />
-          </Button>
-          <Avatar>
-            <AvatarImage src={otherUser?.avatar_url} />
-            <AvatarFallback>
-              {otherUser?.username?.[0]?.toUpperCase() || '?'}
-            </AvatarFallback>
-          </Avatar>
-          <div>
-            <h2 className="font-semibold">{otherUser?.username}</h2>
-            <UserStatus
-              isOnline={otherUser?.is_online}
-              lastSeen={otherUser?.last_seen}
-            />
+      <div className="border-b p-4">
+        <div className="flex items-center gap-4">
+          <Link to="/chat">
+            <Button variant="ghost" size="icon">
+              <ArrowLeft className="h-4 w-4" />
+            </Button>
+          </Link>
+          <div className="flex items-center gap-3 flex-1">
+            <Avatar className="h-10 w-10">
+              <AvatarImage src={otherUser?.avatar_url} />
+              <AvatarFallback>{otherUser?.username?.[0]}</AvatarFallback>
+            </Avatar>
+            <div>
+              <div className="font-semibold">{otherUser?.username}</div>
+              <div className="text-sm text-muted-foreground">
+                {otherUser?.is_online ? 'Online' : 'Offline'}
+              </div>
+            </div>
           </div>
         </div>
-
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon">
-              <MoreVertical className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={handleBlockUser}>
-              <Ban className="h-4 w-4 mr-2" />
-              Block User
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={handleReportUser}>
-              <Flag className="h-4 w-4 mr-2" />
-              Report User
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
       </div>
 
       {/* Messages Container */}
