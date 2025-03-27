@@ -1,0 +1,69 @@
+Initial session: 7bad0693-9053-423f-a2f0-a61c20b9cbf4
+chunk-W6L2VRDA.js?v=188d5fb6:377 [Violation] 'message' handler took 359ms
+Settings.tsx:60 Error updating profile: Error: Invalid gender value
+    at handleProfileChange (Settings.tsx:47:15)
+    at Object.onValueChange [as current] (Settings.tsx:282:51)
+    at chunk-ICA7ZJMY.js?v=188d5fb6:99:61
+    at Object.onValueChange (chunk-ZOX4DISM.js?v=188d5fb6:38:30)
+    at handleSelect (@radix-ui_react-select.js?v=188d5fb6:867:17)
+    at @radix-ui_react-select.js?v=188d5fb6:910:59
+    at handleEvent (chunk-ZOX4DISM.js?v=188d5fb6:16:49)
+    at HTMLUnknownElement.callCallback2 (chunk-W6L2VRDA.js?v=188d5fb6:3674:22)
+    at Object.invokeGuardedCallbackDev (chunk-W6L2VRDA.js?v=188d5fb6:3699:24)
+    at invokeGuardedCallback (chunk-W6L2VRDA.js?v=188d5fb6:3733:39)
+handleProfileChange @ Settings.tsx:60
+onValueChange @ Settings.tsx:282
+(anonymous) @ chunk-ICA7ZJMY.js?v=188d5fb6:99
+(anonymous) @ chunk-ZOX4DISM.js?v=188d5fb6:38
+handleSelect @ @radix-ui_react-select.js?v=188d5fb6:867
+(anonymous) @ @radix-ui_react-select.js?v=188d5fb6:910
+handleEvent @ chunk-ZOX4DISM.js?v=188d5fb6:16
+callCallback2 @ chunk-W6L2VRDA.js?v=188d5fb6:3674
+invokeGuardedCallbackDev @ chunk-W6L2VRDA.js?v=188d5fb6:3699
+invokeGuardedCallback @ chunk-W6L2VRDA.js?v=188d5fb6:3733
+invokeGuardedCallbackAndCatchFirstError @ chunk-W6L2VRDA.js?v=188d5fb6:3736
+executeDispatch @ chunk-W6L2VRDA.js?v=188d5fb6:7014
+processDispatchQueueItemsInOrder @ chunk-W6L2VRDA.js?v=188d5fb6:7034
+processDispatchQueue @ chunk-W6L2VRDA.js?v=188d5fb6:7043
+dispatchEventsForPlugins @ chunk-W6L2VRDA.js?v=188d5fb6:7051
+(anonymous) @ chunk-W6L2VRDA.js?v=188d5fb6:7174
+batchedUpdates$1 @ chunk-W6L2VRDA.js?v=188d5fb6:18913
+batchedUpdates @ chunk-W6L2VRDA.js?v=188d5fb6:3579
+dispatchEventForPluginEventSystem @ chunk-W6L2VRDA.js?v=188d5fb6:7173
+dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay @ chunk-W6L2VRDA.js?v=188d5fb6:5478
+dispatchEvent @ chunk-W6L2VRDA.js?v=188d5fb6:5472
+dispatchDiscreteEvent @ chunk-W6L2VRDA.js?v=188d5fb6:5449Understand this errorAI
+chunk-W6L2VRDA.js?v=188d5fb6:18625 [Violation] 'click' handler took 193ms
+Settings.tsx:60 Error updating profile: Error: Invalid gender value
+    at handleProfileChange (Settings.tsx:47:15)
+    at Object.onValueChange [as current] (Settings.tsx:282:51)
+    at chunk-ICA7ZJMY.js?v=188d5fb6:99:61
+    at Object.onValueChange (chunk-ZOX4DISM.js?v=188d5fb6:38:30)
+    at handleSelect (@radix-ui_react-select.js?v=188d5fb6:867:17)
+    at @radix-ui_react-select.js?v=188d5fb6:910:59
+    at handleEvent (chunk-ZOX4DISM.js?v=188d5fb6:16:49)
+    at HTMLUnknownElement.callCallback2 (chunk-W6L2VRDA.js?v=188d5fb6:3674:22)
+    at Object.invokeGuardedCallbackDev (chunk-W6L2VRDA.js?v=188d5fb6:3699:24)
+    at invokeGuardedCallback (chunk-W6L2VRDA.js?v=188d5fb6:3733:39)
+handleProfileChange @ Settings.tsx:60
+onValueChange @ Settings.tsx:282
+(anonymous) @ chunk-ICA7ZJMY.js?v=188d5fb6:99
+(anonymous) @ chunk-ZOX4DISM.js?v=188d5fb6:38
+handleSelect @ @radix-ui_react-select.js?v=188d5fb6:867
+(anonymous) @ @radix-ui_react-select.js?v=188d5fb6:910
+handleEvent @ chunk-ZOX4DISM.js?v=188d5fb6:16
+callCallback2 @ chunk-W6L2VRDA.js?v=188d5fb6:3674
+invokeGuardedCallbackDev @ chunk-W6L2VRDA.js?v=188d5fb6:3699
+invokeGuardedCallback @ chunk-W6L2VRDA.js?v=188d5fb6:3733
+invokeGuardedCallbackAndCatchFirstError @ chunk-W6L2VRDA.js?v=188d5fb6:3736
+executeDispatch @ chunk-W6L2VRDA.js?v=188d5fb6:7014
+processDispatchQueueItemsInOrder @ chunk-W6L2VRDA.js?v=188d5fb6:7034
+processDispatchQueue @ chunk-W6L2VRDA.js?v=188d5fb6:7043
+dispatchEventsForPlugins @ chunk-W6L2VRDA.js?v=188d5fb6:7051
+(anonymous) @ chunk-W6L2VRDA.js?v=188d5fb6:7174
+batchedUpdates$1 @ chunk-W6L2VRDA.js?v=188d5fb6:18913
+batchedUpdates @ chunk-W6L2VRDA.js?v=188d5fb6:3579
+dispatchEventForPluginEventSystem @ chunk-W6L2VRDA.js?v=188d5fb6:7173
+dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay @ chunk-W6L2VRDA.js?v=188d5fb6:5478
+dispatchEvent @ chunk-W6L2VRDA.js?v=188d5fb6:5472
+dispatchDiscreteEvent @ chunk-W6L2VRDA.js?v=188d5fb6:5449Understand this errorAI
