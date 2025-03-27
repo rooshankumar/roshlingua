@@ -584,7 +584,7 @@ const Settings = () => {
                     </SelectTrigger>
                     <SelectContent>
                       {genderOptions.map((option) => (
-                        <SelectItem key={option} value={option.toLowerCase()}>
+                        <SelectItem key={option} value={option}>
                           {option}
                         </SelectItem>
                       ))}
