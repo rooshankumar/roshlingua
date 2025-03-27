@@ -88,23 +88,36 @@ const Settings = ({ onLogout }: SettingsProps) => {
     try {
       if (!profile?.id) return;
 
-      const updates = {
-        username: field === 'username' ? value : profile.username,
-        bio: field === 'bio' ? value : profile.bio,
-        native_language: field === 'nativeLanguage' ? value : profile.native_language,
-        learning_language: field === 'learningLanguage' ? value : profile.learning_language,
-        proficiency_level: field === 'proficiencyLevel' ? value : profile.proficiency_level,
-      };
+      // Split updates between users and profiles tables
+      if (field === 'nativeLanguage' || field === 'learningLanguage' || field === 'proficiencyLevel') {
+        const userUpdates = {
+          native_language: field === 'nativeLanguage' ? value : profile.native_language,
+          learning_language: field === 'learningLanguage' ? value : profile.learning_language,
+          proficiency_level: field === 'proficiencyLevel' ? value : profile.proficiency_level,
+        };
 
-      const { error } = await supabase
-        .from('profiles')
-        .update(updates)
-        .eq('id', profile.id);
+        const { error: userError } = await supabase
+          .from('users')
+          .update(userUpdates)
+          .eq('id', profile.id);
 
-      if (error) throw error;
+        if (userError) throw userError;
+      } else {
+        const profileUpdates = {
+          username: field === 'username' ? value : profile.username,
+          bio: field === 'bio' ? value : profile.bio,
+        };
+
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .update(profileUpdates)
+          .eq('id', profile.id);
+
+        if (profileError) throw profileError;
+      }
 
       // Update local state through the hook's update function
-      await updateProfile(updates);
+      await updateProfile({...profile, [field]:value});
 
       toast({
         title: "Success",
