@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { useAuth } from "@/providers/AuthProvider";
 import {
   Select,
   SelectContent,
@@ -175,7 +176,11 @@ const Community = () => {
     setUsers(updatedUsers || []);
   };
 
+  const { user } = useAuth();
+  
   const handleStartChat = async (userId: string) => {
+    if (!user) return;
+    
     try {
       // Check if conversation already exists
       const { data: existingConv } = await supabase
