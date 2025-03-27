@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { supabase } from '@/lib/supabase';
@@ -74,13 +73,13 @@ export default function ChatList() {
           <Link to="/community">Start New Chat</Link>
         </Button>
       </div>
-      
+
       <div className="space-y-2">
         {conversations.map((conversation) => {
           const otherParticipants = conversation.participants
             .filter(p => p.profiles.id !== user?.id)
             .map(p => p.profiles);
-            
+
           return (
             <Link
               key={conversation.id}
