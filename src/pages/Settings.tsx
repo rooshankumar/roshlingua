@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { 
   Bell, 
@@ -44,6 +43,9 @@ import {
   TabsList,
   TabsTrigger,
 } from "@/components/ui/tabs";
+import { useAuth } from "@/providers/AuthProvider";
+import { useRealtimeProfile } from "@/hooks/useRealtimeProfile";
+import { supabase } from "@/lib/supabase";
 
 interface SettingsProps {
   onLogout: () => void;
@@ -52,24 +54,17 @@ interface SettingsProps {
 const Settings = ({ onLogout }: SettingsProps) => {
   const { theme, setTheme } = useTheme();
   const { toast } = useToast();
-  
-  const [profileData, setProfileData] = useState({
-    name: "Sarah Johnson",
-    bio: "Software engineer passionate about learning Spanish for my upcoming trip to Mexico.",
-    email: "sarah.johnson@example.com",
-    avatar: "/placeholder.svg",
-    nativeLanguage: "English",
-    learningLanguage: "Spanish",
-    proficiencyLevel: "Intermediate (B1)",
-  });
-  
+  const { user } = useAuth();
+  const { profile, updateProfile } = useRealtimeProfile(user?.id);
+
+
   const [privacySettings, setPrivacySettings] = useState({
     showOnlineStatus: true,
     showLastActive: true,
     allowMessages: true,
     showProfileInSearch: true,
   });
-  
+
   const [notificationSettings, setNotificationSettings] = useState({
     newMessages: true,
     profileViews: true,
@@ -77,68 +72,65 @@ const Settings = ({ onLogout }: SettingsProps) => {
     streakReminders: true,
     marketingEmails: false,
   });
-  
+
   const languages = [
     "English", "Spanish", "French", "German", "Italian",
     "Portuguese", "Chinese", "Japanese", "Korean", "Russian",
     "Arabic", "Hindi", "Turkish", "Dutch", "Swedish"
   ];
-  
+
   const proficiencyLevels = [
     "Beginner (A1)", "Elementary (A2)", "Intermediate (B1)", 
     "Upper Intermediate (B2)", "Advanced (C1)", "Proficient (C2)"
   ];
-  
-  const handleProfileChange = (field: string, value: string) => {
-    setProfileData(prev => ({
-      ...prev,
-      [field]: value
-    }));
+
+  const handleProfileChange = async (field: string, value: string) => {
+    await updateProfile({...profile, [field]: value});
   };
-  
+
   const handlePrivacyChange = (field: string, value: boolean) => {
     setPrivacySettings(prev => ({
       ...prev,
       [field]: value
     }));
   };
-  
+
   const handleNotificationChange = (field: string, value: boolean) => {
     setNotificationSettings(prev => ({
       ...prev,
       [field]: value
     }));
   };
-  
-  const handleSaveProfile = () => {
+
+  const handleSaveProfile = async () => {
     // In a real app, this would save to a backend
     toast({
       title: "Profile updated",
       description: "Your profile information has been saved.",
     });
   };
-  
+
   const handleSavePrivacy = () => {
     toast({
       title: "Privacy settings updated",
       description: "Your privacy preferences have been saved.",
     });
   };
-  
+
   const handleSaveNotifications = () => {
     toast({
       title: "Notification settings updated",
       description: "Your notification preferences have been saved.",
     });
   };
-  
+
   const handleChangePassword = () => {
     toast({
       title: "Password change requested",
       description: "We've sent a password reset link to your email.",
     });
   };
-  
+
   const handleUploadAvatar = () => {
     // In a real app, this would open a file picker
     toast({
@@ -146,7 +138,7 @@ const Settings = ({ onLogout }: SettingsProps) => {
       description: "Avatar upload functionality will be available in the next update.",
     });
   };
-  
+
   const handleLogout = () => {
     toast({
       title: "Logging out",
@@ -154,7 +146,7 @@ const Settings = ({ onLogout }: SettingsProps) => {
     });
     onLogout();
   };
-  
+
   return (
     <div className="container pb-12 animate-fade-in">
       <div className="space-y-2 mb-8">
@@ -163,7 +155,7 @@ const Settings = ({ onLogout }: SettingsProps) => {
           Manage your account preferences and settings
         </p>
       </div>
-      
+
       <Tabs defaultValue="profile" className="mb-8">
         <TabsList className="grid grid-cols-4 mb-8">
           <TabsTrigger value="profile" className="flex items-center">
@@ -183,7 +175,7 @@ const Settings = ({ onLogout }: SettingsProps) => {
             <span className="hidden sm:inline">Account</span>
           </TabsTrigger>
         </TabsList>
-        
+
         {/* Profile Settings */}
         <TabsContent value="profile" className="space-y-6">
           <Card>
@@ -197,40 +189,40 @@ const Settings = ({ onLogout }: SettingsProps) => {
               <div className="flex flex-col md:flex-row md:space-x-6">
                 <div className="flex flex-col items-center space-y-4 mb-6 md:mb-0">
                   <Avatar className="h-24 w-24">
-                    <AvatarImage src={profileData.avatar} alt={profileData.name} />
-                    <AvatarFallback>{profileData.name.charAt(0)}</AvatarFallback>
+                    <AvatarImage src={profile?.avatar} alt={profile?.name} />
+                    <AvatarFallback>{profile?.name?.charAt(0)}</AvatarFallback>
                   </Avatar>
                   <Button variant="outline" onClick={handleUploadAvatar}>
                     Change Avatar
                   </Button>
                 </div>
-                
+
                 <div className="flex-1 space-y-4">
                   <div className="grid gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="name">Full Name</Label>
                       <Input 
                         id="name" 
-                        value={profileData.name}
+                        value={profile?.name || ""}
                         onChange={(e) => handleProfileChange("name", e.target.value)}
                       />
                     </div>
-                    
+
                     <div className="space-y-2">
                       <Label htmlFor="email">Email</Label>
                       <Input 
                         id="email" 
                         type="email" 
-                        value={profileData.email}
+                        value={profile?.email || ""}
                         onChange={(e) => handleProfileChange("email", e.target.value)}
                       />
                     </div>
-                    
+
                     <div className="space-y-2">
                       <Label htmlFor="bio">Bio</Label>
                       <Textarea 
                         id="bio" 
-                        value={profileData.bio}
+                        value={profile?.bio || ""}
                         onChange={(e) => handleProfileChange("bio", e.target.value)}
                         className="min-h-[100px]"
                       />
@@ -238,17 +230,17 @@ const Settings = ({ onLogout }: SettingsProps) => {
                   </div>
                 </div>
               </div>
-              
+
               <Separator />
-              
+
               <div className="space-y-4">
                 <h3 className="text-lg font-medium">Language Settings</h3>
-                
+
                 <div className="grid gap-4 sm:grid-cols-2">
                   <div className="space-y-2">
                     <Label htmlFor="nativeLanguage">Native Language</Label>
                     <Select
-                      value={profileData.nativeLanguage}
+                      value={profile?.nativeLanguage || ""}
                       onValueChange={(value) => handleProfileChange("nativeLanguage", value)}
                     >
                       <SelectTrigger id="nativeLanguage">
@@ -263,11 +255,11 @@ const Settings = ({ onLogout }: SettingsProps) => {
                       </SelectContent>
                     </Select>
                   </div>
-                  
+
                   <div className="space-y-2">
                     <Label htmlFor="learningLanguage">Learning Language</Label>
                     <Select
-                      value={profileData.learningLanguage}
+                      value={profile?.learningLanguage || ""}
                       onValueChange={(value) => handleProfileChange("learningLanguage", value)}
                     >
                       <SelectTrigger id="learningLanguage">
@@ -275,7 +267,7 @@ const Settings = ({ onLogout }: SettingsProps) => {
                       </SelectTrigger>
                       <SelectContent>
                         {languages
-                          .filter((lang) => lang !== profileData.nativeLanguage)
+                          .filter((lang) => lang !== profile?.nativeLanguage)
                           .map((language) => (
                             <SelectItem key={language} value={language}>
                               {language}
@@ -285,11 +277,11 @@ const Settings = ({ onLogout }: SettingsProps) => {
                       </SelectContent>
                     </Select>
                   </div>
-                  
+
                   <div className="space-y-2 sm:col-span-2">
                     <Label htmlFor="proficiencyLevel">Proficiency Level</Label>
                     <Select
-                      value={profileData.proficiencyLevel}
+                      value={profile?.proficiencyLevel || ""}
                       onValueChange={(value) => handleProfileChange("proficiencyLevel", value)}
                     >
                       <SelectTrigger id="proficiencyLevel">
@@ -315,7 +307,7 @@ const Settings = ({ onLogout }: SettingsProps) => {
             </CardFooter>
           </Card>
         </TabsContent>
-        
+
         {/* Privacy Settings */}
         <TabsContent value="privacy" className="space-y-6">
           <Card>
@@ -340,9 +332,9 @@ const Settings = ({ onLogout }: SettingsProps) => {
                     onCheckedChange={(value) => handlePrivacyChange("showOnlineStatus", value)}
                   />
                 </div>
-                
+
                 <Separator />
-                
+
                 <div className="flex items-center justify-between">
                   <div className="space-y-0.5">
                     <Label htmlFor="showLastActive">Show last active time</Label>
@@ -356,9 +348,9 @@ const Settings = ({ onLogout }: SettingsProps) => {
                     onCheckedChange={(value) => handlePrivacyChange("showLastActive", value)}
                   />
                 </div>
-                
+
                 <Separator />
-                
+
                 <div className="flex items-center justify-between">
                   <div className="space-y-0.5">
                     <Label htmlFor="allowMessages">Allow messages</Label>
@@ -372,9 +364,9 @@ const Settings = ({ onLogout }: SettingsProps) => {
                     onCheckedChange={(value) => handlePrivacyChange("allowMessages", value)}
                   />
                 </div>
-                
+
                 <Separator />
-                
+
                 <div className="flex items-center justify-between">
                   <div className="space-y-0.5">
                     <Label htmlFor="showProfileInSearch">Show profile in search</Label>
@@ -398,7 +390,7 @@ const Settings = ({ onLogout }: SettingsProps) => {
             </CardFooter>
           </Card>
         </TabsContent>
-        
+
         {/* Notification Settings */}
         <TabsContent value="notifications" className="space-y-6">
           <Card>
@@ -423,9 +415,9 @@ const Settings = ({ onLogout }: SettingsProps) => {
                     onCheckedChange={(value) => handleNotificationChange("newMessages", value)}
                   />
                 </div>
-                
+
                 <Separator />
-                
+
                 <div className="flex items-center justify-between">
                   <div className="space-y-0.5">
                     <Label htmlFor="profileViews">Profile views</Label>
@@ -439,9 +431,9 @@ const Settings = ({ onLogout }: SettingsProps) => {
                     onCheckedChange={(value) => handleNotificationChange("profileViews", value)}
                   />
                 </div>
-                
+
                 <Separator />
-                
+
                 <div className="flex items-center justify-between">
                   <div className="space-y-0.5">
                     <Label htmlFor="learningReminders">Learning reminders</Label>
@@ -455,9 +447,9 @@ const Settings = ({ onLogout }: SettingsProps) => {
                     onCheckedChange={(value) => handleNotificationChange("learningReminders", value)}
                   />
                 </div>
-                
+
                 <Separator />
-                
+
                 <div className="flex items-center justify-between">
                   <div className="space-y-0.5">
                     <Label htmlFor="streakReminders">Streak reminders</Label>
@@ -471,9 +463,9 @@ const Settings = ({ onLogout }: SettingsProps) => {
                     onCheckedChange={(value) => handleNotificationChange("streakReminders", value)}
                   />
                 </div>
-                
+
                 <Separator />
-                
+
                 <div className="flex items-center justify-between">
                   <div className="space-y-0.5">
                     <Label htmlFor="marketingEmails">Marketing emails</Label>
@@ -497,7 +489,7 @@ const Settings = ({ onLogout }: SettingsProps) => {
             </CardFooter>
           </Card>
         </TabsContent>
-        
+
         {/* Account Settings */}
         <TabsContent value="account" className="space-y-6">
           <Card>
@@ -510,7 +502,7 @@ const Settings = ({ onLogout }: SettingsProps) => {
             <CardContent className="space-y-8">
               <div className="space-y-4">
                 <h3 className="text-lg font-medium">Security</h3>
-                
+
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
                     <div>
@@ -524,12 +516,12 @@ const Settings = ({ onLogout }: SettingsProps) => {
                       Change
                     </Button>
                   </div>
-                  
+
                   <div className="flex items-center justify-between">
                     <div>
                       <h4 className="font-medium">Email</h4>
                       <p className="text-sm text-muted-foreground">
-                        {profileData.email}
+                        {profile?.email || ""}
                       </p>
                     </div>
                     <Button variant="outline">
@@ -539,12 +531,12 @@ const Settings = ({ onLogout }: SettingsProps) => {
                   </div>
                 </div>
               </div>
-              
+
               <Separator />
-              
+
               <div className="space-y-4">
                 <h3 className="text-lg font-medium">Appearance</h3>
-                
+
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
                     <div>
@@ -582,12 +574,12 @@ const Settings = ({ onLogout }: SettingsProps) => {
                   </div>
                 </div>
               </div>
-              
+
               <Separator />
-              
+
               <div className="space-y-4">
                 <h3 className="text-lg font-medium">Subscription</h3>
-                
+
                 <div className="bg-muted/50 rounded-lg p-4">
                   <div className="flex justify-between items-center mb-4">
                     <div>
