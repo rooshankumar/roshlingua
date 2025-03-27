@@ -16,7 +16,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
-import { Shield, Bell, Key, User, Lock, Mail, Save, LogOut, Moon, Sun, Globe } from "lucide-react";
+import { Shield, Bell, Key, User, Lock, Mail, Save, LogOut, Moon, Sun, Globe, Wallet } from "lucide-react";
 
 const Settings = () => {
   const { theme, setTheme } = useTheme();
