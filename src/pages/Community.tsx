@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -41,7 +41,7 @@ const Community = () => {
   const [languageFilter, setLanguageFilter] = useState("");
   const [onlineOnly, setOnlineOnly] = useState(false);
   const [showMoreFilters, setShowMoreFilters] = useState(false); // Added state for more filters
-
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -129,7 +129,7 @@ const Community = () => {
 
   const handleLike = async (userId: string) => {
     const currentUser = (await supabase.auth.getUser()).data.user?.id;
-    
+
     // Check if already liked
     const { data: existingLike } = await supabase
       .from('user_likes')
@@ -174,6 +174,36 @@ const Community = () => {
 
     setUsers(updatedUsers || []);
   };
+
+  const handleStartChat = async (userId: string) => {
+    try {
+      // Create a new conversation
+      const { data: conversation, error: convError } = await supabase
+        .from('conversations')
+        .insert({})
+        .select()
+        .single();
+
+      if (convError) throw convError;
+
+      // Add participants
+      const currentUser = (await supabase.auth.getUser()).data.user;
+      const { error: partError } = await supabase
+        .from('conversation_participants')
+        .insert([
+          { conversation_id: conversation.id, user_id: currentUser?.id },
+          { conversation_id: conversation.id, user_id: userId }
+        ]);
+
+      if (partError) throw partError;
+
+      // Navigate to the new chat
+      navigate(`/chat/${conversation.id}`);
+    } catch (error) {
+      console.error('Error creating conversation:', error);
+    }
+  };
+
 
   const availableLanguages = Array.from(
     new Set(
@@ -292,8 +322,8 @@ const Community = () => {
                       <span>{user.likes_count || 0}</span>
                     </Button>
 
-                    <Button asChild variant="outline" size="sm">
-                      <Link to={`/chat/${user.id}`}>
+                    <Button onClick={() => handleStartChat(user.id)} asChild variant="outline" size="sm">
+                      <Link to={`/chat/${user.id}`}> {/* Link remains for visual purposes, but navigation is handled by handleStartChat */}
                         <MessageCircle className="h-4 w-4 mr-2" />
                         Start Chat
                       </Link>
