@@ -1,3 +1,4 @@
+
 import { createContext, useContext, useEffect, useState } from "react";
 import { Session, User } from "@supabase/supabase-js";
 import { supabase, createUserRecord } from "@/lib/supabase";
@@ -31,7 +32,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     console.log("Setting up auth state listener");
-
+    
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, currentSession) => {
@@ -39,17 +40,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setSession(currentSession);
         setUser(currentSession?.user ?? null);
         setIsLoading(false);
-        // Update last_login
-        if (event === 'SIGNED_IN' && currentSession?.user?.id) {
-          try {
-            await supabase
-              .from('profiles')
-              .update({ last_login: new Date().toISOString() })
-              .eq('id', currentSession.user.id);
-          } catch (error) {
-            console.error("Error updating last_login:", error);
-          }
-        }
       }
     );
 
@@ -87,7 +77,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       });
 
       if (error) throw error;
-
+      
       // We now handle setting the user state via the onAuthStateChange listener
     } catch (error) {
       console.error("Login error:", error);
@@ -113,17 +103,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       });
 
       if (error) throw error;
-
+      
       // Create the user record in the users table
       if (data.user) {
         await createUserRecord(data.user.id, email, name);
       }
-
+      
       toast({
         title: "Account created",
         description: "Please check your email to confirm your account.",
       });
-
+      
       // We now handle setting the user state via the onAuthStateChange listener
     } catch (error) {
       console.error("Signup error:", error);
@@ -148,7 +138,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           },
         },
       });
-
+      
       if (error) throw error;
       // We now handle setting the user state via the onAuthStateChange listener
     } catch (error) {
@@ -161,12 +151,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       throw error;
     }
   };
-
+  
   const signOut = async () => {
     try {
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
-
+      
       toast({
         title: "Logged out",
         description: "You have been successfully logged out.",
