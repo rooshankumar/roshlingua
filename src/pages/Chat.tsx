@@ -121,7 +121,6 @@ export default function Chat() {
     });
   };
 
-  const [otherUser, setOtherUser] = useState(null);
   const { id } = useParams();
 
   useEffect(() => {
