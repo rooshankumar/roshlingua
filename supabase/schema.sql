@@ -82,6 +82,16 @@ CREATE POLICY "Public profiles are viewable by everyone" ON public.profiles
 CREATE POLICY "Users can update own profile" ON public.profiles
   FOR UPDATE USING (auth.uid() = id);
 
+-- Users policies
+CREATE POLICY "Public users are viewable by everyone" ON public.users
+  FOR SELECT USING (true);
+
+CREATE POLICY "Users can update own record" ON public.users
+  FOR UPDATE USING (auth.uid() = id);
+
+-- Enable real-time for users table
+ALTER PUBLICATION supabase_realtime ADD TABLE users;
+
 -- Conversations policies
 CREATE POLICY "Users can view their conversations" ON public.conversations
   FOR SELECT USING (
