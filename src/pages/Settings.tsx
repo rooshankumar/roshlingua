@@ -25,7 +25,6 @@ const Settings = () => {
   const { user } = useAuth();
   const { profile, updateProfile } = useRealtimeProfile(user?.id);
   const navigate = useNavigate();
-  const [localBio, setLocalBio] = useState(profile?.bio || ""); // Added local state for bio
 
   const languages = [
     "English", "Spanish", "French", "German", "Italian",
@@ -274,22 +273,10 @@ const Settings = () => {
                       <Label htmlFor="bio">Bio</Label>
                       <Textarea 
                         id="bio" 
-                        value={localBio || profile?.bio || ""}
-                        onChange={(e) => setLocalBio(e.target.value)}
+                        value={profile?.bio || ""}
+                        onChange={(e) => handleProfileChange("bio", e.target.value)}
                         className="min-h-[100px]"
                       />
-                      <Button 
-                        onClick={async () => {
-                          if (localBio !== profile?.bio) {
-                            await handleProfileChange('bio', localBio);
-                            setLocalBio('');
-                          }
-                        }}
-                        className="mt-2"
-                        disabled={!localBio || localBio === profile?.bio}
-                      >
-                        Save Bio
-                      </Button>
                     </div>
 
                     <div className="space-y-2">
