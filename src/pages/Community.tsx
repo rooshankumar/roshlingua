@@ -177,7 +177,27 @@ const Community = () => {
 
   const handleStartChat = async (userId: string) => {
     try {
-      // Create a new conversation
+      // Check if conversation already exists
+      const { data: existingConv } = await supabase
+        .from('conversation_participants')
+        .select(`
+          conversation_id,
+          conversations:conversation_id (
+            id
+          )
+        `)
+        .eq('user_id', user.id)
+        .eq('conversation_id', supabase.from('conversation_participants')
+          .select('conversation_id')
+          .eq('user_id', userId));
+
+      if (existingConv?.length > 0) {
+        // Use existing conversation
+        navigate(`/chat/${existingConv[0].conversations.id}`);
+        return;
+      }
+
+      // Create new conversation if none exists
       const { data: conversation, error: convError } = await supabase
         .from('conversations')
         .insert({})
@@ -187,11 +207,10 @@ const Community = () => {
       if (convError) throw convError;
 
       // Add participants
-      const currentUser = (await supabase.auth.getUser()).data.user;
       const { error: partError } = await supabase
         .from('conversation_participants')
         .insert([
-          { conversation_id: conversation.id, user_id: currentUser?.id },
+          { conversation_id: conversation.id, user_id: user.id },
           { conversation_id: conversation.id, user_id: userId }
         ]);
 
