@@ -46,9 +46,11 @@ const Community = () => {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
+        const currentUser = (await supabase.auth.getUser()).data.user;
         const { data, error } = await supabase
           .from('users')
-          .select('*');
+          .select('*')
+          .neq('id', currentUser?.id); // Exclude current user
 
         if (error) {
           console.error("Error fetching users:", error);
