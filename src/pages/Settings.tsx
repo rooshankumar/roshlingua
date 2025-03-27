@@ -593,27 +593,6 @@ const Settings = () => {
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <h4 className="font-medium">Gender</h4>
-                    <p className="text-sm text-muted-foreground">Select your gender</p>
-                  </div>
-                  <Select value={profile?.gender || ""} onValueChange={(value) => handleProfileChange("gender", value)}>
-                    <SelectTrigger className="w-[180px]">
-                      <SelectValue placeholder="Select gender" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {genderOptions.map((gender) => (
-                        <SelectItem key={gender} value={gender} >
-                          {gender}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <Separator />
-
-                <div className="flex items-center justify-between">
-                  <div>
                     <h4 className="font-medium">Password</h4>
                     <p className="text-sm text-muted-foreground">
                       Change your account password
