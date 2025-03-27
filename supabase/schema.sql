@@ -20,9 +20,18 @@ CREATE TABLE public.profiles (
   learning_language TEXT,
   proficiency_level TEXT CHECK (proficiency_level IN ('beginner', 'intermediate', 'advanced', 'native')),
   learning_goal TEXT,
-  streak_count INTEGER DEFAULT 0,
-  streak_last_date DATE,
-  likes_count INTEGER DEFAULT 0
+  last_login TIMESTAMP WITH TIME ZONE,
+  streak_count INTEGER DEFAULT 1 NOT NULL,
+  streak_last_date DATE DEFAULT CURRENT_DATE,
+  likes_count INTEGER DEFAULT 0,
+  CONSTRAINT protect_streak_columns CHECK (
+    CASE 
+      WHEN TG_OP = 'UPDATE' THEN
+        (OLD.streak_count = NEW.streak_count AND OLD.streak_last_date = NEW.streak_last_date)
+        OR current_user = 'authenticated'
+      ELSE true
+    END
+  )
 );
 
 -- Create conversations table
@@ -136,6 +145,34 @@ CREATE POLICY "Avatar images are publicly accessible"
 CREATE POLICY "Users can upload their own avatar"
   ON storage.objects FOR INSERT
   WITH CHECK (bucket_id = 'avatars' AND (storage.foldername(name))[1] = auth.uid()::text);
+
+-- Function to handle streak updates
+CREATE OR REPLACE FUNCTION public.update_streak()
+RETURNS TRIGGER AS $$
+BEGIN
+  -- Set default streak to 1 for new users
+  IF OLD.streak_count IS NULL THEN
+    NEW.streak_count = 1;
+  -- If last login was yesterday, increase streak
+  ELSIF OLD.last_login::date = CURRENT_DATE - INTERVAL '1 day' THEN
+    NEW.streak_count = OLD.streak_count + 1;
+  ELSE
+    -- Otherwise, reset streak
+    NEW.streak_count = 1;
+  END IF;
+
+  -- Update streak last date
+  NEW.streak_last_date = CURRENT_DATE;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Create streak update trigger
+CREATE TRIGGER streak_update_trigger
+BEFORE UPDATE ON public.profiles
+FOR EACH ROW
+WHEN (NEW.last_login IS DISTINCT FROM OLD.last_login)
+EXECUTE FUNCTION public.update_streak();
 
 -- Function to update profile updated_at
 CREATE OR REPLACE FUNCTION public.handle_updated_at()
