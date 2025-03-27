@@ -48,35 +48,16 @@ const Settings = () => {
         throw new Error("Invalid gender value");
       }
 
-      // Check if profile exists
-      const { data: existingProfile } = await supabase
-        .from('profiles')
-        .select('id')
-        .eq('id', user.id)
-        .single();
+      // Update user data
+      const { error } = await supabase
+        .from('users')
+        .update({ 
+          [field]: value,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', user.id);
 
-      if (!existingProfile) {
-        // Create profile if it doesn't exist
-        const { error: insertError } = await supabase
-          .from('profiles')
-          .insert([{ 
-            id: user.id,
-            [field]: value,
-            updated_at: new Date().toISOString()
-          }]);
-        if (insertError) throw insertError;
-      } else {
-        // Update existing profile
-        const { error } = await supabase
-          .from('profiles')
-          .update({ 
-            [field]: value,
-            updated_at: new Date().toISOString()
-          })
-          .eq('id', user.id);
-        if (error) throw error;
-      }
-
+      if (error) throw error;
       if (field === 'bio') {
         await updateProfile({...profile, bio: value}); //added to update realtime profile
       }
