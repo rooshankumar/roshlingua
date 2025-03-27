@@ -103,11 +103,23 @@ const Settings = ({ onLogout }: SettingsProps) => {
   };
 
   const handleSaveProfile = async () => {
-    // In a real app, this would save to a backend
-    toast({
-      title: "Profile updated",
-      description: "Your profile information has been saved.",
-    });
+    try {
+      if (!profile || !user) return;
+      
+      await updateProfile(profile);
+      
+      toast({
+        title: "Profile updated",
+        description: "Your profile information has been saved.",
+      });
+    } catch (error) {
+      console.error('Error saving profile:', error);
+      toast({
+        title: "Error",
+        description: "Failed to save profile. Please try again.",
+        variant: "destructive"
+      });
+    }
   };
 
   const handleSavePrivacy = () => {
@@ -131,12 +143,38 @@ const Settings = ({ onLogout }: SettingsProps) => {
     });
   };
 
-  const handleUploadAvatar = () => {
-    // In a real app, this would open a file picker
-    toast({
-      title: "Feature coming soon",
-      description: "Avatar upload functionality will be available in the next update.",
-    });
+  const handleUploadAvatar = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (!event.target.files || !event.target.files[0]) return;
+    
+    const file = event.target.files[0];
+    const fileExt = file.name.split('.').pop();
+    const filePath = `${user?.id}-${Math.random()}.${fileExt}`;
+
+    try {
+      const { error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(filePath, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('avatars')
+        .getPublicUrl(filePath);
+
+      await updateProfile({ ...profile, avatar_url: publicUrl });
+
+      toast({
+        title: "Avatar updated",
+        description: "Your profile picture has been updated successfully.",
+      });
+    } catch (error) {
+      console.error('Error uploading avatar:', error);
+      toast({
+        title: "Error",
+        description: "Failed to upload avatar. Please try again.",
+        variant: "destructive"
+      });
+    }
   };
 
   const handleLogout = () => {
@@ -192,9 +230,18 @@ const Settings = ({ onLogout }: SettingsProps) => {
                     <AvatarImage src={profile?.avatar} alt={profile?.name} />
                     <AvatarFallback>{profile?.name?.charAt(0)}</AvatarFallback>
                   </Avatar>
-                  <Button variant="outline" onClick={handleUploadAvatar}>
-                    Change Avatar
-                  </Button>
+                  <div className="flex flex-col items-center gap-2">
+                    <input
+                      type="file"
+                      id="avatar"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={handleUploadAvatar}
+                    />
+                    <Button variant="outline" onClick={() => document.getElementById('avatar')?.click()}>
+                      Change Avatar
+                    </Button>
+                  </div>
                 </div>
 
                 <div className="flex-1 space-y-4">
