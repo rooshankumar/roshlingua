@@ -1,79 +1,28 @@
 import { useState } from "react";
-import { 
-  Bell, 
-  Globe, 
-  Key, 
-  Lock, 
-  LogOut, 
-  Mail, 
-  Moon, 
-  Save, 
-  Shield, 
-  Sun, 
-  User, 
-  Wallet 
-} from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { useTheme } from "@/hooks/use-theme";
+import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/providers/AuthProvider";
+import { useRealtimeProfile } from "@/hooks/useRealtimeProfile";
+import {
+  Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle
+} from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { 
-  Select, 
-  SelectContent, 
-  SelectItem, 
-  SelectTrigger, 
-  SelectValue 
-} from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { Switch } from "@/components/ui/switch";
-import { Separator } from "@/components/ui/separator";
-import { useTheme } from "@/components/theme-provider";
-import { useToast } from "@/hooks/use-toast";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@/components/ui/tabs";
-import { useAuth } from "@/providers/AuthProvider";
-import { useRealtimeProfile } from "@/hooks/useRealtimeProfile";
-import { supabase } from "@/lib/supabase";
-import { useNavigate } from 'react-router-dom';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Separator } from "@/components/ui/separator";
+import { Shield, Bell, Key, User, Lock, Mail, Save, LogOut, Moon, Sun, Globe } from "lucide-react";
 
-interface SettingsProps {
-  onLogout: () => void;
-}
-
-const Settings = ({ onLogout }: SettingsProps) => {
+const Settings = () => {
   const { theme, setTheme } = useTheme();
   const { toast } = useToast();
   const { user } = useAuth();
-  const { profile, updateProfile, setProfile } = useRealtimeProfile(user?.id);
+  const { profile, updateProfile } = useRealtimeProfile(user?.id);
   const navigate = useNavigate();
-
-
-  const [privacySettings, setPrivacySettings] = useState({
-    showOnlineStatus: true,
-    showLastActive: true,
-    allowMessages: true,
-    showProfileInSearch: true,
-  });
-
-  const [notificationSettings, setNotificationSettings] = useState({
-    newMessages: true,
-    profileViews: true,
-    learningReminders: true,
-    streakReminders: true,
-    marketingEmails: false,
-  });
 
   const languages = [
     "English", "Spanish", "French", "German", "Italian",
@@ -86,114 +35,30 @@ const Settings = ({ onLogout }: SettingsProps) => {
     "Upper Intermediate (B2)", "Advanced (C1)", "Proficient (C2)"
   ];
 
+  const genders = ["Male", "Female", "Rather not say"];
+
   const handleProfileChange = async (field: string, value: string) => {
+    if (!profile?.id) return;
     try {
-      if (!profile?.id) return;
-
-      // Split updates between users and profiles tables
-      if (field === 'nativeLanguage' || field === 'learningLanguage' || field === 'proficiencyLevel') {
-        const userUpdates = {
-          native_language: field === 'nativeLanguage' ? value : profile.native_language,
-          learning_language: field === 'learningLanguage' ? value : profile.learning_language,
-          proficiency_level: field === 'proficiencyLevel' ? value : profile.proficiency_level,
-        };
-
-        const { error: userError } = await supabase
-          .from('users')
-          .update(userUpdates)
-          .eq('id', profile.id);
-
-        if (userError) throw userError;
-      } else {
-        const profileUpdates = {
-          username: field === 'username' ? value : profile.username,
-          bio: field === 'bio' ? value : profile.bio,
-        };
-
-        const { error: profileError } = await supabase
-          .from('profiles')
-          .update(profileUpdates)
-          .eq('id', profile.id);
-
-        if (profileError) throw profileError;
-      }
-
-      // Update local state through the hook's update function
-      await updateProfile({...profile, [field]:value});
-
-      toast({
-        title: "Success",
-        description: "Profile updated successfully",
-      });
+      const updatedProfile = {
+        ...profile,
+        [field]: value,
+        updated_at: new Date().toISOString()
+      };
+      await updateProfile(updatedProfile);
     } catch (error) {
-      console.error('Error updating profile:', error);
+      console.error("Error updating profile:", error);
       toast({
-        title: "Error",
-        description: "Failed to update profile",
-        variant: "destructive"
+        variant: "destructive",
+        title: "Update failed",
+        description: "Could not update profile. Please try again.",
       });
     }
   };
 
-  const handlePrivacyChange = (field: string, value: boolean) => {
-    setPrivacySettings(prev => ({
-      ...prev,
-      [field]: value
-    }));
-  };
-
-  const handleNotificationChange = (field: string, value: boolean) => {
-    setNotificationSettings(prev => ({
-      ...prev,
-      [field]: value
-    }));
-  };
-
-  const handleSaveProfile = async () => {
-    try {
-      if (!profile || !user) return;
-
-      await updateProfile(profile);
-
-      toast({
-        title: "Profile updated",
-        description: "Your profile information has been saved.",
-      });
-    } catch (error) {
-      console.error('Error saving profile:', error);
-      toast({
-        title: "Error",
-        description: "Failed to save profile. Please try again.",
-        variant: "destructive"
-      });
-    }
-  };
-
-  const handleSavePrivacy = () => {
-    toast({
-      title: "Privacy settings updated",
-      description: "Your privacy preferences have been saved.",
-    });
-  };
-
-  const handleSaveNotifications = () => {
-    toast({
-      title: "Notification settings updated",
-      description: "Your notification preferences have been saved.",
-    });
-  };
-
-  const handleChangePassword = () => {
-    toast({
-      title: "Password change requested",
-      description: "We've sent a password reset link to your email.",
-    });
-  };
-
-  const handleUploadAvatar = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (!event.target.files || !event.target.files[0]) return;
-
-    const file = event.target.files[0];
+  const handleUploadAvatar = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files || !e.target.files[0]) return;
+    const file = e.target.files[0];
     const fileExt = file.name.split('.').pop();
     const fileName = `${Date.now()}.${fileExt}`;
     const filePath = `${user?.id}/${fileName}`;
@@ -223,6 +88,75 @@ const Settings = ({ onLogout }: SettingsProps) => {
         variant: "destructive"
       });
     }
+  };
+
+  const handleSaveProfile = async () => {
+    try {
+      if (!profile?.id) return;
+      await updateProfile(profile);
+      toast({
+        title: "Profile updated",
+        description: "Your profile has been successfully updated.",
+      });
+    } catch (error) {
+      console.error("Error saving profile:", error);
+      toast({
+        variant: "destructive",
+        title: "Save failed",
+        description: "Could not save profile changes. Please try again.",
+      });
+    }
+  };
+
+  const [privacySettings, setPrivacySettings] = useState({
+    showOnlineStatus: true,
+    showLastActive: true,
+    allowMessages: true,
+    showProfileInSearch: true,
+  });
+
+  const handlePrivacyChange = (field: string, value: boolean) => {
+    setPrivacySettings(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
+
+  const handleSavePrivacy = () => {
+    toast({
+      title: "Privacy settings updated",
+      description: "Your privacy preferences have been saved.",
+    });
+  };
+
+
+  const [notificationSettings, setNotificationSettings] = useState({
+    newMessages: true,
+    profileViews: true,
+    learningReminders: true,
+    streakReminders: true,
+    marketingEmails: false,
+  });
+
+  const handleNotificationChange = (field: string, value: boolean) => {
+    setNotificationSettings(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
+
+  const handleSaveNotifications = () => {
+    toast({
+      title: "Notification settings updated",
+      description: "Your notification preferences have been saved.",
+    });
+  };
+
+  const handleChangePassword = () => {
+    toast({
+      title: "Password change requested",
+      description: "We've sent a password reset link to your email.",
+    });
   };
 
   const handleLogout = async () => {
@@ -268,7 +202,6 @@ const Settings = ({ onLogout }: SettingsProps) => {
           </TabsTrigger>
         </TabsList>
 
-        {/* Profile Settings */}
         <TabsContent value="profile" className="space-y-6">
           <Card>
             <CardHeader>
@@ -281,8 +214,8 @@ const Settings = ({ onLogout }: SettingsProps) => {
               <div className="flex flex-col md:flex-row md:space-x-6">
                 <div className="flex flex-col items-center space-y-4 mb-6 md:mb-0">
                   <Avatar className="h-24 w-24">
-                    <AvatarImage src={profile?.avatar} alt={profile?.name} />
-                    <AvatarFallback>{profile?.name?.charAt(0)}</AvatarFallback>
+                    <AvatarImage src={profile?.avatar_url} alt={profile?.full_name} />
+                    <AvatarFallback>{profile?.full_name?.charAt(0)}</AvatarFallback>
                   </Avatar>
                   <div className="flex flex-col items-center gap-2">
                     <input
@@ -304,8 +237,8 @@ const Settings = ({ onLogout }: SettingsProps) => {
                       <Label htmlFor="name">Full Name</Label>
                       <Input 
                         id="name" 
-                        value={profile?.name || ""}
-                        onChange={(e) => handleProfileChange("name", e.target.value)}
+                        value={profile?.full_name || ""}
+                        onChange={(e) => handleProfileChange("full_name", e.target.value)}
                       />
                     </div>
 
@@ -315,7 +248,8 @@ const Settings = ({ onLogout }: SettingsProps) => {
                         id="email" 
                         type="email" 
                         value={profile?.email || ""}
-                        onChange={(e) => handleProfileChange("email", e.target.value)}
+                        disabled
+                        className="bg-muted"
                       />
                     </div>
 
@@ -328,6 +262,25 @@ const Settings = ({ onLogout }: SettingsProps) => {
                         className="min-h-[100px]"
                       />
                     </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="gender">Gender</Label>
+                      <Select 
+                        value={profile?.gender || ""}
+                        onValueChange={(value) => handleProfileChange("gender", value)}
+                      >
+                        <SelectTrigger id="gender">
+                          <SelectValue placeholder="Select gender" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {genders.map((gender) => (
+                            <SelectItem key={gender} value={gender.toLowerCase()}>
+                              {gender}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -336,13 +289,12 @@ const Settings = ({ onLogout }: SettingsProps) => {
 
               <div className="space-y-4">
                 <h3 className="text-lg font-medium">Language Settings</h3>
-
                 <div className="grid gap-4 sm:grid-cols-2">
                   <div className="space-y-2">
                     <Label htmlFor="nativeLanguage">Native Language</Label>
                     <Select
-                      value={profile?.nativeLanguage || ""}
-                      onValueChange={(value) => handleProfileChange("nativeLanguage", value)}
+                      value={profile?.native_language || ""}
+                      onValueChange={(value) => handleProfileChange("native_language", value)}
                     >
                       <SelectTrigger id="nativeLanguage">
                         <SelectValue placeholder="Select language" />
@@ -360,21 +312,18 @@ const Settings = ({ onLogout }: SettingsProps) => {
                   <div className="space-y-2">
                     <Label htmlFor="learningLanguage">Learning Language</Label>
                     <Select
-                      value={profile?.learningLanguage || ""}
-                      onValueChange={(value) => handleProfileChange("learningLanguage", value)}
+                      value={profile?.learning_language || ""}
+                      onValueChange={(value) => handleProfileChange("learning_language", value)}
                     >
                       <SelectTrigger id="learningLanguage">
                         <SelectValue placeholder="Select language" />
                       </SelectTrigger>
                       <SelectContent>
-                        {languages
-                          .filter((lang) => lang !== profile?.nativeLanguage)
-                          .map((language) => (
-                            <SelectItem key={language} value={language}>
-                              {language}
-                            </SelectItem>
-                          ))
-                        }
+                        {languages.map((language) => (
+                          <SelectItem key={language} value={language}>
+                            {language}
+                          </SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
                   </div>
@@ -382,8 +331,8 @@ const Settings = ({ onLogout }: SettingsProps) => {
                   <div className="space-y-2 sm:col-span-2">
                     <Label htmlFor="proficiencyLevel">Proficiency Level</Label>
                     <Select
-                      value={profile?.proficiencyLevel || ""}
-                      onValueChange={(value) => handleProfileChange("proficiencyLevel", value)}
+                      value={profile?.proficiency_level || ""}
+                      onValueChange={(value) => handleProfileChange("proficiency_level", value)}
                     >
                       <SelectTrigger id="proficiencyLevel">
                         <SelectValue placeholder="Select level" />
@@ -398,9 +347,28 @@ const Settings = ({ onLogout }: SettingsProps) => {
                     </Select>
                   </div>
                 </div>
+
+                <div className="space-y-2">
+                  <h4 className="font-medium text-sm text-muted-foreground">Streak Information</h4>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label>Current Streak</Label>
+                      <p className="text-sm">{profile?.streak_count || 0} days</p>
+                    </div>
+                    <div>
+                      <Label>Last Active</Label>
+                      <p className="text-sm">
+                        {profile?.streak_last_date ? new Date(profile.streak_last_date).toLocaleDateString() : 'Never'}
+                      </p>
+                    </div>
+                  </div>
+                </div>
               </div>
             </CardContent>
-            <CardFooter>
+            <CardFooter className="flex justify-between">
+              <Button variant="outline" onClick={() => navigate(-1)}>
+                Cancel
+              </Button>
               <Button onClick={handleSaveProfile} className="button-hover">
                 <Save className="h-4 w-4 mr-2" />
                 Save Changes
