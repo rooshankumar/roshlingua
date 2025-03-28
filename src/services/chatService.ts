@@ -4,16 +4,16 @@ import type { ChatMessage, ChatConversation } from '@/types/chat';
 export const chatService = {
   async createConversation(userId: string) {
     const { data: { user }, error: authError } = await supabase.auth.getUser();
-    
+
     if (!user) throw new Error("User not authenticated");
 
     const { data: conversation, error: convError } = await supabase
       .from('conversations')
       .insert({
-        creator_id: user.id,
-        last_message_at: new Date().toISOString(),
         created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
+        updated_at: new Date().toISOString(),
+        last_message_at: new Date().toISOString(),
+        creator_id: user.id
       })
       .select()
       .single();
