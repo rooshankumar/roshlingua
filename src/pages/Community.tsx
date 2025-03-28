@@ -19,6 +19,7 @@ import { Heart, MessageCircle, Search, Filter, Flame } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from "@/components/ui/badge";
+import { toast } from '@/components/ui/toast';
 
 
 interface User {
@@ -181,9 +182,9 @@ const Community = () => {
   const handleStartChat = async (userId: string) => {
     try {
       // Get current user and verify authentication
-      const { data: { user: currentUser }, error: authError } = await supabase.auth.getUser();
-      
-      if (authError || !currentUser) {
+      const { data: { user }, error: authError } = await supabase.auth.getUser();
+
+      if (authError || !user) {
         console.error('Authentication error:', authError?.message || 'No authenticated user found');
         toast({
           title: "Authentication Error",
@@ -197,7 +198,7 @@ const Community = () => {
       const { data: conversation, error: conversationError } = await supabase
         .from('conversations')
         .insert({
-          creator_id: currentUser.id,
+          creator_id: user.id,
           created_at: new Date().toISOString()
         })
         .select('*')
@@ -205,6 +206,11 @@ const Community = () => {
 
       if (conversationError) {
         console.error('Error creating conversation:', conversationError);
+        toast({
+          title: "Error",
+          description: "Failed to create conversation",
+          variant: "destructive"
+        });
         return;
       }
 
@@ -219,7 +225,7 @@ const Community = () => {
           },
           { 
             conversation_id: conversation.id, 
-            user_id: currentUser.id,
+            user_id: user.id,
             last_read_at: new Date().toISOString()
           }
         ]);
