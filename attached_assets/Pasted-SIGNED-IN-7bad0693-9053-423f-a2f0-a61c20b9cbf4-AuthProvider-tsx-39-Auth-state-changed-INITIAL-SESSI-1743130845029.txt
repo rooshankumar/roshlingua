@@ -1,0 +1,55 @@
+SIGNED_IN 7bad0693-9053-423f-a2f0-a61c20b9cbf4
+AuthProvider.tsx:39 Auth state changed: INITIAL_SESSION 7bad0693-9053-423f-a2f0-a61c20b9cbf4
+AuthProvider.tsx:55 Initial session: 7bad0693-9053-423f-a2f0-a61c20b9cbf4
+@supabase_supabase-js.js?v=188d5fb6:3900 
+            
+            
+           GET https://yekzyvdjjozhhatdefsq.supabase.co/rest/v1/users?select=has_completed_onboarding&id=eq.7bad0693-9053-423f-a2f0-a61c20b9cbf4 400 (Bad Request)
+(anonymous) @ @supabase_supabase-js.js?v=188d5fb6:3900
+(anonymous) @ @supabase_supabase-js.js?v=188d5fb6:3921
+fulfilled @ @supabase_supabase-js.js?v=188d5fb6:3873
+Promise.then
+step @ @supabase_supabase-js.js?v=188d5fb6:3886
+(anonymous) @ @supabase_supabase-js.js?v=188d5fb6:3888
+__awaiter6 @ @supabase_supabase-js.js?v=188d5fb6:3870
+(anonymous) @ @supabase_supabase-js.js?v=188d5fb6:3911
+then @ @supabase_supabase-js.js?v=188d5fb6:89Understand this errorAI
+@supabase_supabase-js.js?v=188d5fb6:3900 
+            
+            
+           GET https://yekzyvdjjozhhatdefsq.supabase.co/rest/v1/users?select=has_completed_onboarding&id=eq.7bad0693-9053-423f-a2f0-a61c20b9cbf4 400 (Bad Request)
+(anonymous) @ @supabase_supabase-js.js?v=188d5fb6:3900
+(anonymous) @ @supabase_supabase-js.js?v=188d5fb6:3921
+fulfilled @ @supabase_supabase-js.js?v=188d5fb6:3873
+Promise.then
+step @ @supabase_supabase-js.js?v=188d5fb6:3886
+(anonymous) @ @supabase_supabase-js.js?v=188d5fb6:3888
+__awaiter6 @ @supabase_supabase-js.js?v=188d5fb6:3870
+(anonymous) @ @supabase_supabase-js.js?v=188d5fb6:3911
+then @ @supabase_supabase-js.js?v=188d5fb6:89Understand this errorAI
+@supabase_supabase-js.js?v=188d5fb6:3900 
+            
+            
+           GET https://yekzyvdjjozhhatdefsq.supabase.co/rest/v1/users?select=has_completed_onboarding&id=eq.7bad0693-9053-423f-a2f0-a61c20b9cbf4 400 (Bad Request)
+(anonymous) @ @supabase_supabase-js.js?v=188d5fb6:3900
+(anonymous) @ @supabase_supabase-js.js?v=188d5fb6:3921
+fulfilled @ @supabase_supabase-js.js?v=188d5fb6:3873
+Promise.then
+step @ @supabase_supabase-js.js?v=188d5fb6:3886
+(anonymous) @ @supabase_supabase-js.js?v=188d5fb6:3888
+__awaiter6 @ @supabase_supabase-js.js?v=188d5fb6:3870
+(anonymous) @ @supabase_supabase-js.js?v=188d5fb6:3911
+then @ @supabase_supabase-js.js?v=188d5fb6:89Understand this errorAI
+@supabase_supabase-js.js?v=188d5fb6:3900 
+            
+            
+           GET https://yekzyvdjjozhhatdefsq.supabase.co/rest/v1/users?select=has_completed_onboarding&id=eq.7bad0693-9053-423f-a2f0-a61c20b9cbf4 400 (Bad Request)
+(anonymous) @ @supabase_supabase-js.js?v=188d5fb6:3900
+(anonymous) @ @supabase_supabase-js.js?v=188d5fb6:3921
+fulfilled @ @supabase_supabase-js.js?v=188d5fb6:3873
+Promise.then
+step @ @supabase_supabase-js.js?v=188d5fb6:3886
+(anonymous) @ @supabase_supabase-js.js?v=188d5fb6:3888
+__awaiter6 @ @supabase_supabase-js.js?v=188d5fb6:3870
+(anonymous) @ @supabase_supabase-js.js?v=188d5fb6:3911
+then @ @supabase_supabase-js.js?v=188d5fb6:89Understand this errorAI
