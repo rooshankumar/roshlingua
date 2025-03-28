@@ -20,7 +20,7 @@ export default function ChatHeader() {
         .from('conversation_participants')
         .select(`
           user_id,
-          profiles:user_id (
+          profiles!conversation_participants_user_id_fkey (
             id,
             username,
             avatar_url,
@@ -35,7 +35,6 @@ export default function ChatHeader() {
       }
 
       if (participants && participants.length > 0) {
-        // Find the participant that is not the current user
         const otherParticipant = participants.find(p => p.user_id !== user.id);
         if (otherParticipant?.profiles) {
           setOtherUser(otherParticipant.profiles);
@@ -63,9 +62,6 @@ export default function ChatHeader() {
             </div>
           </>
         )}
-        <div className="ml-auto flex items-center space-x-4">
-          {/* Chat controls can go here */}
-        </div>
       </div>
     </div>
   );
