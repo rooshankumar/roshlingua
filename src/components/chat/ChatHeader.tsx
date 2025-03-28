@@ -1,20 +1,20 @@
+
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useSupabase } from '@/hooks/useSupabase';
+import { useAuth } from '@/providers/AuthProvider';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Profile } from '@/lib/database.types';
 
 export default function ChatHeader() {
   const { id } = useParams();
   const { supabase } = useSupabase();
-  const [recipient, setRecipient] = useState<Profile | null>(null);
+  const { user } = useAuth();
+  const [otherUser, setOtherUser] = useState<Profile | null>(null);
 
   useEffect(() => {
-    async function getRecipientInfo() {
-      if (!id) return;
-
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
+    async function getOtherUserInfo() {
+      if (!id || !user) return;
 
       const { data: participants, error } = await supabase
         .from('conversation_participants')
@@ -22,7 +22,7 @@ export default function ChatHeader() {
           user_id,
           profiles:user_id (
             id,
-            full_name,
+            username,
             avatar_url,
             is_online
           )
@@ -35,29 +35,30 @@ export default function ChatHeader() {
       }
 
       if (participants && participants.length > 0) {
+        // Find the participant that is not the current user
         const otherParticipant = participants.find(p => p.user_id !== user.id);
         if (otherParticipant?.profiles) {
-          setRecipient(otherParticipant.profiles);
+          setOtherUser(otherParticipant.profiles);
         }
       }
     }
 
-    getRecipientInfo();
-  }, [id, supabase]);
+    getOtherUserInfo();
+  }, [id, supabase, user]);
 
   return (
     <div className="border-b">
       <div className="flex h-16 items-center px-4 gap-3">
-        {recipient && (
+        {otherUser && (
           <>
             <Avatar>
-              <AvatarImage src={recipient.avatar_url || ''} />
-              <AvatarFallback>{recipient.full_name?.[0]}</AvatarFallback>
+              <AvatarImage src={otherUser.avatar_url || ''} />
+              <AvatarFallback>{otherUser.username?.[0]}</AvatarFallback>
             </Avatar>
             <div>
-              <p className="text-sm font-medium leading-none">{recipient.full_name}</p>
+              <p className="text-sm font-medium leading-none">{otherUser.username}</p>
               <p className="text-sm text-muted-foreground">
-                {recipient.is_online ? 'Online' : 'Offline'}
+                {otherUser.is_online ? 'Online' : 'Offline'}
               </p>
             </div>
           </>
