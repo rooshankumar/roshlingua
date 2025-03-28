@@ -24,7 +24,7 @@ USING (
   )
 );
 
--- Create new policies for conversation participants
+-- Create simple, non-recursive policies for conversation participants
 CREATE POLICY "Enable participant viewing"
 ON conversation_participants FOR SELECT TO authenticated
 USING (user_id = auth.uid());
