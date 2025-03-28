@@ -1,0 +1,103 @@
+Understanding How Conversations & Messaging Work in RosLingua
+Your real-time chat system in RosLingua involves multiple tables that work together. Below is an overview of how your app uses these tables to create conversations and send messages.
+
+🔹 Key Tables Used in the Chat System
+Table	Purpose
+profiles	Stores user information (ID, name, avatar, etc.).
+conversations	Stores conversation metadata (created_at, updated_at, etc.).
+conversation_participants	Links users to specific conversations.
+messages	Stores messages in conversations.
+message_reactions	Stores reactions (emojis, likes) on messages.
+📌 How a Conversation is Started
+1️⃣ A user starts a conversation
+Frontend: When a user clicks "Start Chat," your app sends a POST request to Supabase to create a new conversation.
+
+Backend (Supabase SQL): The conversations table receives a new row with a UUID and timestamps.
+
+🔹 Query executed in Supabase:
+
+javascript
+Copy
+Edit
+const { data, error } = await supabase
+  .from('conversations')
+  .insert([{ created_at: new Date().toISOString() }]);
+2️⃣ Users are added as participants
+Frontend: Once a conversation is created, the users involved are added to conversation_participants.
+
+Backend (Supabase SQL): The user IDs are linked to the conversation.
+
+🔹 Query executed in Supabase:
+
+javascript
+Copy
+Edit
+const { data, error } = await supabase
+  .from('conversation_participants')
+  .insert([{ conversation_id: conversationId, user_id: userId }]);
+👀 Possible Issue:
+
+If RLS (Row-Level Security) blocks the insert, users won’t be added to the conversation.
+
+3️⃣ Messages are sent in real-time
+Frontend: A user types a message and sends it.
+
+Backend (Supabase SQL): A new row is added to messages.
+
+🔹 Query executed in Supabase:
+
+javascript
+Copy
+Edit
+const { data, error } = await supabase
+  .from('messages')
+  .insert([{ conversation_id: conversationId, sender_id: userId, content: "Hello!" }]);
+👀 Possible Issue:
+
+If the user isn’t in conversation_participants, they can't send messages (403 Forbidden).
+
+4️⃣ Messages are received in real-time
+Frontend: Supabase listens for new messages in the messages table using onSnapshot().
+
+Backend: Messages are automatically fetched.
+
+🔹 Supabase real-time listener in frontend:
+
+javascript
+Copy
+Edit
+supabase
+  .from('messages')
+  .on('INSERT', payload => {
+    console.log('New message received:', payload.new);
+  })
+  .subscribe();
+👀 Possible Issue:
+
+If RLS blocks SELECT, the user won’t receive messages.
+
+5️⃣ Users react to messages
+Frontend: A user clicks an emoji reaction on a message.
+
+Backend (Supabase SQL): The reaction is stored in message_reactions.
+
+🔹 Query executed in Supabase:
+
+javascript
+Copy
+Edit
+const { data, error } = await supabase
+  .from('message_reactions')
+  .insert([{ message_id: messageId, user_id: userId, reaction: "👍" }]);
+👀 Possible Issue:
+
+If RLS blocks this action, reactions won’t be saved.
+
+🔧 What Might Be Broken in RosLingua?
+🚨 Potential Issues & Fixes:
+
+Issue	Fix
+403 Forbidden when starting a chat	Add RLS policy to allow INSERT into conversations (see previous response).
+403 Forbidden when sending messages	Ensure user exists in conversation_participants.
+Messages not appearing in real-time	Check if frontend is subscribed to messages using .on('INSERT', ...).
+Reactions not working	Add an RLS policy for message_reactions.
