@@ -1,4 +1,3 @@
-
 import type { Config } from "tailwindcss";
 
 export default {
@@ -11,6 +10,13 @@ export default {
 	],
 	prefix: "",
 	theme: {
+    extend: {
+      colors: {
+        'chat-primary': '#0084FF',
+        'chat-dark': '#0070D8',
+        'chat-unread': '#E5F1FF',
+      },
+    },
 		container: {
 			center: true,
 			padding: '2rem',
