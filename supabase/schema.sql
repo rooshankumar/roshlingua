@@ -166,10 +166,11 @@ CREATE POLICY "Users can view messages in their conversations" ON public.message
 CREATE POLICY "Users can insert messages in their conversations" ON public.messages
   FOR INSERT WITH CHECK (
     auth.uid() = sender_id AND
-    conversation_id IN (
-      SELECT conversation_id 
+    EXISTS (
+      SELECT 1 
       FROM public.conversation_participants
-      WHERE user_id = auth.uid()
+      WHERE conversation_id = messages.conversation_id 
+      AND user_id = auth.uid()
     )
   );
 
