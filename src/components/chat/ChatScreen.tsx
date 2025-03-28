@@ -7,7 +7,7 @@ import { MessageInput } from "./MessageInput";
 import { useEffect, useRef, useState } from "react";
 import { ArrowLeft, MoreVertical } from "lucide-react";
 import { Button } from "../ui/button";
-import { useIsMobile } from "@/hooks/use-mobile";
+import { useMobile } from "@/hooks/use-mobile";
 import { TypingIndicator } from "./TypingIndicator";
 
 interface ChatScreenProps {
@@ -29,7 +29,7 @@ export const ChatScreen = ({
 }: ChatScreenProps) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [isTyping, setIsTyping] = useState(false);
-  const isMobile = useIsMobile();
+  const isMobile = useMobile();
   
   const conversationMessages = getMessagesByConversation(messages, conversationId);
   const groupedMessages = groupMessagesByDate(conversationMessages);
