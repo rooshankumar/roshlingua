@@ -98,18 +98,29 @@ export default function Chat() {
 
     try {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user || !otherUser) return; // Added null check for otherUser
+      if (!user || !otherUser) return;
 
+      // Update conversation last_message_at
+      await supabase
+        .from('conversations')
+        .update({ last_message_at: new Date().toISOString() })
+        .eq('id', conversationId);
+
+      // Send message
       const { error } = await supabase
         .from('messages')
         .insert({ 
-          content: message, 
+          content: message.trim(), 
           conversation_id: conversationId,
           sender_id: user.id,
-          recipient_id: otherUser.id // Added recipient_id
+          recipient_id: otherUser.id,
+          is_read: false
         });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error sending message:', error);
+        throw error;
+      }
       setMessage('');
     } catch (error) {
       console.error('Error sending message:', error);
