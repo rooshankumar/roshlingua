@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
@@ -29,7 +28,7 @@ export default function Chat() {
   useEffect(() => {
     const fetchConversationDetails = async () => {
       if (!conversationId) return;
-      
+
       try {
         const { data: participants } = await supabase
           .from('conversation_participants')
@@ -88,12 +87,15 @@ export default function Chat() {
     if (!message.trim()) return;
 
     try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
       const { error } = await supabase
         .from('messages')
-        .insert({
+        .insert({ 
+          content: message, 
           conversation_id: conversationId,
-          sender_id: user?.id,
-          content: message,
+          sender_id: user.id 
         });
 
       if (error) throw error;
