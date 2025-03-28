@@ -24,8 +24,11 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
         .eq('user_id', user.id)
         .single();
 
-      if (!onboardingError && onboardingData) {
-        setHasCompletedOnboarding(onboardingData.is_complete || false);
+      if (!onboardingError) {
+        // If we got data, use it, otherwise default to false
+        setHasCompletedOnboarding(onboardingData?.is_complete ?? false);
+      } else {
+        console.error("Error checking onboarding status:", onboardingError);
       }
       setIsCheckingOnboarding(false);
     };
