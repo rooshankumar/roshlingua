@@ -181,12 +181,14 @@ const Community = () => {
   const handleStartChat = async (userId: string) => {
     try {
       // Create conversation
+      const { data: { user } } = await supabase.auth.getUser();
       const { data: conversation, error: conversationError } = await supabase
         .from('conversations')
         .insert({
+          creator_id: user.id,
           created_at: new Date().toISOString()
         })
-        .select()
+        .select('*')
         .single();
 
       if (conversationError) {

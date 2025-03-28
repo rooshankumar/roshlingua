@@ -10,9 +10,9 @@ DROP POLICY IF EXISTS "Enable participant viewing" ON conversation_participants;
 DROP POLICY IF EXISTS "Enable participant creation" ON conversation_participants;
 
 -- Create new policies for conversations
-CREATE POLICY "Enable conversation creation"
+CREATE POLICY "User can create conversations"
 ON conversations FOR INSERT TO authenticated
-WITH CHECK (true);
+WITH CHECK (creator_id = auth.uid());
 
 CREATE POLICY "Enable conversation viewing for participants"
 ON conversations FOR SELECT TO authenticated
