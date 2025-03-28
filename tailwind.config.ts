@@ -15,6 +15,9 @@ export default {
         'chat-primary': '#0084FF',
         'chat-dark': '#0070D8',
         'chat-unread': '#E5F1FF',
+        'chat-primary': '#0084FF',
+        'chat-dark': '#0070D8',
+        'chat-unread': '#E5F1FF',
       },
     },
 		container: {

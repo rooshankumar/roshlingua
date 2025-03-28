@@ -1,27 +1,21 @@
+import { Database } from "@/integrations/supabase/types";
 
-export interface Message {
-  id: string;
-  conversation_id: string;
-  sender_id: string;
-  recipient_id: string;
-  content: string;
-  created_at: string;
-  is_read: boolean;
+export type Message = Database["public"]["Tables"]["messages"]["Row"];
+export type Conversation = Database["public"]["Tables"]["conversations"]["Row"];
+export type ConversationParticipant = Database["public"]["Tables"]["conversation_participants"]["Row"];
+
+export interface ChatMessage extends Message {
+  sender?: {
+    id: string;
+    avatar_url?: string;
+    full_name?: string;
+  };
 }
 
-export interface Conversation {
-  id: string;
-  created_at: string;
-  last_message_at: string;
-  participants?: ConversationParticipant[];
-  lastMessage?: Message;
-}
-
-export interface ConversationParticipant {
-  id: string;
-  conversation_id: string;
-  user_id: string;
-  created_at: string;
+export interface ChatConversation extends Conversation {
+  participants: ConversationParticipant[];
+  last_message?: ChatMessage;
+  unread_count?: number;
 }
 
 export interface User {

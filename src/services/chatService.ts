@@ -1,5 +1,5 @@
 import { supabase } from '@/lib/supabase';
-import { Conversation, Message } from '@/types/chat';
+import type { ChatMessage, ChatConversation } from '@/types/chat';
 
 export const chatService = {
   async createConversation(userId: string) {
@@ -23,47 +23,43 @@ export const chatService = {
     return conversation;
   },
 
-  async getConversations() {
+  async getConversations(userId: string) {
     const { data, error } = await supabase
       .from('conversations')
       .select(`
         *,
-        participants:conversation_participants(
-          user_id,
-          created_at
-        )
+        participants:conversation_participants(user_id),
+        last_message:messages(*)
       `)
       .order('last_message_at', { ascending: false });
 
     if (error) throw error;
-    return data as Conversation[];
+    return data as ChatConversation[];
   },
 
   async getMessages(conversationId: string) {
     const { data, error } = await supabase
       .from('messages')
-      .select('*')
+      .select(`
+        *,
+        sender:profiles(id, avatar_url, full_name)
+      `)
       .eq('conversation_id', conversationId)
       .order('created_at', { ascending: true });
 
     if (error) throw error;
-    return data as Message[];
+    return data as ChatMessage[];
   },
 
-  async sendMessage(conversationId: string, recipientId: string, content: string) {
+  async sendMessage(message: Partial<ChatMessage>) {
     const { data, error } = await supabase
       .from('messages')
-      .insert({
-        conversation_id: conversationId,
-        sender_id: (await supabase.auth.getUser()).data.user?.id,
-        recipient_id: recipientId,
-        content
-      })
+      .insert(message)
       .select()
       .single();
 
     if (error) throw error;
-    return data as Message;
+    return data;
   },
 
   async markAsRead(messageId: string) {
@@ -75,7 +71,7 @@ export const chatService = {
     if (error) throw error;
   },
 
-  subscribeToConversation(conversationId: string, callback: (message: Message) => void) {
+  subscribeToConversation(conversationId: string, callback: (message: ChatMessage) => void) {
     return supabase
       .channel(`conversation:${conversationId}`)
       .on(
@@ -86,7 +82,7 @@ export const chatService = {
           table: 'messages',
           filter: `conversation_id=eq.${conversationId}`
         },
-        (payload) => callback(payload.new as Message)
+        (payload) => callback(payload.new as ChatMessage)
       )
       .subscribe();
   }
