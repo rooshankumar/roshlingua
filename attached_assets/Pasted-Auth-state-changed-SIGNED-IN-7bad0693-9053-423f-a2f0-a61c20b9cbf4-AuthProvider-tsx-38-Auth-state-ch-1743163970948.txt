@@ -1,0 +1,35 @@
+Auth state changed: SIGNED_IN 7bad0693-9053-423f-a2f0-a61c20b9cbf4
+AuthProvider.tsx:38 Auth state changed: SIGNED_IN 7bad0693-9053-423f-a2f0-a61c20b9cbf4
+@supabase_supabase-js.js?v=47bff508:3900 
+            
+            
+           POST https://yekzyvdjjozhhatdefsq.supabase.co/rest/v1/conversations?columns=%22created_by%22%2C%22last_message_at%22&select=* 400 (Bad Request)
+(anonymous) @ @supabase_supabase-js.js?v=47bff508:3900
+(anonymous) @ @supabase_supabase-js.js?v=47bff508:3921
+fulfilled @ @supabase_supabase-js.js?v=47bff508:3873
+Promise.then
+step @ @supabase_supabase-js.js?v=47bff508:3886
+(anonymous) @ @supabase_supabase-js.js?v=47bff508:3888
+__awaiter6 @ @supabase_supabase-js.js?v=47bff508:3870
+(anonymous) @ @supabase_supabase-js.js?v=47bff508:3911
+then @ @supabase_supabase-js.js?v=47bff508:89Understand this errorAI
+Community.tsx:250 Error starting chat: {code: 'PGRST204', details: null, hint: null, message: "Could not find the 'created_by' column of 'conversations' in the schema cache"}
+handleStartChat @ Community.tsx:250
+await in handleStartChat
+onClick @ Community.tsx:377
+handleClick @ react-router-dom.js?v=47bff508:5342
+callCallback2 @ chunk-W6L2VRDA.js?v=47bff508:3674
+invokeGuardedCallbackDev @ chunk-W6L2VRDA.js?v=47bff508:3699
+invokeGuardedCallback @ chunk-W6L2VRDA.js?v=47bff508:3733
+invokeGuardedCallbackAndCatchFirstError @ chunk-W6L2VRDA.js?v=47bff508:3736
+executeDispatch @ chunk-W6L2VRDA.js?v=47bff508:7014
+processDispatchQueueItemsInOrder @ chunk-W6L2VRDA.js?v=47bff508:7034
+processDispatchQueue @ chunk-W6L2VRDA.js?v=47bff508:7043
+dispatchEventsForPlugins @ chunk-W6L2VRDA.js?v=47bff508:7051
+(anonymous) @ chunk-W6L2VRDA.js?v=47bff508:7174
+batchedUpdates$1 @ chunk-W6L2VRDA.js?v=47bff508:18913
+batchedUpdates @ chunk-W6L2VRDA.js?v=47bff508:3579
+dispatchEventForPluginEventSystem @ chunk-W6L2VRDA.js?v=47bff508:7173
+dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay @ chunk-W6L2VRDA.js?v=47bff508:5478
+dispatchEvent @ chunk-W6L2VRDA.js?v=47bff508:5472
+dispatchDiscreteEvent @ chunk-W6L2VRDA.js?v=47bff508:5449Understand this errorAI
