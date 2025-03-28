@@ -93,8 +93,27 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
         return !!values.nativeLanguage && !!values.learningLanguage && !!values.proficiencyLevel;
       case 3:
         if (!values.learningGoal) return false;
-        // No need to check onboarding status here, it will be updated in handleSubmit
-        return true;
+        return (async () => {
+          const { error: onboardingError } = await supabase
+            .from('onboarding_status')
+            .upsert({
+              user_id: userId,
+              is_complete: true,
+              current_step: 'completed',
+              updated_at: new Date().toISOString()
+            });
+
+          if (onboardingError) {
+            console.error("Error updating onboarding status:", onboardingError);
+            toast({
+              variant: "destructive",
+              title: "Error updating onboarding status",
+              description: "Please try again.",
+            });
+            return false;
+          }
+          return true;
+        })();
       default:
         return true;
     }
