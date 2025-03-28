@@ -18,34 +18,21 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
     const checkOnboardingStatus = async () => {
       if (!user) return;
 
-      const { data: onboardingData, error: onboardingError } = await supabase
-        .from('onboarding_status')
-        .select('is_complete')
-        .eq('user_id', user.id)
-        .maybeSingle();
+      // First check users table for profile completion
+      const { data: userData, error: userError } = await supabase
+        .from('users')
+        .select('*')
+        .eq('id', user.id)
+        .single();
 
-      if (!onboardingError) {
-        setHasCompletedOnboarding(onboardingData?.is_complete ?? false);
+      if (!userError && userData) {
+        // If user data exists, they completed onboarding
+        setHasCompletedOnboarding(true);
+        setIsCheckingOnboarding(false);
+        return;
       }
+
       setIsCheckingOnboarding(false);
-    };
-
-    const channel = supabase
-      .channel('onboarding_status_changes')
-      .on('postgres_changes', {
-        event: '*',
-        schema: 'public',
-        table: 'onboarding_status',
-        filter: `user_id=eq.${user.id}`
-      }, (payload) => {
-        setHasCompletedOnboarding(payload.new?.is_complete ?? false);
-      })
-      .subscribe();
-
-    checkOnboardingStatus();
-
-    return () => {
-      channel.unsubscribe();
     };
 
     checkOnboardingStatus();
