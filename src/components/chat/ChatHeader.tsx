@@ -12,16 +12,29 @@ export default function ChatHeader() {
   useEffect(() => {
     async function getRecipientInfo() {
       if (!id) return;
-      
+
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
-      const { data: participants } = await supabase
+      const { data: participants, error } = await supabase
         .from('conversation_participants')
-        .select('user_id, profiles(*)') // Join with profiles
+        .select(`
+          user_id,
+          profiles:user_id (
+            id,
+            full_name,
+            avatar_url,
+            is_online
+          )
+        `)
         .eq('conversation_id', id);
 
-      if (participants) {
+      if (error) {
+        console.error('Error fetching participants:', error);
+        return;
+      }
+
+      if (participants && participants.length > 0) {
         const otherParticipant = participants.find(p => p.user_id !== user.id);
         if (otherParticipant?.profiles) {
           setRecipient(otherParticipant.profiles);
