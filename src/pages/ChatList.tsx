@@ -23,8 +23,8 @@ export default function ChatList() {
           conversations:conversation_id (
             id,
             created_at,
-            participants:conversation_participants (
-              profiles:user_id (
+            participants:conversation_participants!inner (
+              user:user_id (
                 id,
                 username,
                 avatar_url,
@@ -120,10 +120,17 @@ export default function ChatList() {
             );
           })
         ) : (
-          <div className="text-center py-8">
-            <p className="text-muted-foreground mb-4">No conversations yet</p>
+          <div className="text-center py-12">
+            <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-muted flex items-center justify-center">
+              <MessageCircle className="h-8 w-8 text-muted-foreground" />
+            </div>
+            <h3 className="text-lg font-medium mb-2">No conversations yet</h3>
+            <p className="text-muted-foreground mb-6">Start chatting with other language learners</p>
             <Button asChild>
-              <Link to="/community">Find Users</Link>
+              <Link to="/community">
+                <Users className="h-4 w-4 mr-2" />
+                Find Users
+              </Link>
             </Button>
           </div>
         )}
