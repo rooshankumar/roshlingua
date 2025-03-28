@@ -12,11 +12,20 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
   const { user, isLoading } = useAuth();
   const location = useLocation();
   const [isCheckingOnboarding, setIsCheckingOnboarding] = useState(true);
-  const [hasCompletedOnboarding, setHasCompletedOnboarding] = useState(false);
+  const [hasCompletedOnboarding, setHasCompletedOnboarding] = useState(() => {
+    return localStorage.getItem("onboarding_completed") === "true";
+  });
 
   useEffect(() => {
     const checkOnboardingStatus = async () => {
       if (!user) return;
+
+      // First check localStorage
+      if (localStorage.getItem("onboarding_completed") === "true") {
+        setHasCompletedOnboarding(true);
+        setIsCheckingOnboarding(false);
+        return;
+      }
 
       const { data: onboardingData, error: onboardingError } = await supabase
         .from('onboarding_status')
@@ -24,11 +33,9 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
         .eq('user_id', user.id)
         .maybeSingle();
 
-      if (!onboardingError) {
-        // If we got data, use it, otherwise default to false
-        setHasCompletedOnboarding(onboardingData?.is_complete ?? false);
-      } else {
-        console.error("Error checking onboarding status:", onboardingError);
+      if (!onboardingError && onboardingData?.is_complete) {
+        localStorage.setItem("onboarding_completed", "true");
+        setHasCompletedOnboarding(true);
       }
       setIsCheckingOnboarding(false);
     };
