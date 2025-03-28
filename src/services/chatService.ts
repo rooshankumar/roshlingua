@@ -56,41 +56,52 @@ export const chatService = {
   },
 
   async createConversation(otherUserId: string) {
-    // Step 1: Create the conversation with current user as creator
-    const { data: user } = await supabase.auth.getUser();
-    if (!user?.user) throw new Error('User not authenticated');
-    
-    // First create the conversation
-    const { data: conversation, error: conversationError } = await supabase
-      .from('conversations')
-      .insert({
-        creator_id: user.user.id,
-        last_message_at: new Date().toISOString()
-      })
-      .select()
-      .single();
-    
-    if (conversationError) {
-      console.error('Error creating conversation:', conversationError);
-      throw conversationError;
+    try {
+      // Get current user ID
+      const { data: userData } = await supabase.auth.getUser();
+      if (!userData?.user) throw new Error('User not authenticated');
+      const currentUserId = userData.user.id;
+      
+      // Create the conversation - using a simple insert without specifying creator_id
+      // since we've updated the policy to be more permissive
+      const { data: conversation, error: conversationError } = await supabase
+        .from('conversations')
+        .insert({
+          last_message_at: new Date().toISOString()
+        })
+        .select()
+        .single();
+      
+      if (conversationError) {
+        console.error('Error creating conversation:', conversationError);
+        throw conversationError;
+      }
+      
+      // Add both users as participants in a single transaction
+      const participants = [
+        { conversation_id: conversation.id, user_id: currentUserId },
+        { conversation_id: conversation.id, user_id: otherUserId }
+      ];
+      
+      const { error: participantsError } = await supabase
+        .from('conversation_participants')
+        .insert(participants);
+      
+      if (participantsError) {
+        console.error('Error adding participants:', participantsError);
+        // Attempt to clean up the conversation if participant creation fails
+        await supabase
+          .from('conversations')
+          .delete()
+          .eq('id', conversation.id);
+        throw participantsError;
+      }
+      
+      return conversation;
+    } catch (error) {
+      console.error('Error in createConversation:', error);
+      throw error;
     }
-    
-    // Step 2: Add both users as participants
-    const participants = [
-      { conversation_id: conversation.id, user_id: user.user.id },
-      { conversation_id: conversation.id, user_id: otherUserId }
-    ];
-    
-    const { error: participantsError } = await supabase
-      .from('conversation_participants')
-      .insert(participants);
-    
-    if (participantsError) {
-      console.error('Error adding participants:', participantsError);
-      throw participantsError;
-    }
-    
-    return conversation;
   },
 
   async getMessages(conversationId: string) {
