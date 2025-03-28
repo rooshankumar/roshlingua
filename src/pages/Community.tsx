@@ -82,7 +82,7 @@ const Community = () => {
           learning_language: user.learning_language || 'Spanish',
           proficiency_level: user.proficiency_level || 'beginner',
           is_online: user.is_online || false,
-          streak_count: user.streak_count || 0, // Added streak_count default
+          streak_count: user.streak_count || 1, // Added streak_count default, now set to 1
           likes_count: user.likes_count || 0, // Added likes_count default
           age: user.age || null
         }));
@@ -364,8 +364,6 @@ const Community = () => {
                       </p>
                     </div>
                   </div>
-
-                  {/* Removed redundant streak display */}
 
                   <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
                     {user.bio || 'No bio available.'}
