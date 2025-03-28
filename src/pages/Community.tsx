@@ -51,7 +51,17 @@ const Community = () => {
         const currentUser = (await supabase.auth.getUser()).data.user;
         const { data, error } = await supabase
           .from('users')
-          .select('*')
+          .select(`
+            id,
+            name,
+            native_language,
+            learning_language,
+            proficiency_level,
+            bio,
+            avatar_url,
+            streak_count,
+            is_online
+          `)
           .neq('id', currentUser?.id); // Exclude current user
 
         if (error) {
