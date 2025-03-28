@@ -180,17 +180,24 @@ const Community = () => {
 
   const handleStartChat = async (userId: string) => {
     try {
-      // Get current user
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        console.error('No authenticated user found');
+      // Get current user and verify authentication
+      const { data: { user: currentUser }, error: authError } = await supabase.auth.getUser();
+      
+      if (authError || !currentUser) {
+        console.error('Authentication error:', authError?.message || 'No authenticated user found');
+        toast({
+          title: "Authentication Error",
+          description: "Please sign in to start a chat",
+          variant: "destructive"
+        });
         return;
       }
 
-      // Create conversation
+      // Create conversation with required creator_id
       const { data: conversation, error: conversationError } = await supabase
         .from('conversations')
         .insert({
+          creator_id: currentUser.id,
           creator_id: user.id,
           created_at: new Date().toISOString()
         })
