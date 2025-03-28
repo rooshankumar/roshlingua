@@ -92,6 +92,22 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
       case 2:
         return !!values.nativeLanguage && !!values.learningLanguage && !!values.proficiencyLevel;
       case 3:
+
+      // Update onboarding status
+      const { error: onboardingError } = await supabase
+        .from('onboarding_status')
+        .upsert({
+          user_id: userId,
+          is_complete: true,
+          current_step: 'completed',
+          updated_at: new Date().toISOString()
+        });
+
+      if (onboardingError) {
+        console.error("Error updating onboarding status:", onboardingError);
+        throw onboardingError;
+      }
+
         return !!values.learningGoal;
       default:
         return true;
@@ -153,7 +169,7 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
           proficiency_level: formData.proficiencyLevel,
           learning_goal: formData.learningGoal,
           avatar_url: formData.avatarUrl || null,
-          has_completed_onboarding: true,
+          
           updated_at: new Date().toISOString()
         })
         .eq('id', userId);

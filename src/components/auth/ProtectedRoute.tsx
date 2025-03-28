@@ -18,14 +18,14 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
     const checkOnboardingStatus = async () => {
       if (!user) return;
 
-      const { data: userData, error: userError } = await supabase
-        .from('users')
-        .select('has_completed_onboarding')
-        .eq('id', user.id)
+      const { data: onboardingData, error: onboardingError } = await supabase
+        .from('onboarding_status')
+        .select('is_complete')
+        .eq('user_id', user.id)
         .single();
 
-      if (!userError && userData) {
-        setHasCompletedOnboarding(userData.has_completed_onboarding || false);
+      if (!onboardingError && onboardingData) {
+        setHasCompletedOnboarding(onboardingData.is_complete || false);
       }
       setIsCheckingOnboarding(false);
     };
