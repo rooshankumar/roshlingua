@@ -182,9 +182,9 @@ const Community = () => {
   const handleStartChat = async (userId: string) => {
     try {
       // Get current user and verify authentication
-      const { data: { user }, error: authError } = await supabase.auth.getUser();
+      const { data: { user: currentUser }, error: authError } = await supabase.auth.getUser();
 
-      if (authError || !user) {
+      if (authError || !currentUser) {
         console.error('Authentication error:', authError?.message || 'No authenticated user found');
         toast({
           title: "Authentication Error",
@@ -194,11 +194,11 @@ const Community = () => {
         return;
       }
 
-      // Create conversation with required creator_id
+      // Create conversation
       const { data: conversation, error: conversationError } = await supabase
         .from('conversations')
         .insert({
-          creator_id: user.id,
+          creator_id: currentUser.id,
           created_at: new Date().toISOString()
         })
         .select('*')
@@ -214,24 +214,21 @@ const Community = () => {
         return;
       }
 
-      // Add both users as participants
+      // Add participants
       const { error: participantsError } = await supabase
         .from('conversation_participants')
         .insert([
-          { 
-            conversation_id: conversation.id, 
-            user_id: userId,
-            last_read_at: new Date().toISOString()
-          },
-          { 
-            conversation_id: conversation.id, 
-            user_id: user.id,
-            last_read_at: new Date().toISOString()
-          }
+          { conversation_id: conversation.id, user_id: currentUser.id },
+          { conversation_id: conversation.id, user_id: userId }
         ]);
 
       if (participantsError) {
         console.error('Error adding participants:', participantsError);
+        toast({
+          title: "Error",
+          description: "Failed to add participants",
+          variant: "destructive"
+        });
         return;
       }
 
