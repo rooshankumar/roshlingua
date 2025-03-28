@@ -151,12 +151,19 @@ CREATE POLICY "Users can view messages in their conversations" ON public.message
 
 CREATE POLICY "Users can insert messages in their conversations" ON public.messages
   FOR INSERT WITH CHECK (
+    auth.uid() = sender_id AND
     EXISTS (
       SELECT 1 FROM public.conversation_participants
       WHERE conversation_id = messages.conversation_id
       AND user_id = auth.uid()
     )
   );
+
+CREATE POLICY "Users can delete their own messages" ON public.messages
+  FOR DELETE USING (auth.uid() = sender_id);
+
+CREATE POLICY "Users can update their own messages" ON public.messages
+  FOR UPDATE USING (auth.uid() = sender_id);
 
 -- Message reactions policies
 CREATE POLICY "Users can manage their reactions" ON public.message_reactions
