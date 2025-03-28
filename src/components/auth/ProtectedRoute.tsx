@@ -12,20 +12,11 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
   const { user, isLoading } = useAuth();
   const location = useLocation();
   const [isCheckingOnboarding, setIsCheckingOnboarding] = useState(true);
-  const [hasCompletedOnboarding, setHasCompletedOnboarding] = useState(() => {
-    return localStorage.getItem("onboarding_completed") === "true";
-  });
+  const [hasCompletedOnboarding, setHasCompletedOnboarding] = useState(false);
 
   useEffect(() => {
     const checkOnboardingStatus = async () => {
       if (!user) return;
-
-      // First check localStorage
-      if (localStorage.getItem("onboarding_completed") === "true") {
-        setHasCompletedOnboarding(true);
-        setIsCheckingOnboarding(false);
-        return;
-      }
 
       const { data: onboardingData, error: onboardingError } = await supabase
         .from('onboarding_status')
@@ -33,11 +24,28 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
         .eq('user_id', user.id)
         .maybeSingle();
 
-      if (!onboardingError && onboardingData?.is_complete) {
-        localStorage.setItem("onboarding_completed", "true");
-        setHasCompletedOnboarding(true);
+      if (!onboardingError) {
+        setHasCompletedOnboarding(onboardingData?.is_complete ?? false);
       }
       setIsCheckingOnboarding(false);
+    };
+
+    const channel = supabase
+      .channel('onboarding_status_changes')
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'onboarding_status',
+        filter: `user_id=eq.${user.id}`
+      }, (payload) => {
+        setHasCompletedOnboarding(payload.new?.is_complete ?? false);
+      })
+      .subscribe();
+
+    checkOnboardingStatus();
+
+    return () => {
+      channel.unsubscribe();
     };
 
     checkOnboardingStatus();
