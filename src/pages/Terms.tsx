@@ -109,7 +109,7 @@ const Terms = () => {
               If you have any questions about these Terms, please contact us:
             </p>
             <ul>
-              <li>By email: terms@languagelandia.com</li>
+              <li>By email: roshlingua@gmail.com</li>
               <li>By visiting our contact page: <Link to="/contact" className="text-primary hover:underline">Contact Us</Link></li>
             </ul>
           </div>
