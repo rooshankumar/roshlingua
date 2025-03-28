@@ -1,0 +1,35 @@
+Auth state changed: INITIAL_SESSION 7bad0693-9053-423f-a2f0-a61c20b9cbf4
+AuthProvider.tsx:55 Initial session: 7bad0693-9053-423f-a2f0-a61c20b9cbf4
+@supabase_supabase-js.js?v=188d5fb6:3900 
+            
+            
+           GET https://yekzyvdjjozhhatdefsq.supabase.co/rest/v1/conversation_participants?select=conversation_id%2Cconversations%3Aconversation_id%28id%2Ccreated_at%2Cparticipants%3Aconversation_participants%28profiles%3Auser_id%28id%2Cusername%2Cavatar_url%2Cis_online%2Clast_seen%29%29%29&user_id=eq.7bad0693-9053-423f-a2f0-a61c20b9cbf4 400 (Bad Request)
+(anonymous) @ @supabase_supabase-js.js?v=188d5fb6:3900
+(anonymous) @ @supabase_supabase-js.js?v=188d5fb6:3921
+fulfilled @ @supabase_supabase-js.js?v=188d5fb6:3873
+Promise.then
+step @ @supabase_supabase-js.js?v=188d5fb6:3886
+(anonymous) @ @supabase_supabase-js.js?v=188d5fb6:3888
+__awaiter6 @ @supabase_supabase-js.js?v=188d5fb6:3870
+(anonymous) @ @supabase_supabase-js.js?v=188d5fb6:3911
+then @ @supabase_supabase-js.js?v=188d5fb6:89Understand this errorAI
+ChatList.tsx:40 Error fetching conversations: {code: 'PGRST200', details: "Searched for a foreign key relationship between 'c…n the schema 'public', but no matches were found.", hint: null, message: "Could not find a relationship between 'conversation_participants' and 'user_id' in the schema cache"}
+fetchConversations @ ChatList.tsx:40
+await in fetchConversations
+(anonymous) @ ChatList.tsx:61
+commitHookEffectListMount @ chunk-W6L2VRDA.js?v=188d5fb6:16915
+commitPassiveMountOnFiber @ chunk-W6L2VRDA.js?v=188d5fb6:18156
+commitPassiveMountEffects_complete @ chunk-W6L2VRDA.js?v=188d5fb6:18129
+commitPassiveMountEffects_begin @ chunk-W6L2VRDA.js?v=188d5fb6:18119
+commitPassiveMountEffects @ chunk-W6L2VRDA.js?v=188d5fb6:18109
+flushPassiveEffectsImpl @ chunk-W6L2VRDA.js?v=188d5fb6:19490
+flushPassiveEffects @ chunk-W6L2VRDA.js?v=188d5fb6:19447
+performSyncWorkOnRoot @ chunk-W6L2VRDA.js?v=188d5fb6:18868
+flushSyncCallbacks @ chunk-W6L2VRDA.js?v=188d5fb6:9119
+commitRootImpl @ chunk-W6L2VRDA.js?v=188d5fb6:19432
+commitRoot @ chunk-W6L2VRDA.js?v=188d5fb6:19277
+finishConcurrentRender @ chunk-W6L2VRDA.js?v=188d5fb6:18805
+performConcurrentWorkOnRoot @ chunk-W6L2VRDA.js?v=188d5fb6:18718
+workLoop @ chunk-W6L2VRDA.js?v=188d5fb6:197
+flushWork @ chunk-W6L2VRDA.js?v=188d5fb6:176
+performWorkUntilDeadline @ chunk-W6L2VRDA.js?v=188d5fb6:384Understand this errorAI
