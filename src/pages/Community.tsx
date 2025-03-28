@@ -357,7 +357,13 @@ const Community = () => {
                         )}
                       </div>
                       <p className="text-sm text-muted-foreground flex items-center gap-2">
-                        {user.native_language} → {user.learning_language}
+                        <span className="px-2 py-0.5 rounded border-green-500 border bg-green-50/10 text-green-700 transition-all hover:bg-green-100/20 hover:scale-105 duration-300">
+                          {user.native_language}
+                        </span>
+                        →
+                        <span className="px-2 py-0.5 rounded border-blue-500 border bg-blue-50/10 text-blue-700 transition-all hover:bg-blue-100/20 hover:scale-105 duration-300">
+                          {user.learning_language}
+                        </span>
                         <span className="text-xs px-2 py-0.5 rounded bg-muted">
                           {user.proficiency_level || 'Beginner'}
                         </span>
