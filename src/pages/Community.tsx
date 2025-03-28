@@ -21,7 +21,6 @@ import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from "@/components/ui/badge";
 import { toast } from '@/hooks/use-toast';
 
-
 interface User {
   id: string;
   full_name: string;
@@ -54,13 +53,15 @@ const Community = () => {
           .select(`
             id,
             full_name,
+            username,
             native_language,
             learning_language,
             proficiency_level,
             bio,
             avatar_url,
             streak_count,
-            is_online
+            is_online,
+            likes_count
           `)
           .neq('id', currentUser?.id); // Exclude current user
 
@@ -80,8 +81,8 @@ const Community = () => {
           learning_language: user.learning_language || 'Spanish',
           proficiency_level: user.proficiency_level || 'beginner',
           is_online: user.is_online || false,
-          streak_count: user.streak_count || 0, //Added streak_count default
-          likes_count: user.likes_count || 0 //Added likes_count default
+          streak_count: user.streak_count || 0, // Added streak_count default
+          likes_count: user.likes_count || 0 // Added likes_count default
         }));
 
         setUsers(usersWithDefaults);

@@ -9,7 +9,7 @@ import { MessageCircle } from 'lucide-react';
 
 export default function ChatList() {
   const { user } = useAuth();
-  const [conversations, setConversations] = useState([]);
+  const [conversations, setConversations] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {

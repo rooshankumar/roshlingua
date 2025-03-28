@@ -22,77 +22,43 @@ export default function Chat() {
   const { toast } = useToast();
   const navigate = useNavigate();
   const [message, setMessage] = useState('');
-  const [messages, setMessages] = useState([]);
-  const [otherUser, setOtherUser] = useState(null);
+  const [messages, setMessages] = useState<any[]>([]);
+  const [otherUser, setOtherUser] = useState<any>(null);
 
   useEffect(() => {
     const fetchConversationDetails = async () => {
-      if (!conversationId) return;
+      if (!conversationId || !user) return;
 
       try {
-        const { data: participants } = await supabase
+        const { data: participants, error } = await supabase
           .from('conversation_participants')
-          .select(`
-            conversations!inner (id),
-            profiles!inner (
-              id,
-              username,
-              avatar_url,
-              is_online,
-              last_seen
-            )
-          `)
+          .select('conversation_id, user_id, profiles(id, username, avatar_url, is_online, last_seen)')
           .eq('conversation_id', conversationId);
 
-        if (!participants || participants.length === 0) {
-          console.error('No participants found');
+        if (error) {
+          console.error('Error fetching conversation participants:', error);
           return;
         }
 
         const otherParticipant = participants.find(
-          p => p.profiles.id !== user?.id
+          (p) => p.user_id !== user.id  // Ensure you're not finding your own profile
         );
 
         if (otherParticipant) {
           setOtherUser(otherParticipant.profiles);
         } else {
-          console.error('Other participant not found');
+          console.error('No other participants found in this conversation');
         }
 
         // Fetch messages
-        if (!user || !conversationId) return;
+        const { data: messagesData, error: messagesError } = await supabase
+          .from('messages')
+          .select('*')
+          .eq('conversation_id', conversationId)
+          .order('created_at', { ascending: true });
 
-        try {
-          // Verify user is participant
-          const { data: isParticipant } = await supabase
-            .from('conversation_participants')
-            .select('*')
-            .eq('conversation_id', conversationId)
-            .eq('user_id', user.id)
-            .single();
-
-          if (!isParticipant) {
-            toast({
-              title: "Error",
-              description: "You don't have access to this conversation",
-              variant: "destructive"
-            });
-            navigate('/chat');
-            return;
-          }
-
-          const { data: messagesData, error: messagesError } = await supabase
-            .from('messages')
-            .select('*')
-            .eq('conversation_id', conversationId)
-            .order('created_at', { ascending: true });
-
-          if (messagesError) throw messagesError;
-          setMessages(messagesData || []);
-        } catch (error) {
-          console.error('Error fetching messages:', error);
-        }
-
+        if (messagesError) throw messagesError;
+        setMessages(messagesData || []);
 
         // Mark messages as read
         if (user) {
@@ -136,7 +102,7 @@ export default function Chat() {
     };
   }, [conversationId, user?.id]);
 
-  const handleSendMessage = async (e) => {
+  const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!message.trim()) return;
 
