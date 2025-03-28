@@ -32,6 +32,7 @@ WITH CHECK (
     WHERE conversation_id = messages.conversation_id
     AND user_id = auth.uid()
   )
+  AND auth.uid() = sender_id
 );
 
 CREATE POLICY "Users can view messages from their conversations"
