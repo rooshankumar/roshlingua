@@ -180,8 +180,14 @@ const Community = () => {
 
   const handleStartChat = async (userId: string) => {
     try {
-      // Create conversation
+      // Get current user
       const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        console.error('No authenticated user found');
+        return;
+      }
+
+      // Create conversation
       const { data: conversation, error: conversationError } = await supabase
         .from('conversations')
         .insert({
