@@ -191,27 +191,23 @@ const Community = () => {
 
   const handleStartChat = async (otherUserId: string) => {
     try {
-      // First check if conversation exists
-      // Check for existing conversation
-      // First get other user's conversations
-      const { data: otherUserConversations } = await supabase
+      // Check if conversation already exists between users
+      const { data: existingConversation } = await supabase
         .from('conversation_participants')
         .select('conversation_id')
-        .eq('user_id', otherUserId);
+        .in('user_id', [user?.id, otherUserId])
+        .order('conversation_id');
 
-      if (!otherUserConversations) return;
+      if (existingConversation?.length >= 2) {
+        const conversations = existingConversation.map(p => p.conversation_id);
+        const commonConversation = conversations.filter((id, index) => 
+          conversations.indexOf(id) !== index
+        )[0];
 
-      // Then check if current user is in any of these conversations
-      const { data: existingConversations } = await supabase
-        .from('conversation_participants')
-        .select('conversation_id')
-        .eq('user_id', user?.id)
-        .in('conversation_id', otherUserConversations.map(c => c.conversation_id)
-        );
-
-      if (existingConversations && existingConversations.length > 0) {
-        navigate(`/chat/${existingConversations[0].conversation_id}`);
-        return;
+        if (commonConversation) {
+          navigate(`/chat/${commonConversation}`);
+          return;
+        }
       }
 
       // Get current user and verify authentication
@@ -227,24 +223,15 @@ const Community = () => {
         return;
       }
 
-      // Create conversation
-      const { data: conversation, error: conversationError } = await supabase
+      // Create new conversation if none exists
+      const { data: conversation, error } = await supabase
         .from('conversations')
-        .insert({
-          created_at: new Date().toISOString()
-        })
-        .select('*')
+        .insert({ creator_id: currentUser.id })
+        .select()
         .single();
 
-      if (conversationError) {
-        console.error('Error creating conversation:', conversationError);
-        console.log('Current user:', currentUser);
-        console.log('Auth status:', await supabase.auth.getSession());
-        return;
-      }
-
-      if (conversationError) {
-        console.error('Error creating conversation:', conversationError);
+      if (error) {
+        console.error('Error creating conversation:', error);
         toast({
           title: "Error",
           description: "Failed to create conversation",
@@ -253,7 +240,8 @@ const Community = () => {
         return;
       }
 
-      // Add participants
+
+      // Add both participants
       const { error: participantsError } = await supabase
         .from('conversation_participants')
         .insert([
