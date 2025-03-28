@@ -3,43 +3,34 @@ import type { ChatMessage, ChatConversation } from '@/types/chat';
 
 export const chatService = {
   async createConversation(userId: string) {
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    // Get the current authenticated user
+    const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) throw new Error("User not authenticated");
 
-    const { data: conversation, error: convError } = await supabase
+    // Create the conversation with proper fields
+    const { data: conversation, error } = await supabase
       .from('conversations')
       .insert({
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
+        creator_id: user.id,
         last_message_at: new Date().toISOString(),
-        creator_id: user.id
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
       })
       .select()
       .single();
 
-    if (convError) throw convError;
+    if (error) throw error;
 
-    // Create conversation participants
-    const { error: partError } = await supabase
+    // Add both users as participants
+    const { error: participantError } = await supabase
       .from('conversation_participants')
       .insert([
         { conversation_id: conversation.id, user_id: user.id },
         { conversation_id: conversation.id, user_id: userId }
       ]);
 
-    if (partError) throw partError;
-
-    if (convError) throw convError;
-
-    const { error: partError } = await supabase
-      .from('conversation_participants')
-      .insert([
-        { conversation_id: conversation.id, user_id: (await supabase.auth.getUser()).data.user?.id },
-        { conversation_id: conversation.id, user_id: userId }
-      ]);
-
-    if (partError) throw partError;
+    if (participantError) throw participantError;
 
     return conversation;
   },
