@@ -53,7 +53,7 @@ const Community = () => {
           .from('users')
           .select(`
             id,
-            name,
+            full_name,
             native_language,
             learning_language,
             proficiency_level,
