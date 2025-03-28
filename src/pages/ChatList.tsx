@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { supabase } from '@/lib/supabase';
@@ -6,6 +5,7 @@ import { useAuth } from '@/providers/AuthProvider';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { UserStatus } from '@/components/UserStatus';
+import { MessageCircle } from 'lucide-react';
 
 export default function ChatList() {
   const { user } = useAuth();
@@ -93,49 +93,31 @@ export default function ChatList() {
 
     return (
       <div className="space-y-2">
-        {conversations.map((conversation) => {
-
-  return (
-    <div className="container max-w-2xl mx-auto p-4">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">Your Conversations</h1>
-        <Button asChild>
-          <Link to="/community">Start New Chat</Link>
-        </Button>
-      </div>
-
-      <div className="space-y-2">
-        {conversations.length > 0 ? (
-          conversations.map((conversation) => {
-            const otherParticipants = conversation.participants
-              .filter(p => p.profiles.id !== user?.id)
-              .map(p => p.profiles);
-
-            return (
-              <Link
-                key={conversation.id}
-                to={`/chat/${conversation.id}`}
-                className="flex items-center gap-3 p-3 rounded-lg hover:bg-secondary/50 transition-colors"
-              >
-                <Avatar>
-                  <AvatarImage src={otherParticipants[0]?.avatar_url} />
-                  <AvatarFallback>
-                    {otherParticipants[0]?.username?.[0]?.toUpperCase() || '?'}
-                  </AvatarFallback>
-                </Avatar>
-                <div className="flex-1">
-                  <h3 className="font-medium">
-                    {otherParticipants[0]?.username || 'Unknown User'}
-                  </h3>
-                  <UserStatus
-                    isOnline={otherParticipants[0]?.is_online}
-                    lastSeen={otherParticipants[0]?.last_seen}
-                  />
-                </div>
-              </Link>
-            );
-          })
-        })}
+        {conversations.map((conversation) => (
+          <Link
+            key={conversation.id}
+            to={`/chat/${conversation.id}`}
+            className="flex items-center gap-3 p-3 rounded-lg hover:bg-secondary/50 transition-colors"
+          >
+            <Avatar>
+              <AvatarImage
+                src={conversation.participants[0]?.profiles?.avatar_url}
+              />
+              <AvatarFallback>
+                {conversation.participants[0]?.profiles?.username?.[0]?.toUpperCase() || '?'}
+              </AvatarFallback>
+            </Avatar>
+            <div className="flex-1">
+              <h3 className="font-medium">
+                {conversation.participants[0]?.profiles?.username || 'Unknown User'}
+              </h3>
+              <UserStatus
+                isOnline={conversation.participants[0]?.profiles?.is_online}
+                lastSeen={conversation.participants[0]?.profiles?.last_seen}
+              />
+            </div>
+          </Link>
+        ))}
       </div>
     );
   };
@@ -149,14 +131,6 @@ export default function ChatList() {
         </Button>
       </div>
       {renderContent()}
-    </div>
-  );
-                Find Users
-              </Link>
-            </Button>
-          </div>
-        )}
-      </div>
     </div>
   );
 }
