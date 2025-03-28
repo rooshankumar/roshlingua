@@ -30,9 +30,20 @@ export default function Chat() {
       if (!conversationId || !user) return;
 
       try {
+        // Fetch conversation participants including the other user's profile
         const { data: participants, error } = await supabase
           .from('conversation_participants')
-          .select('conversation_id, user_id, profiles(id, username, avatar_url, is_online, last_seen)')
+          .select(`
+            conversation_id,
+            user_id,
+            users!user_id (
+              id,
+              username,
+              avatar_url,
+              is_online,
+              last_seen
+            )
+          `)
           .eq('conversation_id', conversationId);
 
         if (error) {
@@ -44,8 +55,12 @@ export default function Chat() {
           (p) => p.user_id !== user.id  // Ensure you're not finding your own profile
         );
 
+        const otherParticipant = participants?.find(
+          (p) => p.user_id !== user.id
+        );
+
         if (otherParticipant) {
-          setOtherUser(otherParticipant.profiles);
+          setOtherUser(otherParticipant.users);
         } else {
           console.error('No other participants found in this conversation');
         }
