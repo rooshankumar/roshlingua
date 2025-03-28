@@ -198,7 +198,6 @@ const Community = () => {
         .from('conversations')
         .insert({
           creator_id: currentUser.id,
-          creator_id: user.id,
           created_at: new Date().toISOString()
         })
         .select('*')
@@ -206,13 +205,6 @@ const Community = () => {
 
       if (conversationError) {
         console.error('Error creating conversation:', conversationError);
-        return;
-      }
-
-      // Get current user
-      const { data: { user: currentUser } } = await supabase.auth.getUser();
-      if (!currentUser) {
-        console.error('No authenticated user found');
         return;
       }
 
