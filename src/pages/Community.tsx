@@ -19,7 +19,7 @@ import { Heart, MessageCircle, Search, Filter, Flame } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from "@/components/ui/badge";
-import { toast } from '@/components/ui/toast';
+import { toast } from '@/hooks/use-toast';
 
 
 interface User {
