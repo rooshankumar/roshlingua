@@ -12,20 +12,17 @@ DROP POLICY IF EXISTS "Enable conversation creation" ON conversations;
 DROP POLICY IF EXISTS "Enable read conversations" ON conversations;
 DROP POLICY IF EXISTS "Enable create conversations" ON conversations;
 
--- Conversations policies with broader insert permissions
-CREATE POLICY "Allow conversation creation"
+-- Conversations policies
+CREATE POLICY "Enable create conversations"
 ON conversations FOR INSERT TO authenticated
 WITH CHECK (true);
 
-CREATE POLICY "Allow conversation viewing"
+CREATE POLICY "Enable read conversations"
 ON conversations FOR SELECT TO authenticated
 USING (EXISTS (
   SELECT 1 FROM conversation_participants 
   WHERE conversation_id = id 
   AND user_id = auth.uid()
-) OR EXISTS (
-  SELECT 1 FROM profiles 
-  WHERE id = auth.uid()
 ));
 
 -- Conversation participants policies
@@ -37,23 +34,17 @@ CREATE POLICY "Enable create participants"
 ON conversation_participants FOR INSERT TO authenticated
 WITH CHECK (
   user_id = auth.uid() OR
-  EXISTS (
-    SELECT 1 FROM conversation_participants cp
-    WHERE cp.conversation_id = conversation_participants.conversation_id
-    AND cp.user_id = auth.uid()
-  )
+  (SELECT true FROM conversations WHERE id = conversation_id LIMIT 1)
 );
 
 -- Messages policies
 CREATE POLICY "Enable read messages"
 ON messages FOR SELECT TO authenticated
-USING (
-  EXISTS (
-    SELECT 1 FROM conversation_participants
-    WHERE conversation_id = messages.conversation_id
-    AND user_id = auth.uid()
-  )
-);
+USING (EXISTS (
+  SELECT 1 FROM conversation_participants
+  WHERE conversation_id = messages.conversation_id
+  AND user_id = auth.uid()
+));
 
 CREATE POLICY "Enable create messages"
 ON messages FOR INSERT TO authenticated
@@ -61,7 +52,7 @@ WITH CHECK (
   sender_id = auth.uid() AND
   EXISTS (
     SELECT 1 FROM conversation_participants
-    WHERE conversation_id = messages.conversation_id
+    WHERE conversation_id = messages.conversation_id 
     AND user_id = auth.uid()
   )
 );
