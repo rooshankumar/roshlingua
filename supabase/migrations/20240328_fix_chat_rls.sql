@@ -1,4 +1,4 @@
--- Drop existing policies
+-- Drop all existing policies
 DROP POLICY IF EXISTS "Users can send messages" ON messages;
 DROP POLICY IF EXISTS "Users can view messages" ON messages;
 DROP POLICY IF EXISTS "Enable message sending" ON messages;
@@ -9,21 +9,24 @@ DROP POLICY IF EXISTS "Enable participant creation" ON conversation_participants
 DROP POLICY IF EXISTS "Users can view their conversations" ON conversations;
 DROP POLICY IF EXISTS "Enable conversation access" ON conversations;
 DROP POLICY IF EXISTS "Enable conversation creation" ON conversations;
+DROP POLICY IF EXISTS "Enable read conversations" ON conversations;
+DROP POLICY IF EXISTS "Enable create conversations" ON conversations;
 
--- Conversations policies
-CREATE POLICY "Enable read conversations"
-ON conversations FOR SELECT TO authenticated
-USING (
-  EXISTS (
-    SELECT 1 FROM conversation_participants
-    WHERE conversation_id = id 
-    AND user_id = auth.uid()
-  )
-);
-
-CREATE POLICY "Enable create conversations"
+-- Conversations policies with broader insert permissions
+CREATE POLICY "Allow conversation creation"
 ON conversations FOR INSERT TO authenticated
 WITH CHECK (true);
+
+CREATE POLICY "Allow conversation viewing"
+ON conversations FOR SELECT TO authenticated
+USING (EXISTS (
+  SELECT 1 FROM conversation_participants 
+  WHERE conversation_id = id 
+  AND user_id = auth.uid()
+) OR EXISTS (
+  SELECT 1 FROM profiles 
+  WHERE id = auth.uid()
+));
 
 -- Conversation participants policies
 CREATE POLICY "Enable read participants"
