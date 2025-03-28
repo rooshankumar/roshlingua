@@ -1,0 +1,30 @@
+'click' handler took 267ms
+@supabase_supabase-js.js?v=0ae9952d:3900 
+            
+            
+           GET https://yekzyvdjjozhhatdefsq.supabase.co/rest/v1/conversation_participants?select=conversation_id%2Cconversations%3Aconversation_id%28id%2Ccreated_at%2Cparticipants%3Aconversation_participants%21inner%28profile%3Auser_id%28id%2Cusername%2Cavatar_url%2Cis_online%2Clast_seen%29%29%29&user_id=eq.7bad0693-9053-423f-a2f0-a61c20b9cbf4 400 (Bad Request)
+(anonymous) @ @supabase_supabase-js.js?v=0ae9952d:3900
+(anonymous) @ @supabase_supabase-js.js?v=0ae9952d:3921
+fulfilled @ @supabase_supabase-js.js?v=0ae9952d:3873
+Promise.then
+step @ @supabase_supabase-js.js?v=0ae9952d:3886
+(anonymous) @ @supabase_supabase-js.js?v=0ae9952d:3888
+__awaiter6 @ @supabase_supabase-js.js?v=0ae9952d:3870
+(anonymous) @ @supabase_supabase-js.js?v=0ae9952d:3911
+then @ @supabase_supabase-js.js?v=0ae9952d:89Understand this errorAI
+ChatList.tsx:40 Error fetching conversations: {code: 'PGRST200', details: "Searched for a foreign key relationship between 'c…n the schema 'public', but no matches were found.", hint: null, message: "Could not find a relationship between 'conversation_participants' and 'user_id' in the schema cache"}code: "PGRST200"details: "Searched for a foreign key relationship between 'conversation_participants' and 'user_id' in the schema 'public', but no matches were found."hint: nullmessage: "Could not find a relationship between 'conversation_participants' and 'user_id' in the schema cache"[[Prototype]]: Object
+fetchConversations @ ChatList.tsx:40
+await in fetchConversations
+(anonymous) @ ChatList.tsx:61
+commitHookEffectListMount @ chunk-W6L2VRDA.js?v=a3e1073b:16915
+commitPassiveMountOnFiber @ chunk-W6L2VRDA.js?v=a3e1073b:18156
+commitPassiveMountEffects_complete @ chunk-W6L2VRDA.js?v=a3e1073b:18129
+commitPassiveMountEffects_begin @ chunk-W6L2VRDA.js?v=a3e1073b:18119
+commitPassiveMountEffects @ chunk-W6L2VRDA.js?v=a3e1073b:18109
+flushPassiveEffectsImpl @ chunk-W6L2VRDA.js?v=a3e1073b:19490
+flushPassiveEffects @ chunk-W6L2VRDA.js?v=a3e1073b:19447
+commitRootImpl @ chunk-W6L2VRDA.js?v=a3e1073b:19416
+commitRoot @ chunk-W6L2VRDA.js?v=a3e1073b:19277
+performSyncWorkOnRoot @ chunk-W6L2VRDA.js?v=a3e1073b:18895
+flushSyncCallbacks @ chunk-W6L2VRDA.js?v=a3e1073b:9119
+(anonymous) @ chunk-W6L2VRDA.js?v=a3e1073b:18627Understand this errorAI
