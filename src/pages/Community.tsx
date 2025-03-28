@@ -192,46 +192,43 @@ const Community = () => {
 
   const handleStartChat = async (otherUserId: string) => {
     try {
-      if (!user) return;
-
-      // Verify both users exist in users table
-      const { data: users, error: usersError } = await supabase
-        .from('users')
-        .select('id')
-        .in('id', [user.id, otherUserId]);
-
-      if (usersError || !users || users.length !== 2) {
+      if (!user) {
         toast({
           title: "Error",
-          description: "Invalid user IDs",
-          variant: "destructive"
+          description: "You must be logged in to start a chat",
+          variant: "destructive",
         });
         return;
       }
 
-      // Check if conversation exists
-      const { data: existingParticipants } = await supabase
+      // First check for existing conversation
+      const { data: participants, error: participantsError } = await supabase
         .from('conversation_participants')
         .select('conversation_id')
         .eq('user_id', user.id);
 
-      const { data: matchingConversation } = await supabase
-        .from('conversation_participants')
-        .select('conversation_id')
-        .in('conversation_id', existingParticipants?.map(p => p.conversation_id) || [])
-        .eq('user_id', otherUserId)
-        .single();
+      if (participantsError) throw participantsError;
 
-      if (matchingConversation) {
-        navigate(`/chat/${matchingConversation.conversation_id}`);
-        return;
+      if (participants && participants.length > 0) {
+        const { data: existingChat } = await supabase
+          .from('conversation_participants')
+          .select('conversation_id')
+          .in('conversation_id', participants.map(p => p.conversation_id))
+          .eq('user_id', otherUserId)
+          .maybeSingle();
+
+        if (existingChat) {
+          navigate(`/chat/${existingChat.conversation_id}`);
+          return;
+        }
       }
 
       // Create new conversation
       const { data: newConversation, error: conversationError } = await supabase
         .from('conversations')
         .insert([{
-          created_by: user.id // Track who created the conversation
+          created_by: user.id,
+          last_message_at: new Date().toISOString()
         }])
         .select()
         .single();
@@ -239,14 +236,14 @@ const Community = () => {
       if (conversationError) throw conversationError;
 
       // Add participants
-      const { error: participantsError } = await supabase
+      const { error: participantsError2 } = await supabase
         .from('conversation_participants')
         .insert([
           { conversation_id: newConversation.id, user_id: user.id },
           { conversation_id: newConversation.id, user_id: otherUserId }
         ]);
 
-      if (participantsError) throw participantsError;
+      if (participantsError2) throw participantsError2;
 
       navigate(`/chat/${newConversation.id}`);
     } catch (error) {
