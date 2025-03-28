@@ -230,7 +230,7 @@ const Community = () => {
           created_by: user.id,
           last_message_at: new Date().toISOString()
         }])
-        .select()
+        .select('*')
         .single();
 
       if (conversationError) throw conversationError;
