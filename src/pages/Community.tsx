@@ -192,12 +192,13 @@ const Community = () => {
   const handleStartChat = async (otherUserId: string) => {
     try {
       // First check if conversation exists
+      // Check for existing conversation
       const { data: existingConversations } = await supabase
         .from('conversation_participants')
         .select('conversation_id')
         .eq('user_id', user?.id)
-        .in('conversation_id', (sub) =>
-          sub
+        .in('conversation_id', 
+          supabase
             .from('conversation_participants')
             .select('conversation_id')
             .eq('user_id', otherUserId)
