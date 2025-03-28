@@ -193,15 +193,20 @@ const Community = () => {
     try {
       // First check if conversation exists
       // Check for existing conversation
+      // First get other user's conversations
+      const { data: otherUserConversations } = await supabase
+        .from('conversation_participants')
+        .select('conversation_id')
+        .eq('user_id', otherUserId);
+
+      if (!otherUserConversations) return;
+
+      // Then check if current user is in any of these conversations
       const { data: existingConversations } = await supabase
         .from('conversation_participants')
         .select('conversation_id')
         .eq('user_id', user?.id)
-        .in('conversation_id', 
-          supabase
-            .from('conversation_participants')
-            .select('conversation_id')
-            .eq('user_id', otherUserId)
+        .in('conversation_id', otherUserConversations.map(c => c.conversation_id)
         );
 
       if (existingConversations && existingConversations.length > 0) {
