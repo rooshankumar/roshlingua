@@ -1,0 +1,85 @@
+[Violation] 'message' handler took 168ms
+@supabase_supabase-js.js?v=188d5fb6:3900 
+            
+            
+           GET https://yekzyvdjjozhhatdefsq.supabase.co/rest/v1/onboarding_status?select=is_complete&user_id=eq.7bad0693-9053-423f-a2f0-a61c20b9cbf4 406 (Not Acceptable)
+(anonymous) @ @supabase_supabase-js.js?v=188d5fb6:3900
+(anonymous) @ @supabase_supabase-js.js?v=188d5fb6:3921
+fulfilled @ @supabase_supabase-js.js?v=188d5fb6:3873
+Promise.then
+step @ @supabase_supabase-js.js?v=188d5fb6:3886
+(anonymous) @ @supabase_supabase-js.js?v=188d5fb6:3888
+__awaiter6 @ @supabase_supabase-js.js?v=188d5fb6:3870
+(anonymous) @ @supabase_supabase-js.js?v=188d5fb6:3911
+then @ @supabase_supabase-js.js?v=188d5fb6:89Understand this errorAI
+ProtectedRoute.tsx:31 Error checking onboarding status: {code: 'PGRST116', details: 'The result contains 0 rows', hint: null, message: 'JSON object requested, multiple (or no) rows returned'}code: "PGRST116"details: "The result contains 0 rows"hint: nullmessage: "JSON object requested, multiple (or no) rows returned"[[Prototype]]: Object
+checkOnboardingStatus @ ProtectedRoute.tsx:31
+await in checkOnboardingStatus
+(anonymous) @ ProtectedRoute.tsx:36
+commitHookEffectListMount @ chunk-W6L2VRDA.js?v=188d5fb6:16915
+commitPassiveMountOnFiber @ chunk-W6L2VRDA.js?v=188d5fb6:18156
+commitPassiveMountEffects_complete @ chunk-W6L2VRDA.js?v=188d5fb6:18129
+commitPassiveMountEffects_begin @ chunk-W6L2VRDA.js?v=188d5fb6:18119
+commitPassiveMountEffects @ chunk-W6L2VRDA.js?v=188d5fb6:18109
+flushPassiveEffectsImpl @ chunk-W6L2VRDA.js?v=188d5fb6:19490
+flushPassiveEffects @ chunk-W6L2VRDA.js?v=188d5fb6:19447
+(anonymous) @ chunk-W6L2VRDA.js?v=188d5fb6:19328
+workLoop @ chunk-W6L2VRDA.js?v=188d5fb6:197
+flushWork @ chunk-W6L2VRDA.js?v=188d5fb6:176
+performWorkUntilDeadline @ chunk-W6L2VRDA.js?v=188d5fb6:384Understand this errorAI
+@supabase_supabase-js.js?v=188d5fb6:3900 
+            
+            
+           GET https://yekzyvdjjozhhatdefsq.supabase.co/rest/v1/onboarding_status?select=is_complete&user_id=eq.7bad0693-9053-423f-a2f0-a61c20b9cbf4 406 (Not Acceptable)
+(anonymous) @ @supabase_supabase-js.js?v=188d5fb6:3900
+(anonymous) @ @supabase_supabase-js.js?v=188d5fb6:3921
+fulfilled @ @supabase_supabase-js.js?v=188d5fb6:3873
+Promise.then
+step @ @supabase_supabase-js.js?v=188d5fb6:3886
+(anonymous) @ @supabase_supabase-js.js?v=188d5fb6:3888
+__awaiter6 @ @supabase_supabase-js.js?v=188d5fb6:3870
+(anonymous) @ @supabase_supabase-js.js?v=188d5fb6:3911
+then @ @supabase_supabase-js.js?v=188d5fb6:89Understand this errorAI
+ProtectedRoute.tsx:31 Error checking onboarding status: {code: 'PGRST116', details: 'The result contains 0 rows', hint: null, message: 'JSON object requested, multiple (or no) rows returned'}code: "PGRST116"details: "The result contains 0 rows"hint: nullmessage: "JSON object requested, multiple (or no) rows returned"[[Prototype]]: Object
+checkOnboardingStatus @ ProtectedRoute.tsx:31
+await in checkOnboardingStatus
+(anonymous) @ ProtectedRoute.tsx:36
+commitHookEffectListMount @ chunk-W6L2VRDA.js?v=188d5fb6:16915
+commitPassiveMountOnFiber @ chunk-W6L2VRDA.js?v=188d5fb6:18156
+commitPassiveMountEffects_complete @ chunk-W6L2VRDA.js?v=188d5fb6:18129
+commitPassiveMountEffects_begin @ chunk-W6L2VRDA.js?v=188d5fb6:18119
+commitPassiveMountEffects @ chunk-W6L2VRDA.js?v=188d5fb6:18109
+flushPassiveEffectsImpl @ chunk-W6L2VRDA.js?v=188d5fb6:19490
+flushPassiveEffects @ chunk-W6L2VRDA.js?v=188d5fb6:19447
+(anonymous) @ chunk-W6L2VRDA.js?v=188d5fb6:19328
+workLoop @ chunk-W6L2VRDA.js?v=188d5fb6:197
+flushWork @ chunk-W6L2VRDA.js?v=188d5fb6:176
+performWorkUntilDeadline @ chunk-W6L2VRDA.js?v=188d5fb6:384Understand this errorAI
+@supabase_supabase-js.js?v=188d5fb6:3900 
+            
+            
+           GET https://yekzyvdjjozhhatdefsq.supabase.co/rest/v1/onboarding_status?select=is_complete&user_id=eq.7bad0693-9053-423f-a2f0-a61c20b9cbf4 406 (Not Acceptable)
+(anonymous) @ @supabase_supabase-js.js?v=188d5fb6:3900
+(anonymous) @ @supabase_supabase-js.js?v=188d5fb6:3921
+fulfilled @ @supabase_supabase-js.js?v=188d5fb6:3873
+Promise.then
+step @ @supabase_supabase-js.js?v=188d5fb6:3886
+(anonymous) @ @supabase_supabase-js.js?v=188d5fb6:3888
+__awaiter6 @ @supabase_supabase-js.js?v=188d5fb6:3870
+(anonymous) @ @supabase_supabase-js.js?v=188d5fb6:3911
+then @ @supabase_supabase-js.js?v=188d5fb6:89Understand this errorAI
+ProtectedRoute.tsx:31 Error checking onboarding status: {code: 'PGRST116', details: 'The result contains 0 rows', hint: null, message: 'JSON object requested, multiple (or no) rows returned'}code: "PGRST116"details: "The result contains 0 rows"hint: nullmessage: "JSON object requested, multiple (or no) rows returned"[[Prototype]]: Object
+checkOnboardingStatus @ ProtectedRoute.tsx:31
+await in checkOnboardingStatus
+(anonymous) @ ProtectedRoute.tsx:36
+commitHookEffectListMount @ chunk-W6L2VRDA.js?v=188d5fb6:16915
+commitPassiveMountOnFiber @ chunk-W6L2VRDA.js?v=188d5fb6:18156
+commitPassiveMountEffects_complete @ chunk-W6L2VRDA.js?v=188d5fb6:18129
+commitPassiveMountEffects_begin @ chunk-W6L2VRDA.js?v=188d5fb6:18119
+commitPassiveMountEffects @ chunk-W6L2VRDA.js?v=188d5fb6:18109
+flushPassiveEffectsImpl @ chunk-W6L2VRDA.js?v=188d5fb6:19490
+flushPassiveEffects @ chunk-W6L2VRDA.js?v=188d5fb6:19447
+(anonymous) @ chunk-W6L2VRDA.js?v=188d5fb6:19328
+workLoop @ chunk-W6L2VRDA.js?v=188d5fb6:197
+flushWork @ chunk-W6L2VRDA.js?v=188d5fb6:176
+performWorkUntilDeadline @ chunk-W6L2VRDA.js?v=188d5fb6:384Understand this errorAI
