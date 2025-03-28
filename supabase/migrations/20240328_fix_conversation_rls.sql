@@ -1,32 +1,42 @@
-
--- Drop existing policies
+-- First, drop the existing policies on conversations table to clean up
 DROP POLICY IF EXISTS "Users can create conversations" ON conversations;
-DROP POLICY IF EXISTS "Users can view their conversations" ON conversations;
-DROP POLICY IF EXISTS "Users can manage their conversations" ON conversations;
-DROP POLICY IF EXISTS "Users can insert themselves as participants" ON conversation_participants;
-DROP POLICY IF EXISTS "Users can update their conversations" ON conversations;
-DROP POLICY IF EXISTS "Users can delete their conversations" ON conversations;
-DROP POLICY IF EXISTS "Users can add participants after creating conversation" ON conversation_participants;
-DROP POLICY IF EXISTS "Users can view conversation participants" ON conversation_participants;
+DROP POLICY IF EXISTS "Enable conversation creation" ON conversations;
+DROP POLICY IF EXISTS "Users can view their own conversations" ON conversations;
+DROP POLICY IF EXISTS "Participants can update conversation time" ON conversations;
+
+-- Create clean and proper policies for conversations table
+CREATE POLICY "Enable conversation creation" 
+ON conversations 
+FOR INSERT TO authenticated
+WITH CHECK (creator_id = auth.uid());
+
+-- Allow users to see conversations they participate in
+CREATE POLICY "Users can view their conversations"
+ON conversations
+FOR SELECT TO authenticated
+USING (
+  EXISTS (
+    SELECT 1 FROM conversation_participants
+    WHERE conversation_participants.conversation_id = conversations.id
+    AND conversation_participants.user_id = auth.uid()
+  )
+);
+
+-- Allow participants to update conversation metadata
+CREATE POLICY "Participants can update conversations"
+ON conversations
+FOR UPDATE TO authenticated
+USING (
+  EXISTS (
+    SELECT 1 FROM conversation_participants
+    WHERE conversation_participants.conversation_id = conversations.id
+    AND conversation_participants.user_id = auth.uid()
+  )
+);
 
 -- Add creator_id column to conversations
 ALTER TABLE conversations 
 ADD COLUMN IF NOT EXISTS creator_id UUID REFERENCES profiles(id);
-
--- New policies for conversations
-CREATE POLICY "Enable conversation creation" ON conversations
-FOR INSERT TO authenticated
-WITH CHECK (true);
-
-CREATE POLICY "Enable conversation access" ON conversations
-FOR ALL TO authenticated
-USING (
-  EXISTS (
-    SELECT 1 FROM conversation_participants
-    WHERE conversation_id = id
-    AND user_id = auth.uid()
-  )
-);
 
 -- New policies for conversation participants
 CREATE POLICY "Enable participant creation" ON conversation_participants

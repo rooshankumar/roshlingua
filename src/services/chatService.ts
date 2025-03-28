@@ -55,6 +55,44 @@ export const chatService = {
     return data as ChatConversation[];
   },
 
+  async createConversation(otherUserId: string) {
+    // Step 1: Create the conversation with current user as creator
+    const { data: user } = await supabase.auth.getUser();
+    if (!user?.user) throw new Error('User not authenticated');
+    
+    // First create the conversation
+    const { data: conversation, error: conversationError } = await supabase
+      .from('conversations')
+      .insert({
+        creator_id: user.user.id,
+        last_message_at: new Date().toISOString()
+      })
+      .select()
+      .single();
+    
+    if (conversationError) {
+      console.error('Error creating conversation:', conversationError);
+      throw conversationError;
+    }
+    
+    // Step 2: Add both users as participants
+    const participants = [
+      { conversation_id: conversation.id, user_id: user.user.id },
+      { conversation_id: conversation.id, user_id: otherUserId }
+    ];
+    
+    const { error: participantsError } = await supabase
+      .from('conversation_participants')
+      .insert(participants);
+    
+    if (participantsError) {
+      console.error('Error adding participants:', participantsError);
+      throw participantsError;
+    }
+    
+    return conversation;
+  },
+
   async getMessages(conversationId: string) {
     const { data, error } = await supabase
       .from('messages')
