@@ -51,10 +51,6 @@ export default function Chat() {
           return;
         }
 
-        const otherParticipant = participants.find(
-          (p) => p.user_id !== user.id  // Ensure you're not finding your own profile
-        );
-
         const otherParticipant = participants?.find(
           (p) => p.user_id !== user.id
         );
