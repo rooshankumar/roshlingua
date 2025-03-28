@@ -11,10 +11,24 @@ export const chatService = {
       .from('conversations')
       .insert({
         creator_id: user.id,
-        last_message_at: new Date().toISOString()
+        last_message_at: new Date().toISOString(),
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
       })
       .select()
       .single();
+
+    if (convError) throw convError;
+
+    // Create conversation participants
+    const { error: partError } = await supabase
+      .from('conversation_participants')
+      .insert([
+        { conversation_id: conversation.id, user_id: user.id },
+        { conversation_id: conversation.id, user_id: userId }
+      ]);
+
+    if (partError) throw partError;
 
     if (convError) throw convError;
 
