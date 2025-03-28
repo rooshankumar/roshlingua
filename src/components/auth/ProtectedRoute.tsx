@@ -47,6 +47,8 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
     return () => {
       channel.unsubscribe();
     };
+
+    checkOnboardingStatus();
   }, [user]);
 
   if (isLoading || isCheckingOnboarding) {
