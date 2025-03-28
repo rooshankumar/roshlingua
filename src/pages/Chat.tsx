@@ -60,14 +60,39 @@ export default function Chat() {
         }
 
         // Fetch messages
-        const { data: messagesData, error: messagesError } = await supabase
-          .from('messages')
-          .select('*')
-          .eq('conversation_id', conversationId)
-          .order('created_at', { ascending: true });
+        if (!user || !conversationId) return;
 
-        if (messagesError) throw messagesError;
-        setMessages(messagesData || []);
+        try {
+          // Verify user is participant
+          const { data: isParticipant } = await supabase
+            .from('conversation_participants')
+            .select('*')
+            .eq('conversation_id', conversationId)
+            .eq('user_id', user.id)
+            .single();
+
+          if (!isParticipant) {
+            toast({
+              title: "Error",
+              description: "You don't have access to this conversation",
+              variant: "destructive"
+            });
+            navigate('/chat');
+            return;
+          }
+
+          const { data: messagesData, error: messagesError } = await supabase
+            .from('messages')
+            .select('*')
+            .eq('conversation_id', conversationId)
+            .order('created_at', { ascending: true });
+
+          if (messagesError) throw messagesError;
+          setMessages(messagesData || []);
+        } catch (error) {
+          console.error('Error fetching messages:', error);
+        }
+
 
         // Mark messages as read
         if (user) {

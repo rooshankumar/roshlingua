@@ -191,93 +191,52 @@ const Community = () => {
 
   const handleStartChat = async (otherUserId: string) => {
     try {
-      const { data: { user: currentUser } } = await supabase.auth.getUser();
-      if (!currentUser) return;
+      if (!user) return;
 
-      // Check if conversation already exists between these users
+      // Check if conversation exists
       const { data: existingParticipants } = await supabase
         .from('conversation_participants')
         .select('conversation_id')
-        .in('user_id', [currentUser.id, otherUserId]);
+        .eq('user_id', user.id);
 
-      if (existingParticipants) {
-        // Find conversation where both users are participants
-        const conversationCounts = existingParticipants.reduce((acc: Record<string, number>, curr) => {
-          acc[curr.conversation_id] = (acc[curr.conversation_id] || 0) + 1;
-          return acc;
-        }, {});
+      const { data: matchingConversation } = await supabase
+        .from('conversation_participants')
+        .select('conversation_id')
+        .in('conversation_id', existingParticipants?.map(p => p.conversation_id) || [])
+        .eq('user_id', otherUserId)
+        .single();
 
-        const existingConversationId = Object.entries(conversationCounts)
-          .find(([_, count]) => count === 2)?.[0];
-
-        if (existingConversationId) {
-          navigate(`/chat/${existingConversationId}`);
-          return;
-        }
+      if (matchingConversation) {
+        navigate(`/chat/${matchingConversation.conversation_id}`);
+        return;
       }
 
-      // Create new conversation if none exists
-      const { data: newConversation, error: convError } = await supabase
+      // Create new conversation
+      const { data: newConversation, error: conversationError } = await supabase
         .from('conversations')
-        .insert({ 
-          created_at: new Date().toISOString(),
-          last_message_at: new Date().toISOString()
-        })
+        .insert([{}])
         .select()
         .single();
 
-      if (convError) {
-        console.error('Error creating conversation:', convError);
-        toast({
-          title: "Error",
-          description: "Failed to create conversation",
-          variant: "destructive"
-        });
-        return;
-      }
+      if (conversationError) throw conversationError;
 
-      // Add both participants
+      // Add participants
       const { error: participantsError } = await supabase
         .from('conversation_participants')
         .insert([
-          { conversation_id: newConversation.id, user_id: currentUser.id },
+          { conversation_id: newConversation.id, user_id: user.id },
           { conversation_id: newConversation.id, user_id: otherUserId }
         ]);
 
-      if (participantsError) {
-        console.error('Error adding participants:', participantsError);
-        toast({
-          title: "Error",
-          description: "Failed to add participants",
-          variant: "destructive"
-        });
-        return;
-      }
+      if (participantsError) throw participantsError;
 
-      // Create initial message
-      const { error: messageError } = await supabase
-        .from('messages')
-        .insert({
-          conversation_id: newConversation.id,
-          sender_id: currentUser.id,
-          recipient_id: otherUserId,
-          content: "Started a conversation",
-          created_at: new Date().toISOString(),
-          is_read: false
-        });
-
-      if (messageError) {
-        console.error('Error creating initial message:', messageError);
-      }
-
-      // Navigate to the chat
       navigate(`/chat/${newConversation.id}`);
     } catch (error) {
-      console.error('Error creating conversation:', error);
+      console.error('Error starting chat:', error);
       toast({
-        title: "Error",
-        description: "Failed to start conversation",
-        variant: "destructive"
+        title: 'Error',
+        description: 'Failed to start chat',
+        variant: 'destructive',
       });
     }
   };
