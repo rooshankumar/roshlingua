@@ -7,22 +7,23 @@ INSERT INTO storage.buckets (id, name, public) VALUES ('attachments', 'attachmen
 
 -- Create profiles table
 CREATE TABLE public.profiles (
-  id UUID PRIMARY KEY REFERENCES auth.users(id),
+  id UUID PRIMARY KEY,
   username TEXT UNIQUE,
   full_name TEXT,
   avatar_url TEXT,
   bio TEXT,
   gender TEXT CHECK (gender IN ('Male', 'Female', 'Rather not say')),
   is_online BOOLEAN DEFAULT false,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
-  updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
+  last_seen TIMESTAMP WITH TIME ZONE,
   native_language TEXT,
   learning_language TEXT,
   proficiency_level TEXT CHECK (proficiency_level IN ('beginner', 'intermediate', 'advanced', 'native')),
   learning_goal TEXT,
   streak_count INTEGER DEFAULT 0,
   streak_last_date DATE,
-  likes_count INTEGER DEFAULT 0
+  likes_count INTEGER DEFAULT 0,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
 -- Create conversations table
@@ -76,21 +77,17 @@ ALTER TABLE public.message_reactions ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.user_likes ENABLE ROW LEVEL SECURITY;
 
 -- Profiles policies
-CREATE POLICY "Public profiles are viewable by everyone" ON public.profiles
-  FOR SELECT USING (true);
+CREATE POLICY "Public profiles are viewable by everyone" 
+ON public.profiles FOR SELECT 
+USING (true);
 
-CREATE POLICY "Users can update own profile" ON public.profiles
-  FOR UPDATE USING (auth.uid() = id);
+CREATE POLICY "Users can update own profile" 
+ON public.profiles FOR UPDATE 
+USING (auth.uid() = id);
 
--- Users policies
-CREATE POLICY "Public users are viewable by everyone" ON public.users
-  FOR SELECT USING (true);
-
-CREATE POLICY "Users can update own record" ON public.users
-  FOR UPDATE USING (auth.uid() = id);
-
--- Enable real-time for users table
-ALTER PUBLICATION supabase_realtime ADD TABLE users;
+CREATE POLICY "Users can insert own profile" 
+ON public.profiles FOR INSERT 
+WITH CHECK (auth.uid() = id);
 
 -- Conversations policies
 CREATE POLICY "Users can view their conversations" ON public.conversations
@@ -157,7 +154,7 @@ END;
 $$ language 'plpgsql';
 
 -- Trigger for profiles
-CREATE TRIGGER handle_updated_at
+CREATE TRIGGER on_profile_updated
   BEFORE UPDATE ON public.profiles
   FOR EACH ROW
   EXECUTE PROCEDURE public.handle_updated_at();
