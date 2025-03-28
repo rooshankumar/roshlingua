@@ -227,7 +227,7 @@ const Community = () => {
       const { data: newConversation, error: conversationError } = await supabase
         .from('conversations')
         .insert([{
-          created_by: user.id,
+          creator_id: user.id,
           last_message_at: new Date().toISOString()
         }])
         .select('*')
