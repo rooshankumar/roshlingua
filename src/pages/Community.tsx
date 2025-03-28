@@ -370,15 +370,22 @@ const Community = () => {
                   </p>
 
                   <div className="flex justify-between mt-4 pt-3 border-t border-border">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="flex items-center space-x-1"
-                      onClick={() => handleLike(user.id)}
-                    >
-                      <Heart className="h-4 w-4" />
-                      <span>{user.likes_count || 0}</span>
-                    </Button>
+                    <div className="flex items-center space-x-2">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleLike(user.id)}
+                      >
+                        <Heart className="h-4 w-4" />
+                        <span>{user.likes_count || 0}</span>
+                      </Button>
+                      {user.streak_count > 0 && (
+                        <Button variant="ghost" size="sm">
+                          <Flame className="h-4 w-4 text-primary" />
+                          <span>{user.streak_count} </span>
+                        </Button>
+                      )}
+                    </div>
 
                     <Button onClick={() => handleStartChat(user.id)} asChild variant="outline" size="sm">
                       <Link to={`/chat/${user.id}`}> {/* Link remains for visual purposes, but navigation is handled by handleStartChat */}
