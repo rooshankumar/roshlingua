@@ -1,9 +1,10 @@
-Auth state changed: SIGNED_IN 7bad0693-9053-423f-a2f0-a61c20b9cbf4
-AuthProvider.tsx:38 Auth state changed: SIGNED_IN 7bad0693-9053-423f-a2f0-a61c20b9cbf4
+SIGNED_IN 7bad0693-9053-423f-a2f0-a61c20b9cbf4
+AuthProvider.tsx:38 Auth state changed: INITIAL_SESSION 7bad0693-9053-423f-a2f0-a61c20b9cbf4
+AuthProvider.tsx:54 Initial session: 7bad0693-9053-423f-a2f0-a61c20b9cbf4
 @supabase_supabase-js.js?v=47bff508:3900 
             
             
-           POST https://yekzyvdjjozhhatdefsq.supabase.co/rest/v1/conversations?columns=%22created_by%22%2C%22last_message_at%22&select=* 400 (Bad Request)
+           POST https://yekzyvdjjozhhatdefsq.supabase.co/rest/v1/conversations?columns=%22creator_id%22%2C%22last_message_at%22&select=* 403 (Forbidden)
 (anonymous) @ @supabase_supabase-js.js?v=47bff508:3900
 (anonymous) @ @supabase_supabase-js.js?v=47bff508:3921
 fulfilled @ @supabase_supabase-js.js?v=47bff508:3873
@@ -13,7 +14,7 @@ step @ @supabase_supabase-js.js?v=47bff508:3886
 __awaiter6 @ @supabase_supabase-js.js?v=47bff508:3870
 (anonymous) @ @supabase_supabase-js.js?v=47bff508:3911
 then @ @supabase_supabase-js.js?v=47bff508:89Understand this errorAI
-Community.tsx:250 Error starting chat: {code: 'PGRST204', details: null, hint: null, message: "Could not find the 'created_by' column of 'conversations' in the schema cache"}
+Community.tsx:250 Error starting chat: {code: '42501', details: null, hint: null, message: 'new row violates row-level security policy for table "conversations"'}
 handleStartChat @ Community.tsx:250
 await in handleStartChat
 onClick @ Community.tsx:377
