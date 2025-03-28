@@ -33,6 +33,7 @@ interface User {
   is_online: boolean;
   likes_count: number;
   username: string;
+  age: number | null;
 }
 
 const Community = () => {
@@ -82,7 +83,8 @@ const Community = () => {
           proficiency_level: user.proficiency_level || 'beginner',
           is_online: user.is_online || false,
           streak_count: user.streak_count || 0, // Added streak_count default
-          likes_count: user.likes_count || 0 // Added likes_count default
+          likes_count: user.likes_count || 0, // Added likes_count default
+          age: user.age || null
         }));
 
         setUsers(usersWithDefaults);
@@ -343,6 +345,12 @@ const Community = () => {
                           <p className="text-xs text-muted-foreground">
                             {user.age ? `${user.age} years old` : 'Age not specified'}
                           </p>
+                          {user.streak_count > 0 && (
+                            <div className="flex items-center mt-1 gap-1 text-xs text-muted-foreground">
+                              <Flame className="h-3 w-3 text-primary" />
+                              <span>{user.streak_count} day streak</span>
+                            </div>
+                          )}
                         </div>
                         {user.is_online && (
                           <Badge variant="success" className="ml-2">Online</Badge>
@@ -357,12 +365,7 @@ const Community = () => {
                     </div>
                   </div>
 
-                  {user.streak_count > 0 && (
-                    <div className="flex items-center gap-2 mb-2 text-xs text-muted-foreground">
-                      <Flame className="h-4 w-4 text-orange-500" />
-                      <span>{user.streak_count} day streak</span>
-                    </div>
-                  )}
+                  {/* Removed redundant streak display */}
 
                   <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
                     {user.bio || 'No bio available.'}
@@ -381,7 +384,7 @@ const Community = () => {
 
                     <Button onClick={() => handleStartChat(user.id)} asChild variant="outline" size="sm">
                       <Link to={`/chat/${user.id}`}> {/* Link remains for visual purposes, but navigation is handled by handleStartChat */}
-                        <MessageCircle className="h-4 w-4 mr-2" />
+                        <MessageSquare className="h-4 w-4 mr-2" />
                         Start Chat
                       </Link>
                     </Button>
