@@ -14,11 +14,5 @@ CREATE POLICY "Users can update read status of their messages" ON messages
 FOR UPDATE USING (
   recipient_id = auth.uid()
 ) WITH CHECK (
-  recipient_id = auth.uid() AND
-  old.id = new.id AND 
-  old.conversation_id = new.conversation_id AND
-  old.sender_id = new.sender_id AND
-  old.recipient_id = new.recipient_id AND
-  old.content = new.content AND
-  old.created_at = new.created_at
+  recipient_id = auth.uid()
 );
