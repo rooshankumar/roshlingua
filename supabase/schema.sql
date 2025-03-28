@@ -101,6 +101,20 @@ CREATE POLICY "Users can view their conversations" ON public.conversations
 CREATE POLICY "Users can create conversations" ON public.conversations
   FOR INSERT WITH CHECK (true);
 
+-- Allow conversation creation to trigger participant addition
+CREATE POLICY "Users can insert themselves as participants" ON public.conversation_participants
+  FOR INSERT WITH CHECK (
+    auth.uid() = user_id OR 
+    EXISTS (
+      SELECT 1 FROM public.conversations c
+      WHERE c.id = conversation_id
+      AND NOT EXISTS (
+        SELECT 1 FROM public.conversation_participants p
+        WHERE p.conversation_id = c.id
+      )
+    )
+  );
+
 CREATE POLICY "Users can update their conversations" ON public.conversations
   FOR UPDATE USING (
     EXISTS (
@@ -152,10 +166,10 @@ CREATE POLICY "Users can view messages in their conversations" ON public.message
 CREATE POLICY "Users can insert messages in their conversations" ON public.messages
   FOR INSERT WITH CHECK (
     auth.uid() = sender_id AND
-    EXISTS (
-      SELECT 1 FROM public.conversation_participants
-      WHERE conversation_id = messages.conversation_id
-      AND user_id = auth.uid()
+    conversation_id IN (
+      SELECT conversation_id 
+      FROM public.conversation_participants
+      WHERE user_id = auth.uid()
     )
   );
 
