@@ -1,3 +1,4 @@
+
 import { Message } from "@/types/chat";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
@@ -10,7 +11,7 @@ interface MessageBubbleProps {
 
 export const MessageBubble = ({ message, isOwnMessage }: MessageBubbleProps) => {
   const timestamp = format(new Date(message.created_at), "h:mm a");
-
+  
   return (
     <div
       className={cn(
