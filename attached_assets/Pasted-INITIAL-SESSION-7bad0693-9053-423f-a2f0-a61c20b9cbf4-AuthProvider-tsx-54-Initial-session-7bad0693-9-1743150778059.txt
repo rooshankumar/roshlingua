@@ -1,0 +1,33 @@
+INITIAL_SESSION 7bad0693-9053-423f-a2f0-a61c20b9cbf4
+AuthProvider.tsx:54 Initial session: 7bad0693-9053-423f-a2f0-a61c20b9cbf4
+@supabase_supabase-js.js?v=0ae9952d:3900 
+            
+            
+           POST https://yekzyvdjjozhhatdefsq.supabase.co/rest/v1/messages 403 (Forbidden)
+(anonymous) @ @supabase_supabase-js.js?v=0ae9952d:3900
+(anonymous) @ @supabase_supabase-js.js?v=0ae9952d:3921
+fulfilled @ @supabase_supabase-js.js?v=0ae9952d:3873
+Promise.then
+step @ @supabase_supabase-js.js?v=0ae9952d:3886
+(anonymous) @ @supabase_supabase-js.js?v=0ae9952d:3888
+__awaiter6 @ @supabase_supabase-js.js?v=0ae9952d:3870
+(anonymous) @ @supabase_supabase-js.js?v=0ae9952d:3911
+then @ @supabase_supabase-js.js?v=0ae9952d:89Understand this errorAI
+Chat.tsx:104 Error sending message: {code: '42501', details: null, hint: null, message: 'new row violates row-level security policy for table "messages"'}code: "42501"details: nullhint: nullmessage: "new row violates row-level security policy for table \"messages\""[[Prototype]]: Object
+handleSendMessage @ Chat.tsx:104
+await in handleSendMessage
+callCallback2 @ chunk-W6L2VRDA.js?v=a3e1073b:3674
+invokeGuardedCallbackDev @ chunk-W6L2VRDA.js?v=a3e1073b:3699
+invokeGuardedCallback @ chunk-W6L2VRDA.js?v=a3e1073b:3733
+invokeGuardedCallbackAndCatchFirstError @ chunk-W6L2VRDA.js?v=a3e1073b:3736
+executeDispatch @ chunk-W6L2VRDA.js?v=a3e1073b:7014
+processDispatchQueueItemsInOrder @ chunk-W6L2VRDA.js?v=a3e1073b:7034
+processDispatchQueue @ chunk-W6L2VRDA.js?v=a3e1073b:7043
+dispatchEventsForPlugins @ chunk-W6L2VRDA.js?v=a3e1073b:7051
+(anonymous) @ chunk-W6L2VRDA.js?v=a3e1073b:7174
+batchedUpdates$1 @ chunk-W6L2VRDA.js?v=a3e1073b:18913
+batchedUpdates @ chunk-W6L2VRDA.js?v=a3e1073b:3579
+dispatchEventForPluginEventSystem @ chunk-W6L2VRDA.js?v=a3e1073b:7173
+dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay @ chunk-W6L2VRDA.js?v=a3e1073b:5478
+dispatchEvent @ chunk-W6L2VRDA.js?v=a3e1073b:5472
+dispatchDiscreteEvent @ chunk-W6L2VRDA.js?v=a3e1073b:5449Understand this errorAI
