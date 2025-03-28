@@ -8,11 +8,11 @@ export const chatService = {
 
     if (!user) throw new Error("User not authenticated");
 
-    // Create the conversation with proper fields
+    // Create the conversation with proper fields and explicitly set creator_id
     const { data: conversation, error } = await supabase
       .from('conversations')
       .insert({
-        creator_id: user.id,
+        creator_id: user.id, // Explicitly set this to match the RLS policy
         last_message_at: new Date().toISOString(),
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
@@ -20,7 +20,10 @@ export const chatService = {
       .select()
       .single();
 
-    if (error) throw error;
+    if (error) {
+      console.error("Error creating conversation:", error);
+      throw error;
+    }
 
     // Add both users as participants
     const { error: participantError } = await supabase
@@ -30,7 +33,10 @@ export const chatService = {
         { conversation_id: conversation.id, user_id: userId }
       ]);
 
-    if (participantError) throw participantError;
+    if (participantError) {
+      console.error("Error adding participants:", participantError);
+      throw participantError;
+    }
 
     return conversation;
   },
