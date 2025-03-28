@@ -8,12 +8,16 @@ DROP POLICY IF EXISTS "Enable conversation creation" ON conversations;
 DROP POLICY IF EXISTS "Enable conversation viewing for participants" ON conversations;
 DROP POLICY IF EXISTS "Enable participant viewing" ON conversation_participants;
 DROP POLICY IF EXISTS "Enable participant creation" ON conversation_participants;
+DROP POLICY IF EXISTS "User can create conversations" ON conversations;
+DROP POLICY IF EXISTS "Users can create conversations" ON conversations;
+DROP POLICY IF EXISTS "Allow conversation creation" ON conversations;
 
--- Create new policies for conversations
-CREATE POLICY "User can create conversations"
+-- Create the correct INSERT policy for conversations
+CREATE POLICY "Authenticated users can create conversations"
 ON conversations FOR INSERT TO authenticated
-WITH CHECK (creator_id = auth.uid());
+WITH CHECK (auth.uid() = creator_id);
 
+-- Create policy for viewing conversations
 CREATE POLICY "Enable conversation viewing for participants"
 ON conversations FOR SELECT TO authenticated
 USING (
@@ -24,7 +28,7 @@ USING (
   )
 );
 
--- Create simple, non-recursive policies for conversation participants
+-- Create policies for conversation participants
 CREATE POLICY "Enable participant viewing"
 ON conversation_participants FOR SELECT TO authenticated
 USING (user_id = auth.uid());
