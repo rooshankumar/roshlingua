@@ -22,7 +22,7 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
         .from('onboarding_status')
         .select('is_complete')
         .eq('user_id', user.id)
-        .single();
+        .maybeSingle();
 
       if (!onboardingError) {
         // If we got data, use it, otherwise default to false
