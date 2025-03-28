@@ -12,22 +12,20 @@ export default function ChatHeader() {
   useEffect(() => {
     async function getRecipientInfo() {
       if (!id) return;
+      
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
 
-      const { data: participant } = await supabase
+      const { data: participants } = await supabase
         .from('conversation_participants')
-        .select('user_id')
-        .eq('conversation_id', id)
-        .neq('user_id', (await supabase.auth.getUser()).data.user?.id)
-        .single();
+        .select('user_id, profiles(*)') // Join with profiles
+        .eq('conversation_id', id);
 
-      if (participant) {
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select()
-          .eq('id', participant.user_id)
-          .single();
-
-        if (profile) setRecipient(profile);
+      if (participants) {
+        const otherParticipant = participants.find(p => p.user_id !== user.id);
+        if (otherParticipant?.profiles) {
+          setRecipient(otherParticipant.profiles);
+        }
       }
     }
 
