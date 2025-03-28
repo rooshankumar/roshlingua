@@ -153,6 +153,7 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
           proficiency_level: formData.proficiencyLevel,
           learning_goal: formData.learningGoal,
           avatar_url: formData.avatarUrl || null,
+          has_completed_onboarding: true,
           updated_at: new Date().toISOString()
         })
         .eq('id', userId);
