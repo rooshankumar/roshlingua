@@ -9,7 +9,6 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -20,7 +19,6 @@ import {
   FormField,
   FormItem,
   FormLabel,
-  FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import {
@@ -69,87 +67,45 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
       avatarUrl: "",
     }
   });
-  
+
   const navigate = useNavigate();
   const { toast } = useToast();
-  
+
   const languages = [
     "English", "Spanish", "French", "German", "Italian",
     "Portuguese", "Chinese", "Japanese", "Korean", "Russian",
     "Arabic", "Hindi", "Turkish", "Dutch", "Swedish"
   ];
-  
+
   const proficiencyLevels = [
     "Beginner (A1)", "Elementary (A2)", "Intermediate (B1)", 
     "Upper Intermediate (B2)", "Advanced (C1)", "Proficient (C2)"
   ];
-  
-  const isStepValid = (step: number) => {
-    const values = form.getValues();
-    switch (step) {
-      case 1:
-        return !!values.name && !!values.gender && !!values.dob;
-      case 2:
-        return !!values.nativeLanguage && !!values.learningLanguage && !!values.proficiencyLevel;
-      case 3:
-        if (!values.learningGoal) return false;
-        return (async () => {
-          const { error: onboardingError } = await supabase
-            .from('onboarding_status')
-            .upsert({
-              user_id: userId,
-              is_complete: true,
-              current_step: 'completed',
-              updated_at: new Date().toISOString()
-            });
 
-          if (onboardingError) {
-            console.error("Error updating onboarding status:", onboardingError);
-            toast({
-              variant: "destructive",
-              title: "Error updating onboarding status",
-              description: "Please try again.",
-            });
-            return false;
-          }
-          return true;
-        })();
-      default:
-        return true;
-    }
-  };
-  
+
   const handleNextStep = () => {
-    if (isStepValid(step)) {
-      if (step < 4) {
-        setStep(step + 1);
-      } else {
-        handleSubmit();
-      }
+    if (step < 4) {
+      setStep(step + 1);
     } else {
-      toast({
-        variant: "destructive",
-        title: "Missing information",
-        description: "Please fill in all required fields.",
-      });
+      handleSubmit();
     }
   };
-  
+
   const handlePrevStep = () => {
     if (step > 1) {
       setStep(step - 1);
     }
   };
-  
+
   const handleSubmit = async () => {
     try {
       setIsLoading(true);
       const formData = form.getValues();
       console.log("Submitting onboarding data:", formData);
-      
+
       // Get the current user
       const { data: { session } } = await supabase.auth.getSession();
-      
+
       if (!session || !session.user) {
         toast({
           variant: "destructive",
@@ -159,9 +115,9 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
         navigate("/auth");
         return;
       }
-      
+
       const userId = session.user.id;
-      
+
       // Update the users table
       const { error: userError } = await supabase
         .from('users')
@@ -174,11 +130,10 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
           proficiency_level: formData.proficiencyLevel,
           learning_goal: formData.learningGoal,
           avatar_url: formData.avatarUrl || null,
-          
           updated_at: new Date().toISOString()
         })
         .eq('id', userId);
-        
+
       if (userError) {
         console.error("Error updating user data:", userError);
         toast({
@@ -188,7 +143,7 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
         });
         return;
       }
-      
+
       // Update onboarding status
       const { error: onboardingError } = await supabase
         .from('onboarding_status')
@@ -198,23 +153,23 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
           updated_at: new Date().toISOString()
         })
         .eq('user_id', userId);
-        
+
       if (onboardingError) {
         console.error("Error updating onboarding status:", onboardingError);
         // Continue anyway, don't block the user
       }
-      
+
       // Check if profile exists, create if it doesn't
       const { data: profileData, error: profileCheckError } = await supabase
         .from('profiles')
         .select('id')
         .eq('id', userId)
         .single();
-        
+
       if (profileCheckError && profileCheckError.code !== 'PGRST116') {
         console.error("Error checking profile:", profileCheckError);
       }
-      
+
       if (!profileData) {
         // Create profile if it doesn't exist
         const { error: profileCreateError } = await supabase
@@ -224,7 +179,7 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
             username: formData.name.toLowerCase().replace(/\s+/g, '_'),
             bio: formData.learningGoal
           });
-          
+
         if (profileCreateError) {
           console.error("Error creating profile:", profileCreateError);
           // Continue anyway, don't block the user
@@ -239,24 +194,24 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
             updated_at: new Date().toISOString()
           })
           .eq('id', userId);
-          
+
         if (profileUpdateError) {
           console.error("Error updating profile:", profileUpdateError);
           // Continue anyway, don't block the user
         }
       }
-      
+
       toast({
         title: "Profile created",
         description: "Your profile has been successfully set up!",
       });
-      
+
       // Update local storage for immediate effect
       localStorage.setItem("onboarding_completed", "true");
-      
+
       // Call onComplete prop
       onComplete();
-      
+
       // Force reload to trigger ProtectedRoute check
       window.location.href = "/dashboard";
     } catch (error) {
@@ -270,20 +225,20 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
       setIsLoading(false);
     }
   };
-  
+
   const uploadAvatar = () => {
     // In a real app, this would open a file picker and upload the image
     // For now, let's simulate uploading an avatar
     setTimeout(() => {
       form.setValue("avatarUrl", "/placeholder.svg");
-      
+
       toast({
         title: "Avatar uploaded",
         description: "Your profile picture has been updated.",
       });
     }, 1000);
   };
-  
+
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-gradient-to-b from-background to-secondary">
       <div className="w-full max-w-md">
@@ -328,7 +283,7 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
                       </FormItem>
                     )}
                   />
-                  
+
                   <FormField
                     control={form.control}
                     name="gender"
@@ -354,7 +309,7 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
                       </FormItem>
                     )}
                   />
-                  
+
                   <FormField
                     control={form.control}
                     name="dob"
@@ -401,7 +356,7 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
                   />
                 </div>
               )}
-              
+
               {step === 2 && (
                 <div className="space-y-4">
                   <FormField
@@ -430,7 +385,7 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
                       </FormItem>
                     )}
                   />
-                  
+
                   <FormField
                     control={form.control}
                     name="learningLanguage"
@@ -460,7 +415,7 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
                       </FormItem>
                     )}
                   />
-                  
+
                   <FormField
                     control={form.control}
                     name="proficiencyLevel"
@@ -492,7 +447,7 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
                   />
                 </div>
               )}
-              
+
               {step === 3 && (
                 <div className="space-y-4">
                   <FormField
@@ -516,7 +471,7 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
                   />
                 </div>
               )}
-              
+
               {step === 4 && (
                 <div className="space-y-6">
                   <div className="flex flex-col items-center space-y-4">
@@ -542,7 +497,7 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
                         <Upload className="h-4 w-4" />
                       </Button>
                     </div>
-                    
+
                     <div className="text-center">
                       <p className="text-sm text-muted-foreground mb-2">
                         Upload a profile picture (optional)
@@ -556,10 +511,10 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
                       </Button>
                     </div>
                   </div>
-                  
+
                   <div className="space-y-4 pt-4">
                     <h3 className="font-medium">Review Your Information</h3>
-                    
+
                     <div className="grid grid-cols-2 gap-4 text-sm">
                       <div>
                         <p className="text-muted-foreground">Name</p>
@@ -588,7 +543,7 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
                         <p className="font-medium">{form.getValues("proficiencyLevel")}</p>
                       </div>
                     </div>
-                    
+
                     <div>
                       <p className="text-muted-foreground">Learning Goal</p>
                       <p className="text-sm">{form.getValues("learningGoal")}</p>
