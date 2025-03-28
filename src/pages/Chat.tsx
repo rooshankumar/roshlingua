@@ -52,7 +52,7 @@ export default function Chat() {
         const otherParticipant = participants.find(
           p => p.profiles.id !== user?.id
         );
-        
+
         if (otherParticipant) {
           setOtherUser(otherParticipant.profiles);
         } else {
@@ -98,14 +98,15 @@ export default function Chat() {
 
     try {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
+      if (!user || !otherUser) return; // Added null check for otherUser
 
       const { error } = await supabase
         .from('messages')
         .insert({ 
           content: message, 
           conversation_id: conversationId,
-          sender_id: user.id 
+          sender_id: user.id,
+          recipient_id: otherUser.id // Added recipient_id
         });
 
       if (error) throw error;

@@ -226,7 +226,10 @@ const Community = () => {
       // Create new conversation if none exists
       const { data: conversation, error } = await supabase
         .from('conversations')
-        .insert({ creator_id: currentUser.id })
+        .insert({ 
+          creator_id: currentUser.id,
+          last_message_at: new Date().toISOString()
+        })
         .select()
         .single();
 
@@ -238,6 +241,21 @@ const Community = () => {
           variant: "destructive"
         });
         return;
+      }
+
+      // Create initial message
+      const { error: messageError } = await supabase
+        .from('messages')
+        .insert({
+          conversation_id: conversation.id,
+          sender_id: currentUser.id,
+          recipient_id: otherUserId,
+          content: "Started a conversation",
+          is_read: false
+        });
+
+      if (messageError) {
+        console.error('Error creating initial message:', messageError);
       }
 
 
