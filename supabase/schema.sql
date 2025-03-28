@@ -98,6 +98,17 @@ CREATE POLICY "Users can view their conversations" ON public.conversations
     )
   );
 
+CREATE POLICY "Users can create conversations" ON public.conversations
+  FOR INSERT WITH CHECK (true);
+
+CREATE POLICY "Users can update their conversations" ON public.conversations
+  FOR UPDATE USING (
+    EXISTS (
+      SELECT 1 FROM public.conversation_participants
+      WHERE conversation_id = id AND user_id = auth.uid()
+    )
+  );
+
 -- Conversation participants policies
 CREATE POLICY "Users can view conversation participants" ON public.conversation_participants
   FOR SELECT USING (

@@ -208,11 +208,17 @@ const Community = () => {
       const { data: conversation, error: conversationError } = await supabase
         .from('conversations')
         .insert({
-          creator_id: currentUser.id,
           created_at: new Date().toISOString()
         })
         .select('*')
         .single();
+
+      if (conversationError) {
+        console.error('Error creating conversation:', conversationError);
+        console.log('Current user:', currentUser);
+        console.log('Auth status:', await supabase.auth.getSession());
+        return;
+      }
 
       if (conversationError) {
         console.error('Error creating conversation:', conversationError);
