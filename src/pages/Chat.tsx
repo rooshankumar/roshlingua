@@ -60,13 +60,24 @@ export default function Chat() {
         }
 
         // Fetch messages
-        const { data: messages } = await supabase
+        const { data: messagesData, error: messagesError } = await supabase
           .from('messages')
           .select('*')
           .eq('conversation_id', conversationId)
           .order('created_at', { ascending: true });
 
-        setMessages(messages || []);
+        if (messagesError) throw messagesError;
+        setMessages(messagesData || []);
+
+        // Mark messages as read
+        if (user) {
+          await supabase
+            .from('messages')
+            .update({ is_read: true })
+            .eq('conversation_id', conversationId)
+            .eq('recipient_id', user.id)
+            .eq('is_read', false);
+        }
       } catch (error) {
         console.error('Error fetching conversation:', error);
       }
@@ -76,14 +87,22 @@ export default function Chat() {
 
     // Subscribe to new messages
     const channel = supabase
-      .channel(`conversation:${conversationId}`)
+      .channel(`chat:${conversationId}`)
       .on('postgres_changes', {
         event: 'INSERT',
         schema: 'public',
         table: 'messages',
         filter: `conversation_id=eq.${conversationId}`
-      }, payload => {
+      }, (payload) => {
         setMessages(prev => [...prev, payload.new]);
+        // Mark message as read if recipient is current user
+        const { data: { user } } = supabase.auth.getUser();
+        if (user && payload.new.recipient_id === user.id) {
+          supabase
+            .from('messages')
+            .update({ is_read: true })
+            .eq('id', payload.new.id);
+        }
       })
       .subscribe();
 

@@ -195,85 +195,90 @@ const Community = () => {
       if (!currentUser) return;
 
       // Check if conversation already exists between these users
-      const { data: existingConversation } = await supabase
+      const { data: existingParticipants } = await supabase
         .from('conversation_participants')
-        .select(`
-          conversation_id,
-          conversations:conversation_id (
-            id
-          )
-        `)
-        .in('user_id', [currentUser.id, otherUserId])
-        .eq('conversations.is_active', true)
-        .order('conversations.last_message_at', { ascending: false });
+        .select('conversation_id')
+        .in('user_id', [currentUser.id, otherUserId]);
 
-      let conversationId;
+      if (existingParticipants) {
+        // Find conversation where both users are participants
+        const conversationCounts = existingParticipants.reduce((acc: Record<string, number>, curr) => {
+          acc[curr.conversation_id] = (acc[curr.conversation_id] || 0) + 1;
+          return acc;
+        }, {});
 
-      if (existingConversation && existingConversation.length >= 2) {
-        // If conversation exists, use it
-        conversationId = existingConversation[0].conversation_id;
-      } else {
-        // Create new conversation
-        const { data: newConversation, error: convError } = await supabase
-          .from('conversations')
-          .insert({ 
-            creator_id: currentUser.id,
-            last_message_at: new Date().toISOString(),
-            is_active: true
-          })
-          .select()
-          .single();
+        const existingConversationId = Object.entries(conversationCounts)
+          .find(([_, count]) => count === 2)?.[0];
 
-        if (convError) {
-          console.error('Error creating conversation:', convError);
-          toast({
-            title: "Error",
-            description: "Failed to create conversation",
-            variant: "destructive"
-          });
+        if (existingConversationId) {
+          navigate(`/chat/${existingConversationId}`);
           return;
-        }
-
-        conversationId = newConversation.id;
-
-        // Add both participants
-        const { error: participantsError } = await supabase
-          .from('conversation_participants')
-          .insert([
-            { conversation_id: conversationId, user_id: currentUser.id },
-            { conversation_id: conversationId, user_id: otherUserId }
-          ]);
-
-        if (participantsError) {
-          console.error('Error adding participants:', participantsError);
-          toast({
-            title: "Error",
-            description: "Failed to add participants",
-            variant: "destructive"
-          });
-          return;
-        }
-
-        // Create initial message
-        const { error: messageError } = await supabase
-          .from('messages')
-          .insert({
-            conversation_id: conversationId,
-            sender_id: currentUser.id,
-            recipient_id: otherUserId,
-            content: "Started a conversation",
-            is_read: false
-          });
-
-        if (messageError) {
-          console.error('Error creating initial message:', messageError);
         }
       }
 
+      // Create new conversation if none exists
+      const { data: newConversation, error: convError } = await supabase
+        .from('conversations')
+        .insert({ 
+          created_at: new Date().toISOString(),
+          last_message_at: new Date().toISOString()
+        })
+        .select()
+        .single();
+
+      if (convError) {
+        console.error('Error creating conversation:', convError);
+        toast({
+          title: "Error",
+          description: "Failed to create conversation",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      // Add both participants
+      const { error: participantsError } = await supabase
+        .from('conversation_participants')
+        .insert([
+          { conversation_id: newConversation.id, user_id: currentUser.id },
+          { conversation_id: newConversation.id, user_id: otherUserId }
+        ]);
+
+      if (participantsError) {
+        console.error('Error adding participants:', participantsError);
+        toast({
+          title: "Error",
+          description: "Failed to add participants",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      // Create initial message
+      const { error: messageError } = await supabase
+        .from('messages')
+        .insert({
+          conversation_id: newConversation.id,
+          sender_id: currentUser.id,
+          recipient_id: otherUserId,
+          content: "Started a conversation",
+          created_at: new Date().toISOString(),
+          is_read: false
+        });
+
+      if (messageError) {
+        console.error('Error creating initial message:', messageError);
+      }
+
       // Navigate to the chat
-      navigate(`/chat/${conversationId}`);
+      navigate(`/chat/${newConversation.id}`);
     } catch (error) {
       console.error('Error creating conversation:', error);
+      toast({
+        title: "Error",
+        description: "Failed to start conversation",
+        variant: "destructive"
+      });
     }
   };
 
