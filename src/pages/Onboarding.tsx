@@ -67,11 +67,34 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
       proficiencyLevel: "",
       learningGoal: "",
       avatarUrl: "",
+    },
+    // Basic validation to ensure required fields are filled
+    // Alternatively, you could use zod or another schema validator
+    async validate(values) {
+      const errors: Record<string, string> = {};
+      if (!values.name) errors.name = "Name is required";
+      if (!values.gender) errors.gender = "Gender is required";
+      if (!values.dob) errors.dob = "Date of birth is required";
+      return errors;
     }
   });
   
   const navigate = useNavigate();
   const { toast } = useToast();
+  
+  // Function to calculate age from DOB
+  const calculateAge = (dob: Date): number => {
+    const today = new Date();
+    let age = today.getFullYear() - dob.getFullYear();
+    const monthDifference = today.getMonth() - dob.getMonth();
+    
+    // Adjust age if birthday hasn't occurred yet this year
+    if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < dob.getDate())) {
+      age--;
+    }
+    
+    return age;
+  };
   
   const languages = [
     "English", "Spanish", "French", "German", "Italian",
@@ -94,6 +117,23 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
       case 3:
         if (!values.learningGoal) return false;
         return (async () => {
+          // Calculate age from DOB
+          const age = values.dob ? calculateAge(values.dob) : null;
+          
+          // Update user profile with calculated age
+          const { error: userError } = await supabase
+            .from('users')
+            .update({ 
+              age: age,
+              updated_at: new Date().toISOString() 
+            })
+            .eq('id', userId);
+          
+          if (userError) {
+            console.error('Error updating user age:', userError);
+            return false;
+          }
+          
           const { error: onboardingError } = await supabase
             .from('onboarding_status')
             .upsert({
@@ -394,8 +434,9 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
                           </PopoverContent>
                         </Popover>
                         <FormDescription>
-                          We use this to calculate your age.
+                          Required. We use this to calculate your age for profile display.
                         </FormDescription>
+                        <FormMessage />
                       </FormItem>
                     )}
                   />
