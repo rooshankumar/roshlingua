@@ -109,6 +109,26 @@ CREATE POLICY "Users can update their conversations" ON public.conversations
     )
   );
 
+CREATE POLICY "Users can delete their conversations" ON public.conversations
+  FOR DELETE USING (
+    EXISTS (
+      SELECT 1 FROM public.conversation_participants
+      WHERE conversation_id = id AND user_id = auth.uid()
+    )
+  );
+
+-- Allow participants to be added right after conversation creation
+CREATE POLICY "Users can add participants after creating conversation" ON public.conversation_participants
+  FOR INSERT WITH CHECK (
+    auth.uid() IN (
+      SELECT user_id FROM public.conversation_participants 
+      WHERE conversation_id = conversation_participants.conversation_id
+    ) OR NOT EXISTS (
+      SELECT 1 FROM public.conversation_participants
+      WHERE conversation_id = conversation_participants.conversation_id
+    )
+  );
+
 -- Conversation participants policies
 CREATE POLICY "Users can view conversation participants" ON public.conversation_participants
   FOR SELECT USING (
