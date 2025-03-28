@@ -188,9 +188,11 @@ export interface Database {
 }
 
 // Type shortcuts
-export type User = Database['public']['Tables']['users']['Row'];
+export type Profile = Database['public']['Tables']['profiles']['Row'];
 export type Message = Database['public']['Tables']['messages']['Row'];
 export type Conversation = Database['public']['Tables']['conversations']['Row'] & {
-  participants?: User[];
+  participants?: Profile[];
   last_message?: Message;
 };
+export type ConversationParticipant = Database['public']['Tables']['conversation_participants']['Row'];
+export type MessageReaction = Database['public']['Tables']['message_reactions']['Row'];
