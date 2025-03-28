@@ -189,8 +189,25 @@ const Community = () => {
 
   const { user } = useAuth();
 
-  const handleStartChat = async (userId: string) => {
+  const handleStartChat = async (otherUserId: string) => {
     try {
+      // First check if conversation exists
+      const { data: existingConversations } = await supabase
+        .from('conversation_participants')
+        .select('conversation_id')
+        .eq('user_id', user?.id)
+        .in('conversation_id', (sub) =>
+          sub
+            .from('conversation_participants')
+            .select('conversation_id')
+            .eq('user_id', otherUserId)
+        );
+
+      if (existingConversations && existingConversations.length > 0) {
+        navigate(`/chat/${existingConversations[0].conversation_id}`);
+        return;
+      }
+
       // Get current user and verify authentication
       const { data: { user: currentUser }, error: authError } = await supabase.auth.getUser();
 
@@ -235,7 +252,7 @@ const Community = () => {
         .from('conversation_participants')
         .insert([
           { conversation_id: conversation.id, user_id: currentUser.id },
-          { conversation_id: conversation.id, user_id: userId }
+          { conversation_id: conversation.id, user_id: otherUserId }
         ]);
 
       if (participantsError) {

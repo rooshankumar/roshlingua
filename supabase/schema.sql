@@ -90,16 +90,24 @@ ON public.profiles FOR INSERT
 WITH CHECK (auth.uid() = id);
 
 -- Conversations policies
+CREATE POLICY "Users can create conversations" ON public.conversations
+  FOR INSERT WITH CHECK (true);
+
 CREATE POLICY "Users can view their conversations" ON public.conversations
-  FOR SELECT USING (
+  FOR ALL USING (
     EXISTS (
       SELECT 1 FROM public.conversation_participants
       WHERE conversation_id = id AND user_id = auth.uid()
     )
   );
 
-CREATE POLICY "Users can create conversations" ON public.conversations
-  FOR INSERT WITH CHECK (true);
+CREATE POLICY "Users can manage their conversations" ON public.conversations
+  FOR ALL USING (
+    EXISTS (
+      SELECT 1 FROM public.conversation_participants
+      WHERE conversation_id = id AND user_id = auth.uid()
+    )
+  );
 
 -- Allow conversation creation to trigger participant addition
 CREATE POLICY "Users can insert themselves as participants" ON public.conversation_participants
