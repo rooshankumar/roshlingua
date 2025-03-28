@@ -193,6 +193,21 @@ const Community = () => {
     try {
       if (!user) return;
 
+      // Verify both users exist in users table
+      const { data: users, error: usersError } = await supabase
+        .from('users')
+        .select('id')
+        .in('id', [user.id, otherUserId]);
+
+      if (usersError || !users || users.length !== 2) {
+        toast({
+          title: "Error",
+          description: "Invalid user IDs",
+          variant: "destructive"
+        });
+        return;
+      }
+
       // Check if conversation exists
       const { data: existingParticipants } = await supabase
         .from('conversation_participants')
@@ -214,7 +229,9 @@ const Community = () => {
       // Create new conversation
       const { data: newConversation, error: conversationError } = await supabase
         .from('conversations')
-        .insert([{}])
+        .insert([{
+          created_by: user.id // Track who created the conversation
+        }])
         .select()
         .single();
 
