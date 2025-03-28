@@ -92,22 +92,24 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
       case 2:
         return !!values.nativeLanguage && !!values.learningLanguage && !!values.proficiencyLevel;
       case 3:
+        const updateOnboardingStatus = async () => {
+          const { error: onboardingError } = await supabase
+            .from('onboarding_status')
+            .upsert({
+              user_id: userId,
+              is_complete: true,
+              current_step: 'completed',
+              updated_at: new Date().toISOString()
+            });
 
-      // Update onboarding status
-      const { error: onboardingError } = await supabase
-        .from('onboarding_status')
-        .upsert({
-          user_id: userId,
-          is_complete: true,
-          current_step: 'completed',
-          updated_at: new Date().toISOString()
-        });
-
-      if (onboardingError) {
-        console.error("Error updating onboarding status:", onboardingError);
-        throw onboardingError;
-      }
-
+          if (onboardingError) {
+            console.error("Error updating onboarding status:", onboardingError);
+            throw onboardingError;
+          }
+        };
+        
+        // Execute the async function
+        updateOnboardingStatus();
         return !!values.learningGoal;
       default:
         return true;
