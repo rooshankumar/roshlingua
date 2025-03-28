@@ -1,0 +1,282 @@
+[plugin:vite:react-swc] × the name `useState` is defined multiple times
+    ╭─[/home/runner/workspace/src/components/chat/MessageInput.tsx:2:1]
+  1 │ 
+  2 │ import { useState } from "react";
+    ·          ────┬───
+    ·              ╰── previous definition of `useState` here
+  3 │ import { Send } from "lucide-react";
+  4 │ import { Button } from "../ui/button";
+  5 │ import { Textarea } from "../ui/textarea";
+  6 │ 
+  7 │ interface MessageInputProps {
+  8 │   onSendMessage: (content: string) => void;
+  9 │ }
+ 10 │ 
+ 11 │ export const MessageInput = ({ onSendMessage }: MessageInputProps) => {
+ 12 │   const [message, setMessage] = useState("");
+ 13 │ 
+ 14 │   const handleSubmit = (e: React.FormEvent) => {
+ 15 │     e.preventDefault();
+ 16 │     if (message.trim()) {
+ 17 │       onSendMessage(message.trim());
+ 18 │       setMessage("");
+ 19 │     }
+ 20 │   };
+ 21 │ 
+ 22 │   return (
+ 23 │     <form onSubmit={handleSubmit} className="p-4 border-t">
+ 24 │       <div className="flex gap-2">
+ 25 │         <Textarea
+ 26 │           value={message}
+ 27 │           onChange={(e) => setMessage(e.target.value)}
+ 28 │           placeholder="Type a message..."
+ 29 │           className="min-h-[20px] max-h-[120px] resize-none"
+ 30 │           onKeyDown={(e) => {
+ 31 │             if (e.key === 'Enter' && !e.shiftKey) {
+ 32 │               e.preventDefault();
+ 33 │               handleSubmit(e);
+ 34 │             }
+ 35 │           }}
+ 36 │         />
+ 37 │         <Button type="submit" size="icon" className="shrink-0">
+ 38 │           <Send className="h-5 w-5" />
+ 39 │         </Button>
+ 40 │       </div>
+ 41 │     </form>
+ 42 │   );
+ 43 │ };
+ 44 │ import { useState, KeyboardEvent } from "react";
+    ·          ────┬───
+    ·              ╰── `useState` redefined here
+ 45 │ import { Button } from "../ui/button";
+ 46 │ import { Textarea } from "../ui/textarea";
+ 47 │ import { Send } from "lucide-react";
+    ╰────
+  × the name `Button` is defined multiple times
+    ╭─[/home/runner/workspace/src/components/chat/MessageInput.tsx:4:1]
+  1 │ 
+  2 │ import { useState } from "react";
+  3 │ import { Send } from "lucide-react";
+  4 │ import { Button } from "../ui/button";
+    ·          ───┬──
+    ·             ╰── previous definition of `Button` here
+  5 │ import { Textarea } from "../ui/textarea";
+  6 │ 
+  7 │ interface MessageInputProps {
+  8 │   onSendMessage: (content: string) => void;
+  9 │ }
+ 10 │ 
+ 11 │ export const MessageInput = ({ onSendMessage }: MessageInputProps) => {
+ 12 │   const [message, setMessage] = useState("");
+ 13 │ 
+ 14 │   const handleSubmit = (e: React.FormEvent) => {
+ 15 │     e.preventDefault();
+ 16 │     if (message.trim()) {
+ 17 │       onSendMessage(message.trim());
+ 18 │       setMessage("");
+ 19 │     }
+ 20 │   };
+ 21 │ 
+ 22 │   return (
+ 23 │     <form onSubmit={handleSubmit} className="p-4 border-t">
+ 24 │       <div className="flex gap-2">
+ 25 │         <Textarea
+ 26 │           value={message}
+ 27 │           onChange={(e) => setMessage(e.target.value)}
+ 28 │           placeholder="Type a message..."
+ 29 │           className="min-h-[20px] max-h-[120px] resize-none"
+ 30 │           onKeyDown={(e) => {
+ 31 │             if (e.key === 'Enter' && !e.shiftKey) {
+ 32 │               e.preventDefault();
+ 33 │               handleSubmit(e);
+ 34 │             }
+ 35 │           }}
+ 36 │         />
+ 37 │         <Button type="submit" size="icon" className="shrink-0">
+ 38 │           <Send className="h-5 w-5" />
+ 39 │         </Button>
+ 40 │       </div>
+ 41 │     </form>
+ 42 │   );
+ 43 │ };
+ 44 │ import { useState, KeyboardEvent } from "react";
+ 45 │ import { Button } from "../ui/button";
+    ·          ───┬──
+    ·             ╰── `Button` redefined here
+ 46 │ import { Textarea } from "../ui/textarea";
+ 47 │ import { Send } from "lucide-react";
+    ╰────
+  × the name `Textarea` is defined multiple times
+    ╭─[/home/runner/workspace/src/components/chat/MessageInput.tsx:5:1]
+  2 │ import { useState } from "react";
+  3 │ import { Send } from "lucide-react";
+  4 │ import { Button } from "../ui/button";
+  5 │ import { Textarea } from "../ui/textarea";
+    ·          ────┬───
+    ·              ╰── previous definition of `Textarea` here
+  6 │ 
+  7 │ interface MessageInputProps {
+  8 │   onSendMessage: (content: string) => void;
+  9 │ }
+ 10 │ 
+ 11 │ export const MessageInput = ({ onSendMessage }: MessageInputProps) => {
+ 12 │   const [message, setMessage] = useState("");
+ 13 │ 
+ 14 │   const handleSubmit = (e: React.FormEvent) => {
+ 15 │     e.preventDefault();
+ 16 │     if (message.trim()) {
+ 17 │       onSendMessage(message.trim());
+ 18 │       setMessage("");
+ 19 │     }
+ 20 │   };
+ 21 │ 
+ 22 │   return (
+ 23 │     <form onSubmit={handleSubmit} className="p-4 border-t">
+ 24 │       <div className="flex gap-2">
+ 25 │         <Textarea
+ 26 │           value={message}
+ 27 │           onChange={(e) => setMessage(e.target.value)}
+ 28 │           placeholder="Type a message..."
+ 29 │           className="min-h-[20px] max-h-[120px] resize-none"
+ 30 │           onKeyDown={(e) => {
+ 31 │             if (e.key === 'Enter' && !e.shiftKey) {
+ 32 │               e.preventDefault();
+ 33 │               handleSubmit(e);
+ 34 │             }
+ 35 │           }}
+ 36 │         />
+ 37 │         <Button type="submit" size="icon" className="shrink-0">
+ 38 │           <Send className="h-5 w-5" />
+ 39 │         </Button>
+ 40 │       </div>
+ 41 │     </form>
+ 42 │   );
+ 43 │ };
+ 44 │ import { useState, KeyboardEvent } from "react";
+ 45 │ import { Button } from "../ui/button";
+ 46 │ import { Textarea } from "../ui/textarea";
+    ·          ────┬───
+    ·              ╰── `Textarea` redefined here
+ 47 │ import { Send } from "lucide-react";
+ 48 │ 
+ 49 │ interface MessageInputProps {
+    ╰────
+  × the name `Send` is defined multiple times
+    ╭─[/home/runner/workspace/src/components/chat/MessageInput.tsx:3:1]
+  1 │ 
+  2 │ import { useState } from "react";
+  3 │ import { Send } from "lucide-react";
+    ·          ──┬─
+    ·            ╰── previous definition of `Send` here
+  4 │ import { Button } from "../ui/button";
+  5 │ import { Textarea } from "../ui/textarea";
+  6 │ 
+  7 │ interface MessageInputProps {
+  8 │   onSendMessage: (content: string) => void;
+  9 │ }
+ 10 │ 
+ 11 │ export const MessageInput = ({ onSendMessage }: MessageInputProps) => {
+ 12 │   const [message, setMessage] = useState("");
+ 13 │ 
+ 14 │   const handleSubmit = (e: React.FormEvent) => {
+ 15 │     e.preventDefault();
+ 16 │     if (message.trim()) {
+ 17 │       onSendMessage(message.trim());
+ 18 │       setMessage("");
+ 19 │     }
+ 20 │   };
+ 21 │ 
+ 22 │   return (
+ 23 │     <form onSubmit={handleSubmit} className="p-4 border-t">
+ 24 │       <div className="flex gap-2">
+ 25 │         <Textarea
+ 26 │           value={message}
+ 27 │           onChange={(e) => setMessage(e.target.value)}
+ 28 │           placeholder="Type a message..."
+ 29 │           className="min-h-[20px] max-h-[120px] resize-none"
+ 30 │           onKeyDown={(e) => {
+ 31 │             if (e.key === 'Enter' && !e.shiftKey) {
+ 32 │               e.preventDefault();
+ 33 │               handleSubmit(e);
+ 34 │             }
+ 35 │           }}
+ 36 │         />
+ 37 │         <Button type="submit" size="icon" className="shrink-0">
+ 38 │           <Send className="h-5 w-5" />
+ 39 │         </Button>
+ 40 │       </div>
+ 41 │     </form>
+ 42 │   );
+ 43 │ };
+ 44 │ import { useState, KeyboardEvent } from "react";
+ 45 │ import { Button } from "../ui/button";
+ 46 │ import { Textarea } from "../ui/textarea";
+ 47 │ import { Send } from "lucide-react";
+    ·          ──┬─
+    ·            ╰── `Send` redefined here
+ 48 │ 
+ 49 │ interface MessageInputProps {
+ 50 │   onSendMessage: (content: string) => void;
+    ╰────
+  × the name `MessageInput` is defined multiple times
+    ╭─[/home/runner/workspace/src/components/chat/MessageInput.tsx:11:1]
+  8 │   onSendMessage: (content: string) => void;
+  9 │ }
+ 10 │ 
+ 11 │ export const MessageInput = ({ onSendMessage }: MessageInputProps) => {
+    ·              ──────┬─────
+    ·                    ╰── previous definition of `MessageInput` here
+ 12 │   const [message, setMessage] = useState("");
+ 13 │ 
+ 14 │   const handleSubmit = (e: React.FormEvent) => {
+ 15 │     e.preventDefault();
+ 16 │     if (message.trim()) {
+ 17 │       onSendMessage(message.trim());
+ 18 │       setMessage("");
+ 19 │     }
+ 20 │   };
+ 21 │ 
+ 22 │   return (
+ 23 │     <form onSubmit={handleSubmit} className="p-4 border-t">
+ 24 │       <div className="flex gap-2">
+ 25 │         <Textarea
+ 26 │           value={message}
+ 27 │           onChange={(e) => setMessage(e.target.value)}
+ 28 │           placeholder="Type a message..."
+ 29 │           className="min-h-[20px] max-h-[120px] resize-none"
+ 30 │           onKeyDown={(e) => {
+ 31 │             if (e.key === 'Enter' && !e.shiftKey) {
+ 32 │               e.preventDefault();
+ 33 │               handleSubmit(e);
+ 34 │             }
+ 35 │           }}
+ 36 │         />
+ 37 │         <Button type="submit" size="icon" className="shrink-0">
+ 38 │           <Send className="h-5 w-5" />
+ 39 │         </Button>
+ 40 │       </div>
+ 41 │     </form>
+ 42 │   );
+ 43 │ };
+ 44 │ import { useState, KeyboardEvent } from "react";
+ 45 │ import { Button } from "../ui/button";
+ 46 │ import { Textarea } from "../ui/textarea";
+ 47 │ import { Send } from "lucide-react";
+ 48 │ 
+ 49 │ interface MessageInputProps {
+ 50 │   onSendMessage: (content: string) => void;
+ 51 │ }
+ 52 │ 
+ 53 │ export const MessageInput = ({ onSendMessage }: MessageInputProps) => {
+    ·              ──────┬─────
+    ·                    ╰── `MessageInput` redefined here
+ 54 │   const [message, setMessage] = useState("");
+ 55 │ 
+ 56 │   const handleSend = () => {
+    ╰────
+/home/runner/workspace/src/components/chat/MessageInput.tsx:2:1
+1  |  
+2  |  import { useState } from "react";
+   |            ^
+3  |  import { Send } from "lucide-react";
+4  |  import { Button } from "../ui/button";
