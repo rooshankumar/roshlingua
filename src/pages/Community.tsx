@@ -345,12 +345,6 @@ const Community = () => {
                           <p className="text-xs text-muted-foreground">
                             {user.age ? `${user.age} years old` : 'Age not specified'}
                           </p>
-                          {user.streak_count > 0 && (
-                            <div className="flex items-center mt-1 gap-1 text-xs text-muted-foreground">
-                              <Flame className="h-3 w-3 text-primary" />
-                              <span>{user.streak_count} day streak</span>
-                            </div>
-                          )}
                         </div>
                         {user.is_online && (
                           <Badge variant="success" className="ml-2">Online</Badge>
