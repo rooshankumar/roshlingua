@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { Heart, MessageCircle, Search, Filter, Flame } from 'lucide-react';
+import { Heart, MessageSquare, Search, Filter, Flame } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from "@/components/ui/badge";
