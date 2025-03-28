@@ -338,7 +338,12 @@ const Community = () => {
                     </Avatar>
                     <div className="flex-1">
                       <div className="flex items-center justify-between">
-                        <h3 className="font-medium">{user.username || user.full_name}</h3>
+                        <div>
+                          <h3 className="font-medium">{user.full_name}</h3>
+                          {user.username && (
+                            <p className="text-xs text-muted-foreground">@{user.username}</p>
+                          )}
+                        </div>
                         {user.is_online && (
                           <Badge variant="success" className="ml-2">Online</Badge>
                         )}
