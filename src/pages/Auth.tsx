@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams, useLocation } from "react-router-dom";
 import { 
@@ -99,7 +98,11 @@ const Auth = () => {
   const handleGoogleAuth = async () => {
     try {
       setIsLoading(true);
-      await loginWithGoogle();
+      await loginWithGoogle({
+        options: {
+          scopes: 'https://www.googleapis.com/auth/user.birthday.read'
+        }
+      });
       // Redirection is handled by the callback URL
     } catch (error) {
       console.error("Google auth error in component:", error);

@@ -28,6 +28,21 @@ VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFz
 2. Create a new project or select an existing one
 3. Navigate to "APIs & Services" > "Credentials"
 4. Click "Create Credentials" > "OAuth client ID"
+
+
+### Updating Google OAuth to include birthday information
+
+To fetch the user's birthday from Google OAuth:
+
+1. Go to your Google Cloud Console project
+2. Navigate to "OAuth consent screen"
+3. Add the "https://www.googleapis.com/auth/user.birthday.read" scope to your OAuth scopes
+4. Save and publish the updated consent screen
+5. Users will now be asked to grant permission to access their birthday information
+
+Note that users must explicitly consent to sharing their birthday information.
+
+
 5. Set up your OAuth consent screen if prompted
 6. For Application Type, select "Web application"
 

@@ -30,8 +30,23 @@ const AuthCallback = () => {
             const email = user.email || '';
             const fullName = user.user_metadata.full_name || user.user_metadata.name || email.split('@')[0];
             
+            // Calculate age if we can get birth date from Google OAuth metadata
+            let age = null;
+            if (user.user_metadata.birthdate) {
+              const birthDate = new Date(user.user_metadata.birthdate);
+              const today = new Date();
+              age = today.getFullYear() - birthDate.getFullYear();
+              // Adjust age if birthday hasn't occurred yet this year
+              const hasBirthdayOccurredThisYear = 
+                today.getMonth() > birthDate.getMonth() || 
+                (today.getMonth() === birthDate.getMonth() && today.getDate() >= birthDate.getDate());
+              if (!hasBirthdayOccurredThisYear) {
+                age--;
+              }
+            }
+            
             // Create user record in our database tables
-            const success = await createUserRecord(user.id, email, fullName);
+            const success = await createUserRecord(user.id, email, fullName, age);
             
             if (success) {
               console.log("User record created successfully");
