@@ -53,7 +53,7 @@ const Community = () => {
           .select(`
             id,
             full_name,
-            username,
+            age,
             native_language,
             learning_language,
             proficiency_level,
@@ -340,9 +340,9 @@ const Community = () => {
                       <div className="flex items-center justify-between">
                         <div>
                           <h3 className="font-medium">{user.full_name}</h3>
-                          {user.username && (
-                            <p className="text-xs text-muted-foreground">@{user.username}</p>
-                          )}
+                          <p className="text-xs text-muted-foreground">
+                            {user.age ? `${user.age} years old` : 'Age not specified'}
+                          </p>
                         </div>
                         {user.is_online && (
                           <Badge variant="success" className="ml-2">Online</Badge>
