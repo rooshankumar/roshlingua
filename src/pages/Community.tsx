@@ -177,49 +177,50 @@ const Community = () => {
   };
 
   const { user } = useAuth();
-  
+
   const handleStartChat = async (userId: string) => {
-    if (!user) return;
-    
     try {
-      // Check if conversation already exists
-      const { data: existingConv } = await supabase
-        .from('conversation_participants')
-        .select(`
-          conversation_id,
-          conversations:conversation_id (
-            id
-          )
-        `)
-        .eq('user_id', user.id)
-        .eq('conversation_id', supabase.from('conversation_participants')
-          .select('conversation_id')
-          .eq('user_id', userId));
-
-      if (existingConv?.length > 0) {
-        // Use existing conversation
-        navigate(`/chat/${existingConv[0].conversations.id}`);
-        return;
-      }
-
-      // Create new conversation if none exists
-      const { data: conversation, error: convError } = await supabase
+      // Create conversation
+      const { data: conversation, error: conversationError } = await supabase
         .from('conversations')
-        .insert({})
+        .insert({
+          created_at: new Date().toISOString()
+        })
         .select()
         .single();
 
-      if (convError) throw convError;
+      if (conversationError) {
+        console.error('Error creating conversation:', conversationError);
+        return;
+      }
 
-      // Add participants
-      const { error: partError } = await supabase
+      // Get current user
+      const { data: { user: currentUser } } = await supabase.auth.getUser();
+      if (!currentUser) {
+        console.error('No authenticated user found');
+        return;
+      }
+
+      // Add both users as participants
+      const { error: participantsError } = await supabase
         .from('conversation_participants')
         .insert([
-          { conversation_id: conversation.id, user_id: user.id },
-          { conversation_id: conversation.id, user_id: userId }
+          { 
+            conversation_id: conversation.id, 
+            user_id: userId,
+            last_read_at: new Date().toISOString()
+          },
+          { 
+            conversation_id: conversation.id, 
+            user_id: currentUser.id,
+            last_read_at: new Date().toISOString()
+          }
         ]);
 
-      if (partError) throw partError;
+      if (participantsError) {
+        console.error('Error adding participants:', participantsError);
+        return;
+      }
 
       // Navigate to the new chat
       navigate(`/chat/${conversation.id}`);
