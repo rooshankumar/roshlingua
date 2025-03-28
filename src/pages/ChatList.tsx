@@ -24,7 +24,7 @@ export default function ChatList() {
             id,
             created_at,
             participants:conversation_participants!inner (
-              user:user_id (
+              profile:user_id (
                 id,
                 username,
                 avatar_url,

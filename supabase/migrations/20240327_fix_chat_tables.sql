@@ -1,8 +1,11 @@
 
 -- Fix foreign key relationships
 ALTER TABLE conversation_participants
+DROP CONSTRAINT IF EXISTS conversation_participants_user_id_fkey;
+
+ALTER TABLE conversation_participants
 ADD CONSTRAINT conversation_participants_user_id_fkey 
-FOREIGN KEY (user_id) REFERENCES auth.users(id);
+FOREIGN KEY (user_id) REFERENCES profiles(id);
 
 ALTER TABLE conversation_participants
 ADD CONSTRAINT conversation_participants_conversation_id_fkey
