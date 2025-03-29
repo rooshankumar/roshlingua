@@ -73,10 +73,12 @@ export const fetchConversations = async (userId: string): Promise<Conversation[]
     .select(`
       *,
       conversation_participants!inner (
+        user_id,
         user:users!inner (
           id,
           email,
-          raw_user_meta_data
+          full_name,
+          avatar_url
         )
       )
     `)
@@ -89,8 +91,8 @@ export const fetchConversations = async (userId: string): Promise<Conversation[]
     participants: conv.conversation_participants?.map(p => ({
       id: p.user.id,
       email: p.user.email,
-      name: p.user.raw_user_meta_data?.full_name || p.user.email?.split('@')[0],
-      avatar: p.user.raw_user_meta_data?.avatar_url || '/placeholder.svg',
+      name: p.user.full_name || p.user.email?.split('@')[0],
+      avatar: p.user.avatar_url || '/placeholder.svg',
     })) || []
   })) || [];
 };
