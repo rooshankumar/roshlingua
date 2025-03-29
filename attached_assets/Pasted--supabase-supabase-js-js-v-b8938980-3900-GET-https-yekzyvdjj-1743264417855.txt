@@ -1,0 +1,29 @@
+@supabase_supabase-js.js?v=b8938980:3900 
+            
+            
+           GET https://yekzyvdjjozhhatdefsq.supabase.co/rest/v1/conversations?select=*%2Cconversation_participants%21inner%28user_id%2Cuser%3Aauth.users%21inner%28id%2Cemail%2Craw_user_meta_data%29%29&conversation_participants.user_id=eq.7bad0693-9053-423f-a2f0-a61c20b9cbf4 400 (Bad Request)
+(anonymous) @ @supabase_supabase-js.js?v=b8938980:3900
+(anonymous) @ @supabase_supabase-js.js?v=b8938980:3921
+fulfilled @ @supabase_supabase-js.js?v=b8938980:3873
+Promise.then
+step @ @supabase_supabase-js.js?v=b8938980:3886
+(anonymous) @ @supabase_supabase-js.js?v=b8938980:3888
+__awaiter6 @ @supabase_supabase-js.js?v=b8938980:3870
+(anonymous) @ @supabase_supabase-js.js?v=b8938980:3911
+then @ @supabase_supabase-js.js?v=b8938980:89Understand this errorAI
+Chat.tsx:26 Error loading conversations: {code: 'PGRST100', details: 'unexpected "u" expecting "sum", "avg", "count", "max" or "min"', hint: null, message: '"failed to parse select parameter (*,conversation_…,email,raw_user_meta_data)))" (line 1, column 53)'}code: "PGRST100"details: "unexpected \"u\" expecting \"sum\", \"avg\", \"count\", \"max\" or \"min\""hint: nullmessage: "\"failed to parse select parameter (*,conversation_participants!inner(user_id,user:auth.users!inner(id,email,raw_user_meta_data)))\" (line 1, column 53)"[[Prototype]]: Object
+loadConversations @ Chat.tsx:26
+await in loadConversations
+(anonymous) @ Chat.tsx:32
+commitHookEffectListMount @ chunk-W6L2VRDA.js?v=b8938980:16915
+commitPassiveMountOnFiber @ chunk-W6L2VRDA.js?v=b8938980:18156
+commitPassiveMountEffects_complete @ chunk-W6L2VRDA.js?v=b8938980:18129
+commitPassiveMountEffects_begin @ chunk-W6L2VRDA.js?v=b8938980:18119
+commitPassiveMountEffects @ chunk-W6L2VRDA.js?v=b8938980:18109
+flushPassiveEffectsImpl @ chunk-W6L2VRDA.js?v=b8938980:19490
+flushPassiveEffects @ chunk-W6L2VRDA.js?v=b8938980:19447
+commitRootImpl @ chunk-W6L2VRDA.js?v=b8938980:19416
+commitRoot @ chunk-W6L2VRDA.js?v=b8938980:19277
+performSyncWorkOnRoot @ chunk-W6L2VRDA.js?v=b8938980:18895
+flushSyncCallbacks @ chunk-W6L2VRDA.js?v=b8938980:9119
+(anonymous) @ chunk-W6L2VRDA.js?v=b8938980:18627Understand this errorAI
