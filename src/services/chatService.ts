@@ -1,5 +1,5 @@
 import { supabase } from '@/lib/supabase';
-import type { ChatMessage, ChatConversation } from '@/types/chat';
+import type { ChatMessage, ChatConversation, Message, Conversation } from '@/types/chat';
 
 // Placeholder useAuth hook -  Needs a proper implementation
 const useAuth = () => {
@@ -129,5 +129,77 @@ export const chatService = {
       });
 
     return channel;
+  },
+
+  async fetchConversations: async (userId: string): Promise<Conversation[]> => {
+    const { data, error } = await supabase
+      .from('conversations')
+      .select(`
+        *,
+        participants:conversation_participants(user:profiles(*)),
+        last_message:messages(*)
+      `)
+      .contains('participant_ids', [userId])
+      .order('updated_at', { ascending: false });
+
+    if (error) throw error;
+    return data || [];
+  },
+
+  async fetchMessages: async (conversationId: string): Promise<Message[]> => {
+    const { data, error } = await supabase
+      .from('messages')
+      .select('*')
+      .eq('conversation_id', conversationId)
+      .order('created_at', { ascending: true });
+
+    if (error) throw error;
+    return data || [];
+  },
+
+  async sendMessage: async (
+    conversationId: string,
+    senderId: string,
+    recipientId: string,
+    content: string
+  ): Promise<Message> => {
+    const { data, error } = await supabase
+      .from('messages')
+      .insert({
+        conversation_id: conversationId,
+        sender_id: senderId,
+        recipient_id: recipientId,
+        content: content
+      })
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  },
+
+  async markMessagesAsRead: async (conversationId: string, userId: string) => {
+    const { error } = await supabase
+      .from('messages')
+      .update({ is_read: true })
+      .eq('conversation_id', conversationId)
+      .eq('recipient_id', userId)
+      .eq('is_read', false);
+
+    if (error) throw error;
+  },
+
+  subscribeToMessages: (conversationId: string, callback: (message: Message) => void) => {
+    return supabase
+      .channel(`messages:${conversationId}`)
+      .on('INSERT', (payload) => callback(payload.new as Message))
+      .subscribe();
+  },
+
+  subscribeToConversations: (userId: string, callback: () => void) => {
+    return supabase
+      .channel(`conversations:${userId}`)
+      .on('*', callback)
+      .subscribe();
   }
 };
