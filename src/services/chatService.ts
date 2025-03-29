@@ -67,45 +67,43 @@ export const sendMessage = async (
 
 // Fetch conversations for a user
 export const fetchConversations = async (userId: string): Promise<Conversation[]> => {
-  const { data, error } = await supabase
+  // First get the conversation IDs for this user
+  const { data: participantData, error: participantError } = await supabase
     .from('conversation_participants')
-    .select(`
-      conversation:conversations!inner(*),
-      user:auth.users!inner(
-        id,
-        email,
-        raw_user_meta_data
-      )
-    `)
+    .select('conversation_id')
     .eq('user_id', userId);
 
-  if (error) throw error;
+  if (participantError) throw participantError;
+  if (!participantData?.length) return [];
 
-  // Transform the data structure
-  const conversations = data?.reduce((acc: any[], participant) => {
-    const existingConv = acc.find(c => c.id === participant.conversation.id);
-    if (existingConv) {
-      existingConv.participants.push({
-        id: participant.user.id,
-        email: participant.user.email,
-        name: participant.user.raw_user_meta_data?.full_name || participant.user.email.split('@')[0],
-        avatar: participant.user.raw_user_meta_data?.avatar_url || '/placeholder.svg',
-      });
-    } else {
-      acc.push({
-        ...participant.conversation,
-        participants: [{
-          id: participant.user.id,
-          email: participant.user.email,
-          name: participant.user.raw_user_meta_data?.full_name || participant.user.email.split('@')[0],
-          avatar: participant.user.raw_user_meta_data?.avatar_url || '/placeholder.svg',
-        }]
-      });
-    }
-    return acc;
-  }, []);
+  const conversationIds = participantData.map(p => p.conversation_id);
 
-  return conversations || [];
+  // Then get the conversations and their participants
+  const { data: conversations, error: conversationsError } = await supabase
+    .from('conversations')
+    .select(`
+      *,
+      participants:conversation_participants(
+        user:auth.users(
+          id,
+          email,
+          raw_user_meta_data
+        )
+      )
+    `)
+    .in('id', conversationIds);
+
+  if (conversationsError) throw conversationsError;
+
+  return conversations?.map(conv => ({
+    ...conv,
+    participants: conv.participants?.map(p => ({
+      id: p.user.id,
+      email: p.user.email,
+      name: p.user.raw_user_meta_data?.full_name || p.user.email?.split('@')[0],
+      avatar: p.user.raw_user_meta_data?.avatar_url || '/placeholder.svg',
+    })) || []
+  })) || [];
 };
 
 // Create a new conversation
