@@ -67,18 +67,15 @@ export const sendMessage = async (
 
 // Fetch conversations for a user
 export const fetchConversations = async (userId: string): Promise<Conversation[]> => {
-  // First get conversations where user is a participant
   const { data: conversations, error: conversationsError } = await supabase
     .from('conversations')
     .select(`
       *,
       conversation_participants!inner (
         user_id,
-        user:users!inner (
+        users:user_id (
           id,
-          email,
-          full_name,
-          avatar_url
+          email
         )
       )
     `)
@@ -89,10 +86,10 @@ export const fetchConversations = async (userId: string): Promise<Conversation[]
   return conversations?.map(conv => ({
     ...conv,
     participants: conv.conversation_participants?.map(p => ({
-      id: p.user.id,
-      email: p.user.email,
-      name: p.user.full_name || p.user.email?.split('@')[0],
-      avatar: p.user.avatar_url || '/placeholder.svg',
+      id: p.users.id,
+      email: p.users.email,
+      name: p.users.email?.split('@')[0],
+      avatar: '/placeholder.svg',
     })) || []
   })) || [];
 };
