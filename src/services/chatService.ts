@@ -72,9 +72,8 @@ export const fetchConversations = async (userId: string): Promise<Conversation[]
     .from('conversations')
     .select(`
       *,
-      conversation_participants!inner(
-        user_id,
-        user:auth.users!inner(
+      conversation_participants!inner (
+        user:users!inner (
           id,
           email,
           raw_user_meta_data
@@ -88,10 +87,10 @@ export const fetchConversations = async (userId: string): Promise<Conversation[]
   return conversations?.map(conv => ({
     ...conv,
     participants: conv.conversation_participants?.map(p => ({
-      id: p.users.id,
-      email: p.users.email,
-      name: p.users.raw_user_meta_data?.full_name || p.users.email?.split('@')[0],
-      avatar: p.users.raw_user_meta_data?.avatar_url || '/placeholder.svg',
+      id: p.user.id,
+      email: p.user.email,
+      name: p.user.raw_user_meta_data?.full_name || p.user.email?.split('@')[0],
+      avatar: p.user.raw_user_meta_data?.avatar_url || '/placeholder.svg',
     })) || []
   })) || [];
 };
