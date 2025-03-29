@@ -1,81 +1,113 @@
 
-import { Message } from "@/types/chat";
-import { cn } from "@/lib/utils";
-import { format } from "date-fns";
-import { Check, CheckCheck } from "lucide-react";
-
-interface MessageBubbleProps {
-  message: Message;
-  isOwnMessage: boolean;
-}
-
-export const MessageBubble = ({ message, isOwnMessage }: MessageBubbleProps) => {
-  const timestamp = format(new Date(message.created_at), "h:mm a");
-  
-  return (
-    <div
-      className={cn(
-        "flex gap-2",
-        isOwnMessage ? "justify-end" : "justify-start"
-      )}
-    >
-      <div
-        className={cn(
-          "relative max-w-[80%] px-4 py-2 rounded-lg",
-          isOwnMessage
-            ? "bg-chat-primary text-white rounded-br-none"
-            : "bg-muted rounded-bl-none"
-        )}
-      >
-        <p>{message.content}</p>
-        <div className={cn(
-          "flex items-center text-xs mt-1 gap-1",
-          isOwnMessage ? "text-white/70 justify-end" : "text-muted-foreground"
-        )}>
-          <span>{timestamp}</span>
-          {isOwnMessage && (
-            message.is_read ? <CheckCheck className="h-3 w-3" /> : <Check className="h-3 w-3" />
-          )}
-        </div>
-      </div>
-    </div>
-  );
-};
 import { useState } from "react";
 import { Message } from "@/types/chat";
 import { Button } from "@/components/ui/button";
-import { Translate, VolumeIcon, BookMark } from "lucide-react";
+import { Translate, VolumeIcon, BookMark, Check } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface MessageBubbleProps {
   message: Message;
   isOwnMessage: boolean;
+  learningLanguage: string;
+  nativeLanguage: string;
 }
 
-export const MessageBubble = ({ message, isOwnMessage }: MessageBubbleProps) => {
+export const MessageBubble = ({ 
+  message, 
+  isOwnMessage,
+  learningLanguage,
+  nativeLanguage
+}: MessageBubbleProps) => {
   const [showTranslation, setShowTranslation] = useState(false);
+  const [isSaved, setIsSaved] = useState(false);
   const [translation, setTranslation] = useState("");
 
+  const handleTranslate = async () => {
+    if (!showTranslation) {
+      // Mock translation - replace with actual translation API
+      setTranslation("This is a translated version of the message");
+    }
+    setShowTranslation(!showTranslation);
+  };
+
+  const handleSpeak = () => {
+    const utterance = new SpeechSynthesisUtterance(message.content);
+    utterance.lang = learningLanguage.toLowerCase().includes('english') ? 'en-US' : 'es-ES';
+    window.speechSynthesis.speak(utterance);
+  };
+
+  const handleSave = () => {
+    setIsSaved(!isSaved);
+    // Add to saved phrases in your backend
+  };
+
   return (
-    <div className={`flex flex-col gap-1 max-w-[80%] ${isOwnMessage ? "ml-auto" : ""}`}>
+    <div 
+      className={`flex flex-col gap-1 max-w-[80%] ${isOwnMessage ? "ml-auto items-end" : ""}`}
+    >
       <div
         className={`p-3 rounded-lg ${
           isOwnMessage ? "bg-primary text-primary-foreground" : "bg-muted"
         }`}
       >
         <p>{message.content}</p>
-        {showTranslation && <p className="mt-2 text-sm opacity-80">{translation}</p>}
+        {showTranslation && (
+          <div className="mt-2 pt-2 border-t border-primary/20 text-sm opacity-80">
+            {translation}
+          </div>
+        )}
       </div>
       
-      <div className={`flex gap-2 ${isOwnMessage ? "justify-end" : ""}`}>
-        <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-          <Translate className="h-4 w-4" />
-        </Button>
-        <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-          <VolumeIcon className="h-4 w-4" />
-        </Button>
-        <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-          <BookMark className="h-4 w-4" />
-        </Button>
+      <div className="flex gap-1">
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="h-8 w-8 p-0" 
+              onClick={handleTranslate}
+            >
+              <Translate className="h-4 w-4" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            {showTranslation ? "Hide translation" : "Show translation"}
+          </TooltipContent>
+        </Tooltip>
+
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="h-8 w-8 p-0"
+              onClick={handleSpeak}
+            >
+              <VolumeIcon className="h-4 w-4" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>Listen to pronunciation</TooltipContent>
+        </Tooltip>
+
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="h-8 w-8 p-0"
+              onClick={handleSave}
+            >
+              {isSaved ? (
+                <Check className="h-4 w-4 text-green-500" />
+              ) : (
+                <BookMark className="h-4 w-4" />
+              )}
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            {isSaved ? "Saved to phrases" : "Save phrase"}
+          </TooltipContent>
+        </Tooltip>
       </div>
     </div>
   );
