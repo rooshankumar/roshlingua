@@ -186,7 +186,7 @@ export const fetchConversationsOld = async (userId: string) => {
         .map((p) => ({
           id: p.user.id,
           email: p.user.email,
-          name: p.user.raw_user_meta_data?.full_name || p.user.email?.split('@')[0],
+          name: p.user.raw_user_meta_data?.full_name || p.user.raw_user_meta_data?.name || p.user.email?.split('@')[0],
           avatar: p.user.raw_user_meta_data?.avatar_url || '/placeholder.svg',
         })) || [],
     lastMessage: conv.messages?.[0],
