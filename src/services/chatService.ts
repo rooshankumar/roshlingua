@@ -67,41 +67,34 @@ export const sendMessage = async (
 
 // Fetch conversations for a user
 export const fetchConversations = async (userId: string): Promise<Conversation[]> => {
-  // First get the conversation IDs for this user
-  const { data: participantData, error: participantError } = await supabase
-    .from('conversation_participants')
-    .select('conversation_id')
-    .eq('user_id', userId);
-
-  if (participantError) throw participantError;
-  if (!participantData?.length) return [];
-
-  const conversationIds = participantData.map(p => p.conversation_id);
-
-  // Then get the conversations and their participants
   const { data: conversations, error: conversationsError } = await supabase
     .from('conversations')
     .select(`
       *,
-      participants:conversation_participants(
-        user:auth.users(
+      conversation_participants(
+        auth.users(
           id,
           email,
           raw_user_meta_data
         )
       )
     `)
-    .in('id', conversationIds);
+    .in('id', (
+      supabase
+        .from('conversation_participants')
+        .select('conversation_id')
+        .eq('user_id', userId)
+    ));
 
   if (conversationsError) throw conversationsError;
 
   return conversations?.map(conv => ({
     ...conv,
-    participants: conv.participants?.map(p => ({
-      id: p.user.id,
-      email: p.user.email,
-      name: p.user.raw_user_meta_data?.full_name || p.user.email?.split('@')[0],
-      avatar: p.user.raw_user_meta_data?.avatar_url || '/placeholder.svg',
+    participants: conv.conversation_participants?.map(p => ({
+      id: p.users.id,
+      email: p.users.email,
+      name: p.users.raw_user_meta_data?.full_name || p.users.email?.split('@')[0],
+      avatar: p.users.raw_user_meta_data?.avatar_url || '/placeholder.svg',
     })) || []
   })) || [];
 };
