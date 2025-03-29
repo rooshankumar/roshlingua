@@ -17,25 +17,21 @@ export default function ChatList() {
 
     const fetchConversations = async () => {
       try {
+        // Temporarily simplified query for debugging
+        console.log("Fetching conversations for user ID:", user.id);
         const { data, error } = await supabase
           .from('conversation_participants')
           .select(`
             conversation_id,
             conversations:conversation_id (
               id,
-              created_at,
-              participants:conversation_participants!inner (
-                profiles:user_id (
-                  id,
-                  username,
-                  avatar_url,
-                  is_online,
-                  last_seen
-                )
-              )
+              created_at
             )
           `)
           .eq('user_id', user.id);
+        
+        console.log("Raw conversation data:", data);
+        console.log("Query error:", error);
 
         if (error) {
           console.error('Error fetching conversations:', error);
@@ -122,13 +118,24 @@ export default function ChatList() {
     );
   };
 
+  const handleDebug = async () => {
+    const { debugConversations } = await import('@/utils/debugSupabase');
+    await debugConversations();
+    alert('Check console for debug info');
+  };
+
   return (
     <div className="container max-w-2xl mx-auto p-4">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Your Conversations</h1>
-        <Button asChild>
-          <Link to="/community">Start New Chat</Link>
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={handleDebug} size="sm">
+            Debug DB
+          </Button>
+          <Button asChild>
+            <Link to="/community">Start New Chat</Link>
+          </Button>
+        </div>
       </div>
       {renderContent()}
     </div>
