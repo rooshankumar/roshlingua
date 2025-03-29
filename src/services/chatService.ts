@@ -1,7 +1,7 @@
 import { supabase } from '@/lib/supabase';
 import { Message, Conversation } from '@/types/chat';
 
-// Placeholder useAuth hook -  Needs a proper implementation
+// Placeholder useAuth hook - Needs a proper implementation
 const useAuth = () => {
   const user = { id: 'user-id' };
   return { user };
@@ -43,35 +43,6 @@ export const createConversation = async (otherUserId: string) => {
   }
 };
 
-export const getConversations = async (userId: string) => {
-  const { data, error } = await supabase
-    .from('conversations')
-    .select(`
-      *,
-      participants:conversation_participants(user:profiles(*)),
-      messages(*)
-    `)
-    .contains('participant_ids', [userId])
-    .order('created_at', { ascending: false });
-
-  if (error) throw error;
-  return data || [];
-};
-
-export const getMessages = async (conversationId: string) => {
-  const { data, error } = await supabase
-    .from('messages')
-    .select(`
-      *,
-      sender:profiles!sender_id(*),
-      recipient:profiles!recipient_id(*)
-    `)
-    .eq('conversation_id', conversationId)
-    .order('created_at', { ascending: true });
-
-  if (error) throw error;
-  return data || [];
-};
 
 export const sendMessage = async (
   conversationId: string,
@@ -102,37 +73,48 @@ export const markMessagesAsRead = async (conversationId: string, userId: string)
     .from('messages')
     .update({ is_read: true })
     .eq('conversation_id', conversationId)
-    .eq('recipient_id', userId)
-    .eq('is_read', false);
+    .eq('recipient_id', userId);
 
   if (error) throw error;
 };
 
-export const subscribeToMessages = (callback: (message: Message) => void) => {
-  return supabase
-    .channel('messages')
+export const subscribeToMessages = (conversationId: string, callback: (message: Message) => void) => {
+  const channel = supabase
+    .channel(`conversation:${conversationId}`)
     .on(
       'postgres_changes',
-      { event: 'INSERT', schema: 'public', table: 'messages' },
+      {
+        event: 'INSERT',
+        schema: 'public',
+        table: 'messages',
+        filter: `conversation_id=eq.${conversationId}`
+      },
       (payload) => callback(payload.new as Message)
     )
     .subscribe();
+
+  return () => {
+    channel.unsubscribe();
+  };
 };
 
 export const subscribeToConversations = (userId: string, callback: () => void) => {
-  return supabase
-    .channel('conversations')
+  const channel = supabase
+    .channel(`user_conversations:${userId}`)
     .on(
       'postgres_changes',
       {
         event: '*',
         schema: 'public',
-        table: 'conversations',
-        filter: `participant_ids=cs.{${userId}}`
+        table: 'conversations'
       },
       () => callback()
     )
     .subscribe();
+
+  return () => {
+    channel.unsubscribe();
+  };
 };
 
 export const fetchConversations = async (userId: string): Promise<Conversation[]> => {
@@ -140,14 +122,41 @@ export const fetchConversations = async (userId: string): Promise<Conversation[]
     .from('conversations')
     .select(`
       *,
-      conversation_participants!inner(user_id, conversation_id),
-      profiles!conversation_participants(*)
+      conversation_participants!inner (
+        profiles (
+          id,
+          name,
+          avatar_url,
+          last_seen
+        )
+      ),
+      messages (
+        id,
+        content,
+        created_at,
+        sender_id,
+        recipient_id,
+        is_read
+      )
     `)
     .eq('conversation_participants.user_id', userId)
     .order('updated_at', { ascending: false });
 
   if (error) throw error;
-  return data || [];
+
+  return data?.map(conversation => ({
+    id: conversation.id,
+    participants: conversation.conversation_participants.map(p => ({
+      id: p.profiles.id,
+      name: p.profiles.name,
+      avatar: p.profiles.avatar_url,
+      lastSeen: p.profiles.last_seen
+    })),
+    lastMessage: conversation.messages[0],
+    createdAt: conversation.created_at,
+    lastMessageAt: conversation.messages[0]?.created_at || conversation.created_at,
+    unreadCount: conversation.messages.filter(m => !m.is_read && m.recipient_id === userId).length
+  })) || [];
 };
 
 export const fetchMessages = async (conversationId: string): Promise<Message[]> => {
