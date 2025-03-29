@@ -1,0 +1,174 @@
+[plugin:vite:react-swc] × the name `supabase` is defined multiple times
+     ╭─[/home/runner/workspace/src/services/chatService.ts:1:1]
+   1 │ import { supabase } from '@/lib/supabase';
+     ·          ────┬───
+     ·              ╰── previous definition of `supabase` here
+   2 │ import { Message, Conversation } from '@/types/chat';
+   3 │ 
+   4 │ export const subscribeToMessages = (
+   5 │   conversationId: string,
+   6 │   onMessage: (message: Message) => void
+   7 │ ) => {
+   8 │   const channel = supabase
+   9 │     .channel(`messages:${conversationId}`)
+  10 │     .on(
+  11 │       'postgres_changes',
+  12 │       {
+  13 │         event: 'INSERT',
+  14 │         schema: 'public',
+  15 │         table: 'messages',
+  16 │         filter: `conversation_id=eq.${conversationId}`
+  17 │       },
+  18 │       (payload) => {
+  19 │         onMessage(payload.new as Message);
+  20 │       }
+  21 │     )
+  22 │     .subscribe();
+  23 │ 
+  24 │   return () => {
+  25 │     channel.unsubscribe();
+  26 │   };
+  27 │ };
+  28 │ 
+  29 │ export const subscribeToConversations = (
+  30 │   userId: string,
+  31 │   onUpdate: () => void
+  32 │ ) => {
+  33 │   const channel = supabase
+  34 │     .channel(`conversations:${userId}`)
+  35 │     .on(
+  36 │       'postgres_changes',
+  37 │       {
+  38 │         event: '*',
+  39 │         schema: 'public',
+  40 │         table: 'conversations',
+  41 │       },
+  42 │       () => {
+  43 │         onUpdate();
+  44 │       }
+  45 │     )
+  46 │     .subscribe();
+  47 │ 
+  48 │   return () => {
+  49 │     channel.unsubscribe();
+  50 │   };
+  51 │ };
+  52 │ 
+  53 │ export const fetchConversations = async (userId: string) => {
+  54 │   // First get conversations where user is a participant
+  55 │   const { data: participantData, error: participantError } = await supabase
+  56 │     .from('conversation_participants')
+  57 │     .select('conversation_id')
+  58 │     .eq('user_id', userId);
+  59 │ 
+  60 │   if (participantError) throw participantError;
+  61 │   if (!participantData?.length) return [];
+  62 │ 
+  63 │   const conversationIds = participantData.map(p => p.conversation_id);
+  64 │ 
+  65 │   // Then fetch those conversations with their last messages
+  66 │   const { data: conversations, error: conversationsError } = await supabase
+  67 │     .from('conversations')
+  68 │     .select(`
+  69 │       *,
+  70 │       messages(*)
+  71 │     `)
+  72 │     .in('id', conversationIds)
+  73 │     .order('created_at', { ascending: false });
+  74 │ 
+  75 │   if (conversationsError) throw conversationsError;
+  76 │ 
+  77 │   // Get participant details
+  78 │   const { data: participants, error: participantsError } = await supabase
+  79 │     .from('conversation_participants')
+  80 │     .select(`
+  81 │       conversation_id,
+  82 │       user_id,
+  83 │       user:auth.users!inner(
+  84 │         id,
+  85 │         email,
+  86 │         user_metadata->full_name,
+  87 │         user_metadata->avatar_url
+  88 │       )
+  89 │     `)
+  90 │     .in('conversation_id', conversationIds);
+  91 │ 
+  92 │   if (participantsError) throw participantsError;
+  93 │ 
+  94 │   // Combine the data
+  95 │   return conversations?.map(conv => ({
+  96 │     ...conv,
+  97 │     participants: participants
+  98 │       ?.filter(p => p.conversation_id === conv.id)
+  99 │       .map(p => ({
+ 100 │         id: p.user.id,
+ 101 │         email: p.user.email,
+ 102 │         name: p.user.user_metadata?.full_name || p.user.email?.split('@')[0],
+ 103 │         avatar: p.user.user_metadata?.avatar_url
+ 104 │       })) || [],
+ 105 │     lastMessage: conv.messages?.[0]
+ 106 │   }));
+ 107 │ };
+ 108 │ 
+ 109 │ export const fetchMessages = async (conversationId: string): Promise<Message[]> => {
+ 110 │   const { data, error } = await supabase
+ 111 │     .from('messages')
+ 112 │     .select('*')
+ 113 │     .eq('conversation_id', conversationId)
+ 114 │     .order('created_at', { ascending: true });
+ 115 │ 
+ 116 │   if (error) throw error;
+ 117 │   return data || [];
+ 118 │ };
+ 119 │ 
+ 120 │ export const sendMessage = async (
+ 121 │   conversationId: string,
+ 122 │   senderId: string,
+ 123 │   recipientId: string,
+ 124 │   content: string
+ 125 │ ): Promise<Message | null> => {
+ 126 │   const message = {
+ 127 │     conversation_id: conversationId,
+ 128 │     sender_id: senderId,
+ 129 │     recipient_id: recipientId,
+ 130 │     content: content,
+ 131 │     is_read: false
+ 132 │   };
+ 133 │ 
+ 134 │   const { data, error } = await supabase
+ 135 │     .from('messages')
+ 136 │     .insert([message])
+ 137 │     .select()
+ 138 │     .single();
+ 139 │ 
+ 140 │   if (error) {
+ 141 │     console.error('Error sending message:', error);
+ 142 │     return null;
+ 143 │   }
+ 144 │ 
+ 145 │   return data;
+ 146 │ };
+ 147 │ 
+ 148 │ export const markMessagesAsRead = async (
+ 149 │   conversationId: string,
+ 150 │   userId: string
+ 151 │ ) => {
+ 152 │   const { error } = await supabase
+ 153 │     .from('messages')
+ 154 │     .update({ is_read: true })
+ 155 │     .eq('conversation_id', conversationId)
+ 156 │     .eq('recipient_id', userId)
+ 157 │     .eq('is_read', false);
+ 158 │ 
+ 159 │   if (error) {
+ 160 │     console.error('Error marking messages as read:', error);
+ 161 │   }
+ 162 │ };
+ 163 │ 
+ 164 │ import { supabase } from '@/lib/supabase';
+     ·          ────┬───
+     ·              ╰── `supabase` redefined here
+ 165 │ 
+ 166 │ export interface Chat {
+ 167 │   id: string;
+     ╰────
