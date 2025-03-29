@@ -56,7 +56,7 @@ export const subscribeToMessages = (conversationId: string, onMessage: (message:
   // Subscribe to user presence
   channel.track({
     online_at: new Date().toISOString(),
-    user_id: supabase.auth.user()?.id
+    user_id: (await supabase.auth.getUser()).data.user?.id
   });
 
   subscriptions.set(conversationId, channel);
