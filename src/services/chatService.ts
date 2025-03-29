@@ -44,6 +44,40 @@ export const createConversation = async (otherUserId: string) => {
 };
 
 
+export const fetchConversations = async (userId: string): Promise<Conversation[]> => {
+  const { data, error } = await supabase
+    .from('conversations')
+    .select(`
+      *,
+      participants:conversation_participants(
+        user_id,
+        user:auth.users(
+          id,
+          email,
+          user_metadata->>full_name as name,
+          user_metadata->>avatar_url as avatar
+        )
+      ),
+      last_message:messages(*)
+    `)
+    .contains('participant_ids', [userId])
+    .order('updated_at', { ascending: false });
+
+  if (error) throw error;
+  return data || [];
+};
+
+export const fetchMessages = async (conversationId: string): Promise<Message[]> => {
+  const { data, error } = await supabase
+    .from('messages')
+    .select('*')
+    .eq('conversation_id', conversationId)
+    .order('created_at', { ascending: true });
+
+  if (error) throw error;
+  return data || [];
+};
+
 export const sendMessage = async (
   conversationId: string,
   senderId: string,
@@ -71,7 +105,8 @@ export const markMessagesAsRead = async (conversationId: string, userId: string)
     .from('messages')
     .update({ is_read: true })
     .eq('conversation_id', conversationId)
-    .eq('recipient_id', userId);
+    .eq('recipient_id', userId)
+    .eq('is_read', false);
 
   if (error) throw error;
 };
@@ -105,58 +140,4 @@ export const subscribeToConversations = (userId: string, callback: () => void) =
       () => callback()
     )
     .subscribe();
-};
-
-export const fetchConversations = async (userId: string): Promise<Conversation[]> => {
-  const { data, error } = await supabase
-    .from('conversations')
-    .select(`
-      *,
-      conversation_participants!inner (
-        user_id,
-        profiles!inner (
-          id,
-          name,
-          avatar_url,
-          last_seen
-        )
-      ),
-      messages (
-        id,
-        content,
-        created_at,
-        sender_id,
-        recipient_id,
-        is_read
-      )
-    `)
-    .eq('conversation_participants.user_id', userId)
-    .order('updated_at', { ascending: false });
-
-  if (error) throw error;
-
-  return data?.map(conversation => ({
-    id: conversation.id,
-    participants: conversation.conversation_participants.map(p => ({
-      id: p.profiles.id,
-      name: p.profiles.name,
-      avatar: p.profiles.avatar_url,
-      lastSeen: p.profiles.last_seen
-    })),
-    lastMessage: conversation.messages?.[0],
-    createdAt: conversation.created_at,
-    lastMessageAt: conversation.messages?.[0]?.created_at || conversation.created_at,
-    unreadCount: conversation.messages?.filter(m => !m.is_read && m.recipient_id === userId).length || 0
-  })) || [];
-};
-
-export const fetchMessages = async (conversationId: string): Promise<Message[]> => {
-  const { data, error } = await supabase
-    .from('messages')
-    .select('*')
-    .eq('conversation_id', conversationId)
-    .order('created_at', { ascending: true });
-
-  if (error) throw error;
-  return data || [];
 };
