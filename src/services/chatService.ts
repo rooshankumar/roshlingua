@@ -4,7 +4,7 @@ import { Message, Conversation } from '@/types/chat';
 const subscriptions = new Map(); // To prevent duplicate subscriptions
 
 // Subscribe to new messages in a conversation (Prevents Duplicates)
-export const subscribeToMessages = (conversationId: string, onMessage: (message: Message) => void, onRead: (messageId: string) => void) => {
+export const subscribeToMessages = async (conversationId: string, onMessage: (message: Message) => void, onRead: (messageId: string) => void) => {
   if (subscriptions.has(conversationId)) return subscriptions.get(conversationId);
 
   const channel = supabase
