@@ -60,7 +60,7 @@ export const fetchConversations = async (userId: string): Promise<Conversation[]
       ),
       last_message:messages(*)
     `)
-    .eq('participant_ids', userId)
+    .contains('participant_ids', [userId])
     .order('updated_at', { ascending: false });
 
   if (error) throw error;
