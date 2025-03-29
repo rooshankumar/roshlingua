@@ -1,42 +1,43 @@
+
 import { useState, useEffect } from "react";
-import { useAuth } from "@/hooks/useAuth";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { useAuth } from "@/providers/AuthProvider";
 import { Loader2 } from "lucide-react";
-import { Chat, fetchChats, sendChat, subscribeToChats } from "@/services/chatService";
+import { fetchConversations, subscribeToConversations } from "@/services/chatService";
+import { Conversation } from "@/types/chat";
+import { ChatScreen } from "@/components/chat/ChatScreen";
 
 const ChatPage = () => {
-  const [messages, setMessages] = useState<Chat[]>([]);
-  const [newMessage, setNewMessage] = useState("");
-  const [isLoading, setIsLoading] = useState(true);
   const { user } = useAuth();
+  const [conversations, setConversations] = useState<Conversation[]>([]);
+  const [activeConversation, setActiveConversation] = useState<Conversation | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const loadChats = async () => {
-      const chats = await fetchChats();
-      setMessages(chats);
-      setIsLoading(false);
+    if (!user) return;
+
+    const loadConversations = async () => {
+      try {
+        const convs = await fetchConversations(user.id);
+        setConversations(convs);
+        if (convs.length > 0) {
+          setActiveConversation(convs[0]);
+        }
+      } catch (error) {
+        console.error('Error loading conversations:', error);
+      } finally {
+        setIsLoading(false);
+      }
     };
 
-    loadChats();
+    loadConversations();
 
-    // Subscribe to new chats
-    const unsubscribe = subscribeToChats((chat) => {
-      setMessages((prev) => [chat, ...prev]);
-    });
+    // Subscribe to conversation updates
+    const unsubscribe = subscribeToConversations(user.id, loadConversations);
 
     return () => {
       unsubscribe();
     };
-  }, []);
-
-  const handleSendMessage = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!user || !newMessage.trim()) return;
-
-    await sendChat(newMessage, user.id);
-    setNewMessage("");
-  };
+  }, [user]);
 
   if (!user) {
     return (
@@ -55,30 +56,44 @@ const ChatPage = () => {
   }
 
   return (
-    <div className="h-screen flex flex-col p-4 max-w-2xl mx-auto">
-      <div className="flex-1 overflow-y-auto space-y-4 mb-4">
-        {messages.map((message) => (
-          <div
-            key={message.id}
-            className={`p-3 rounded-lg max-w-[80%] ${
-              message.sender_id === user.id
-                ? "ml-auto bg-primary text-primary-foreground"
-                : "bg-muted"
-            }`}
-          >
-            {message.content}
-          </div>
-        ))}
+    <div className="h-screen flex">
+      {/* Conversations List */}
+      <div className="w-80 border-r bg-muted/30">
+        <div className="p-4 border-b">
+          <h2 className="font-semibold">Conversations</h2>
+        </div>
+        <div className="overflow-y-auto">
+          {conversations.map((conv) => {
+            const partner = conv.participants.find(p => p.id !== user.id);
+            if (!partner) return null;
+            return (
+              <button
+                key={conv.id}
+                onClick={() => setActiveConversation(conv)}
+                className={`w-full p-4 text-left hover:bg-muted/50 ${
+                  activeConversation?.id === conv.id ? 'bg-muted' : ''
+                }`}
+              >
+                <div className="font-medium">{partner.name}</div>
+                <div className="text-sm text-muted-foreground truncate">
+                  {conv.lastMessage?.content || 'No messages yet'}
+                </div>
+              </button>
+            );
+          })}
+        </div>
       </div>
-      <form onSubmit={handleSendMessage} className="flex gap-2">
-        <Input
-          value={newMessage}
-          onChange={(e) => setNewMessage(e.target.value)}
-          placeholder="Type a message..."
-          className="flex-1"
-        />
-        <Button type="submit">Send</Button>
-      </form>
+
+      {/* Active Chat */}
+      <div className="flex-1">
+        {activeConversation ? (
+          <ChatScreen conversation={activeConversation} />
+        ) : (
+          <div className="h-full flex items-center justify-center text-muted-foreground">
+            Select a conversation to start chatting
+          </div>
+        )}
+      </div>
     </div>
   );
 };
