@@ -18,5 +18,4 @@ export const useMobile = (breakpoint = 768) => {
   return isMobile;
 };
 
-export { useIsMobile as useMobile };
-export default useIsMobile;
+export default useMobile;
