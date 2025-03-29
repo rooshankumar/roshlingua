@@ -4,18 +4,25 @@ import { useParams } from 'react-router-dom';
 import { useSupabase } from '@/hooks/useSupabase';
 import { useAuth } from '@/providers/AuthProvider';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
+import { Languages, Circle } from 'lucide-react';
 import { Profile } from '@/lib/database.types';
+import { User } from '@/types/chat';
 
-export default function ChatHeader() {
+interface ChatHeaderProps {
+  partner?: User;
+}
+
+export const ChatHeader = ({ partner }: ChatHeaderProps) => {
   const { id } = useParams();
   const { supabase } = useSupabase();
   const { user } = useAuth();
   const [otherUser, setOtherUser] = useState<Profile | null>(null);
 
   useEffect(() => {
-    async function getOtherUserInfo() {
-      if (!id || !user) return;
+    if (!id || !user || partner) return;
 
+    async function getOtherUserInfo() {
       const { data: participants, error } = await supabase
         .from('conversation_participants')
         .select(`
@@ -43,7 +50,36 @@ export default function ChatHeader() {
     }
 
     getOtherUserInfo();
-  }, [id, supabase, user]);
+  }, [id, supabase, user, partner]);
+
+  if (partner) {
+    return (
+      <div className="border-b p-4 flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <Avatar>
+            <AvatarImage src={partner.avatar} />
+            <AvatarFallback>{partner.name[0]}</AvatarFallback>
+          </Avatar>
+          <div>
+            <div className="flex items-center gap-2">
+              <h3 className="font-semibold">{partner.name}</h3>
+              <Circle className={`h-3 w-3 ${partner.isOnline ? "fill-green-500" : "fill-gray-400"}`} />
+            </div>
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <div className="flex items-center gap-1">
+                <Languages className="h-4 w-4" />
+                <Badge variant="secondary">{partner.nativeLanguage}</Badge>
+                <span>→</span>
+                <Badge>{partner.learningLanguage}</Badge>
+              </div>
+              <span>•</span>
+              <span>Streak: {partner.streakCount} days</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="border-b">
@@ -62,43 +98,6 @@ export default function ChatHeader() {
             </div>
           </>
         )}
-      </div>
-    </div>
-  );
-}
-import { User } from "@/types/chat";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
-import { Languages, Circle } from "lucide-react";
-
-interface ChatHeaderProps {
-  partner: User;
-}
-
-export const ChatHeader = ({ partner }: ChatHeaderProps) => {
-  return (
-    <div className="border-b p-4 flex items-center justify-between">
-      <div className="flex items-center gap-3">
-        <Avatar>
-          <AvatarImage src={partner.avatar} />
-          <AvatarFallback>{partner.name[0]}</AvatarFallback>
-        </Avatar>
-        <div>
-          <div className="flex items-center gap-2">
-            <h3 className="font-semibold">{partner.name}</h3>
-            <Circle className={`h-3 w-3 ${partner.isOnline ? "fill-green-500" : "fill-gray-400"}`} />
-          </div>
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <div className="flex items-center gap-1">
-              <Languages className="h-4 w-4" />
-              <Badge variant="secondary">{partner.nativeLanguage}</Badge>
-              <span>→</span>
-              <Badge>{partner.learningLanguage}</Badge>
-            </div>
-            <span>•</span>
-            <span>Streak: {partner.streakCount} days</span>
-          </div>
-        </div>
       </div>
     </div>
   );
