@@ -41,3 +41,42 @@ export const MessageBubble = ({ message, isOwnMessage }: MessageBubbleProps) => 
     </div>
   );
 };
+import { useState } from "react";
+import { Message } from "@/types/chat";
+import { Button } from "@/components/ui/button";
+import { Translate, VolumeIcon, BookMark } from "lucide-react";
+
+interface MessageBubbleProps {
+  message: Message;
+  isOwnMessage: boolean;
+}
+
+export const MessageBubble = ({ message, isOwnMessage }: MessageBubbleProps) => {
+  const [showTranslation, setShowTranslation] = useState(false);
+  const [translation, setTranslation] = useState("");
+
+  return (
+    <div className={`flex flex-col gap-1 max-w-[80%] ${isOwnMessage ? "ml-auto" : ""}`}>
+      <div
+        className={`p-3 rounded-lg ${
+          isOwnMessage ? "bg-primary text-primary-foreground" : "bg-muted"
+        }`}
+      >
+        <p>{message.content}</p>
+        {showTranslation && <p className="mt-2 text-sm opacity-80">{translation}</p>}
+      </div>
+      
+      <div className={`flex gap-2 ${isOwnMessage ? "justify-end" : ""}`}>
+        <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+          <Translate className="h-4 w-4" />
+        </Button>
+        <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+          <VolumeIcon className="h-4 w-4" />
+        </Button>
+        <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+          <BookMark className="h-4 w-4" />
+        </Button>
+      </div>
+    </div>
+  );
+};

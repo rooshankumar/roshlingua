@@ -66,3 +66,40 @@ export default function ChatHeader() {
     </div>
   );
 }
+import { User } from "@/types/chat";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Languages, Circle } from "lucide-react";
+
+interface ChatHeaderProps {
+  partner: User;
+}
+
+export const ChatHeader = ({ partner }: ChatHeaderProps) => {
+  return (
+    <div className="border-b p-4 flex items-center justify-between">
+      <div className="flex items-center gap-3">
+        <Avatar>
+          <AvatarImage src={partner.avatar} />
+          <AvatarFallback>{partner.name[0]}</AvatarFallback>
+        </Avatar>
+        <div>
+          <div className="flex items-center gap-2">
+            <h3 className="font-semibold">{partner.name}</h3>
+            <Circle className={`h-3 w-3 ${partner.isOnline ? "fill-green-500" : "fill-gray-400"}`} />
+          </div>
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            <div className="flex items-center gap-1">
+              <Languages className="h-4 w-4" />
+              <Badge variant="secondary">{partner.nativeLanguage}</Badge>
+              <span>→</span>
+              <Badge>{partner.learningLanguage}</Badge>
+            </div>
+            <span>•</span>
+            <span>Streak: {partner.streakCount} days</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
