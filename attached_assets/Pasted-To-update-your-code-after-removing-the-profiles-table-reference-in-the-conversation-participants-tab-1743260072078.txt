@@ -1,0 +1,129 @@
+To update your code after removing the profiles table reference in the conversation_participants table, follow these steps:
+
+1️⃣ Update Your SQL Queries
+If you were using profiles before, update your queries to reference auth.users.
+
+Example 1: Selecting User Details
+Before (Using profiles)
+sql
+Copy
+Edit
+SELECT cp.*, p.username, p.avatar_url
+FROM conversation_participants cp
+JOIN profiles p ON cp.user_id = p.id
+WHERE cp.conversation_id = 'some_conversation_id';
+After (Using auth.users)
+sql
+Copy
+Edit
+SELECT cp.*, u.username, u.avatar_url
+FROM conversation_participants cp
+JOIN auth.users u ON cp.user_id = u.id
+WHERE cp.conversation_id = 'some_conversation_id';
+✅ Make sure auth.users has the necessary columns (username, avatar_url, etc.).
+
+Example 2: Inserting a New Participant
+Before (Inserting with profiles)
+sql
+Copy
+Edit
+INSERT INTO conversation_participants (conversation_id, user_id)
+VALUES ('some_conversation_id', (SELECT id FROM profiles WHERE username = 'roshan'));
+After (Using auth.users)
+sql
+Copy
+Edit
+INSERT INTO conversation_participants (conversation_id, user_id)
+VALUES ('some_conversation_id', (SELECT id FROM auth.users WHERE username = 'roshan'));
+2️⃣ Update Prisma Schema (If Using Prisma)
+If you’re using Prisma, update your schema:
+
+Before (With profiles)
+prisma
+Copy
+Edit
+model ConversationParticipants {
+  id        String  @id @default(uuid())
+  user_id   String
+  profile   Profiles @relation(fields: [user_id], references: [id])  
+}
+After (With auth.users)
+prisma
+Copy
+Edit
+model ConversationParticipants {
+  id        String  @id @default(uuid())
+  user_id   String
+  user      User @relation(fields: [user_id], references: [id])  
+}
+✅ Run migrations after updating Prisma:
+
+sh
+Copy
+Edit
+npx prisma migrate dev --name update_user_relation
+3️⃣ Update Backend Code (If Using Node.js / Sequelize / TypeORM)
+Sequelize Example
+Before (profiles reference)
+javascript
+Copy
+Edit
+ConversationParticipants.belongsTo(Profiles, { foreignKey: 'user_id' });
+After (auth.users reference)
+javascript
+Copy
+Edit
+ConversationParticipants.belongsTo(Users, { foreignKey: 'user_id' });
+TypeORM Example
+Before
+typescript
+Copy
+Edit
+@Entity()
+export class ConversationParticipants {
+  @ManyToOne(() => Profiles, (profile) => profile.participants)
+  @JoinColumn({ name: 'user_id' })
+  profile: Profiles;
+}
+After
+typescript
+Copy
+Edit
+@Entity()
+export class ConversationParticipants {
+  @ManyToOne(() => Users, (user) => user.participants)
+  @JoinColumn({ name: 'user_id' })
+  user: Users;
+}
+4️⃣ Update API Calls (If Using Express / Next.js / GraphQL)
+Before (Fetching from profiles)
+javascript
+Copy
+Edit
+app.get('/conversations/:id/participants', async (req, res) => {
+  const participants = await db.query(`
+    SELECT cp.*, p.username, p.avatar_url 
+    FROM conversation_participants cp 
+    JOIN profiles p ON cp.user_id = p.id 
+    WHERE cp.conversation_id = $1
+  `, [req.params.id]);
+  res.json(participants.rows);
+});
+After (Fetching from auth.users)
+javascript
+Copy
+Edit
+app.get('/conversations/:id/participants', async (req, res) => {
+  const participants = await db.query(`
+    SELECT cp.*, u.username, u.avatar_url 
+    FROM conversation_participants cp 
+    JOIN auth.users u ON cp.user_id = u.id 
+    WHERE cp.conversation_id = $1
+  `, [req.params.id]);
+  res.json(participants.rows);
+});
+✅ Final Steps
+1️⃣ Update all SQL queries to reference auth.users instead of profiles.
+2️⃣ Modify Prisma schema, Sequelize models, or TypeORM entities.
+3️⃣ Run migrations if needed (npx prisma migrate dev).
+4️⃣ Test API calls and check if everything works fine.
