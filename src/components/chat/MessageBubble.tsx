@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { Message } from "@/types/chat";
 import { Button } from "@/components/ui/button";
-import { Translate, VolumeIcon, BookMark, Check } from "lucide-react";
+import { translate, VolumeIcon, Bookmark, Check } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface MessageBubbleProps {
