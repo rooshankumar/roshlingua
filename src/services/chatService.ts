@@ -1,4 +1,3 @@
-
 import { supabase } from '@/lib/supabase';
 import { Message, Conversation } from '@/types/chat';
 
@@ -160,4 +159,64 @@ export const markMessagesAsRead = async (
   if (error) {
     console.error('Error marking messages as read:', error);
   }
+};
+
+import { supabase } from '@/lib/supabase';
+
+export interface Chat {
+  id: string;
+  sender_id: string;
+  content: string;
+  created_at: string;
+}
+
+export const subscribeToChats = (onChat: (chat: Chat) => void) => {
+  const channel = supabase
+    .channel('chats')
+    .on(
+      'postgres_changes',
+      {
+        event: 'INSERT',
+        schema: 'public',
+        table: 'chats'
+      },
+      (payload) => {
+        onChat(payload.new as Chat);
+      }
+    )
+    .subscribe();
+
+  return () => {
+    channel.unsubscribe();
+  };
+};
+
+export const sendChat = async (content: string, senderId: string): Promise<Chat | null> => {
+  const { data, error } = await supabase
+    .from('chats')
+    .insert([{ content, sender_id: senderId }])
+    .select()
+    .single();
+
+  if (error) {
+    console.error('Error sending chat:', error);
+    return null;
+  }
+
+  return data;
+};
+
+export const fetchChats = async (): Promise<Chat[]> => {
+  const { data, error } = await supabase
+    .from('chats')
+    .select('*')
+    .order('created_at', { ascending: false })
+    .limit(50);
+
+  if (error) {
+    console.error('Error fetching chats:', error);
+    return [];
+  }
+
+  return data;
 };
