@@ -3,133 +3,123 @@ import type { Message, Conversation } from '@/types/chat';
 
 // Placeholder useAuth hook -  Needs a proper implementation
 const useAuth = () => {
-  const user = supabase.auth.user();
+  const user = { id: 'user-id' };
   return { user };
 };
 
 export const createConversation = async (otherUserId: string) => {
-    try {
-      // Get current user ID
-      const { user } = useAuth();
-      if (!user) throw new Error('User not authenticated');
-      const currentUserId = user.id;
+  try {
+    // Get current user ID
+    const { user } = useAuth();
+    if (!user) throw new Error('No user found');
 
-      // Create the conversation - using a simple insert without specifying creator_id
-      // since we've updated the policy to be more permissive
-      const { data: conversation, error: conversationError } = await supabase
-        .from('conversations')
-        .insert({
-          last_message_at: new Date().toISOString()
-        })
-        .select()
-        .single();
-
-      if (conversationError) {
-        console.error('Error creating conversation:', conversationError);
-        throw conversationError;
-      }
-
-      // Add both users as participants in a single transaction
-      const participants = [
-        { conversation_id: conversation.id, user_id: currentUserId },
-        { conversation_id: conversation.id, user_id: otherUserId }
-      ];
-
-      const { error: participantsError } = await supabase
-        .from('conversation_participants')
-        .insert(participants);
-
-      if (participantsError) {
-        console.error('Error adding participants:', participantsError);
-        // Attempt to clean up the conversation if participant creation fails
-        await supabase
-          .from('conversations')
-          .delete()
-          .eq('id', conversation.id);
-        throw participantsError;
-      }
-
-      return conversation;
-    } catch (error) {
-      console.error('Error in createConversation:', error);
-      throw error;
-    }
-  };
-
-export const getConversations = async (userId: string) => {
-    const { data, error } = await supabase
+    // Check if conversation already exists
+    const { data: existingConversation } = await supabase
       .from('conversations')
-      .select(`
-        *,
-        participants:conversation_participants(user_id),
-        last_message:messages(*)
-      `)
-      .order('last_message_at', { ascending: false });
+      .select('*')
+      .contains('participant_ids', [user.id, otherUserId])
+      .single();
 
-    if (error) throw error;
-    return data as ChatConversation[];
-  };
+    if (existingConversation) {
+      return existingConversation;
+    }
 
-export const getMessages = async (conversationId: string) => {
-    const { data, error } = await supabase
-      .from('messages')
-      .select(`
-        *,
-        sender:profiles(id, avatar_url, full_name)
-      `)
-      .eq('conversation_id', conversationId)
-      .order('created_at', { ascending: true });
-
-    if (error) throw error;
-    return data as ChatMessage[];
-  };
-
-export const sendMessage = async (message: Partial<ChatMessage>) => {
-    const { data, error } = await supabase
-      .from('messages')
-      .insert(message)
+    // Create new conversation
+    const { data: newConversation, error } = await supabase
+      .from('conversations')
+      .insert({
+        participant_ids: [user.id, otherUserId],
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      })
       .select()
       .single();
 
     if (error) throw error;
-    return data;
+    return newConversation;
+  } catch (error) {
+    console.error('Error in createConversation:', error);
+    throw error;
+  }
+};
+
+export const getConversations = async (userId: string) => {
+  const { data, error } = await supabase
+    .from('conversations')
+    .select(`
+      *,
+      participants:conversation_participants(user:profiles(*)),
+      messages(*)
+    `)
+    .contains('participant_ids', [userId])
+    .order('created_at', { ascending: false });
+
+  if (error) throw error;
+  return data || [];
+};
+
+export const getMessages = async (conversationId: string) => {
+  const { data, error } = await supabase
+    .from('messages')
+    .select(`
+      *,
+      sender:profiles!sender_id(*),
+      recipient:profiles!recipient_id(*)
+    `)
+    .eq('conversation_id', conversationId)
+    .order('created_at', { ascending: true });
+
+  if (error) throw error;
+  return data || [];
+};
+
+export const sendMessage = async (
+  conversationId: string,
+  senderId: string,
+  recipientId: string,
+  content: string
+): Promise<Message> => {
+  const message = {
+    conversation_id: conversationId,
+    sender_id: senderId,
+    recipient_id: recipientId,
+    content: content,
+    created_at: new Date().toISOString(),
+    is_read: false
   };
 
+  const { data, error } = await supabase
+    .from('messages')
+    .insert(message)
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+};
 
 export const markAsRead = async (messageId: string) => {
-    const { error } = await supabase
-      .from('messages')
-      .update({ is_read: true })
-      .eq('id', messageId);
+  const { error } = await supabase
+    .from('messages')
+    .update({ is_read: true })
+    .eq('id', messageId);
 
-    if (error) throw error;
-  };
+  if (error) throw error;
+};
 
-export const subscribeToConversation = (conversationId: string, callback: (message: ChatMessage) => void) => {
-    const channel = supabase
-      .channel(`conversation:${conversationId}`)
-      .on(
-        'postgres_changes',
-        {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'messages',
-          filter: `conversation_id=eq.${conversationId}`
-        },
-        (payload) => callback(payload.new as ChatMessage)
-      )
-      .subscribe((status) => {
-        console.log(`Message subscription status for ${conversationId}:`, status);
-        if (status === 'SUBSCRIPTION_ERROR') {
-          console.error('Message subscription error, attempting to reconnect...');
-          setTimeout(() => {
-            channel.subscribe();
-          }, 1000);
-        }
-      });
+export const subscribeToMessages = (conversationId: string, callback: (message: Message) => void) => {
+  return supabase
+    .channel(`messages:${conversationId}`)
+    .on('INSERT', (payload) => callback(payload.new as Message))
+    .subscribe();
+};
 
-    return channel;
-  };
+export const subscribeToConversations = (userId: string, callback: () => void) => {
+  return supabase
+    .channel(`conversations:${userId}`)
+    .on('*', callback)
+    .subscribe();
+};
 
 export const fetchConversations = async (userId: string): Promise<Conversation[]> => {
   const { data, error } = await supabase
@@ -155,50 +145,4 @@ export const fetchMessages = async (conversationId: string): Promise<Message[]> 
 
   if (error) throw error;
   return data || [];
-};
-
-export const sendMessage = async (
-  conversationId: string,
-  senderId: string,
-  recipientId: string,
-  content: string
-): Promise<Message> => {
-  const { data, error } = await supabase
-    .from('messages')
-    .insert({
-      conversation_id: conversationId,
-      sender_id: senderId,
-      recipient_id: recipientId,
-      content: content
-    })
-    .select()
-    .single();
-
-  if (error) throw error;
-  return data;
-};
-
-export const markMessagesAsRead = async (conversationId: string, userId: string) => {
-  const { error } = await supabase
-    .from('messages')
-    .update({ is_read: true })
-    .eq('conversation_id', conversationId)
-    .eq('recipient_id', userId)
-    .eq('is_read', false);
-
-  if (error) throw error;
-};
-
-export const subscribeToMessages = (conversationId: string, callback: (message: Message) => void) => {
-  return supabase
-    .channel(`messages:${conversationId}`)
-    .on('INSERT', (payload) => callback(payload.new as Message))
-    .subscribe();
-};
-
-export const subscribeToConversations = (userId: string, callback: () => void) => {
-  return supabase
-    .channel(`conversations:${userId}`)
-    .on('*', callback)
-    .subscribe();
 };
