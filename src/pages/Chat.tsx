@@ -17,10 +17,32 @@ const ChatPage = () => {
 
     const loadConversation = async () => {
       try {
-        const conversations = await fetchConversations(user.id);
-        const conv = conversations.find(c => c.id === conversationId);
-        if (conv) {
-          setConversation(conv);
+        const { data: participants, error } = await supabase
+          .from('conversation_participants')
+          .select(`
+            user_id,
+            users:user_id (
+              id,
+              email
+            )
+          `)
+          .eq('conversation_id', conversationId);
+
+        if (error) throw error;
+
+        if (participants) {
+          const otherParticipant = participants.find(p => p.user_id !== user.id);
+          if (otherParticipant?.users) {
+            setConversation({
+              id: conversationId,
+              participants: [{
+                id: otherParticipant.users.id,
+                email: otherParticipant.users.email,
+                name: otherParticipant.users.email?.split('@')[0],
+                avatar: '/placeholder.svg'
+              }]
+            });
+          }
         }
       } catch (error) {
         console.error('Error loading conversation:', error);
@@ -30,7 +52,7 @@ const ChatPage = () => {
     };
 
     loadConversation();
-  }, [user, conversationId]);
+  }, [user, conversationId, supabase]);
 
   if (!user) {
     return (

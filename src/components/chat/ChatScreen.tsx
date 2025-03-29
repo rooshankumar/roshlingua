@@ -17,10 +17,10 @@ export const ChatScreen = ({ conversation }: ChatScreenProps) => {
   const [newMessage, setNewMessage] = useState('');
   const [isLoading, setIsLoading] = useState(true);
 
-  const partner = conversation.participants.find(p => p.id !== user?.id);
+  const partner = conversation?.participants?.find(p => p.id !== user?.id);
 
   useEffect(() => {
-    if (!conversation.id) return;
+    if (!conversation?.id) return;
 
     const loadMessages = async () => {
       try {
