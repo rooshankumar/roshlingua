@@ -8,6 +8,7 @@ export const subscribeToMessages = (conversationId: string, onMessage: (message:
   if (subscriptions.has(conversationId)) return subscriptions.get(conversationId);
 
   const channel = supabase
+    .channel(`realtime:messages:${conversationId}`)
     .channel(`messages:${conversationId}`)
     .on(
       'postgres_changes',
@@ -18,7 +19,23 @@ export const subscribeToMessages = (conversationId: string, onMessage: (message:
         filter: `conversation_id=eq.${conversationId}`
       },
       payload => {
+        console.log("New Message Received:", payload.new);
         onMessage(payload.new as Message);
+      }
+    )
+    .on(
+      'postgres_changes',
+      {
+        event: 'UPDATE',
+        schema: 'public',
+        table: 'messages',
+        filter: `conversation_id=eq.${conversationId}`
+      },
+      payload => {
+        console.log("Message Read Status Updated:", payload.new);
+        if (payload.new.is_read) {
+          onRead(payload.new.id);
+        }
       }
     )
     .on(
