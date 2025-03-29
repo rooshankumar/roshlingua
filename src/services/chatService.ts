@@ -161,8 +161,6 @@ export const markMessagesAsRead = async (
   }
 };
 
-import { supabase } from '@/lib/supabase';
-
 export interface Chat {
   id: string;
   sender_id: string;
