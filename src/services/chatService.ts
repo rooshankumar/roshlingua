@@ -39,7 +39,10 @@ export const fetchMessages = async (conversationId: string): Promise<Message[]> 
     .eq('conversation_id', conversationId)
     .order('created_at', { ascending: false });
 
-  if (error) throw error;
+  if (error) {
+    console.error('Error fetching messages:', error);
+    throw error;
+  }
   return data || [];
 };
 

@@ -25,7 +25,9 @@ export const ChatScreen = ({ conversation }: ChatScreenProps) => {
     const loadMessages = async () => {
       try {
         const msgs = await fetchMessages(conversation.id);
-        setMessages(msgs);
+        setMessages(msgs.sort((a, b) => 
+          new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+        ));
       } catch (error) {
         console.error('Error loading messages:', error);
       } finally {
@@ -36,13 +38,13 @@ export const ChatScreen = ({ conversation }: ChatScreenProps) => {
     loadMessages();
 
     const unsubscribe = subscribeToMessages(conversation.id, (message) => {
-      setMessages(prev => [message, ...prev]);
+      setMessages(prev => [message, ...prev.filter(m => m.id !== message.id)]);
     });
 
     return () => {
       unsubscribe();
     };
-  }, [conversation.id]);
+  }, [conversation?.id]);
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -62,6 +64,32 @@ export const ChatScreen = ({ conversation }: ChatScreenProps) => {
     <div className="flex flex-col h-screen">
       <div className="border-b p-4">
         <h2 className="font-semibold">{partner.name}</h2>
+      </div>
+      <div className="flex-1 overflow-y-auto flex flex-col-reverse p-4 gap-4">
+        {isLoading ? (
+          <div className="flex justify-center items-center h-full">
+            <Loader2 className="h-8 w-8 animate-spin" />
+          </div>
+        ) : messages.length === 0 ? (
+          <div className="text-center text-gray-500">No messages yet</div>
+        ) : (
+          messages.map((message) => (
+            <div
+              key={message.id}
+              className={`flex ${message.sender_id === user?.id ? 'justify-end' : 'justify-start'}`}
+            >
+              <div
+                className={`max-w-[70%] p-3 rounded-lg ${
+                  message.sender_id === user?.id
+                    ? 'bg-primary text-primary-foreground'
+                    : 'bg-muted'
+                }`}
+              >
+                {message.content}
+              </div>
+            </div>
+          ))
+        )}
       </div>
 
       <div className="flex-1 overflow-y-auto p-4 flex flex-col-reverse">
