@@ -17,18 +17,30 @@ export default function ChatList() {
 
     const fetchConversations = async () => {
       try {
-        // Temporarily simplified query for debugging
         console.log("Fetching conversations for user ID:", user.id);
+        
+        // Direct approach: fetch all conversations where the user is a participant
         const { data, error } = await supabase
-          .from('conversation_participants')
+          .from('conversations')
           .select(`
-            conversation_id,
-            conversations:conversation_id (
-              id,
-              created_at
+            id,
+            created_at,
+            updated_at,
+            participants:conversation_participants(
+              user_id,
+              profiles:user_id(
+                id,
+                username,
+                avatar_url,
+                is_online,
+                last_seen
+              )
             )
           `)
-          .eq('user_id', user.id);
+          .or(`id.in.(
+            select conversation_id from conversation_participants 
+            where user_id = '${user.id}'
+          )`);
         
         console.log("Raw conversation data:", data);
         console.log("Query error:", error);
@@ -124,6 +136,17 @@ export default function ChatList() {
     alert('Check console for debug info');
   };
 
+  const handleFixDatabase = async () => {
+    const { fixSupabaseData } = await import('@/utils/debugSupabase');
+    const result = await fixSupabaseData();
+    if (result.success) {
+      alert('Database fixed successfully. Please refresh the page.');
+      window.location.reload();
+    } else {
+      alert('Failed to fix database: ' + JSON.stringify(result.error));
+    }
+  };
+
   return (
     <div className="container max-w-2xl mx-auto p-4">
       <div className="flex justify-between items-center mb-6">
@@ -131,6 +154,9 @@ export default function ChatList() {
         <div className="flex gap-2">
           <Button variant="outline" onClick={handleDebug} size="sm">
             Debug DB
+          </Button>
+          <Button variant="destructive" onClick={handleFixDatabase} size="sm">
+            Fix DB
           </Button>
           <Button asChild>
             <Link to="/community">Start New Chat</Link>
