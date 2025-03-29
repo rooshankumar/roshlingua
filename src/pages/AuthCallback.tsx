@@ -1,6 +1,5 @@
-
 import { useEffect, useState } from "react";
-import { Navigate, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { supabase, createUserRecord } from "@/lib/supabase";
 import { Loader2 } from "lucide-react";
 
@@ -12,77 +11,63 @@ const AuthCallback = () => {
   useEffect(() => {
     const handleAuthCallback = async () => {
       try {
-        // Process the OAuth callback
-        const { data, error } = await supabase.auth.getSession();
-        
-        if (error) {
-          throw error;
+        // Retrieve the authenticated user
+        const { data: userData, error: userError } = await supabase.auth.getUser();
+
+        if (userError || !userData?.user) {
+          throw new Error("No session found. Please log in again.");
         }
 
-        // If we have a session, create the user record
-        if (data.session?.user) {
-          const user = data.session.user;
-          console.log("User authenticated:", user.id);
-          
-          // Check if this might be a new user from Google OAuth
-          try {
-            // Extract user information from the user object
-            const email = user.email || '';
-            const fullName = user.user_metadata.full_name || user.user_metadata.name || email.split('@')[0];
-            
-            // Calculate age if we can get birth date from Google OAuth metadata
-            let age = null;
-            if (user.user_metadata.birthdate) {
-              const birthDate = new Date(user.user_metadata.birthdate);
-              const today = new Date();
-              age = today.getFullYear() - birthDate.getFullYear();
-              // Adjust age if birthday hasn't occurred yet this year
-              const hasBirthdayOccurredThisYear = 
-                today.getMonth() > birthDate.getMonth() || 
-                (today.getMonth() === birthDate.getMonth() && today.getDate() >= birthDate.getDate());
-              if (!hasBirthdayOccurredThisYear) {
-                age--;
-              }
-            }
-            
-            // Create user record in our database tables
-            const success = await createUserRecord(user.id, email, fullName, age);
-            
-            if (success) {
-              console.log("User record created successfully");
-            } else {
-              console.warn("Failed to create user record, but proceeding with auth");
-            }
-            
-            // After signing in, redirect to onboarding for new users or dashboard for existing
-            // Check if onboarding is complete for this user
-            const { data: onboardingData } = await supabase
-              .from('onboarding_status')
-              .select('is_complete')
-              .eq('user_id', user.id)
-              .single();
-              
-            if (onboardingData && onboardingData.is_complete) {
-              // Redirect to dashboard if onboarding is complete
-              navigate('/dashboard', { replace: true });
-            } else {
-              // Redirect to onboarding if not complete
-              navigate('/onboarding', { replace: true });
-            }
-          } catch (err) {
-            console.error("Error in user record creation:", err);
-            // Even if user record creation fails, continue with auth
-            navigate('/dashboard', { replace: true });
+        const user = userData.user;
+        console.log("User authenticated:", user.id);
+
+        // Extract user info
+        const email = user.email || "";
+        const fullName = user.user_metadata?.full_name || user.user_metadata?.name || email.split("@")[0];
+
+        // Calculate age from birthdate (if available)
+        let age = null;
+        if (user.user_metadata?.birthdate) {
+          const birthDate = new Date(user.user_metadata.birthdate);
+          const today = new Date();
+          age = today.getFullYear() - birthDate.getFullYear();
+
+          // Adjust age if birthday hasn't occurred yet this year
+          if (
+            today.getMonth() < birthDate.getMonth() ||
+            (today.getMonth() === birthDate.getMonth() && today.getDate() < birthDate.getDate())
+          ) {
+            age--;
           }
-        } else {
-          // No session, redirect to login
-          navigate('/auth', { replace: true });
         }
-        
-        setIsLoading(false);
+
+        // Create user record in our database
+        const success = await createUserRecord(user.id, email, fullName, age);
+
+        if (!success) {
+          console.warn("User record creation failed, but proceeding...");
+        }
+
+        // Check onboarding status
+        const { data: onboardingData, error: onboardingError } = await supabase
+          .from("onboarding_status")
+          .select("is_complete")
+          .eq("user_id", user.id)
+          .maybeSingle(); // <== This prevents an error if there's no data
+
+        if (onboardingError) {
+          console.error("Onboarding check failed:", onboardingError);
+        }
+
+        if (onboardingData?.is_complete) {
+          navigate("/dashboard", { replace: true });
+        } else {
+          navigate("/onboarding", { replace: true });
+        }
       } catch (err) {
         console.error("Auth callback error:", err);
-        setError(err.message || "Authentication failed");
+        setError(err instanceof Error ? err.message : "Authentication failed.");
+      } finally {
         setIsLoading(false);
       }
     };
@@ -115,7 +100,6 @@ const AuthCallback = () => {
     );
   }
 
-  // Let the useEffect handle the navigation
   return (
     <div className="flex items-center justify-center min-h-screen">
       <div className="flex flex-col items-center gap-4">
