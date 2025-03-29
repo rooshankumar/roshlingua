@@ -1,4 +1,3 @@
-
 -- Create the conversations table
 CREATE TABLE IF NOT EXISTS public.conversations (
   id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
