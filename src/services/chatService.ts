@@ -65,7 +65,7 @@ export const fetchConversations = async (userId: string) => {
       messages(*)
     `)
     .in('id', conversationIds)
-    .order('updated_at', { ascending: false });
+    .order('created_at', { ascending: false });
 
   if (conversationsError) throw conversationsError;
 
