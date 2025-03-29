@@ -4,7 +4,7 @@ import { Message, Conversation } from '@/types/chat';
 const subscriptions = new Map(); // To prevent duplicate subscriptions
 
 // Subscribe to new messages in a conversation (Prevents Duplicates)
-export const subscribeToMessages = (conversationId: string, onMessage: (message: Message) => void) => {
+export const subscribeToMessages = (conversationId: string, onMessage: (message: Message) => void, onRead: (messageId: string) => void) => {
   if (subscriptions.has(conversationId)) return subscriptions.get(conversationId);
 
   const channel = supabase
@@ -21,7 +21,27 @@ export const subscribeToMessages = (conversationId: string, onMessage: (message:
         onMessage(payload.new as Message);
       }
     )
+    .on(
+      'postgres_changes',
+      {
+        event: 'UPDATE',
+        schema: 'public',
+        table: 'messages',
+        filter: `conversation_id=eq.${conversationId}`
+      },
+      payload => {
+        if (payload.new.is_read) {
+          onRead(payload.new.id);
+        }
+      }
+    )
     .subscribe();
+
+  // Subscribe to user presence
+  channel.track({
+    online_at: new Date().toISOString(),
+    user_id: supabase.auth.user()?.id
+  });
 
   subscriptions.set(conversationId, channel);
 
