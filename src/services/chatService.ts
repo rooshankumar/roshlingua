@@ -187,7 +187,9 @@ export const fetchConversationsOld = async (userId: string) => {
           id: p.user.id,
           email: p.user.email,
           name: p.user.raw_user_meta_data?.name || p.user.raw_user_meta_data?.full_name || p.user.email?.split('@')[0],
-          avatar: p.user.raw_user_meta_data?.picture || p.user.raw_user_meta_data?.avatar_url || '/placeholder.svg',
+          avatar: p.user.raw_user_meta_data?.picture || p.user.raw_user_meta_data?.avatar_url || `/placeholder.svg?name=${encodeURIComponent(p.user.raw_user_meta_data?.name || '')}`,
+          lastSeen: p.user.last_sign_in_at,
+          status: 'offline'
         })) || [],
     lastMessage: conv.messages?.[0],
   }));

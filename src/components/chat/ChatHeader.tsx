@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { supabase } from '@/lib/supabase';
@@ -19,7 +18,9 @@ export const ChatHeader = ({ partner }: ChatHeaderProps) => {
   const [otherUser, setOtherUser] = useState<Profile | null>(null);
 
   useEffect(() => {
-    if (!id || !user || partner) return;
+    if (!id || !user) { // Removed the partner check to always fetch user info
+      return;
+    }
 
     async function getOtherUserInfo() {
       const { data: participants, error } = await supabase
@@ -30,7 +31,10 @@ export const ChatHeader = ({ partner }: ChatHeaderProps) => {
             id,
             username,
             avatar_url,
-            is_online
+            is_online,
+            nativeLanguage,
+            learningLanguage,
+            streakCount // Added missing fields
           )
         `)
         .eq('conversation_id', id);
@@ -49,31 +53,36 @@ export const ChatHeader = ({ partner }: ChatHeaderProps) => {
     }
 
     getOtherUserInfo();
-  }, [id, user, partner]);
+  }, [id, user]); // Removed partner from dependency array
 
-  if (partner) {
+  // Using partner information if available, otherwise fallback to otherUser
+  const displayedUser = partner || otherUser;
+
+  if (displayedUser) {
     return (
       <div className="border-b p-4 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <Avatar>
-            <AvatarImage src={partner.avatar} />
-            <AvatarFallback>{partner.name[0]}</AvatarFallback>
+            <AvatarImage src={displayedUser.avatar_url || displayedUser.avatar || ''} />
+            <AvatarFallback>{displayedUser.username?.[0] || displayedUser.name?.[0]}</AvatarFallback>
           </Avatar>
           <div>
             <div className="flex items-center gap-2">
-              <h3 className="font-semibold">{partner.name}</h3>
-              <Circle className={`h-3 w-3 ${partner.isOnline ? "fill-green-500" : "fill-gray-400"}`} />
+              <h3 className="font-semibold">{displayedUser.username || displayedUser.name}</h3>
+              <Circle className={`h-3 w-3 ${displayedUser.is_online ? "fill-green-500" : "fill-gray-400"}`} />
             </div>
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <div className="flex items-center gap-1">
-                <Languages className="h-4 w-4" />
-                <Badge variant="secondary">{partner.nativeLanguage}</Badge>
-                <span>→</span>
-                <Badge>{partner.learningLanguage}</Badge>
+            {displayedUser.nativeLanguage && ( // conditionally render language info
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <div className="flex items-center gap-1">
+                  <Languages className="h-4 w-4" />
+                  <Badge variant="secondary">{displayedUser.nativeLanguage}</Badge>
+                  <span>→</span>
+                  <Badge>{displayedUser.learningLanguage}</Badge>
+                </div>
+                <span>•</span>
+                <span>Streak: {displayedUser.streakCount} days</span>
               </div>
-              <span>•</span>
-              <span>Streak: {partner.streakCount} days</span>
-            </div>
+            )}
           </div>
         </div>
       </div>
@@ -83,20 +92,8 @@ export const ChatHeader = ({ partner }: ChatHeaderProps) => {
   return (
     <div className="border-b">
       <div className="flex h-16 items-center px-4 gap-3">
-        {otherUser && (
-          <>
-            <Avatar>
-              <AvatarImage src={otherUser.avatar_url || ''} />
-              <AvatarFallback>{otherUser.username?.[0]}</AvatarFallback>
-            </Avatar>
-            <div>
-              <p className="text-sm font-medium leading-none">{otherUser.username}</p>
-              <p className="text-sm text-muted-foreground">
-                {otherUser.is_online ? 'Online' : 'Offline'}
-              </p>
-            </div>
-          </>
-        )}
+        {/* Loading indicator or placeholder */}
+        <p>Loading...</p>
       </div>
     </div>
   );
