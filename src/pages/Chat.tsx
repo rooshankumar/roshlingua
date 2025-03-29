@@ -6,7 +6,7 @@ import { ChatScreen } from "@/components/chat/ChatScreen";
 import { Message, Conversation, User } from "@/types/chat";
 import { getOtherParticipant } from "@/utils/chatUtils";
 import { useToast } from "@/hooks/use-toast";
-import { useMobile } from "@/hooks/use-mobile";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { 
   fetchConversations, 
   fetchMessages, 
