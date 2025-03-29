@@ -25,9 +25,14 @@ export const ChatScreen = ({ conversation }: ChatScreenProps) => {
     const loadMessages = async () => {
       try {
         const msgs = await fetchMessages(conversation.id);
-        setMessages(msgs.sort((a, b) => 
-          new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-        ));
+        setMessages(prev => {
+          const uniqueMessages = msgs.filter(msg => 
+            !prev.some(p => p.id === msg.id)
+          );
+          return [...uniqueMessages, ...prev].sort((a, b) => 
+            new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+          );
+        });
       } catch (error) {
         console.error('Error loading messages:', error);
       } finally {
@@ -38,7 +43,12 @@ export const ChatScreen = ({ conversation }: ChatScreenProps) => {
     loadMessages();
 
     const unsubscribe = subscribeToMessages(conversation.id, (message) => {
-      setMessages(prev => [message, ...prev.filter(m => m.id !== message.id)]);
+      setMessages(prev => {
+        if (prev.some(m => m.id === message.id)) return prev;
+        return [...prev, message].sort((a, b) => 
+          new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+        );
+      });
     });
 
     return () => {
