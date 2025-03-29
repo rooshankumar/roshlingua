@@ -1,0 +1,77 @@
+Auth state changed: SIGNED_IN 7bad0693-9053-423f-a2f0-a61c20b9cbf4
+AuthProvider.tsx:38 Auth state changed: INITIAL_SESSION 7bad0693-9053-423f-a2f0-a61c20b9cbf4
+AuthProvider.tsx:54 Initial session: 7bad0693-9053-423f-a2f0-a61c20b9cbf4
+Chat.tsx:34 Loading state: true
+Chat.tsx:35 User: null
+Chat.tsx:36 Conversations: []
+Chat.tsx:34 Loading state: false
+Chat.tsx:35 User: null
+Chat.tsx:36 Conversations: []
+Chat.tsx:34 Loading state: false
+Chat.tsx:35 User: {id: '7bad0693-9053-423f-a2f0-a61c20b9cbf4', aud: 'authenticated', role: 'authenticated', email: 'isthisroshan@gmail.com', email_confirmed_at: '2025-03-24T06:14:24.781766Z', …}
+Chat.tsx:36 Conversations: []
+Chat.tsx:34 Loading state: true
+Chat.tsx:35 User: {id: '7bad0693-9053-423f-a2f0-a61c20b9cbf4', aud: 'authenticated', role: 'authenticated', email: 'isthisroshan@gmail.com', email_confirmed_at: '2025-03-24T06:14:24.781766Z', …}
+Chat.tsx:36 Conversations: []
+Chat.tsx:34 Loading state: true
+Chat.tsx:35 User: {id: '7bad0693-9053-423f-a2f0-a61c20b9cbf4', aud: 'authenticated', role: 'authenticated', email: 'isthisroshan@gmail.com', email_confirmed_at: '2025-03-24T06:14:24.781766Z', …}
+Chat.tsx:36 Conversations: []
+@supabase_supabase-js.js?v=188d5fb6:3900 
+            
+            
+           GET https://yekzyvdjjozhhatdefsq.supabase.co/rest/v1/conversations?select=*%2Cparticipants%3Aconversation_participants%28user_id%2Cuser%3Aauth.users%21inner%28id%2Cemail%2Cuser_metadata-%3E%3E%27full_name%27ASname%2Cuser_metadata-%3E%3E%27avatar_url%27ASavatar%29%29%2Clast_message%3Amessages%28*%29&participant_ids=eq.7bad0693-9053-423f-a2f0-a61c20b9cbf4&order=updated_at.desc 400 (Bad Request)
+(anonymous) @ @supabase_supabase-js.js?v=188d5fb6:3900
+(anonymous) @ @supabase_supabase-js.js?v=188d5fb6:3921
+fulfilled @ @supabase_supabase-js.js?v=188d5fb6:3873
+Promise.then
+step @ @supabase_supabase-js.js?v=188d5fb6:3886
+(anonymous) @ @supabase_supabase-js.js?v=188d5fb6:3888
+__awaiter6 @ @supabase_supabase-js.js?v=188d5fb6:3870
+(anonymous) @ @supabase_supabase-js.js?v=188d5fb6:3911
+then @ @supabase_supabase-js.js?v=188d5fb6:89Understand this errorAI
+Chat.tsx:51 Error loading conversations: {code: 'PGRST100', details: 'unexpected "u" expecting "sum", "avg", "count", "max" or "min"', hint: null, message: '"failed to parse select parameter (*,participants:…)),last_message:messages(*))" (line 1, column 60)'}
+loadConversations @ Chat.tsx:51
+await in loadConversations
+(anonymous) @ Chat.tsx:63
+commitHookEffectListMount @ chunk-W6L2VRDA.js?v=188d5fb6:16915
+commitPassiveMountOnFiber @ chunk-W6L2VRDA.js?v=188d5fb6:18156
+commitPassiveMountEffects_complete @ chunk-W6L2VRDA.js?v=188d5fb6:18129
+commitPassiveMountEffects_begin @ chunk-W6L2VRDA.js?v=188d5fb6:18119
+commitPassiveMountEffects @ chunk-W6L2VRDA.js?v=188d5fb6:18109
+flushPassiveEffectsImpl @ chunk-W6L2VRDA.js?v=188d5fb6:19490
+flushPassiveEffects @ chunk-W6L2VRDA.js?v=188d5fb6:19447
+(anonymous) @ chunk-W6L2VRDA.js?v=188d5fb6:19328
+workLoop @ chunk-W6L2VRDA.js?v=188d5fb6:197
+flushWork @ chunk-W6L2VRDA.js?v=188d5fb6:176
+performWorkUntilDeadline @ chunk-W6L2VRDA.js?v=188d5fb6:384Understand this errorAI
+Chat.tsx:34 Loading state: false
+Chat.tsx:35 User: {id: '7bad0693-9053-423f-a2f0-a61c20b9cbf4', aud: 'authenticated', role: 'authenticated', email: 'isthisroshan@gmail.com', email_confirmed_at: '2025-03-24T06:14:24.781766Z', …}
+Chat.tsx:36 Conversations: []
+@supabase_supabase-js.js?v=188d5fb6:3900 
+            
+            
+           GET https://yekzyvdjjozhhatdefsq.supabase.co/rest/v1/conversations?select=*%2Cparticipants%3Aconversation_participants%28user_id%2Cuser%3Aauth.users%21inner%28id%2Cemail%2Cuser_metadata-%3E%3E%27full_name%27ASname%2Cuser_metadata-%3E%3E%27avatar_url%27ASavatar%29%29%2Clast_message%3Amessages%28*%29&participant_ids=eq.7bad0693-9053-423f-a2f0-a61c20b9cbf4&order=updated_at.desc 400 (Bad Request)
+(anonymous) @ @supabase_supabase-js.js?v=188d5fb6:3900
+(anonymous) @ @supabase_supabase-js.js?v=188d5fb6:3921
+fulfilled @ @supabase_supabase-js.js?v=188d5fb6:3873
+Promise.then
+step @ @supabase_supabase-js.js?v=188d5fb6:3886
+(anonymous) @ @supabase_supabase-js.js?v=188d5fb6:3888
+__awaiter6 @ @supabase_supabase-js.js?v=188d5fb6:3870
+(anonymous) @ @supabase_supabase-js.js?v=188d5fb6:3911
+then @ @supabase_supabase-js.js?v=188d5fb6:89Understand this errorAI
+Chat.tsx:75 Uncaught (in promise) {code: 'PGRST100', details: 'unexpected "u" expecting "sum", "avg", "count", "max" or "min"', hint: null, message: '"failed to parse select parameter (*,participants:…)),last_message:messages(*))" (line 1, column 60)'}
+loadConversations @ Chat.tsx:75
+await in loadConversations
+(anonymous) @ Chat.tsx:77
+commitHookEffectListMount @ chunk-W6L2VRDA.js?v=188d5fb6:16915
+commitPassiveMountOnFiber @ chunk-W6L2VRDA.js?v=188d5fb6:18156
+commitPassiveMountEffects_complete @ chunk-W6L2VRDA.js?v=188d5fb6:18129
+commitPassiveMountEffects_begin @ chunk-W6L2VRDA.js?v=188d5fb6:18119
+commitPassiveMountEffects @ chunk-W6L2VRDA.js?v=188d5fb6:18109
+flushPassiveEffectsImpl @ chunk-W6L2VRDA.js?v=188d5fb6:19490
+flushPassiveEffects @ chunk-W6L2VRDA.js?v=188d5fb6:19447
+(anonymous) @ chunk-W6L2VRDA.js?v=188d5fb6:19328
+workLoop @ chunk-W6L2VRDA.js?v=188d5fb6:197
+flushWork @ chunk-W6L2VRDA.js?v=188d5fb6:176
+performWorkUntilDeadline @ chunk-W6L2VRDA.js?v=188d5fb6:384Understand this errorAI
