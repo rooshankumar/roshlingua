@@ -44,6 +44,69 @@ export const createConversation = async (otherUserId: string) => {
 };
 
 
+export const sendMessage = async (
+  conversationId: string,
+  senderId: string,
+  recipientId: string,
+  content: string
+): Promise<Message> => {
+  const { data, error } = await supabase
+    .from('messages')
+    .insert({
+      conversation_id: conversationId,
+      sender_id: senderId,
+      recipient_id: recipientId,
+      content,
+      is_read: false
+    })
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+};
+
+export const markMessagesAsRead = async (conversationId: string, userId: string) => {
+  const { error } = await supabase
+    .from('messages')
+    .update({ is_read: true })
+    .eq('conversation_id', conversationId)
+    .eq('recipient_id', userId);
+
+  if (error) throw error;
+};
+
+export const subscribeToMessages = (conversationId: string, callback: (message: Message) => void) => {
+  return supabase
+    .channel(`messages:${conversationId}`)
+    .on(
+      'postgres_changes',
+      {
+        event: 'INSERT',
+        schema: 'public',
+        table: 'messages',
+        filter: `conversation_id=eq.${conversationId}`
+      },
+      (payload) => callback(payload.new as Message)
+    )
+    .subscribe();
+};
+
+export const subscribeToConversations = (userId: string, callback: () => void) => {
+  return supabase
+    .channel(`user_conversations:${userId}`)
+    .on(
+      'postgres_changes',
+      {
+        event: '*',
+        schema: 'public',
+        table: 'conversations',
+      },
+      () => callback()
+    )
+    .subscribe();
+};
+
 export const fetchConversations = async (userId: string): Promise<Conversation[]> => {
   const { data, error } = await supabase
     .from('conversations')
@@ -59,8 +122,8 @@ export const fetchConversations = async (userId: string): Promise<Conversation[]
         )
       ),
       messages (
-        id, 
-        content, 
+        id,
+        content,
         created_at,
         sender_id,
         recipient_id,
@@ -96,68 +159,4 @@ export const fetchMessages = async (conversationId: string): Promise<Message[]> 
 
   if (error) throw error;
   return data || [];
-};
-
-export const sendMessage = async (
-  conversationId: string,
-  senderId: string,
-  recipientId: string,
-  content: string
-): Promise<Message> => {
-  const { data, error } = await supabase
-    .from('messages')
-    .insert({
-      conversation_id: conversationId,
-      sender_id: senderId,
-      recipient_id: recipientId,
-      content,
-      is_read: false
-    })
-    .select()
-    .single();
-
-  if (error) throw error;
-  return data;
-};
-
-export const markMessagesAsRead = async (conversationId: string, userId: string) => {
-  const { error } = await supabase
-    .from('messages')
-    .update({ is_read: true })
-    .eq('conversation_id', conversationId)
-    .eq('recipient_id', userId)
-    .eq('is_read', false);
-
-  if (error) throw error;
-};
-
-export const subscribeToMessages = (conversationId: string, callback: (message: Message) => void) => {
-  return supabase
-    .channel(`messages:${conversationId}`)
-    .on(
-      'postgres_changes',
-      {
-        event: 'INSERT',
-        schema: 'public',
-        table: 'messages',
-        filter: `conversation_id=eq.${conversationId}`
-      },
-      (payload) => callback(payload.new as Message)
-    )
-    .subscribe();
-};
-
-export const subscribeToConversations = (userId: string, callback: () => void) => {
-  return supabase
-    .channel(`user_conversations:${userId}`)
-    .on(
-      'postgres_changes',
-      {
-        event: '*',
-        schema: 'public',
-        table: 'conversations',
-      },
-      () => callback()
-    )
-    .subscribe();
 };
