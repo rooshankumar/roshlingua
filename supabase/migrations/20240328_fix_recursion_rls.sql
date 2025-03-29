@@ -17,7 +17,10 @@ USING (
 );
 
 -- Fix read access to conversation_participants
+DROP POLICY IF EXISTS "Users can read participants" ON conversation_participants;
 DROP POLICY IF EXISTS "Users can read participants where they participate" ON conversation_participants;
+
+-- Now create the policy after making sure all existing variations are dropped
 CREATE POLICY "Users can read participants" ON conversation_participants
 FOR SELECT TO authenticated
 USING (
