@@ -72,9 +72,9 @@ export const fetchConversations = async (userId: string): Promise<Conversation[]
     .from('conversations')
     .select(`
       *,
-      conversation_participants(
+      conversation_participants!inner(
         user_id,
-        users:auth.users(
+        user:auth.users!inner(
           id,
           email,
           raw_user_meta_data
