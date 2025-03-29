@@ -178,23 +178,29 @@ export const fetchConversationsOld = async (userId: string) => {
 
   if (participantsError) throw participantsError;
 
-  return conversations?.map((conv) => ({
+  return conversations?.map(async (conv) => ({
     ...conv,
     participants:
       participants
         ?.filter((p) => p.conversation_id === conv.id)
-        .map((p) => ({
-          id: p.user.id,
-          email: p.user.email,
-          name: p.user.raw_user_meta_data?.full_name,
-          age: p.user.raw_user_meta_data?.age,
-          nativeLanguage: p.user.raw_user_meta_data?.native_language,
-          learningLanguage: p.user.raw_user_meta_data?.learning_language,
-          proficiencyLevel: p.user.raw_user_meta_data?.proficiency_level,
-          avatar: p.user.raw_user_meta_data?.avatar_url || `/placeholder.svg?name=${encodeURIComponent(p.user.raw_user_meta_data?.full_name || '')}`,
-          lastSeen: p.user.last_sign_in_at,
-          status: 'offline'
-        })) || [],
+        .map(async (p) => {
+          // Fetch user profile from users table
+          const { data: userData } = await supabase
+            .from('users')
+            .select('*')
+            .eq('id', p.user.id)
+            .single();
+
+          return {
+            id: p.user.id,
+            email: p.user.email,
+            name: userData?.full_name || p.user.email?.split('@')[0],
+            avatar: userData?.avatar_url || '/placeholder.svg',
+            nativeLanguage: userData?.native_language,
+            learningLanguage: userData?.learning_language,
+            proficiencyLevel: userData?.proficiency_level
+          };
+        }) || [],
     lastMessage: conv.messages?.[0],
   }));
 };
