@@ -28,19 +28,15 @@ export default function ChatList() {
             updated_at,
             participants:conversation_participants(
               user_id,
-              profiles:user_id(
+              user:user_id(
                 id,
-                username,
-                avatar_url,
-                is_online,
-                last_seen
+                email,
+                raw_user_meta_data->>'full_name' AS full_name,
+                raw_user_meta_data->>'avatar_url' AS avatar_url
               )
             )
           `)
-          .or(`id.in.(
-            select conversation_id from conversation_participants 
-            where user_id = '${user.id}'
-          )`);
+          .eq('conversation_participants.user_id', user.id);
         
         console.log("Raw conversation data:", data);
         console.log("Query error:", error);
