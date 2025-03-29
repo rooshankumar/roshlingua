@@ -4,7 +4,7 @@ import { useAuth } from '@/providers/AuthProvider';
 import { Conversation } from '@/types/chat';
 import { ChatScreen } from '@/components/chat/ChatScreen';
 import { Loader2 } from 'lucide-react';
-import { fetchConversations } from '@/services/chatService';
+import { supabase } from '@/lib/supabase';
 
 const ChatPage = () => {
   const { conversationId } = useParams();
