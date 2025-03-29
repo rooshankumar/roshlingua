@@ -68,11 +68,11 @@ export const ChatHeader = ({ partner }: ChatHeaderProps) => {
           </Avatar>
           <div>
             <div className="flex items-center gap-2">
-              <h3 className="font-semibold">{displayedUser.username || displayedUser.name}</h3>
+              <h3 className="font-semibold">{displayedUser.name}</h3>
               <Circle className={`h-3 w-3 ${displayedUser.is_online ? "fill-green-500" : "fill-gray-400"}`} />
+              {displayedUser.age && <span className="text-sm text-muted-foreground">{displayedUser.age} years old</span>}
             </div>
-            {displayedUser.nativeLanguage && ( // conditionally render language info
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <div className="flex items-center gap-1">
                   <Languages className="h-4 w-4" />
                   <Badge variant="secondary">{displayedUser.nativeLanguage}</Badge>

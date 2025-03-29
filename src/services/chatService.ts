@@ -186,8 +186,12 @@ export const fetchConversationsOld = async (userId: string) => {
         .map((p) => ({
           id: p.user.id,
           email: p.user.email,
-          name: p.user.raw_user_meta_data?.name || p.user.raw_user_meta_data?.full_name || p.user.email?.split('@')[0],
-          avatar: p.user.raw_user_meta_data?.picture || p.user.raw_user_meta_data?.avatar_url || `/placeholder.svg?name=${encodeURIComponent(p.user.raw_user_meta_data?.name || '')}`,
+          name: p.user.raw_user_meta_data?.full_name,
+          age: p.user.raw_user_meta_data?.age,
+          nativeLanguage: p.user.raw_user_meta_data?.native_language,
+          learningLanguage: p.user.raw_user_meta_data?.learning_language,
+          proficiencyLevel: p.user.raw_user_meta_data?.proficiency_level,
+          avatar: p.user.raw_user_meta_data?.avatar_url || `/placeholder.svg?name=${encodeURIComponent(p.user.raw_user_meta_data?.full_name || '')}`,
           lastSeen: p.user.last_sign_in_at,
           status: 'offline'
         })) || [],
