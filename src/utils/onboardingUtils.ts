@@ -52,3 +52,66 @@ export const updateOnboardingStatus = async (userId: string, isComplete: boolean
     return { success: false, error: err };
   }
 };
+import { supabase } from '@/lib/supabase';
+
+export async function checkOnboardingStatus(userId: string) {
+  if (!userId) {
+    console.error("No user ID provided to check onboarding status");
+    return null;
+  }
+
+  try {
+    // First check if we have a valid session
+    const { data: sessionData } = await supabase.auth.getSession();
+    if (!sessionData?.session) {
+      console.error("No active session when checking onboarding status");
+      return null;
+    }
+
+    // Get onboarding status
+    const { data, error } = await supabase
+      .from('onboarding_status')
+      .select('*')
+      .eq('user_id', userId)
+      .single();
+
+    if (error) {
+      console.error("Error fetching onboarding status:", error);
+      return null;
+    }
+
+    console.log("Onboarding status data:", data);
+    return data;
+  } catch (err) {
+    console.error("Exception checking onboarding status:", err);
+    return null;
+  }
+}
+
+export async function completeOnboarding(userId: string) {
+  if (!userId) {
+    console.error("No user ID provided to complete onboarding");
+    return false;
+  }
+
+  try {
+    const { error } = await supabase
+      .from('onboarding_status')
+      .update({ 
+        is_complete: true, 
+        current_step: 'completed',
+        updated_at: new Date().toISOString()
+      })
+      .eq('user_id', userId);
+
+    if (error) {
+      console.error("Failed to complete onboarding:", error);
+      return false;
+    }
+
+    return true;
+  } catch (err) {
+    console.error("Exception completing onboarding:", err);
+    return false;
+  }
+}

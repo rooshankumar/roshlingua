@@ -4,11 +4,17 @@ import type { Database } from './database.types';
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
+if (!supabaseUrl || !supabaseAnonKey) {
+  throw new Error('Missing Supabase environment variables');
+}
+
 // Create single instance
 export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
   auth: {
     persistSession: true,
-    autoRefreshToken: true
+    autoRefreshToken: true,
+    storageKey: 'supabase_auth_token',
+    detectSessionInUrl: true
   }
 });
 
@@ -57,53 +63,12 @@ export const createUserRecord = async (userId: string, email: string, fullName: 
 
     if (error) {
       console.error("Failed to create user record:", error);
-
-      try {
-        const usersInsert = await supabase
-          .from('users')
-          .insert({
-            id: userId,
-            email: email,
-            full_name: fullName,
-            native_language: 'English',
-            learning_language: 'Spanish',
-            proficiency_level: 'beginner'
-          })
-          .select();
-
-        if (usersInsert.error) throw usersInsert.error;
-
-        const profilesInsert = await supabase
-          .from('profiles')
-          .insert({
-            id: userId
-          })
-          .select();
-
-        if (profilesInsert.error) throw profilesInsert.error;
-
-        const onboardingInsert = await supabase
-          .from('onboarding_status')
-          .insert({
-            user_id: userId,
-            is_complete: false
-          })
-          .select();
-
-        if (onboardingInsert.error) throw onboardingInsert.error;
-
-        console.log("Created user record through fallback method");
-        return true;
-      } catch (fallbackError) {
-        console.error("Fallback user creation also failed:", fallbackError);
-        return false;
-      }
+      return { success: false, error };
     }
 
-    console.log("Created user record successfully:", data);
-    return true;
-  } catch (error) {
-    console.error("Error in createUserRecord:", error);
-    return false;
+    return { success: true, data };
+  } catch (err) {
+    console.error("Exception creating user record:", err);
+    return { success: false, error: err };
   }
 };
