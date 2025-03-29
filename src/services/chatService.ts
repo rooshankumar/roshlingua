@@ -8,7 +8,6 @@ export const subscribeToMessages = (conversationId: string, onMessage: (message:
   if (subscriptions.has(conversationId)) return subscriptions.get(conversationId);
 
   const channel = supabase
-    .channel(`realtime:messages:${conversationId}`)
     .channel(`messages:${conversationId}`)
     .on(
       'postgres_changes',
