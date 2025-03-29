@@ -68,21 +68,44 @@ export const sendMessage = async (
 // Fetch conversations for a user
 export const fetchConversations = async (userId: string): Promise<Conversation[]> => {
   const { data, error } = await supabase
-    .from('conversations')
+    .from('conversation_participants')
     .select(`
-      *,
-      participants:conversation_participants(
-        user:users(
-          id,
-          email,
-          raw_user_meta_data
-        )
+      conversation:conversations!inner(*),
+      user:auth.users!inner(
+        id,
+        email,
+        raw_user_meta_data
       )
     `)
-    .eq('participants.user_id', userId);
+    .eq('user_id', userId);
 
   if (error) throw error;
-  return data || [];
+
+  // Transform the data structure
+  const conversations = data?.reduce((acc: any[], participant) => {
+    const existingConv = acc.find(c => c.id === participant.conversation.id);
+    if (existingConv) {
+      existingConv.participants.push({
+        id: participant.user.id,
+        email: participant.user.email,
+        name: participant.user.raw_user_meta_data?.full_name || participant.user.email.split('@')[0],
+        avatar: participant.user.raw_user_meta_data?.avatar_url || '/placeholder.svg',
+      });
+    } else {
+      acc.push({
+        ...participant.conversation,
+        participants: [{
+          id: participant.user.id,
+          email: participant.user.email,
+          name: participant.user.raw_user_meta_data?.full_name || participant.user.email.split('@')[0],
+          avatar: participant.user.raw_user_meta_data?.avatar_url || '/placeholder.svg',
+        }]
+      });
+    }
+    return acc;
+  }, []);
+
+  return conversations || [];
 };
 
 // Create a new conversation
