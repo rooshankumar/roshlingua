@@ -26,9 +26,14 @@ export default function ChatList() {
             id,
             created_at,
             updated_at,
+            messages:messages(
+              id,
+              content,
+              created_at,
+              sender_id
+            ),
             participants:conversation_participants(
-              user_id,
-              user:user_id(
+              user:users!inner(
                 id,
                 email,
                 raw_user_meta_data->>'full_name' AS full_name,
@@ -36,16 +41,36 @@ export default function ChatList() {
               )
             )
           `)
-          .eq('conversation_participants.user_id', user.id);
-        
+          .eq('conversation_participants.user_id', user.id)
+          .order('updated_at', { ascending: false });
+
         console.log("Raw conversation data:", data);
-        console.log("Query error:", error);
+        if (error) {
+          console.error("Query error:", error);
+          setConversations([]);
+        } else if (data) {
+          const processedConversations = data.map(conv => ({
+            id: conv.id,
+            created_at: conv.created_at,
+            updated_at: conv.updated_at,
+            participants: conv.participants
+              .filter(p => p.user.id !== user.id)
+              .map(p => ({
+                id: p.user.id,
+                name: p.user.full_name || p.user.email?.split('@')[0] || 'Unknown User',
+                avatar: p.user.avatar_url || '/placeholder.svg',
+                email: p.user.email
+              })),
+            lastMessage: conv.messages?.[0]
+          }));
+          setConversations(processedConversations);
+        }
 
         if (error) {
           console.error('Error fetching conversations:', error);
           setConversations([]);
         } else {
-          setConversations(data?.map(c => c.conversations) || []);
+          // Removed as it's handled in the query processing above
         }
       } catch (error) {
         console.error('Error in fetchConversations:', error);
