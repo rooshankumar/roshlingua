@@ -23,9 +23,44 @@ const Chat = () => {
   const [activeConversationId, setActiveConversationId] = useState<string | null>(null);
   const [showChatScreen, setShowChatScreen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
   const isMobile = useIsMobile();
-  const { user } = useAuth(); // Get current user from your auth system
+  const { user } = useAuth();
+
+  // Debug loading state
+  useEffect(() => {
+    console.log('Loading state:', isLoading);
+    console.log('User:', user);
+    console.log('Conversations:', conversations);
+  }, [isLoading, user, conversations]);
+
+  useEffect(() => {
+    if (!user?.id) {
+      setIsLoading(false);
+      return;
+    }
+
+    const loadConversations = async () => {
+      try {
+        setIsLoading(true);
+        const conversationsData = await fetchConversations(user.id);
+        setConversations(conversationsData || []);
+      } catch (err) {
+        console.error('Error loading conversations:', err);
+        setError('Failed to load conversations');
+        toast({
+          title: "Error",
+          description: "Failed to load conversations",
+          variant: "destructive"
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadConversations();
+  }, [user?.id, toast]);
 
   // Fetch conversations on load
   useEffect(() => {
@@ -215,28 +250,21 @@ const Chat = () => {
 
   if (isLoading) {
     return (
-      <div className="h-screen flex bg-background">
-        <div className="w-full md:w-1/3 lg:w-1/4 border-r">
-          <div className="p-4 border-b">
-            <Skeleton className="h-8 w-32 mb-4" />
-            <Skeleton className="h-10 w-full" />
-          </div>
-          <div className="p-4">
-            {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="flex items-center gap-3 mb-4">
-                <Skeleton className="h-10 w-10 rounded-full" />
-                <div className="space-y-2 flex-1">
-                  <Skeleton className="h-4 w-24" />
-                  <Skeleton className="h-3 w-32" />
-                </div>
-              </div>
-            ))}
-          </div>
+      <div className="h-screen flex items-center justify-center bg-background">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Loading conversations...</p>
         </div>
-        <div className="flex-1 hidden md:block">
-          <div className="h-full flex items-center justify-center">
-            <p className="text-muted-foreground">Select a conversation</p>
-          </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="h-screen flex items-center justify-center bg-background">
+        <div className="text-center">
+          <p className="text-red-500 mb-4">{error}</p>
+          <Button onClick={() => window.location.reload()}>Retry</Button>
         </div>
       </div>
     );
