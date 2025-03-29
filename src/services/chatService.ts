@@ -44,27 +44,61 @@ export const createConversation = async (otherUserId: string) => {
 };
 
 
-export const fetchConversations = async (userId: string): Promise<Conversation[]> => {
-  const { data, error } = await supabase
+export const fetchConversations = async (userId: string) => {
+  // First get conversations where user is a participant
+  const { data: participantData, error: participantError } = await supabase
+    .from('conversation_participants')
+    .select('conversation_id')
+    .eq('user_id', userId);
+
+  if (participantError) throw participantError;
+
+  if (!participantData?.length) return [];
+
+  const conversationIds = participantData.map(p => p.conversation_id);
+
+  // Then fetch those conversations with their last messages
+  const { data: conversations, error: conversationsError } = await supabase
     .from('conversations')
     .select(`
       *,
-      participants:conversation_participants(
-        user_id,
-        user:auth.users!inner(
-          id,
-          email,
-          user_metadata->>'full_name' as name,
-          user_metadata->>'avatar_url' as avatar
-        )
-      ),
-      last_message:messages(*)
+      messages(*)
     `)
-    .contains('participant_ids', [userId])
+    .in('id', conversationIds)
     .order('updated_at', { ascending: false });
 
-  if (error) throw error;
-  return data || [];
+  if (conversationsError) throw conversationsError;
+
+  // Finally get participant details
+  const { data: participants, error: participantsError } = await supabase
+    .from('conversation_participants')
+    .select(`
+      conversation_id,
+      user_id,
+      user:auth.users!inner(
+        id,
+        email,
+        user_metadata->full_name,
+        user_metadata->avatar_url
+      )
+    `)
+    .in('conversation_id', conversationIds);
+
+  if (participantsError) throw participantsError;
+
+  // Combine the data
+  return conversations?.map(conv => ({
+    ...conv,
+    participants: participants
+      ?.filter(p => p.conversation_id === conv.id)
+      .map(p => ({
+        id: p.user.id,
+        email: p.user.email,
+        name: p.user.user_metadata?.full_name || p.user.email?.split('@')[0],
+        avatar: p.user.user_metadata?.avatar_url
+      })) || [],
+    lastMessage: conv.messages?.[0]
+  }));
 };
 
 export const fetchMessages = async (conversationId: string): Promise<Message[]> => {
