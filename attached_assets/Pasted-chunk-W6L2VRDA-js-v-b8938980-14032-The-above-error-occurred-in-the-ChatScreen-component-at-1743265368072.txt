@@ -1,0 +1,27 @@
+chunk-W6L2VRDA.js?v=b8938980:14032 The above error occurred in the <ChatScreen> component:
+
+    at ChatScreen (https://311dc50e-02bb-41a1-8cc7-bdb86136d3b1-00-3dnhmmi5i7l9a.sisko.replit.dev/src/components/chat/ChatScreen.tsx?t=1743265312909:18:30)
+    at ChatPage (https://311dc50e-02bb-41a1-8cc7-bdb86136d3b1-00-3dnhmmi5i7l9a.sisko.replit.dev/src/pages/Chat.tsx?t=1743265312909:19:32)
+    at main
+    at div
+    at AppLayout (https://311dc50e-02bb-41a1-8cc7-bdb86136d3b1-00-3dnhmmi5i7l9a.sisko.replit.dev/src/components/layouts/AppLayout.tsx:35:22)
+    at ProtectedRoute (https://311dc50e-02bb-41a1-8cc7-bdb86136d3b1-00-3dnhmmi5i7l9a.sisko.replit.dev/src/components/auth/ProtectedRoute.tsx:15:27)
+    at RenderedRoute (https://311dc50e-02bb-41a1-8cc7-bdb86136d3b1-00-3dnhmmi5i7l9a.sisko.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=b8938980:4069:5)
+    at Routes (https://311dc50e-02bb-41a1-8cc7-bdb86136d3b1-00-3dnhmmi5i7l9a.sisko.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=b8938980:4508:5)
+    at AppRoutes (https://311dc50e-02bb-41a1-8cc7-bdb86136d3b1-00-3dnhmmi5i7l9a.sisko.replit.dev/src/App.tsx?t=1743265312909:35:33)
+    at AuthProvider (https://311dc50e-02bb-41a1-8cc7-bdb86136d3b1-00-3dnhmmi5i7l9a.sisko.replit.dev/src/providers/AuthProvider.tsx:23:32)
+    at Router (https://311dc50e-02bb-41a1-8cc7-bdb86136d3b1-00-3dnhmmi5i7l9a.sisko.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=b8938980:4451:15)
+    at BrowserRouter (https://311dc50e-02bb-41a1-8cc7-bdb86136d3b1-00-3dnhmmi5i7l9a.sisko.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=b8938980:5196:5)
+    at ThemeProvider (https://311dc50e-02bb-41a1-8cc7-bdb86136d3b1-00-3dnhmmi5i7l9a.sisko.replit.dev/src/components/theme-provider.tsx:17:33)
+    at QueryClientProvider (https://311dc50e-02bb-41a1-8cc7-bdb86136d3b1-00-3dnhmmi5i7l9a.sisko.replit.dev/node_modules/.vite/deps/@tanstack_react-query.js?v=b8938980:2794:3)
+    at App
+
+Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://reactjs.org/link/error-boundaries to learn more about error boundaries.
+chunk-W6L2VRDA.js?v=b8938980:19413 Uncaught TypeError: Cannot read properties of undefined (reading 'split')
+    at getInitials (ChatScreen.tsx:93:17)
+    at ChatScreen.tsx:134:40
+    at Array.map (<anonymous>)
+    at ChatScreen (ChatScreen.tsx:118:23)
+﻿
+
