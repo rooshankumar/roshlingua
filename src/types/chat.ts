@@ -3,23 +3,30 @@ export interface User {
   id: string;
   name: string;
   avatar: string;
-  lastSeen?: string;
+  nativeLanguage: string;
+  learningLanguage: string;
+  proficiencyLevel: 'beginner' | 'intermediate' | 'advanced';
+  streakCount: number;
   isOnline?: boolean;
+  lastSeen?: string;
 }
 
 export interface Message {
   id: string;
-  conversation_id: string; // Changed to snake_case for Supabase compatibility
-  sender_id: string;      // Changed to snake_case for Supabase compatibility
-  recipient_id: string;   // Changed to snake_case for Supabase compatibility
+  conversation_id: string;
+  sender_id: string;
+  recipient_id: string;
   content: string;
-  created_at: string;     // Changed to snake_case for Supabase compatibility
-  is_read: boolean;       // Changed to snake_case for Supabase compatibility
+  translation?: string;
+  created_at: string;
+  is_read: boolean;
+  language: string;
 }
 
 export interface Conversation {
   id: string;
   participants: User[];
+  learningLanguage: string;
   lastMessage?: Message;
   createdAt: string;
   lastMessageAt: string;
