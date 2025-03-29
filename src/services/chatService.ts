@@ -50,17 +50,15 @@ export const sendMessage = async (
   recipientId: string,
   content: string
 ): Promise<Message> => {
-  const message = {
-    conversation_id: conversationId,
-    sender_id: senderId,
-    recipient_id: recipientId,
-    content,
-    is_read: false
-  };
-
   const { data, error } = await supabase
     .from('messages')
-    .insert(message)
+    .insert({
+      conversation_id: conversationId,
+      sender_id: senderId,
+      recipient_id: recipientId,
+      content,
+      is_read: false
+    })
     .select()
     .single();
 
@@ -79,8 +77,8 @@ export const markMessagesAsRead = async (conversationId: string, userId: string)
 };
 
 export const subscribeToMessages = (conversationId: string, callback: (message: Message) => void) => {
-  const channel = supabase
-    .channel(`conversation:${conversationId}`)
+  return supabase
+    .channel(`messages:${conversationId}`)
     .on(
       'postgres_changes',
       {
@@ -92,29 +90,21 @@ export const subscribeToMessages = (conversationId: string, callback: (message: 
       (payload) => callback(payload.new as Message)
     )
     .subscribe();
-
-  return () => {
-    channel.unsubscribe();
-  };
 };
 
 export const subscribeToConversations = (userId: string, callback: () => void) => {
-  const channel = supabase
+  return supabase
     .channel(`user_conversations:${userId}`)
     .on(
       'postgres_changes',
       {
         event: '*',
         schema: 'public',
-        table: 'conversations'
+        table: 'conversations',
       },
       () => callback()
     )
     .subscribe();
-
-  return () => {
-    channel.unsubscribe();
-  };
 };
 
 export const fetchConversations = async (userId: string): Promise<Conversation[]> => {
