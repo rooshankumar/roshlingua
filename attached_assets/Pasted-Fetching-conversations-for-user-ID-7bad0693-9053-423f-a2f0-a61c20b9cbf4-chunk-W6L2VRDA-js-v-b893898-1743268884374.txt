@@ -1,0 +1,28 @@
+Fetching conversations for user ID: 7bad0693-9053-423f-a2f0-a61c20b9cbf4
+chunk-W6L2VRDA.js?v=b8938980:14032 The above error occurred in the <ChatScreen> component:
+
+    at ChatScreen (https://311dc50e-02bb-41a1-8cc7-bdb86136d3b1-00-3dnhmmi5i7l9a.sisko.replit.dev/src/components/chat/ChatScreen.tsx?t=1743268606662:19:30)
+    at ChatPage (https://311dc50e-02bb-41a1-8cc7-bdb86136d3b1-00-3dnhmmi5i7l9a.sisko.replit.dev/src/pages/Chat.tsx?t=1743268606662:19:32)
+
+Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://reactjs.org/link/error-boundaries to learn more about error boundaries.
+logCapturedError @ chunk-W6L2VRDA.js?v=b8938980:14032Understand this errorAI
+chunk-W6L2VRDA.js?v=b8938980:9129 Uncaught TypeError: unsubscribe is not a function
+    at ChatScreen.tsx:69:7
+    at safelyCallDestroy (chunk-W6L2VRDA.js?v=b8938980:16748:13)
+    at commitHookEffectListUnmount (chunk-W6L2VRDA.js?v=b8938980:16875:19)
+    at commitPassiveUnmountInsideDeletedTreeOnFiber (chunk-W6L2VRDA.js?v=b8938980:18283:17)
+    at commitPassiveUnmountEffectsInsideOfDeletedTree_begin (chunk-W6L2VRDA.js?v=b8938980:18245:13)
+    at commitPassiveUnmountEffects_begin (chunk-W6L2VRDA.js?v=b8938980:18181:19)
+    at commitPassiveUnmountEffects (chunk-W6L2VRDA.js?v=b8938980:18169:11)
+    at flushPassiveEffectsImpl (chunk-W6L2VRDA.js?v=b8938980:19489:11)
+    at flushPassiveEffects (chunk-W6L2VRDA.js?v=b8938980:19447:22)
+    at commitRootImpl (chunk-W6L2VRDA.js?v=b8938980:19416:13)Understand this errorAI
+yekzyvdjjozhhatdefsq.supabase.co/rest/v1/conversations?select=id%2Ccreated_at%2Cupdated_at%2Cparticipants%3Aconversation_participants%28user_id%2Cuser%3Auser_id%28id%2Cemail%2Craw_user_meta_data-%3E%3E%27full_name%27ASfull_name%2Craw_user_meta_data-%3E%3E%27avatar_url%27ASavatar_url%29%29&conversation_participants.user_id=eq.7bad0693-9053-423f-a2f0-a61c20b9cbf4:1 
+            
+            
+           Failed to load resource: the server responded with a status of 400 ()Understand this errorAI
+ChatList.tsx:41 Raw conversation data: null
+ChatList.tsx:42 Query error: Object
+ChatList.tsx:45 Error fetching conversations: Object
+fetchConversations @ ChatList.tsx:45Understand this errorAI
