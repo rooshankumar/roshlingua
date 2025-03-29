@@ -73,8 +73,7 @@ export const fetchConversations = async (userId: string) => {
       user:auth.users!inner(
         id,
         email,
-        raw_user_meta_data->>'full_name' as full_name,
-        raw_user_meta_data->>'avatar_url' as avatar_url
+        raw_user_meta_data
       )
     `)
     .in('conversation_id', conversationIds);
@@ -89,8 +88,8 @@ export const fetchConversations = async (userId: string) => {
         .map((p) => ({
           id: p.user.id,
           email: p.user.email,
-          name: p.user.full_name || p.user.email?.split('@')[0],
-          avatar: p.user.avatar_url || '/placeholder.svg',
+          name: p.user.raw_user_meta_data?.full_name || p.user.email?.split('@')[0],
+          avatar: p.user.raw_user_meta_data?.avatar_url || '/placeholder.svg',
         })) || [],
     lastMessage: conv.messages?.[0],
   }));
