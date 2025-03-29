@@ -1,9 +1,9 @@
 import { supabase } from '@/lib/supabase';
-import { Message, Conversation, Chat } from '@/types/chat';
+import { Message, Conversation } from '@/types/chat';
 
 const subscriptions = new Map(); // To prevent duplicate subscriptions
 
-// ✅ Subscribe to Messages (Prevents Duplicates, Ensures Cleanup)
+// Subscribe to new messages in a conversation (Prevents Duplicates)
 export const subscribeToMessages = (conversationId: string, onMessage: (message: Message) => void) => {
   if (subscriptions.has(conversationId)) return subscriptions.get(conversationId);
 
@@ -11,8 +11,13 @@ export const subscribeToMessages = (conversationId: string, onMessage: (message:
     .channel(`messages:${conversationId}`)
     .on(
       'postgres_changes',
-      { event: 'INSERT', schema: 'public', table: 'messages', filter: `conversation_id=eq.${conversationId}` },
-      (payload) => {
+      {
+        event: 'INSERT',
+        schema: 'public',
+        table: 'messages',
+        filter: `conversation_id=eq.${conversationId}`
+      },
+      payload => {
         onMessage(payload.new as Message);
       }
     )
@@ -24,6 +29,87 @@ export const subscribeToMessages = (conversationId: string, onMessage: (message:
     supabase.removeChannel(channel);
     subscriptions.delete(conversationId);
   };
+};
+
+// Fetch messages for a conversation
+export const fetchMessages = async (conversationId: string): Promise<Message[]> => {
+  const { data, error } = await supabase
+    .from('messages')
+    .select('*')
+    .eq('conversation_id', conversationId)
+    .order('created_at', { ascending: false });
+
+  if (error) throw error;
+  return data || [];
+};
+
+// Send a new message
+export const sendMessage = async (
+  conversationId: string,
+  senderId: string,
+  content: string
+): Promise<Message> => {
+  const { data, error } = await supabase
+    .from('messages')
+    .insert([
+      {
+        conversation_id: conversationId,
+        sender_id: senderId,
+        content
+      }
+    ])
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+};
+
+// Fetch conversations for a user
+export const fetchConversations = async (userId: string): Promise<Conversation[]> => {
+  const { data, error } = await supabase
+    .from('conversations')
+    .select(`
+      *,
+      participants:conversation_participants(
+        user:users(
+          id,
+          email,
+          raw_user_meta_data
+        )
+      )
+    `)
+    .eq('participants.user_id', userId);
+
+  if (error) throw error;
+  return data || [];
+};
+
+// Create a new conversation
+export const createConversation = async (
+  creatorId: string,
+  participantIds: string[]
+): Promise<string> => {
+  const { data: conversation, error: convError } = await supabase
+    .from('conversations')
+    .insert([{ created_by: creatorId }])
+    .select()
+    .single();
+
+  if (convError) throw convError;
+
+  const participants = [...new Set([creatorId, ...participantIds])].map(userId => ({
+    conversation_id: conversation.id,
+    user_id: userId
+  }));
+
+  const { error: partError } = await supabase
+    .from('conversation_participants')
+    .insert(participants);
+
+  if (partError) throw partError;
+
+  return conversation.id;
 };
 
 // ✅ Subscribe to Conversations (Real-time updates)
@@ -46,7 +132,7 @@ export const subscribeToConversations = (userId: string, onUpdate: () => void) =
 };
 
 // ✅ Fetch Conversations (Optimized Query)
-export const fetchConversations = async (userId: string) => {
+export const fetchConversationsOld = async (userId: string) => {
   const { data: participantData, error: participantError } = await supabase
     .from('conversation_participants')
     .select('conversation_id')
@@ -95,45 +181,6 @@ export const fetchConversations = async (userId: string) => {
   }));
 };
 
-// ✅ Fetch Messages (Now Supports Pagination)
-export const fetchMessages = async (conversationId: string, limit = 50, offset = 0): Promise<Message[]> => {
-  const { data, error } = await supabase
-    .from('messages')
-    .select('*')
-    .eq('conversation_id', conversationId)
-    .order('created_at', { ascending: true })
-    .range(offset, offset + limit - 1);
-
-  if (error) throw error;
-  return data || [];
-};
-
-// ✅ Send Message (Ensures Correct Timestamp)
-export const sendMessage = async (
-  conversationId: string,
-  senderId: string,
-  recipientId: string,
-  content: string
-): Promise<Message | null> => {
-  const message = {
-    conversation_id: conversationId,
-    sender_id: senderId,
-    recipient_id: recipientId,
-    content,
-    is_read: false,
-    created_at: new Date().toISOString(), // Added timestamp
-  };
-
-  const { data, error } = await supabase.from('messages').insert([message]).select().single();
-
-  if (error) {
-    console.error('Error sending message:', error);
-    return null;
-  }
-
-  return data;
-};
-
 // ✅ Mark Messages as Read (Optimized)
 export const markMessagesAsRead = async (conversationId: string, userId: string) => {
   const { error } = await supabase
@@ -149,13 +196,13 @@ export const markMessagesAsRead = async (conversationId: string, userId: string)
 };
 
 // ✅ Subscribe to Chats (Prevents Duplicate Subscriptions)
-export const subscribeToChats = (onChat: (chat: Chat) => void) => {
+export const subscribeToChats = (onChat: (chat: any) => void) => {
   if (subscriptions.has('chats')) return subscriptions.get('chats');
 
   const channel = supabase
     .channel('chats')
     .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'chats' }, (payload) => {
-      onChat(payload.new as Chat);
+      onChat(payload.new as any);
     })
     .subscribe();
 
@@ -168,7 +215,7 @@ export const subscribeToChats = (onChat: (chat: Chat) => void) => {
 };
 
 // ✅ Send Chat (Ensures Timestamp)
-export const sendChat = async (content: string, senderId: string): Promise<Chat | null> => {
+export const sendChat = async (content: string, senderId: string): Promise<any | null> => {
   const { data, error } = await supabase
     .from('chats')
     .insert([{ content, sender_id: senderId, created_at: new Date().toISOString() }])
@@ -184,7 +231,7 @@ export const sendChat = async (content: string, senderId: string): Promise<Chat 
 };
 
 // ✅ Fetch Chats (Pagination Support)
-export const fetchChats = async (limit = 50): Promise<Chat[]> => {
+export const fetchChats = async (limit = 50): Promise<any[]> => {
   const { data, error } = await supabase
     .from('chats')
     .select('*')
