@@ -1,43 +1,36 @@
-
-import { useState, useEffect } from "react";
-import { useAuth } from "@/providers/AuthProvider";
-import { Loader2 } from "lucide-react";
-import { fetchConversations, subscribeToConversations } from "@/services/chatService";
-import { Conversation } from "@/types/chat";
-import { ChatScreen } from "@/components/chat/ChatScreen";
+import { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
+import { useAuth } from '@/providers/AuthProvider';
+import { Conversation } from '@/types/chat';
+import { ChatScreen } from '@/components/chat/ChatScreen';
+import { Loader2 } from 'lucide-react';
+import { fetchConversations } from '@/services/chatService';
 
 const ChatPage = () => {
+  const { conversationId } = useParams();
   const { user } = useAuth();
-  const [conversations, setConversations] = useState<Conversation[]>([]);
-  const [activeConversation, setActiveConversation] = useState<Conversation | null>(null);
+  const [conversation, setConversation] = useState<Conversation | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    if (!user) return;
+    if (!user || !conversationId) return;
 
-    const loadConversations = async () => {
+    const loadConversation = async () => {
       try {
-        const convs = await fetchConversations(user.id);
-        setConversations(convs);
-        if (convs.length > 0) {
-          setActiveConversation(convs[0]);
+        const conversations = await fetchConversations(user.id);
+        const conv = conversations.find(c => c.id === conversationId);
+        if (conv) {
+          setConversation(conv);
         }
       } catch (error) {
-        console.error('Error loading conversations:', error);
+        console.error('Error loading conversation:', error);
       } finally {
         setIsLoading(false);
       }
     };
 
-    loadConversations();
-
-    // Subscribe to conversation updates
-    const unsubscribe = subscribeToConversations(user.id, loadConversations);
-
-    return () => {
-      unsubscribe();
-    };
-  }, [user]);
+    loadConversation();
+  }, [user, conversationId]);
 
   if (!user) {
     return (
@@ -55,47 +48,15 @@ const ChatPage = () => {
     );
   }
 
-  return (
-    <div className="h-screen flex">
-      {/* Conversations List */}
-      <div className="w-80 border-r bg-muted/30">
-        <div className="p-4 border-b">
-          <h2 className="font-semibold">Conversations</h2>
-        </div>
-        <div className="overflow-y-auto">
-          {conversations.map((conv) => {
-            const partner = conv.participants.find(p => p.id !== user.id);
-            if (!partner) return null;
-            return (
-              <button
-                key={conv.id}
-                onClick={() => setActiveConversation(conv)}
-                className={`w-full p-4 text-left hover:bg-muted/50 ${
-                  activeConversation?.id === conv.id ? 'bg-muted' : ''
-                }`}
-              >
-                <div className="font-medium">{partner.name}</div>
-                <div className="text-sm text-muted-foreground truncate">
-                  {conv.lastMessage?.content || 'No messages yet'}
-                </div>
-              </button>
-            );
-          })}
-        </div>
+  if (!conversation) {
+    return (
+      <div className="h-screen flex items-center justify-center">
+        <p>Conversation not found</p>
       </div>
+    );
+  }
 
-      {/* Active Chat */}
-      <div className="flex-1">
-        {activeConversation ? (
-          <ChatScreen conversation={activeConversation} />
-        ) : (
-          <div className="h-full flex items-center justify-center text-muted-foreground">
-            Select a conversation to start chatting
-          </div>
-        )}
-      </div>
-    </div>
-  );
+  return <ChatScreen conversation={conversation} />;
 };
 
 export default ChatPage;
