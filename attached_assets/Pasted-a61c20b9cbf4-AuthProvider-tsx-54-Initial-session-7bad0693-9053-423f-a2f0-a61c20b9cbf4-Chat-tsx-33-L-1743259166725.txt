@@ -1,0 +1,262 @@
+a61c20b9cbf4
+AuthProvider.tsx:54 Initial session: 7bad0693-9053-423f-a2f0-a61c20b9cbf4
+Chat.tsx:33 Loading state: true
+Chat.tsx:34 User: null
+Chat.tsx:35 Conversations: []
+Chat.tsx:33 Loading state: false
+Chat.tsx:34 User: null
+Chat.tsx:35 Conversations: []
+Chat.tsx:33 Loading state: false
+Chat.tsx:34 User: {id: '7bad0693-9053-423f-a2f0-a61c20b9cbf4', aud: 'authenticated', role: 'authenticated', email: 'isthisroshan@gmail.com', email_confirmed_at: '2025-03-24T06:14:24.781766Z', …}
+Chat.tsx:35 Conversations: []
+Chat.tsx:33 Loading state: true
+Chat.tsx:34 User: {id: '7bad0693-9053-423f-a2f0-a61c20b9cbf4', aud: 'authenticated', role: 'authenticated', email: 'isthisroshan@gmail.com', email_confirmed_at: '2025-03-24T06:14:24.781766Z', …}
+Chat.tsx:35 Conversations: []
+Chat.tsx:33 Loading state: true
+Chat.tsx:34 User: {id: '7bad0693-9053-423f-a2f0-a61c20b9cbf4', aud: 'authenticated', role: 'authenticated', email: 'isthisroshan@gmail.com', email_confirmed_at: '2025-03-24T06:14:24.781766Z', …}
+Chat.tsx:35 Conversations: []
+@supabase_supabase-js.js?v=188d5fb6:3900 
+            
+            
+           GET https://yekzyvdjjozhhatdefsq.supabase.co/rest/v1/conversations?select=*%2Cparticipants%3Aconversation_participants%28user%3Aprofiles%28*%29%29%2Clast_message%3Amessages%28*%29&participant_ids=cs.%7B7bad0693-9053-423f-a2f0-a61c20b9cbf4%7D&order=updated_at.desc 400 (Bad Request)
+(anonymous) @ @supabase_supabase-js.js?v=188d5fb6:3900
+(anonymous) @ @supabase_supabase-js.js?v=188d5fb6:3921
+fulfilled @ @supabase_supabase-js.js?v=188d5fb6:3873
+Promise.then
+step @ @supabase_supabase-js.js?v=188d5fb6:3886
+(anonymous) @ @supabase_supabase-js.js?v=188d5fb6:3888
+__awaiter6 @ @supabase_supabase-js.js?v=188d5fb6:3870
+(anonymous) @ @supabase_supabase-js.js?v=188d5fb6:3911
+then @ @supabase_supabase-js.js?v=188d5fb6:89Understand this errorAI
+Chat.tsx:50 Error loading conversations: {code: 'PGRST200', details: "Searched for a foreign key relationship between 'c…n the schema 'public', but no matches were found.", hint: null, message: "Could not find a relationship between 'conversation_participants' and 'profiles' in the schema cache"}
+loadConversations @ Chat.tsx:50
+await in loadConversations
+(anonymous) @ Chat.tsx:62
+commitHookEffectListMount @ chunk-W6L2VRDA.js?v=188d5fb6:16915
+commitPassiveMountOnFiber @ chunk-W6L2VRDA.js?v=188d5fb6:18156
+commitPassiveMountEffects_complete @ chunk-W6L2VRDA.js?v=188d5fb6:18129
+commitPassiveMountEffects_begin @ chunk-W6L2VRDA.js?v=188d5fb6:18119
+commitPassiveMountEffects @ chunk-W6L2VRDA.js?v=188d5fb6:18109
+flushPassiveEffectsImpl @ chunk-W6L2VRDA.js?v=188d5fb6:19490
+flushPassiveEffects @ chunk-W6L2VRDA.js?v=188d5fb6:19447
+(anonymous) @ chunk-W6L2VRDA.js?v=188d5fb6:19328
+workLoop @ chunk-W6L2VRDA.js?v=188d5fb6:197
+flushWork @ chunk-W6L2VRDA.js?v=188d5fb6:176
+performWorkUntilDeadline @ chunk-W6L2VRDA.js?v=188d5fb6:384Understand this errorAI
+Chat.tsx:267 Uncaught ReferenceError: Button is not defined
+    at Chat (Chat.tsx:267:12)
+    at renderWithHooks (chunk-W6L2VRDA.js?v=188d5fb6:11548:26)
+    at updateFunctionComponent (chunk-W6L2VRDA.js?v=188d5fb6:14582:28)
+    at beginWork (chunk-W6L2VRDA.js?v=188d5fb6:15924:22)
+    at HTMLUnknownElement.callCallback2 (chunk-W6L2VRDA.js?v=188d5fb6:3674:22)
+    at Object.invokeGuardedCallbackDev (chunk-W6L2VRDA.js?v=188d5fb6:3699:24)
+    at invokeGuardedCallback (chunk-W6L2VRDA.js?v=188d5fb6:3733:39)
+    at beginWork$1 (chunk-W6L2VRDA.js?v=188d5fb6:19765:15)
+    at performUnitOfWork (chunk-W6L2VRDA.js?v=188d5fb6:19198:20)
+    at workLoopSync (chunk-W6L2VRDA.js?v=188d5fb6:19137:13)
+Chat @ Chat.tsx:267
+renderWithHooks @ chunk-W6L2VRDA.js?v=188d5fb6:11548
+updateFunctionComponent @ chunk-W6L2VRDA.js?v=188d5fb6:14582
+beginWork @ chunk-W6L2VRDA.js?v=188d5fb6:15924
+callCallback2 @ chunk-W6L2VRDA.js?v=188d5fb6:3674
+invokeGuardedCallbackDev @ chunk-W6L2VRDA.js?v=188d5fb6:3699
+invokeGuardedCallback @ chunk-W6L2VRDA.js?v=188d5fb6:3733
+beginWork$1 @ chunk-W6L2VRDA.js?v=188d5fb6:19765
+performUnitOfWork @ chunk-W6L2VRDA.js?v=188d5fb6:19198
+workLoopSync @ chunk-W6L2VRDA.js?v=188d5fb6:19137
+renderRootSync @ chunk-W6L2VRDA.js?v=188d5fb6:19116
+performConcurrentWorkOnRoot @ chunk-W6L2VRDA.js?v=188d5fb6:18678
+workLoop @ chunk-W6L2VRDA.js?v=188d5fb6:197
+flushWork @ chunk-W6L2VRDA.js?v=188d5fb6:176
+performWorkUntilDeadline @ chunk-W6L2VRDA.js?v=188d5fb6:384Understand this errorAI
+Chat.tsx:267 Uncaught ReferenceError: Button is not defined
+    at Chat (Chat.tsx:267:12)
+    at renderWithHooks (chunk-W6L2VRDA.js?v=188d5fb6:11548:26)
+    at updateFunctionComponent (chunk-W6L2VRDA.js?v=188d5fb6:14582:28)
+    at beginWork (chunk-W6L2VRDA.js?v=188d5fb6:15924:22)
+    at HTMLUnknownElement.callCallback2 (chunk-W6L2VRDA.js?v=188d5fb6:3674:22)
+    at Object.invokeGuardedCallbackDev (chunk-W6L2VRDA.js?v=188d5fb6:3699:24)
+    at invokeGuardedCallback (chunk-W6L2VRDA.js?v=188d5fb6:3733:39)
+    at beginWork$1 (chunk-W6L2VRDA.js?v=188d5fb6:19765:15)
+    at performUnitOfWork (chunk-W6L2VRDA.js?v=188d5fb6:19198:20)
+    at workLoopSync (chunk-W6L2VRDA.js?v=188d5fb6:19137:13)
+Chat @ Chat.tsx:267
+renderWithHooks @ chunk-W6L2VRDA.js?v=188d5fb6:11548
+updateFunctionComponent @ chunk-W6L2VRDA.js?v=188d5fb6:14582
+beginWork @ chunk-W6L2VRDA.js?v=188d5fb6:15924
+callCallback2 @ chunk-W6L2VRDA.js?v=188d5fb6:3674
+invokeGuardedCallbackDev @ chunk-W6L2VRDA.js?v=188d5fb6:3699
+invokeGuardedCallback @ chunk-W6L2VRDA.js?v=188d5fb6:3733
+beginWork$1 @ chunk-W6L2VRDA.js?v=188d5fb6:19765
+performUnitOfWork @ chunk-W6L2VRDA.js?v=188d5fb6:19198
+workLoopSync @ chunk-W6L2VRDA.js?v=188d5fb6:19137
+renderRootSync @ chunk-W6L2VRDA.js?v=188d5fb6:19116
+recoverFromConcurrentError @ chunk-W6L2VRDA.js?v=188d5fb6:18736
+performConcurrentWorkOnRoot @ chunk-W6L2VRDA.js?v=188d5fb6:18684
+workLoop @ chunk-W6L2VRDA.js?v=188d5fb6:197
+flushWork @ chunk-W6L2VRDA.js?v=188d5fb6:176
+performWorkUntilDeadline @ chunk-W6L2VRDA.js?v=188d5fb6:384Understand this errorAI
+chunk-W6L2VRDA.js?v=188d5fb6:14032 The above error occurred in the <Chat> component:
+
+    at Chat (https://e6c41a8b-f4e5-4f73-8fa0-8d2b96f6bd8c-00-ilejrhg7nvtf.pike.replit.dev/src/pages/Chat.tsx?t=1743259118198:21:47)
+    at main
+    at div
+    at AppLayout (https://e6c41a8b-f4e5-4f73-8fa0-8d2b96f6bd8c-00-ilejrhg7nvtf.pike.replit.dev/src/components/layouts/AppLayout.tsx:35:22)
+    at ProtectedRoute (https://e6c41a8b-f4e5-4f73-8fa0-8d2b96f6bd8c-00-ilejrhg7nvtf.pike.replit.dev/src/components/auth/ProtectedRoute.tsx:15:27)
+    at RenderedRoute (https://e6c41a8b-f4e5-4f73-8fa0-8d2b96f6bd8c-00-ilejrhg7nvtf.pike.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=188d5fb6:4069:5)
+    at Routes (https://e6c41a8b-f4e5-4f73-8fa0-8d2b96f6bd8c-00-ilejrhg7nvtf.pike.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=188d5fb6:4508:5)
+    at AppRoutes (https://e6c41a8b-f4e5-4f73-8fa0-8d2b96f6bd8c-00-ilejrhg7nvtf.pike.replit.dev/src/App.tsx?t=1743259118198:35:33)
+    at AuthProvider (https://e6c41a8b-f4e5-4f73-8fa0-8d2b96f6bd8c-00-ilejrhg7nvtf.pike.replit.dev/src/providers/AuthProvider.tsx:23:32)
+    at Router (https://e6c41a8b-f4e5-4f73-8fa0-8d2b96f6bd8c-00-ilejrhg7nvtf.pike.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=188d5fb6:4451:15)
+    at BrowserRouter (https://e6c41a8b-f4e5-4f73-8fa0-8d2b96f6bd8c-00-ilejrhg7nvtf.pike.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=188d5fb6:5196:5)
+    at ThemeProvider (https://e6c41a8b-f4e5-4f73-8fa0-8d2b96f6bd8c-00-ilejrhg7nvtf.pike.replit.dev/src/components/theme-provider.tsx:17:33)
+    at QueryClientProvider (https://e6c41a8b-f4e5-4f73-8fa0-8d2b96f6bd8c-00-ilejrhg7nvtf.pike.replit.dev/node_modules/.vite/deps/@tanstack_react-query.js?v=188d5fb6:2794:3)
+    at App
+
+Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://reactjs.org/link/error-boundaries to learn more about error boundaries.
+logCapturedError @ chunk-W6L2VRDA.js?v=188d5fb6:14032
+update.callback @ chunk-W6L2VRDA.js?v=188d5fb6:14052
+callCallback @ chunk-W6L2VRDA.js?v=188d5fb6:11248
+commitUpdateQueue @ chunk-W6L2VRDA.js?v=188d5fb6:11265
+commitLayoutEffectOnFiber @ chunk-W6L2VRDA.js?v=188d5fb6:17093
+commitLayoutMountEffects_complete @ chunk-W6L2VRDA.js?v=188d5fb6:17980
+commitLayoutEffects_begin @ chunk-W6L2VRDA.js?v=188d5fb6:17969
+commitLayoutEffects @ chunk-W6L2VRDA.js?v=188d5fb6:17920
+commitRootImpl @ chunk-W6L2VRDA.js?v=188d5fb6:19353
+commitRoot @ chunk-W6L2VRDA.js?v=188d5fb6:19277
+finishConcurrentRender @ chunk-W6L2VRDA.js?v=188d5fb6:18760
+performConcurrentWorkOnRoot @ chunk-W6L2VRDA.js?v=188d5fb6:18718
+workLoop @ chunk-W6L2VRDA.js?v=188d5fb6:197
+flushWork @ chunk-W6L2VRDA.js?v=188d5fb6:176
+performWorkUntilDeadline @ chunk-W6L2VRDA.js?v=188d5fb6:384Understand this errorAI
+chunk-W6L2VRDA.js?v=188d5fb6:19413 Uncaught ReferenceError: Button is not defined
+    at Chat (Chat.tsx:267:12)
+    at renderWithHooks (chunk-W6L2VRDA.js?v=188d5fb6:11548:26)
+    at updateFunctionComponent (chunk-W6L2VRDA.js?v=188d5fb6:14582:28)
+    at beginWork (chunk-W6L2VRDA.js?v=188d5fb6:15924:22)
+    at beginWork$1 (chunk-W6L2VRDA.js?v=188d5fb6:19753:22)
+    at performUnitOfWork (chunk-W6L2VRDA.js?v=188d5fb6:19198:20)
+    at workLoopSync (chunk-W6L2VRDA.js?v=188d5fb6:19137:13)
+    at renderRootSync (chunk-W6L2VRDA.js?v=188d5fb6:19116:15)
+    at recoverFromConcurrentError (chunk-W6L2VRDA.js?v=188d5fb6:18736:28)
+    at performConcurrentWorkOnRoot (chunk-W6L2VRDA.js?v=188d5fb6:18684:30)
+Chat @ Chat.tsx:267
+renderWithHooks @ chunk-W6L2VRDA.js?v=188d5fb6:11548
+updateFunctionComponent @ chunk-W6L2VRDA.js?v=188d5fb6:14582
+beginWork @ chunk-W6L2VRDA.js?v=188d5fb6:15924
+beginWork$1 @ chunk-W6L2VRDA.js?v=188d5fb6:19753
+performUnitOfWork @ chunk-W6L2VRDA.js?v=188d5fb6:19198
+workLoopSync @ chunk-W6L2VRDA.js?v=188d5fb6:19137
+renderRootSync @ chunk-W6L2VRDA.js?v=188d5fb6:19116
+recoverFromConcurrentError @ chunk-W6L2VRDA.js?v=188d5fb6:18736
+performConcurrentWorkOnRoot @ chunk-W6L2VRDA.js?v=188d5fb6:18684
+workLoop @ chunk-W6L2VRDA.js?v=188d5fb6:197
+flushWork @ chunk-W6L2VRDA.js?v=188d5fb6:176
+performWorkUntilDeadline @ chunk-W6L2VRDA.js?v=188d5fb6:384Understand this errorAI
+chunk-W6L2VRDA.js?v=188d5fb6:16670 Uncaught TypeError: unsubscribe is not a function
+    at Chat.tsx:84:7
+    at safelyCallDestroy (chunk-W6L2VRDA.js?v=188d5fb6:16748:13)
+    at commitHookEffectListUnmount (chunk-W6L2VRDA.js?v=188d5fb6:16875:19)
+    at commitPassiveUnmountInsideDeletedTreeOnFiber (chunk-W6L2VRDA.js?v=188d5fb6:18283:17)
+    at commitPassiveUnmountEffectsInsideOfDeletedTree_begin (chunk-W6L2VRDA.js?v=188d5fb6:18245:13)
+    at commitPassiveUnmountEffects_begin (chunk-W6L2VRDA.js?v=188d5fb6:18181:19)
+    at commitPassiveUnmountEffects (chunk-W6L2VRDA.js?v=188d5fb6:18169:11)
+    at flushPassiveEffectsImpl (chunk-W6L2VRDA.js?v=188d5fb6:19489:11)
+    at flushPassiveEffects (chunk-W6L2VRDA.js?v=188d5fb6:19447:22)
+    at performSyncWorkOnRoot (chunk-W6L2VRDA.js?v=188d5fb6:18868:11)
+(anonymous) @ Chat.tsx:84
+safelyCallDestroy @ chunk-W6L2VRDA.js?v=188d5fb6:16748
+commitHookEffectListUnmount @ chunk-W6L2VRDA.js?v=188d5fb6:16875
+commitPassiveUnmountInsideDeletedTreeOnFiber @ chunk-W6L2VRDA.js?v=188d5fb6:18283
+commitPassiveUnmountEffectsInsideOfDeletedTree_begin @ chunk-W6L2VRDA.js?v=188d5fb6:18245
+commitPassiveUnmountEffects_begin @ chunk-W6L2VRDA.js?v=188d5fb6:18181
+commitPassiveUnmountEffects @ chunk-W6L2VRDA.js?v=188d5fb6:18169
+flushPassiveEffectsImpl @ chunk-W6L2VRDA.js?v=188d5fb6:19489
+flushPassiveEffects @ chunk-W6L2VRDA.js?v=188d5fb6:19447
+performSyncWorkOnRoot @ chunk-W6L2VRDA.js?v=188d5fb6:18868
+flushSyncCallbacks @ chunk-W6L2VRDA.js?v=188d5fb6:9119
+(anonymous) @ chunk-W6L2VRDA.js?v=188d5fb6:18627Understand this errorAI
+chunk-W6L2VRDA.js?v=188d5fb6:14032 The above error occurred in the <Chat> component:
+
+    at Chat (https://e6c41a8b-f4e5-4f73-8fa0-8d2b96f6bd8c-00-ilejrhg7nvtf.pike.replit.dev/src/pages/Chat.tsx?t=1743259118198:21:47)
+    at main
+    at div
+    at AppLayout (https://e6c41a8b-f4e5-4f73-8fa0-8d2b96f6bd8c-00-ilejrhg7nvtf.pike.replit.dev/src/components/layouts/AppLayout.tsx:35:22)
+    at ProtectedRoute (https://e6c41a8b-f4e5-4f73-8fa0-8d2b96f6bd8c-00-ilejrhg7nvtf.pike.replit.dev/src/components/auth/ProtectedRoute.tsx:15:27)
+    at RenderedRoute (https://e6c41a8b-f4e5-4f73-8fa0-8d2b96f6bd8c-00-ilejrhg7nvtf.pike.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=188d5fb6:4069:5)
+    at Routes (https://e6c41a8b-f4e5-4f73-8fa0-8d2b96f6bd8c-00-ilejrhg7nvtf.pike.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=188d5fb6:4508:5)
+    at AppRoutes (https://e6c41a8b-f4e5-4f73-8fa0-8d2b96f6bd8c-00-ilejrhg7nvtf.pike.replit.dev/src/App.tsx?t=1743259118198:35:33)
+    at AuthProvider (https://e6c41a8b-f4e5-4f73-8fa0-8d2b96f6bd8c-00-ilejrhg7nvtf.pike.replit.dev/src/providers/AuthProvider.tsx:23:32)
+    at Router (https://e6c41a8b-f4e5-4f73-8fa0-8d2b96f6bd8c-00-ilejrhg7nvtf.pike.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=188d5fb6:4451:15)
+    at BrowserRouter (https://e6c41a8b-f4e5-4f73-8fa0-8d2b96f6bd8c-00-ilejrhg7nvtf.pike.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=188d5fb6:5196:5)
+    at ThemeProvider (https://e6c41a8b-f4e5-4f73-8fa0-8d2b96f6bd8c-00-ilejrhg7nvtf.pike.replit.dev/src/components/theme-provider.tsx:17:33)
+    at QueryClientProvider (https://e6c41a8b-f4e5-4f73-8fa0-8d2b96f6bd8c-00-ilejrhg7nvtf.pike.replit.dev/node_modules/.vite/deps/@tanstack_react-query.js?v=188d5fb6:2794:3)
+    at App
+
+Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://reactjs.org/link/error-boundaries to learn more about error boundaries.
+logCapturedError @ chunk-W6L2VRDA.js?v=188d5fb6:14032
+update.callback @ chunk-W6L2VRDA.js?v=188d5fb6:14052
+callCallback @ chunk-W6L2VRDA.js?v=188d5fb6:11248
+commitUpdateQueue @ chunk-W6L2VRDA.js?v=188d5fb6:11265
+commitLayoutEffectOnFiber @ chunk-W6L2VRDA.js?v=188d5fb6:17093
+commitLayoutMountEffects_complete @ chunk-W6L2VRDA.js?v=188d5fb6:17980
+commitLayoutEffects_begin @ chunk-W6L2VRDA.js?v=188d5fb6:17969
+commitLayoutEffects @ chunk-W6L2VRDA.js?v=188d5fb6:17920
+commitRootImpl @ chunk-W6L2VRDA.js?v=188d5fb6:19353
+commitRoot @ chunk-W6L2VRDA.js?v=188d5fb6:19277
+performSyncWorkOnRoot @ chunk-W6L2VRDA.js?v=188d5fb6:18895
+flushSyncCallbacks @ chunk-W6L2VRDA.js?v=188d5fb6:9119
+(anonymous) @ chunk-W6L2VRDA.js?v=188d5fb6:18627Understand this errorAI
+chunk-W6L2VRDA.js?v=188d5fb6:9129 Uncaught TypeError: unsubscribe is not a function
+    at Chat.tsx:84:7
+    at safelyCallDestroy (chunk-W6L2VRDA.js?v=188d5fb6:16748:13)
+    at commitHookEffectListUnmount (chunk-W6L2VRDA.js?v=188d5fb6:16875:19)
+    at commitPassiveUnmountInsideDeletedTreeOnFiber (chunk-W6L2VRDA.js?v=188d5fb6:18283:17)
+    at commitPassiveUnmountEffectsInsideOfDeletedTree_begin (chunk-W6L2VRDA.js?v=188d5fb6:18245:13)
+    at commitPassiveUnmountEffects_begin (chunk-W6L2VRDA.js?v=188d5fb6:18181:19)
+    at commitPassiveUnmountEffects (chunk-W6L2VRDA.js?v=188d5fb6:18169:11)
+    at flushPassiveEffectsImpl (chunk-W6L2VRDA.js?v=188d5fb6:19489:11)
+    at flushPassiveEffects (chunk-W6L2VRDA.js?v=188d5fb6:19447:22)
+    at performSyncWorkOnRoot (chunk-W6L2VRDA.js?v=188d5fb6:18868:11)
+(anonymous) @ Chat.tsx:84
+safelyCallDestroy @ chunk-W6L2VRDA.js?v=188d5fb6:16748
+commitHookEffectListUnmount @ chunk-W6L2VRDA.js?v=188d5fb6:16875
+commitPassiveUnmountInsideDeletedTreeOnFiber @ chunk-W6L2VRDA.js?v=188d5fb6:18283
+commitPassiveUnmountEffectsInsideOfDeletedTree_begin @ chunk-W6L2VRDA.js?v=188d5fb6:18245
+commitPassiveUnmountEffects_begin @ chunk-W6L2VRDA.js?v=188d5fb6:18181
+commitPassiveUnmountEffects @ chunk-W6L2VRDA.js?v=188d5fb6:18169
+flushPassiveEffectsImpl @ chunk-W6L2VRDA.js?v=188d5fb6:19489
+flushPassiveEffects @ chunk-W6L2VRDA.js?v=188d5fb6:19447
+performSyncWorkOnRoot @ chunk-W6L2VRDA.js?v=188d5fb6:18868
+flushSyncCallbacks @ chunk-W6L2VRDA.js?v=188d5fb6:9119
+(anonymous) @ chunk-W6L2VRDA.js?v=188d5fb6:18627Understand this errorAI
+@supabase_supabase-js.js?v=188d5fb6:3900 
+            
+            
+           GET https://yekzyvdjjozhhatdefsq.supabase.co/rest/v1/conversations?select=*%2Cparticipants%3Aconversation_participants%28user%3Aprofiles%28*%29%29%2Clast_message%3Amessages%28*%29&participant_ids=cs.%7B7bad0693-9053-423f-a2f0-a61c20b9cbf4%7D&order=updated_at.desc 400 (Bad Request)
+(anonymous) @ @supabase_supabase-js.js?v=188d5fb6:3900
+(anonymous) @ @supabase_supabase-js.js?v=188d5fb6:3921
+fulfilled @ @supabase_supabase-js.js?v=188d5fb6:3873
+Promise.then
+step @ @supabase_supabase-js.js?v=188d5fb6:3886
+(anonymous) @ @supabase_supabase-js.js?v=188d5fb6:3888
+__awaiter6 @ @supabase_supabase-js.js?v=188d5fb6:3870
+(anonymous) @ @supabase_supabase-js.js?v=188d5fb6:3911
+then @ @supabase_supabase-js.js?v=188d5fb6:89Understand this errorAI
+Chat.tsx:74 Uncaught (in promise) {code: 'PGRST200', details: "Searched for a foreign key relationship between 'c…n the schema 'public', but no matches were found.", hint: null, message: "Could not find a relationship between 'conversation_participants' and 'profiles' in the schema cache"}
+loadConversations @ Chat.tsx:74
+await in loadConversations
+(anonymous) @ Chat.tsx:76
+commitHookEffectListMount @ chunk-W6L2VRDA.js?v=188d5fb6:16915
+commitPassiveMountOnFiber @ chunk-W6L2VRDA.js?v=188d5fb6:18156
+commitPassiveMountEffects_complete @ chunk-W6L2VRDA.js?v=188d5fb6:18129
+commitPassiveMountEffects_begin @ chunk-W6L2VRDA.js?v=188d5fb6:18119
+commitPassiveMountEffects @ chunk-W6L2VRDA.js?v=188d5fb6:18109
+flushPassiveEffectsImpl @ chunk-W6L2VRDA.js?v=188d5fb6:19490
+flushPassiveEffects @ chunk-W6L2VRDA.js?v=188d5fb6:19447
+(anonymous) @ chunk-W6L2VRDA.js?v=188d5fb6:19328
+workLoop @ chunk-W6L2VRDA.js?v=188d5fb6:197
+flushWork @ chunk-W6L2VRDA.js?v=188d5fb6:176
+performWorkUntilDeadline @ chunk-W6L2VRDA.js?v=188d5fb6:384Understand this errorAI
