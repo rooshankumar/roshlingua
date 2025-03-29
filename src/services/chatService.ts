@@ -1,5 +1,5 @@
 import { supabase } from '@/lib/supabase';
-import type { Message, Conversation } from '@/types/chat';
+import { Message, ChatMessage, Conversation } from '@/types/chat';
 
 // Placeholder useAuth hook -  Needs a proper implementation
 const useAuth = () => {
@@ -78,14 +78,13 @@ export const sendMessage = async (
   senderId: string,
   recipientId: string,
   content: string
-): Promise<Message> => {
+) => {
   const message = {
     conversation_id: conversationId,
     sender_id: senderId,
     recipient_id: recipientId,
-    content: content,
-    created_at: new Date().toISOString(),
-    is_read: false
+    content,
+    is_read: false,
   };
 
   const { data, error } = await supabase
@@ -98,26 +97,41 @@ export const sendMessage = async (
   return data;
 };
 
-export const markAsRead = async (messageId: string) => {
+export const markMessagesAsRead = async (conversationId: string, userId: string) => {
   const { error } = await supabase
     .from('messages')
     .update({ is_read: true })
-    .eq('id', messageId);
+    .eq('conversation_id', conversationId)
+    .eq('recipient_id', userId)
+    .eq('is_read', false);
 
   if (error) throw error;
 };
 
-export const subscribeToMessages = (conversationId: string, callback: (message: Message) => void) => {
+export const subscribeToMessages = (callback: (message: Message) => void) => {
   return supabase
-    .channel(`messages:${conversationId}`)
-    .on('INSERT', (payload) => callback(payload.new as Message))
+    .channel('messages')
+    .on(
+      'postgres_changes',
+      { event: 'INSERT', schema: 'public', table: 'messages' },
+      (payload) => callback(payload.new as Message)
+    )
     .subscribe();
 };
 
 export const subscribeToConversations = (userId: string, callback: () => void) => {
   return supabase
-    .channel(`conversations:${userId}`)
-    .on('*', callback)
+    .channel('conversations')
+    .on(
+      'postgres_changes',
+      {
+        event: '*',
+        schema: 'public',
+        table: 'conversations',
+        filter: `participant_ids=cs.{${userId}}`
+      },
+      () => callback()
+    )
     .subscribe();
 };
 
