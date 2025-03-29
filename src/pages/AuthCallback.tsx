@@ -11,11 +11,31 @@ const AuthCallback = () => {
   useEffect(() => {
     const handleAuthCallback = async () => {
       try {
-        // Retrieve the authenticated user
+        // Step 1: Extract tokens from URL fragment
+        const hashParams = new URLSearchParams(window.location.hash.substring(1)); // Remove `#`
+        const accessToken = hashParams.get("access_token");
+        const refreshToken = hashParams.get("refresh_token");
+        const expiresIn = hashParams.get("expires_in");
+
+        if (!accessToken || !refreshToken) {
+          throw new Error("Missing authentication tokens.");
+        }
+
+        // Step 2: Store session in Supabase
+        const { data, error } = await supabase.auth.setSession({
+          access_token: accessToken,
+          refresh_token: refreshToken,
+        });
+
+        if (error) {
+          throw error;
+        }
+
+        // Step 3: Get the user session from Supabase
         const { data: userData, error: userError } = await supabase.auth.getUser();
 
         if (userError || !userData?.user) {
-          throw new Error("No session found. Please log in again.");
+          throw new Error("Failed to retrieve user session.");
         }
 
         const user = userData.user;
@@ -25,39 +45,19 @@ const AuthCallback = () => {
         const email = user.email || "";
         const fullName = user.user_metadata?.full_name || user.user_metadata?.name || email.split("@")[0];
 
-        // Calculate age from birthdate (if available)
-        let age = null;
-        if (user.user_metadata?.birthdate) {
-          const birthDate = new Date(user.user_metadata.birthdate);
-          const today = new Date();
-          age = today.getFullYear() - birthDate.getFullYear();
-
-          // Adjust age if birthday hasn't occurred yet this year
-          if (
-            today.getMonth() < birthDate.getMonth() ||
-            (today.getMonth() === birthDate.getMonth() && today.getDate() < birthDate.getDate())
-          ) {
-            age--;
-          }
-        }
-
-        // Create user record in our database
-        const success = await createUserRecord(user.id, email, fullName, age);
+        // Step 4: Save user in database
+        const success = await createUserRecord(user.id, email, fullName, null);
 
         if (!success) {
           console.warn("User record creation failed, but proceeding...");
         }
 
-        // Check onboarding status
-        const { data: onboardingData, error: onboardingError } = await supabase
+        // Step 5: Redirect user based on onboarding status
+        const { data: onboardingData } = await supabase
           .from("onboarding_status")
           .select("is_complete")
           .eq("user_id", user.id)
-          .maybeSingle(); // <== This prevents an error if there's no data
-
-        if (onboardingError) {
-          console.error("Onboarding check failed:", onboardingError);
-        }
+          .maybeSingle();
 
         if (onboardingData?.is_complete) {
           navigate("/dashboard", { replace: true });
