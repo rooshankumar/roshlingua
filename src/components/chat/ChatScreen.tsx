@@ -7,7 +7,7 @@ import { MessageInput } from "./MessageInput";
 import { useEffect, useRef, useState } from "react";
 import { ArrowLeft, MoreVertical } from "lucide-react";
 import { Button } from "../ui/button";
-import { useMobile } from "@/hooks/use-mobile";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { TypingIndicator } from "./TypingIndicator";
 
 interface ChatScreenProps {
