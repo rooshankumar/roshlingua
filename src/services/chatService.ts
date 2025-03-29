@@ -1,5 +1,5 @@
 import { supabase } from '@/lib/supabase';
-import { Message, ChatMessage, Conversation } from '@/types/chat';
+import { Message, Conversation } from '@/types/chat';
 
 // Placeholder useAuth hook -  Needs a proper implementation
 const useAuth = () => {
@@ -78,13 +78,13 @@ export const sendMessage = async (
   senderId: string,
   recipientId: string,
   content: string
-) => {
+): Promise<Message> => {
   const message = {
     conversation_id: conversationId,
     sender_id: senderId,
     recipient_id: recipientId,
     content,
-    is_read: false,
+    is_read: false
   };
 
   const { data, error } = await supabase
@@ -140,10 +140,10 @@ export const fetchConversations = async (userId: string): Promise<Conversation[]
     .from('conversations')
     .select(`
       *,
-      participants:conversation_participants(user:profiles(*)),
-      last_message:messages(*)
+      conversation_participants!inner(user_id, conversation_id),
+      profiles!conversation_participants(*)
     `)
-    .contains('participant_ids', [userId])
+    .eq('conversation_participants.user_id', userId)
     .order('updated_at', { ascending: false });
 
   if (error) throw error;

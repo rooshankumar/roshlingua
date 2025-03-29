@@ -1,5 +1,6 @@
 
 import { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
 import { ConversationList } from "@/components/chat/ConversationList";
 import { ChatScreen } from "@/components/chat/ChatScreen";
 import { Message, Conversation, User } from "@/types/chat";
