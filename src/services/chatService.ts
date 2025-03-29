@@ -51,11 +51,11 @@ export const fetchConversations = async (userId: string): Promise<Conversation[]
       *,
       participants:conversation_participants(
         user_id,
-        user:auth.users(
+        user:auth.users!inner(
           id,
           email,
-          user_metadata->>full_name as name,
-          user_metadata->>avatar_url as avatar
+          user_metadata->>'full_name' AS name,
+          user_metadata->>'avatar_url' AS avatar
         )
       ),
       last_message:messages(*)
