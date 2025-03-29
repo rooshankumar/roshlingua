@@ -1,0 +1,99 @@
+a61c20b9cbf4
+AuthProvider.tsx:54 Initial session: 7bad0693-9053-423f-a2f0-a61c20b9cbf4
+chunk-W6L2VRDA.js?v=b8938980:16670 Uncaught TypeError: supabase.auth.user is not a function
+    at subscribeToMessages (chatService.ts:59:28)
+    at ChatScreen.tsx:58:25
+    at commitHookEffectListMount (chunk-W6L2VRDA.js?v=b8938980:16915:34)
+    at commitPassiveMountOnFiber (chunk-W6L2VRDA.js?v=b8938980:18156:19)
+    at commitPassiveMountEffects_complete (chunk-W6L2VRDA.js?v=b8938980:18129:17)
+    at commitPassiveMountEffects_begin (chunk-W6L2VRDA.js?v=b8938980:18119:15)
+    at commitPassiveMountEffects (chunk-W6L2VRDA.js?v=b8938980:18109:11)
+    at flushPassiveEffectsImpl (chunk-W6L2VRDA.js?v=b8938980:19490:11)
+    at flushPassiveEffects (chunk-W6L2VRDA.js?v=b8938980:19447:22)
+    at performSyncWorkOnRoot (chunk-W6L2VRDA.js?v=b8938980:18868:11)
+subscribeToMessages @ chatService.ts:59
+(anonymous) @ ChatScreen.tsx:58
+commitHookEffectListMount @ chunk-W6L2VRDA.js?v=b8938980:16915
+commitPassiveMountOnFiber @ chunk-W6L2VRDA.js?v=b8938980:18156
+commitPassiveMountEffects_complete @ chunk-W6L2VRDA.js?v=b8938980:18129
+commitPassiveMountEffects_begin @ chunk-W6L2VRDA.js?v=b8938980:18119
+commitPassiveMountEffects @ chunk-W6L2VRDA.js?v=b8938980:18109
+flushPassiveEffectsImpl @ chunk-W6L2VRDA.js?v=b8938980:19490
+flushPassiveEffects @ chunk-W6L2VRDA.js?v=b8938980:19447
+performSyncWorkOnRoot @ chunk-W6L2VRDA.js?v=b8938980:18868
+flushSyncCallbacks @ chunk-W6L2VRDA.js?v=b8938980:9119
+commitRootImpl @ chunk-W6L2VRDA.js?v=b8938980:19432
+commitRoot @ chunk-W6L2VRDA.js?v=b8938980:19277
+finishConcurrentRender @ chunk-W6L2VRDA.js?v=b8938980:18805
+performConcurrentWorkOnRoot @ chunk-W6L2VRDA.js?v=b8938980:18718
+workLoop @ chunk-W6L2VRDA.js?v=b8938980:197
+flushWork @ chunk-W6L2VRDA.js?v=b8938980:176
+performWorkUntilDeadline @ chunk-W6L2VRDA.js?v=b8938980:384Understand this errorAI
+chunk-W6L2VRDA.js?v=b8938980:14032 The above error occurred in the <ChatScreen> component:
+
+    at ChatScreen (https://311dc50e-02bb-41a1-8cc7-bdb86136d3b1-00-3dnhmmi5i7l9a.sisko.replit.dev/src/components/chat/ChatScreen.tsx?t=1743268498811:19:30)
+    at ChatPage (https://311dc50e-02bb-41a1-8cc7-bdb86136d3b1-00-3dnhmmi5i7l9a.sisko.replit.dev/src/pages/Chat.tsx?t=1743268498811:19:32)
+    at main
+    at div
+    at AppLayout (https://311dc50e-02bb-41a1-8cc7-bdb86136d3b1-00-3dnhmmi5i7l9a.sisko.replit.dev/src/components/layouts/AppLayout.tsx:35:22)
+    at ProtectedRoute (https://311dc50e-02bb-41a1-8cc7-bdb86136d3b1-00-3dnhmmi5i7l9a.sisko.replit.dev/src/components/auth/ProtectedRoute.tsx:15:27)
+    at RenderedRoute (https://311dc50e-02bb-41a1-8cc7-bdb86136d3b1-00-3dnhmmi5i7l9a.sisko.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=b8938980:4069:5)
+    at Routes (https://311dc50e-02bb-41a1-8cc7-bdb86136d3b1-00-3dnhmmi5i7l9a.sisko.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=b8938980:4508:5)
+    at AppRoutes (https://311dc50e-02bb-41a1-8cc7-bdb86136d3b1-00-3dnhmmi5i7l9a.sisko.replit.dev/src/App.tsx?t=1743268498811:35:33)
+    at AuthProvider (https://311dc50e-02bb-41a1-8cc7-bdb86136d3b1-00-3dnhmmi5i7l9a.sisko.replit.dev/src/providers/AuthProvider.tsx:23:32)
+    at Router (https://311dc50e-02bb-41a1-8cc7-bdb86136d3b1-00-3dnhmmi5i7l9a.sisko.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=b8938980:4451:15)
+    at BrowserRouter (https://311dc50e-02bb-41a1-8cc7-bdb86136d3b1-00-3dnhmmi5i7l9a.sisko.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=b8938980:5196:5)
+    at ThemeProvider (https://311dc50e-02bb-41a1-8cc7-bdb86136d3b1-00-3dnhmmi5i7l9a.sisko.replit.dev/src/components/theme-provider.tsx:17:33)
+    at QueryClientProvider (https://311dc50e-02bb-41a1-8cc7-bdb86136d3b1-00-3dnhmmi5i7l9a.sisko.replit.dev/node_modules/.vite/deps/@tanstack_react-query.js?v=b8938980:2794:3)
+    at App
+
+Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://reactjs.org/link/error-boundaries to learn more about error boundaries.
+logCapturedError @ chunk-W6L2VRDA.js?v=b8938980:14032
+update.callback @ chunk-W6L2VRDA.js?v=b8938980:14052
+callCallback @ chunk-W6L2VRDA.js?v=b8938980:11248
+commitUpdateQueue @ chunk-W6L2VRDA.js?v=b8938980:11265
+commitLayoutEffectOnFiber @ chunk-W6L2VRDA.js?v=b8938980:17093
+commitLayoutMountEffects_complete @ chunk-W6L2VRDA.js?v=b8938980:17980
+commitLayoutEffects_begin @ chunk-W6L2VRDA.js?v=b8938980:17969
+commitLayoutEffects @ chunk-W6L2VRDA.js?v=b8938980:17920
+commitRootImpl @ chunk-W6L2VRDA.js?v=b8938980:19353
+commitRoot @ chunk-W6L2VRDA.js?v=b8938980:19277
+performSyncWorkOnRoot @ chunk-W6L2VRDA.js?v=b8938980:18895
+flushSyncCallbacks @ chunk-W6L2VRDA.js?v=b8938980:9119
+commitRootImpl @ chunk-W6L2VRDA.js?v=b8938980:19432
+commitRoot @ chunk-W6L2VRDA.js?v=b8938980:19277
+finishConcurrentRender @ chunk-W6L2VRDA.js?v=b8938980:18805
+performConcurrentWorkOnRoot @ chunk-W6L2VRDA.js?v=b8938980:18718
+workLoop @ chunk-W6L2VRDA.js?v=b8938980:197
+flushWork @ chunk-W6L2VRDA.js?v=b8938980:176
+performWorkUntilDeadline @ chunk-W6L2VRDA.js?v=b8938980:384Understand this errorAI
+chunk-W6L2VRDA.js?v=b8938980:9129 Uncaught TypeError: supabase.auth.user is not a function
+    at subscribeToMessages (chatService.ts:59:28)
+    at ChatScreen.tsx:58:25
+    at commitHookEffectListMount (chunk-W6L2VRDA.js?v=b8938980:16915:34)
+    at commitPassiveMountOnFiber (chunk-W6L2VRDA.js?v=b8938980:18156:19)
+    at commitPassiveMountEffects_complete (chunk-W6L2VRDA.js?v=b8938980:18129:17)
+    at commitPassiveMountEffects_begin (chunk-W6L2VRDA.js?v=b8938980:18119:15)
+    at commitPassiveMountEffects (chunk-W6L2VRDA.js?v=b8938980:18109:11)
+    at flushPassiveEffectsImpl (chunk-W6L2VRDA.js?v=b8938980:19490:11)
+    at flushPassiveEffects (chunk-W6L2VRDA.js?v=b8938980:19447:22)
+    at performSyncWorkOnRoot (chunk-W6L2VRDA.js?v=b8938980:18868:11)
+subscribeToMessages @ chatService.ts:59
+(anonymous) @ ChatScreen.tsx:58
+commitHookEffectListMount @ chunk-W6L2VRDA.js?v=b8938980:16915
+commitPassiveMountOnFiber @ chunk-W6L2VRDA.js?v=b8938980:18156
+commitPassiveMountEffects_complete @ chunk-W6L2VRDA.js?v=b8938980:18129
+commitPassiveMountEffects_begin @ chunk-W6L2VRDA.js?v=b8938980:18119
+commitPassiveMountEffects @ chunk-W6L2VRDA.js?v=b8938980:18109
+flushPassiveEffectsImpl @ chunk-W6L2VRDA.js?v=b8938980:19490
+flushPassiveEffects @ chunk-W6L2VRDA.js?v=b8938980:19447
+performSyncWorkOnRoot @ chunk-W6L2VRDA.js?v=b8938980:18868
+flushSyncCallbacks @ chunk-W6L2VRDA.js?v=b8938980:9119
+commitRootImpl @ chunk-W6L2VRDA.js?v=b8938980:19432
+commitRoot @ chunk-W6L2VRDA.js?v=b8938980:19277
+finishConcurrentRender @ chunk-W6L2VRDA.js?v=b8938980:18805
+performConcurrentWorkOnRoot @ chunk-W6L2VRDA.js?v=b8938980:18718
+workLoop @ chunk-W6L2VRDA.js?v=b8938980:197
+flushWork @ chunk-W6L2VRDA.js?v=b8938980:176
+performWorkUntilDeadline @ chunk-W6L2VRDA.js?v=b8938980:384Understand this errorAI
