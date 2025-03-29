@@ -2,6 +2,8 @@
 -- Create the conversations table
 CREATE TABLE IF NOT EXISTS public.conversations (
   id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+  creator_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  last_message_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()),
   created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
