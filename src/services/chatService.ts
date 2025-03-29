@@ -123,6 +123,7 @@ export const fetchConversations = async (userId: string): Promise<Conversation[]
     .select(`
       *,
       conversation_participants!inner (
+        user_id,
         profiles (
           id,
           name,
@@ -143,20 +144,7 @@ export const fetchConversations = async (userId: string): Promise<Conversation[]
     .order('updated_at', { ascending: false });
 
   if (error) throw error;
-
-  return data?.map(conversation => ({
-    id: conversation.id,
-    participants: conversation.conversation_participants.map(p => ({
-      id: p.profiles.id,
-      name: p.profiles.name,
-      avatar: p.profiles.avatar_url,
-      lastSeen: p.profiles.last_seen
-    })),
-    lastMessage: conversation.messages[0],
-    createdAt: conversation.created_at,
-    lastMessageAt: conversation.messages[0]?.created_at || conversation.created_at,
-    unreadCount: conversation.messages.filter(m => !m.is_read && m.recipient_id === userId).length
-  })) || [];
+  return data || [];
 };
 
 export const fetchMessages = async (conversationId: string): Promise<Message[]> => {
