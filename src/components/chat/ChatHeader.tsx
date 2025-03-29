@@ -1,7 +1,7 @@
 
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { useSupabase } from '@/hooks/useSupabase';
+import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/providers/AuthProvider';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
@@ -15,7 +15,6 @@ interface ChatHeaderProps {
 
 export const ChatHeader = ({ partner }: ChatHeaderProps) => {
   const { id } = useParams();
-  const { supabase } = useSupabase();
   const { user } = useAuth();
   const [otherUser, setOtherUser] = useState<Profile | null>(null);
 
@@ -50,7 +49,7 @@ export const ChatHeader = ({ partner }: ChatHeaderProps) => {
     }
 
     getOtherUserInfo();
-  }, [id, supabase, user, partner]);
+  }, [id, user, partner]);
 
   if (partner) {
     return (
