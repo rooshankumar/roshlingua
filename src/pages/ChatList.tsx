@@ -49,21 +49,32 @@ export default function ChatList() {
           console.error("Query error:", error);
           setConversations([]);
         } else if (data) {
-          const processedConversations = data.map(conv => ({
-            id: conv.id,
-            created_at: conv.created_at,
-            updated_at: conv.updated_at,
-            participants: conv.participants
-              .filter(p => p.user.id !== user.id)
-              .map(p => ({
-                id: p.user.id,
-                name: p.user.full_name || p.user.email?.split('@')[0] || 'Unknown User',
-                avatar: p.user.avatar_url || '/placeholder.svg',
-                email: p.user.email
-              })),
-            lastMessage: conv.messages?.[0]
-          }));
+          const processedConversations = data.map(conv => {
+            const otherParticipant = conv.participants
+              .find(p => p.user.id !== user.id)?.user;
+            
+            const lastMessage = conv.messages?.[0];
+            
+            return {
+              id: conv.id,
+              created_at: conv.created_at,
+              updated_at: conv.updated_at,
+              lastMessage: lastMessage ? {
+                content: lastMessage.content,
+                timestamp: lastMessage.created_at,
+                isRead: lastMessage.is_read
+              } : null,
+              participant: otherParticipant ? {
+                id: otherParticipant.id,
+                name: otherParticipant.full_name || otherParticipant.email?.split('@')[0] || 'Unknown User',
+                avatar: otherParticipant.avatar_url || '/placeholder.svg',
+                email: otherParticipant.email
+              } : null
+            };
+          }).sort((a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime());
+          
           setConversations(processedConversations);
+          setLoading(false);
         }
 
         if (error) {
@@ -129,21 +140,25 @@ export default function ChatList() {
             className="flex items-center gap-3 p-3 rounded-lg hover:bg-secondary/50 transition-colors"
           >
             <Avatar>
-              <AvatarImage
-                src={conversation.participants[0]?.profiles?.avatar_url}
-              />
+              <AvatarImage src={conversation.participant?.avatar} />
               <AvatarFallback>
-                {conversation.participants[0]?.profiles?.username?.[0]?.toUpperCase() || '?'}
+                {conversation.participant?.name?.[0]?.toUpperCase() || '?'}
               </AvatarFallback>
             </Avatar>
             <div className="flex-1">
-              <h3 className="font-medium">
-                {conversation.participants[0]?.profiles?.username || 'Unknown User'}
-              </h3>
-              <UserStatus
-                isOnline={conversation.participants[0]?.profiles?.is_online}
-                lastSeen={conversation.participants[0]?.profiles?.last_seen}
-              />
+              <div className="flex justify-between items-start">
+                <h3 className="font-medium">{conversation.participant?.name}</h3>
+                {conversation.lastMessage && (
+                  <span className="text-xs text-muted-foreground">
+                    {new Date(conversation.lastMessage.timestamp).toLocaleDateString()}
+                  </span>
+                )}
+              </div>
+              {conversation.lastMessage && (
+                <p className="text-sm text-muted-foreground truncate">
+                  {conversation.lastMessage.content}
+                </p>
+              )}
             </div>
           </Link>
         ))}
