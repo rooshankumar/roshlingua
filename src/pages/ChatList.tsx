@@ -30,6 +30,37 @@ const ChatList = () => {
   const [conversations, setConversations] = useState<ChatPreview[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
+  // Track online presence
+  useEffect(() => {
+    if (!user) return;
+    
+    const channel = supabase.channel('online-users')
+      .on('presence', { event: 'sync' }, () => {
+        const state = channel.presenceState();
+        const presenceData = Object.values(state).flat() as any[];
+        setConversations(prev => prev.map(conv => ({
+          ...conv,
+          participant: {
+            ...conv.participant,
+            is_online: presenceData.some(p => p.user_id === conv.participant.id),
+            last_seen: presenceData.find(p => p.user_id === conv.participant.id)?.last_seen
+          }
+        })));
+      })
+      .subscribe(async (status) => {
+        if (status === 'SUBSCRIBED') {
+          await channel.track({
+            user_id: user.id,
+            last_seen: new Date().toISOString()
+          });
+        }
+      });
+
+    return () => {
+      channel.unsubscribe();
+    };
+  }, [user]);
+
   useEffect(() => {
     if (!user) return;
     setIsLoading(true);
@@ -162,10 +193,17 @@ const ChatList = () => {
                   <div className="ml-4 flex-1">
                     <div className="flex items-center justify-between">
                       <h3 className="font-medium">{conversation.participant.full_name}</h3>
-                      <UserStatus 
-                        isOnline={conversation.participant.is_online} 
-                        lastSeen={conversation.participant.last_seen} 
-                      />
+                      <div className="flex flex-col items-end gap-1">
+                        <UserStatus 
+                          isOnline={conversation.participant.is_online} 
+                          lastSeen={conversation.participant.last_seen} 
+                        />
+                        {conversation.lastMessage && (
+                          <span className="text-xs text-muted-foreground">
+                            {new Date(conversation.lastMessage.created_at).toLocaleDateString()}
+                          </span>
+                        )}
+                      </div>
                     </div>
                     {conversation.lastMessage && (
                       <p className="text-sm text-muted-foreground truncate">
