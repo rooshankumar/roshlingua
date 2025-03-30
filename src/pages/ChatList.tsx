@@ -36,11 +36,6 @@ export default function ChatList() {
           .from('conversation_participants')
           .select(`
             conversation_id,
-            conversations!conversation_participants_conversation_id_fkey (
-              id,
-              creator_id,
-              last_message_at
-            ),
             users!conversation_participants_user_id_fkey (
               id,
               email,
@@ -48,7 +43,7 @@ export default function ChatList() {
               avatar_url
             )
           `)
-          .eq('user_id', user.id);
+          .neq('user_id', user.id);
 
         if (participantsError) throw participantsError;
 

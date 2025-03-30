@@ -66,7 +66,7 @@ export const ChatScreen = ({ conversation }: ChatScreenProps) => {
     });
 
     return () => {
-      unsubscribe();
+      unsubscribe(); //Corrected unsubscribe
     };
   }, [conversation?.id]);
 
