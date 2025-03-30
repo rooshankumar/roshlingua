@@ -67,6 +67,7 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
       proficiencyLevel: "",
       learningGoal: "",
       avatarUrl: "",
+      dob: undefined as Date | undefined,
     },
     // Basic validation to ensure required fields are filled
     // Alternatively, you could use zod or another schema validator
@@ -146,6 +147,42 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
                 gender: values.gender,
                 date_of_birth: values.dob?.toISOString(),
                 native_language: values.nativeLanguage,
+
+              <div className="grid gap-2">
+                <Label htmlFor="dob">Date of Birth</Label>
+                <Input
+                  type="date"
+                  id="dob"
+                  {...form.register("dob")}
+                  className="col-span-3"
+                />
+              </div>
+
+              <div className="grid gap-2">
+                <Label htmlFor="avatar">Profile Picture</Label>
+                <Input
+                  type="file"
+                  id="avatar"
+                  accept="image/*"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      uploadAvatar(file);
+                    }
+                  }}
+                  className="col-span-3"
+                />
+                {form.getValues("avatarUrl") && (
+                  <div className="mt-2">
+                    <img 
+                      src={form.getValues("avatarUrl")} 
+                      alt="Profile preview" 
+                      className="w-24 h-24 rounded-full object-cover"
+                    />
+                  </div>
+                )}
+              </div>
+
                 learning_language: values.learningLanguage,
                 proficiency_level: values.proficiencyLevel,
                 learning_goal: values.learningGoal,
@@ -229,6 +266,13 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
     try {
       setIsLoading(true);
       const formData = form.getValues();
+      const { data: { user }, error: userError } = await supabase.auth.getUser();
+      
+      if (userError || !user) {
+        throw new Error('User not authenticated');
+      }
+
+      const userId = user.id;
       console.log("Submitting onboarding data:", formData);
 
       // Get the current user
@@ -387,17 +431,40 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
     }
   };
 
-  const uploadAvatar = () => {
-    // In a real app, this would open a file picker and upload the image
-    // For now, let's simulate uploading an avatar
-    setTimeout(() => {
-      form.setValue("avatarUrl", "/placeholder.svg");
+  const uploadAvatar = async (file: File) => {
+    try {
+      setIsLoading(true);
+      const fileExt = file.name.split('.').pop();
+      const filePath = `${userId}/${Math.random()}.${fileExt}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(filePath, file);
+
+      if (uploadError) {
+        throw uploadError;
+      }
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('avatars')
+        .getPublicUrl(filePath);
+
+      form.setValue("avatarUrl", publicUrl);
 
       toast({
         title: "Avatar uploaded",
         description: "Your profile picture has been updated.",
       });
-    }, 1000);
+    } catch (error) {
+      console.error('Error uploading avatar:', error);
+      toast({
+        variant: "destructive",
+        title: "Upload failed",
+        description: "Could not upload profile picture. Please try again.",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   let userId = null;
