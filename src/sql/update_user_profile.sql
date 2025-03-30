@@ -13,7 +13,7 @@ CREATE OR REPLACE FUNCTION public.update_user_profile(
   streak_count INTEGER DEFAULT 0
 ) RETURNS VOID AS $$
 BEGIN
-  -- Update the users table
+  -- Update users table
   UPDATE public.users
   SET 
     avatar_url = COALESCE($2, users.avatar_url),
@@ -29,13 +29,25 @@ BEGIN
     updated_at = NOW()
   WHERE id = user_id;
 
-  -- Update the profiles table if exists
-  UPDATE public.profiles
-  SET 
-    bio = COALESCE($3, profiles.bio),
-    avatar_url = COALESCE($2, profiles.avatar_url),
-    streak_count = COALESCE($11, profiles.streak_count),
-    updated_at = NOW()
-  WHERE id = user_id;
+  -- Insert or update profiles table using UPSERT
+  INSERT INTO public.profiles (
+    id,
+    bio,
+    avatar_url,
+    streak_count,
+    updated_at
+  ) VALUES (
+    user_id,
+    COALESCE($3, (SELECT bio FROM public.profiles WHERE id = user_id)),
+    COALESCE($2, (SELECT avatar_url FROM public.profiles WHERE id = user_id)),
+    COALESCE($11, (SELECT streak_count FROM public.profiles WHERE id = user_id)),
+    NOW()
+  )
+  ON CONFLICT (id) DO UPDATE
+  SET
+    bio = EXCLUDED.bio,
+    avatar_url = EXCLUDED.avatar_url,
+    streak_count = EXCLUDED.streak_count,
+    updated_at = EXCLUDED.updated_at;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
