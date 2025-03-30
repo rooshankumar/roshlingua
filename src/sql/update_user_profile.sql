@@ -13,19 +13,19 @@ CREATE OR REPLACE FUNCTION public.update_user_profile(
   streak_count INTEGER DEFAULT 0
 ) RETURNS VOID AS $$
 BEGIN
-  UPDATE public.users u
+  UPDATE public.users
   SET 
-    avatar_url = COALESCE(update_user_profile.avatar_url, u.avatar_url),
-    bio = COALESCE(update_user_profile.bio, u.bio),
-    date_of_birth = COALESCE(update_user_profile.date_of_birth, u.date_of_birth),
-    email = COALESCE(update_user_profile.email, u.email),
-    full_name = COALESCE(update_user_profile.full_name, u.full_name),
-    gender = COALESCE(update_user_profile.gender, u.gender),
-    learning_language = COALESCE(update_user_profile.learning_language, u.learning_language),
-    native_language = COALESCE(update_user_profile.native_language, u.native_language),
-    proficiency_level = COALESCE(update_user_profile.proficiency_level, u.proficiency_level),
-    streak_count = COALESCE(update_user_profile.streak_count, u.streak_count),
+    avatar_url = COALESCE(update_user_profile.avatar_url, users.avatar_url),
+    bio = COALESCE(update_user_profile.bio, users.bio),
+    date_of_birth = COALESCE(update_user_profile.date_of_birth, users.date_of_birth),
+    email = COALESCE(update_user_profile.email, users.email),
+    full_name = COALESCE(update_user_profile.full_name, users.full_name),
+    gender = COALESCE(update_user_profile.gender, users.gender),
+    learning_language = COALESCE(update_user_profile.learning_language, users.learning_language),
+    native_language = COALESCE(update_user_profile.native_language, users.native_language),
+    proficiency_level = COALESCE(update_user_profile.proficiency_level, users.proficiency_level),
+    streak_count = COALESCE(update_user_profile.streak_count, users.streak_count),
     updated_at = NOW()
-  WHERE u.id = update_user_profile.user_id;
+  WHERE id = update_user_profile.user_id;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
