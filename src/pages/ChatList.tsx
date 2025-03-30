@@ -36,6 +36,11 @@ export default function ChatList() {
           .from('conversation_participants')
           .select(`
             conversation_id,
+            conversations!conversation_participants_conversation_id_fkey (
+              id,
+              creator_id,
+              last_message_at
+            ),
             users!conversation_participants_user_id_fkey (
               id,
               email,
@@ -43,12 +48,27 @@ export default function ChatList() {
               avatar_url
             )
           `)
-          .neq('user_id', user.id);
+          .eq('user_id', user.id);
 
         if (participantsError) throw participantsError;
 
         const conversationPreviews = await Promise.all(
           participantsData.map(async (participant) => {
+            // Get the other participant in the conversation
+            const { data: otherParticipant } = await supabase
+              .from('conversation_participants')
+              .select(`
+                users!conversation_participants_user_id_fkey (
+                  id,
+                  email,
+                  full_name,
+                  avatar_url
+                )
+              `)
+              .eq('conversation_id', participant.conversation_id)
+              .neq('user_id', user.id)
+              .single();
+
             const { data: messages } = await supabase
               .from('messages')
               .select('content, created_at')
@@ -59,10 +79,10 @@ export default function ChatList() {
             return {
               id: participant.conversation_id,
               participant: {
-                id: participant.users.id,
-                email: participant.users.email,
-                full_name: participant.users.full_name || participant.users.email?.split('@')[0],
-                avatar_url: participant.users.avatar_url || '/placeholder.svg'
+                id: otherParticipant?.users?.id,
+                email: otherParticipant?.users?.email,
+                full_name: otherParticipant?.users?.full_name || otherParticipant?.users?.email?.split('@')[0],
+                avatar_url: otherParticipant?.users?.avatar_url || '/placeholder.svg'
               },
               lastMessage: messages?.[0]
             };
