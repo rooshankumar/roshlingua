@@ -27,7 +27,7 @@ export const ChatHeader = ({ partner }: ChatHeaderProps) => {
         .from('conversation_participants')
         .select(`
           user_id,
-          profiles!conversation_participants_user_id_fkey (
+          profiles (
             id,
             username,
             avatar_url,
