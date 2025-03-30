@@ -50,7 +50,14 @@ const Settings = () => {
   };
 
   const handleSaveProfile = async () => {
-    if (!user?.id) return;
+    if (!user?.id) {
+      toast({
+        title: "Error",
+        description: "User ID not found",
+        variant: "destructive"
+      });
+      return;
+    }
 
     try {
       // Update user profile
@@ -65,7 +72,8 @@ const Settings = () => {
           date_of_birth: localProfile.date_of_birth,
           updated_at: new Date().toISOString()
         })
-        .eq('id', user.id);
+        .eq('id', user.id)
+        .single();
 
       if (userError) throw userError;
 
