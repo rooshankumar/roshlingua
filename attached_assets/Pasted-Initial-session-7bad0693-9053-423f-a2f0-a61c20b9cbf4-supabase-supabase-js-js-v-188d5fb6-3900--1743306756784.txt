@@ -1,0 +1,165 @@
+Initial session: 7bad0693-9053-423f-a2f0-a61c20b9cbf4
+@supabase_supabase-js.js?v=188d5fb6:3900 
+            
+            
+           POST https://yekzyvdjjozhhatdefsq.supabase.co/rest/v1/messages?select=* 400 (Bad Request)
+(anonymous) @ @supabase_supabase-js.js?v=188d5fb6:3900
+(anonymous) @ @supabase_supabase-js.js?v=188d5fb6:3921
+fulfilled @ @supabase_supabase-js.js?v=188d5fb6:3873
+Promise.then
+step @ @supabase_supabase-js.js?v=188d5fb6:3886
+(anonymous) @ @supabase_supabase-js.js?v=188d5fb6:3888
+__awaiter6 @ @supabase_supabase-js.js?v=188d5fb6:3870
+(anonymous) @ @supabase_supabase-js.js?v=188d5fb6:3911
+then @ @supabase_supabase-js.js?v=188d5fb6:89Understand this errorAI
+ChatScreen.tsx:125 Error sending message: {code: '23502', details: "Failing row contains (1711b7a5-92e0-4074-bdc1-55e1…t's up?, 2025-03-30 03:52:25.616552+00, f, null).", hint: null, message: 'null value in column "user_id" of relation "messages" violates not-null constraint'}
+sendMessage @ ChatScreen.tsx:125
+await in sendMessage
+callCallback2 @ chunk-W6L2VRDA.js?v=188d5fb6:3674
+invokeGuardedCallbackDev @ chunk-W6L2VRDA.js?v=188d5fb6:3699
+invokeGuardedCallback @ chunk-W6L2VRDA.js?v=188d5fb6:3733
+invokeGuardedCallbackAndCatchFirstError @ chunk-W6L2VRDA.js?v=188d5fb6:3736
+executeDispatch @ chunk-W6L2VRDA.js?v=188d5fb6:7014
+processDispatchQueueItemsInOrder @ chunk-W6L2VRDA.js?v=188d5fb6:7034
+processDispatchQueue @ chunk-W6L2VRDA.js?v=188d5fb6:7043
+dispatchEventsForPlugins @ chunk-W6L2VRDA.js?v=188d5fb6:7051
+(anonymous) @ chunk-W6L2VRDA.js?v=188d5fb6:7174
+batchedUpdates$1 @ chunk-W6L2VRDA.js?v=188d5fb6:18913
+batchedUpdates @ chunk-W6L2VRDA.js?v=188d5fb6:3579
+dispatchEventForPluginEventSystem @ chunk-W6L2VRDA.js?v=188d5fb6:7173
+dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay @ chunk-W6L2VRDA.js?v=188d5fb6:5478
+dispatchEvent @ chunk-W6L2VRDA.js?v=188d5fb6:5472
+dispatchDiscreteEvent @ chunk-W6L2VRDA.js?v=188d5fb6:5449Understand this errorAI
+ChatScreen.tsx:127 Uncaught ReferenceError: optimisticMessage is not defined
+    at ChatScreen.tsx:127:57
+    at Array.filter (<anonymous>)
+    at ChatScreen.tsx:127:32
+    at basicStateReducer (chunk-W6L2VRDA.js?v=188d5fb6:11703:49)
+    at updateReducer (chunk-W6L2VRDA.js?v=188d5fb6:11794:30)
+    at updateState (chunk-W6L2VRDA.js?v=188d5fb6:12021:18)
+    at Object.useState (chunk-W6L2VRDA.js?v=188d5fb6:12753:24)
+    at useState (chunk-ZMLY2J2T.js?v=188d5fb6:1066:29)
+    at ChatScreen (ChatScreen.tsx:29:35)
+    at renderWithHooks (chunk-W6L2VRDA.js?v=188d5fb6:11548:26)
+(anonymous) @ ChatScreen.tsx:127
+(anonymous) @ ChatScreen.tsx:127
+basicStateReducer @ chunk-W6L2VRDA.js?v=188d5fb6:11703
+updateReducer @ chunk-W6L2VRDA.js?v=188d5fb6:11794
+updateState @ chunk-W6L2VRDA.js?v=188d5fb6:12021
+useState @ chunk-W6L2VRDA.js?v=188d5fb6:12753
+useState @ chunk-ZMLY2J2T.js?v=188d5fb6:1066
+ChatScreen @ ChatScreen.tsx:29
+renderWithHooks @ chunk-W6L2VRDA.js?v=188d5fb6:11548
+updateFunctionComponent @ chunk-W6L2VRDA.js?v=188d5fb6:14582
+beginWork @ chunk-W6L2VRDA.js?v=188d5fb6:15924
+callCallback2 @ chunk-W6L2VRDA.js?v=188d5fb6:3674
+invokeGuardedCallbackDev @ chunk-W6L2VRDA.js?v=188d5fb6:3699
+invokeGuardedCallback @ chunk-W6L2VRDA.js?v=188d5fb6:3733
+beginWork$1 @ chunk-W6L2VRDA.js?v=188d5fb6:19765
+performUnitOfWork @ chunk-W6L2VRDA.js?v=188d5fb6:19198
+workLoopSync @ chunk-W6L2VRDA.js?v=188d5fb6:19137
+renderRootSync @ chunk-W6L2VRDA.js?v=188d5fb6:19116
+performConcurrentWorkOnRoot @ chunk-W6L2VRDA.js?v=188d5fb6:18678
+workLoop @ chunk-W6L2VRDA.js?v=188d5fb6:197
+flushWork @ chunk-W6L2VRDA.js?v=188d5fb6:176
+performWorkUntilDeadline @ chunk-W6L2VRDA.js?v=188d5fb6:384Understand this errorAI
+ChatScreen.tsx:127 Uncaught ReferenceError: optimisticMessage is not defined
+    at ChatScreen.tsx:127:57
+    at Array.filter (<anonymous>)
+    at ChatScreen.tsx:127:32
+    at basicStateReducer (chunk-W6L2VRDA.js?v=188d5fb6:11703:49)
+    at updateReducer (chunk-W6L2VRDA.js?v=188d5fb6:11794:30)
+    at updateState (chunk-W6L2VRDA.js?v=188d5fb6:12021:18)
+    at Object.useState (chunk-W6L2VRDA.js?v=188d5fb6:12753:24)
+    at useState (chunk-ZMLY2J2T.js?v=188d5fb6:1066:29)
+    at ChatScreen (ChatScreen.tsx:29:35)
+    at renderWithHooks (chunk-W6L2VRDA.js?v=188d5fb6:11548:26)
+(anonymous) @ ChatScreen.tsx:127
+(anonymous) @ ChatScreen.tsx:127
+basicStateReducer @ chunk-W6L2VRDA.js?v=188d5fb6:11703
+updateReducer @ chunk-W6L2VRDA.js?v=188d5fb6:11794
+updateState @ chunk-W6L2VRDA.js?v=188d5fb6:12021
+useState @ chunk-W6L2VRDA.js?v=188d5fb6:12753
+useState @ chunk-ZMLY2J2T.js?v=188d5fb6:1066
+ChatScreen @ ChatScreen.tsx:29
+renderWithHooks @ chunk-W6L2VRDA.js?v=188d5fb6:11548
+updateFunctionComponent @ chunk-W6L2VRDA.js?v=188d5fb6:14582
+beginWork @ chunk-W6L2VRDA.js?v=188d5fb6:15924
+callCallback2 @ chunk-W6L2VRDA.js?v=188d5fb6:3674
+invokeGuardedCallbackDev @ chunk-W6L2VRDA.js?v=188d5fb6:3699
+invokeGuardedCallback @ chunk-W6L2VRDA.js?v=188d5fb6:3733
+beginWork$1 @ chunk-W6L2VRDA.js?v=188d5fb6:19765
+performUnitOfWork @ chunk-W6L2VRDA.js?v=188d5fb6:19198
+workLoopSync @ chunk-W6L2VRDA.js?v=188d5fb6:19137
+renderRootSync @ chunk-W6L2VRDA.js?v=188d5fb6:19116
+recoverFromConcurrentError @ chunk-W6L2VRDA.js?v=188d5fb6:18736
+performConcurrentWorkOnRoot @ chunk-W6L2VRDA.js?v=188d5fb6:18684
+workLoop @ chunk-W6L2VRDA.js?v=188d5fb6:197
+flushWork @ chunk-W6L2VRDA.js?v=188d5fb6:176
+performWorkUntilDeadline @ chunk-W6L2VRDA.js?v=188d5fb6:384Understand this errorAI
+chunk-W6L2VRDA.js?v=188d5fb6:14032 The above error occurred in the <ChatScreen> component:
+
+    at ChatScreen (https://cad3dbcd-7fca-44c6-9d87-87d0f56ad7b5-00-29qas9zjta2qz.sisko.replit.dev/src/components/chat/ChatScreen.tsx?t=1743306733739:19:30)
+    at ChatPage (https://cad3dbcd-7fca-44c6-9d87-87d0f56ad7b5-00-29qas9zjta2qz.sisko.replit.dev/src/pages/Chat.tsx?t=1743306733739:19:32)
+    at main
+    at div
+    at AppLayout (https://cad3dbcd-7fca-44c6-9d87-87d0f56ad7b5-00-29qas9zjta2qz.sisko.replit.dev/src/components/layouts/AppLayout.tsx:35:22)
+    at ProtectedRoute (https://cad3dbcd-7fca-44c6-9d87-87d0f56ad7b5-00-29qas9zjta2qz.sisko.replit.dev/src/components/auth/ProtectedRoute.tsx:15:27)
+    at RenderedRoute (https://cad3dbcd-7fca-44c6-9d87-87d0f56ad7b5-00-29qas9zjta2qz.sisko.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=188d5fb6:4069:5)
+    at Routes (https://cad3dbcd-7fca-44c6-9d87-87d0f56ad7b5-00-29qas9zjta2qz.sisko.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=188d5fb6:4508:5)
+    at AppRoutes (https://cad3dbcd-7fca-44c6-9d87-87d0f56ad7b5-00-29qas9zjta2qz.sisko.replit.dev/src/App.tsx?t=1743306733739:35:33)
+    at AuthProvider (https://cad3dbcd-7fca-44c6-9d87-87d0f56ad7b5-00-29qas9zjta2qz.sisko.replit.dev/src/providers/AuthProvider.tsx:23:32)
+    at Router (https://cad3dbcd-7fca-44c6-9d87-87d0f56ad7b5-00-29qas9zjta2qz.sisko.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=188d5fb6:4451:15)
+    at BrowserRouter (https://cad3dbcd-7fca-44c6-9d87-87d0f56ad7b5-00-29qas9zjta2qz.sisko.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=188d5fb6:5196:5)
+    at ThemeProvider (https://cad3dbcd-7fca-44c6-9d87-87d0f56ad7b5-00-29qas9zjta2qz.sisko.replit.dev/src/components/theme-provider.tsx:17:33)
+    at QueryClientProvider (https://cad3dbcd-7fca-44c6-9d87-87d0f56ad7b5-00-29qas9zjta2qz.sisko.replit.dev/node_modules/.vite/deps/@tanstack_react-query.js?v=188d5fb6:2794:3)
+    at App
+
+Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://reactjs.org/link/error-boundaries to learn more about error boundaries.
+logCapturedError @ chunk-W6L2VRDA.js?v=188d5fb6:14032
+update.callback @ chunk-W6L2VRDA.js?v=188d5fb6:14052
+callCallback @ chunk-W6L2VRDA.js?v=188d5fb6:11248
+commitUpdateQueue @ chunk-W6L2VRDA.js?v=188d5fb6:11265
+commitLayoutEffectOnFiber @ chunk-W6L2VRDA.js?v=188d5fb6:17093
+commitLayoutMountEffects_complete @ chunk-W6L2VRDA.js?v=188d5fb6:17980
+commitLayoutEffects_begin @ chunk-W6L2VRDA.js?v=188d5fb6:17969
+commitLayoutEffects @ chunk-W6L2VRDA.js?v=188d5fb6:17920
+commitRootImpl @ chunk-W6L2VRDA.js?v=188d5fb6:19353
+commitRoot @ chunk-W6L2VRDA.js?v=188d5fb6:19277
+finishConcurrentRender @ chunk-W6L2VRDA.js?v=188d5fb6:18760
+performConcurrentWorkOnRoot @ chunk-W6L2VRDA.js?v=188d5fb6:18718
+workLoop @ chunk-W6L2VRDA.js?v=188d5fb6:197
+flushWork @ chunk-W6L2VRDA.js?v=188d5fb6:176
+performWorkUntilDeadline @ chunk-W6L2VRDA.js?v=188d5fb6:384Understand this errorAI
+chunk-W6L2VRDA.js?v=188d5fb6:19413 Uncaught ReferenceError: optimisticMessage is not defined
+    at ChatScreen.tsx:127:57
+    at Array.filter (<anonymous>)
+    at ChatScreen.tsx:127:32
+    at basicStateReducer (chunk-W6L2VRDA.js?v=188d5fb6:11703:49)
+    at updateReducer (chunk-W6L2VRDA.js?v=188d5fb6:11794:30)
+    at updateState (chunk-W6L2VRDA.js?v=188d5fb6:12021:18)
+    at Object.useState (chunk-W6L2VRDA.js?v=188d5fb6:12753:24)
+    at useState (chunk-ZMLY2J2T.js?v=188d5fb6:1066:29)
+    at ChatScreen (ChatScreen.tsx:29:35)
+    at renderWithHooks (chunk-W6L2VRDA.js?v=188d5fb6:11548:26)
+(anonymous) @ ChatScreen.tsx:127
+(anonymous) @ ChatScreen.tsx:127
+basicStateReducer @ chunk-W6L2VRDA.js?v=188d5fb6:11703
+updateReducer @ chunk-W6L2VRDA.js?v=188d5fb6:11794
+updateState @ chunk-W6L2VRDA.js?v=188d5fb6:12021
+useState @ chunk-W6L2VRDA.js?v=188d5fb6:12753
+useState @ chunk-ZMLY2J2T.js?v=188d5fb6:1066
+ChatScreen @ ChatScreen.tsx:29
+renderWithHooks @ chunk-W6L2VRDA.js?v=188d5fb6:11548
+updateFunctionComponent @ chunk-W6L2VRDA.js?v=188d5fb6:14582
+beginWork @ chunk-W6L2VRDA.js?v=188d5fb6:15924
+beginWork$1 @ chunk-W6L2VRDA.js?v=188d5fb6:19753
+performUnitOfWork @ chunk-W6L2VRDA.js?v=188d5fb6:19198
+workLoopSync @ chunk-W6L2VRDA.js?v=188d5fb6:19137
+renderRootSync @ chunk-W6L2VRDA.js?v=188d5fb6:19116
+recoverFromConcurrentError @ chunk-W6L2VRDA.js?v=188d5fb6:18736
+performConcurrentWorkOnRoot @ chunk-W6L2VRDA.js?v=188d5fb6:18684
+workLoop @ chunk-W6L2VRDA.js?v=188d5fb6:197
+flushWork @ chunk-W6L2VRDA.js?v=188d5fb6:176
+performWorkUntilDeadline @ chunk-W6L2VRDA.js?v=188d5fb6:384Understand this errorAI
