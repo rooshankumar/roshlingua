@@ -36,10 +36,37 @@ const Auth = () => {
   const from = (location.state as any)?.from || "/dashboard";
 
   useEffect(() => {
+    const checkOnboardingStatus = async () => {
+      if (!user) return;
+
+      try {
+        const { data, error } = await supabase
+          .from('users')
+          .select('onboarding_completed')
+          .eq('id', user.id)
+          .single();
+
+        if (error) throw error;
+
+        if (data?.onboarding_completed) {
+          navigate('/dashboard', { replace: true });
+        } else {
+          navigate('/onboarding', { replace: true });
+        }
+      } catch (error) {
+        console.error('Error checking onboarding status:', error);
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Failed to check onboarding status"
+        });
+      }
+    };
+
     if (user) {
-      navigate(from, { replace: true });
+      checkOnboardingStatus();
     }
-  }, [user, navigate, from]);
+  }, [user, navigate, toast]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();

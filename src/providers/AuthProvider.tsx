@@ -139,7 +139,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       });
 
       if (error) throw error;
-      // We now handle setting the user state via the onAuthStateChange listener
+
+      // Wait for session to be established
+      const maxAttempts = 10;
+      let attempts = 0;
+      
+      while (attempts < maxAttempts) {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session) {
+          setSession(session);
+          setUser(session.user);
+          break;
+        }
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        attempts++;
+      }
     } catch (error) {
       console.error("Google login error:", error);
       toast({
