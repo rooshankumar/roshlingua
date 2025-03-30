@@ -1,0 +1,107 @@
+[
+  {
+    "instance_id": "00000000-0000-0000-0000-000000000000",
+    "id": "7bad0693-9053-423f-a2f0-a61c20b9cbf4",
+    "aud": "authenticated",
+    "role": "authenticated",
+    "email": "isthisroshan@gmail.com",
+    "encrypted_password": "$2a$10$p2oDxunsjI9SDdKWNIbYV.bfMPaBYWNx747OcGWjtKIQYTZf8YEM.",
+    "email_confirmed_at": "2025-03-24 06:14:24.781766+00",
+    "invited_at": null,
+    "confirmation_token": "",
+    "confirmation_sent_at": "2025-03-24 06:14:06.719412+00",
+    "recovery_token": "",
+    "recovery_sent_at": null,
+    "email_change_token_new": "",
+    "email_change": "",
+    "email_change_sent_at": null,
+    "last_sign_in_at": "2025-03-30 04:59:28.145716+00",
+    "raw_app_meta_data": {
+      "provider": "email",
+      "providers": [
+        "email",
+        "google"
+      ]
+    },
+    "raw_user_meta_data": {
+      "iss": "https://accounts.google.com",
+      "sub": "106953344191144128084",
+      "name": "Roshan Kumar",
+      "email": "isthisroshan@gmail.com",
+      "gender": "Female",
+      "picture": "https://lh3.googleusercontent.com/a/ACg8ocLzRg2hwF5Vk6-GaDRYK5ZjPy8wg9PInK6iOsXgR7sJl_8iw5c=s96-c",
+      "full_name": "Roshan Kuma",
+      "onboarded": true,
+      "avatar_url": "https://lh3.googleusercontent.com/a/ACg8ocLzRg2hwF5Vk6-GaDRYK5ZjPy8wg9PInK6iOsXgR7sJl_8iw5c=s96-c",
+      "provider_id": "106953344191144128084",
+      "email_verified": true,
+      "phone_verified": false,
+      "native_language": "Chinese",
+      "proficiency_level": "Beginner (A1)"
+    },
+    "is_super_admin": null,
+    "created_at": "2025-03-24 06:14:06.708746+00",
+    "updated_at": "2025-03-30 04:59:28.15677+00",
+    "phone": null,
+    "phone_confirmed_at": null,
+    "phone_change": "",
+    "phone_change_token": "",
+    "phone_change_sent_at": null,
+    "confirmed_at": "2025-03-24 06:14:24.781766+00",
+    "email_change_token_current": "",
+    "email_change_confirm_status": 0,
+    "banned_until": null,
+    "reauthentication_token": "",
+    "reauthentication_sent_at": null,
+    "is_sso_user": false,
+    "deleted_at": null,
+    "is_anonymous": false
+  }
+]
+
+
+ChatGPT said:
+The error message "UPDATE requires a WHERE clause" suggests that your Supabase update request is missing a proper WHERE condition, which is necessary to target a specific row in the users table.
+
+Possible Causes:
+Incorrect Query Structure
+
+The PATCH request should include a valid condition like id=eq.<user_id> to specify which record to update.
+
+If the id is not being passed correctly, the update will fail.
+
+Supabase Client Code Issue
+
+If you’re using Supabase's JavaScript client, ensure the .eq("id", userId) is properly set before updating the record.
+
+Data Format Issues
+
+The raw_user_meta_data contains "gender": "Female", but your details indicate you are male. If this field has constraints in the database, the update may be failing.
+
+Permission Issues
+
+Ensure that the authenticated role has UPDATE permissions on the users table.
+
+Possible Fixes:
+Ensure the Update Query Has a WHERE Clause
+
+javascript
+Copy
+Edit
+const { data, error } = await supabase
+  .from('users')
+  .update({ gender: 'Male' }) // Modify as needed
+  .eq('id', '7bad0693-9053-423f-a2f0-a61c20b9cbf4'); // Ensure the ID is included
+
+if (error) {
+  console.error("Update Error:", error);
+}
+Check Your API Call
+Verify that the PATCH request URL includes a proper condition:
+
+bash
+Copy
+Edit
+PATCH https://yekzyvdjjozhhatdefsq.supabase.co/rest/v1/users?id=eq.7bad0693-9053-423f-a2f0-a61c20b9cbf4
+Review Supabase Policies
+Ensure your users table has an UPDATE policy allowing updates for authenticated users.
