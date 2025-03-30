@@ -61,9 +61,8 @@ const Settings = () => {
           [field]: value,
           updated_at: new Date().toISOString()
         })
-        .eq('id', user.id)
-        .select()
-        .single();
+        .match({ id: user.id })
+        .select();
 
       if (error) {
         throw error;
