@@ -147,10 +147,6 @@ const Settings = () => {
     }
   };
 
-  const handleSaveProfile = async () => {
-    try {
-      if (!user?.id) return;
-
       // Update bio if changed
       if (localBio !== profile?.bio) {
         await handleProfileChange("bio", localBio);
