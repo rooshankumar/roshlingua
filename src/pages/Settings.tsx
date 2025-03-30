@@ -137,7 +137,10 @@ const Settings = () => {
     try {
       const { data, error } = await supabase
         .from('users')
-        .update({ [field]: value })
+        .update({
+          [field]: value,
+          updated_at: new Date().toISOString()
+        })
         .eq('id', user?.id);
 
       if (error) throw error;
@@ -146,7 +149,7 @@ const Settings = () => {
         updateProfile({ ...profile, [field]: value });
         toast({
           title: "Success",
-          description: "Profile updated successfully"
+          description: `${field} updated successfully`
         });
       }
     } catch (error) {
