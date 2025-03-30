@@ -36,7 +36,8 @@ const ChatList = () => {
           .from('conversation_participants')
           .select(`
             conversation_id,
-            users!conversation_participants_user_id_fkey (
+            user_id,
+            users (
               id,
               email,
               full_name,
