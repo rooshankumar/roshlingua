@@ -1,0 +1,66 @@
+ST https://yekzyvdjjozhhatdefsq.supabase.co/rest/v1/users?on_conflict=id&select=* 401 (Unauthorized)
+(anonymous) @ @supabase_supabase-js.js?v=75cdd38b:3900
+(anonymous) @ @supabase_supabase-js.js?v=75cdd38b:3921
+fulfilled @ @supabase_supabase-js.js?v=75cdd38b:3873
+Promise.then
+step @ @supabase_supabase-js.js?v=75cdd38b:3886
+(anonymous) @ @supabase_supabase-js.js?v=75cdd38b:3888
+__awaiter6 @ @supabase_supabase-js.js?v=75cdd38b:3870
+(anonymous) @ @supabase_supabase-js.js?v=75cdd38b:3911
+then @ @supabase_supabase-js.js?v=75cdd38b:89Understand this errorAI
+AuthProvider.tsx:131 Error creating user profile: {code: '42501', details: null, hint: null, message: 'new row violates row-level security policy for table "users"'}code: "42501"details: nullhint: nullmessage: "new row violates row-level security policy for table \"users\""[[Prototype]]: Object
+signup @ AuthProvider.tsx:131
+await in signup
+handleSignup @ Auth.tsx:109
+callCallback2 @ chunk-W6L2VRDA.js?v=36ed0111:3674
+invokeGuardedCallbackDev @ chunk-W6L2VRDA.js?v=36ed0111:3699
+invokeGuardedCallback @ chunk-W6L2VRDA.js?v=36ed0111:3733
+invokeGuardedCallbackAndCatchFirstError @ chunk-W6L2VRDA.js?v=36ed0111:3736
+executeDispatch @ chunk-W6L2VRDA.js?v=36ed0111:7014
+processDispatchQueueItemsInOrder @ chunk-W6L2VRDA.js?v=36ed0111:7034
+processDispatchQueue @ chunk-W6L2VRDA.js?v=36ed0111:7043
+dispatchEventsForPlugins @ chunk-W6L2VRDA.js?v=36ed0111:7051
+(anonymous) @ chunk-W6L2VRDA.js?v=36ed0111:7174
+batchedUpdates$1 @ chunk-W6L2VRDA.js?v=36ed0111:18913
+batchedUpdates @ chunk-W6L2VRDA.js?v=36ed0111:3579
+dispatchEventForPluginEventSystem @ chunk-W6L2VRDA.js?v=36ed0111:7173
+dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay @ chunk-W6L2VRDA.js?v=36ed0111:5478
+dispatchEvent @ chunk-W6L2VRDA.js?v=36ed0111:5472
+dispatchDiscreteEvent @ chunk-W6L2VRDA.js?v=36ed0111:5449Understand this errorAI
+AuthProvider.tsx:146 Signup error: {code: '42501', details: null, hint: null, message: 'new row violates row-level security policy for table "users"'}code: "42501"details: nullhint: nullmessage: "new row violates row-level security policy for table \"users\""[[Prototype]]: Object
+signup @ AuthProvider.tsx:146
+await in signup
+handleSignup @ Auth.tsx:109
+callCallback2 @ chunk-W6L2VRDA.js?v=36ed0111:3674
+invokeGuardedCallbackDev @ chunk-W6L2VRDA.js?v=36ed0111:3699
+invokeGuardedCallback @ chunk-W6L2VRDA.js?v=36ed0111:3733
+invokeGuardedCallbackAndCatchFirstError @ chunk-W6L2VRDA.js?v=36ed0111:3736
+executeDispatch @ chunk-W6L2VRDA.js?v=36ed0111:7014
+processDispatchQueueItemsInOrder @ chunk-W6L2VRDA.js?v=36ed0111:7034
+processDispatchQueue @ chunk-W6L2VRDA.js?v=36ed0111:7043
+dispatchEventsForPlugins @ chunk-W6L2VRDA.js?v=36ed0111:7051
+(anonymous) @ chunk-W6L2VRDA.js?v=36ed0111:7174
+batchedUpdates$1 @ chunk-W6L2VRDA.js?v=36ed0111:18913
+batchedUpdates @ chunk-W6L2VRDA.js?v=36ed0111:3579
+dispatchEventForPluginEventSystem @ chunk-W6L2VRDA.js?v=36ed0111:7173
+dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay @ chunk-W6L2VRDA.js?v=36ed0111:5478
+dispatchEvent @ chunk-W6L2VRDA.js?v=36ed0111:5472
+dispatchDiscreteEvent @ chunk-W6L2VRDA.js?v=36ed0111:5449Understand this errorAI
+Auth.tsx:119 Signup error in component: {code: '42501', details: null, hint: null, message: 'new row violates row-level security policy for table "users"'}code: "42501"details: nullhint: nullmessage: "new row violates row-level security policy for table \"users\""[[Prototype]]: Object
+handleSignup @ Auth.tsx:119
+await in handleSignup
+callCallback2 @ chunk-W6L2VRDA.js?v=36ed0111:3674
+invokeGuardedCallbackDev @ chunk-W6L2VRDA.js?v=36ed0111:3699
+invokeGuardedCallback @ chunk-W6L2VRDA.js?v=36ed0111:3733
+invokeGuardedCallbackAndCatchFirstError @ chunk-W6L2VRDA.js?v=36ed0111:3736
+executeDispatch @ chunk-W6L2VRDA.js?v=36ed0111:7014
+processDispatchQueueItemsInOrder @ chunk-W6L2VRDA.js?v=36ed0111:7034
+processDispatchQueue @ chunk-W6L2VRDA.js?v=36ed0111:7043
+dispatchEventsForPlugins @ chunk-W6L2VRDA.js?v=36ed0111:7051
+(anonymous) @ chunk-W6L2VRDA.js?v=36ed0111:7174
+batchedUpdates$1 @ chunk-W6L2VRDA.js?v=36ed0111:18913
+batchedUpdates @ chunk-W6L2VRDA.js?v=36ed0111:3579
+dispatchEventForPluginEventSystem @ chunk-W6L2VRDA.js?v=36ed0111:7173
+dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay @ chunk-W6L2VRDA.js?v=36ed0111:5478
+dispatchEvent @ chunk-W6L2VRDA.js?v=36ed0111:5472
+dispatchDiscreteEvent @ chunk-W6L2VRDA.js?v=36ed0111:5449Understand this errorAI
