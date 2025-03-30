@@ -7,6 +7,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { fetchMessages, sendMessage, subscribeToMessages } from '@/services/chatService';
 import { Loader2, ArrowLeft } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
+import { supabase } from '@/lib/supabase';
 
 interface ChatScreenProps {
   conversation: Conversation;
