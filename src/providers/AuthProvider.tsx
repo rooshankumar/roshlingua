@@ -27,7 +27,32 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [authError, setAuthError] = useState<string | null>(null);
   const { toast } = useToast();
+
+  // Password validation rules
+  const PASSWORD_RULES = {
+    minLength: 8,
+    requireNumber: true,
+    requireSpecial: true,
+    requireUppercase: true
+  };
+
+  const validatePassword = (password: string): { isValid: boolean; error: string | null } => {
+    if (password.length < PASSWORD_RULES.minLength) {
+      return { isValid: false, error: `Password must be at least ${PASSWORD_RULES.minLength} characters` };
+    }
+    if (PASSWORD_RULES.requireNumber && !/\d/.test(password)) {
+      return { isValid: false, error: 'Password must contain at least one number' };
+    }
+    if (PASSWORD_RULES.requireSpecial && !/[!@#$%^&*]/.test(password)) {
+      return { isValid: false, error: 'Password must contain at least one special character' };
+    }
+    if (PASSWORD_RULES.requireUppercase && !/[A-Z]/.test(password)) {
+      return { isValid: false, error: 'Password must contain at least one uppercase letter' };
+    }
+    return { isValid: true, error: null };
+  };
 
   useEffect(() => {
     console.log("Setting up auth state listener");
@@ -69,28 +94,77 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const login = async (email: string, password: string) => {
+    const MAX_LOGIN_ATTEMPTS = 5;
+    const LOCKOUT_DURATION = 15 * 60 * 1000; // 15 minutes
+    const loginAttempts = new Map<string, { count: number; lastAttempt: number }>();
+
     try {
+      // Check for rate limiting
+      const attempts = loginAttempts.get(email) || { count: 0, lastAttempt: 0 };
+      const now = Date.now();
+
+      if (attempts.count >= MAX_LOGIN_ATTEMPTS && now - attempts.lastAttempt < LOCKOUT_DURATION) {
+        const remainingTime = Math.ceil((LOCKOUT_DURATION - (now - attempts.lastAttempt)) / 60000);
+        toast({
+          variant: "destructive",
+          title: "Account locked",
+          description: `Too many login attempts. Please try again in ${remainingTime} minutes.`
+        });
+        return;
+      }
+
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
-      if (error) throw error;
+      if (error) {
+        // Update login attempts
+        loginAttempts.set(email, {
+          count: attempts.count + 1,
+          lastAttempt: now
+        });
 
-      // We now handle setting the user state via the onAuthStateChange listener
+        const attemptsLeft = MAX_LOGIN_ATTEMPTS - (attempts.count + 1);
+        toast({
+          variant: "destructive",
+          title: "Login failed",
+          description: `${error.message}${attemptsLeft > 0 ? ` (${attemptsLeft} attempts remaining)` : ''}`
+        });
+        throw error;
+      }
+
+      // Reset login attempts on successful login
+      loginAttempts.delete(email);
     } catch (error) {
       console.error("Login error:", error);
-      toast({
-        variant: "destructive",
-        title: "Login failed",
-        description: error.message || "Please check your credentials and try again.",
-      });
       throw error;
     }
   };
 
   const signup = async (email: string, password: string, name: string) => {
     try {
+      // Validate password
+      const passwordValidation = validatePassword(password);
+      if (!passwordValidation.isValid) {
+        toast({
+          variant: "destructive",
+          title: "Invalid password",
+          description: passwordValidation.error
+        });
+        return;
+      }
+
+      // Validate email
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        toast({
+          variant: "destructive",
+          title: "Invalid email",
+          description: "Please enter a valid email address"
+        });
+        return;
+      }
+
       const { data: authData, error } = await supabase.auth.signUp({
         email,
         password,
@@ -104,11 +178,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       });
 
       if (error) {
-        console.error("Auth signup error:", error);
+        const errorMessage = error.message === 'User already registered'
+          ? 'This email is already registered. Please log in instead.'
+          : error.message;
+
         toast({
           variant: "destructive",
           title: "Signup failed",
-          description: error.message
+          description: errorMessage
         });
         return;
       }
