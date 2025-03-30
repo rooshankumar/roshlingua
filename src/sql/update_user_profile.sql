@@ -15,11 +15,11 @@ CREATE OR REPLACE FUNCTION public.update_user_profile(
 BEGIN
   -- Update the users table
   UPDATE users
-  SET full_name = COALESCE(full_name, users.full_name),
-      email = COALESCE(email, users.email),
-      gender = COALESCE(gender, users.gender),
-      native_language = COALESCE(native_language, users.native_language),
-      learning_language = COALESCE(learning_language, users.learning_language),
+  SET full_name = COALESCE($3, users.full_name),
+      email = COALESCE($4, users.email),
+      gender = COALESCE($5, users.gender),
+      native_language = COALESCE($8, users.native_language),
+      learning_language = COALESCE($7, users.learning_language),
       updated_at = NOW()
   WHERE id = user_id;
 
