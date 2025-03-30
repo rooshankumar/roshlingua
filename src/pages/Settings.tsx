@@ -40,7 +40,16 @@ const Settings = () => {
 
   const genders = ["Male", "Female", "Rather not say"];
 
-  const handleProfileChange = async (field: string, value: string) => {
+  const [localProfile, setLocalProfile] = useState(profile || {});
+
+  const handleProfileChange = (field: string, value: string) => {
+    setLocalProfile(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
+
+  const handleSaveProfile = async () => {
     if (!user?.id) {
       toast({
         title: "Error",
@@ -51,31 +60,37 @@ const Settings = () => {
     }
 
     try {
-      if (field === "gender" && !genders.includes(value)) {
-        throw new Error("Invalid gender value");
-      }
+      const { error } = await supabase
+        .from('users')
+        .update(localProfile)
+        .eq('id', user.id);
 
-      let userData = {};
+      if (error) throw error;
+
+      updateProfile(localProfile);
       
-      if (field === 'email') {
-        const { error } = await supabase.auth.updateUser({ email: value });
-        if (error) throw error;
-      } else if (field === 'password') {
-        const { error } = await supabase.auth.updateUser({ password: value });
-        if (error) throw error;
-      } else {
-        // For other fields, update the public.users table
-        const { error } = await supabase
-          .from('users')
-          .update({ [field]: value })
-          .eq('id', user.id)
-          .single();
-        
-        if (error) throw error;
-      }
-      }
+      toast({
+        title: "Success",
+        description: "Profile updated successfully",
+      });
+    } catch (error) {
+      console.error("Error updating profile:", error);
+      toast({
+        title: "Error",
+        description: "Failed to update profile",
+        variant: "destructive"
+      });
+    }
+  };
 
-      // Update local state if the update was successful
+  // Initialize local state when profile changes
+  useEffect(() => {
+    if (profile) {
+      setLocalProfile(profile);
+    }
+  }, [profile]);
+
+  // Use localProfile instead of profile for form values
       updateProfile({
         ...profile,
         [field]: value,
