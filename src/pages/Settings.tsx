@@ -50,72 +50,31 @@ const Settings = () => {
   };
 
   const handleSaveProfile = async () => {
-    if (!user?.id) {
-      toast({
-        title: "Error",
-        description: "You must be logged in to update your profile.",
-        variant: "destructive"
-      });
-      return;
-    }
+    if (!user?.id) return;
 
     try {
-      const { data: { user: updatedUser }, error } = await supabase.auth.updateUser({
-        data: {
+      const { data, error } = await supabase
+        .from('users')
+        .update({
           ...localProfile,
-          bio: localBio,
           updated_at: new Date().toISOString()
-        }
-      });
+        })
+        .eq('id', user?.id);
 
       if (error) throw error;
 
-      if (updatedUser?.user_metadata) {
-        updateProfile({ ...profile, ...updatedUser.user_metadata, bio: localBio });
+      if (data) {
+        updateProfile(localProfile);
+        toast({
+          title: "Success",
+          description: "Profile updated successfully"
+        });
       }
-
-      toast({
-        title: "Success",
-        description: "Profile updated successfully.",
-      });
     } catch (error) {
       console.error('Error updating profile:', error);
       toast({
         title: "Error",
         description: "Failed to update profile. Please try again.",
-        variant: "destructive"
-      });
-    }
-
-    try {
-      const updates = {
-        raw_user_meta_data: {
-          ...user.user_metadata,
-          full_name: localProfile.full_name,
-          bio: localBio,
-          native_language: localProfile.native_language,
-          learning_language: localProfile.learning_language,
-          proficiency_level: localProfile.proficiency_level,
-          gender: localProfile.gender,
-          updated_at: new Date().toISOString()
-        }
-      };
-
-      const { error } = await supabase.auth.updateUser(updates);
-
-      if (error) throw error;
-
-      updateProfile({ ...profile, ...updates.raw_user_meta_data });
-
-      toast({
-        title: "Success",
-        description: "Profile updated successfully"
-      });
-    } catch (error) {
-      console.error("Error updating profile:", error);
-      toast({
-        title: "Error",
-        description: error instanceof Error ? error.message : "Failed to update profile. Please try again.",
         variant: "destructive"
       });
     }
@@ -128,39 +87,6 @@ const Settings = () => {
     }
   }, [profile]);
 
-  const handleProfileFieldChange = async (field: string, value: string) => {
-    setLocalProfile(prev => ({
-      ...prev,
-      [field]: value
-    }));
-
-    try {
-      const { data, error } = await supabase
-        .from('users')
-        .update({
-          [field]: value,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', user?.id);
-
-      if (error) throw error;
-
-      if (data) {
-        updateProfile({ ...profile, [field]: value });
-        toast({
-          title: "Success",
-          description: `${field} updated successfully`
-        });
-      }
-    } catch (error) {
-      console.error('Error updating profile:', error);
-      toast({
-        title: "Error",
-        description: "Failed to update profile. Please try again.",
-        variant: "destructive"
-      });
-    }
-  };
 
   const handleUploadAvatar = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files || !e.target.files[0]) return;
@@ -327,8 +253,8 @@ const Settings = () => {
                       <Label htmlFor="name">Full Name</Label>
                       <Input 
                         id="name" 
-                        value={profile?.full_name || ""}
-                        onChange={(e) => handleProfileFieldChange("full_name", e.target.value)}
+                        value={localProfile?.full_name || ""}
+                        onChange={(e) => handleProfileChange("full_name", e.target.value)}
                       />
                     </div>
 
@@ -356,8 +282,8 @@ const Settings = () => {
                     <div className="space-y-2">
                       <Label htmlFor="gender">Gender</Label>
                       <Select 
-                        value={profile?.gender || ""}
-                        onValueChange={(value) => handleProfileFieldChange("gender", value)}
+                        value={localProfile?.gender || ""}
+                        onValueChange={(value) => handleProfileChange("gender", value)}
                       >
                         <SelectTrigger id="gender">
                           <SelectValue placeholder="Select gender" />
@@ -383,8 +309,8 @@ const Settings = () => {
                   <div className="space-y-2">
                     <Label htmlFor="nativeLanguage">Native Language</Label>
                     <Select
-                      value={profile?.native_language || ""}
-                      onValueChange={(value) => handleProfileFieldChange("native_language", value)}
+                      value={localProfile?.native_language || ""}
+                      onValueChange={(value) => handleProfileChange("native_language", value)}
                     >
                       <SelectTrigger id="nativeLanguage">
                         <SelectValue placeholder="Select language" />
@@ -402,8 +328,8 @@ const Settings = () => {
                   <div className="space-y-2">
                     <Label htmlFor="learningLanguage">Learning Language</Label>
                     <Select
-                      value={profile?.learning_language || ""}
-                      onValueChange={(value) => handleProfileFieldChange("learning_language", value)}
+                      value={localProfile?.learning_language || ""}
+                      onValueChange={(value) => handleProfileChange("learning_language", value)}
                     >
                       <SelectTrigger id="learningLanguage">
                         <SelectValue placeholder="Select language" />
@@ -421,8 +347,8 @@ const Settings = () => {
                   <div className="space-y-2 sm:col-span-2">
                     <Label htmlFor="proficiencyLevel">Proficiency Level</Label>
                     <Select
-                      value={profile?.proficiency_level || ""}
-                      onValueChange={(value) => handleProfileFieldChange("proficiency_level", value)}
+                      value={localProfile?.proficiency_level || ""}
+                      onValueChange={(value) => handleProfileChange("proficiency_level", value)}
                     >
                       <SelectTrigger id="proficiencyLevel">
                         <SelectValue placeholder="Select level" />
@@ -455,13 +381,10 @@ const Settings = () => {
                 </div>
               </div>
             </CardContent>
-            <CardFooter className="flex justify-between">
-              <Button variant="outline" onClick={() => navigate(-1)}>
-                Cancel
-              </Button>
-              <Button onClick={handleSaveProfile} className="button-hover">
+            <CardFooter>
+              <Button onClick={handleSaveProfile} className="w-full">
                 <Save className="h-4 w-4 mr-2" />
-                Save Changes
+                Save Profile Changes
               </Button>
             </CardFooter>
           </Card>
