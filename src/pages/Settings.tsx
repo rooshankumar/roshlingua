@@ -42,53 +42,49 @@ const Settings = () => {
 
   const handleProfileChange = async (field: string, value: string) => {
     if (!user?.id) {
-      console.error("No user ID available");
+      toast({
+        title: "Error",
+        description: "You must be logged in to update your profile.",
+        variant: "destructive"
+      });
       return;
     }
 
     try {
-      // Validate gender values
-      if (field === "gender" && !["Male", "Female", "Rather not say"].includes(value)) {
+      if (field === "gender" && !genders.includes(value)) {
         throw new Error("Invalid gender value");
       }
 
-      // Verify current user
-      const { data: authUser, error: userError } = await supabase.auth.getUser();
-      if (userError || !authUser.user) {
-        throw new Error("User authentication failed");
-      }
-
-      // Update user data
       const { error } = await supabase
         .from('users')
         .update({
           [field]: value,
           updated_at: new Date().toISOString()
         })
-        .eq('id', authUser.user.id)
-        .eq('created_by', authUser.user.id);
+        .eq('id', user.id)
+        .single();
 
       if (error) {
-        console.error("Error updating profile:", error);
         throw error;
       }
 
-      // Update local profile state
-      if (profile) {
-        const updatedProfile = {
-          ...profile,
-          [field]: value,
-          updated_at: new Date().toISOString()
-        };
-        await updateProfile(updatedProfile);
-      }
+      // Update local state if the update was successful
+      updateProfile({
+        ...profile,
+        [field]: value,
+        updated_at: new Date().toISOString()
+      });
 
+      toast({
+        title: "Success",
+        description: `${field.charAt(0).toUpperCase() + field.slice(1)} updated successfully.`,
+      });
     } catch (error) {
       console.error("Error updating profile:", error);
       toast({
-        variant: "destructive",
-        title: "Update failed",
-        description: "Could not update profile. Please try again.",
+        title: "Error",
+        description: error instanceof Error ? error.message : "Failed to update profile. Please try again.",
+        variant: "destructive"
       });
     }
   };
@@ -130,7 +126,7 @@ const Settings = () => {
   const handleSaveProfile = async () => {
     try {
       if (!user?.id) return;
-      
+
       // Update bio if changed
       if (localBio !== profile?.bio) {
         await handleProfileChange("bio", localBio);
