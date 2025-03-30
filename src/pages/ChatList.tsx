@@ -4,12 +4,26 @@ import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/providers/AuthProvider';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { UserStatus } from '@/components/UserStatus';
-import { MessageCircle } from 'lucide-react';
+import { Card, CardContent } from '@/components/ui/card';
+import { MessageCircle, Loader2 } from 'lucide-react';
+
+interface ChatPreview {
+  id: string;
+  participant: {
+    id: string;
+    email: string;
+    name?: string;
+    avatar?: string;
+  };
+  lastMessage?: {
+    content: string;
+    created_at: string;
+  };
+}
 
 export default function ChatList() {
   const { user } = useAuth();
-  const [conversations, setConversations] = useState<any[]>([]);
+  const [conversations, setConversations] = useState<ChatPreview[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -17,189 +31,119 @@ export default function ChatList() {
 
     const fetchConversations = async () => {
       try {
-        console.log("Fetching conversations for user ID:", user.id);
-        
-        // Direct approach: fetch all conversations where the user is a participant
-        const { data, error } = await supabase
-          .from('conversations')
+        const { data: participantsData, error: participantsError } = await supabase
+          .from('conversation_participants')
           .select(`
-            id,
-            created_at,
-            updated_at,
-            messages:messages(
+            conversation_id,
+            users:user_id (
               id,
-              content,
-              created_at,
-              sender_id
-            ),
-            participants:conversation_participants(
-              user:users!inner(
-                id,
-                email,
-                raw_user_meta_data->>'full_name' AS full_name,
-                raw_user_meta_data->>'avatar_url' AS avatar_url
-              )
+              email
             )
           `)
-          .eq('conversation_participants.user_id', user.id)
-          .order('updated_at', { ascending: false });
+          .eq('user_id', user.id);
 
-        console.log("Raw conversation data:", data);
-        if (error) {
-          console.error("Query error:", error);
-          setConversations([]);
-        } else if (data) {
-          const processedConversations = data.map(conv => {
-            const otherParticipant = conv.participants
-              .find(p => p.user.id !== user.id)?.user;
-            
-            const lastMessage = conv.messages?.[0];
-            
+        if (participantsError) throw participantsError;
+
+        const conversationPreviews = await Promise.all(
+          participantsData.map(async (participant) => {
+            const { data: messages } = await supabase
+              .from('messages')
+              .select('content, created_at')
+              .eq('conversation_id', participant.conversation_id)
+              .order('created_at', { ascending: false })
+              .limit(1);
+
             return {
-              id: conv.id,
-              created_at: conv.created_at,
-              updated_at: conv.updated_at,
-              lastMessage: lastMessage ? {
-                content: lastMessage.content,
-                timestamp: lastMessage.created_at,
-                isRead: lastMessage.is_read
-              } : null,
-              participant: otherParticipant ? {
-                id: otherParticipant.id,
-                name: otherParticipant.full_name || otherParticipant.email?.split('@')[0] || 'Unknown User',
-                avatar: otherParticipant.avatar_url || '/placeholder.svg',
-                email: otherParticipant.email
-              } : null
+              id: participant.conversation_id,
+              participant: {
+                id: participant.users.id,
+                email: participant.users.email,
+                name: participant.users.email?.split('@')[0],
+                avatar: '/placeholder.svg'
+              },
+              lastMessage: messages?.[0]
             };
-          }).sort((a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime());
-          
-          setConversations(processedConversations);
-          setLoading(false);
-        }
+          })
+        );
 
-        if (error) {
-          console.error('Error fetching conversations:', error);
-          setConversations([]);
-        } else {
-          // Removed as it's handled in the query processing above
-        }
+        setConversations(conversationPreviews);
       } catch (error) {
-        console.error('Error in fetchConversations:', error);
-        setConversations([]);
+        console.error('Error fetching conversations:', error);
       } finally {
         setLoading(false);
       }
     };
 
-    // Subscribe to new conversations
-    const channel = supabase
-      .channel('conversation_updates')
-      .on('postgres_changes', {
-        event: '*',
-        schema: 'public',
-        table: 'conversation_participants',
-        filter: `user_id=eq.${user.id}`
-      }, () => {
-        fetchConversations();
-      })
-      .subscribe();
-
     fetchConversations();
-
-    return () => {
-      channel.unsubscribe();
-    };
   }, [user]);
 
-  const renderContent = () => {
-    if (loading) {
-      return <div className="text-center py-8">Loading conversations...</div>;
-    }
-
-    if (!conversations || conversations.length === 0) {
-      return (
-        <div className="text-center py-12">
-          <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-muted flex items-center justify-center">
-            <MessageCircle className="h-8 w-8 text-muted-foreground" />
-          </div>
-          <h3 className="text-lg font-medium mb-2">Welcome! Start Your First Chat</h3>
-          <p className="text-muted-foreground mb-6">Connect with other language learners</p>
-          <Button asChild>
-            <Link to="/community">Find Language Partners</Link>
-          </Button>
-        </div>
-      );
-    }
-
+  if (loading) {
     return (
-      <div className="space-y-2">
-        {conversations.map((conversation) => (
-          <Link
-            key={conversation.id}
-            to={`/chat/${conversation.id}`}
-            className="flex items-center gap-3 p-3 rounded-lg hover:bg-secondary/50 transition-colors"
-          >
-            <Avatar>
-              <AvatarImage src={conversation.participant?.avatar} />
-              <AvatarFallback>
-                {conversation.participant?.name?.[0]?.toUpperCase() || '?'}
-              </AvatarFallback>
-            </Avatar>
-            <div className="flex-1">
-              <div className="flex justify-between items-start">
-                <h3 className="font-medium">{conversation.participant?.name}</h3>
-                {conversation.lastMessage && (
-                  <span className="text-xs text-muted-foreground">
-                    {new Date(conversation.lastMessage.timestamp).toLocaleDateString()}
-                  </span>
-                )}
-              </div>
-              {conversation.lastMessage && (
-                <p className="text-sm text-muted-foreground truncate">
-                  {conversation.lastMessage.content}
-                </p>
-              )}
-            </div>
-          </Link>
-        ))}
+      <div className="flex items-center justify-center h-[80vh]">
+        <Loader2 className="w-8 h-8 animate-spin" />
       </div>
     );
-  };
-
-  const handleDebug = async () => {
-    const { debugConversations } = await import('@/utils/debugSupabase');
-    await debugConversations();
-    alert('Check console for debug info');
-  };
-
-  const handleFixDatabase = async () => {
-    const { fixSupabaseData } = await import('@/utils/debugSupabase');
-    const result = await fixSupabaseData();
-    if (result.success) {
-      alert('Database fixed successfully. Please refresh the page.');
-      window.location.reload();
-    } else {
-      alert('Failed to fix database: ' + JSON.stringify(result.error));
-    }
-  };
+  }
 
   return (
-    <div className="container max-w-2xl mx-auto p-4">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">Your Conversations</h1>
-        <div className="flex gap-2">
-          <Button variant="outline" onClick={handleDebug} size="sm">
-            Debug DB
-          </Button>
-          <Button variant="destructive" onClick={handleFixDatabase} size="sm">
-            Fix DB
-          </Button>
-          <Button asChild>
-            <Link to="/community">Start New Chat</Link>
-          </Button>
-        </div>
+    <div className="container max-w-3xl mx-auto py-6 space-y-4">
+      <div className="flex items-center justify-between">
+        <h1 className="text-2xl font-bold">Messages</h1>
+        <Button asChild variant="outline">
+          <Link to="/community">Find People</Link>
+        </Button>
       </div>
-      {renderContent()}
+
+      {conversations.length === 0 ? (
+        <Card>
+          <CardContent className="flex flex-col items-center justify-center py-12 text-center">
+            <MessageCircle className="w-12 h-12 text-muted-foreground mb-4" />
+            <h3 className="text-lg font-medium">No conversations yet</h3>
+            <p className="text-muted-foreground mt-2">
+              Start chatting with people from the community
+            </p>
+            <Button asChild className="mt-4" variant="outline">
+              <Link to="/community">Browse Community</Link>
+            </Button>
+          </CardContent>
+        </Card>
+      ) : (
+        <div className="space-y-2">
+          {conversations.map((conversation) => (
+            <Link 
+              key={conversation.id}
+              to={`/chat/${conversation.id}`}
+              className="block"
+            >
+              <Card className="hover:bg-muted/50 transition-colors">
+                <CardContent className="flex items-center p-4">
+                  <Avatar className="h-12 w-12">
+                    <AvatarImage src={conversation.participant.avatar} />
+                    <AvatarFallback>
+                      {conversation.participant.name?.substring(0, 2).toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="ml-4 flex-1">
+                    <div className="flex items-center justify-between">
+                      <h3 className="font-medium">{conversation.participant.name}</h3>
+                      {conversation.lastMessage && (
+                        <span className="text-sm text-muted-foreground">
+                          {new Date(conversation.lastMessage.created_at).toLocaleDateString()}
+                        </span>
+                      )}
+                    </div>
+                    {conversation.lastMessage && (
+                      <p className="text-sm text-muted-foreground truncate">
+                        {conversation.lastMessage.content}
+                      </p>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            </Link>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
