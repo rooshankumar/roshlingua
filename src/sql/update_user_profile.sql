@@ -1,13 +1,13 @@
 
 CREATE OR REPLACE FUNCTION public.update_user_profile(
   p_user_id UUID,
-  p_full_name TEXT,
-  p_email TEXT,
-  p_gender TEXT,
-  p_native_language TEXT,
-  p_learning_language TEXT,
-  p_bio TEXT,
   p_avatar_url TEXT,
+  p_bio TEXT,
+  p_email TEXT,
+  p_full_name TEXT,
+  p_gender TEXT,
+  p_learning_language TEXT,
+  p_native_language TEXT,
   p_streak_count INTEGER
 ) RETURNS VOID AS $$
 BEGIN
