@@ -61,23 +61,23 @@ const Settings = () => {
 
     try {
       const updates = {
-        full_name: localProfile.full_name,
-        bio: localBio,
-        native_language: localProfile.native_language,
-        learning_language: localProfile.learning_language,
-        proficiency_level: localProfile.proficiency_level,
-        gender: localProfile.gender,
-        updated_at: new Date().toISOString()
+        raw_user_meta_data: {
+          ...user.user_metadata,
+          full_name: localProfile.full_name,
+          bio: localBio,
+          native_language: localProfile.native_language,
+          learning_language: localProfile.learning_language,
+          proficiency_level: localProfile.proficiency_level,
+          gender: localProfile.gender,
+          updated_at: new Date().toISOString()
+        }
       };
 
-      const { error } = await supabase
-        .from('profiles')
-        .update(updates)
-        .eq('id', user.id);
+      const { error } = await supabase.auth.updateUser(updates);
 
       if (error) throw error;
 
-      updateProfile({ ...profile, ...updates });
+      updateProfile({ ...profile, ...updates.raw_user_meta_data });
 
       toast({
         title: "Success",
