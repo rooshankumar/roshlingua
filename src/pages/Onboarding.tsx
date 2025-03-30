@@ -225,22 +225,19 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
       }
 
 
-      // Update the users table
-      const { error: userError } = await supabase
-        .from('users')
-        .update({
-          full_name: formData.name,
-          gender: formData.gender,
-          date_of_birth: formData.dob ? new Date(formData.dob).toISOString() : null,
-          native_language: formData.nativeLanguage,
-          learning_language: formData.learningLanguage,
-          proficiency_level: formData.proficiencyLevel,
-          learning_goal: formData.learningGoal,
-          avatar_url: formData.avatarUrl || null,
-
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', userId);
+      // Update user profile using RPC
+      const { error: userError } = await supabase.rpc('update_user_profile', {
+        user_id: userId,
+        full_name: formData.name,
+        gender: formData.gender,
+        date_of_birth: formData.dob ? new Date(formData.dob).toISOString() : null,
+        native_language: formData.nativeLanguage,
+        learning_language: formData.learningLanguage,
+        proficiency_level: formData.proficiencyLevel,
+        bio: formData.learningGoal,
+        avatar_url: formData.avatarUrl || null,
+        onboarding_completed: true
+      });
 
       if (userError) {
         console.error("Error updating user data:", userError);
@@ -252,25 +249,7 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
         return;
       }
 
-      // Update onboarding status
-      const { error: onboardingError } = await supabase
-        .from('onboarding_status')
-        .update({
-          is_complete: true,
-          current_step: 'completed',
-          updated_at: new Date().toISOString()
-        })
-        .eq('user_id', userId);
-
-      if (onboardingError) {
-        console.error("Error updating onboarding status:", onboardingError);
-        // Continue anyway, don't block the user
-        toast({
-          title: "Profile Updated",
-          description: "Your profile has been updated, but there was an issue updating the onboarding status.",
-          variant: "warning"
-        });
-      } else {
+      if (!userError) {
         toast({
           title: "Profile created",
           description: "Your profile has been successfully set up!",
