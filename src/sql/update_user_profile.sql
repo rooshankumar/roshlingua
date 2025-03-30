@@ -27,27 +27,23 @@ BEGIN
     proficiency_level = COALESCE($10, users.proficiency_level),
     streak_count = COALESCE($11, users.streak_count),
     updated_at = NOW()
-  WHERE id = user_id;
+  WHERE id = $1;
 
-  -- Insert or update profiles table using UPSERT
-  INSERT INTO public.profiles (
-    id,
-    bio,
-    avatar_url,
-    streak_count,
-    updated_at
-  ) VALUES (
-    user_id,
-    COALESCE($3, (SELECT bio FROM public.profiles WHERE id = user_id)),
-    COALESCE($2, (SELECT avatar_url FROM public.profiles WHERE id = user_id)),
-    COALESCE($11, (SELECT streak_count FROM public.profiles WHERE id = user_id)),
+  -- Handle profiles table with upsert
+  INSERT INTO public.profiles (id, bio, avatar_url, streak_count, updated_at)
+  VALUES (
+    $1,
+    $3,
+    $2,
+    $11,
     NOW()
   )
-  ON CONFLICT (id) DO UPDATE
-  SET
+  ON CONFLICT (id) 
+  DO UPDATE SET
     bio = EXCLUDED.bio,
     avatar_url = EXCLUDED.avatar_url,
     streak_count = EXCLUDED.streak_count,
     updated_at = EXCLUDED.updated_at;
+
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
