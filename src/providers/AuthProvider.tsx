@@ -105,7 +105,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       // Create the user record in the users table
       if (data.user) {
-        await createUserRecord(data.user.id, email, name);
+        const { error: profileError } = await supabase
+          .from('users')
+          .insert([{ 
+            id: data.user.id,
+            full_name: name,
+            email: data.user.email,
+            updated_at: new Date().toISOString()
+          }]);
+
+        if (profileError) {
+          console.error("Error creating user profile:", profileError);
+          toast({
+            variant: "destructive",
+            title: "Signup failed",
+            description: profileError.message || "There was an error creating your account.",
+          });
+          throw profileError;
+        }
       }
 
       toast({
@@ -143,7 +160,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       // Wait for session to be established
       const maxAttempts = 10;
       let attempts = 0;
-      
+
       while (attempts < maxAttempts) {
         const { data: { session } } = await supabase.auth.getSession();
         if (session) {
