@@ -91,43 +91,45 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signup = async (email: string, password: string, name: string) => {
     try {
-      const { data: authData, error: authError } = await supabase.auth.signUp({
+      const { data: authData, error: signUpError } = await supabase.auth.signUp({
         email,
         password,
         options: {
           data: {
             full_name: name,
-          },
-          emailRedirectTo: `${window.location.origin}/auth/callback`
+          }
         }
       });
 
-      if (authError) {
-        console.error("Auth signup error:", authError);
+      if (signUpError) {
+        console.error("Auth signup error:", signUpError);
         toast({
           variant: "destructive",
-          title: "Signup failed",
-          description: authError.message
+          title: "Signup failed", 
+          description: signUpError.message
         });
-        throw authError;
+        throw signUpError;
       }
 
       if (authData.user) {
-        const { data: functionData, error: functionError } = await supabase
-          .rpc('create_user_with_onboarding', {
-            p_user_id: authData.user.id,
-            p_email: authData.user.email,
-            p_full_name: name
-          });
+        const { error: userError } = await supabase
+          .from('users')
+          .insert([{
+            id: authData.user.id,
+            email: authData.user.email,
+            full_name: name,
+            updated_at: new Date().toISOString()
+          }])
+          .single();
 
-        if (functionError) {
-          console.error("Error creating user profile:", functionError);
+        if (userError) {
+          console.error("Error creating user profile:", userError);
           toast({
-            variant: "destructive", 
+            variant: "destructive",
             title: "Profile creation failed",
             description: "Could not create user profile"
           });
-          throw functionError;
+          throw userError;
         }
 
         toast({
