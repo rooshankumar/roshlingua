@@ -120,24 +120,41 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
           // Calculate age from DOB
           const age = values.dob ? calculateAge(values.dob) : null;
 
-          // Update user profile with calculated age
-          const { error: userError } = await supabase
+          // Update user profile with calculated age and other data
+          const { data: sessionData } = await supabase.auth.getSession();
+          const currentUserId = sessionData?.session?.user?.id;
+
+          if (!currentUserId) {
+            console.error('No user ID found in session');
+            return false;
+          }
+
+          const { data: profileData, error: profileError } = await supabase
             .from('users')
             .update({ 
               age: age,
-              updated_at: new Date().toISOString() 
+              full_name: values.name,
+              gender: values.gender,
+              date_of_birth: values.dob?.toISOString(),
+              native_language: values.nativeLanguage,
+              learning_language: values.learningLanguage,
+              proficiency_level: values.proficiencyLevel,
+              learning_goal: values.learningGoal,
+              updated_at: new Date().toISOString()
             })
-            .eq('id', userId);
+            .eq('id', currentUserId)
+            .select()
+            .single();
 
-          if (userError) {
-            console.error('Error updating user age:', userError);
+          if (profileError) {
+            console.error('Error updating profile:', profileError);
             return false;
           }
 
           const { error: onboardingError } = await supabase
             .from('onboarding_status')
             .upsert({
-              user_id: userId,
+              user_id: currentUserId,
               is_complete: true,
               current_step: 'completed',
               updated_at: new Date().toISOString()
