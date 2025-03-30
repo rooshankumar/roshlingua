@@ -11,6 +11,7 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
+  CardFooter, // Added CardFooter import
 } from "@/components/ui/card";
 import {
   Form,
