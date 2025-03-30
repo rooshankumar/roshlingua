@@ -97,48 +97,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         options: {
           data: {
             full_name: name,
-          },
-        },
+          }
+        }
       });
 
-      if (authError) {
-        console.error("Auth signup error:", authError);
-        toast({
-          variant: "destructive",
-          title: "Signup failed",
-          description: authError.message,
-        });
-        throw authError;
-      }
+      if (authError) throw authError;
 
       if (authData.user) {
-        const { error: profileError } = await supabase
-          .from('users')
-          .insert({
-            id: authData.user.id,
-            full_name: name,
-            email: authData.user.email,
-            updated_at: new Date().toISOString(),
-          });
-
-        if (profileError) {
-          console.error("Error creating user profile:", profileError);
-          // Delete the auth user if profile creation fails
-          await supabase.auth.admin.deleteUser(authData.user.id);
-          toast({
-            variant: "destructive",
-            title: "Signup failed",
-            description: "Error creating user profile",
-          });
-          throw profileError;
-        }
-
+        // User created successfully
         toast({
-          title: "Welcome to roshLingua!",
-          description: "Your account has been created successfully.",
+          title: "Account created",
+          description: "Please check your email to confirm your account.",
         });
-
-        return authData;
       }
     } catch (error) {
       console.error("Signup error:", error);
