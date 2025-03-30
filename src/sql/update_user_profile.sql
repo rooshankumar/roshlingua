@@ -13,7 +13,7 @@ CREATE OR REPLACE FUNCTION public.update_user_profile(
   streak_count INTEGER DEFAULT 0
 ) RETURNS VOID AS $$
 BEGIN
-  -- Update the users table
+  -- Update the users table with WHERE clause
   UPDATE users
   SET avatar_url = COALESCE($2, users.avatar_url),
       bio = COALESCE($3, users.bio),
@@ -26,9 +26,9 @@ BEGIN
       proficiency_level = COALESCE($10, users.proficiency_level),
       streak_count = COALESCE($11, users.streak_count),
       updated_at = NOW()
-  WHERE id = user_id;
+  WHERE users.id = user_id;
 
-  -- Update or insert into profiles table
+  -- Insert or update profiles table
   INSERT INTO profiles (id, bio, avatar_url, streak_count, updated_at)
   VALUES (user_id, bio, avatar_url, streak_count, NOW())
   ON CONFLICT (id) DO UPDATE
