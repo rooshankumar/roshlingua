@@ -1,0 +1,21 @@
+<input data-lov-id=​"src/​pages/​Auth.tsx:​342:​16" data-lov-name=​"Input" data-component-path=​"src/​pages/​Auth.tsx" data-component-line=​"342" data-component-file=​"Auth.tsx" data-component-name=​"Input" data-component-content=​"%7B%22placeholder%22%3A%22%E2%80%A2%E2%80%A2%E2%80%A2%E2%80%A2%E2%80%A2%E2%80%A2%E2%80%A2%E2%80%A2%22%7D" type=​"password" class=​"flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background file:​border-0 file:​bg-transparent file:​text-sm file:​font-medium file:​text-foreground placeholder:​text-muted-foreground focus-visible:​outline-none focus-visible:​ring-2 focus-visible:​ring-ring focus-visible:​ring-offset-2 disabled:​cursor-not-allowed disabled:​opacity-50 md:​text-sm" id=​"confirm-password" placeholder=​"••••••••" required value=​"12345678">​flex
+yekzyvdjjozhhatdefsq.supabase.co/auth/v1/signup:1 
+            
+            
+           Failed to load resource: the server responded with a status of 500 ()Understand this errorAI
+AuthProvider.tsx:118 Signup error: AuthApiError: Database error saving new user
+    at handleError2 (@supabase_supabase-js.js?v=75cdd38b:4523:9)
+    at async _handleRequest2 (@supabase_supabase-js.js?v=75cdd38b:4564:5)
+    at async _request (@supabase_supabase-js.js?v=75cdd38b:4548:16)
+    at async SupabaseAuthClient.signUp (@supabase_supabase-js.js?v=75cdd38b:5241:15)
+    at async signup (AuthProvider.tsx:94:31)
+    at async handleSignup (Auth.tsx:109:9)
+signup @ AuthProvider.tsx:118Understand this errorAI
+Auth.tsx:119 Signup error in component: AuthApiError: Database error saving new user
+    at handleError2 (@supabase_supabase-js.js?v=75cdd38b:4523:9)
+    at async _handleRequest2 (@supabase_supabase-js.js?v=75cdd38b:4564:5)
+    at async _request (@supabase_supabase-js.js?v=75cdd38b:4548:16)
+    at async SupabaseAuthClient.signUp (@supabase_supabase-js.js?v=75cdd38b:5241:15)
+    at async signup (AuthProvider.tsx:94:31)
+    at async handleSignup (Auth.tsx:109:9)
+handleSignup @ Auth.tsx:119Understand this errorAI
