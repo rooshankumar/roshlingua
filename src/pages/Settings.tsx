@@ -53,7 +53,7 @@ const Settings = () => {
     if (!user?.id) return;
 
     try {
-      // Update user profile
+      // Update main profile in users table
       const { error: userError } = await supabase
         .from('users')
         .update({
@@ -65,8 +65,7 @@ const Settings = () => {
           date_of_birth: localProfile.date_of_birth,
           updated_at: new Date().toISOString()
         })
-        .eq('id', user.id)
-        .single();
+        .eq('id', user.id);
 
       if (userError) throw userError;
 
@@ -81,6 +80,7 @@ const Settings = () => {
 
       if (profileError) throw profileError;
 
+      // Update local state
       updateProfile({
         ...localProfile,
         bio: localBio
