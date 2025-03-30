@@ -53,15 +53,33 @@ const Settings = () => {
     if (!user?.id) return;
 
     try {
-      const { data, error } = await supabase
+      // Update user profile
+      const { error: userError } = await supabase
         .from('users')
         .update({
-          ...localProfile,
+          full_name: localProfile.full_name,
+          gender: localProfile.gender,
+          native_language: localProfile.native_language,
+          learning_language: localProfile.learning_language,
+          proficiency_level: localProfile.proficiency_level,
+          date_of_birth: localProfile.date_of_birth,
           updated_at: new Date().toISOString()
         })
-        .eq('id', user?.id);
+        .eq('id', user.id);
 
-      if (error) throw error;
+      if (userError) throw userError;
+
+      // Update bio in profiles table
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .upsert({
+          id: user.id,
+          bio: localBio,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', user.id);
+
+      if (profileError) throw profileError;
 
       if (data) {
         updateProfile(localProfile);
