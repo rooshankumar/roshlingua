@@ -154,18 +154,8 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
           } else {
             const { error: updateError } = await supabase
               .from('users')
-              .update({
-                full_name: values.name,
-                gender: values.gender,
-                date_of_birth: values.dob?.toISOString(),
-                native_language: values.nativeLanguage,
-                learning_language: values.learningLanguage,
-                proficiency_level: values.proficiencyLevel,
-                learning_goal: values.learningGoal,
-                updated_at: new Date().toISOString(),
-                onboarding_status: false //Added onboarding status
-              })
-              .eq('id', currentUserId);
+              .update(userData)
+              .eq('id', user.id);
 
             if (updateError) {
               console.error('Error updating user profile:', updateError);
@@ -236,7 +226,23 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
         return;
       }
 
-      console.log("Submitting onboarding data:", formData);
+      // Format the data properly
+      const userData = {
+        id: user.id,
+        full_name: formData.full_name,
+        gender: formData.gender,
+        date_of_birth: formData.date_of_birth instanceof Date ? 
+          formData.date_of_birth.toISOString().split('T')[0] : 
+          null,
+        native_language: formData.native_language,
+        learning_language: formData.learning_language,
+        proficiency_level: formData.proficiency_level,
+        learning_goal: formData.learning_goal,
+        avatar_url: formData.avatar_url,
+        updated_at: new Date().toISOString()
+      };
+
+      console.log("Submitting onboarding data:", userData);
 
       const { error: updateError } = await supabase
         .from('users')
