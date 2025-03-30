@@ -97,7 +97,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         options: {
           data: {
             full_name: name,
-          }
+          },
+          emailRedirectTo: `${window.location.origin}/auth/callback`
         }
       });
 
@@ -112,26 +113,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
 
       if (authData.user) {
-        const { error: userError } = await supabase
-          .from('users')
-          .insert([{
-            id: authData.user.id,
-            email: authData.user.email,
-            full_name: name,
-            updated_at: new Date().toISOString()
-          }])
-          .single();
-
-        if (userError) {
-          console.error("Error creating user profile:", userError);
-          toast({
-            variant: "destructive",
-            title: "Profile creation failed",
-            description: "Could not create user profile"
-          });
-          throw userError;
-        }
-
+        // Let the auth webhook handle user creation
         toast({
           title: "Account created",
           description: "Please check your email to confirm your account.",
