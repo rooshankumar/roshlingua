@@ -91,7 +91,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signup = async (email: string, password: string, name: string) => {
     try {
-      const { data, error } = await supabase.auth.signUp({
+      const { data: authData, error: authError } = await supabase.auth.signUp({
         email,
         password,
         options: {
@@ -101,43 +101,47 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         },
       });
 
-      if (error) throw error;
+      if (authError) {
+        console.error("Auth signup error:", authError);
+        toast({
+          variant: "destructive",
+          title: "Signup failed",
+          description: authError.message,
+        });
+        throw authError;
+      }
 
-      // Create the user record in the users table
-      if (data.user) {
+      if (authData.user) {
         const { error: profileError } = await supabase
           .from('users')
-          .insert([{ 
-            id: data.user.id,
+          .insert({
+            id: authData.user.id,
             full_name: name,
-            email: data.user.email,
-            updated_at: new Date().toISOString()
-          }]);
+            email: authData.user.email,
+            updated_at: new Date().toISOString(),
+          });
 
         if (profileError) {
           console.error("Error creating user profile:", profileError);
+          // Delete the auth user if profile creation fails
+          await supabase.auth.admin.deleteUser(authData.user.id);
           toast({
             variant: "destructive",
             title: "Signup failed",
-            description: profileError.message || "There was an error creating your account.",
+            description: "Error creating user profile",
           });
           throw profileError;
         }
+
+        toast({
+          title: "Welcome to roshLingua!",
+          description: "Your account has been created successfully.",
+        });
+
+        return authData;
       }
-
-      toast({
-        title: "Account created",
-        description: "Please check your email to confirm your account.",
-      });
-
-      // We now handle setting the user state via the onAuthStateChange listener
     } catch (error) {
       console.error("Signup error:", error);
-      toast({
-        variant: "destructive",
-        title: "Signup failed",
-        description: error.message || "There was an error creating your account.",
-      });
       throw error;
     }
   };
