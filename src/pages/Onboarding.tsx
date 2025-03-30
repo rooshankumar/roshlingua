@@ -9,7 +9,6 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -39,6 +38,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/lib/supabase";
+import { Label } from "@/components/ui/label"; // Added import
 
 interface OnboardingProps {
   onComplete: () => void;
@@ -69,8 +69,6 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
       avatarUrl: "",
       dob: undefined as Date | undefined,
     },
-    // Basic validation to ensure required fields are filled
-    // Alternatively, you could use zod or another schema validator
     async validate(values) {
       const errors: Record<string, string> = {};
       if (!values.name) errors.name = "Name is required";
@@ -83,13 +81,11 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  // Function to calculate age from DOB
   const calculateAge = (dob: Date): number => {
     const today = new Date();
     let age = today.getFullYear() - dob.getFullYear();
     const monthDifference = today.getMonth() - dob.getMonth();
 
-    // Adjust age if birthday hasn't occurred yet this year
     if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < dob.getDate())) {
       age--;
     }
@@ -118,10 +114,7 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
       case 3:
         if (!values.learningGoal) return false;
         return (async () => {
-          // Calculate age from DOB
           const age = values.dob ? calculateAge(values.dob) : null;
-
-          // Update user profile with calculated age and other data
           const { data: sessionData } = await supabase.auth.getSession();
           const currentUserId = sessionData?.session?.user?.id;
 
@@ -130,7 +123,6 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
             return false;
           }
 
-          // First ensure user exists
           const { data: existingUser, error: checkError } = await supabase
             .from('users')
             .select('id')
@@ -138,7 +130,6 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
             .single();
 
           if (checkError) {
-            // If user doesn't exist, insert new record
             const { error: insertError } = await supabase
               .from('users')
               .insert([{
@@ -159,7 +150,6 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
               return false;
             }
           } else {
-            // Update existing user
             const { error: updateError } = await supabase
               .from('users')
               .update({
@@ -232,7 +222,7 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
       setIsLoading(true);
       const formData = form.getValues();
       const { data: { user }, error: userError } = await supabase.auth.getUser();
-      
+
       if (userError || !user) {
         toast({
           variant: "destructive",
@@ -245,7 +235,6 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
 
       console.log("Submitting onboarding data:", formData);
 
-      // Update user data in the users table
       const { error: updateError } = await supabase
         .from('users')
         .update({
@@ -270,26 +259,6 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
         });
         return;
       }
-      if (sessionError) {
-        console.error("Error refreshing session:", sessionError);
-        toast({
-          title: "Authentication Error",
-          description: "Could not refresh session. Please log in again.",
-          variant: "destructive"
-        });
-        return;
-      }
-
-      if (!sessionData?.session) {
-        console.error("No active session. Please log in again.");
-        toast({
-          title: "Authentication Error",
-          description: "Your session has expired. Please log in again.",
-          variant: "destructive"
-        });
-        return;
-      }
-
 
       // First update the users table
       const { error: userUpdateError } = await supabase
@@ -299,7 +268,7 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
           avatar_url: formData.avatarUrl || null,
           updated_at: new Date().toISOString()
         })
-        .eq('id', userId);
+        .eq('id', user.id);
 
       if (userUpdateError) {
         console.error('Error updating user:', userUpdateError);
@@ -315,7 +284,7 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
       const { error: profileError } = await supabase
         .from('user_profiles')
         .upsert({
-          user_id: userId,
+          user_id: user.id,
           gender: formData.gender,
           date_of_birth: formData.dob ? new Date(formData.dob).toISOString() : null,
           native_language: formData.nativeLanguage,
@@ -350,7 +319,7 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
       const { data: profileData, error: profileCheckError } = await supabase
         .from('profiles')
         .select('id')
-        .eq('id', userId)
+        .eq('id', user.id)
         .single();
 
       if (profileCheckError && profileCheckError.code !== 'PGRST116') {
@@ -362,7 +331,7 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
         const { error: profileCreateError } = await supabase
           .from('profiles')
           .insert({
-            id: userId,
+            id: user.id,
             username: formData.name.toLowerCase().replace(/\s+/g, '_'),
             bio: formData.learningGoal
           });
@@ -380,7 +349,7 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
             bio: formData.learningGoal,
             updated_at: new Date().toISOString()
           })
-          .eq('id', userId);
+          .eq('id', user.id);
 
         if (profileUpdateError) {
           console.error("Error updating profile:", profileUpdateError);
@@ -413,7 +382,7 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
     try {
       setIsLoading(true);
       const fileExt = file.name.split('.').pop();
-      const filePath = `${userId}/${Math.random()}.${fileExt}`;
+      const filePath = `${user.id}/${Math.random()}.${fileExt}`;
 
       const { error: uploadError } = await supabase.storage
         .from('avatars')
@@ -445,9 +414,12 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
     }
   };
 
+
+  const { data: { user }, error: userError } = await supabase.auth.getUser();
+
   let userId = null;
-  if (form.getValues().name){
-    userId = "replace with user id logic"
+  if (user) {
+    userId = user.id;
   }
 
   return (
@@ -480,12 +452,21 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
               {step === 1 && (
                 <div className="space-y-4">
                   <div className="grid gap-2">
-                    <Label htmlFor="dob">Date of Birth</Label>
-                    <Input
-                      type="date"
-                      id="dob"
-                      {...form.register("dob")}
-                      className="col-span-3"
+                    <FormField
+                      control={form.control}
+                      name="dob"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Date of Birth</FormLabel>
+                          <FormControl>
+                            <Input
+                              type="date"
+                              {...field}
+                              className="col-span-3"
+                            />
+                          </FormControl>
+                        </FormItem>
+                      )}
                     />
                   </div>
 
