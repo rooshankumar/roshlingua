@@ -97,14 +97,45 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         options: {
           data: {
             full_name: name,
-          }
+          },
+          emailRedirectTo: `${window.location.origin}/auth/callback`
         }
       });
 
-      if (authError) throw authError;
+      if (authError) {
+        console.error("Auth signup error:", authError);
+        toast({
+          variant: "destructive",
+          title: "Signup failed",
+          description: authError.message
+        });
+        throw authError;
+      }
 
       if (authData.user) {
-        // User created successfully
+        const { error: profileError } = await supabase
+          .from('users')
+          .insert([
+            {
+              id: authData.user.id,
+              full_name: name,
+              email: authData.user.email,
+              updated_at: new Date().toISOString()
+            }
+          ])
+          .select()
+          .single();
+
+        if (profileError) {
+          console.error("Error creating user profile:", profileError);
+          toast({
+            variant: "destructive", 
+            title: "Profile creation failed",
+            description: "Could not create user profile"
+          });
+          throw profileError;
+        }
+
         toast({
           title: "Account created",
           description: "Please check your email to confirm your account.",
