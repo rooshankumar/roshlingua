@@ -1,0 +1,73 @@
+Auth state changed: INITIAL_SESSION 7bad0693-9053-423f-a2f0-a61c20b9cbf4
+AuthProvider.tsx:54 Initial session: 7bad0693-9053-423f-a2f0-a61c20b9cbf4
+chunk-W6L2VRDA.js?v=188d5fb6:377 [Violation] 'message' handler took 165ms
+chunk-W6L2VRDA.js?v=188d5fb6:16670 Uncaught TypeError: unsubscribe is not a function
+    at ChatScreen.tsx:69:7
+    at safelyCallDestroy (chunk-W6L2VRDA.js?v=188d5fb6:16748:13)
+    at commitHookEffectListUnmount (chunk-W6L2VRDA.js?v=188d5fb6:16875:19)
+    at commitPassiveUnmountInsideDeletedTreeOnFiber (chunk-W6L2VRDA.js?v=188d5fb6:18283:17)
+    at commitPassiveUnmountEffectsInsideOfDeletedTree_begin (chunk-W6L2VRDA.js?v=188d5fb6:18245:13)
+    at commitPassiveUnmountEffects_begin (chunk-W6L2VRDA.js?v=188d5fb6:18181:19)
+    at commitPassiveUnmountEffects (chunk-W6L2VRDA.js?v=188d5fb6:18169:11)
+    at flushPassiveEffectsImpl (chunk-W6L2VRDA.js?v=188d5fb6:19489:11)
+    at flushPassiveEffects (chunk-W6L2VRDA.js?v=188d5fb6:19447:22)
+    at commitRootImpl (chunk-W6L2VRDA.js?v=188d5fb6:19416:13)
+(anonymous) @ ChatScreen.tsx:69
+safelyCallDestroy @ chunk-W6L2VRDA.js?v=188d5fb6:16748
+commitHookEffectListUnmount @ chunk-W6L2VRDA.js?v=188d5fb6:16875
+commitPassiveUnmountInsideDeletedTreeOnFiber @ chunk-W6L2VRDA.js?v=188d5fb6:18283
+commitPassiveUnmountEffectsInsideOfDeletedTree_begin @ chunk-W6L2VRDA.js?v=188d5fb6:18245
+commitPassiveUnmountEffects_begin @ chunk-W6L2VRDA.js?v=188d5fb6:18181
+commitPassiveUnmountEffects @ chunk-W6L2VRDA.js?v=188d5fb6:18169
+flushPassiveEffectsImpl @ chunk-W6L2VRDA.js?v=188d5fb6:19489
+flushPassiveEffects @ chunk-W6L2VRDA.js?v=188d5fb6:19447
+commitRootImpl @ chunk-W6L2VRDA.js?v=188d5fb6:19416
+commitRoot @ chunk-W6L2VRDA.js?v=188d5fb6:19277
+performSyncWorkOnRoot @ chunk-W6L2VRDA.js?v=188d5fb6:18895
+flushSyncCallbacks @ chunk-W6L2VRDA.js?v=188d5fb6:9119
+(anonymous) @ chunk-W6L2VRDA.js?v=188d5fb6:18627Understand this errorAI
+chunk-W6L2VRDA.js?v=188d5fb6:14032 The above error occurred in the <ChatScreen> component:
+
+    at ChatScreen (https://cad3dbcd-7fca-44c6-9d87-87d0f56ad7b5-00-29qas9zjta2qz.sisko.replit.dev/src/components/chat/ChatScreen.tsx?t=1743304580937:19:30)
+    at ChatPage (https://cad3dbcd-7fca-44c6-9d87-87d0f56ad7b5-00-29qas9zjta2qz.sisko.replit.dev/src/pages/Chat.tsx?t=1743304580937:19:32)
+
+Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://reactjs.org/link/error-boundaries to learn more about error boundaries.
+logCapturedError @ chunk-W6L2VRDA.js?v=188d5fb6:14032
+update.callback @ chunk-W6L2VRDA.js?v=188d5fb6:14052
+callCallback @ chunk-W6L2VRDA.js?v=188d5fb6:11248
+commitUpdateQueue @ chunk-W6L2VRDA.js?v=188d5fb6:11265
+commitLayoutEffectOnFiber @ chunk-W6L2VRDA.js?v=188d5fb6:17093
+commitLayoutMountEffects_complete @ chunk-W6L2VRDA.js?v=188d5fb6:17980
+commitLayoutEffects_begin @ chunk-W6L2VRDA.js?v=188d5fb6:17969
+commitLayoutEffects @ chunk-W6L2VRDA.js?v=188d5fb6:17920
+commitRootImpl @ chunk-W6L2VRDA.js?v=188d5fb6:19353
+commitRoot @ chunk-W6L2VRDA.js?v=188d5fb6:19277
+performSyncWorkOnRoot @ chunk-W6L2VRDA.js?v=188d5fb6:18895
+flushSyncCallbacks @ chunk-W6L2VRDA.js?v=188d5fb6:9119
+(anonymous) @ chunk-W6L2VRDA.js?v=188d5fb6:18627Understand this errorAI
+chunk-W6L2VRDA.js?v=188d5fb6:9129 Uncaught TypeError: unsubscribe is not a function
+    at ChatScreen.tsx:69:7
+    at safelyCallDestroy (chunk-W6L2VRDA.js?v=188d5fb6:16748:13)
+    at commitHookEffectListUnmount (chunk-W6L2VRDA.js?v=188d5fb6:16875:19)
+    at commitPassiveUnmountInsideDeletedTreeOnFiber (chunk-W6L2VRDA.js?v=188d5fb6:18283:17)
+    at commitPassiveUnmountEffectsInsideOfDeletedTree_begin (chunk-W6L2VRDA.js?v=188d5fb6:18245:13)
+    at commitPassiveUnmountEffects_begin (chunk-W6L2VRDA.js?v=188d5fb6:18181:19)
+    at commitPassiveUnmountEffects (chunk-W6L2VRDA.js?v=188d5fb6:18169:11)
+    at flushPassiveEffectsImpl (chunk-W6L2VRDA.js?v=188d5fb6:19489:11)
+    at flushPassiveEffects (chunk-W6L2VRDA.js?v=188d5fb6:19447:22)
+    at commitRootImpl (chunk-W6L2VRDA.js?v=188d5fb6:19416:13)
+(anonymous) @ ChatScreen.tsx:69
+safelyCallDestroy @ chunk-W6L2VRDA.js?v=188d5fb6:16748
+commitHookEffectListUnmount @ chunk-W6L2VRDA.js?v=188d5fb6:16875
+commitPassiveUnmountInsideDeletedTreeOnFiber @ chunk-W6L2VRDA.js?v=188d5fb6:18283
+commitPassiveUnmountEffectsInsideOfDeletedTree_begin @ chunk-W6L2VRDA.js?v=188d5fb6:18245
+commitPassiveUnmountEffects_begin @ chunk-W6L2VRDA.js?v=188d5fb6:18181
+commitPassiveUnmountEffects @ chunk-W6L2VRDA.js?v=188d5fb6:18169
+flushPassiveEffectsImpl @ chunk-W6L2VRDA.js?v=188d5fb6:19489
+flushPassiveEffects @ chunk-W6L2VRDA.js?v=188d5fb6:19447
+commitRootImpl @ chunk-W6L2VRDA.js?v=188d5fb6:19416
+commitRoot @ chunk-W6L2VRDA.js?v=188d5fb6:19277
+performSyncWorkOnRoot @ chunk-W6L2VRDA.js?v=188d5fb6:18895
+flushSyncCallbacks @ chunk-W6L2VRDA.js?v=188d5fb6:9119
+(anonymous) @ chunk-W6L2VRDA.js?v=188d5fb6:18627Understand this errorAI
