@@ -112,15 +112,29 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         throw signUpError;
       }
 
-      // After successful signup, let the Supabase webhook handle user creation
-      // The webhook will have the service_role key to bypass RLS
-
       if (authData.user) {
-        // Let the auth webhook handle user creation
-        toast({
-          title: "Account created",
-          description: "Please check your email to confirm your account.",
-        });
+        try {
+          // Create user profile directly
+          const { error: profileError } = await supabase.rpc('initialize_user_profile', {
+            user_id: authData.user.id,
+            user_email: email,
+            user_name: name
+          });
+
+          if (profileError) throw profileError;
+
+          toast({
+            title: "Account created",
+            description: "Please check your email to confirm your account.",
+          });
+        } catch (profileError) {
+          console.error("Profile creation error:", profileError);
+          toast({
+            variant: "destructive",
+            title: "Profile creation failed",
+            description: "Account created but profile setup failed. Please contact support."
+          });
+        }
       }
     } catch (error) {
       console.error("Signup error:", error);
