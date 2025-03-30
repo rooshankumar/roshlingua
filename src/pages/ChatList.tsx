@@ -1,19 +1,20 @@
+
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { supabase } from '@/lib/supabase';
-import { useAuth } from '@/providers/AuthProvider';
-import { Button } from '@/components/ui/button';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Card, CardContent } from '@/components/ui/card';
 import { MessageCircle, Loader2 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { useAuth } from '@/providers/AuthProvider';
+import { supabase } from '@/lib/supabase';
 
 interface ChatPreview {
   id: string;
   participant: {
     id: string;
     email: string;
-    name?: string;
-    avatar?: string;
+    full_name: string;
+    avatar_url: string;
   };
   lastMessage?: {
     content: string;
@@ -35,12 +36,14 @@ export default function ChatList() {
           .from('conversation_participants')
           .select(`
             conversation_id,
-            users:user_id (
+            users!conversation_participants_user_id_fkey (
               id,
-              email
+              email,
+              full_name,
+              avatar_url
             )
           `)
-          .eq('user_id', user.id);
+          .neq('user_id', user.id);
 
         if (participantsError) throw participantsError;
 
@@ -58,8 +61,8 @@ export default function ChatList() {
               participant: {
                 id: participant.users.id,
                 email: participant.users.email,
-                name: participant.users.email?.split('@')[0],
-                avatar: '/placeholder.svg'
+                full_name: participant.users.full_name || participant.users.email?.split('@')[0],
+                avatar_url: participant.users.avatar_url || '/placeholder.svg'
               },
               lastMessage: messages?.[0]
             };
@@ -118,14 +121,14 @@ export default function ChatList() {
               <Card className="hover:bg-muted/50 transition-colors">
                 <CardContent className="flex items-center p-4">
                   <Avatar className="h-12 w-12">
-                    <AvatarImage src={conversation.participant.avatar} />
+                    <AvatarImage src={conversation.participant.avatar_url} />
                     <AvatarFallback>
-                      {conversation.participant.name?.substring(0, 2).toUpperCase()}
+                      {conversation.participant.full_name?.substring(0, 2).toUpperCase()}
                     </AvatarFallback>
                   </Avatar>
                   <div className="ml-4 flex-1">
                     <div className="flex items-center justify-between">
-                      <h3 className="font-medium">{conversation.participant.name}</h3>
+                      <h3 className="font-medium">{conversation.participant.full_name}</h3>
                       {conversation.lastMessage && (
                         <span className="text-sm text-muted-foreground">
                           {new Date(conversation.lastMessage.created_at).toLocaleDateString()}
