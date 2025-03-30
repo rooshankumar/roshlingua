@@ -240,13 +240,12 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
         .from('users')
         .update({
           gender: formData.gender,
-          date_of_birth: formData.dob instanceof Date ? formData.dob.toISOString() : null,
+          date_of_birth: formData.dob ? new Date(formData.dob).toISOString() : null,
           native_language: formData.nativeLanguage,
           learning_language: formData.learningLanguage,
           proficiency_level: formData.proficiencyLevel,
           learning_goal: formData.learningGoal,
           avatar_url: formData.avatarUrl,
-          onboarding_completed: true,
           updated_at: new Date().toISOString()
         })
         .eq('id', user.id);
