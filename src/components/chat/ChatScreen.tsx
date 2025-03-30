@@ -129,15 +129,18 @@ export const ChatScreen = ({ conversation }: ChatScreenProps) => {
             className={`flex ${message.user_id === user?.id ? 'justify-end' : 'justify-start'}`}
           >
             <div
-              className={`max-w-[70%] rounded-lg p-3 ${
-                message.user_id === user?.id
-                  ? 'bg-primary text-primary-foreground ml-auto'
-                  : 'bg-muted'
-              }`}
+              className={`flex ${message.user_id === user?.id ? 'justify-end' : 'justify-start'} w-full`}
             >
+              <div
+                className={`max-w-[70%] rounded-lg p-3 ${
+                  message.user_id === user?.id
+                    ? 'bg-primary text-primary-foreground'
+                    : 'bg-muted'
+                }`}
+              >
               {message.content}
             </div>
-          </div>
+            </div>
         ))}
         <div ref={messagesEndRef} />
       </div>
