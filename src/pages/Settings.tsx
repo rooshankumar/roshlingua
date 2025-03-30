@@ -65,7 +65,8 @@ const Settings = () => {
           [field]: value,
           updated_at: new Date().toISOString()
         })
-        .eq('id', authUser.user.id);
+        .eq('id', authUser.user.id)
+        .eq('created_by', authUser.user.id);
 
       if (error) {
         console.error("Error updating profile:", error);
