@@ -415,12 +415,15 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
   };
 
 
-  const { data: { user }, error: userError } = await supabase.auth.getUser();
-
+  let user;
   let userId = null;
-  if (user) {
-    userId = user.id;
-  }
+  (async () => {
+    const { data: userData, error: userError } = await supabase.auth.getUser();
+    if (userData) {
+      user = userData.user;
+      userId = user.id;
+    }
+  })();
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-gradient-to-b from-background to-secondary">
