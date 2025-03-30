@@ -50,41 +50,40 @@ const Settings = () => {
   };
 
   const handleSaveProfile = async () => {
-    if (!user?.id) return;
+    if (!user?.id) {
+      toast({
+        title: "Error",
+        description: "User ID not found",
+        variant: "destructive"
+      });
+      return;
+    }
 
     try {
-      // Update main profile in users table
-      const { error: userError } = await supabase
-        .from('users')
-        .update({
-          full_name: localProfile.full_name,
-          gender: localProfile.gender,
-          native_language: localProfile.native_language,
-          learning_language: localProfile.learning_language,
-          proficiency_level: localProfile.proficiency_level,
-          date_of_birth: localProfile.date_of_birth,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', user.id);
-
-      if (userError) throw userError;
-
-      // Update bio in profiles table
-      const { error: profileError } = await supabase
-        .from('profiles')
-        .upsert({
-          id: user.id,
-          bio: localBio,
-          updated_at: new Date().toISOString()
-        });
-
-      if (profileError) throw profileError;
-
-      // Update local state
-      updateProfile({
-        ...localProfile,
-        bio: localBio
+      const { data, error } = await supabase.rpc('update_user_profile', {
+        p_user_id: user.id,
+        p_full_name: localProfile.full_name,
+        p_email: localProfile.email,
+        p_gender: localProfile.gender,
+        p_native_language: localProfile.native_language,
+        p_learning_language: localProfile.learning_language,
+        p_proficiency_level: localProfile.proficiency_level,
+        p_date_of_birth: localProfile.date_of_birth,
+        p_bio: localBio,
+        p_avatar_url: localProfile.avatar_url,
+        p_streak_count: localProfile.streak_count || 0
       });
+
+      if (error) throw error;
+
+      // Update local state with the returned data
+      if (data) {
+        updateProfile({
+          ...data,
+          bio: data.bio || localBio // Ensure bio is included
+        });
+      }
+
       toast({
         title: "Success",
         description: "Profile updated successfully"
@@ -93,7 +92,7 @@ const Settings = () => {
       console.error('Error updating profile:', error);
       toast({
         title: "Error",
-        description: "Failed to update profile. Please try again.",
+        description: error.message || "Failed to update profile. Please try again.",
         variant: "destructive"
       });
     }
