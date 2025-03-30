@@ -50,14 +50,7 @@ const Settings = () => {
   };
 
   const handleSaveProfile = async () => {
-    if (!user?.id) {
-      toast({
-        title: "Error",
-        description: "User ID not found",
-        variant: "destructive"
-      });
-      return;
-    }
+    if (!user?.id) return;
 
     try {
       // Update user profile
@@ -84,18 +77,18 @@ const Settings = () => {
           id: user.id,
           bio: localBio,
           updated_at: new Date().toISOString()
-        })
-        .eq('id', user.id);
+        });
 
       if (profileError) throw profileError;
 
-      if (data) {
-        updateProfile(localProfile);
-        toast({
-          title: "Success",
-          description: "Profile updated successfully"
-        });
-      }
+      updateProfile({
+        ...localProfile,
+        bio: localBio
+      });
+      toast({
+        title: "Success",
+        description: "Profile updated successfully"
+      });
     } catch (error) {
       console.error('Error updating profile:', error);
       toast({
@@ -112,6 +105,26 @@ const Settings = () => {
       setLocalProfile(profile);
     }
   }, [profile]);
+
+
+  // Fetch bio on component mount
+  useEffect(() => {
+    const fetchBio = async () => {
+      if (!user?.id) return;
+
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('bio')
+        .eq('id', user.id)
+        .single();
+
+      if (!error && data) {
+        setLocalBio(data.bio || '');
+      }
+    };
+
+    fetchBio();
+  }, [user]);
 
 
   const handleUploadAvatar = async (e: React.ChangeEvent<HTMLInputElement>) => {
