@@ -101,22 +101,27 @@ const Settings = () => {
   }, [profile]);
 
   const handleProfileFieldChange = async (field: string, value: string) => {
-      try {
-      updateProfile({
-        ...profile,
-        [field]: value,
-        updated_at: new Date().toISOString()
+    setLocalProfile(prev => ({
+      ...prev,
+      [field]: value
+    }));
+
+    try {
+      const { error } = await supabase.auth.updateUser({
+        data: {
+          [field]: value,
+          updated_at: new Date().toISOString()
+        }
       });
 
-      toast({
-        title: "Success",
-        description: `${field.charAt(0).toUpperCase() + field.slice(1)} updated successfully.`,
-      });
+      if (error) throw error;
+
+      updateProfile({ ...profile, [field]: value });
     } catch (error) {
-      console.error("Error updating profile:", error);
+      console.error('Error updating profile:', error);
       toast({
         title: "Error",
-        description: error instanceof Error ? error.message : "Failed to update profile. Please try again.",
+        description: "Failed to update profile. Please try again.",
         variant: "destructive"
       });
     }
