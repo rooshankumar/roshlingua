@@ -1,0 +1,88 @@
+Auth state changed: INITIAL_SESSION 7bad0693-9053-423f-a2f0-a61c20b9cbf4
+AuthProvider.tsx:54 Initial session: 7bad0693-9053-423f-a2f0-a61c20b9cbf4
+chunk-W6L2VRDA.js?v=188d5fb6:16670 Uncaught TypeError: unsubscribe is not a function
+    at ChatScreen.tsx:75:11
+    at safelyCallDestroy (chunk-W6L2VRDA.js?v=188d5fb6:16748:13)
+    at commitHookEffectListUnmount (chunk-W6L2VRDA.js?v=188d5fb6:16875:19)
+    at commitPassiveUnmountOnFiber (chunk-W6L2VRDA.js?v=188d5fb6:18232:17)
+    at commitPassiveUnmountEffects_complete (chunk-W6L2VRDA.js?v=188d5fb6:18213:15)
+    at commitPassiveUnmountEffects_begin (chunk-W6L2VRDA.js?v=188d5fb6:18204:15)
+    at commitPassiveUnmountEffects (chunk-W6L2VRDA.js?v=188d5fb6:18169:11)
+    at flushPassiveEffectsImpl (chunk-W6L2VRDA.js?v=188d5fb6:19489:11)
+    at flushPassiveEffects (chunk-W6L2VRDA.js?v=188d5fb6:19447:22)
+    at chunk-W6L2VRDA.js?v=188d5fb6:19328:17
+(anonymous) @ ChatScreen.tsx:75
+safelyCallDestroy @ chunk-W6L2VRDA.js?v=188d5fb6:16748
+commitHookEffectListUnmount @ chunk-W6L2VRDA.js?v=188d5fb6:16875
+commitPassiveUnmountOnFiber @ chunk-W6L2VRDA.js?v=188d5fb6:18232
+commitPassiveUnmountEffects_complete @ chunk-W6L2VRDA.js?v=188d5fb6:18213
+commitPassiveUnmountEffects_begin @ chunk-W6L2VRDA.js?v=188d5fb6:18204
+commitPassiveUnmountEffects @ chunk-W6L2VRDA.js?v=188d5fb6:18169
+flushPassiveEffectsImpl @ chunk-W6L2VRDA.js?v=188d5fb6:19489
+flushPassiveEffects @ chunk-W6L2VRDA.js?v=188d5fb6:19447
+(anonymous) @ chunk-W6L2VRDA.js?v=188d5fb6:19328
+workLoop @ chunk-W6L2VRDA.js?v=188d5fb6:197
+flushWork @ chunk-W6L2VRDA.js?v=188d5fb6:176
+performWorkUntilDeadline @ chunk-W6L2VRDA.js?v=188d5fb6:384Understand this errorAI
+chunk-W6L2VRDA.js?v=188d5fb6:14032 The above error occurred in the <ChatScreen> component:
+
+    at ChatScreen (https://cad3dbcd-7fca-44c6-9d87-87d0f56ad7b5-00-29qas9zjta2qz.sisko.replit.dev/src/components/chat/ChatScreen.tsx?t=1743304785437:19:30)
+    at ChatPage (https://cad3dbcd-7fca-44c6-9d87-87d0f56ad7b5-00-29qas9zjta2qz.sisko.replit.dev/src/pages/Chat.tsx?t=1743304785437:19:32)
+    at main
+    at div
+    at AppLayout (https://cad3dbcd-7fca-44c6-9d87-87d0f56ad7b5-00-29qas9zjta2qz.sisko.replit.dev/src/components/layouts/AppLayout.tsx:35:22)
+    at ProtectedRoute (https://cad3dbcd-7fca-44c6-9d87-87d0f56ad7b5-00-29qas9zjta2qz.sisko.replit.dev/src/components/auth/ProtectedRoute.tsx:15:27)
+    at RenderedRoute (https://cad3dbcd-7fca-44c6-9d87-87d0f56ad7b5-00-29qas9zjta2qz.sisko.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=188d5fb6:4069:5)
+    at Routes (https://cad3dbcd-7fca-44c6-9d87-87d0f56ad7b5-00-29qas9zjta2qz.sisko.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=188d5fb6:4508:5)
+    at AppRoutes (https://cad3dbcd-7fca-44c6-9d87-87d0f56ad7b5-00-29qas9zjta2qz.sisko.replit.dev/src/App.tsx?t=1743304785952:35:33)
+    at AuthProvider (https://cad3dbcd-7fca-44c6-9d87-87d0f56ad7b5-00-29qas9zjta2qz.sisko.replit.dev/src/providers/AuthProvider.tsx:23:32)
+    at Router (https://cad3dbcd-7fca-44c6-9d87-87d0f56ad7b5-00-29qas9zjta2qz.sisko.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=188d5fb6:4451:15)
+    at BrowserRouter (https://cad3dbcd-7fca-44c6-9d87-87d0f56ad7b5-00-29qas9zjta2qz.sisko.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=188d5fb6:5196:5)
+    at ThemeProvider (https://cad3dbcd-7fca-44c6-9d87-87d0f56ad7b5-00-29qas9zjta2qz.sisko.replit.dev/src/components/theme-provider.tsx:17:33)
+    at QueryClientProvider (https://cad3dbcd-7fca-44c6-9d87-87d0f56ad7b5-00-29qas9zjta2qz.sisko.replit.dev/node_modules/.vite/deps/@tanstack_react-query.js?v=188d5fb6:2794:3)
+    at App
+
+Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://reactjs.org/link/error-boundaries to learn more about error boundaries.
+logCapturedError @ chunk-W6L2VRDA.js?v=188d5fb6:14032
+update.callback @ chunk-W6L2VRDA.js?v=188d5fb6:14052
+callCallback @ chunk-W6L2VRDA.js?v=188d5fb6:11248
+commitUpdateQueue @ chunk-W6L2VRDA.js?v=188d5fb6:11265
+commitLayoutEffectOnFiber @ chunk-W6L2VRDA.js?v=188d5fb6:17093
+commitLayoutMountEffects_complete @ chunk-W6L2VRDA.js?v=188d5fb6:17980
+commitLayoutEffects_begin @ chunk-W6L2VRDA.js?v=188d5fb6:17969
+commitLayoutEffects @ chunk-W6L2VRDA.js?v=188d5fb6:17920
+commitRootImpl @ chunk-W6L2VRDA.js?v=188d5fb6:19353
+commitRoot @ chunk-W6L2VRDA.js?v=188d5fb6:19277
+performSyncWorkOnRoot @ chunk-W6L2VRDA.js?v=188d5fb6:18895
+flushSyncCallbacks @ chunk-W6L2VRDA.js?v=188d5fb6:9119
+flushPassiveEffectsImpl @ chunk-W6L2VRDA.js?v=188d5fb6:19506
+flushPassiveEffects @ chunk-W6L2VRDA.js?v=188d5fb6:19447
+(anonymous) @ chunk-W6L2VRDA.js?v=188d5fb6:19328
+workLoop @ chunk-W6L2VRDA.js?v=188d5fb6:197
+flushWork @ chunk-W6L2VRDA.js?v=188d5fb6:176
+performWorkUntilDeadline @ chunk-W6L2VRDA.js?v=188d5fb6:384Understand this errorAI
+chunk-W6L2VRDA.js?v=188d5fb6:9129 Uncaught TypeError: unsubscribe is not a function
+    at ChatScreen.tsx:75:11
+    at safelyCallDestroy (chunk-W6L2VRDA.js?v=188d5fb6:16748:13)
+    at commitHookEffectListUnmount (chunk-W6L2VRDA.js?v=188d5fb6:16875:19)
+    at commitPassiveUnmountOnFiber (chunk-W6L2VRDA.js?v=188d5fb6:18232:17)
+    at commitPassiveUnmountEffects_complete (chunk-W6L2VRDA.js?v=188d5fb6:18213:15)
+    at commitPassiveUnmountEffects_begin (chunk-W6L2VRDA.js?v=188d5fb6:18204:15)
+    at commitPassiveUnmountEffects (chunk-W6L2VRDA.js?v=188d5fb6:18169:11)
+    at flushPassiveEffectsImpl (chunk-W6L2VRDA.js?v=188d5fb6:19489:11)
+    at flushPassiveEffects (chunk-W6L2VRDA.js?v=188d5fb6:19447:22)
+    at chunk-W6L2VRDA.js?v=188d5fb6:19328:17
+(anonymous) @ ChatScreen.tsx:75
+safelyCallDestroy @ chunk-W6L2VRDA.js?v=188d5fb6:16748
+commitHookEffectListUnmount @ chunk-W6L2VRDA.js?v=188d5fb6:16875
+commitPassiveUnmountOnFiber @ chunk-W6L2VRDA.js?v=188d5fb6:18232
+commitPassiveUnmountEffects_complete @ chunk-W6L2VRDA.js?v=188d5fb6:18213
+commitPassiveUnmountEffects_begin @ chunk-W6L2VRDA.js?v=188d5fb6:18204
+commitPassiveUnmountEffects @ chunk-W6L2VRDA.js?v=188d5fb6:18169
+flushPassiveEffectsImpl @ chunk-W6L2VRDA.js?v=188d5fb6:19489
+flushPassiveEffects @ chunk-W6L2VRDA.js?v=188d5fb6:19447
+(anonymous) @ chunk-W6L2VRDA.js?v=188d5fb6:19328
+workLoop @ chunk-W6L2VRDA.js?v=188d5fb6:197
+flushWork @ chunk-W6L2VRDA.js?v=188d5fb6:176
+performWorkUntilDeadline @ chunk-W6L2VRDA.js?v=188d5fb6:384Understand this errorAI
