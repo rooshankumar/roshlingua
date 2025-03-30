@@ -234,16 +234,6 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
       const { data: { user }, error: userError } = await supabase.auth.getUser();
       
       if (userError || !user) {
-        throw new Error('User not authenticated');
-      }
-
-      const userId = user.id;
-      console.log("Submitting onboarding data:", formData);
-
-      // Get the current user
-      const { data: { session } } = await supabase.auth.getSession();
-
-      if (!session || !session.user) {
         toast({
           variant: "destructive",
           title: "Authentication error",
@@ -253,10 +243,33 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
         return;
       }
 
-      const userId = session.user.id;
+      console.log("Submitting onboarding data:", formData);
 
-      // First refresh the auth token to ensure we have a valid session
-      const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+      // Update user data in the users table
+      const { error: updateError } = await supabase
+        .from('users')
+        .update({
+          gender: formData.gender,
+          date_of_birth: formData.dob ? new Date(formData.dob).toISOString() : null,
+          native_language: formData.nativeLanguage,
+          learning_language: formData.learningLanguage,
+          proficiency_level: formData.proficiencyLevel,
+          learning_goal: formData.learningGoal,
+          avatar_url: formData.avatarUrl,
+          onboarding_completed: true,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', user.id);
+
+      if (updateError) {
+        console.error('Error updating user data:', updateError);
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Failed to update profile. Please try again.",
+        });
+        return;
+      }
       if (sessionError) {
         console.error("Error refreshing session:", sessionError);
         toast({
