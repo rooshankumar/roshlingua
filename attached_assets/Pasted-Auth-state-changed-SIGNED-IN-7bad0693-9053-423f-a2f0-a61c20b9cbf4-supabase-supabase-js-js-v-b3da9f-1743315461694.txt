@@ -1,0 +1,32 @@
+Auth state changed: SIGNED_IN 7bad0693-9053-423f-a2f0-a61c20b9cbf4
+@supabase_supabase-js.js?v=b3da9f4b:3900 
+            
+            
+           POST https://yekzyvdjjozhhatdefsq.supabase.co/rest/v1/rpc/update_user_profile 404 (Not Found)
+(anonymous) @ @supabase_supabase-js.js?v=b3da9f4b:3900
+(anonymous) @ @supabase_supabase-js.js?v=b3da9f4b:3921
+fulfilled @ @supabase_supabase-js.js?v=b3da9f4b:3873
+Promise.then
+step @ @supabase_supabase-js.js?v=b3da9f4b:3886
+(anonymous) @ @supabase_supabase-js.js?v=b3da9f4b:3888
+__awaiter6 @ @supabase_supabase-js.js?v=b3da9f4b:3870
+(anonymous) @ @supabase_supabase-js.js?v=b3da9f4b:3911
+then @ @supabase_supabase-js.js?v=b3da9f4b:89Understand this errorAI
+Settings.tsx:92 Error updating profile: {code: 'PGRST202', details: 'Searched for the function public.update_user_profi…r, but no matches were found in the schema cache.', hint: 'Perhaps you meant to call the function public.upda…ge, p_native_language, p_streak_count, p_user_id)', message: 'Could not find the function public.update_user_pro…level, streak_count, user_id) in the schema cache'}code: "PGRST202"details: "Searched for the function public.update_user_profile with parameters avatar_url, bio, date_of_birth, email, full_name, gender, learning_language, native_language, proficiency_level, streak_count, user_id or with a single unnamed json/jsonb parameter, but no matches were found in the schema cache."hint: "Perhaps you meant to call the function public.update_user_profile(p_avatar_url, p_bio, p_email, p_full_name, p_gender, p_learning_language, p_native_language, p_streak_count, p_user_id)"message: "Could not find the function public.update_user_profile(avatar_url, bio, date_of_birth, email, full_name, gender, learning_language, native_language, proficiency_level, streak_count, user_id) in the schema cache"[[Prototype]]: Object
+handleSaveProfile @ Settings.tsx:92
+await in handleSaveProfile
+callCallback2 @ chunk-W6L2VRDA.js?v=b3da9f4b:3674
+invokeGuardedCallbackDev @ chunk-W6L2VRDA.js?v=b3da9f4b:3699
+invokeGuardedCallback @ chunk-W6L2VRDA.js?v=b3da9f4b:3733
+invokeGuardedCallbackAndCatchFirstError @ chunk-W6L2VRDA.js?v=b3da9f4b:3736
+executeDispatch @ chunk-W6L2VRDA.js?v=b3da9f4b:7014
+processDispatchQueueItemsInOrder @ chunk-W6L2VRDA.js?v=b3da9f4b:7034
+processDispatchQueue @ chunk-W6L2VRDA.js?v=b3da9f4b:7043
+dispatchEventsForPlugins @ chunk-W6L2VRDA.js?v=b3da9f4b:7051
+(anonymous) @ chunk-W6L2VRDA.js?v=b3da9f4b:7174
+batchedUpdates$1 @ chunk-W6L2VRDA.js?v=b3da9f4b:18913
+batchedUpdates @ chunk-W6L2VRDA.js?v=b3da9f4b:3579
+dispatchEventForPluginEventSystem @ chunk-W6L2VRDA.js?v=b3da9f4b:7173
+dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay @ chunk-W6L2VRDA.js?v=b3da9f4b:5478
+dispatchEvent @ chunk-W6L2VRDA.js?v=b3da9f4b:5472
+dispatchDiscreteEvent @ chunk-W6L2VRDA.js?v=b3da9f4b:5449Understand this errorAI
