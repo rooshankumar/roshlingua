@@ -68,6 +68,7 @@ const Settings = () => {
       const { error } = await supabase
         .from('users')
         .update(localProfile)
+        .eq('id', user.id)
         .eq('id', user.id);
 
       if (error) throw error;
