@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { UserStatus } from '@/components/UserStatus';
 import { MessageCircle, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -14,6 +15,8 @@ interface ChatPreview {
     email: string;
     full_name: string;
     avatar_url: string;
+    is_online?: boolean;
+    last_seen?: string;
   };
   lastMessage?: {
     content: string;
@@ -159,11 +162,10 @@ const ChatList = () => {
                   <div className="ml-4 flex-1">
                     <div className="flex items-center justify-between">
                       <h3 className="font-medium">{conversation.participant.full_name}</h3>
-                      {conversation.lastMessage && (
-                        <span className="text-sm text-muted-foreground">
-                          {new Date(conversation.lastMessage.created_at).toLocaleDateString()}
-                        </span>
-                      )}
+                      <UserStatus 
+                        isOnline={conversation.participant.is_online} 
+                        lastSeen={conversation.participant.last_seen} 
+                      />
                     </div>
                     {conversation.lastMessage && (
                       <p className="text-sm text-muted-foreground truncate">
