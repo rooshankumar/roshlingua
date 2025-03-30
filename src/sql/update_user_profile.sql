@@ -35,6 +35,7 @@ BEGIN
   SET bio = EXCLUDED.bio,
       avatar_url = EXCLUDED.avatar_url,
       streak_count = EXCLUDED.streak_count,
-      updated_at = NOW();
+      updated_at = NOW()
+  WHERE profiles.id = user_id;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
