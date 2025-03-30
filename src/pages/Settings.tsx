@@ -51,15 +51,24 @@ const Settings = () => {
       // Update user data
       const { error } = await supabase
         .from('users')
-        .update({ 
+        .update({
           [field]: value,
           updated_at: new Date().toISOString()
         })
-        .eq('id', user.id); // Added WHERE clause for user ID
+        .match({ id: user.id });
 
-      if (error) throw error;
-      if (field === 'bio') {
-        await updateProfile({...profile, bio: value}); //added to update realtime profile
+      if (error) {
+        console.error("Error updating profile:", error);
+        throw error;
+      }
+
+      // Update local profile state
+      if (profile) {
+        await updateProfile({
+          ...profile,
+          [field]: value,
+          updated_at: new Date().toISOString()
+        });
       }
 
     } catch (error) {
@@ -107,12 +116,14 @@ const Settings = () => {
   };
 
   const handleSaveProfile = async () => {
-    if (localBio !== profile?.bio) {
-      await handleProfileChange("bio", localBio);
-    }
     try {
-      if (!profile?.id) return;
-      await updateProfile(profile);
+      if (!user?.id) return;
+      
+      // Update bio if changed
+      if (localBio !== profile?.bio) {
+        await handleProfileChange("bio", localBio);
+      }
+
       toast({
         title: "Profile updated",
         description: "Your profile has been successfully updated.",
