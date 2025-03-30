@@ -46,14 +46,14 @@ interface OnboardingProps {
 }
 
 type OnboardingFormData = {
-  name: string;
+  full_name: string;
   gender: string;
-  dob?: Date;
-  nativeLanguage: string;
-  learningLanguage: string;
-  proficiencyLevel: string;
-  learningGoal: string;
-  avatarUrl: string;
+  date_of_birth?: Date;
+  native_language: string;
+  learning_language: string;
+  proficiency_level: string;
+  learning_goal: string;
+  avatar_url: string;
 }
 
 const Onboarding = ({ onComplete }: OnboardingProps) => {
@@ -61,14 +61,14 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const form = useForm<OnboardingFormData>({
     defaultValues: {
-      name: "",
+      full_name: "",
       gender: "",
-      nativeLanguage: "",
-      learningLanguage: "",
-      proficiencyLevel: "",
-      learningGoal: "",
-      avatarUrl: "",
-      dob: undefined as Date | undefined,
+      native_language: "",
+      learning_language: "",
+      proficiency_level: "",
+      learning_goal: "",
+      avatar_url: "",
+      date_of_birth: undefined as Date | undefined,
     },
     async validate(values) {
       const errors: Record<string, string> = {};
