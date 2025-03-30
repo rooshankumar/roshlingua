@@ -1,30 +1,19 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { ArrowLeft, Send } from 'lucide-react';
-import { supabase } from '@/lib/supabase';
-import { useAuth } from '@/providers/AuthProvider';
+import { Button } from '@/components/ui/button';
 import { Message } from '@/types/chat';
+import { useAuth } from '@/providers/AuthProvider';
+import { supabase } from '@/lib/supabase';
 
-interface Participant {
-  id: string;
-  email: string;
-  full_name: string;
-  avatar_url: string;
+interface Props {
+  conversation: {
+    id: string;
+    title?: string;
+  };
 }
 
-interface ConversationProps {
-  id: string;
-  participant: Participant;
-}
-
-interface ChatScreenProps {
-  conversation: ConversationProps;
-}
-
-export const ChatScreen = ({ conversation }: ChatScreenProps) => {
+export const ChatScreen = ({ conversation }: Props) => {
   const { user } = useAuth();
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState('');
@@ -35,10 +24,6 @@ export const ChatScreen = ({ conversation }: ChatScreenProps) => {
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
-
-  const getInitials = (name: string) => {
-    return name.split(' ').map(n => n[0]).join('').toUpperCase();
   };
 
   useEffect(() => {
@@ -54,77 +39,71 @@ export const ChatScreen = ({ conversation }: ChatScreenProps) => {
 
         if (error) throw error;
         setMessages(data || []);
+        scrollToBottom();
       } catch (error) {
         console.error('Error fetching messages:', error);
       } finally {
         setIsLoading(false);
-        scrollToBottom();
       }
     };
 
     fetchMessages();
 
     const channel = supabase
-      .channel(`conversation_${conversation.id}`)
+      .channel('messages')
       .on('postgres_changes', {
         event: 'INSERT',
         schema: 'public',
         table: 'messages',
-        filter: `conversation_id=eq.${conversation.id}`
+        filter: `conversation_id=eq.${conversation.id}`,
       }, (payload) => {
-        // Only add message if it's not from current user
         if (payload.new.sender_id !== user?.id) {
-          setMessages(prev => [...prev, payload.new]);
+          setMessages(prev => [...prev, payload.new as Message]);
           scrollToBottom();
         }
       })
       .subscribe();
 
     return () => {
-      channel.unsubscribe();
+      supabase.removeChannel(channel);
     };
-  }, [conversation.id, user?.id]);
+  }, [conversation?.id, user?.id]);
 
   const sendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newMessage.trim() || !user?.id || !conversation?.id || isSending) return;
 
+    const tempMessage = {
+      id: Date.now().toString(),
+      content: newMessage.trim(),
+      conversation_id: conversation.id,
+      sender_id: user.id,
+      user_id: user.id,
+      created_at: new Date().toISOString()
+    };
+
     try {
       setIsSending(true);
-      const messageContent = newMessage.trim();
       setNewMessage('');
-
-      // Optimistically add message to UI
-      const optimisticMessage = {
-        id: Date.now().toString(),
-        content: messageContent,
-        created_at: new Date().toISOString(),
-        sender_id: user.id,
-        conversation_id: conversation.id
-      };
-      setMessages(prev => [...prev, optimisticMessage]);
+      setMessages(prev => [...prev, tempMessage]);
       scrollToBottom();
 
-      const { error, data } = await supabase
+      const { error } = await supabase
         .from('messages')
         .insert({
-          content: messageContent,
+          content: tempMessage.content,
           conversation_id: conversation.id,
-          sender_id: user.id
-        })
-        .select()
-        .single();
+          sender_id: user.id,
+          user_id: user.id
+        });
 
-      if (error) throw error;
-
-      // Update the optimistic message with the real one
-      setMessages(prev => prev.map(msg => 
-        msg.id === optimisticMessage.id ? data : msg
-      ));
+      if (error) {
+        throw error;
+      }
     } catch (error) {
       console.error('Error sending message:', error);
-      // Remove optimistic message on error
-      setMessages(prev => prev.filter(msg => msg.id !== optimisticMessage.id));
+      setMessages(prev => prev.filter(msg => msg.id !== tempMessage.id));
+      setNewMessage(tempMessage.content);
     } finally {
       setIsSending(false);
     }
@@ -137,28 +116,21 @@ export const ChatScreen = ({ conversation }: ChatScreenProps) => {
           variant="ghost" 
           size="icon"
           onClick={() => navigate('/chat')}
-          className="mr-2"
         >
           <ArrowLeft className="h-5 w-5" />
         </Button>
-        <Avatar className="h-10 w-10">
-          <AvatarImage src={conversation.participant.avatar_url} />
-          <AvatarFallback>{getInitials(conversation.participant.full_name || conversation.participant.email)}</AvatarFallback>
-        </Avatar>
-        <div className="ml-3">
-          <p className="font-medium">{conversation.participant.full_name || conversation.participant.email}</p>
-        </div>
+        <h2 className="ml-4 font-semibold">{conversation.title || 'Chat'}</h2>
       </div>
 
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {messages.map((message) => (
           <div
             key={message.id}
-            className={`flex ${message.user_id === user?.id ? 'justify-end' : 'justify-start'}`}
+            className={`flex ${message.sender_id === user?.id ? 'justify-end' : 'justify-start'}`}
           >
             <div
-              className={`max-w-[70%] rounded-lg p-3 ${
-                message.user_id === user?.id
+              className={`max-w-[70%] rounded-lg px-4 py-2 ${
+                message.sender_id === user?.id
                   ? 'bg-primary text-primary-foreground'
                   : 'bg-muted'
               }`}
@@ -171,14 +143,20 @@ export const ChatScreen = ({ conversation }: ChatScreenProps) => {
       </div>
 
       <form onSubmit={sendMessage} className="p-4 border-t flex gap-2">
-        <Input
+        <input
+          type="text"
           value={newMessage}
           onChange={(e) => setNewMessage(e.target.value)}
+          onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && sendMessage(e)}
           placeholder="Type a message..."
-          className="flex-1"
+          className="flex-1 rounded-lg border p-2"
         />
         <Button type="submit" size="icon" disabled={isSending}>
-          {isSending ? <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-gray-500"></div> : <Send className="h-4 w-4" />}
+          {isSending ? (
+            <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-current" />
+          ) : (
+            <Send className="h-4 w-4" />
+          )}
         </Button>
       </form>
     </div>
