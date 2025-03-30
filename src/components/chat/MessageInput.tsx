@@ -37,9 +37,13 @@ export const MessageInput = ({ onSendMessage }: MessageInputProps) => {
       <Button 
         onClick={handleSend}
         className="h-[60px] px-6"
-        disabled={!message.trim()}
+        disabled={!message.trim() || props.isSending}
       >
-        <Send className="h-5 w-5" />
+        {props.isSending ? (
+          <Loader2 className="h-5 w-5 animate-spin" />
+        ) : (
+          <Send className="h-5 w-5" />
+        )}
       </Button>
     </div>
   );

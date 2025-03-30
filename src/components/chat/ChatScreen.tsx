@@ -29,6 +29,7 @@ export const ChatScreen = ({ conversation }: ChatScreenProps) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const [isLoading, setIsLoading] = useState(true);
+  const [isSending, setIsSending] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
 
@@ -69,36 +70,63 @@ export const ChatScreen = ({ conversation }: ChatScreenProps) => {
         event: 'INSERT',
         schema: 'public',
         table: 'messages',
-        filter: `conversation_id=eq.${conversation.id}`,
+        filter: `conversation_id=eq.${conversation.id}`
       }, (payload) => {
-        setMessages(prev => [...prev, payload.new as Message]);
-        scrollToBottom();
+        // Only add message if it's not from current user
+        if (payload.new.sender_id !== user?.id) {
+          setMessages(prev => [...prev, payload.new]);
+          scrollToBottom();
+        }
       })
       .subscribe();
 
     return () => {
-      supabase.removeChannel(channel);
+      channel.unsubscribe();
     };
-  }, [conversation?.id]);
+  }, [conversation.id, user?.id]);
 
   const sendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newMessage.trim() || !user?.id || !conversation?.id) return;
+    if (!newMessage.trim() || !user?.id || !conversation?.id || isSending) return;
 
     try {
-      const { error } = await supabase
+      setIsSending(true);
+      const messageContent = newMessage.trim();
+      setNewMessage('');
+
+      // Optimistically add message to UI
+      const optimisticMessage = {
+        id: Date.now().toString(),
+        content: messageContent,
+        created_at: new Date().toISOString(),
+        sender_id: user.id,
+        conversation_id: conversation.id
+      };
+      setMessages(prev => [...prev, optimisticMessage]);
+      scrollToBottom();
+
+      const { error, data } = await supabase
         .from('messages')
         .insert({
-          content: newMessage.trim(),
+          content: messageContent,
           conversation_id: conversation.id,
-          user_id: user.id,
           sender_id: user.id
-        });
+        })
+        .select()
+        .single();
 
       if (error) throw error;
-      setNewMessage('');
+
+      // Update the optimistic message with the real one
+      setMessages(prev => prev.map(msg => 
+        msg.id === optimisticMessage.id ? data : msg
+      ));
     } catch (error) {
       console.error('Error sending message:', error);
+      // Remove optimistic message on error
+      setMessages(prev => prev.filter(msg => msg.id !== optimisticMessage.id));
+    } finally {
+      setIsSending(false);
     }
   };
 
@@ -149,8 +177,8 @@ export const ChatScreen = ({ conversation }: ChatScreenProps) => {
           placeholder="Type a message..."
           className="flex-1"
         />
-        <Button type="submit" size="icon">
-          <Send className="h-4 w-4" />
+        <Button type="submit" size="icon" disabled={isSending}>
+          {isSending ? <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-gray-500"></div> : <Send className="h-4 w-4" />}
         </Button>
       </form>
     </div>
