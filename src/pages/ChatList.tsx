@@ -54,10 +54,10 @@ const ChatList = () => {
 
         const conversationPreviews = await Promise.all(
           participantsData.map(async (participant) => {
-            const { data: otherParticipant } = await supabase
+            const { data: otherParticipant, error: otherParticipantError } = await supabase
               .from('conversation_participants')
               .select(`
-                users!conversation_participants_user_id_fkey (
+                users:user_id (
                   id,
                   email,
                   full_name,
@@ -68,6 +68,11 @@ const ChatList = () => {
               .neq('user_id', user.id)
               .single();
 
+            if (otherParticipantError) {
+              console.error('Error fetching other participant:', otherParticipantError);
+              return null;
+            }
+
             const { data: messages } = await supabase
               .from('messages')
               .select('content, created_at')
@@ -75,16 +80,17 @@ const ChatList = () => {
               .order('created_at', { ascending: false })
               .limit(1);
 
-            return {
+            const participantUser = otherParticipant?.users;
+            return participantUser ? {
               id: participant.conversation_id,
               participant: {
-                id: otherParticipant?.users?.id,
-                email: otherParticipant?.users?.email,
-                full_name: otherParticipant?.users?.full_name || otherParticipant?.users?.email?.split('@')[0],
-                avatar_url: otherParticipant?.users?.avatar_url || '/placeholder.svg'
+                id: participantUser.id,
+                email: participantUser.email,
+                full_name: participantUser.full_name || participantUser.email?.split('@')[0],
+                avatar_url: participantUser.avatar_url || '/placeholder.svg'
               },
               lastMessage: messages?.[0]
-            };
+            } : null;
           })
         );
 
