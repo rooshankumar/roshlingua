@@ -60,20 +60,24 @@ const Settings = () => {
     }
 
     try {
-      // Update bio if changed
-      if (localBio !== profile?.bio) {
-        await handleProfileChange("bio", localBio);
-      }
+      const updates = {
+        full_name: localProfile.full_name,
+        bio: localBio,
+        native_language: localProfile.native_language,
+        learning_language: localProfile.learning_language,
+        proficiency_level: localProfile.proficiency_level,
+        gender: localProfile.gender,
+        updated_at: new Date().toISOString()
+      };
 
       const { error } = await supabase
-        .from('users')
-        .update(localProfile)
-        .eq('id', user.id)
+        .from('profiles')
+        .update(updates)
         .eq('id', user.id);
 
       if (error) throw error;
 
-      updateProfile(localProfile);
+      updateProfile({ ...profile, ...updates });
 
       toast({
         title: "Success",
