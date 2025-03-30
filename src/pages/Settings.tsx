@@ -69,20 +69,16 @@ const Settings = () => {
 
       toast({
         title: "Success",
-        description: `Profile updated successfully.`,
+        description: "Profile updated successfully"
       });
 
       updateProfile(localProfile);
-      
-      toast({
-        title: "Success",
-        description: "Profile updated successfully",
-      });
+
     } catch (error) {
       console.error("Error updating profile:", error);
       toast({
         title: "Error",
-        description: "Failed to update profile",
+        description: error instanceof Error ? error.message : "Failed to update profile. Please try again.",
         variant: "destructive"
       });
     }
@@ -95,7 +91,8 @@ const Settings = () => {
     }
   }, [profile]);
 
-  // Use localProfile instead of profile for form values
+  const handleProfileFieldChange = async (field: string, value: string) => {
+      try {
       updateProfile({
         ...profile,
         [field]: value,
@@ -305,7 +302,7 @@ const Settings = () => {
                       <Input 
                         id="name" 
                         value={profile?.full_name || ""}
-                        onChange={(e) => handleProfileChange("full_name", e.target.value)}
+                        onChange={(e) => handleProfileFieldChange("full_name", e.target.value)}
                       />
                     </div>
 
@@ -334,7 +331,7 @@ const Settings = () => {
                       <Label htmlFor="gender">Gender</Label>
                       <Select 
                         value={profile?.gender || ""}
-                        onValueChange={(value) => handleProfileChange("gender", value)}
+                        onValueChange={(value) => handleProfileFieldChange("gender", value)}
                       >
                         <SelectTrigger id="gender">
                           <SelectValue placeholder="Select gender" />
@@ -361,7 +358,7 @@ const Settings = () => {
                     <Label htmlFor="nativeLanguage">Native Language</Label>
                     <Select
                       value={profile?.native_language || ""}
-                      onValueChange={(value) => handleProfileChange("native_language", value)}
+                      onValueChange={(value) => handleProfileFieldChange("native_language", value)}
                     >
                       <SelectTrigger id="nativeLanguage">
                         <SelectValue placeholder="Select language" />
@@ -380,7 +377,7 @@ const Settings = () => {
                     <Label htmlFor="learningLanguage">Learning Language</Label>
                     <Select
                       value={profile?.learning_language || ""}
-                      onValueChange={(value) => handleProfileChange("learning_language", value)}
+                      onValueChange={(value) => handleProfileFieldChange("learning_language", value)}
                     >
                       <SelectTrigger id="learningLanguage">
                         <SelectValue placeholder="Select language" />
@@ -399,7 +396,7 @@ const Settings = () => {
                     <Label htmlFor="proficiencyLevel">Proficiency Level</Label>
                     <Select
                       value={profile?.proficiency_level || ""}
-                      onValueChange={(value) => handleProfileChange("proficiency_level", value)}
+                      onValueChange={(value) => handleProfileFieldChange("proficiency_level", value)}
                     >
                       <SelectTrigger id="proficiencyLevel">
                         <SelectValue placeholder="Select level" />
