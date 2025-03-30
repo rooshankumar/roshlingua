@@ -55,14 +55,24 @@ const Settings = () => {
         throw new Error("Invalid gender value");
       }
 
-      const { data, error } = await supabase.auth.updateUser({
-        data: {
-          [field]: value
-        }
-      });
-
-      if (error) {
-        throw error;
+      let userData = {};
+      
+      if (field === 'email') {
+        const { error } = await supabase.auth.updateUser({ email: value });
+        if (error) throw error;
+      } else if (field === 'password') {
+        const { error } = await supabase.auth.updateUser({ password: value });
+        if (error) throw error;
+      } else {
+        // For other fields, update the public.users table
+        const { error } = await supabase
+          .from('users')
+          .update({ [field]: value })
+          .eq('id', user.id)
+          .single();
+        
+        if (error) throw error;
+      }
       }
 
       // Update local state if the update was successful
