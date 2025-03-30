@@ -91,7 +91,8 @@ export const ChatScreen = ({ conversation }: ChatScreenProps) => {
         .insert({
           content: newMessage.trim(),
           conversation_id: conversation.id,
-          user_id: user.id
+          user_id: user.id,
+          sender_id: user.id
         });
 
       if (error) throw error;
