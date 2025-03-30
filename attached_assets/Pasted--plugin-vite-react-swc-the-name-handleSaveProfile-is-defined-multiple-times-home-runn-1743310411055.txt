@@ -1,0 +1,118 @@
+[plugin:vite:react-swc] × the name `handleSaveProfile` is defined multiple times
+     ╭─[/home/runner/workspace/src/pages/Settings.tsx:52:1]
+  49 │     }));
+  50 │   };
+  51 │ 
+  52 │   const handleSaveProfile = async () => {
+     ·         ────────┬────────
+     ·                 ╰── previous definition of `handleSaveProfile` here
+  53 │     if (!user?.id) {
+  54 │       toast({
+  55 │         title: "Error",
+  56 │         description: "You must be logged in to update your profile.",
+  57 │         variant: "destructive"
+  58 │       });
+  59 │       return;
+  60 │     }
+  61 │ 
+  62 │     try {
+  63 │       const { error } = await supabase
+  64 │         .from('users')
+  65 │         .update(localProfile)
+  66 │         .eq('id', user.id);
+  67 │ 
+  68 │       if (error) throw error;
+  69 │ 
+  70 │       toast({
+  71 │         title: "Success",
+  72 │         description: "Profile updated successfully"
+  73 │       });
+  74 │ 
+  75 │       updateProfile(localProfile);
+  76 │ 
+  77 │     } catch (error) {
+  78 │       console.error("Error updating profile:", error);
+  79 │       toast({
+  80 │         title: "Error",
+  81 │         description: error instanceof Error ? error.message : "Failed to update profile. Please try again.",
+  82 │         variant: "destructive"
+  83 │       });
+  84 │     }
+  85 │   };
+  86 │ 
+  87 │   // Initialize local state when profile changes
+  88 │   useEffect(() => {
+  89 │     if (profile) {
+  90 │       setLocalProfile(profile);
+  91 │     }
+  92 │   }, [profile]);
+  93 │ 
+  94 │   const handleProfileFieldChange = async (field: string, value: string) => {
+  95 │       try {
+  96 │       updateProfile({
+  97 │         ...profile,
+  98 │         [field]: value,
+  99 │         updated_at: new Date().toISOString()
+ 100 │       });
+ 101 │ 
+ 102 │       toast({
+ 103 │         title: "Success",
+ 104 │         description: `${field.charAt(0).toUpperCase() + field.slice(1)} updated successfully.`,
+ 105 │       });
+ 106 │     } catch (error) {
+ 107 │       console.error("Error updating profile:", error);
+ 108 │       toast({
+ 109 │         title: "Error",
+ 110 │         description: error instanceof Error ? error.message : "Failed to update profile. Please try again.",
+ 111 │         variant: "destructive"
+ 112 │       });
+ 113 │     }
+ 114 │   };
+ 115 │ 
+ 116 │   const handleUploadAvatar = async (e: React.ChangeEvent<HTMLInputElement>) => {
+ 117 │     if (!e.target.files || !e.target.files[0]) return;
+ 118 │     const file = e.target.files[0];
+ 119 │     const fileExt = file.name.split('.').pop();
+ 120 │     const fileName = `${Date.now()}.${fileExt}`;
+ 121 │     const filePath = `${user?.id}/${fileName}`;
+ 122 │ 
+ 123 │     try {
+ 124 │       const { error: uploadError } = await supabase.storage
+ 125 │         .from('avatars')
+ 126 │         .upload(filePath, file);
+ 127 │ 
+ 128 │       if (uploadError) throw uploadError;
+ 129 │ 
+ 130 │       const { data: { publicUrl } } = supabase.storage
+ 131 │         .from('avatars')
+ 132 │         .getPublicUrl(filePath);
+ 133 │ 
+ 134 │       await updateProfile({ ...profile, avatar_url: publicUrl });
+ 135 │ 
+ 136 │       toast({
+ 137 │         title: "Avatar updated",
+ 138 │         description: "Your profile picture has been updated successfully.",
+ 139 │       });
+ 140 │     } catch (error) {
+ 141 │       console.error('Error uploading avatar:', error);
+ 142 │       toast({
+ 143 │         title: "Error",
+ 144 │         description: "Failed to upload avatar. Please try again.",
+ 145 │         variant: "destructive"
+ 146 │       });
+ 147 │     }
+ 148 │   };
+ 149 │ 
+ 150 │   const handleSaveProfile = async () => {
+     ·         ────────┬────────
+     ·                 ╰── `handleSaveProfile` redefined here
+ 151 │     try {
+ 152 │       if (!user?.id) return;
+     ╰────
+/home/runner/workspace/src/pages/Settings.tsx:52:1
+556|                      <Label htmlFor="profileViews">Profile views</Label>
+557|                      <p className="text-sm text-muted-foreground">
+558|                        Get notified when someone views your profile
+   |                                     ^
+559|                      </p>
+560|      
