@@ -1,3 +1,4 @@
+
 CREATE OR REPLACE FUNCTION public.update_user_profile(
   user_id UUID,
   avatar_url TEXT DEFAULT NULL,
@@ -12,19 +13,19 @@ CREATE OR REPLACE FUNCTION public.update_user_profile(
   streak_count INTEGER DEFAULT 0
 ) RETURNS VOID AS $$
 BEGIN
-  UPDATE public.users
+  UPDATE public.users u
   SET 
-    avatar_url = COALESCE($2, avatar_url),
-    bio = COALESCE($3, bio),
-    date_of_birth = COALESCE($4, date_of_birth),
-    email = COALESCE($5, email),
-    full_name = COALESCE($6, full_name),
-    gender = COALESCE($7, gender),
-    learning_language = COALESCE($8, learning_language),
-    native_language = COALESCE($9, native_language),
-    proficiency_level = COALESCE($10, proficiency_level),
-    streak_count = COALESCE($11, streak_count),
+    avatar_url = COALESCE(update_user_profile.avatar_url, u.avatar_url),
+    bio = COALESCE(update_user_profile.bio, u.bio),
+    date_of_birth = COALESCE(update_user_profile.date_of_birth, u.date_of_birth),
+    email = COALESCE(update_user_profile.email, u.email),
+    full_name = COALESCE(update_user_profile.full_name, u.full_name),
+    gender = COALESCE(update_user_profile.gender, u.gender),
+    learning_language = COALESCE(update_user_profile.learning_language, u.learning_language),
+    native_language = COALESCE(update_user_profile.native_language, u.native_language),
+    proficiency_level = COALESCE(update_user_profile.proficiency_level, u.proficiency_level),
+    streak_count = COALESCE(update_user_profile.streak_count, u.streak_count),
     updated_at = NOW()
-  WHERE id = $1;
+  WHERE u.id = update_user_profile.user_id;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
