@@ -17,6 +17,7 @@ export const ChatScreen = ({ conversation }: ChatScreenProps) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const [isLoading, setIsLoading] = useState(true);
+  const [subscribed, setSubscribed] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
 
@@ -55,23 +56,27 @@ export const ChatScreen = ({ conversation }: ChatScreenProps) => {
 
     loadMessages();
 
-    let unsubscribe;
-    unsubscribe = subscribeToMessages(conversation.id, (message) => {
-      setMessages(prev => {
-        if (prev.some(m => m.id === message.id)) return prev;
-        return [...prev, message].sort((a, b) =>
-          new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
-        );
+    if (!subscribed && conversation?.id) {
+      const unsubscribe = subscribeToMessages(conversation.id, (message) => {
+        setMessages(prev => {
+          if (prev.some(m => m.id === message.id)) return prev;
+          return [...prev, message].sort((a, b) =>
+            new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+          );
+        });
+        scrollToBottom();
       });
-      scrollToBottom();
-    });
 
-    return () => {
-      if (unsubscribe) {
-        unsubscribe(); 
-      }
-    };
-  }, [conversation?.id]);
+      setSubscribed(true);
+      
+      return () => {
+        setSubscribed(false);
+        if (unsubscribe) {
+          unsubscribe();
+        }
+      };
+    }
+  }, [conversation?.id, subscribed]);
 
   const handleSend = async (e: React.FormEvent) => {
     e.preventDefault();

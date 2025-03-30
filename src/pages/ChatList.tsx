@@ -1,6 +1,5 @@
-
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { MessageCircle, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -22,14 +21,15 @@ interface ChatPreview {
   };
 }
 
-export default function ChatList() {
+const ChatList = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [conversations, setConversations] = useState<ChatPreview[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     if (!user) return;
-
+    setIsLoading(true);
     const fetchConversations = async () => {
       try {
         const { data: participantsData, error: participantsError } = await supabase
@@ -49,7 +49,6 @@ export default function ChatList() {
 
         const conversationPreviews = await Promise.all(
           participantsData.map(async (participant) => {
-            // Get the other participant in the conversation
             const { data: otherParticipant } = await supabase
               .from('conversation_participants')
               .select(`
@@ -88,14 +87,19 @@ export default function ChatList() {
       } catch (error) {
         console.error('Error fetching conversations:', error);
       } finally {
-        setLoading(false);
+        setIsLoading(false);
       }
     };
 
     fetchConversations();
+
+    return () => {
+      setConversations([]);
+      setIsLoading(true);
+    };
   }, [user]);
 
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="flex items-center justify-center h-[80vh]">
         <Loader2 className="w-8 h-8 animate-spin" />
@@ -128,7 +132,7 @@ export default function ChatList() {
       ) : (
         <div className="space-y-2">
           {conversations.map((conversation) => (
-            <Link 
+            <Link
               key={conversation.id}
               to={`/chat/${conversation.id}`}
               className="block"
@@ -164,4 +168,6 @@ export default function ChatList() {
       )}
     </div>
   );
-}
+};
+
+export default ChatList;
