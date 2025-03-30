@@ -55,7 +55,7 @@ const Settings = () => {
           [field]: value,
           updated_at: new Date().toISOString()
         })
-        .eq('id', user.id);
+        .eq('id', user.id); // Added WHERE clause for user ID
 
       if (error) throw error;
       if (field === 'bio') {
@@ -278,8 +278,8 @@ const Settings = () => {
                       <Label htmlFor="bio">Bio</Label>
                       <Textarea 
                         id="bio" 
-                        value={profile?.bio || ""}
-                        onChange={(e) => handleProfileChange("bio", e.target.value)}
+                        value={localBio}
+                        onChange={(e) => setLocalBio(e.target.value)}
                         className="min-h-[100px]"
                       />
                     </div>
