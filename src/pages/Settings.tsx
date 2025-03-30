@@ -67,6 +67,11 @@ const Settings = () => {
 
       if (error) throw error;
 
+      toast({
+        title: "Success",
+        description: `Profile updated successfully.`,
+      });
+
       updateProfile(localProfile);
       
       toast({
