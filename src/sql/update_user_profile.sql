@@ -19,6 +19,7 @@ BEGIN
     RAISE EXCEPTION 'user_id cannot be null';
   END IF;
 
+  -- Perform the update with proper WHERE clause
   UPDATE public.users
   SET 
     avatar_url = COALESCE(update_user_profile.avatar_url, users.avatar_url),
@@ -33,7 +34,7 @@ BEGIN
     streak_count = COALESCE(update_user_profile.streak_count, users.streak_count),
     onboarding_completed = COALESCE(update_user_profile.onboarding_completed, users.onboarding_completed),
     updated_at = NOW()
-  WHERE id = user_id::uuid;
+  WHERE id = user_id;
 
   -- Check if update was successful
   IF NOT FOUND THEN
