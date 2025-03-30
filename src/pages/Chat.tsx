@@ -1,10 +1,20 @@
+
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useAuth } from '@/providers/AuthProvider';
-import { Conversation } from '@/types/chat';
-import { ChatScreen } from '@/components/chat/ChatScreen';
 import { Loader2 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
+import { ChatScreen } from '@/components/chat/ChatScreen';
+
+interface Conversation {
+  id: string;
+  participant: {
+    id: string;
+    email: string;
+    full_name: string;
+    avatar_url: string;
+  };
+}
 
 const ChatPage = () => {
   const { conversationId } = useParams();
@@ -17,32 +27,32 @@ const ChatPage = () => {
 
     const loadConversation = async () => {
       try {
-        const { data: participants, error } = await supabase
+        const { data: otherParticipant, error } = await supabase
           .from('conversation_participants')
           .select(`
-            user_id,
-            users (
+            users:user_id (
               id,
-              email
+              email,
+              full_name,
+              avatar_url
             )
           `)
-          .eq('conversation_id', conversationId);
+          .eq('conversation_id', conversationId)
+          .neq('user_id', user.id)
+          .single();
 
         if (error) throw error;
 
-        if (participants) {
-          const otherParticipant = participants.find(p => p.user_id !== user.id);
-          if (otherParticipant?.users) {
-            setConversation({
-              id: conversationId,
-              participants: [{
-                id: otherParticipant.users.id,
-                email: otherParticipant.users.email,
-                name: otherParticipant.users.email?.split('@')[0],
-                avatar: '/placeholder.svg'
-              }]
-            });
-          }
+        if (otherParticipant?.users) {
+          setConversation({
+            id: conversationId,
+            participant: {
+              id: otherParticipant.users.id,
+              email: otherParticipant.users.email,
+              full_name: otherParticipant.users.full_name || otherParticipant.users.email?.split('@')[0],
+              avatar_url: otherParticipant.users.avatar_url || '/placeholder.svg'
+            }
+          });
         }
       } catch (error) {
         console.error('Error loading conversation:', error);
@@ -52,7 +62,7 @@ const ChatPage = () => {
     };
 
     loadConversation();
-  }, [user, conversationId, supabase]);
+  }, [user, conversationId]);
 
   if (!user) {
     return (

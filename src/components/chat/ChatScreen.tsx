@@ -1,16 +1,28 @@
-import { useEffect, useState, useRef } from 'react';
-import { useAuth } from '@/providers/AuthProvider';
-import { Message, Conversation } from '@/types/chat';
+
+import { useEffect, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { fetchMessages, sendMessage, subscribeToMessages } from '@/services/chatService';
-import { Loader2, ArrowLeft } from 'lucide-react';
-import { Link, useNavigate } from 'react-router-dom';
+import { ArrowLeft, Send } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
+import { useAuth } from '@/providers/AuthProvider';
+import { Message } from '@/types/chat';
+
+interface Participant {
+  id: string;
+  email: string;
+  full_name: string;
+  avatar_url: string;
+}
+
+interface ConversationProps {
+  id: string;
+  participant: Participant;
+}
 
 interface ChatScreenProps {
-  conversation: Conversation;
+  conversation: ConversationProps;
 }
 
 export const ChatScreen = ({ conversation }: ChatScreenProps) => {
@@ -18,75 +30,72 @@ export const ChatScreen = ({ conversation }: ChatScreenProps) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const [isLoading, setIsLoading] = useState(true);
-  const [subscribed, setSubscribed] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
-
-  const partner = conversation?.participants?.find(p => p.id !== user?.id);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
-  const getInitials = (name?: string) => {
-    if (!name) return '??';
+  const getInitials = (name: string) => {
     return name.split(' ').map(n => n[0]).join('').toUpperCase();
   };
 
   useEffect(() => {
     if (!conversation?.id) return;
 
-    const loadMessages = async () => {
+    const fetchMessages = async () => {
       try {
-        const msgs = await fetchMessages(conversation.id);
-        setMessages(prev => {
-          const uniqueMessages = msgs.filter(msg => 
-            !prev.some(p => p.id === msg.id)
-          );
-          return [...uniqueMessages, ...prev].sort((a, b) => 
-            new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
-          );
-        });
+        const { data, error } = await supabase
+          .from('messages')
+          .select('*')
+          .eq('conversation_id', conversation.id)
+          .order('created_at', { ascending: true });
+
+        if (error) throw error;
+        setMessages(data || []);
       } catch (error) {
-        console.error('Error loading messages:', error);
+        console.error('Error fetching messages:', error);
       } finally {
         setIsLoading(false);
         scrollToBottom();
       }
     };
 
-    loadMessages();
+    fetchMessages();
 
     const channel = supabase
-      .channel(`chat:${conversation?.id}`)
+      .channel(`conversation_${conversation.id}`)
       .on('postgres_changes', {
         event: 'INSERT',
         schema: 'public',
         table: 'messages',
-        filter: `conversation_id=eq.${conversation?.id}`
+        filter: `conversation_id=eq.${conversation.id}`,
       }, (payload) => {
-        const newMessage = payload.new as Message;
-        setMessages(prev => {
-          if (prev.some(m => m.id === newMessage.id)) return prev;
-          return [...prev, newMessage].sort((a, b) =>
-            new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
-          );
-        });
+        setMessages(prev => [...prev, payload.new as Message]);
         scrollToBottom();
       })
       .subscribe();
 
     return () => {
-      channel.unsubscribe();
+      supabase.removeChannel(channel);
     };
   }, [conversation?.id]);
 
-  const handleSend = async (e: React.FormEvent) => {
+  const sendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newMessage.trim() || !user?.id || !conversation?.id) return;
 
     try {
-      await sendMessage(conversation.id, user.id, newMessage.trim());
+      const { error } = await supabase
+        .from('messages')
+        .insert({
+          content: newMessage.trim(),
+          conversation_id: conversation.id,
+          user_id: user.id
+        });
+
+      if (error) throw error;
       setNewMessage('');
     } catch (error) {
       console.error('Error sending message:', error);
@@ -95,7 +104,6 @@ export const ChatScreen = ({ conversation }: ChatScreenProps) => {
 
   return (
     <div className="flex flex-col h-screen">
-      {/* Chat Header */}
       <div className="flex items-center p-4 border-b">
         <Button 
           variant="ghost" 
@@ -106,56 +114,44 @@ export const ChatScreen = ({ conversation }: ChatScreenProps) => {
           <ArrowLeft className="h-5 w-5" />
         </Button>
         <Avatar className="h-10 w-10">
-          <AvatarImage src={partner?.avatar} />
-          <AvatarFallback>{getInitials(partner?.name || partner?.email)}</AvatarFallback>
+          <AvatarImage src={conversation.participant.avatar_url} />
+          <AvatarFallback>{getInitials(conversation.participant.full_name || conversation.participant.email)}</AvatarFallback>
         </Avatar>
         <div className="ml-3">
-          <p className="font-medium">{partner?.name || partner?.email}</p>
+          <p className="font-medium">{conversation.participant.full_name || conversation.participant.email}</p>
         </div>
       </div>
 
-      {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-4">
-        {isLoading ? (
-          <div className="flex justify-center items-center h-full">
-            <Loader2 className="h-8 w-8 animate-spin" />
-          </div>
-        ) : (
-          messages.map((message) => (
+      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+        {messages.map((message) => (
+          <div
+            key={message.id}
+            className={`flex ${message.user_id === user?.id ? 'justify-end' : 'justify-start'}`}
+          >
             <div
-              key={message.id}
-              className={`flex mb-4 ${
-                message.sender_id === user?.id ? 'justify-end' : 'justify-start'
+              className={`max-w-[70%] rounded-lg p-3 ${
+                message.user_id === user?.id
+                  ? 'bg-primary text-primary-foreground'
+                  : 'bg-muted'
               }`}
             >
-              <div
-                className={`rounded-lg px-4 py-2 max-w-[70%] ${
-                  message.sender_id === user?.id
-                    ? 'bg-primary text-primary-foreground'
-                    : 'bg-muted'
-                }`}
-              >
-                {message.content}
-              </div>
+              {message.content}
             </div>
-          ))
-        )}
+          </div>
+        ))}
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Message Input */}
-      <form onSubmit={handleSend} className="p-4 border-t">
-        <div className="flex gap-2">
-          <Input
-            value={newMessage}
-            onChange={(e) => setNewMessage(e.target.value)}
-            placeholder="Type a message..."
-            className="flex-1"
-          />
-          <Button type="submit" disabled={!newMessage.trim()}>
-            Send
-          </Button>
-        </div>
+      <form onSubmit={sendMessage} className="p-4 border-t flex gap-2">
+        <Input
+          value={newMessage}
+          onChange={(e) => setNewMessage(e.target.value)}
+          placeholder="Type a message..."
+          className="flex-1"
+        />
+        <Button type="submit" size="icon">
+          <Send className="h-4 w-4" />
+        </Button>
       </form>
     </div>
   );
