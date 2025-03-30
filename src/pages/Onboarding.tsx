@@ -225,18 +225,18 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
       }
 
 
-      // Update user profile using RPC
+      // Update user profile using RPC  - ATTEMPTED FIX, MAY REQUIRE DATABASE/RPC FUNCTION CHANGES
       const { data, error: userError } = await supabase.rpc('update_user_profile', {
-        p_user_id: userId,
-        p_full_name: formData.name,
-        p_gender: formData.gender,
-        p_date_of_birth: formData.dob ? new Date(formData.dob).toISOString() : null,
-        p_native_language: formData.nativeLanguage,
-        p_learning_language: formData.learningLanguage,
-        p_proficiency_level: formData.proficiencyLevel,
-        p_bio: formData.learningGoal,
-        p_avatar_url: formData.avatarUrl || null,
-        p_onboarding_completed: true
+        user_id: userId,
+        full_name: formData.name,
+        gender: formData.gender,
+        date_of_birth: formData.dob ? new Date(formData.dob).toISOString() : null,
+        native_language: formData.nativeLanguage,
+        learning_language: formData.learningLanguage,
+        proficiency_level: formData.proficiencyLevel,
+        bio: formData.learningGoal,
+        avatar_url: formData.avatarUrl || null,
+        onboarding_completed: true
       });
 
       if (userError) {
