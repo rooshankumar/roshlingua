@@ -112,6 +112,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         throw signUpError;
       }
 
+      // After successful signup, let the Supabase webhook handle user creation
+      // The webhook will have the service_role key to bypass RLS
+
       if (authData.user) {
         // Let the auth webhook handle user creation
         toast({
