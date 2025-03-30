@@ -95,8 +95,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         email,
         password,
         options: {
+          emailRedirectTo: `${window.location.origin}/auth/callback`,
           data: {
-            full_name: name
+            full_name: name,
+            email: email
           }
         }
       });
@@ -108,10 +110,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           title: "Signup failed",
           description: error.message
         });
-        throw error;
+        return;
       }
 
       if (authData.user) {
+        // Call RPC function to create user
+        const { error: rpcError } = await supabase.rpc('create_user_with_onboarding', {
+          new_user_id: authData.user.id,
+          new_email: email
+        });
+
+        if (rpcError) {
+          console.error("User creation error:", rpcError);
+          toast({
+            variant: "destructive",
+            title: "Account creation failed",
+            description: "Error creating user profile"
+          });
+          return;
+        }
+
         toast({
           title: "Account created",
           description: "Please check your email to confirm your account.",
