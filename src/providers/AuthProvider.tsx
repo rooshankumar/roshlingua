@@ -114,25 +114,29 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       if (authData.user) {
         try {
-          // Create user profile directly
-          const { error: profileError } = await supabase.rpc('initialize_user_profile', {
-            user_id: authData.user.id,
-            user_email: email,
-            user_name: name
-          });
+          // Create user record directly
+          const { error: userError } = await supabase
+            .from('users')
+            .insert({
+              id: authData.user.id,
+              email: email,
+              name: name,
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString()
+            });
 
-          if (profileError) throw profileError;
+          if (userError) throw userError;
 
           toast({
             title: "Account created",
             description: "Please check your email to confirm your account.",
           });
-        } catch (profileError) {
-          console.error("Profile creation error:", profileError);
+        } catch (error) {
+          console.error("User creation error:", error);
           toast({
             variant: "destructive",
-            title: "Profile creation failed",
-            description: "Account created but profile setup failed. Please contact support."
+            title: "Account creation failed",
+            description: "Please try again or contact support."
           });
         }
       }
