@@ -111,16 +111,7 @@ export const ChatScreen = ({ conversation }: Props) => {
 
   return (
     <div className="flex flex-col h-screen">
-      <div className="flex items-center p-4 border-b">
-        <Button 
-          variant="ghost" 
-          size="icon"
-          onClick={() => navigate('/chat')}
-        >
-          <ArrowLeft className="h-5 w-5" />
-        </Button>
-        <h2 className="ml-4 font-semibold">{conversation.title || 'Chat'}</h2>
-      </div>
+      <ChatHeader conversation={conversation} />
 
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {messages.map((message) => (

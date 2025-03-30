@@ -1,99 +1,48 @@
-import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
-import { supabase } from '@/lib/supabase';
-import { useAuth } from '@/providers/AuthProvider';
+import { useNavigate, useParams } from 'react-router-dom';
+import { ArrowLeft } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
-import { Languages, Circle } from 'lucide-react';
-import { Profile } from '@/lib/database.types';
-import { User } from '@/types/chat';
+import { useAuth } from '@/providers/AuthProvider';
+import { supabase } from '@/lib/supabase';
+import { useEffect, useState } from 'react';
 
-interface ChatHeaderProps {
-  partner?: User;
+interface Props {
+  conversation: {
+    id: string;
+    participant: {
+      id: string;
+      email: string;
+      full_name: string;
+      avatar_url: string;
+    };
+  };
 }
 
-export const ChatHeader = ({ partner }: ChatHeaderProps) => {
-  const { id } = useParams();
-  const { user } = useAuth();
-  const [otherUser, setOtherUser] = useState<Profile | null>(null);
-
-  useEffect(() => {
-    if (!id || !user) { // Removed the partner check to always fetch user info
-      return;
-    }
-
-    async function getOtherUserInfo() {
-      const { data: participants, error } = await supabase
-        .from('conversation_participants')
-        .select(`
-          user_id,
-          profiles (
-            id,
-            username,
-            avatar_url,
-            is_online,
-            nativeLanguage,
-            learningLanguage,
-            streakCount // Added missing fields
-          )
-        `)
-        .eq('conversation_id', id);
-
-      if (error) {
-        console.error('Error fetching participants:', error);
-        return;
-      }
-
-      if (participants && participants.length > 0) {
-        const otherParticipant = participants.find(p => p.user_id !== user.id);
-        if (otherParticipant?.profiles) {
-          setOtherUser(otherParticipant.profiles);
-        }
-      }
-    }
-
-    getOtherUserInfo();
-  }, [id, user]); // Removed partner from dependency array
-
-  // Using partner information if available, otherwise fallback to otherUser
-  const displayedUser = partner || otherUser;
-
-  if (displayedUser) {
-    return (
-      <div className="border-b p-4 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <Avatar>
-            <AvatarImage src={displayedUser.avatar_url || displayedUser.avatar || ''} />
-            <AvatarFallback>{displayedUser.username?.[0] || displayedUser.name?.[0]}</AvatarFallback>
-          </Avatar>
-          <div>
-            <div className="flex items-center gap-2">
-              <h3 className="font-semibold">{displayedUser.name}</h3>
-              <Circle className={`h-3 w-3 ${displayedUser.is_online ? "fill-green-500" : "fill-gray-400"}`} />
-              {displayedUser.age && <span className="text-sm text-muted-foreground">{displayedUser.age} years old</span>}
-            </div>
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <div className="flex items-center gap-1">
-                  <Languages className="h-4 w-4" />
-                  <Badge variant="secondary">{displayedUser.nativeLanguage}</Badge>
-                  <span>→</span>
-                  <Badge>{displayedUser.learningLanguage}</Badge>
-                </div>
-                <span>•</span>
-                <span>Streak: {displayedUser.streakCount} days</span>
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-    );
-  }
+export const ChatHeader = ({ conversation }: Props) => {
+  const navigate = useNavigate();
+  const participant = conversation.participant;
 
   return (
-    <div className="border-b">
-      <div className="flex h-16 items-center px-4 gap-3">
-        {/* Loading indicator or placeholder */}
-        <p>Loading...</p>
+    <div className="flex items-center p-4 border-b">
+      <Button 
+        variant="ghost" 
+        size="icon"
+        onClick={() => navigate('/chat')}
+      >
+        <ArrowLeft className="h-5 w-5" />
+      </Button>
+      <div className="flex items-center ml-4">
+        <Avatar>
+          <AvatarImage src={participant.avatar_url} />
+          <AvatarFallback>
+            {participant.full_name?.substring(0, 2).toUpperCase() || 'U'}
+          </AvatarFallback>
+        </Avatar>
+        <div className="ml-3">
+          <h2 className="font-semibold">
+            {participant.full_name || participant.email?.split('@')[0]}
+          </h2>
+        </div>
       </div>
     </div>
   );
