@@ -60,6 +60,11 @@ const Settings = () => {
     }
 
     try {
+      // Update bio if changed
+      if (localBio !== profile?.bio) {
+        await handleProfileChange("bio", localBio);
+      }
+
       const { error } = await supabase
         .from('users')
         .update(localProfile)
@@ -67,13 +72,12 @@ const Settings = () => {
 
       if (error) throw error;
 
+      updateProfile(localProfile);
+
       toast({
         title: "Success",
         description: "Profile updated successfully"
       });
-
-      updateProfile(localProfile);
-
     } catch (error) {
       console.error("Error updating profile:", error);
       toast({
@@ -146,8 +150,6 @@ const Settings = () => {
       });
     }
   };
-
-  const handleSaveProfile = async () => {
     if (!user?.id) {
       toast({
         title: "Error",
