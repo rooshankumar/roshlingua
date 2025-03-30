@@ -74,7 +74,7 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
       const errors: Record<string, string> = {};
       if (!values.name) errors.name = "Name is required";
       if (!values.gender) errors.gender = "Gender is required";
-      if (!values.dob) errors.dob = "Date of birth is required";
+      //Date of birth is no longer required.
       return errors;
     }
   });
@@ -109,7 +109,7 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
     const values = form.getValues();
     switch (step) {
       case 1:
-        return !!values.name && !!values.gender && !!values.dob;
+        return !!values.name && !!values.gender; //Removed dob validation
       case 2:
         return !!values.nativeLanguage && !!values.learningLanguage && !!values.proficiencyLevel;
       case 3:
@@ -143,7 +143,8 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
                 proficiency_level: values.proficiencyLevel,
                 learning_goal: values.learningGoal,
                 avatar_url: values.avatarUrl,
-                updated_at: new Date().toISOString()
+                updated_at: new Date().toISOString(),
+                onboarding_status: false //Added onboarding status
               }]);
 
             if (insertError) {
@@ -161,7 +162,8 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
                 learning_language: values.learningLanguage,
                 proficiency_level: values.proficiencyLevel,
                 learning_goal: values.learningGoal,
-                updated_at: new Date().toISOString()
+                updated_at: new Date().toISOString(),
+                onboarding_status: false //Added onboarding status
               })
               .eq('id', currentUserId);
 
@@ -240,13 +242,14 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
         .from('users')
         .update({
           gender: formData.gender,
-          date_of_birth: formData.dob ? new Date(formData.dob).toISOString() : null,
+          date_of_birth: formData.dob, //Simplified date_of_birth handling
           native_language: formData.nativeLanguage,
           learning_language: formData.learningLanguage,
           proficiency_level: formData.proficiencyLevel,
           learning_goal: formData.learningGoal,
           avatar_url: formData.avatarUrl,
-          updated_at: new Date().toISOString()
+          updated_at: new Date().toISOString(),
+          onboarding_status: true //Set onboarding status to true
         })
         .eq('id', user.id);
 
@@ -259,6 +262,7 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
         });
         return;
       }
+
 
       // First update the users table
       const { error: userUpdateError } = await supabase
@@ -280,13 +284,13 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
         return;
       }
 
-      // Then update user profile data
+      // Then update user profile data (assuming user_profiles table exists)
       const { error: profileError } = await supabase
         .from('user_profiles')
         .upsert({
           user_id: user.id,
           gender: formData.gender,
-          date_of_birth: formData.dob ? new Date(formData.dob).toISOString() : null,
+          date_of_birth: formData.dob, //Simplified date_of_birth handling
           native_language: formData.nativeLanguage,
           learning_language: formData.learningLanguage,
           proficiency_level: formData.proficiencyLevel,
@@ -460,7 +464,7 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
                       name="dob"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Date of Birth</FormLabel>
+                          <FormLabel>Date of Birth (Optional)</FormLabel>
                           <FormControl>
                             <Input
                               type="date"
@@ -540,51 +544,6 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
                     )}
                   />
 
-                  <FormField
-                    control={form.control}
-                    name="dob"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Date of Birth</FormLabel>
-                        <Popover>
-                          <PopoverTrigger asChild>
-                            <FormControl>
-                              <Button
-                                variant="outline"
-                                className={cn(
-                                  "w-full justify-start text-left font-normal",
-                                  !field.value && "text-muted-foreground"
-                                )}
-                              >
-                                <CalendarIcon className="mr-2 h-4 w-4" />
-                                {field.value ? (
-                                  format(field.value, "PPP")
-                                ) : (
-                                  <span>Pick a date</span>
-                                )}
-                              </Button>
-                            </FormControl>
-                          </PopoverTrigger>
-                          <PopoverContent className="w-auto p-0">
-                            <Calendar
-                              mode="single"
-                              selected={field.value}
-                              onSelect={field.onChange}
-                              disabled={(date) =>
-                                date > new Date() || date < new Date("1900-01-01")
-                              }
-                              initialFocus
-                              className="pointer-events-auto"
-                            />
-                          </PopoverContent>
-                        </Popover>
-                        <FormDescription>
-                          Required. We use this to calculate your age for profile display.
-                        </FormDescription>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
                 </div>
               )}
 
