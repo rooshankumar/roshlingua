@@ -242,21 +242,44 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
       }
 
 
-      // Update user profile using RPC  - ATTEMPTED FIX, MAY REQUIRE DATABASE/RPC FUNCTION CHANGES
-      const { data, error: userError } = await supabase.rpc('update_user_profile', {
-        user_id: userId,
-        full_name: formData.name,
-        gender: formData.gender,
-        date_of_birth: formData.dob ? new Date(formData.dob).toISOString() : null,
-        native_language: formData.nativeLanguage,
-        learning_language: formData.learningLanguage,
-        proficiency_level: formData.proficiencyLevel,
-        bio: formData.learningGoal,
-        avatar_url: formData.avatarUrl || null,
-        onboarding_completed: true
-      });
+      // First update the users table
+      const { error: userUpdateError } = await supabase
+        .from('users')
+        .update({
+          full_name: formData.name,
+          avatar_url: formData.avatarUrl || null,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', userId);
 
-      if (userError) {
+      if (userUpdateError) {
+        console.error('Error updating user:', userUpdateError);
+        toast({
+          variant: "destructive",
+          title: "Error updating profile",
+          description: "Failed to update basic profile information.",
+        });
+        return;
+      }
+
+      // Then update user profile data
+      const { error: profileError } = await supabase
+        .from('user_profiles')
+        .upsert({
+          user_id: userId,
+          gender: formData.gender,
+          date_of_birth: formData.dob ? new Date(formData.dob).toISOString() : null,
+          native_language: formData.nativeLanguage,
+          learning_language: formData.learningLanguage,
+          proficiency_level: formData.proficiencyLevel,
+          learning_goal: formData.learningGoal,
+          onboarding_completed: true,
+          updated_at: new Date().toISOString()
+        }, {
+          onConflict: 'user_id'
+        });
+
+      if (profileError) {
         console.error('Error updating profile:', userError);
         toast({
           title: "Error",
