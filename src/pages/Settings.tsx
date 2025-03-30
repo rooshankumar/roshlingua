@@ -60,6 +60,34 @@ const Settings = () => {
     }
 
     try {
+      const { data: { user: updatedUser }, error } = await supabase.auth.updateUser({
+        data: {
+          ...localProfile,
+          bio: localBio,
+          updated_at: new Date().toISOString()
+        }
+      });
+
+      if (error) throw error;
+
+      if (updatedUser?.user_metadata) {
+        updateProfile({ ...profile, ...updatedUser.user_metadata, bio: localBio });
+      }
+
+      toast({
+        title: "Success",
+        description: "Profile updated successfully.",
+      });
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update profile. Please try again.",
+        variant: "destructive"
+      });
+    }
+
+    try {
       const updates = {
         raw_user_meta_data: {
           ...user.user_metadata,
@@ -107,8 +135,9 @@ const Settings = () => {
     }));
 
     try {
-      const { error } = await supabase.auth.updateUser({
+      const { data: { user: updatedUser }, error } = await supabase.auth.updateUser({
         data: {
+          ...profile,
           [field]: value,
           updated_at: new Date().toISOString()
         }
@@ -116,7 +145,9 @@ const Settings = () => {
 
       if (error) throw error;
 
-      updateProfile({ ...profile, [field]: value });
+      if (updatedUser?.user_metadata) {
+        updateProfile({ ...profile, ...updatedUser.user_metadata });
+      }
     } catch (error) {
       console.error('Error updating profile:', error);
       toast({
