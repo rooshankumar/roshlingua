@@ -56,27 +56,29 @@ export const ChatScreen = ({ conversation }: ChatScreenProps) => {
 
     loadMessages();
 
-    if (!subscribed && conversation?.id) {
-      const unsubscribe = subscribeToMessages(conversation.id, (message) => {
+    const channel = supabase
+      .channel(`chat:${conversation?.id}`)
+      .on('postgres_changes', {
+        event: 'INSERT',
+        schema: 'public',
+        table: 'messages',
+        filter: `conversation_id=eq.${conversation?.id}`
+      }, (payload) => {
+        const newMessage = payload.new as Message;
         setMessages(prev => {
-          if (prev.some(m => m.id === message.id)) return prev;
-          return [...prev, message].sort((a, b) =>
+          if (prev.some(m => m.id === newMessage.id)) return prev;
+          return [...prev, newMessage].sort((a, b) =>
             new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
           );
         });
         scrollToBottom();
-      });
+      })
+      .subscribe();
 
-      setSubscribed(true);
-      
-      return () => {
-        setSubscribed(false);
-        if (unsubscribe) {
-          unsubscribe();
-        }
-      };
-    }
-  }, [conversation?.id, subscribed]);
+    return () => {
+      channel.unsubscribe();
+    };
+  }, [conversation?.id]);
 
   const handleSend = async (e: React.FormEvent) => {
     e.preventDefault();
