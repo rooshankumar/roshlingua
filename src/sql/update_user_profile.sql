@@ -1,16 +1,16 @@
 
 CREATE OR REPLACE FUNCTION public.update_user_profile(
   user_id UUID,
-  avatar_url TEXT,
-  bio TEXT,
+  avatar_url TEXT DEFAULT NULL,
+  bio TEXT DEFAULT NULL,
   date_of_birth DATE DEFAULT NULL,
-  email TEXT,
-  full_name TEXT,
-  gender TEXT,
-  learning_language TEXT,
-  native_language TEXT,
+  email TEXT DEFAULT NULL,
+  full_name TEXT DEFAULT NULL,
+  gender TEXT DEFAULT NULL,
+  learning_language TEXT DEFAULT NULL,
+  native_language TEXT DEFAULT NULL,
   proficiency_level TEXT DEFAULT NULL,
-  streak_count INTEGER
+  streak_count INTEGER DEFAULT 0
 ) RETURNS VOID AS $$
 BEGIN
   -- Update the users table
