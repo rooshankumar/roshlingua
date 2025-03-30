@@ -147,6 +147,17 @@ const Settings = () => {
     }
   };
 
+  const handleSaveProfile = async () => {
+    if (!user?.id) {
+      toast({
+        title: "Error",
+        description: "You must be logged in to update your profile.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    try {
       // Update bio if changed
       if (localBio !== profile?.bio) {
         await handleProfileChange("bio", localBio);
