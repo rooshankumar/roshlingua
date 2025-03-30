@@ -1,0 +1,32 @@
+[Violation] 'message' handler took 439ms
+@supabase_supabase-js.js?v=b3da9f4b:3900 
+            
+            
+           POST https://yekzyvdjjozhhatdefsq.supabase.co/rest/v1/rpc/update_user_profile 400 (Bad Request)
+(anonymous) @ @supabase_supabase-js.js?v=b3da9f4b:3900
+(anonymous) @ @supabase_supabase-js.js?v=b3da9f4b:3921
+fulfilled @ @supabase_supabase-js.js?v=b3da9f4b:3873
+Promise.then
+step @ @supabase_supabase-js.js?v=b3da9f4b:3886
+(anonymous) @ @supabase_supabase-js.js?v=b3da9f4b:3888
+__awaiter6 @ @supabase_supabase-js.js?v=b3da9f4b:3870
+(anonymous) @ @supabase_supabase-js.js?v=b3da9f4b:3911
+then @ @supabase_supabase-js.js?v=b3da9f4b:89Understand this errorAI
+Settings.tsx:92 Error updating profile: {code: '42702', details: 'It could refer to either a PL/pgSQL variable or a table column.', hint: null, message: 'column reference "full_name" is ambiguous'}code: "42702"details: "It could refer to either a PL/pgSQL variable or a table column."hint: nullmessage: "column reference \"full_name\" is ambiguous"[[Prototype]]: Object
+handleSaveProfile @ Settings.tsx:92
+await in handleSaveProfile
+callCallback2 @ chunk-W6L2VRDA.js?v=b3da9f4b:3674
+invokeGuardedCallbackDev @ chunk-W6L2VRDA.js?v=b3da9f4b:3699
+invokeGuardedCallback @ chunk-W6L2VRDA.js?v=b3da9f4b:3733
+invokeGuardedCallbackAndCatchFirstError @ chunk-W6L2VRDA.js?v=b3da9f4b:3736
+executeDispatch @ chunk-W6L2VRDA.js?v=b3da9f4b:7014
+processDispatchQueueItemsInOrder @ chunk-W6L2VRDA.js?v=b3da9f4b:7034
+processDispatchQueue @ chunk-W6L2VRDA.js?v=b3da9f4b:7043
+dispatchEventsForPlugins @ chunk-W6L2VRDA.js?v=b3da9f4b:7051
+(anonymous) @ chunk-W6L2VRDA.js?v=b3da9f4b:7174
+batchedUpdates$1 @ chunk-W6L2VRDA.js?v=b3da9f4b:18913
+batchedUpdates @ chunk-W6L2VRDA.js?v=b3da9f4b:3579
+dispatchEventForPluginEventSystem @ chunk-W6L2VRDA.js?v=b3da9f4b:7173
+dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay @ chunk-W6L2VRDA.js?v=b3da9f4b:5478
+dispatchEvent @ chunk-W6L2VRDA.js?v=b3da9f4b:5472
+dispatchDiscreteEvent @ chunk-W6L2VRDA.js?v=b3da9f4b:5449Understand this errorAI
