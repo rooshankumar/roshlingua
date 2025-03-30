@@ -1,0 +1,90 @@
+Your issue is likely caused by how you're fetching and mapping user data from the conversation_participants table. Specifically, the otherParticipant data might not be resolving correctly. Here’s what could be wrong:
+
+Possible Issues:
+Incorrect Query Structure for Participants:
+
+You're querying for other participants using:
+
+ts
+Copy
+Edit
+const { data: otherParticipant } = await supabase
+  .from('conversation_participants')
+  .select(`
+    users!conversation_participants_user_id_fkey (
+      id,
+      email,
+      full_name,
+      avatar_url
+    )
+  `)
+  .eq('conversation_id', participant.conversation_id)
+  .neq('user_id', user.id)
+  .single();
+This may not return the expected result because users!conversation_participants_user_id_fkey might not be structured correctly.
+
+Data Might Be undefined:
+
+If otherParticipant is undefined, then conversation.participant will also be undefined, which explains why no user name or avatar appears.
+
+Try logging the response to check if data is correctly returned:
+
+ts
+Copy
+Edit
+console.log('Other Participant:', otherParticipant);
+Fix:
+Modify the query that fetches the other participant by explicitly aliasing the user data:
+
+ts
+Copy
+Edit
+const { data: otherParticipant, error: otherParticipantError } = await supabase
+  .from('conversation_participants')
+  .select(`
+    users:user_id (
+      id,
+      email,
+      full_name,
+      avatar_url
+    )
+  `)
+  .eq('conversation_id', participant.conversation_id)
+  .neq('user_id', user.id)
+  .single();
+
+if (otherParticipantError) {
+  console.error('Error fetching other participant:', otherParticipantError);
+}
+Then update how you access otherParticipant:
+
+ts
+Copy
+Edit
+const participantUser = otherParticipant?.users;
+return {
+  id: participant.conversation_id,
+  participant: {
+    id: participantUser?.id,
+    email: participantUser?.email,
+    full_name: participantUser?.full_name || participantUser?.email?.split('@')[0],
+    avatar_url: participantUser?.avatar_url || '/placeholder.svg'
+  },
+  lastMessage: messages?.[0]
+};
+Debugging Steps:
+Check if otherParticipant contains data:
+
+ts
+Copy
+Edit
+console.log('Other Participant:', otherParticipant);
+Ensure conversation_id is correctly linked with users.
+
+Check if the avatar_url is a valid URL by logging:
+
+ts
+Copy
+Edit
+console.log('Avatar URL:', participantUser?.avatar_url);
+After making these changes, try reloading your application. L
