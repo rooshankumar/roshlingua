@@ -135,18 +135,19 @@ const Settings = () => {
     }));
 
     try {
-      const { data: { user: updatedUser }, error } = await supabase.auth.updateUser({
-        data: {
-          ...profile,
-          [field]: value,
-          updated_at: new Date().toISOString()
-        }
-      });
+      const { data, error } = await supabase
+        .from('users')
+        .update({ [field]: value })
+        .eq('id', user?.id);
 
       if (error) throw error;
 
-      if (updatedUser?.user_metadata) {
-        updateProfile({ ...profile, ...updatedUser.user_metadata });
+      if (data) {
+        updateProfile({ ...profile, [field]: value });
+        toast({
+          title: "Success",
+          description: "Profile updated successfully"
+        });
       }
     } catch (error) {
       console.error('Error updating profile:', error);
