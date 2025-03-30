@@ -120,7 +120,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             .insert({
               id: authData.user.id,
               email: email,
-              name: name,
+              full_name: name,
               created_at: new Date().toISOString(),
               updated_at: new Date().toISOString()
             });
