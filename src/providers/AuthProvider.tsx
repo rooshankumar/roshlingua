@@ -91,54 +91,31 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signup = async (email: string, password: string, name: string) => {
     try {
-      const { data: authData, error: signUpError } = await supabase.auth.signUp({
+      const { data: authData, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
           data: {
-            full_name: name,
-          },
-          emailRedirectTo: `${window.location.origin}/auth/callback`
+            full_name: name
+          }
         }
       });
 
-      if (signUpError) {
-        console.error("Auth signup error:", signUpError);
+      if (error) {
+        console.error("Auth signup error:", error);
         toast({
           variant: "destructive",
-          title: "Signup failed", 
-          description: signUpError.message
+          title: "Signup failed",
+          description: error.message
         });
-        throw signUpError;
+        throw error;
       }
 
       if (authData.user) {
-        try {
-          // Create user record directly
-          const { error: userError } = await supabase
-            .from('users')
-            .insert({
-              id: authData.user.id,
-              email: email,
-              full_name: name,
-              created_at: new Date().toISOString(),
-              updated_at: new Date().toISOString()
-            });
-
-          if (userError) throw userError;
-
-          toast({
-            title: "Account created",
-            description: "Please check your email to confirm your account.",
-          });
-        } catch (error) {
-          console.error("User creation error:", error);
-          toast({
-            variant: "destructive",
-            title: "Account creation failed",
-            description: "Please try again or contact support."
-          });
-        }
+        toast({
+          title: "Account created",
+          description: "Please check your email to confirm your account.",
+        });
       }
     } catch (error) {
       console.error("Signup error:", error);
