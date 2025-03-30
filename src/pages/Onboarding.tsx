@@ -129,26 +129,53 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
             return false;
           }
 
-          const { data: profileData, error: profileError } = await supabase
+          // First ensure user exists
+          const { data: existingUser, error: checkError } = await supabase
             .from('users')
-            .update({ 
-              age: age,
-              full_name: values.name,
-              gender: values.gender,
-              date_of_birth: values.dob?.toISOString(),
-              native_language: values.nativeLanguage,
-              learning_language: values.learningLanguage,
-              proficiency_level: values.proficiencyLevel,
-              learning_goal: values.learningGoal,
-              updated_at: new Date().toISOString()
-            })
+            .select('id')
             .eq('id', currentUserId)
-            .select()
             .single();
 
-          if (profileError) {
-            console.error('Error updating profile:', profileError);
-            return false;
+          if (checkError) {
+            // If user doesn't exist, insert new record
+            const { error: insertError } = await supabase
+              .from('users')
+              .insert([{
+                id: currentUserId,
+                full_name: values.name,
+                gender: values.gender,
+                date_of_birth: values.dob?.toISOString(),
+                native_language: values.nativeLanguage,
+                learning_language: values.learningLanguage,
+                proficiency_level: values.proficiencyLevel,
+                learning_goal: values.learningGoal,
+                updated_at: new Date().toISOString()
+              }]);
+
+            if (insertError) {
+              console.error('Error creating user profile:', insertError);
+              return false;
+            }
+          } else {
+            // Update existing user
+            const { error: updateError } = await supabase
+              .from('users')
+              .update({
+                full_name: values.name,
+                gender: values.gender,
+                date_of_birth: values.dob?.toISOString(),
+                native_language: values.nativeLanguage,
+                learning_language: values.learningLanguage,
+                proficiency_level: values.proficiencyLevel,
+                learning_goal: values.learningGoal,
+                updated_at: new Date().toISOString()
+              })
+              .eq('id', currentUserId);
+
+            if (updateError) {
+              console.error('Error updating user profile:', updateError);
+              return false;
+            }
           }
 
           const { error: onboardingError } = await supabase
@@ -280,7 +307,7 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
         });
 
       if (profileError) {
-        console.error('Error updating profile:', userError);
+        console.error('Error updating profile:', profileError);
         toast({
           title: "Error",
           description: "Failed to update profile. Please try again.",
@@ -289,17 +316,8 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
         return;
       }
 
-      if (userError) {
-        console.error("Error updating user data:", userError);
-        toast({
-          variant: "destructive",
-          title: "Error updating profile",
-          description: userError.message || "Failed to update your profile information.",
-        });
-        return;
-      }
 
-      if (!userError) {
+      if (!profileError) {
         toast({
           title: "Profile created",
           description: "Your profile has been successfully set up!",
