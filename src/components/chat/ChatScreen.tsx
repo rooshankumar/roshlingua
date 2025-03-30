@@ -131,7 +131,7 @@ export const ChatScreen = ({ conversation }: ChatScreenProps) => {
             <div
               className={`max-w-[70%] rounded-lg p-3 ${
                 message.user_id === user?.id
-                  ? 'bg-primary text-primary-foreground'
+                  ? 'bg-primary text-primary-foreground ml-auto'
                   : 'bg-muted'
               }`}
             >
