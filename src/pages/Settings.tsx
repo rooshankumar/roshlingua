@@ -62,7 +62,6 @@ const Settings = () => {
           updated_at: new Date().toISOString()
         })
         .eq('id', user.id)
-        .eq('auth_id', user.id)
         .select()
         .single();
 
