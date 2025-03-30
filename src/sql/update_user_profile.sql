@@ -13,29 +13,29 @@ CREATE OR REPLACE FUNCTION public.update_user_profile(
   streak_count INTEGER DEFAULT 0
 ) RETURNS VOID AS $$
 BEGIN
-  -- Update users table
-  UPDATE public.users
+  -- Update users table with WHERE clause
+  UPDATE public.users 
   SET 
-    avatar_url = COALESCE($2, users.avatar_url),
-    bio = COALESCE($3, users.bio),
-    date_of_birth = COALESCE($4::date, users.date_of_birth),
-    email = COALESCE($5, users.email),
-    full_name = COALESCE($6, users.full_name),
-    gender = COALESCE($7, users.gender),
-    learning_language = COALESCE($8, users.learning_language),
-    native_language = COALESCE($9, users.native_language),
-    proficiency_level = COALESCE($10, users.proficiency_level),
-    streak_count = COALESCE($11, users.streak_count),
+    avatar_url = COALESCE(update_user_profile.avatar_url, users.avatar_url),
+    bio = COALESCE(update_user_profile.bio, users.bio),
+    date_of_birth = COALESCE(update_user_profile.date_of_birth, users.date_of_birth),
+    email = COALESCE(update_user_profile.email, users.email),
+    full_name = COALESCE(update_user_profile.full_name, users.full_name),
+    gender = COALESCE(update_user_profile.gender, users.gender),
+    learning_language = COALESCE(update_user_profile.learning_language, users.learning_language),
+    native_language = COALESCE(update_user_profile.native_language, users.native_language),
+    proficiency_level = COALESCE(update_user_profile.proficiency_level, users.proficiency_level),
+    streak_count = COALESCE(update_user_profile.streak_count, users.streak_count),
     updated_at = NOW()
-  WHERE id = $1;
+  WHERE id = update_user_profile.user_id;
 
   -- Handle profiles table with upsert
   INSERT INTO public.profiles (id, bio, avatar_url, streak_count, updated_at)
   VALUES (
-    $1,
-    $3,
-    $2,
-    $11,
+    update_user_profile.user_id,
+    update_user_profile.bio,
+    update_user_profile.avatar_url,
+    update_user_profile.streak_count,
     NOW()
   )
   ON CONFLICT (id) 
@@ -44,6 +44,5 @@ BEGIN
     avatar_url = EXCLUDED.avatar_url,
     streak_count = EXCLUDED.streak_count,
     updated_at = EXCLUDED.updated_at;
-
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
