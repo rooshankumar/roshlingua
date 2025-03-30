@@ -1,29 +1,31 @@
 
 CREATE OR REPLACE FUNCTION public.update_user_profile(
-  p_user_id UUID,
-  p_avatar_url TEXT,
-  p_bio TEXT,
-  p_email TEXT,
-  p_full_name TEXT,
-  p_gender TEXT,
-  p_learning_language TEXT,
-  p_native_language TEXT,
-  p_streak_count INTEGER
+  user_id UUID,
+  avatar_url TEXT,
+  bio TEXT,
+  date_of_birth DATE DEFAULT NULL,
+  email TEXT,
+  full_name TEXT,
+  gender TEXT,
+  learning_language TEXT,
+  native_language TEXT,
+  proficiency_level TEXT DEFAULT NULL,
+  streak_count INTEGER
 ) RETURNS VOID AS $$
 BEGIN
   -- Update the users table
   UPDATE users
-  SET full_name = p_full_name,
-      email = p_email,
-      gender = p_gender,
-      native_language = p_native_language,
-      learning_language = p_learning_language,
+  SET full_name = COALESCE(full_name, users.full_name),
+      email = COALESCE(email, users.email),
+      gender = COALESCE(gender, users.gender),
+      native_language = COALESCE(native_language, users.native_language),
+      learning_language = COALESCE(learning_language, users.learning_language),
       updated_at = NOW()
-  WHERE id = p_user_id;
+  WHERE id = user_id;
 
   -- Update or insert into profiles table
   INSERT INTO profiles (id, bio, avatar_url, streak_count, updated_at)
-  VALUES (p_user_id, p_bio, p_avatar_url, p_streak_count, NOW())
+  VALUES (user_id, bio, avatar_url, streak_count, NOW())
   ON CONFLICT (id) DO UPDATE
   SET bio = EXCLUDED.bio,
       avatar_url = EXCLUDED.avatar_url,
