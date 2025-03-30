@@ -61,17 +61,17 @@ const Settings = () => {
 
     try {
       const { data, error } = await supabase.rpc('update_user_profile', {
-        p_user_id: user.id,
-        p_full_name: localProfile.full_name,
-        p_email: localProfile.email,
-        p_gender: localProfile.gender,
-        p_native_language: localProfile.native_language,
-        p_learning_language: localProfile.learning_language,
-        p_proficiency_level: localProfile.proficiency_level,
-        p_date_of_birth: localProfile.date_of_birth,
-        p_bio: localBio,
-        p_avatar_url: localProfile.avatar_url,
-        p_streak_count: localProfile.streak_count || 0
+        user_id: user.id,
+        full_name: localProfile.full_name,
+        email: localProfile.email,
+        gender: localProfile.gender,
+        native_language: localProfile.native_language,
+        learning_language: localProfile.learning_language,
+        proficiency_level: localProfile.proficiency_level,
+        date_of_birth: localProfile.date_of_birth,
+        bio: localBio,
+        avatar_url: localProfile.avatar_url,
+        streak_count: localProfile.streak_count || 0
       });
 
       if (error) throw error;
