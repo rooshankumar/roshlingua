@@ -165,7 +165,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return;
       }
 
-      const { data: authData, error } = await supabase.auth.signUp({
+      // First create the auth user
+      const { data: authData, error: signUpError } = await supabase.auth.signUp({
         email,
         password,
         options: {
@@ -177,15 +178,53 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
       });
 
-      if (error) {
-        const errorMessage = error.message === 'User already registered'
+      if (signUpError) {
+        console.error("Signup error:", signUpError);
+        const errorMessage = signUpError.message === 'User already registered'
           ? 'This email is already registered. Please log in instead.'
-          : error.message;
+          : signUpError.message;
 
         toast({
           variant: "destructive",
           title: "Signup failed",
           description: errorMessage
+        });
+        return;
+      }
+
+      if (!authData.user?.id) {
+        toast({
+          variant: "destructive",
+          title: "Signup failed",
+          description: "Failed to create user account"
+        });
+        return;
+      }
+
+      // Create the user record in the users table
+      const { error: userError } = await supabase
+        .from('users')
+        .insert([
+          {
+            id: authData.user.id,
+            email: email,
+            full_name: name,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          }
+        ])
+        .select()
+        .single();
+
+      if (userError) {
+        console.error("User creation error:", userError);
+        // Attempt to clean up the auth user if profile creation fails
+        await supabase.auth.admin.deleteUser(authData.user.id);
+        
+        toast({
+          variant: "destructive",
+          title: "Account creation failed",
+          description: "Failed to create user profile. Please try again."
         });
         return;
       }
