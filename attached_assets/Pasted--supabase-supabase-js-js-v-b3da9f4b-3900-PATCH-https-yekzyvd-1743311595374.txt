@@ -1,0 +1,76 @@
+@supabase_supabase-js.js?v=b3da9f4b:3900 
+            
+            
+           PATCH https://yekzyvdjjozhhatdefsq.supabase.co/rest/v1/users?id=eq.7bad0693-9053-423f-a2f0-a61c20b9cbf4 400 (Bad Request)
+(anonymous) @ @supabase_supabase-js.js?v=b3da9f4b:3900
+(anonymous) @ @supabase_supabase-js.js?v=b3da9f4b:3921
+fulfilled @ @supabase_supabase-js.js?v=b3da9f4b:3873
+Promise.then
+step @ @supabase_supabase-js.js?v=b3da9f4b:3886
+(anonymous) @ @supabase_supabase-js.js?v=b3da9f4b:3888
+__awaiter6 @ @supabase_supabase-js.js?v=b3da9f4b:3870
+(anonymous) @ @supabase_supabase-js.js?v=b3da9f4b:3911
+then @ @supabase_supabase-js.js?v=b3da9f4b:89Understand this errorAI
+useRealtimeProfile.ts:70 Error updating profile: {code: '21000', details: null, hint: null, message: 'UPDATE requires a WHERE clause'}
+updateProfile @ useRealtimeProfile.ts:70
+await in updateProfile
+handleProfileFieldChange @ Settings.tsx:105
+onValueChange @ Settings.tsx:347
+(anonymous) @ chunk-UNPIZKVI.js?v=b3da9f4b:99
+(anonymous) @ chunk-Q5O6I442.js?v=b3da9f4b:38
+handleSelect @ @radix-ui_react-select.js?v=b3da9f4b:867
+(anonymous) @ @radix-ui_react-select.js?v=b3da9f4b:910
+handleEvent @ chunk-Q5O6I442.js?v=b3da9f4b:16
+callCallback2 @ chunk-W6L2VRDA.js?v=b3da9f4b:3674
+invokeGuardedCallbackDev @ chunk-W6L2VRDA.js?v=b3da9f4b:3699
+invokeGuardedCallback @ chunk-W6L2VRDA.js?v=b3da9f4b:3733
+invokeGuardedCallbackAndCatchFirstError @ chunk-W6L2VRDA.js?v=b3da9f4b:3736
+executeDispatch @ chunk-W6L2VRDA.js?v=b3da9f4b:7014
+processDispatchQueueItemsInOrder @ chunk-W6L2VRDA.js?v=b3da9f4b:7034
+processDispatchQueue @ chunk-W6L2VRDA.js?v=b3da9f4b:7043
+dispatchEventsForPlugins @ chunk-W6L2VRDA.js?v=b3da9f4b:7051
+(anonymous) @ chunk-W6L2VRDA.js?v=b3da9f4b:7174
+batchedUpdates$1 @ chunk-W6L2VRDA.js?v=b3da9f4b:18913
+batchedUpdates @ chunk-W6L2VRDA.js?v=b3da9f4b:3579
+dispatchEventForPluginEventSystem @ chunk-W6L2VRDA.js?v=b3da9f4b:7173
+dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay @ chunk-W6L2VRDA.js?v=b3da9f4b:5478
+dispatchEvent @ chunk-W6L2VRDA.js?v=b3da9f4b:5472
+dispatchDiscreteEvent @ chunk-W6L2VRDA.js?v=b3da9f4b:5449Understand this errorAI
+@supabase_supabase-js.js?v=b3da9f4b:3900 
+            
+            
+           PATCH https://yekzyvdjjozhhatdefsq.supabase.co/rest/v1/users?id=eq.7bad0693-9053-423f-a2f0-a61c20b9cbf4 400 (Bad Request)
+(anonymous) @ @supabase_supabase-js.js?v=b3da9f4b:3900
+(anonymous) @ @supabase_supabase-js.js?v=b3da9f4b:3921
+fulfilled @ @supabase_supabase-js.js?v=b3da9f4b:3873
+Promise.then
+step @ @supabase_supabase-js.js?v=b3da9f4b:3886
+(anonymous) @ @supabase_supabase-js.js?v=b3da9f4b:3888
+__awaiter6 @ @supabase_supabase-js.js?v=b3da9f4b:3870
+(anonymous) @ @supabase_supabase-js.js?v=b3da9f4b:3911
+then @ @supabase_supabase-js.js?v=b3da9f4b:89Understand this errorAI
+useRealtimeProfile.ts:70 Error updating profile: {code: '21000', details: null, hint: null, message: 'UPDATE requires a WHERE clause'}code: "21000"details: nullhint: nullmessage: "UPDATE requires a WHERE clause"[[Prototype]]: Object
+updateProfile @ useRealtimeProfile.ts:70
+await in updateProfile
+handleProfileFieldChange @ Settings.tsx:105
+onValueChange @ Settings.tsx:320
+(anonymous) @ chunk-UNPIZKVI.js?v=b3da9f4b:99
+(anonymous) @ chunk-Q5O6I442.js?v=b3da9f4b:38
+handleSelect @ @radix-ui_react-select.js?v=b3da9f4b:867
+(anonymous) @ @radix-ui_react-select.js?v=b3da9f4b:910
+handleEvent @ chunk-Q5O6I442.js?v=b3da9f4b:16
+callCallback2 @ chunk-W6L2VRDA.js?v=b3da9f4b:3674
+invokeGuardedCallbackDev @ chunk-W6L2VRDA.js?v=b3da9f4b:3699
+invokeGuardedCallback @ chunk-W6L2VRDA.js?v=b3da9f4b:3733
+invokeGuardedCallbackAndCatchFirstError @ chunk-W6L2VRDA.js?v=b3da9f4b:3736
+executeDispatch @ chunk-W6L2VRDA.js?v=b3da9f4b:7014
+processDispatchQueueItemsInOrder @ chunk-W6L2VRDA.js?v=b3da9f4b:7034
+processDispatchQueue @ chunk-W6L2VRDA.js?v=b3da9f4b:7043
+dispatchEventsForPlugins @ chunk-W6L2VRDA.js?v=b3da9f4b:7051
+(anonymous) @ chunk-W6L2VRDA.js?v=b3da9f4b:7174
+batchedUpdates$1 @ chunk-W6L2VRDA.js?v=b3da9f4b:18913
+batchedUpdates @ chunk-W6L2VRDA.js?v=b3da9f4b:3579
+dispatchEventForPluginEventSystem @ chunk-W6L2VRDA.js?v=b3da9f4b:7173
+dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay @ chunk-W6L2VRDA.js?v=b3da9f4b:5478
+dispatchEvent @ chunk-W6L2VRDA.js?v=b3da9f4b:5472
+dispatchDiscreteEvent @ chunk-W6L2VRDA.js?v=b3da9f4b:5449Understand this errorAI
