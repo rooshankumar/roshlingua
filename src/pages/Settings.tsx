@@ -55,15 +55,11 @@ const Settings = () => {
         throw new Error("Invalid gender value");
       }
 
-      const { data, error } = await supabase
-        .from('users')
-        .update({
-          [field]: value,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', user.id)
-        .select('*')
-        .single();
+      const { data, error } = await supabase.auth.updateUser({
+        data: {
+          [field]: value
+        }
+      });
 
       if (error) {
         throw error;
