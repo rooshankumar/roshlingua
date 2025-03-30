@@ -115,14 +115,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (authData.user) {
         const { error: profileError } = await supabase
           .from('users')
-          .insert([
+          .upsert(
             {
               id: authData.user.id,
               full_name: name,
               email: authData.user.email,
               updated_at: new Date().toISOString()
-            }
-          ])
+            },
+            { onConflict: 'id' }
+          )
           .select()
           .single();
 
