@@ -55,7 +55,8 @@ export const ChatScreen = ({ conversation }: ChatScreenProps) => {
 
     loadMessages();
 
-    const unsubscribe = subscribeToMessages(conversation.id, (message) => {
+    let unsubscribe;
+    unsubscribe = subscribeToMessages(conversation.id, (message) => {
       setMessages(prev => {
         if (prev.some(m => m.id === message.id)) return prev;
         return [...prev, message].sort((a, b) =>
@@ -66,7 +67,9 @@ export const ChatScreen = ({ conversation }: ChatScreenProps) => {
     });
 
     return () => {
-      unsubscribe(); //Corrected unsubscribe
+      if (unsubscribe) {
+        unsubscribe(); 
+      }
     };
   }, [conversation?.id]);
 
