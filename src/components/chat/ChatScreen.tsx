@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Message } from '@/types/chat';
 import { useAuth } from '@/providers/AuthProvider';
 import { supabase } from '@/lib/supabase';
+import { ChatHeader } from './ChatHeader';
 
 interface Props {
   conversation: {
