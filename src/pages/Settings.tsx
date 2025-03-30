@@ -41,11 +41,21 @@ const Settings = () => {
   const genders = ["Male", "Female", "Rather not say"];
 
   const handleProfileChange = async (field: string, value: string) => {
-    if (!user?.id) return;
+    if (!user?.id) {
+      console.error("No user ID available");
+      return;
+    }
+
     try {
       // Validate gender values
       if (field === "gender" && !["Male", "Female", "Rather not say"].includes(value)) {
         throw new Error("Invalid gender value");
+      }
+
+      // Verify current user
+      const { data: authUser, error: userError } = await supabase.auth.getUser();
+      if (userError || !authUser.user) {
+        throw new Error("User authentication failed");
       }
 
       // Update user data
@@ -55,7 +65,8 @@ const Settings = () => {
           [field]: value,
           updated_at: new Date().toISOString()
         })
-        .match({ id: user.id });
+        .eq('id', authUser.user.id)
+        .single();
 
       if (error) {
         console.error("Error updating profile:", error);
@@ -64,11 +75,12 @@ const Settings = () => {
 
       // Update local profile state
       if (profile) {
-        await updateProfile({
+        const updatedProfile = {
           ...profile,
           [field]: value,
           updated_at: new Date().toISOString()
-        });
+        };
+        await updateProfile(updatedProfile);
       }
 
     } catch (error) {
