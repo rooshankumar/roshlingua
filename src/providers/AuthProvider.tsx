@@ -113,28 +113,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
 
       if (authData.user) {
-        const { error: profileError } = await supabase
-          .from('users')
-          .upsert(
-            {
-              id: authData.user.id,
-              full_name: name,
-              email: authData.user.email,
-              updated_at: new Date().toISOString()
-            },
-            { onConflict: 'id' }
-          )
-          .select()
-          .single();
+        const { data: functionData, error: functionError } = await supabase
+          .rpc('create_user_with_onboarding', {
+            p_user_id: authData.user.id,
+            p_email: authData.user.email,
+            p_full_name: name
+          });
 
-        if (profileError) {
-          console.error("Error creating user profile:", profileError);
+        if (functionError) {
+          console.error("Error creating user profile:", functionError);
           toast({
             variant: "destructive", 
             title: "Profile creation failed",
             description: "Could not create user profile"
           });
-          throw profileError;
+          throw functionError;
         }
 
         toast({
