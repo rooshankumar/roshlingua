@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/lib/supabase";
 import { useTheme } from "@/components/theme-provider";
@@ -147,34 +147,6 @@ const Settings = () => {
         title: "Error",
         description: "Failed to upload avatar. Please try again.",
         variant: "destructive"
-      });
-    }
-  };
-    if (!user?.id) {
-      toast({
-        title: "Error",
-        description: "You must be logged in to update your profile.",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    try {
-      // Update bio if changed
-      if (localBio !== profile?.bio) {
-        await handleProfileChange("bio", localBio);
-      }
-
-      toast({
-        title: "Profile updated",
-        description: "Your profile has been successfully updated.",
-      });
-    } catch (error) {
-      console.error("Error saving profile:", error);
-      toast({
-        variant: "destructive",
-        title: "Save failed",
-        description: "Could not save profile changes. Please try again.",
       });
     }
   };
