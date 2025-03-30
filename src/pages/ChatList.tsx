@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { UserStatus } from '@/components/UserStatus';
 import { MessageCircle, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useAuth } from '@/providers/AuthProvider';
 import { supabase } from '@/lib/supabase';
+import { formatDistanceToNow } from 'date-fns';
 
 interface ChatPreview {
   id: string;
@@ -33,7 +33,7 @@ const ChatList = () => {
   // Track online presence
   useEffect(() => {
     if (!user) return;
-    
+
     const channel = supabase.channel('online-users')
       .on('presence', { event: 'sync' }, () => {
         const state = channel.presenceState();
@@ -194,10 +194,18 @@ const ChatList = () => {
                     <div className="flex items-center justify-between">
                       <h3 className="font-medium">{conversation.participant.full_name}</h3>
                       <div className="flex flex-col items-end gap-1">
-                        <UserStatus 
-                          isOnline={conversation.participant.is_online} 
-                          lastSeen={conversation.participant.last_seen} 
-                        />
+                        <div className="flex items-center gap-2">
+                        {conversation.participant.is_online ? (
+                          <div className="flex items-center">
+                            <div className="w-2 h-2 rounded-full bg-green-500 mr-2" />
+                            <span className="text-xs text-green-600">Online</span>
+                          </div>
+                        ) : conversation.participant.last_seen ? (
+                          <span className="text-xs text-muted-foreground">
+                            {formatDistanceToNow(new Date(conversation.participant.last_seen))} ago
+                          </span>
+                        ) : null}
+                      </div>
                         {conversation.lastMessage && (
                           <span className="text-xs text-muted-foreground">
                             {new Date(conversation.lastMessage.created_at).toLocaleDateString()}
