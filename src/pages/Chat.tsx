@@ -33,7 +33,8 @@ const ChatPage = () => {
               id,
               email,
               full_name,
-              avatar_url
+              avatar_url,
+              profiles:profiles (*)
             )
           `)
           .eq('conversation_id', conversationId)
@@ -49,9 +50,9 @@ const ChatPage = () => {
             participant: {
               id: otherParticipant.id,
               email: otherParticipant.email,
-              full_name: otherParticipant.full_name || otherParticipant.email?.split('@')[0],
-              avatar_url: otherParticipant.avatar_url || '/placeholder.svg',
-              avatar: otherParticipant.avatar_url || '/placeholder.svg'
+              full_name: otherParticipant.profiles?.full_name || otherParticipant.email?.split('@')[0],
+              avatar_url: otherParticipant.profiles?.avatar_url || '/placeholder.svg',
+              avatar: otherParticipant.profiles?.avatar_url || '/placeholder.svg'
             }
           });
         } else {

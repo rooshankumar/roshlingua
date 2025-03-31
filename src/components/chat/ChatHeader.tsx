@@ -20,7 +20,11 @@ interface Props {
 
 export const ChatHeader = ({ conversation }: Props) => {
   const navigate = useNavigate();
-  const participant = conversation.participant;
+  const participant = conversation?.participant;
+
+  if (!participant) {
+    return <div className="flex items-center p-4 border-b">Loading...</div>;
+  }
 
   return (
     <div className="flex items-center p-4 border-b">
@@ -33,15 +37,16 @@ export const ChatHeader = ({ conversation }: Props) => {
       </Button>
       <div className="flex items-center ml-4">
         <Avatar>
-          <AvatarImage src={participant.avatar_url} />
+          <AvatarImage src={participant.avatar_url || '/placeholder.svg'} />
           <AvatarFallback>
-            {participant.full_name?.substring(0, 2).toUpperCase() || 'U'}
+            {participant.full_name?.substring(0, 2).toUpperCase() || participant.email?.substring(0, 2).toUpperCase() || 'U'}
           </AvatarFallback>
         </Avatar>
         <div className="ml-3">
           <h2 className="font-semibold">
             {participant.full_name || participant.email?.split('@')[0]}
           </h2>
+          <p className="text-sm text-muted-foreground">{participant.email}</p>
         </div>
       </div>
     </div>
