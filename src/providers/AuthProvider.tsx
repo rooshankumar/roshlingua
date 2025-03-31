@@ -192,22 +192,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return;
       }
 
-      // Create initial user record
-      const { error: dbError } = await supabase.from('users').insert([{
-        id: authData.user.id,
-        email: email,
-        full_name: name,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-        onboarding_completed: false
-      }]);
+      // Use RPC to create user record safely
+      const { error: dbError } = await supabase.rpc('create_new_user', {
+        user_id: authData.user.id,
+        user_email: email,
+        user_name: name
+      });
 
       if (dbError) {
         console.error("Database error:", dbError);
+        // If there's an error, sign out the partially created user
+        await supabase.auth.signOut();
         toast({
           variant: "destructive",
-          title: "Account setup incomplete",
-          description: "Your account was created but profile setup failed. Please try logging in."
+          title: "Signup failed",
+          description: "There was an error creating your account. Please try again."
         });
         return;
       }
