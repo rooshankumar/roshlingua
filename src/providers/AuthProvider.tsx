@@ -201,15 +201,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return;
       }
 
-      // First create the user record
+      // Create initial user record with minimal data
       const { error: userError } = await supabase
         .from('users')
         .insert([
           {
             id: authData.user.id,
             email: email,
+            full_name: name, // Basic info from signup
             created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString()
+            updated_at: new Date().toISOString(),
+            onboarding_completed: false // Mark for onboarding flow
           }
         ])
         .single();
@@ -220,30 +222,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           variant: "destructive",
           title: "Account creation failed",
           description: "Failed to create user record. Please try again."
-        });
-        await supabase.auth.signOut();
-        return;
-      }
-
-      // Then create the profile
-      const { error: profileError } = await supabase
-        .from('profiles')
-        .insert([
-          {
-            user_id: authData.user.id,
-            email: email,
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString()
-          }
-        ])
-        .single();
-
-      if (profileError) {
-        console.error("Profile creation error:", profileError);
-        toast({
-          variant: "destructive", 
-          title: "Account creation failed",
-          description: "Failed to create profile. Please try again."
         });
         await supabase.auth.signOut();
         return;
