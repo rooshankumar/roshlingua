@@ -32,24 +32,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   // Password validation rules
   const PASSWORD_RULES = {
-    minLength: 8,
-    requireNumber: true,
-    requireSpecial: true,
-    requireUppercase: true
+    minLength: 8
   };
 
   const validatePassword = (password: string): { isValid: boolean; error: string | null } => {
     if (password.length < PASSWORD_RULES.minLength) {
       return { isValid: false, error: `Password must be at least ${PASSWORD_RULES.minLength} characters` };
-    }
-    if (PASSWORD_RULES.requireNumber && !/\d/.test(password)) {
-      return { isValid: false, error: 'Password must contain at least one number' };
-    }
-    if (PASSWORD_RULES.requireSpecial && !/[!@#$%^&*]/.test(password)) {
-      return { isValid: false, error: 'Password must contain at least one special character' };
-    }
-    if (PASSWORD_RULES.requireUppercase && !/[A-Z]/.test(password)) {
-      return { isValid: false, error: 'Password must contain at least one uppercase letter' };
     }
     return { isValid: true, error: null };
   };
