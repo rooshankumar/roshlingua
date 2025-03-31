@@ -160,9 +160,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         options: {
           data: {
             full_name: name,
-            email: email
-          },
-          emailRedirectTo: `${window.location.origin}/auth/callback`
+            onboarding_completed: false
+          }
         }
       });
 
@@ -189,27 +188,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return;
       }
 
-      // Let auth handle the initial user creation
-      const metadata = {
-        full_name: name,
-        onboarding_completed: false
-      };
-
-      const { error: userError } = await supabase.auth.updateUser({
-        data: metadata
-      });
-
-      if (userError) {
-        console.error("User creation error:", userError);
-        toast({
-          variant: "destructive",
-          title: "Account creation failed",
-          description: "Failed to create user record. Please try again."
-        });
-        await supabase.auth.signOut();
-        return;
-      }
-
 
       if (authData.user) {
         toast({
@@ -225,26 +203,28 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const loginWithGoogle = async () => {
     try {
-      const { error } = await supabase.auth.signInWithOAuth({
+      const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
           redirectTo: `${window.location.origin}/auth/callback`,
           queryParams: {
             access_type: 'offline',
-            prompt: 'consent',
-          },
-        },
+            prompt: 'consent'
+          }
+        }
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error("Google auth error:", error);
+        throw error;
+      }
 
-      // Wait for session to be established
+      //Wait for session to be established
       const maxAttempts = 10;
       let attempts = 0;
-
-      while (attempts < maxAttempts) {
-        const { data: { session } } = await supabase.auth.getSession();
-        if (session) {
+      while(attempts < maxAttempts){
+        const {data: {session}} = await supabase.auth.getSession();
+        if(session){
           setSession(session);
           setUser(session.user);
           break;
