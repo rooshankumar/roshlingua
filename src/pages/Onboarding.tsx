@@ -226,31 +226,27 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
         return;
       }
 
-      // Format the data properly
-      const profileData = {
-        gender: formData.gender,
-        date_of_birth: formData.date_of_birth instanceof Date ? 
-          formData.date_of_birth.toISOString().split('T')[0] : 
-          null,
-        native_language: formData.native_language,
-        learning_language: formData.learning_language,
-        proficiency_level: formData.proficiency_level,
-        learning_goal: formData.learning_goal,
-        avatar_url: formData.avatar_url,
-        full_name: formData.full_name,
-        updated_at: new Date().toISOString()
-      };
+      // Update user data
+      const { error: userError } = await supabase
+        .from('users')
+        .update({
+          gender: formData.gender,
+          date_of_birth: formData.date_of_birth instanceof Date ? 
+            formData.date_of_birth.toISOString().split('T')[0] : 
+            null,
+          native_language: formData.native_language,
+          learning_language: formData.learning_language,
+          proficiency_level: formData.proficiency_level,
+          learning_goal: formData.learning_goal,
+          avatar_url: formData.avatar_url,
+          full_name: formData.full_name,
+          onboarding_completed: true,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', user.id);
 
-      console.log("Submitting onboarding data:", profileData);
-
-      // Update profile data
-      const { error: profileError } = await supabase
-        .from('profiles')
-        .update(profileData)
-        .eq('user_id', user.id);
-
-      if (profileError) {
-        console.error('Error updating profile data:', profileError);
+      if (userError) {
+        console.error('Error updating user data:', userError);
         toast({
           variant: "destructive",
           title: "Error",
@@ -258,26 +254,6 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
         });
         return;
       }
-
-      // Update onboarding status in users table
-      const { error: onboardingError } = await supabase
-        .from('users')
-        .update({
-          onboarding_completed: true,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', user.id);
-
-      if (onboardingError) {
-        console.error('Error updating onboarding status:', onboardingError);
-        toast({
-          variant: "destructive",
-          title: "Error",
-          description: "Failed to update onboarding status. Please try again.",
-        });
-        return;
-      }
-
 
       // Show success message
       toast({
