@@ -27,7 +27,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [authError, setAuthError] = useState<string | null>(null);
   const { toast } = useToast();
 
   // Password validation rules
@@ -188,12 +187,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return;
       }
 
-
       if (authData.user) {
         toast({
           title: "Account created",
           description: "Please check your email to confirm your account.",
         });
+
+        // Call createUserRecord after successful signup
+        await createUserRecord(authData.user.id, name);
       }
     } catch (error) {
       console.error("Signup error:", error);
@@ -219,12 +220,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         throw error;
       }
 
-      //Wait for session to be established
+      // Wait for session to be established
       const maxAttempts = 10;
       let attempts = 0;
-      while(attempts < maxAttempts){
-        const {data: {session}} = await supabase.auth.getSession();
-        if(session){
+      while (attempts < maxAttempts) {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session) {
           setSession(session);
           setUser(session.user);
           break;
