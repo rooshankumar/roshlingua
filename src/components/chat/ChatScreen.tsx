@@ -40,15 +40,7 @@ export const ChatScreen = ({ conversation }: Props) => {
       try {
         const { data, error } = await supabase
           .from('messages')
-          .select(`
-            *,
-            sender:profiles!messages_sender_id_fkey(
-              id, 
-              user_id,
-              full_name,
-              avatar_url
-            )
-          `)
+          .select('*, sender:profiles(id, user_id, full_name, avatar_url)')
           .eq('conversation_id', conversation.id)
           .order('created_at', { ascending: false })
           .range((page - 1) * MESSAGES_PER_PAGE, page * MESSAGES_PER_PAGE - 1);
