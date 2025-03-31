@@ -214,9 +214,9 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
     try {
       setIsLoading(true);
       const formData = form.getValues();
-      const { data: { user }, error: userError } = await supabase.auth.getUser();
+      const { data: { user }, error: authError } = await supabase.auth.getUser();
 
-      if (userError || !user) {
+      if (authError || !user) {
         toast({
           variant: "destructive",
           title: "Authentication error",
@@ -227,9 +227,7 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
       }
 
       // Format the data properly
-      const userData = {
-        id: user.id,
-        full_name: formData.full_name,
+      const profileData = {
         gender: formData.gender,
         date_of_birth: formData.date_of_birth instanceof Date ? 
           formData.date_of_birth.toISOString().split('T')[0] : 
@@ -239,24 +237,16 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
         proficiency_level: formData.proficiency_level,
         learning_goal: formData.learning_goal,
         avatar_url: formData.avatar_url,
+        full_name: formData.full_name,
         updated_at: new Date().toISOString()
       };
 
-      console.log("Submitting onboarding data:", userData);
+      console.log("Submitting onboarding data:", profileData);
 
+      // Update profile data
       const { error: profileError } = await supabase
         .from('profiles')
-        .update({
-          gender: formData.gender,
-          date_of_birth: formData.date_of_birth,
-          native_language: formData.native_language,
-          learning_language: formData.learning_language,
-          proficiency_level: formData.proficiency_level,
-          learning_goal: formData.learning_goal,
-          avatar_url: formData.avatar_url,
-          full_name: formData.full_name,
-          updated_at: new Date().toISOString()
-        })
+        .update(profileData)
         .eq('user_id', user.id);
 
       if (profileError) {
@@ -270,7 +260,7 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
       }
 
       // Update onboarding status in users table
-      const { error: userError } = await supabase
+      const { error: onboardingError } = await supabase
         .from('users')
         .update({
           onboarding_completed: true,
@@ -278,60 +268,12 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
         })
         .eq('id', user.id);
 
-      if (userError) {
-        console.error('Error updating user data:', userError);
+      if (onboardingError) {
+        console.error('Error updating onboarding status:', onboardingError);
         toast({
           variant: "destructive",
           title: "Error",
-          description: "Failed to update user status. Please try again.",
-        });
-        return;
-      }
-
-
-      // First update the users table
-      const { error: userUpdateError } = await supabase
-        .from('users')
-        .update({
-          full_name: formData.name,
-          avatar_url: formData.avatarUrl || null,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', user.id);
-
-      if (userUpdateError) {
-        console.error('Error updating user:', userUpdateError);
-        toast({
-          variant: "destructive",
-          title: "Error updating profile",
-          description: "Failed to update basic profile information.",
-        });
-        return;
-      }
-
-      // Then update user profile data (assuming user_profiles table exists)
-      const { error: profileError } = await supabase
-        .from('user_profiles')
-        .upsert({
-          user_id: user.id,
-          gender: formData.gender,
-          date_of_birth: formData.dob, //Simplified date_of_birth handling
-          native_language: formData.nativeLanguage,
-          learning_language: formData.learningLanguage,
-          proficiency_level: formData.proficiencyLevel,
-          learning_goal: formData.learningGoal,
-          onboarding_completed: true,
-          updated_at: new Date().toISOString()
-        }, {
-          onConflict: 'user_id'
-        });
-
-      if (profileError) {
-        console.error('Error updating profile:', profileError);
-        toast({
-          title: "Error",
-          description: "Failed to update profile. Please try again.",
-          variant: "destructive"
+          description: "Failed to update onboarding status. Please try again.",
         });
         return;
       }
