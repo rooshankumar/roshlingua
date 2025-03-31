@@ -1,0 +1,32 @@
+SIGNED_IN 7bad0693-9053-423f-a2f0-a61c20b9cbf4
+@supabase_supabase-js.js?v=9ba35c4b:3900 
+            
+            
+           POST https://yekzyvdjjozhhatdefsq.supabase.co/rest/v1/messages?columns=%22content%22%2C%22conversation_id%22%2C%22sender_id%22%2C%22recipient_id%22 400 (Bad Request)
+(anonymous) @ @supabase_supabase-js.js?v=9ba35c4b:3900
+(anonymous) @ @supabase_supabase-js.js?v=9ba35c4b:3921
+fulfilled @ @supabase_supabase-js.js?v=9ba35c4b:3873
+Promise.then
+step @ @supabase_supabase-js.js?v=9ba35c4b:3886
+(anonymous) @ @supabase_supabase-js.js?v=9ba35c4b:3888
+__awaiter6 @ @supabase_supabase-js.js?v=9ba35c4b:3870
+(anonymous) @ @supabase_supabase-js.js?v=9ba35c4b:3911
+then @ @supabase_supabase-js.js?v=9ba35c4b:89Understand this errorAI
+ChatScreen.tsx:101 Error sending message: {code: 'PGRST204', details: null, hint: null, message: "Could not find the 'recipient_id' column of 'messages' in the schema cache"}code: "PGRST204"details: nullhint: nullmessage: "Could not find the 'recipient_id' column of 'messages' in the schema cache"[[Prototype]]: Object
+handleSend @ ChatScreen.tsx:101
+await in handleSend
+callCallback2 @ chunk-W6L2VRDA.js?v=e30376ae:3674
+invokeGuardedCallbackDev @ chunk-W6L2VRDA.js?v=e30376ae:3699
+invokeGuardedCallback @ chunk-W6L2VRDA.js?v=e30376ae:3733
+invokeGuardedCallbackAndCatchFirstError @ chunk-W6L2VRDA.js?v=e30376ae:3736
+executeDispatch @ chunk-W6L2VRDA.js?v=e30376ae:7014
+processDispatchQueueItemsInOrder @ chunk-W6L2VRDA.js?v=e30376ae:7034
+processDispatchQueue @ chunk-W6L2VRDA.js?v=e30376ae:7043
+dispatchEventsForPlugins @ chunk-W6L2VRDA.js?v=e30376ae:7051
+(anonymous) @ chunk-W6L2VRDA.js?v=e30376ae:7174
+batchedUpdates$1 @ chunk-W6L2VRDA.js?v=e30376ae:18913
+batchedUpdates @ chunk-W6L2VRDA.js?v=e30376ae:3579
+dispatchEventForPluginEventSystem @ chunk-W6L2VRDA.js?v=e30376ae:7173
+dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay @ chunk-W6L2VRDA.js?v=e30376ae:5478
+dispatchEvent @ chunk-W6L2VRDA.js?v=e30376ae:5472
+dispatchDiscreteEvent @ chunk-W6L2VRDA.js?v=e30376ae:5449Understand this errorAI
