@@ -1,0 +1,47 @@
+POST https://yekzyvdjjozhhatdefsq.supabase.co/auth/v1/signup?redirect_to=https%3A%2F%2F6fad4417-e61d-47ac-9b37-ed6a99aba366-00-13i26ffuoqt88.pike.replit.dev%2Fauth%2Fcallback 500 (Internal Server Error)
+(anonymous) @ @supabase_supabase-js.js?v=0a184ea6:4309
+_handleRequest2 @ @supabase_supabase-js.js?v=0a184ea6:4558
+_request @ @supabase_supabase-js.js?v=0a184ea6:4548
+signUp @ @supabase_supabase-js.js?v=0a184ea6:5241
+signup @ AuthProvider.tsx:169
+handleSignup @ Auth.tsx:109
+callCallback2 @ chunk-W6L2VRDA.js?v=49285302:3674
+invokeGuardedCallbackDev @ chunk-W6L2VRDA.js?v=49285302:3699
+invokeGuardedCallback @ chunk-W6L2VRDA.js?v=49285302:3733
+invokeGuardedCallbackAndCatchFirstError @ chunk-W6L2VRDA.js?v=49285302:3736
+executeDispatch @ chunk-W6L2VRDA.js?v=49285302:7014
+processDispatchQueueItemsInOrder @ chunk-W6L2VRDA.js?v=49285302:7034
+processDispatchQueue @ chunk-W6L2VRDA.js?v=49285302:7043
+dispatchEventsForPlugins @ chunk-W6L2VRDA.js?v=49285302:7051
+(anonymous) @ chunk-W6L2VRDA.js?v=49285302:7174
+batchedUpdates$1 @ chunk-W6L2VRDA.js?v=49285302:18913
+batchedUpdates @ chunk-W6L2VRDA.js?v=49285302:3579
+dispatchEventForPluginEventSystem @ chunk-W6L2VRDA.js?v=49285302:7173
+dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay @ chunk-W6L2VRDA.js?v=49285302:5478
+dispatchEvent @ chunk-W6L2VRDA.js?v=49285302:5472
+dispatchDiscreteEvent @ chunk-W6L2VRDA.js?v=49285302:5449Understand this errorAI
+AuthProvider.tsx:182 Signup error: AuthApiError: Database error saving new user
+    at handleError2 (@supabase_supabase-js.js?v=0a184ea6:4523:9)
+    at async _handleRequest2 (@supabase_supabase-js.js?v=0a184ea6:4564:5)
+    at async _request (@supabase_supabase-js.js?v=0a184ea6:4548:16)
+    at async SupabaseAuthClient.signUp (@supabase_supabase-js.js?v=0a184ea6:5241:15)
+    at async signup (AuthProvider.tsx:169:54)
+    at async handleSignup (Auth.tsx:109:9)
+signup @ AuthProvider.tsx:182
+await in signup
+handleSignup @ Auth.tsx:109
+callCallback2 @ chunk-W6L2VRDA.js?v=49285302:3674
+invokeGuardedCallbackDev @ chunk-W6L2VRDA.js?v=49285302:3699
+invokeGuardedCallback @ chunk-W6L2VRDA.js?v=49285302:3733
+invokeGuardedCallbackAndCatchFirstError @ chunk-W6L2VRDA.js?v=49285302:3736
+executeDispatch @ chunk-W6L2VRDA.js?v=49285302:7014
+processDispatchQueueItemsInOrder @ chunk-W6L2VRDA.js?v=49285302:7034
+processDispatchQueue @ chunk-W6L2VRDA.js?v=49285302:7043
+dispatchEventsForPlugins @ chunk-W6L2VRDA.js?v=49285302:7051
+(anonymous) @ chunk-W6L2VRDA.js?v=49285302:7174
+batchedUpdates$1 @ chunk-W6L2VRDA.js?v=49285302:18913
+batchedUpdates @ chunk-W6L2VRDA.js?v=49285302:3579
+dispatchEventForPluginEventSystem @ chunk-W6L2VRDA.js?v=49285302:7173
+dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay @ chunk-W6L2VRDA.js?v=49285302:5478
+dispatchEvent @ chunk-W6L2VRDA.js?v=49285302:5472
+dispatchDiscreteEvent @ chunk-W6L2VRDA.js?v=49285302:5449Understand this errorAI
