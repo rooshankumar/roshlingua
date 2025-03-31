@@ -206,6 +206,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         .from('profiles')
         .insert([
           {
+            id: authData.user.id, // Set id to match auth user id
             user_id: authData.user.id,
             email: email,
             full_name: name,
@@ -213,9 +214,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             username: name.toLowerCase().replace(/\s+/g, '_'),
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString(),
-            native_language: 'English', // Default value, can be updated during onboarding
-            learning_language: 'Spanish', // Default value, can be updated during onboarding
-            proficiency_level: 'Beginner' // Default value, can be updated during onboarding
+            native_language: 'English', // Default value
+            learning_language: 'Spanish', // Default value
+            proficiency_level: 'Beginner', // Default value
+            likes_count: 0 // Initialize likes count
           }
         ])
         .select()
