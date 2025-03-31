@@ -60,19 +60,21 @@ const Settings = () => {
     }
 
     try {
-      const { error } = await supabase.rpc('update_user_profile', {
-        user_id: user.id,
-        avatar_url: localProfile.avatar_url,
-        bio: localProfile.bio,
-        date_of_birth: localProfile.date_of_birth,
-        email: localProfile.email,
-        full_name: localProfile.full_name,
-        gender: localProfile.gender,
-        learning_language: localProfile.learning_language,
-        native_language: localProfile.native_language,
-        proficiency_level: localProfile.proficiency_level,
-        streak_count: localProfile.streak_count || 0
-      });
+      const { error } = await supabase
+        .from('profiles')
+        .update({
+          avatar_url: localProfile.avatar_url,
+          bio: localProfile.bio,
+          date_of_birth: localProfile.date_of_birth,
+          email: localProfile.email,
+          full_name: localProfile.full_name,
+          gender: localProfile.gender,
+          learning_language: localProfile.learning_language,
+          native_language: localProfile.native_language,
+          proficiency_level: localProfile.proficiency_level,
+          streak_count: localProfile.streak_count || 0
+        })
+        .eq('id', user.id);
 
       if (error) {
         throw error;
