@@ -212,7 +212,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             streak_count: 1,
             username: name.toLowerCase().replace(/\s+/g, '_'),
             created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString()
+            updated_at: new Date().toISOString(),
+            native_language: 'English', // Default value, can be updated during onboarding
+            learning_language: 'Spanish', // Default value, can be updated during onboarding
+            proficiency_level: 'Beginner' // Default value, can be updated during onboarding
           }
         ])
         .select()
