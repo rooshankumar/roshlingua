@@ -1,11 +1,13 @@
+
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Send } from 'lucide-react';
+import { Send, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Message } from '@/types/chat';
 import { useAuth } from '@/providers/AuthProvider';
 import { supabase } from '@/lib/supabase';
 import { ChatHeader } from './ChatHeader';
+import { Textarea } from '../ui/textarea';
 
 interface Props {
   conversation: {
@@ -51,62 +53,61 @@ export const ChatScreen = ({ conversation }: Props) => {
     fetchMessages();
 
     const channel = supabase
-      .channel('messages')
+      .channel(`room:${conversation.id}`)
       .on('postgres_changes', {
         event: 'INSERT',
         schema: 'public',
         table: 'messages',
         filter: `conversation_id=eq.${conversation.id}`,
       }, (payload) => {
-        if (payload.new.sender_id !== user?.id) {
-          setMessages(prev => [...prev, payload.new as Message]);
-          scrollToBottom();
-        }
+        setMessages(prev => [...prev, payload.new as Message]);
+        scrollToBottom();
       })
       .subscribe();
 
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [conversation?.id, user?.id]);
+  }, [conversation?.id]);
 
-  const sendMessage = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newMessage.trim() || !user?.id || !conversation?.id || isSending) return;
+  const handleSend = async () => {
+    if (!newMessage.trim() || !user || !conversation?.id || isSending) return;
 
+    setIsSending(true);
     const tempMessage = {
-      id: Date.now().toString(),
+      id: Math.random().toString(),
       content: newMessage.trim(),
-      conversation_id: conversation.id,
       sender_id: user.id,
-      user_id: user.id,
-      created_at: new Date().toISOString()
+      conversation_id: conversation.id,
+      created_at: new Date().toISOString(),
     };
 
     try {
-      setIsSending(true);
-      setNewMessage('');
       setMessages(prev => [...prev, tempMessage]);
+      setNewMessage('');
       scrollToBottom();
 
       const { error } = await supabase
         .from('messages')
-        .insert({
+        .insert([{
           content: tempMessage.content,
           conversation_id: conversation.id,
-          sender_id: user.id,
-          user_id: user.id
-        });
+        }]);
 
-      if (error) {
-        throw error;
-      }
+      if (error) throw error;
     } catch (error) {
       console.error('Error sending message:', error);
       setMessages(prev => prev.filter(msg => msg.id !== tempMessage.id));
       setNewMessage(tempMessage.content);
     } finally {
       setIsSending(false);
+    }
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSend();
     }
   };
 
@@ -134,23 +135,25 @@ export const ChatScreen = ({ conversation }: Props) => {
         <div ref={messagesEndRef} />
       </div>
 
-      <form onSubmit={sendMessage} className="p-4 border-t flex gap-2">
-        <input
-          type="text"
-          value={newMessage}
-          onChange={(e) => setNewMessage(e.target.value)}
-          onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && sendMessage(e)}
-          placeholder="Type a message..."
-          className="flex-1 rounded-lg border p-2"
-        />
-        <Button type="submit" size="icon" disabled={isSending}>
-          {isSending ? (
-            <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-current" />
-          ) : (
-            <Send className="h-4 w-4" />
-          )}
-        </Button>
-      </form>
+      <div className="border-t p-4">
+        <div className="flex gap-2">
+          <Textarea
+            value={newMessage}
+            onChange={(e) => setNewMessage(e.target.value)}
+            onKeyDown={handleKeyPress}
+            placeholder="Type a message..."
+            className="flex-1"
+            rows={1}
+          />
+          <Button 
+            onClick={handleSend} 
+            disabled={!newMessage.trim() || isSending}
+            className="self-end"
+          >
+            {isSending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+          </Button>
+        </div>
+      </div>
     </div>
   );
 };
