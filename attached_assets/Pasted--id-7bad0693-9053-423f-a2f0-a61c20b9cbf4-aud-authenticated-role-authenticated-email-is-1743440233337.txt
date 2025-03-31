@@ -1,0 +1,32 @@
+{id: '7bad0693-9053-423f-a2f0-a61c20b9cbf4', aud: 'authenticated', role: 'authenticated', email: 'isthisroshan@gmail.com', email_confirmed_at: '2025-03-24T06:14:24.781766Z', …}
+@supabase_supabase-js.js?v=617c0c74:3900 
+            
+            
+           GET https://yekzyvdjjozhhatdefsq.supabase.co/rest/v1/messages?select=*%2Csender%3Ausers%21messages_sender_id_fkey%28id%2Cfull_name%2Cavatar_url%29&conversation_id=eq.4d400ec8-a9d0-4d26-a664-ae9a117f240a&order=created_at.desc&offset=50&limit=50 400 (Bad Request)
+(anonymous) @ @supabase_supabase-js.js?v=617c0c74:3900
+(anonymous) @ @supabase_supabase-js.js?v=617c0c74:3921
+fulfilled @ @supabase_supabase-js.js?v=617c0c74:3873
+Promise.then
+step @ @supabase_supabase-js.js?v=617c0c74:3886
+(anonymous) @ @supabase_supabase-js.js?v=617c0c74:3888
+__awaiter6 @ @supabase_supabase-js.js?v=617c0c74:3870
+(anonymous) @ @supabase_supabase-js.js?v=617c0c74:3911
+then @ @supabase_supabase-js.js?v=617c0c74:89Understand this errorAI
+ChatScreen.tsx:65 Error fetching messages: {code: 'PGRST200', details: "Searched for a foreign key relationship between 'm…n the schema 'public', but no matches were found.", hint: null, message: "Could not find a relationship between 'messages' and 'users' in the schema cache"}
+fetchMessages1 @ ChatScreen.tsx:65
+await in fetchMessages1
+(anonymous) @ ChatScreen.tsx:71
+commitHookEffectListMount @ chunk-W6L2VRDA.js?v=617c0c74:16915
+commitPassiveMountOnFiber @ chunk-W6L2VRDA.js?v=617c0c74:18156
+commitPassiveMountEffects_complete @ chunk-W6L2VRDA.js?v=617c0c74:18129
+commitPassiveMountEffects_begin @ chunk-W6L2VRDA.js?v=617c0c74:18119
+commitPassiveMountEffects @ chunk-W6L2VRDA.js?v=617c0c74:18109
+flushPassiveEffectsImpl @ chunk-W6L2VRDA.js?v=617c0c74:19490
+flushPassiveEffects @ chunk-W6L2VRDA.js?v=617c0c74:19447
+commitRootImpl @ chunk-W6L2VRDA.js?v=617c0c74:19416
+commitRoot @ chunk-W6L2VRDA.js?v=617c0c74:19277
+performSyncWorkOnRoot @ chunk-W6L2VRDA.js?v=617c0c74:18895
+flushSyncCallbacks @ chunk-W6L2VRDA.js?v=617c0c74:9119
+(anonymous) @ chunk-W6L2VRDA.js?v=617c0c74:18627Understand this errorAI
+AuthProvider.tsx:296 AuthContext in useAuth: {user: {…}, session: {…}, isLoading: false, login: ƒ, signup: ƒ, …}
+AuthProvider.tsx:297 User in AuthContext: {id: '7bad0693-9053-423f-a2f0-a61c20b9cbf4', aud: 'authenticated', role: 'authenticated', email: 'isthisroshan@gmail.com', email_confirmed_at: '2025-03-24T06:14:24.781766Z', …}
