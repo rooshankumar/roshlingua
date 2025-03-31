@@ -201,66 +201,54 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return;
       }
 
-      // Create user record in public.users table through RPC to ensure proper timing
-      const { error: userError } = await supabase.rpc('create_new_user', {
-        user_id: authData.user.id,
-        user_email: email
-      });
+      // First create the user record
+      const { error: userError } = await supabase
+        .from('users')
+        .insert([
+          {
+            id: authData.user.id,
+            email: email,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          }
+        ])
+        .single();
 
       if (userError) {
         console.error("User creation error:", userError);
-        // Check if it's a duplicate email error
-        if (userError.code === '23505' && userError.message.includes('users_email_unique')) {
-          toast({
-            variant: "destructive",
-            title: "Account creation failed",
-            description: "This email is already registered. Please login instead."
-          });
-        } else {
-          toast({
-            variant: "destructive",
-            title: "Account creation failed",
-            description: "Failed to create user record. Please try again."
-          });
-        }
+        toast({
+          variant: "destructive",
+          title: "Account creation failed",
+          description: "Failed to create user record. Please try again."
+        });
+        await supabase.auth.signOut();
         return;
       }
 
-      // Now create the profile record
+      // Then create the profile
       const { error: profileError } = await supabase
         .from('profiles')
         .insert([
           {
-            id: authData.user.id, // Set id to match auth user id
             user_id: authData.user.id,
             email: email,
-            full_name: name,
-            streak_count: 1,
-            username: name.toLowerCase().replace(/\s+/g, '_'),
             created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString(),
-            native_language: 'English', // Default value
-            learning_language: 'Spanish', // Default value
-            proficiency_level: 'Beginner', // Default value
-            likes_count: 0 // Initialize likes count
+            updated_at: new Date().toISOString()
           }
         ])
-        .select()
         .single();
 
       if (profileError) {
         console.error("Profile creation error:", profileError);
-        // Attempt to clean up the auth user and user record if profile creation fails
-        await supabase.auth.admin.deleteUser(authData.user.id);
-        await supabase.from('users').delete().eq('id', authData.user.id);
-
         toast({
-          variant: "destructive",
+          variant: "destructive", 
           title: "Account creation failed",
-          description: "Failed to create user profile. Please try again."
+          description: "Failed to create profile. Please try again."
         });
+        await supabase.auth.signOut();
         return;
       }
+
 
       if (authData.user) {
         toast({
