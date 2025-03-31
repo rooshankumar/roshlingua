@@ -1,0 +1,131 @@
+[
+  {
+    "column_name": "onboarding_completed"
+  },
+  {
+    "column_name": "id"
+  },
+  {
+    "column_name": "confirmed_at"
+  },
+  {
+    "column_name": "email_change_confirm_status"
+  },
+  {
+    "column_name": "banned_until"
+  },
+  {
+    "column_name": "reauthentication_sent_at"
+  },
+  {
+    "column_name": "is_sso_user"
+  },
+  {
+    "column_name": "deleted_at"
+  },
+  {
+    "column_name": "is_anonymous"
+  },
+  {
+    "column_name": "id"
+  },
+  {
+    "column_name": "date_of_birth"
+  },
+  {
+    "column_name": "created_at"
+  },
+  {
+    "column_name": "updated_at"
+  },
+  {
+    "column_name": "last_login"
+  },
+  {
+    "column_name": "age"
+  },
+  {
+    "column_name": "instance_id"
+  },
+  {
+    "column_name": "email_confirmed_at"
+  },
+  {
+    "column_name": "invited_at"
+  },
+  {
+    "column_name": "confirmation_sent_at"
+  },
+  {
+    "column_name": "recovery_sent_at"
+  },
+  {
+    "column_name": "email_change_sent_at"
+  },
+  {
+    "column_name": "last_sign_in_at"
+  },
+  {
+    "column_name": "raw_app_meta_data"
+  },
+  {
+    "column_name": "raw_user_meta_data"
+  },
+  {
+    "column_name": "is_super_admin"
+  },
+  {
+    "column_name": "created_at"
+  },
+  {
+    "column_name": "updated_at"
+  },
+  {
+    "column_name": "phone_confirmed_at"
+  },
+  {
+    "column_name": "phone_change_sent_at"
+  },
+  {
+    "column_name": "aud"
+  },
+  {
+    "column_name": "role"
+  },
+  {
+    "column_name": "email"
+  },
+  {
+    "column_name": "encrypted_password"
+  },
+  {
+    "column_name": "email_change_token_current"
+  },
+  {
+    "column_name": "phone_change"
+  },
+  {
+    "column_name": "confirmation_token"
+  },
+  {
+    "column_name": "phone_change_token"
+  },
+  {
+    "column_name": "recovery_token"
+  },
+  {
+    "column_name": "reauthentication_token"
+  },
+  {
+    "column_name": "email_change_token_new"
+  },
+  {
+    "column_name": "email_change"
+  },
+  {
+    "column_name": "email"
+  },
+  {
+    "column_name": "phone"
+  }
+]
