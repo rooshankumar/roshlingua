@@ -70,10 +70,15 @@ const Settings = () => {
 
       // Then update profile data with proper UUID
       const { data: { user } } = await supabase.auth.getUser();
+      // Ensure we have the user before proceeding
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('No user found');
+
       const { error } = await supabase
         .from('profiles')
         .upsert({
-          id: user?.id, // Use the auth user id as the profile id
+          id: user.id, // Explicitly set ID to match auth user ID
+          user_id: user.id,
           avatar_url: localProfile.avatar_url || null,
           bio: localProfile.bio || null,
           date_of_birth: formattedDate,
@@ -83,8 +88,13 @@ const Settings = () => {
           native_language: localProfile.native_language || null,
           proficiency_level: "beginner",
           streak_count: localProfile.streak_count || 0,
-          email: user?.email
-        }, { onConflict: 'id' });
+          email: user.email,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        }, { 
+          onConflict: 'id',
+          ignoreDuplicates: false 
+        });
 
       if (error) {
         throw error;
