@@ -71,8 +71,7 @@ const Settings = () => {
         learning_language: localProfile.learning_language,
         native_language: localProfile.native_language,
         proficiency_level: localProfile.proficiency_level,
-        streak_count: localProfile.streak_count || 0,
-        onboarding_completed: true
+        streak_count: localProfile.streak_count || 0
       });
 
       if (error) {
