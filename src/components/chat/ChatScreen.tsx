@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Send, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Message } from '@/types/chat';
 import { useAuth } from '@/providers/AuthProvider';
 import { supabase } from '@/lib/supabase';
@@ -36,7 +37,7 @@ export const ChatScreen = ({ conversation }: Props) => {
       try {
         const { data, error } = await supabase
           .from('messages')
-          .select('*')
+          .select('*, profiles(full_name, avatar_url)')
           .eq('conversation_id', conversation.id)
           .order('created_at', { ascending: true });
 
@@ -140,9 +141,14 @@ export const ChatScreen = ({ conversation }: Props) => {
             {messages.map((message) => (
               <div
                 key={message.id}
-                className={`flex ${message.sender_id === user?.id ? 'justify-end' : 'justify-start'
-                  }`}
+                className={`flex items-end gap-2 ${message.sender_id === user?.id ? 'flex-row-reverse' : 'flex-row'}`}
               >
+                <Avatar className="h-8 w-8">
+                  <AvatarImage src={message.profiles?.avatar_url || '/placeholder.svg'} />
+                  <AvatarFallback>
+                    {message.profiles?.full_name?.substring(0, 2).toUpperCase() || '?'}
+                  </AvatarFallback>
+                </Avatar>
                 <div
                   className={`max-w-[70%] rounded-lg p-3 break-words ${message.sender_id === user?.id
                     ? 'bg-primary text-primary-foreground'
