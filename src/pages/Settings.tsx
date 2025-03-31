@@ -68,18 +68,25 @@ const Settings = () => {
         if (updateEmailError) throw updateEmailError;
       }
 
-      // Then update profile data
+      // Then update profile data with fixed proficiency level
+      const validProficiencyLevels = ["Beginner (A1)", "Elementary (A2)", "Intermediate (B1)", 
+        "Upper Intermediate (B2)", "Advanced (C1)", "Proficient (C2)"];
+      
+      const proficiencyLevel = validProficiencyLevels.includes(localProfile.proficiency_level) 
+        ? localProfile.proficiency_level 
+        : "Beginner (A1)";
+
       const { error } = await supabase
         .from('profiles')
         .update({
-          avatar_url: localProfile.avatar_url,
-          bio: localProfile.bio,
+          avatar_url: localProfile.avatar_url || null,
+          bio: localProfile.bio || null,
           date_of_birth: localProfile.date_of_birth,
           full_name: localProfile.full_name,
           gender: localProfile.gender,
           learning_language: localProfile.learning_language,
           native_language: localProfile.native_language,
-          proficiency_level: localProfile.proficiency_level || 'beginner',
+          proficiency_level: proficiencyLevel,
           streak_count: localProfile.streak_count || 0
         })
         .eq('id', user.id);
