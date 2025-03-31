@@ -201,20 +201,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return;
       }
 
-      // Create user record in public.users table
-      const { error: userError } = await supabase
-        .from('users')
-        .insert([{
-          id: authData.user.id,
-          email: email,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
-        }]);
+      // Create user record in public.users table through RPC to ensure proper timing
+      const { error: userError } = await supabase.rpc('create_new_user', {
+        user_id: authData.user.id,
+        user_email: email
+      });
 
       if (userError) {
         console.error("User creation error:", userError);
-        // Attempt to clean up the auth user if user creation fails
-        await supabase.auth.admin.deleteUser(authData.user.id);
         toast({
           variant: "destructive",
           title: "Account creation failed",
