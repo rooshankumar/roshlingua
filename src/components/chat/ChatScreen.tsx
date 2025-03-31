@@ -92,7 +92,8 @@ export const ChatScreen = ({ conversation }: Props) => {
         .insert([{
           content: tempMessage.content,
           conversation_id: conversation.id,
-          user_id: user.id
+          sender_id: user.id,
+          is_read: false
         }]);
 
       if (error) throw error;
