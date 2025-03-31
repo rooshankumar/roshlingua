@@ -60,6 +60,43 @@ const Settings = () => {
     }
 
     try {
+      const { error } = await supabase.rpc('update_user_profile', {
+        user_id: user.id,
+        avatar_url: localProfile.avatar_url,
+        bio: localProfile.bio,
+        date_of_birth: localProfile.date_of_birth,
+        email: localProfile.email,
+        full_name: localProfile.full_name,
+        gender: localProfile.gender,
+        learning_language: localProfile.learning_language,
+        native_language: localProfile.native_language,
+        proficiency_level: localProfile.proficiency_level,
+        streak_count: localProfile.streak_count || 0,
+        onboarding_completed: true
+      });
+
+      if (error) {
+        throw error;
+      }
+
+      toast({
+        title: "Success",
+        description: "Profile updated successfully",
+      });
+
+      if (updateProfile) {
+        updateProfile(localProfile);
+      }
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update profile",
+        variant: "destructive"
+      });
+    }
+
+    try {
       const { data, error } = await supabase.rpc('update_user_profile', {
         user_id: user.id,
         full_name: localProfile.full_name,
