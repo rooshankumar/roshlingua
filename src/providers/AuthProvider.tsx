@@ -160,7 +160,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           data: {
             full_name: name,
             onboarding_completed: false
-          }
+          },
+          emailRedirectTo: `${window.location.origin}/auth/callback`
         }
       });
 
@@ -187,15 +188,30 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return;
       }
 
-      if (authData.user) {
-        toast({
-          title: "Account created",
-          description: "Please check your email to confirm your account.",
-        });
+      // Create initial user record
+      const { error: dbError } = await supabase.from('users').insert([{
+        id: authData.user.id,
+        email: email,
+        full_name: name,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+        onboarding_completed: false
+      }]);
 
-        // Call createUserRecord after successful signup
-        await createUserRecord(authData.user.id, name);
+      if (dbError) {
+        console.error("Database error:", dbError);
+        toast({
+          variant: "destructive",
+          title: "Account setup incomplete",
+          description: "Your account was created but profile setup failed. Please try logging in."
+        });
+        return;
       }
+
+      toast({
+        title: "Account created",
+        description: "Please check your email to confirm your account.",
+      });
     } catch (error) {
       console.error("Signup error:", error);
       throw error;
