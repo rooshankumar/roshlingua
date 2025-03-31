@@ -193,10 +193,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
 
       // Use RPC to create user record safely
-      const { error: dbError } = await supabase.rpc('create_new_user', {
+      const { error: dbError } = await supabase.rpc('create_user_with_profile', {
         user_id: authData.user.id,
         user_email: email,
-        user_name: name
+        user_full_name: name
       });
 
       if (dbError) {
