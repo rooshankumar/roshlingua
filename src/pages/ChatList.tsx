@@ -132,7 +132,7 @@ const ChatList = () => {
           })
         );
 
-        setConversations(conversationPreviews);
+        setConversations(conversationPreviews.filter(conv => conv !== null) as ChatPreview[]); //Filter out nulls
       } catch (error) {
         console.error('Error fetching conversations:', error);
       } finally {
@@ -189,26 +189,26 @@ const ChatList = () => {
               <Card className="hover:bg-muted/50 transition-colors">
                 <CardContent className="flex items-center p-4">
                   <Avatar className="h-12 w-12">
-                    <AvatarImage src={conversation.participant.avatar_url} />
+                    <AvatarImage src={conversation.participant?.avatar_url || '/placeholder.svg'} /> {/*Handle null avatar_url*/}
                     <AvatarFallback>
-                      {conversation.participant.full_name?.substring(0, 2).toUpperCase()}
+                      {conversation.participant?.full_name?.substring(0, 2).toUpperCase() || 'AB'} {/*Handle null full_name*/}
                     </AvatarFallback>
                   </Avatar>
                   <div className="ml-4 flex-1">
                     <div className="flex items-center justify-between">
-                      <h3 className="font-medium">{conversation.participant.full_name}</h3>
+                      <h3 className="font-medium">{conversation.participant?.full_name || 'Unknown User'}</h3> {/*Handle null full_name*/}
                       <div className="flex flex-col items-end gap-1">
                         <div className="flex items-center gap-2">
-                        {conversation.participant.is_online ? (
-                          <div className="flex items-center">
-                            <div className="w-2 h-2 rounded-full bg-green-500 mr-2" />
-                            <span className="text-xs text-green-600">Online</span>
-                          </div>
-                        ) : conversation.participant.last_seen ? (
-                          <span className="text-xs text-muted-foreground">
-                            {formatDistanceToNow(new Date(conversation.participant.last_seen))} ago
-                          </span>
-                        ) : null}
+                          {conversation.participant?.is_online ? (
+                            <div className="flex items-center">
+                              <div className="w-2 h-2 rounded-full bg-green-500 mr-2" />
+                              <span className="text-xs text-green-600">Online</span>
+                            </div>
+                          ) : conversation.participant?.last_seen ? (
+                            <span className="text-xs text-muted-foreground">
+                              {formatDistanceToNow(new Date(conversation.participant.last_seen))} ago
+                            </span>
+                          ) : null}
                         </div>
                         {conversation.lastMessage && (
                           <span className="text-xs text-muted-foreground">
