@@ -1,4 +1,5 @@
 
+-- Update profile RPC function
 CREATE OR REPLACE FUNCTION public.update_user_profile(
   user_id UUID,
   avatar_url TEXT DEFAULT NULL,
@@ -32,9 +33,8 @@ BEGIN
     native_language = COALESCE(update_user_profile.native_language, users.native_language),
     proficiency_level = COALESCE(update_user_profile.proficiency_level, users.proficiency_level),
     streak_count = COALESCE(update_user_profile.streak_count, users.streak_count),
-    onboarding_completed = COALESCE(update_user_profile.onboarding_completed, users.onboarding_completed),
     updated_at = NOW()
-  WHERE id = user_id;
+  WHERE users.id = update_user_profile.user_id;
 
   -- Check if update was successful
   IF NOT FOUND THEN
