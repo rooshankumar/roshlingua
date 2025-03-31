@@ -1,13 +1,13 @@
 
-import { useEffect, useState } from 'react';
-import { useToast } from '@/hooks/use-toast';
-import { Database } from '@/lib/database.types';
+import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
+import { useToast } from '@/components/ui/use-toast';
+import { Database } from '@/types/supabase';
 
-type User = Database['public']['Tables']['users']['Row'];
+type Profile = Database['public']['Tables']['profiles']['Row'];
 
 export function useRealtimeProfile(userId: string | undefined) {
-  const [profile, setProfile] = useState<User | null>(null);
+  const [profile, setProfile] = useState<Profile | null>(null);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -16,8 +16,22 @@ export function useRealtimeProfile(userId: string | undefined) {
     const fetchProfile = async () => {
       try {
         const { data, error } = await supabase
-          .from('users')
-          .select('*')
+          .from('profiles')
+          .select(`
+            id,
+            full_name,
+            username,
+            bio,
+            native_language,
+            learning_language,
+            proficiency_level,
+            learning_goal,
+            email,
+            avatar_url,
+            gender,
+            streak_count,
+            likes_count
+          `)
           .eq('id', userId)
           .single();
 
@@ -36,27 +50,27 @@ export function useRealtimeProfile(userId: string | undefined) {
     fetchProfile();
 
     // Set up realtime subscription
-    const userSubscription = supabase
-      .channel(`user:${userId}`)
+    const profileSubscription = supabase
+      .channel(`profile:${userId}`)
       .on('postgres_changes', {
         event: '*',
         schema: 'public',
-        table: 'users',
+        table: 'profiles',
         filter: `id=eq.${userId}`
       }, (payload) => {
-        setProfile(payload.new as User);
+        setProfile(payload.new as Profile);
       })
       .subscribe();
 
     return () => {
-      userSubscription.unsubscribe();
+      profileSubscription.unsubscribe();
     };
   }, [userId, toast]);
 
-  const updateProfile = async (updates: Partial<User>) => {
+  const updateProfile = async (updates: Partial<Profile>) => {
     try {
       const { error } = await supabase
-        .from('users')
+        .from('profiles')
         .update(updates)
         .eq('id', userId);
 
