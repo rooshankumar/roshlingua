@@ -78,8 +78,10 @@ const ChatList = () => {
             users:user_id (
               id,
               email,
-              full_name,
-              avatar_url
+              profiles:profiles (
+                full_name,
+                avatar_url
+              )
             )
           `)
           .neq('user_id', user.id);
@@ -94,8 +96,10 @@ const ChatList = () => {
                 users:user_id (
                   id,
                   email,
-                  full_name,
-                  avatar_url
+                  profiles:profiles (
+                    full_name,
+                    avatar_url
+                  )
                 )
               `)
               .eq('conversation_id', participant.conversation_id)
@@ -120,8 +124,8 @@ const ChatList = () => {
               participant: {
                 id: participantUser.id,
                 email: participantUser.email,
-                full_name: participantUser.full_name || participantUser.email?.split('@')[0],
-                avatar_url: participantUser.avatar_url || '/placeholder.svg'
+                full_name: participantUser.profiles.full_name || participantUser.email?.split('@')[0],
+                avatar_url: participantUser.profiles.avatar_url || '/placeholder.svg'
               },
               lastMessage: messages?.[0]
             } : null;
@@ -205,7 +209,7 @@ const ChatList = () => {
                             {formatDistanceToNow(new Date(conversation.participant.last_seen))} ago
                           </span>
                         ) : null}
-                      </div>
+                        </div>
                         {conversation.lastMessage && (
                           <span className="text-xs text-muted-foreground">
                             {new Date(conversation.lastMessage.created_at).toLocaleDateString()}
