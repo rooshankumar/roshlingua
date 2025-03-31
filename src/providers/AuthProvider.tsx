@@ -192,17 +192,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return;
       }
 
-      // Use RPC to create user record safely
-      const { error: dbError } = await supabase.rpc('create_user_with_profile', {
-        user_id: authData.user.id,
-        user_email: email,
-        user_full_name: name
-      });
-
-      if (dbError) {
-        console.error("Database error:", dbError);
-        // If there's an error, sign out the partially created user
-        await supabase.auth.signOut();
+      // User record will be created automatically via database trigger
+      if (!authData.user) {
         toast({
           variant: "destructive",
           title: "Signup failed",

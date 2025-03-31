@@ -13,35 +13,38 @@ CREATE TABLE IF NOT EXISTS public.users (
 );
 
 -- Create secure function for user creation
-CREATE OR REPLACE FUNCTION create_user_with_profile(
-    user_id UUID,
-    user_email TEXT,
-    user_full_name TEXT
-)
-RETURNS void
-LANGUAGE plpgsql
-SECURITY DEFINER
-SET search_path = public
-AS $$
+CREATE OR REPLACE FUNCTION handle_new_user()
+RETURNS TRIGGER AS $$
 BEGIN
-    INSERT INTO public.users (id, email, full_name)
-    VALUES (user_id, user_email, user_full_name)
-    ON CONFLICT (id) DO UPDATE
-    SET email = EXCLUDED.email,
-        full_name = EXCLUDED.full_name,
-        updated_at = NOW();
+    INSERT INTO public.users (id, email, full_name, created_at, updated_at)
+    VALUES (
+        NEW.id,
+        NEW.email,
+        NEW.raw_user_meta_data->>'full_name',
+        NOW(),
+        NOW()
+    );
+    RETURN NEW;
 END;
-$$;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- Create trigger to handle new user signup
+DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
+CREATE TRIGGER on_auth_user_created
+    AFTER INSERT ON auth.users
+    FOR EACH ROW EXECUTE FUNCTION handle_new_user();
 
 -- Grant necessary permissions
 ALTER TABLE public.users ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "Users can view their own data"
-    ON public.users
-    FOR SELECT
+CREATE POLICY "Users can view own data"
+    ON public.users FOR SELECT
     USING (auth.uid() = id);
 
-CREATE POLICY "Users can update their own data"
-    ON public.users
-    FOR UPDATE
+CREATE POLICY "Users can update own data"
+    ON public.users FOR UPDATE
     USING (auth.uid() = id);
+
+CREATE POLICY "Users can insert own data"
+    ON public.users FOR INSERT
+    WITH CHECK (auth.uid() = id);
