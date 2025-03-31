@@ -1,0 +1,78 @@
+We have refactored our database structure, specifically moving relevant columns from the users table to the profiles table. Now, we need to update our codebase accordingly to prevent errors and ensure smooth functionality.
+
+Key Changes in Database:
+Users Table:
+
+We have removed user profile-related fields like full_name, username, gender, bio, learning_language, etc.
+
+The users table now only contains authentication and account-related fields like email, password, is_sso_user, and timestamps.
+
+Columns like streak_count, likes_count, and learning_goal have been moved to the profiles table.
+
+Profiles Table:
+
+The profiles table now contains user-related details like:
+
+full_name, username, email, gender, bio, avatar_url
+
+native_language, learning_language, proficiency_level, learning_goal
+
+streak_count, streak_last_date, likes_count
+
+streak_count should default to 1 instead of 0.
+
+username must be unique (handling for Unknown duplicates needed).
+
+Triggers & Dependencies:
+
+Some triggers in the users table (e.g., trigger_streak_update, trigger_update_last_seen) referenced is_online, last_active_at, and similar fields that have been removed.
+
+We may need to drop or update these triggers to avoid conflicts.
+
+Required Code Fixes:
+1. Backend Updates (API, Queries, Models)
+Update queries to fetch profile data from the profiles table instead of users.
+
+Modify authentication-related logic to link user accounts with profiles correctly.
+
+Ensure streak_count defaults to 1 for new users.
+
+2. Frontend Updates (UI, API Calls)
+Adjust API requests to read/write user profile information from the correct table.
+
+Ensure user profile updates go to profiles, not users.
+
+3. Fixing Constraints & Errors
+Handle the duplicate username issue (Unknown)—either enforce uniqueness or auto-generate a valid username.
+
+Resolve foreign key constraints if any relationships between users and profiles are broken.
+
+4. Testing & Debugging
+Run a migration script to transfer existing user data correctly.
+
+Test user signups, logins, and profile updates to verify smooth transitions.
+
+Check error logs for "column does not exist" issues and fix affected queries.
+
+Final Output Expected
+A fully working codebase with:
+
+Correct users and profiles structure
+
+All references updated accordingly
+
+No broken triggers or queries
+
+No duplicate username errors
+
+Smooth user experience across sign-up, login, and profile updates
+
+Additional Notes for AI:
+If there are any missing dependencies or issues, suggest a fix or migration strategy.
+
+Ensure best practices for database relationships and indexing.
+
+Provide a list of all the updated files and SQL migrations.
+
+Final Request:
+"Please apply all these changes to our codebase and ensure everything works as expected."
