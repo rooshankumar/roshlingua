@@ -220,7 +220,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         console.error("User creation error:", userError);
         // Attempt to clean up the auth user if profile creation fails
         await supabase.auth.admin.deleteUser(authData.user.id);
-        
+
         toast({
           variant: "destructive",
           title: "Account creation failed",
