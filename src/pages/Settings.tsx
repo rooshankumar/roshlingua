@@ -68,9 +68,7 @@ const Settings = () => {
         if (updateEmailError) throw updateEmailError;
       }
 
-      // Then update profile data with proper UUID
-      const { data: { user } } = await supabase.auth.getUser();
-      // Ensure we have the user before proceeding
+      // Get current user
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('No user found');
 
