@@ -12,6 +12,7 @@ interface Props {
   conversation: {
     id: string;
     title?: string;
+    participant?: {id: string} // Added to handle recipient_id
   };
 }
 
@@ -91,6 +92,8 @@ export const ChatScreen = ({ conversation }: Props) => {
         .insert([{
           content: tempMessage.content,
           conversation_id: conversation.id,
+          sender_id: user.id, // Added sender_id here
+          recipient_id: conversation?.participant?.id // Added recipient_id
         }]);
 
       if (error) throw error;
@@ -150,7 +153,7 @@ export const ChatScreen = ({ conversation }: Props) => {
           />
           <Button 
             onClick={handleSend} 
-            disabled={!newMessage.trim() || isSending}
+            disabled={!newMessage.trim() || isSending || !user} // Added user check
             className="self-end"
           >
             {isSending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
