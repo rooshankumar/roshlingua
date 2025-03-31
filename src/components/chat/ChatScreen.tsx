@@ -42,10 +42,12 @@ export const ChatScreen = ({ conversation }: Props) => {
           .from('messages')
           .select(`
             *,
-            sender:users(
+            sender (
               id,
               email,
-              created_at
+              created_at,
+              full_name,
+              avatar_url
             )
           `)
           .eq('conversation_id', conversation.id)
@@ -156,8 +158,8 @@ export const ChatScreen = ({ conversation }: Props) => {
         <div className="flex-1 overflow-y-auto p-4">
           {hasMore && (
             <div className="text-center mb-4">
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 onClick={() => {
                   setPage(prev => prev + 1);
                   fetchMessages(true);
@@ -226,3 +228,5 @@ export const ChatScreen = ({ conversation }: Props) => {
     </div>
   );
 };
+
+export default ChatScreen;
