@@ -244,27 +244,46 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
 
       console.log("Submitting onboarding data:", userData);
 
-      const { error: updateError } = await supabase
-        .from('users')
+      const { error: profileError } = await supabase
+        .from('profiles')
         .update({
           gender: formData.gender,
-          date_of_birth: formData.dob, //Simplified date_of_birth handling
-          native_language: formData.nativeLanguage,
-          learning_language: formData.learningLanguage,
-          proficiency_level: formData.proficiencyLevel,
-          learning_goal: formData.learningGoal,
-          avatar_url: formData.avatarUrl,
-          updated_at: new Date().toISOString(),
-          onboarding_status: true //Set onboarding status to true
+          date_of_birth: formData.date_of_birth,
+          native_language: formData.native_language,
+          learning_language: formData.learning_language,
+          proficiency_level: formData.proficiency_level,
+          learning_goal: formData.learning_goal,
+          avatar_url: formData.avatar_url,
+          full_name: formData.full_name,
+          updated_at: new Date().toISOString()
         })
-        .eq('id', user.id);
+        .eq('user_id', user.id);
 
-      if (updateError) {
-        console.error('Error updating user data:', updateError);
+      if (profileError) {
+        console.error('Error updating profile data:', profileError);
         toast({
           variant: "destructive",
           title: "Error",
           description: "Failed to update profile. Please try again.",
+        });
+        return;
+      }
+
+      // Update onboarding status in users table
+      const { error: userError } = await supabase
+        .from('users')
+        .update({
+          onboarding_completed: true,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', user.id);
+
+      if (userError) {
+        console.error('Error updating user data:', userError);
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Failed to update user status. Please try again.",
         });
         return;
       }
