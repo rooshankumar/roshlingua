@@ -1,4 +1,3 @@
-
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Send, Loader2 } from 'lucide-react';
@@ -115,24 +114,28 @@ export const ChatScreen = ({ conversation }: Props) => {
     <div className="flex flex-col h-screen">
       <ChatHeader conversation={conversation} />
 
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
-        {messages.map((message) => (
-          <div
-            key={message.id}
-            className={`flex ${message.sender_id === user?.id ? 'justify-end' : 'justify-start'}`}
-          >
+      <div className="flex-1 overflow-y-auto p-4">
+        <div className="space-y-4">
+          {messages.map((message) => (
             <div
-              className={`max-w-[70%] rounded-lg px-4 py-2 ${
-                message.sender_id === user?.id
-                  ? 'bg-primary text-primary-foreground'
-                  : 'bg-muted'
+              key={message.id}
+              className={`flex ${
+                message.sender_id === user?.id ? 'justify-end' : 'justify-start'
               }`}
             >
-              {message.content}
+              <div
+                className={`max-w-[70%] rounded-lg p-3 break-words ${
+                  message.sender_id === user?.id
+                    ? 'bg-primary text-primary-foreground'
+                    : 'bg-muted'
+                }`}
+              >
+                {message.content}
+              </div>
             </div>
-          </div>
-        ))}
-        <div ref={messagesEndRef} />
+          ))}
+          <div ref={messagesEndRef} />
+        </div>
       </div>
 
       <div className="border-t p-4">
