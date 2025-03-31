@@ -201,14 +201,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return;
       }
 
-      // Create the user record in the users table
-      const { error: userError } = await supabase
-        .from('users')
+      // Create the profile record
+      const { error: profileError } = await supabase
+        .from('profiles')
         .insert([
           {
-            id: authData.user.id,
+            user_id: authData.user.id,
             email: email,
             full_name: name,
+            streak_count: 1,
+            username: name.toLowerCase().replace(/\s+/g, '_'),
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString()
           }
@@ -216,8 +218,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         .select()
         .single();
 
-      if (userError) {
-        console.error("User creation error:", userError);
+      if (profileError) {
+        console.error("Profile creation error:", profileError);
         // Attempt to clean up the auth user if profile creation fails
         await supabase.auth.admin.deleteUser(authData.user.id);
 
