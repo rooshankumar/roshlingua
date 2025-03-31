@@ -69,13 +69,6 @@ const Settings = () => {
       }
 
       // Then update profile data with fixed proficiency level
-      const validProficiencyLevels = ["Beginner (A1)", "Elementary (A2)", "Intermediate (B1)", 
-        "Upper Intermediate (B2)", "Advanced (C1)", "Proficient (C2)"];
-      
-      const proficiencyLevel = validProficiencyLevels.includes(localProfile.proficiency_level) 
-        ? localProfile.proficiency_level 
-        : "Beginner (A1)";
-
       const { error } = await supabase
         .from('profiles')
         .update({
@@ -86,7 +79,7 @@ const Settings = () => {
           gender: localProfile.gender,
           learning_language: localProfile.learning_language,
           native_language: localProfile.native_language,
-          proficiency_level: proficiencyLevel,
+          proficiency_level: "beginner",
           streak_count: localProfile.streak_count || 0
         })
         .eq('id', user.id);
