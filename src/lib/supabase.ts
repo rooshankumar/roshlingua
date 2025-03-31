@@ -8,14 +8,13 @@ if (!supabaseUrl || !supabaseAnonKey) {
   throw new Error('Missing Supabase environment variables');
 }
 
+// Initialize with anon key for client-side operations
 export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
   auth: {
     autoRefreshToken: true,
     persistSession: true,
-    detectSessionInUrl: true
-  },
-  db: {
-    schema: 'public'
+    detectSessionInUrl: true,
+    flowType: 'pkce'
   }
 });
 

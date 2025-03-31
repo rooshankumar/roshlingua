@@ -125,6 +125,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       loginAttempts.delete(email);
     } catch (error) {
       console.error("Login error:", error);
+      toast({
+        variant: "destructive",
+        title: "Authentication error",
+        description: error instanceof Error ? error.message : "Failed to authenticate"
+      });
       throw error;
     }
   };
@@ -158,8 +163,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         password,
         options: {
           data: {
-            full_name: name,
-            onboarding_completed: false
+            full_name: name
           },
           emailRedirectTo: `${window.location.origin}/auth/callback`
         }
