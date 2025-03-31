@@ -109,6 +109,7 @@ export const ChatScreen = ({ conversation }: Props) => {
           content: tempMessage.content,
           conversation_id: conversation.id,
           sender_id: currentUser.id,
+          user_id: currentUser.id,
           is_read: false
         }]);
 
