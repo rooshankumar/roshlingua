@@ -2,14 +2,30 @@
 -- Enable UUID extension
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
--- Create users table with proper constraints
+-- Create users table with minimal info
 CREATE TABLE IF NOT EXISTS public.users (
     id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
     email TEXT UNIQUE NOT NULL,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Create profiles table for user details
+CREATE TABLE IF NOT EXISTS public.profiles (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    user_id UUID REFERENCES public.users(id) ON DELETE CASCADE,
     full_name TEXT,
+    gender TEXT,
+    date_of_birth DATE,
+    native_language TEXT,
+    learning_language TEXT,
+    proficiency_level TEXT,
+    learning_goal TEXT,
+    avatar_url TEXT,
+    onboarding_completed BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW(),
-    onboarding_completed BOOLEAN DEFAULT FALSE
+    UNIQUE(user_id)
 );
 
 -- Create secure function for user creation

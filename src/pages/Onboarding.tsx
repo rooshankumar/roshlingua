@@ -227,9 +227,10 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
       }
 
       // Update user data with all fields
-      const { error: userError } = await supabase
-        .from('users')
-        .update({
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .upsert({
+          user_id: user.id,
           gender: formData.gender,
           date_of_birth: formData.date_of_birth instanceof Date ? 
             formData.date_of_birth.toISOString().split('T')[0] : 
@@ -242,11 +243,12 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
           full_name: formData.full_name,
           onboarding_completed: true,
           updated_at: new Date().toISOString()
-        })
-        .eq('id', user.id);
+        }, {
+          onConflict: 'user_id'
+        });
 
-      if (userError) {
-        console.error('Error updating user data:', userError);
+      if (profileError) {
+        console.error('Error updating profile data:', profileError);
         toast({
           variant: "destructive",
           title: "Error",
