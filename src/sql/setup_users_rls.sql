@@ -2,31 +2,27 @@
 -- Enable RLS
 ALTER TABLE public.users ENABLE ROW LEVEL SECURITY;
 
--- Create policy for inserting records
-CREATE POLICY "Users can insert their own record"
+-- Allow public signup
+CREATE POLICY "Allow public signup"
 ON public.users
 FOR INSERT
-WITH CHECK (true);  -- Allow initial insert during signup
+WITH CHECK (auth.role() = 'authenticated');
 
-CREATE POLICY "Users can only read their own record"
+-- Users can read own record 
+CREATE POLICY "Users can read own record"
 ON public.users
 FOR SELECT
 USING (auth.uid() = id);
 
-CREATE POLICY "Users can only update their own record"
+-- Users can update own record
+CREATE POLICY "Users can update own record" 
 ON public.users
 FOR UPDATE
 USING (auth.uid() = id)
 WITH CHECK (auth.uid() = id);
 
--- Create policy for viewing records
-CREATE POLICY "Users can view their own record"
+-- Allow auth service manage users
+CREATE POLICY "Auth service manage users"
 ON public.users
-FOR SELECT
-USING (auth.uid() = id);
-
--- Create policy for updating records
-CREATE POLICY "Users can update their own record"
-ON public.users
-FOR UPDATE
+FOR ALL 
 USING (auth.uid() = id);
