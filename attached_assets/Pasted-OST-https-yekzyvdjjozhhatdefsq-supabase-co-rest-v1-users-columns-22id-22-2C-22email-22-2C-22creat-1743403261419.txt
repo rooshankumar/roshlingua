@@ -1,0 +1,55 @@
+OST https://yekzyvdjjozhhatdefsq.supabase.co/rest/v1/users?columns=%22id%22%2C%22email%22%2C%22created_at%22%2C%22updated_at%22 401 (Unauthorized)
+(anonymous) @ @supabase_supabase-js.js?v=0a184ea6:3900
+(anonymous) @ @supabase_supabase-js.js?v=0a184ea6:3921
+fulfilled @ @supabase_supabase-js.js?v=0a184ea6:3873
+Promise.then
+step @ @supabase_supabase-js.js?v=0a184ea6:3886
+(anonymous) @ @supabase_supabase-js.js?v=0a184ea6:3888
+__awaiter6 @ @supabase_supabase-js.js?v=0a184ea6:3870
+(anonymous) @ @supabase_supabase-js.js?v=0a184ea6:3911
+then @ @supabase_supabase-js.js?v=0a184ea6:89Understand this errorAI
+AuthProvider.tsx:215 User creation error: {code: '42501', details: null, hint: null, message: 'new row violates row-level security policy for table "users"'}code: "42501"details: nullhint: nullmessage: "new row violates row-level security policy for table \"users\""[[Prototype]]: Object
+signup @ AuthProvider.tsx:215
+await in signup
+handleSignup @ Auth.tsx:109
+callCallback2 @ chunk-W6L2VRDA.js?v=49285302:3674
+invokeGuardedCallbackDev @ chunk-W6L2VRDA.js?v=49285302:3699
+invokeGuardedCallback @ chunk-W6L2VRDA.js?v=49285302:3733
+invokeGuardedCallbackAndCatchFirstError @ chunk-W6L2VRDA.js?v=49285302:3736
+executeDispatch @ chunk-W6L2VRDA.js?v=49285302:7014
+processDispatchQueueItemsInOrder @ chunk-W6L2VRDA.js?v=49285302:7034
+processDispatchQueue @ chunk-W6L2VRDA.js?v=49285302:7043
+dispatchEventsForPlugins @ chunk-W6L2VRDA.js?v=49285302:7051
+(anonymous) @ chunk-W6L2VRDA.js?v=49285302:7174
+batchedUpdates$1 @ chunk-W6L2VRDA.js?v=49285302:18913
+batchedUpdates @ chunk-W6L2VRDA.js?v=49285302:3579
+dispatchEventForPluginEventSystem @ chunk-W6L2VRDA.js?v=49285302:7173
+dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay @ chunk-W6L2VRDA.js?v=49285302:5478
+dispatchEvent @ chunk-W6L2VRDA.js?v=49285302:5472
+dispatchDiscreteEvent @ chunk-W6L2VRDA.js?v=49285302:5449Understand this errorAI
+AuthProvider.tsx:217 
+            
+            
+           DELETE https://yekzyvdjjozhhatdefsq.supabase.co/auth/v1/admin/users/e1c3a80f-d1d5-4635-b52b-7c994b0adecb 403 (Forbidden)
+(anonymous) @ @supabase_supabase-js.js?v=0a184ea6:4309
+_handleRequest2 @ @supabase_supabase-js.js?v=0a184ea6:4558
+_request @ @supabase_supabase-js.js?v=0a184ea6:4548
+deleteUser @ @supabase_supabase-js.js?v=0a184ea6:4834
+signup @ AuthProvider.tsx:217
+await in signup
+handleSignup @ Auth.tsx:109
+callCallback2 @ chunk-W6L2VRDA.js?v=49285302:3674
+invokeGuardedCallbackDev @ chunk-W6L2VRDA.js?v=49285302:3699
+invokeGuardedCallback @ chunk-W6L2VRDA.js?v=49285302:3733
+invokeGuardedCallbackAndCatchFirstError @ chunk-W6L2VRDA.js?v=49285302:3736
+executeDispatch @ chunk-W6L2VRDA.js?v=49285302:7014
+processDispatchQueueItemsInOrder @ chunk-W6L2VRDA.js?v=49285302:7034
+processDispatchQueue @ chunk-W6L2VRDA.js?v=49285302:7043
+dispatchEventsForPlugins @ chunk-W6L2VRDA.js?v=49285302:7051
+(anonymous) @ chunk-W6L2VRDA.js?v=49285302:7174
+batchedUpdates$1 @ chunk-W6L2VRDA.js?v=49285302:18913
+batchedUpdates @ chunk-W6L2VRDA.js?v=49285302:3579
+dispatchEventForPluginEventSystem @ chunk-W6L2VRDA.js?v=49285302:7173
+dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay @ chunk-W6L2VRDA.js?v=49285302:5478
+dispatchEvent @ chunk-W6L2VRDA.js?v=49285302:5472
+dispatchDiscreteEvent @ chunk-W6L2VRDA.js?v=49285302:5449Understand this errorAI
