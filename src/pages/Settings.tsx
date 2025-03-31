@@ -60,18 +60,26 @@ const Settings = () => {
     }
 
     try {
+      // First update email in auth.users if it changed
+      if (localProfile.email !== user.email) {
+        const { error: updateEmailError } = await supabase.auth.updateUser({
+          email: localProfile.email
+        });
+        if (updateEmailError) throw updateEmailError;
+      }
+
+      // Then update profile data
       const { error } = await supabase
         .from('profiles')
         .update({
           avatar_url: localProfile.avatar_url,
           bio: localProfile.bio,
           date_of_birth: localProfile.date_of_birth,
-          email: localProfile.email,
           full_name: localProfile.full_name,
           gender: localProfile.gender,
           learning_language: localProfile.learning_language,
           native_language: localProfile.native_language,
-          proficiency_level: localProfile.proficiency_level,
+          proficiency_level: localProfile.proficiency_level || 'beginner',
           streak_count: localProfile.streak_count || 0
         })
         .eq('id', user.id);
