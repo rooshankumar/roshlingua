@@ -75,7 +75,7 @@ const Settings = () => {
       const { error } = await supabase
         .from('profiles')
         .upsert({
-          id: user.id, // Explicitly set ID to match auth user ID
+          id: user.id,
           user_id: user.id,
           avatar_url: localProfile.avatar_url || null,
           bio: localProfile.bio || null,
