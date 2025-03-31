@@ -279,54 +279,11 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
       }
 
 
-      if (!profileError) {
-        toast({
-          title: "Profile created",
-          description: "Your profile has been successfully set up!",
-        });
-      }
-
-      // Check if profile exists, create if it doesn't
-      const { data: profileData, error: profileCheckError } = await supabase
-        .from('profiles')
-        .select('id')
-        .eq('id', user.id)
-        .single();
-
-      if (profileCheckError && profileCheckError.code !== 'PGRST116') {
-        console.error("Error checking profile:", profileCheckError);
-      }
-
-      if (!profileData) {
-        // Create profile if it doesn't exist
-        const { error: profileCreateError } = await supabase
-          .from('profiles')
-          .insert({
-            id: user.id,
-            username: formData.name.toLowerCase().replace(/\s+/g, '_'),
-            bio: formData.learningGoal
-          });
-
-        if (profileCreateError) {
-          console.error("Error creating profile:", profileCreateError);
-          // Continue anyway, don't block the user
-        }
-      } else {
-        // Update profile
-        const { error: profileUpdateError } = await supabase
-          .from('profiles')
-          .update({
-            username: formData.name.toLowerCase().replace(/\s+/g, '_'),
-            bio: formData.learningGoal,
-            updated_at: new Date().toISOString()
-          })
-          .eq('id', user.id);
-
-        if (profileUpdateError) {
-          console.error("Error updating profile:", profileUpdateError);
-          // Continue anyway, don't block the user
-        }
-      }
+      // Show success message
+      toast({
+        title: "Profile created",
+        description: "Your profile has been successfully set up!",
+      });
 
 
       // Update local storage for immediate effect
