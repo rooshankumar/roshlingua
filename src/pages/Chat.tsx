@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useAuth } from '@/providers/AuthProvider';
@@ -33,8 +32,10 @@ const ChatPage = () => {
             users:user_id (
               id,
               email,
-              full_name,
-              avatar_url
+              profiles:profiles (
+                full_name,
+                avatar_url
+              )
             )
           `)
           .eq('conversation_id', conversationId)
@@ -44,16 +45,17 @@ const ChatPage = () => {
         if (error) throw error;
 
         if (otherParticipant?.users) {
-          setConversation({
-            id: conversationId,
-            participant: {
-              id: otherParticipant.users.id,
-              email: otherParticipant.users.email,
-              full_name: otherParticipant.users.full_name || otherParticipant.users.email?.split('@')[0],
-              avatar_url: otherParticipant.users.avatar_url || '/placeholder.svg'
-            }
-          });
-        }
+            const profile = otherParticipant.users.profiles;
+            setConversation({
+              id: conversationId,
+              participant: {
+                id: otherParticipant.users.id,
+                email: otherParticipant.users.email,
+                full_name: profile?.full_name || otherParticipant.users.email?.split('@')[0],
+                avatar_url: profile?.avatar_url || '/placeholder.svg'
+              }
+            });
+          }
       } catch (error) {
         console.error('Error loading conversation:', error);
       } finally {
