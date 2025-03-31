@@ -14,10 +14,9 @@ export function useCommunityUsers() {
         const currentUser = (await supabase.auth.getUser()).data.user;
         
         const { data, error } = await supabase
-          .from('users')
+          .from('profiles')
           .select(`
             id,
-            email,
             full_name,
             age,
             bio,
@@ -25,10 +24,11 @@ export function useCommunityUsers() {
             learning_language,
             proficiency_level,
             streak_count,
-            last_active_at
+            avatar_url,
+            likes_count
           `)
           .neq('id', currentUser?.id)
-          .order('last_active_at', { ascending: false });
+          .order('created_at', { ascending: false });
 
         if (error) throw error;
         setUsers(data || []);
