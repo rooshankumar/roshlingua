@@ -68,15 +68,12 @@ const Settings = () => {
         if (updateEmailError) throw updateEmailError;
       }
 
-      // Then update profile data with fixed proficiency level
-      // Format date properly if it exists
-      const formattedDate = localProfile.date_of_birth 
-        ? new Date(localProfile.date_of_birth).toISOString().split('T')[0]
-        : null;
-
+      // Then update profile data with proper UUID
+      const { data: { user } } = await supabase.auth.getUser();
       const { error } = await supabase
         .from('profiles')
-        .update({
+        .upsert({
+          id: user?.id, // Use the auth user id as the profile id
           avatar_url: localProfile.avatar_url || null,
           bio: localProfile.bio || null,
           date_of_birth: formattedDate,
@@ -85,9 +82,9 @@ const Settings = () => {
           learning_language: localProfile.learning_language || null,
           native_language: localProfile.native_language || null,
           proficiency_level: "beginner",
-          streak_count: localProfile.streak_count || 0
-        })
-        .eq('id', user.id);
+          streak_count: localProfile.streak_count || 0,
+          email: user?.email
+        }, { onConflict: 'id' });
 
       if (error) {
         throw error;
