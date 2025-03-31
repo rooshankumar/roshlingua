@@ -189,20 +189,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return;
       }
 
-      // Create initial user record with minimal data
-      const { error: userError } = await supabase
-        .from('users')
-        .insert([
-          {
-            id: authData.user.id,
-            email: email,
-            full_name: name, // Basic info from signup
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString(),
-            onboarding_completed: false // Mark for onboarding flow
-          }
-        ])
-        .single();
+      // Let auth handle the initial user creation
+      const metadata = {
+        full_name: name,
+        onboarding_completed: false
+      };
+
+      const { error: userError } = await supabase.auth.updateUser({
+        data: metadata
+      });
 
       if (userError) {
         console.error("User creation error:", userError);
