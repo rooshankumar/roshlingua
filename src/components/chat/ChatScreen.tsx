@@ -23,6 +23,9 @@ export const ChatScreen = ({ conversation }: Props) => {
   const [newMessage, setNewMessage] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [isSending, setIsSending] = useState(false);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const MESSAGES_PER_PAGE = 50;
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
 
@@ -33,7 +36,7 @@ export const ChatScreen = ({ conversation }: Props) => {
   useEffect(() => {
     if (!conversation?.id) return;
 
-    const fetchMessages = async () => {
+    const fetchMessages = async (loadMore = false) => {
       try {
         const { data, error } = await supabase
           .from('messages')
@@ -46,11 +49,18 @@ export const ChatScreen = ({ conversation }: Props) => {
             )
           `)
           .eq('conversation_id', conversation.id)
-          .order('created_at', { ascending: true });
+          .order('created_at', { ascending: false })
+          .range((page - 1) * MESSAGES_PER_PAGE, page * MESSAGES_PER_PAGE - 1);
 
         if (error) throw error;
-        setMessages(data || []);
-        scrollToBottom();
+
+        setHasMore(data.length === MESSAGES_PER_PAGE);
+        setMessages(prev => {
+          const newMessages = loadMore ? [...prev, ...data.reverse()] : data.reverse();
+          return newMessages;
+        });
+
+        if (!loadMore) scrollToBottom();
       } catch (error) {
         console.error('Error fetching messages:', error);
       } finally {
@@ -76,7 +86,7 @@ export const ChatScreen = ({ conversation }: Props) => {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [conversation?.id]);
+  }, [conversation?.id, page]);
 
   const handleSend = async () => {
     if (!newMessage.trim() || !user || !conversation?.id || isSending) return;
@@ -95,14 +105,8 @@ export const ChatScreen = ({ conversation }: Props) => {
       created_at: new Date().toISOString(),
     };
 
-    console.log("User object in handleSend:", user);
-    console.log("User ID in handleSend:", user?.id);
 
     try {
-      setMessages(prev => [...prev, tempMessage]);
-      setNewMessage('');
-      scrollToBottom();
-
       const { data: currentSession } = await supabase.auth.getSession();
       const currentUser = currentSession?.session?.user;
 
@@ -122,9 +126,11 @@ export const ChatScreen = ({ conversation }: Props) => {
         }]);
 
       if (error) throw error;
+      setMessages(prev => [...prev, tempMessage]);
+      setNewMessage('');
+      scrollToBottom();
     } catch (error) {
       console.error('Error sending message:', error);
-      setMessages(prev => prev.filter(msg => msg.id !== tempMessage.id));
       setNewMessage(tempMessage.content);
     } finally {
       setIsSending(false);
@@ -144,6 +150,19 @@ export const ChatScreen = ({ conversation }: Props) => {
 
       {user?.id ? (
         <div className="flex-1 overflow-y-auto p-4">
+          {hasMore && (
+            <div className="text-center mb-4">
+              <Button 
+                variant="outline" 
+                onClick={() => {
+                  setPage(prev => prev + 1);
+                  fetchMessages(true);
+                }}
+              >
+                Load More
+              </Button>
+            </div>
+          )}
           <div className="space-y-4">
             {messages.map((message) => (
               <div
