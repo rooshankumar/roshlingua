@@ -1,0 +1,75 @@
+[plugin:vite:react-swc] × the name `profileData` is defined multiple times
+     ╭─[/home/runner/workspace/src/pages/Onboarding.tsx:230:1]
+ 227 │       }
+ 228 │ 
+ 229 │       // Format the data properly
+ 230 │       const profileData = {
+     ·             ─────┬─────
+     ·                  ╰── previous definition of `profileData` here
+ 231 │         gender: formData.gender,
+ 232 │         date_of_birth: formData.date_of_birth instanceof Date ? 
+ 233 │           formData.date_of_birth.toISOString().split('T')[0] : 
+ 234 │           null,
+ 235 │         native_language: formData.native_language,
+ 236 │         learning_language: formData.learning_language,
+ 237 │         proficiency_level: formData.proficiency_level,
+ 238 │         learning_goal: formData.learning_goal,
+ 239 │         avatar_url: formData.avatar_url,
+ 240 │         full_name: formData.full_name,
+ 241 │         updated_at: new Date().toISOString()
+ 242 │       };
+ 243 │ 
+ 244 │       console.log("Submitting onboarding data:", profileData);
+ 245 │ 
+ 246 │       // Update profile data
+ 247 │       const { error: profileError } = await supabase
+ 248 │         .from('profiles')
+ 249 │         .update(profileData)
+ 250 │         .eq('user_id', user.id);
+ 251 │ 
+ 252 │       if (profileError) {
+ 253 │         console.error('Error updating profile data:', profileError);
+ 254 │         toast({
+ 255 │           variant: "destructive",
+ 256 │           title: "Error",
+ 257 │           description: "Failed to update profile. Please try again.",
+ 258 │         });
+ 259 │         return;
+ 260 │       }
+ 261 │ 
+ 262 │       // Update onboarding status in users table
+ 263 │       const { error: onboardingError } = await supabase
+ 264 │         .from('users')
+ 265 │         .update({
+ 266 │           onboarding_completed: true,
+ 267 │           updated_at: new Date().toISOString()
+ 268 │         })
+ 269 │         .eq('id', user.id);
+ 270 │ 
+ 271 │       if (onboardingError) {
+ 272 │         console.error('Error updating onboarding status:', onboardingError);
+ 273 │         toast({
+ 274 │           variant: "destructive",
+ 275 │           title: "Error",
+ 276 │           description: "Failed to update onboarding status. Please try again.",
+ 277 │         });
+ 278 │         return;
+ 279 │       }
+ 280 │ 
+ 281 │ 
+ 282 │       if (!profileError) {
+ 283 │         toast({
+ 284 │           title: "Profile created",
+ 285 │           description: "Your profile has been successfully set up!",
+ 286 │         });
+ 287 │       }
+ 288 │ 
+ 289 │       // Check if profile exists, create if it doesn't
+ 290 │       const { data: profileData, error: profileCheckError } = await supabase
+     ·                     ─────┬─────
+     ·                          ╰── `profileData` redefined here
+ 291 │         .from('profiles')
+ 292 │         .select('id')
+ 293 │         .eq('id', user.id)
+     ╰────
+/home/runner/workspace/src/pages/Onboarding.tsx:230:1
