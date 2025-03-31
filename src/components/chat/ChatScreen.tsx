@@ -12,7 +12,7 @@ interface Props {
   conversation: {
     id: string;
     title?: string;
-    participant?: {id: string} 
+    participant?: { id: string }
   };
 }
 
@@ -73,6 +73,11 @@ export const ChatScreen = ({ conversation }: Props) => {
   const handleSend = async () => {
     if (!newMessage.trim() || !user || !conversation?.id || isSending) return;
 
+    if (!user?.id) {
+      console.error("User ID is null right before sending message - preventing send.");
+      return;
+    }
+
     setIsSending(true);
     const tempMessage = {
       id: Math.random().toString(),
@@ -82,17 +87,28 @@ export const ChatScreen = ({ conversation }: Props) => {
       created_at: new Date().toISOString(),
     };
 
+    console.log("User object in handleSend:", user);
+    console.log("User ID in handleSend:", user?.id);
+
     try {
       setMessages(prev => [...prev, tempMessage]);
       setNewMessage('');
       scrollToBottom();
+
+      const { data: currentSession } = await supabase.auth.getSession();
+      const currentUser = currentSession?.session?.user;
+
+      if (!currentUser?.id) {
+        console.error("User ID is null right before database insert.");
+        return;
+      }
 
       const { error } = await supabase
         .from('messages')
         .insert([{
           content: tempMessage.content,
           conversation_id: conversation.id,
-          sender_id: user.id,
+          sender_id: currentUser.id,
           is_read: false
         }]);
 
@@ -117,49 +133,59 @@ export const ChatScreen = ({ conversation }: Props) => {
     <div className="flex flex-col h-screen">
       <ChatHeader conversation={conversation} />
 
-      <div className="flex-1 overflow-y-auto p-4">
-        <div className="space-y-4">
-          {messages.map((message) => (
-            <div
-              key={message.id}
-              className={`flex ${
-                message.sender_id === user?.id ? 'justify-end' : 'justify-start'
-              }`}
-            >
+      {user?.id ? (
+        <div className="flex-1 overflow-y-auto p-4">
+          <div className="space-y-4">
+            {messages.map((message) => (
               <div
-                className={`max-w-[70%] rounded-lg p-3 break-words ${
-                  message.sender_id === user?.id
+                key={message.id}
+                className={`flex ${message.sender_id === user?.id ? 'justify-end' : 'justify-start'
+                  }`}
+              >
+                <div
+                  className={`max-w-[70%] rounded-lg p-3 break-words ${message.sender_id === user?.id
                     ? 'bg-primary text-primary-foreground'
                     : 'bg-muted'
-                }`}
-              >
-                {message.content}
+                    }`}
+                >
+                  {message.content}
+                </div>
               </div>
-            </div>
-          ))}
-          <div ref={messagesEndRef} />
+            ))}
+            <div ref={messagesEndRef} />
+          </div>
         </div>
-      </div>
+      ) : (
+        <div className="flex-1 flex items-center justify-center">
+          <p className="text-muted-foreground">Loading user data...</p>
+        </div>
+      )}
 
-      <div className="border-t p-4">
-        <div className="flex gap-2">
-          <Textarea
-            value={newMessage}
-            onChange={(e) => setNewMessage(e.target.value)}
-            onKeyDown={handleKeyPress}
-            placeholder="Type a message..."
-            className="flex-1"
-            rows={1}
-          />
-          <Button 
-            onClick={handleSend} 
-            disabled={!newMessage.trim() || isSending || !user} 
-            className="self-end"
-          >
-            {isSending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
-          </Button>
+      {user?.id ? (
+        <div className="border-t p-4">
+          <div className="flex gap-2">
+            <Textarea
+              value={newMessage}
+              onChange={(e) => setNewMessage(e.target.value)}
+              onKeyDown={handleKeyPress}
+              placeholder="Type a message..."
+              className="flex-1"
+              rows={1}
+            />
+            <Button
+              onClick={handleSend}
+              disabled={!newMessage.trim() || isSending || !user}
+              className="self-end"
+            >
+              {isSending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+            </Button>
+          </div>
         </div>
-      </div>
+      ) : (
+        <div className="border-t p-4">
+          <p className="text-muted-foreground text-center">Please wait for user data to load...</p>
+        </div>
+      )}
     </div>
   );
 };
