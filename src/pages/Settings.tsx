@@ -69,16 +69,21 @@ const Settings = () => {
       }
 
       // Then update profile data with fixed proficiency level
+      // Format date properly if it exists
+      const formattedDate = localProfile.date_of_birth 
+        ? new Date(localProfile.date_of_birth).toISOString().split('T')[0]
+        : null;
+
       const { error } = await supabase
         .from('profiles')
         .update({
           avatar_url: localProfile.avatar_url || null,
           bio: localProfile.bio || null,
-          date_of_birth: localProfile.date_of_birth,
-          full_name: localProfile.full_name,
-          gender: localProfile.gender,
-          learning_language: localProfile.learning_language,
-          native_language: localProfile.native_language,
+          date_of_birth: formattedDate,
+          full_name: localProfile.full_name || null,
+          gender: localProfile.gender || null,
+          learning_language: localProfile.learning_language || null,
+          native_language: localProfile.native_language || null,
           proficiency_level: "beginner",
           streak_count: localProfile.streak_count || 0
         })
