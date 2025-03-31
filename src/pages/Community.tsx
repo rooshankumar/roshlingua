@@ -33,7 +33,6 @@ interface User {
   is_online: boolean;
   likes_count: number;
   username: string;
-  age: number | null;
 }
 
 const Community = () => {
@@ -49,22 +48,21 @@ const Community = () => {
     const fetchUsers = async () => {
       try {
         const currentUser = (await supabase.auth.getUser()).data.user;
+
         const { data, error } = await supabase
-          .from('users')
+          .from('profiles')
           .select(`
             id,
             full_name,
-            age,
             native_language,
             learning_language,
             proficiency_level,
             bio,
             avatar_url,
             streak_count,
-            is_online,
             likes_count
           `)
-          .neq('id', currentUser?.id); // Exclude current user
+          .neq('id', currentUser?.id);
 
         if (error) {
           console.error("Error fetching users:", error);
@@ -84,7 +82,6 @@ const Community = () => {
           is_online: user.is_online || false,
           streak_count: user.streak_count || 1, // Added streak_count default, now set to 1
           likes_count: user.likes_count || 0, // Added likes_count default
-          age: user.age || null
         }));
 
         setUsers(usersWithDefaults);
@@ -97,12 +94,12 @@ const Community = () => {
     fetchUsers();
 
     const channel = supabase
-      .channel('public:users')
+      .channel('public:profiles')
       .on('postgres_changes', 
         {
           event: '*',
           schema: 'public',
-          table: 'users'
+          table: 'profiles'
         }, 
         payload => {
           console.log('Real-time update:', payload);
@@ -179,7 +176,7 @@ const Community = () => {
 
     // Refresh users to get updated likes count
     const { data: updatedUsers, error: fetchError } = await supabase
-      .from('users')
+      .from('profiles')
       .select('*');
 
     if (fetchError) {
@@ -342,13 +339,8 @@ const Community = () => {
                       <div className="flex items-center justify-between">
                         <div>
                           <h3 className="font-medium">{user.full_name}</h3>
-                          <p className="text-xs text-muted-foreground">
-                            {user.age ? `${user.age} years old` : 'Age not specified'}
-                          </p>
                         </div>
-                        {user.is_online && (
-                          <Badge variant="success" className="ml-2">Online</Badge>
-                        )}
+                        
                       </div>
                       <p className="text-sm text-muted-foreground flex items-center gap-2">
                         <span className="px-2 py-0.5 rounded border-green-500 border bg-green-50/10 text-green-700 transition-all hover:bg-green-100/20 hover:scale-105 duration-300">
