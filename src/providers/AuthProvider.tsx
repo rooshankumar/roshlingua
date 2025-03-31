@@ -201,7 +201,29 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return;
       }
 
-      // Create the profile record
+      // Create user record in public.users table
+      const { error: userError } = await supabase
+        .from('users')
+        .insert([{
+          id: authData.user.id,
+          email: email,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        }]);
+
+      if (userError) {
+        console.error("User creation error:", userError);
+        // Attempt to clean up the auth user if user creation fails
+        await supabase.auth.admin.deleteUser(authData.user.id);
+        toast({
+          variant: "destructive",
+          title: "Account creation failed",
+          description: "Failed to create user record. Please try again."
+        });
+        return;
+      }
+
+      // Now create the profile record
       const { error: profileError } = await supabase
         .from('profiles')
         .insert([
@@ -225,8 +247,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       if (profileError) {
         console.error("Profile creation error:", profileError);
-        // Attempt to clean up the auth user if profile creation fails
+        // Attempt to clean up the auth user and user record if profile creation fails
         await supabase.auth.admin.deleteUser(authData.user.id);
+        await supabase.from('users').delete().eq('id', authData.user.id);
 
         toast({
           variant: "destructive",
