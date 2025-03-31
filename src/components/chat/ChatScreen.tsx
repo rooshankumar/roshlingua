@@ -132,7 +132,6 @@ export const ChatScreen = ({ conversation }: Props) => {
         }]);
 
       if (error) throw error;
-      setMessages(prev => [...prev, tempMessage]);
       setNewMessage('');
       scrollToBottom();
     } catch (error) {
