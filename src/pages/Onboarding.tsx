@@ -226,7 +226,7 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
         return;
       }
 
-      // Update user data
+      // Update user data with all fields
       const { error: userError } = await supabase
         .from('users')
         .update({
@@ -250,7 +250,7 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
         toast({
           variant: "destructive",
           title: "Error",
-          description: "Failed to update profile. Please try again.",
+          description: "Failed to complete onboarding. Please try again.",
         });
         return;
       }
@@ -261,7 +261,7 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
         description: "Your profile has been successfully set up!",
       });
 
-
+      // Proceed with navigation or other completion logic
       // Update local storage for immediate effect
       localStorage.setItem("onboarding_completed", "true");
 
