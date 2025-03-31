@@ -79,7 +79,11 @@ export const ChatScreen = ({ conversation }: Props) => {
         table: 'messages',
         filter: `conversation_id=eq.${conversation.id}`,
       }, (payload) => {
-        setMessages(prev => [...prev, payload.new as Message]);
+        // Check if message already exists before adding
+        setMessages(prev => {
+          const exists = prev.some(msg => msg.id === payload.new.id);
+          return exists ? prev : [...prev, payload.new as Message];
+        });
         scrollToBottom();
       })
       .subscribe();
