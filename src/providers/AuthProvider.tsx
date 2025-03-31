@@ -209,11 +209,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       if (userError) {
         console.error("User creation error:", userError);
-        toast({
-          variant: "destructive",
-          title: "Account creation failed",
-          description: "Failed to create user record. Please try again."
-        });
+        // Check if it's a duplicate email error
+        if (userError.code === '23505' && userError.message.includes('users_email_unique')) {
+          toast({
+            variant: "destructive",
+            title: "Account creation failed",
+            description: "This email is already registered. Please login instead."
+          });
+        } else {
+          toast({
+            variant: "destructive",
+            title: "Account creation failed",
+            description: "Failed to create user record. Please try again."
+          });
+        }
         return;
       }
 
