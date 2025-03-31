@@ -26,36 +26,36 @@ const ChatPage = () => {
 
     const loadConversation = async () => {
       try {
-        const { data: otherParticipant, error } = await supabase
+        const { data: participants, error } = await supabase
           .from('conversation_participants')
           .select(`
             users:user_id (
               id,
               email,
-              profiles:profiles (
-                full_name,
-                avatar_url
-              )
+              full_name,
+              avatar_url
             )
           `)
           .eq('conversation_id', conversationId)
-          .neq('user_id', user.id)
-          .single();
+          .neq('user_id', user.id);
 
         if (error) throw error;
 
-        if (otherParticipant?.users) {
-            const profile = otherParticipant.users.profiles;
-            setConversation({
-              id: conversationId,
-              participant: {
-                id: otherParticipant.users.id,
-                email: otherParticipant.users.email,
-                full_name: profile?.full_name || otherParticipant.users.email?.split('@')[0],
-                avatar_url: profile?.avatar_url || '/placeholder.svg'
-              }
-            });
-          }
+        const otherParticipant = participants?.[0]?.users;
+
+        if (otherParticipant) {
+          setConversation({
+            id: conversationId,
+            participant: {
+              id: otherParticipant.id,
+              email: otherParticipant.email,
+              full_name: otherParticipant.full_name || otherParticipant.email?.split('@')[0],
+              avatar_url: otherParticipant.avatar_url || '/placeholder.svg'
+            }
+          });
+        } else {
+          console.error('No other participant found in conversation');
+        }
       } catch (error) {
         console.error('Error loading conversation:', error);
       } finally {
