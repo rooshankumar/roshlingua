@@ -50,7 +50,8 @@ const ChatPage = () => {
               id: otherParticipant.id,
               email: otherParticipant.email,
               full_name: otherParticipant.full_name || otherParticipant.email?.split('@')[0],
-              avatar_url: otherParticipant.avatar_url || '/placeholder.svg'
+              avatar_url: otherParticipant.avatar_url || '/placeholder.svg',
+              avatar: otherParticipant.avatar_url || '/placeholder.svg'
             }
           });
         } else {
