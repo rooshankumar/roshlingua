@@ -1,4 +1,3 @@
-
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Send, Loader2, FileText, Check } from 'lucide-react';
@@ -147,17 +146,6 @@ export const ChatScreen = ({ conversation }: Props) => {
 
       {user?.id ? (
         <ScrollArea className="flex-1 px-3 md:px-6 pt-4">
-          {hasMore && (
-            <div className="text-center mb-4">
-              <Button
-                variant="outline"
-                onClick={() => setPage(prev => prev + 1)}
-                className="w-full max-w-[200px]"
-              >
-                Load More
-              </Button>
-            </div>
-          )}
           <div className="space-y-4 pb-4">
             {messages.map((message) => (
               <div
@@ -233,27 +221,29 @@ export const ChatScreen = ({ conversation }: Props) => {
       )}
 
       {user?.id ? (
-        <CardContent className="border-t p-4">
-          <div className="flex items-end gap-2">
-            <ChatAttachment onAttach={(url, filename) => handleSend(newMessage, { url, filename })} />
-            <Textarea
-              value={newMessage}
-              onChange={(e) => setNewMessage(e.target.value)}
-              onKeyDown={handleKeyPress}
-              placeholder="Type a message..."
-              className="flex-1 min-h-[60px] max-h-[120px]"
-              rows={1}
-            />
-            <Button
-              onClick={() => handleSend(newMessage)}
-              disabled={!newMessage.trim() || isSending || !user}
-              size="icon"
-              className="h-[60px] w-[60px]"
-            >
-              {isSending ? <Loader2 className="h-5 w-5 animate-spin" /> : <Send className="h-5 w-5" />}
-            </Button>
-          </div>
-        </CardContent>
+        <div className="sticky bottom-0 left-0 right-0 bg-background/95 backdrop-blur-sm border-t">
+          <CardContent className="p-4">
+            <div className="flex items-end gap-2">
+              <ChatAttachment onAttach={(url, filename) => handleSend(newMessage, { url, filename })} />
+              <Textarea
+                value={newMessage}
+                onChange={(e) => setNewMessage(e.target.value)}
+                onKeyDown={handleKeyPress}
+                placeholder="Type a message..."
+                className="flex-1 min-h-[60px] max-h-[120px]"
+                rows={1}
+              />
+              <Button
+                onClick={() => handleSend(newMessage)}
+                disabled={!newMessage.trim() || isSending || !user}
+                size="icon"
+                className="h-[60px] w-[60px]"
+              >
+                {isSending ? <Loader2 className="h-5 w-5 animate-spin" /> : <Send className="h-5 w-5" />}
+              </Button>
+            </div>
+          </CardContent>
+        </div>
       ) : (
         <CardContent className="border-t p-4">
           <p className="text-muted-foreground text-center">Please wait for user data to load...</p>
