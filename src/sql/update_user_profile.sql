@@ -1,11 +1,7 @@
 
 -- Drop existing functions first to avoid conflicts
-DROP FUNCTION IF EXISTS public.update_user_profile(
-  UUID, TEXT, TEXT, TEXT, TEXT, TEXT, TEXT, TEXT, TEXT, TEXT, INTEGER, BOOLEAN
-);
-DROP FUNCTION IF EXISTS public.update_user_profile(
-  UUID, TEXT, TEXT, TEXT, TEXT, TEXT, TEXT, DATE, TEXT, TEXT, INTEGER
-);
+DROP FUNCTION IF EXISTS public.update_user_profile(UUID, TEXT, TEXT, TEXT, TEXT, TEXT, TEXT, TEXT, TEXT, TEXT, INTEGER, BOOLEAN);
+DROP FUNCTION IF EXISTS public.update_user_profile(INTEGER, TEXT, TEXT);
 
 -- Create the single update_user_profile function
 CREATE OR REPLACE FUNCTION public.update_user_profile(
