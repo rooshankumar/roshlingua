@@ -126,7 +126,8 @@ export const ChatScreen = ({ conversation }: Props) => {
           content: tempMessage.content,
           conversation_id: conversation.id,
           sender_id: currentUser.id,
-          is_read: false
+          is_read: false,
+          created_at: new Date().toISOString()
         }]);
 
       if (error) throw error;

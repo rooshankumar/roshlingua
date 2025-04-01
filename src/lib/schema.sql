@@ -20,8 +20,9 @@ CREATE TABLE IF NOT EXISTS public.conversation_participants (
 CREATE TABLE IF NOT EXISTS public.messages (
   id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
   conversation_id UUID NOT NULL REFERENCES public.conversations(id) ON DELETE CASCADE,
-  sender_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  sender_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
   content TEXT NOT NULL,
+  is_read BOOLEAN DEFAULT false,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
