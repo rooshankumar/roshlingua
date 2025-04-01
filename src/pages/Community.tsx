@@ -331,10 +331,10 @@ const Community = () => {
       {filteredUsers.length > 0 ? (
         <div className="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {filteredUsers.map((user) => (
-            <div key={user.id} className="relative group">
-              <Card className="overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
+            <div key={user.id} className="relative">
+              <Card className="h-[420px] overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
                 <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-primary to-primary/50" />
-                <CardContent className="p-0">
+                <CardContent className="p-0 flex flex-col h-full">
                   <div className="relative h-32 bg-gradient-to-b from-primary/10 to-background/5">
                     <div className="absolute -bottom-10 left-1/2 -translate-x-1/2">
                       <Avatar className="h-20 w-20 ring-4 ring-background">
@@ -344,9 +344,9 @@ const Community = () => {
                     </div>
                   </div>
 
-                  <div className="pt-12 px-4 text-center">
-                    <h3 className="font-semibold text-lg mb-1 truncate">{user.full_name}</h3>
-                    <div className="flex flex-wrap items-center justify-center gap-2 mb-2">
+                  <div className="flex-1 pt-12 px-4 text-center">
+                    <h3 className="font-semibold text-lg mb-3 truncate">{user.full_name}</h3>
+                    <div className="flex flex-wrap items-center justify-center gap-2 mb-3">
                       <Badge variant="outline" className="bg-green-500/10 text-green-700 border-green-500/30">
                         {user.native_language}
                       </Badge>
@@ -355,21 +355,23 @@ const Community = () => {
                         {user.learning_language}
                       </Badge>
                     </div>
-                    {user.age && (
-                      <Badge variant="outline" className="mb-3">
-                        {user.age} years old
+                    <div className="flex items-center justify-center gap-2 mb-3">
+                      {user.age && (
+                        <Badge variant="outline">
+                          {user.age} years old
+                        </Badge>
+                      )}
+                      <Badge variant="secondary">
+                        {user.proficiency_level || 'Beginner'}
                       </Badge>
-                    )}
-                    <Badge variant="secondary" className="mb-4">
-                      {user.proficiency_level || 'Beginner'}
-                    </Badge>
+                    </div>
 
-                    <p className="text-sm text-muted-foreground mb-4 line-clamp-2 px-2">
+                    <p className="text-sm text-muted-foreground mb-4 line-clamp-3 px-2">
                       {user.bio || 'No bio available.'}
                     </p>
                   </div>
 
-                  <div className="flex items-center justify-between p-4 bg-muted/50">
+                  <div className="mt-auto flex items-center justify-between p-4 bg-muted/50">
                     <div className="flex items-center gap-4">
                       <Button
                         variant="ghost"
