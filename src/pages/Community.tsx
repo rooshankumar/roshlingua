@@ -62,7 +62,7 @@ const Community = () => {
             avatar_url,
             streak_count,
             likes_count,
-            age // Added age to the selection
+            age
           `)
           .neq('id', currentUser?.id);
 
