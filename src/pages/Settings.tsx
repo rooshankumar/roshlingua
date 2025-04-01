@@ -360,6 +360,34 @@ const Settings = () => {
                     </div>
 
                     <div className="space-y-2">
+                      <Label htmlFor="gender" className="text-base">Gender</Label>
+                      <Select
+                        value={localProfile?.gender || ""}
+                        onValueChange={(value) => handleProfileChange("gender", value)}
+                      >
+                        <SelectTrigger id="gender" className="h-12">
+                          <SelectValue placeholder="Select your gender" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="male">Male</SelectItem>
+                          <SelectItem value="female">Female</SelectItem>
+                          <SelectItem value="Rather not say">Rather not say</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="date_of_birth" className="text-base">Date of Birth</Label>
+                      <Input
+                        id="date_of_birth"
+                        type="date"
+                        value={localProfile?.date_of_birth ? new Date(localProfile.date_of_birth).toISOString().split('T')[0] : ''}
+                        onChange={(e) => handleProfileChange("date_of_birth", e.target.value)}
+                        className="h-12"
+                      />
+                    </div>
+
+                    <div className="space-y-2">
                       <Label htmlFor="bio" className="text-base">Bio</Label>
                       <Textarea
                         id="bio"
