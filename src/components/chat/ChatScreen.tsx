@@ -182,12 +182,13 @@ export const ChatScreen = ({ conversation }: Props) => {
                     {message.sender?.full_name?.substring(0, 2).toUpperCase() || '?'}
                   </AvatarFallback>
                 </Avatar>
-                <div
-                  className={`max-w-[70%] rounded-lg p-3 break-words ${message.sender_id === user?.id
-                    ? 'bg-primary text-primary-foreground'
-                    : 'bg-muted'
-                    }`}
-                >
+                <div className="flex items-end gap-1">
+                  <div
+                    className={`max-w-[70%] rounded-lg p-3 break-words ${message.sender_id === user?.id
+                      ? 'bg-primary text-primary-foreground'
+                      : 'bg-muted'
+                      }`}
+                  >
                   {message.content}
                   {message.attachment_url && (
                     <div className="mt-2">
@@ -209,6 +210,25 @@ export const ChatScreen = ({ conversation }: Props) => {
                             {message.attachment_name || 'Download attachment'}
                           </a>
                         </div>
+                      )}
+                    </div>
+                  )}
+                  </div>
+                  {message.sender_id === user?.id && (
+                    <div className="flex items-center">
+                      {message.is_delivered ? (
+                        message.is_read ? (
+                          <Avatar className="h-4 w-4">
+                            <AvatarImage src={message.recipient?.avatar_url || '/placeholder.svg'} />
+                            <AvatarFallback>
+                              {message.recipient?.full_name?.substring(0, 2).toUpperCase() || '?'}
+                            </AvatarFallback>
+                          </Avatar>
+                        ) : (
+                          <Check className="h-3 w-3" />
+                        )
+                      ) : (
+                        <Check className="h-3 w-3 opacity-50" />
                       )}
                     </div>
                   )}
