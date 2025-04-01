@@ -1,0 +1,42 @@
+ncaught ReferenceError: profileData is not defined
+    at Dashboard (Dashboard.tsx:139:52)
+    at renderWithHooks (chunk-W6L2VRDA.js?v=148d277c:11548:26)
+    at mountIndeterminateComponent (chunk-W6L2VRDA.js?v=148d277c:14926:21)
+    at beginWork (chunk-W6L2VRDA.js?v=148d277c:15914:22)
+    at HTMLUnknownElement.callCallback2 (chunk-W6L2VRDA.js?v=148d277c:3674:22)
+    at Object.invokeGuardedCallbackDev (chunk-W6L2VRDA.js?v=148d277c:3699:24)
+    at invokeGuardedCallback (chunk-W6L2VRDA.js?v=148d277c:3733:39)
+    at beginWork$1 (chunk-W6L2VRDA.js?v=148d277c:19765:15)
+    at performUnitOfWork (chunk-W6L2VRDA.js?v=148d277c:19198:20)
+    at workLoopSync (chunk-W6L2VRDA.js?v=148d277c:19137:13)Understand this errorAI
+chunk-W6L2VRDA.js?v=148d277c:14032 The above error occurred in the <Dashboard> component:
+
+    at Dashboard (https://310a5cb3-b77b-4968-b7ce-b8e553007d17-00-3juld53eagngg.sisko.replit.dev/src/pages/Dashboard.tsx?t=1743502945874:22:22)
+    at main
+    at div
+    at AppLayout (https://310a5cb3-b77b-4968-b7ce-b8e553007d17-00-3juld53eagngg.sisko.replit.dev/src/components/layouts/AppLayout.tsx:35:22)
+    at ProtectedRoute (https://310a5cb3-b77b-4968-b7ce-b8e553007d17-00-3juld53eagngg.sisko.replit.dev/src/components/auth/ProtectedRoute.tsx:15:27)
+    at RenderedRoute (https://310a5cb3-b77b-4968-b7ce-b8e553007d17-00-3juld53eagngg.sisko.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=b4c682a2:4069:5)
+    at Routes (https://310a5cb3-b77b-4968-b7ce-b8e553007d17-00-3juld53eagngg.sisko.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=b4c682a2:4508:5)
+    at AppRoutes (https://310a5cb3-b77b-4968-b7ce-b8e553007d17-00-3juld53eagngg.sisko.replit.dev/src/App.tsx?t=1743502945874:35:33)
+    at AuthProvider (https://310a5cb3-b77b-4968-b7ce-b8e553007d17-00-3juld53eagngg.sisko.replit.dev/src/providers/AuthProvider.tsx:23:32)
+    at Router (https://310a5cb3-b77b-4968-b7ce-b8e553007d17-00-3juld53eagngg.sisko.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=b4c682a2:4451:15)
+    at BrowserRouter (https://310a5cb3-b77b-4968-b7ce-b8e553007d17-00-3juld53eagngg.sisko.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=b4c682a2:5196:5)
+    at ThemeProvider (https://310a5cb3-b77b-4968-b7ce-b8e553007d17-00-3juld53eagngg.sisko.replit.dev/src/components/theme-provider.tsx:17:33)
+    at QueryClientProvider (https://310a5cb3-b77b-4968-b7ce-b8e553007d17-00-3juld53eagngg.sisko.replit.dev/node_modules/.vite/deps/@tanstack_react-query.js?v=c6ae8b17:2794:3)
+    at App
+
+Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://reactjs.org/link/error-boundaries to learn more about error boundaries.
+logCapturedError @ chunk-W6L2VRDA.js?v=148d277c:14032Understand this errorAI
+chunk-W6L2VRDA.js?v=148d277c:19413 Uncaught ReferenceError: profileData is not defined
+    at Dashboard (Dashboard.tsx:139:52)
+    at renderWithHooks (chunk-W6L2VRDA.js?v=148d277c:11548:26)
+    at mountIndeterminateComponent (chunk-W6L2VRDA.js?v=148d277c:14926:21)
+    at beginWork (chunk-W6L2VRDA.js?v=148d277c:15914:22)
+    at beginWork$1 (chunk-W6L2VRDA.js?v=148d277c:19753:22)
+    at performUnitOfWork (chunk-W6L2VRDA.js?v=148d277c:19198:20)
+    at workLoopSync (chunk-W6L2VRDA.js?v=148d277c:19137:13)
+    at renderRootSync (chunk-W6L2VRDA.js?v=148d277c:19116:15)
+    at recoverFromConcurrentError (chunk-W6L2VRDA.js?v=148d277c:18736:28)
+    at performConcurrentWorkOnRoot (chunk-W6L2VRDA.js?v=148d277c:18684:30)Understand this errorAI
