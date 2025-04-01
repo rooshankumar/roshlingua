@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Send, Loader2 } from 'lucide-react';
+import { ChatAttachment } from './ChatAttachment';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Message } from '@/types/chat';
@@ -200,7 +201,11 @@ export const ChatScreen = ({ conversation }: Props) => {
 
       {user?.id ? (
         <div className="border-t p-4">
-          <div className="flex gap-2">
+          <div className="flex items-end gap-2">
+            <ChatAttachment onAttach={(url, filename) => {
+              // Handle attachment here
+              console.log('File attached:', url, filename);
+            }} />
             <Textarea
               value={newMessage}
               onChange={(e) => setNewMessage(e.target.value)}

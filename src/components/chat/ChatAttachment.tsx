@@ -1,6 +1,5 @@
-
 import { useState } from 'react';
-import { Upload, X } from 'lucide-react';
+import { Paperclip } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { Button } from '../ui/button';
 
@@ -52,52 +51,14 @@ export const ChatAttachment = ({ onAttach }: ChatAttachmentProps) => {
         className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
         disabled={uploading}
       />
-      <div className="flex gap-2">
-        <Button 
-          variant="outline" 
-          size="icon"
-          className="h-[60px] relative"
-          disabled={uploading}
-        >
-          <input
-            type="file"
-            accept="image/*"
-            onChange={uploadFile}
-            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-            disabled={uploading}
-          />
-          <Image className="h-5 w-5" />
-        </Button>
-        <Button 
-          variant="outline" 
-          size="icon"
-          className="h-[60px] relative"
-          disabled={uploading}
-        >
-          <input
-            type="file"
-            accept=".pdf,.doc,.docx,.txt"
-            onChange={uploadFile}
-            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-            disabled={uploading}
-          />
-          <FileText className="h-5 w-5" />
-        </Button>
-        <Button 
-          variant="outline" 
-          size="icon"
-          className="h-[60px] relative"
-          disabled={uploading}
-        >
-          <input
-            type="file"
-            onChange={uploadFile}
-            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-            disabled={uploading}
-          />
-          <File className="h-5 w-5" />
-        </Button>
-      </div>
+      <Button 
+        variant="ghost" 
+        size="icon"
+        className="h-10 w-10"
+        disabled={uploading}
+      >
+        <Paperclip className="h-5 w-5" />
+      </Button>
     </div>
   );
 };
