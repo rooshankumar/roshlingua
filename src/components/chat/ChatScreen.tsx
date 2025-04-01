@@ -124,10 +124,12 @@ export const ChatScreen = ({ conversation }: Props) => {
       const { error } = await supabase
         .from('messages')
         .insert([{
-          content: tempMessage.content,
+          content: content,
           conversation_id: conversation.id,
           sender_id: currentUser.id,
           is_read: false,
+          attachment_url: attachment?.url,
+          attachment_name: attachment?.filename,
           created_at: new Date().toISOString()
         }]);
 
@@ -203,8 +205,7 @@ export const ChatScreen = ({ conversation }: Props) => {
         <div className="border-t p-4">
           <div className="flex items-end gap-2">
             <ChatAttachment onAttach={(url, filename) => {
-              // Handle attachment here
-              console.log('File attached:', url, filename);
+              handleSend(newMessage, { url, filename });
             }} />
             <Textarea
               value={newMessage}
