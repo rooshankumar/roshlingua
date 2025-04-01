@@ -195,7 +195,7 @@ export const ChatScreen = ({ conversation }: Props) => {
                         <img 
                           src={message.attachment_url} 
                           alt={message.attachment_name || 'Attachment'} 
-                          className="max-w-full rounded-md"
+                          className="max-w-[200px] max-h-[200px] object-contain rounded-md"
                         />
                       ) : (
                         <div className="flex items-center gap-2 p-2 bg-background/10 rounded-md">
