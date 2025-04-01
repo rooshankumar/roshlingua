@@ -90,7 +90,7 @@ const ChatList = () => {
 
         const conversationPreviews = await Promise.all(
           participantsData.map(async (participant) => {
-            const { data: otherParticipant, error: otherParticipantError } = await supabase
+            const { data: participants, error: participantError } = await supabase
               .from('conversation_participants')
               .select(`
                 users:user_id (
@@ -103,13 +103,14 @@ const ChatList = () => {
                 )
               `)
               .eq('conversation_id', participant.conversation_id)
-              .neq('user_id', user.id)
-              .single();
+              .neq('user_id', user.id);
 
-            if (otherParticipantError) {
-              console.error('Error fetching other participant:', otherParticipantError);
+            if (participantError) {
+              console.error('Error fetching other participant:', participantError);
               return null;
             }
+
+            const otherParticipant = participants?.[0];
 
             const { data: messages } = await supabase
               .from('messages')
