@@ -1,6 +1,6 @@
 
 import { useState, useRef, KeyboardEvent } from "react";
-import { Send, Languages, Check, X, Paperclip } from "lucide-react";
+import { Send, Languages, Check, X, Paperclip, Image, FileText, File } from "lucide-react";
 import { ChatAttachment } from "./ChatAttachment";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";

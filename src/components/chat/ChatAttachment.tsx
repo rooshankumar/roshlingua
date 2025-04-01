@@ -52,14 +52,52 @@ export const ChatAttachment = ({ onAttach }: ChatAttachmentProps) => {
         className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
         disabled={uploading}
       />
-      <Button 
-        variant="outline" 
-        size="icon"
-        className="h-[60px]"
-        disabled={uploading}
-      >
-        <Upload className="h-5 w-5" />
-      </Button>
+      <div className="flex gap-2">
+        <Button 
+          variant="outline" 
+          size="icon"
+          className="h-[60px] relative"
+          disabled={uploading}
+        >
+          <input
+            type="file"
+            accept="image/*"
+            onChange={uploadFile}
+            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+            disabled={uploading}
+          />
+          <Image className="h-5 w-5" />
+        </Button>
+        <Button 
+          variant="outline" 
+          size="icon"
+          className="h-[60px] relative"
+          disabled={uploading}
+        >
+          <input
+            type="file"
+            accept=".pdf,.doc,.docx,.txt"
+            onChange={uploadFile}
+            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+            disabled={uploading}
+          />
+          <FileText className="h-5 w-5" />
+        </Button>
+        <Button 
+          variant="outline" 
+          size="icon"
+          className="h-[60px] relative"
+          disabled={uploading}
+        >
+          <input
+            type="file"
+            onChange={uploadFile}
+            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+            disabled={uploading}
+          />
+          <File className="h-5 w-5" />
+        </Button>
+      </div>
     </div>
   );
 };
