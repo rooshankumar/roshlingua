@@ -1,14 +1,18 @@
+
 -- Enable UUID extension
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
--- Drop existing functions to avoid conflicts
+-- Drop existing triggers first
+DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
+
+-- Now drop existing functions
+DROP FUNCTION IF EXISTS public.handle_new_user();
 DROP FUNCTION IF EXISTS public.create_new_user(uuid, text);
 DROP FUNCTION IF EXISTS public.create_user_with_onboarding(uuid, text, text, text, text, text);
 DROP FUNCTION IF EXISTS public.update_user_profile(uuid, text, text, text, text, text, text, date, text, text, integer);
-DROP FUNCTION IF EXISTS public.handle_new_user();
-DROP FUNCTION IF EXISTS public.update_streak();
 DROP FUNCTION IF EXISTS public.notify_message_read();
 DROP FUNCTION IF EXISTS public.notify_new_message();
+DROP FUNCTION IF EXISTS public.update_streak();
 
 -- Basic user creation with onboarding
 CREATE OR REPLACE FUNCTION public.create_user_with_onboarding(
