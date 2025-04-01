@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Send, Loader2 } from 'lucide-react';
+import { Send, Loader2, FileText } from 'lucide-react';
 import { ChatAttachment } from './ChatAttachment';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
@@ -189,6 +189,29 @@ export const ChatScreen = ({ conversation }: Props) => {
                     }`}
                 >
                   {message.content}
+                  {message.attachment_url && (
+                    <div className="mt-2">
+                      {message.attachment_url.match(/\.(jpg|jpeg|png|gif)$/i) ? (
+                        <img 
+                          src={message.attachment_url} 
+                          alt={message.attachment_name || 'Attachment'} 
+                          className="max-w-full rounded-md"
+                        />
+                      ) : (
+                        <div className="flex items-center gap-2 p-2 bg-background/10 rounded-md">
+                          <FileText className="h-4 w-4" />
+                          <a 
+                            href={message.attachment_url} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="text-sm hover:underline"
+                          >
+                            {message.attachment_name || 'Download attachment'}
+                          </a>
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
               </div>
             ))}
