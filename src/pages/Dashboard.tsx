@@ -40,16 +40,17 @@ const Dashboard = () => {
       // Get user profile data
       const { data: profileData } = await supabase
         .from('profiles')
-        .select('streak_count, proficiency_level, xp_points')
+        .select('streak_count, proficiency_level, xp_points, progress_percentage') // Added progress_percentage
         .eq('id', user.id)
         .single();
 
       if (profileData) {
         setStreak(profileData.streak_count || 0);
-        // Calculate progress based on proficiency level
-        const levels = ['beginner', 'intermediate', 'advanced'];
-        const currentLevel = levels.indexOf(profileData.proficiency_level);
-        setProgress((currentLevel + 1) * 33);
+        setProgress(profileData.progress_percentage || 0); // Use fetched progress_percentage
+        // Calculate progress based on proficiency level - This part is now redundant
+        // const levels = ['beginner', 'intermediate', 'advanced'];
+        // const currentLevel = levels.indexOf(profileData.proficiency_level);
+        // setProgress((currentLevel + 1) * 33);
       }
 
       // Get active conversations count
@@ -135,12 +136,12 @@ const Dashboard = () => {
           </CardHeader>
           <CardContent>
             <div className="flex items-center justify-between mb-1">
-              <div className="text-2xl font-bold">{progress}%</div>
+              <div className="text-2xl font-bold">{profileData?.progress_percentage || 0}%</div>
               <div className="text-xs text-muted-foreground">
-                {progress <= 33 ? 'Beginner' : progress <= 66 ? 'Intermediate' : 'Advanced'}
+                {profileData?.proficiency_level || 'Beginner'}
               </div>
             </div>
-            <Progress value={progress} className="h-2" />
+            <Progress value={profileData?.progress_percentage || 0} className="h-2" />
           </CardContent>
         </Card>
 
