@@ -5,6 +5,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useAuth } from '@/providers/AuthProvider';
 import { supabase } from '@/lib/supabase';
 import { useEffect, useState } from 'react';
+import { UserStatus } from '@/components/UserStatus';
 
 interface Props {
   conversation: {
