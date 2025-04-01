@@ -605,15 +605,15 @@ const Settings = () => {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-8">
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
+              <div className="space-y-6">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                   <div className="space-y-1">
                     <h4 className="text-base font-medium">Password</h4>
                     <p className="text-sm text-muted-foreground">
                       Change your account password
                     </p>
                   </div>
-                  <Button variant="outline" onClick={handleChangePassword}>
+                  <Button variant="outline" onClick={handleChangePassword} className="w-full sm:w-auto">
                     <Lock className="h-4 w-4 mr-2" />
                     Change Password
                   </Button>
@@ -621,12 +621,12 @@ const Settings = () => {
 
                 <Separator />
 
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                   <div className="space-y-1">
                     <h4 className="text-base font-medium">Email Address</h4>
-                    <p className="text-sm text-muted-foreground">{profile?.email}</p>
+                    <p className="text-sm text-muted-foreground break-all">{profile?.email}</p>
                   </div>
-                  <Button variant="outline">
+                  <Button variant="outline" className="w-full sm:w-auto">
                     <Mail className="h-4 w-4 mr-2" />
                     Update Email
                   </Button>
