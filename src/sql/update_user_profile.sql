@@ -1,5 +1,13 @@
 
--- Update profile RPC function
+-- Drop existing functions first to avoid conflicts
+DROP FUNCTION IF EXISTS public.update_user_profile(
+  UUID, TEXT, TEXT, TEXT, TEXT, TEXT, TEXT, TEXT, TEXT, TEXT, INTEGER, BOOLEAN
+);
+DROP FUNCTION IF EXISTS public.update_user_profile(
+  UUID, TEXT, TEXT, TEXT, TEXT, TEXT, TEXT, DATE, TEXT, TEXT, INTEGER
+);
+
+-- Create the single update_user_profile function
 CREATE OR REPLACE FUNCTION public.update_user_profile(
   user_id UUID,
   full_name TEXT DEFAULT NULL,
@@ -43,10 +51,5 @@ BEGIN
     streak_count = COALESCE(update_user_profile.streak_count, profiles.streak_count),
     updated_at = NOW()
   WHERE id = update_user_profile.user_id;
-
-  -- Check if update was successful
-  IF NOT FOUND THEN
-    RAISE EXCEPTION 'User with ID % not found', user_id;
-  END IF;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
