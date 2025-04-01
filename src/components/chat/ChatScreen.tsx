@@ -221,8 +221,8 @@ export const ChatScreen = ({ conversation }: Props) => {
       )}
 
       {user?.id ? (
-        <div className="sticky bottom-0 left-0 right-0 bg-background/95 backdrop-blur-sm border-t">
-          <CardContent className="p-4">
+        <div className="fixed bottom-0 left-0 right-0 md:static bg-background/95 backdrop-blur-sm border-t">
+          <CardContent className="p-4 md:pb-4">
             <div className="flex items-end gap-2">
               <ChatAttachment onAttach={(url, filename) => handleSend(newMessage, { url, filename })} />
               <Textarea

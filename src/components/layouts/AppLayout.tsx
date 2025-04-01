@@ -32,7 +32,7 @@ const routes = [
 
 const AppLayout = ({ children }: AppLayoutProps) => {
   const location = useLocation();
-  const isChatRoute = location.pathname.startsWith('/chat');
+  const isChatDetailRoute = location.pathname.match(/^\/chat\/[0-9a-f-]+$/);
 
   return (
     <div className="min-h-screen flex flex-col md:flex-row">
@@ -42,7 +42,7 @@ const AppLayout = ({ children }: AppLayoutProps) => {
       <main className="flex-1 pb-24 md:p-4 md:pb-4">{children}</main>
 
       {/* Mobile Bottom Navigation */}
-      {!isChatRoute && (
+      {!isChatDetailRoute && (
         <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-background border-t flex justify-around p-2 z-50">
           {routes.map((route) => (
             <NavLink
