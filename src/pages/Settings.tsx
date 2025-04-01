@@ -26,7 +26,7 @@ const Settings = () => {
   const { profile, updateProfile } = useRealtimeProfile(user?.id);
   const navigate = useNavigate();
   const [localBio, setLocalBio] = useState(profile?.bio || "");
-  const [localProfile, setLocalProfile, setProfile] = useState<any>(profile || {}); // Use any to avoid strict type issues initially
+  const [localProfile, setLocalProfile] = useState<any>(profile || {}); // Use any to avoid strict type issues initially
   const [isLoading, setIsLoading] = useState(false);
 
   const languages = [
@@ -194,7 +194,7 @@ const Settings = () => {
         .getPublicUrl(filePath);
 
       await updateProfile({ ...profile, avatar_url: publicUrl });
-      setProfile({...profile, avatar_url: publicUrl});
+      setLocalProfile({...localProfile, avatar_url: publicUrl});
 
       toast({
         title: "Avatar updated",
