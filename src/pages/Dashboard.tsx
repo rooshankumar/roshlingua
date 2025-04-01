@@ -30,7 +30,8 @@ const Dashboard = () => {
   const [activeUsers, setActiveUsers] = useState([]);
   const [stats, setStats] = useState({
     conversations: 0,
-    xp: 0
+    xp: 0,
+    proficiency_level: 'beginner'
   });
 
   useEffect(() => {
@@ -61,7 +62,8 @@ const Dashboard = () => {
 
       setStats({
         conversations: conversationsCount || 0,
-        xp: profileData?.xp_points || 0
+        xp: profileData?.xp_points || 0,
+        proficiency_level: profileData?.proficiency_level || 'beginner'
       });
 
       // Get active users
@@ -136,12 +138,12 @@ const Dashboard = () => {
           </CardHeader>
           <CardContent>
             <div className="flex items-center justify-between mb-1">
-              <div className="text-2xl font-bold">{profileData?.progress_percentage || 0}%</div>
+              <div className="text-2xl font-bold">{progress}%</div>
               <div className="text-xs text-muted-foreground">
-                {profileData?.proficiency_level || 'Beginner'}
+                {stats.proficiency_level || 'Beginner'}
               </div>
             </div>
-            <Progress value={profileData?.progress_percentage || 0} className="h-2" />
+            <Progress value={progress} className="h-2" />
           </CardContent>
         </Card>
 
