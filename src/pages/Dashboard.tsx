@@ -54,10 +54,9 @@ const Dashboard = () => {
 
       // Get active conversations count
       const { count: conversationsCount } = await supabase
-        .from('conversations')
-        .select('id', { count: 'exact' })
-        .eq('participant1_id', user.id)
-        .or(`participant2_id.eq.${user.id}`);
+        .from('conversation_participants')
+        .select('*', { count: 'exact' })
+        .eq('user_id', user.id);
 
       setStats({
         conversations: conversationsCount || 0,
