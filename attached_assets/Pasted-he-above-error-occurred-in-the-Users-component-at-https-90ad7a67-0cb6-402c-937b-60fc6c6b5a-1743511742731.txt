@@ -1,0 +1,138 @@
+he above error occurred in the <Users> component:
+
+    at https://90ad7a67-0cb6-402c-937b-60fc6c6b5afd-00-35vzrhurn40pa.pike.replit.dev/node_modules/.vite/deps/lucide-react.js?v=c4283447:1615:8
+    at a
+    at LinkWithRef (https://90ad7a67-0cb6-402c-937b-60fc6c6b5afd-00-35vzrhurn40pa.pike.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=30f391d4:5298:5)
+    at NavLinkWithRef (https://90ad7a67-0cb6-402c-937b-60fc6c6b5afd-00-35vzrhurn40pa.pike.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=30f391d4:5362:21)
+    at nav
+    at div
+    at AppLayout (https://90ad7a67-0cb6-402c-937b-60fc6c6b5afd-00-35vzrhurn40pa.pike.replit.dev/src/components/layouts/AppLayout.tsx?t=1743511722535:36:22)
+    at ProtectedRoute (https://90ad7a67-0cb6-402c-937b-60fc6c6b5afd-00-35vzrhurn40pa.pike.replit.dev/src/components/auth/ProtectedRoute.tsx:15:27)
+    at RenderedRoute (https://90ad7a67-0cb6-402c-937b-60fc6c6b5afd-00-35vzrhurn40pa.pike.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=30f391d4:4069:5)
+    at Routes (https://90ad7a67-0cb6-402c-937b-60fc6c6b5afd-00-35vzrhurn40pa.pike.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=30f391d4:4508:5)
+    at AppRoutes (https://90ad7a67-0cb6-402c-937b-60fc6c6b5afd-00-35vzrhurn40pa.pike.replit.dev/src/App.tsx?t=1743511722535:35:33)
+    at AuthProvider (https://90ad7a67-0cb6-402c-937b-60fc6c6b5afd-00-35vzrhurn40pa.pike.replit.dev/src/providers/AuthProvider.tsx:23:32)
+    at Router (https://90ad7a67-0cb6-402c-937b-60fc6c6b5afd-00-35vzrhurn40pa.pike.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=30f391d4:4451:15)
+    at BrowserRouter (https://90ad7a67-0cb6-402c-937b-60fc6c6b5afd-00-35vzrhurn40pa.pike.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=30f391d4:5196:5)
+    at ThemeProvider (https://90ad7a67-0cb6-402c-937b-60fc6c6b5afd-00-35vzrhurn40pa.pike.replit.dev/src/components/theme-provider.tsx:17:33)
+    at QueryClientProvider (https://90ad7a67-0cb6-402c-937b-60fc6c6b5afd-00-35vzrhurn40pa.pike.replit.dev/node_modules/.vite/deps/@tanstack_react-query.js?v=a0f0582d:2794:3)
+    at App
+
+Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://reactjs.org/link/error-boundaries to learn more about error boundaries.
+logCapturedError @ chunk-W6L2VRDA.js?v=ff56f048:14032
+update.callback @ chunk-W6L2VRDA.js?v=ff56f048:14052
+callCallback @ chunk-W6L2VRDA.js?v=ff56f048:11248
+commitUpdateQueue @ chunk-W6L2VRDA.js?v=ff56f048:11265
+commitLayoutEffectOnFiber @ chunk-W6L2VRDA.js?v=ff56f048:17093
+commitLayoutMountEffects_complete @ chunk-W6L2VRDA.js?v=ff56f048:17980
+commitLayoutEffects_begin @ chunk-W6L2VRDA.js?v=ff56f048:17969
+commitLayoutEffects @ chunk-W6L2VRDA.js?v=ff56f048:17920
+commitRootImpl @ chunk-W6L2VRDA.js?v=ff56f048:19353
+commitRoot @ chunk-W6L2VRDA.js?v=ff56f048:19277
+finishConcurrentRender @ chunk-W6L2VRDA.js?v=ff56f048:18760
+performConcurrentWorkOnRoot @ chunk-W6L2VRDA.js?v=ff56f048:18718
+workLoop @ chunk-W6L2VRDA.js?v=ff56f048:197
+flushWork @ chunk-W6L2VRDA.js?v=ff56f048:176
+performWorkUntilDeadline @ chunk-W6L2VRDA.js?v=ff56f048:384Understand this errorAI
+chunk-W6L2VRDA.js?v=ff56f048:14032 The above error occurred in the <MessageSquare> component:
+
+    at https://90ad7a67-0cb6-402c-937b-60fc6c6b5afd-00-35vzrhurn40pa.pike.replit.dev/node_modules/.vite/deps/lucide-react.js?v=c4283447:1615:8
+    at a
+    at LinkWithRef (https://90ad7a67-0cb6-402c-937b-60fc6c6b5afd-00-35vzrhurn40pa.pike.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=30f391d4:5298:5)
+    at NavLinkWithRef (https://90ad7a67-0cb6-402c-937b-60fc6c6b5afd-00-35vzrhurn40pa.pike.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=30f391d4:5362:21)
+    at nav
+    at div
+    at AppLayout (https://90ad7a67-0cb6-402c-937b-60fc6c6b5afd-00-35vzrhurn40pa.pike.replit.dev/src/components/layouts/AppLayout.tsx?t=1743511722535:36:22)
+    at ProtectedRoute (https://90ad7a67-0cb6-402c-937b-60fc6c6b5afd-00-35vzrhurn40pa.pike.replit.dev/src/components/auth/ProtectedRoute.tsx:15:27)
+    at RenderedRoute (https://90ad7a67-0cb6-402c-937b-60fc6c6b5afd-00-35vzrhurn40pa.pike.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=30f391d4:4069:5)
+    at Routes (https://90ad7a67-0cb6-402c-937b-60fc6c6b5afd-00-35vzrhurn40pa.pike.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=30f391d4:4508:5)
+    at AppRoutes (https://90ad7a67-0cb6-402c-937b-60fc6c6b5afd-00-35vzrhurn40pa.pike.replit.dev/src/App.tsx?t=1743511722535:35:33)
+    at AuthProvider (https://90ad7a67-0cb6-402c-937b-60fc6c6b5afd-00-35vzrhurn40pa.pike.replit.dev/src/providers/AuthProvider.tsx:23:32)
+    at Router (https://90ad7a67-0cb6-402c-937b-60fc6c6b5afd-00-35vzrhurn40pa.pike.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=30f391d4:4451:15)
+    at BrowserRouter (https://90ad7a67-0cb6-402c-937b-60fc6c6b5afd-00-35vzrhurn40pa.pike.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=30f391d4:5196:5)
+    at ThemeProvider (https://90ad7a67-0cb6-402c-937b-60fc6c6b5afd-00-35vzrhurn40pa.pike.replit.dev/src/components/theme-provider.tsx:17:33)
+    at QueryClientProvider (https://90ad7a67-0cb6-402c-937b-60fc6c6b5afd-00-35vzrhurn40pa.pike.replit.dev/node_modules/.vite/deps/@tanstack_react-query.js?v=a0f0582d:2794:3)
+    at App
+
+Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://reactjs.org/link/error-boundaries to learn more about error boundaries.
+logCapturedError @ chunk-W6L2VRDA.js?v=ff56f048:14032
+update.callback @ chunk-W6L2VRDA.js?v=ff56f048:14052
+callCallback @ chunk-W6L2VRDA.js?v=ff56f048:11248
+commitUpdateQueue @ chunk-W6L2VRDA.js?v=ff56f048:11265
+commitLayoutEffectOnFiber @ chunk-W6L2VRDA.js?v=ff56f048:17093
+commitLayoutMountEffects_complete @ chunk-W6L2VRDA.js?v=ff56f048:17980
+commitLayoutEffects_begin @ chunk-W6L2VRDA.js?v=ff56f048:17969
+commitLayoutEffects @ chunk-W6L2VRDA.js?v=ff56f048:17920
+commitRootImpl @ chunk-W6L2VRDA.js?v=ff56f048:19353
+commitRoot @ chunk-W6L2VRDA.js?v=ff56f048:19277
+finishConcurrentRender @ chunk-W6L2VRDA.js?v=ff56f048:18760
+performConcurrentWorkOnRoot @ chunk-W6L2VRDA.js?v=ff56f048:18718
+workLoop @ chunk-W6L2VRDA.js?v=ff56f048:197
+flushWork @ chunk-W6L2VRDA.js?v=ff56f048:176
+performWorkUntilDeadline @ chunk-W6L2VRDA.js?v=ff56f048:384Understand this errorAI
+chunk-W6L2VRDA.js?v=ff56f048:14032 The above error occurred in the <Settings> component:
+
+    at https://90ad7a67-0cb6-402c-937b-60fc6c6b5afd-00-35vzrhurn40pa.pike.replit.dev/node_modules/.vite/deps/lucide-react.js?v=c4283447:1615:8
+    at a
+    at LinkWithRef (https://90ad7a67-0cb6-402c-937b-60fc6c6b5afd-00-35vzrhurn40pa.pike.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=30f391d4:5298:5)
+    at NavLinkWithRef (https://90ad7a67-0cb6-402c-937b-60fc6c6b5afd-00-35vzrhurn40pa.pike.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=30f391d4:5362:21)
+    at nav
+    at div
+    at AppLayout (https://90ad7a67-0cb6-402c-937b-60fc6c6b5afd-00-35vzrhurn40pa.pike.replit.dev/src/components/layouts/AppLayout.tsx?t=1743511722535:36:22)
+    at ProtectedRoute (https://90ad7a67-0cb6-402c-937b-60fc6c6b5afd-00-35vzrhurn40pa.pike.replit.dev/src/components/auth/ProtectedRoute.tsx:15:27)
+    at RenderedRoute (https://90ad7a67-0cb6-402c-937b-60fc6c6b5afd-00-35vzrhurn40pa.pike.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=30f391d4:4069:5)
+    at Routes (https://90ad7a67-0cb6-402c-937b-60fc6c6b5afd-00-35vzrhurn40pa.pike.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=30f391d4:4508:5)
+    at AppRoutes (https://90ad7a67-0cb6-402c-937b-60fc6c6b5afd-00-35vzrhurn40pa.pike.replit.dev/src/App.tsx?t=1743511722535:35:33)
+    at AuthProvider (https://90ad7a67-0cb6-402c-937b-60fc6c6b5afd-00-35vzrhurn40pa.pike.replit.dev/src/providers/AuthProvider.tsx:23:32)
+    at Router (https://90ad7a67-0cb6-402c-937b-60fc6c6b5afd-00-35vzrhurn40pa.pike.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=30f391d4:4451:15)
+    at BrowserRouter (https://90ad7a67-0cb6-402c-937b-60fc6c6b5afd-00-35vzrhurn40pa.pike.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=30f391d4:5196:5)
+    at ThemeProvider (https://90ad7a67-0cb6-402c-937b-60fc6c6b5afd-00-35vzrhurn40pa.pike.replit.dev/src/components/theme-provider.tsx:17:33)
+    at QueryClientProvider (https://90ad7a67-0cb6-402c-937b-60fc6c6b5afd-00-35vzrhurn40pa.pike.replit.dev/node_modules/.vite/deps/@tanstack_react-query.js?v=a0f0582d:2794:3)
+    at App
+
+Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://reactjs.org/link/error-boundaries to learn more about error boundaries.
+logCapturedError @ chunk-W6L2VRDA.js?v=ff56f048:14032
+update.callback @ chunk-W6L2VRDA.js?v=ff56f048:14052
+callCallback @ chunk-W6L2VRDA.js?v=ff56f048:11248
+commitUpdateQueue @ chunk-W6L2VRDA.js?v=ff56f048:11265
+commitLayoutEffectOnFiber @ chunk-W6L2VRDA.js?v=ff56f048:17093
+commitLayoutMountEffects_complete @ chunk-W6L2VRDA.js?v=ff56f048:17980
+commitLayoutEffects_begin @ chunk-W6L2VRDA.js?v=ff56f048:17969
+commitLayoutEffects @ chunk-W6L2VRDA.js?v=ff56f048:17920
+commitRootImpl @ chunk-W6L2VRDA.js?v=ff56f048:19353
+commitRoot @ chunk-W6L2VRDA.js?v=ff56f048:19277
+finishConcurrentRender @ chunk-W6L2VRDA.js?v=ff56f048:18760
+performConcurrentWorkOnRoot @ chunk-W6L2VRDA.js?v=ff56f048:18718
+workLoop @ chunk-W6L2VRDA.js?v=ff56f048:197
+flushWork @ chunk-W6L2VRDA.js?v=ff56f048:176
+performWorkUntilDeadline @ chunk-W6L2VRDA.js?v=ff56f048:384Understand this errorAI
+chunk-W6L2VRDA.js?v=ff56f048:19413 Uncaught TypeError: className.trim is not a function
+    at lucide-react.js?v=c4283447:1561:42
+    at Array.filter (<anonymous>)
+    at mergeClasses (lucide-react.js?v=c4283447:1560:44)
+    at lucide-react.js?v=c4283447:1618:18
+    at renderWithHooks (chunk-W6L2VRDA.js?v=ff56f048:11548:26)
+    at updateForwardRef (chunk-W6L2VRDA.js?v=ff56f048:14325:28)
+    at beginWork (chunk-W6L2VRDA.js?v=ff56f048:15946:22)
+    at beginWork$1 (chunk-W6L2VRDA.js?v=ff56f048:19753:22)
+    at performUnitOfWork (chunk-W6L2VRDA.js?v=ff56f048:19198:20)
+    at workLoopSync (chunk-W6L2VRDA.js?v=ff56f048:19137:13)
+(anonymous) @ lucide-react.js?v=c4283447:1561
+mergeClasses @ lucide-react.js?v=c4283447:1560
+(anonymous) @ lucide-react.js?v=c4283447:1618
+renderWithHooks @ chunk-W6L2VRDA.js?v=ff56f048:11548
+updateForwardRef @ chunk-W6L2VRDA.js?v=ff56f048:14325
+beginWork @ chunk-W6L2VRDA.js?v=ff56f048:15946
+beginWork$1 @ chunk-W6L2VRDA.js?v=ff56f048:19753
+performUnitOfWork @ chunk-W6L2VRDA.js?v=ff56f048:19198
+workLoopSync @ chunk-W6L2VRDA.js?v=ff56f048:19137
+renderRootSync @ chunk-W6L2VRDA.js?v=ff56f048:19116
+recoverFromConcurrentError @ chunk-W6L2VRDA.js?v=ff56f048:18736
+performConcurrentWorkOnRoot @ chunk-W6L2VRDA.js?v=ff56f048:18684
+workLoop @ chunk-W6L2VRDA.js?v=ff56f048:197
+flushWork @ chunk-W6L2VRDA.js?v=ff56f048:176
+performWorkUntilDeadline @ chunk-W6L2VRDA.js?v=ff56f048:384Understand this errorAI
+chunk-W6L2VRDA.js?v=ff56f048:377 [Violation] 'message' handler took 158ms
