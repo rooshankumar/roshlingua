@@ -43,18 +43,16 @@ BEGIN
   WHERE id = update_user_profile.user_id;
 
   -- Update the profiles table
-  UPDATE public.profiles
+  UPDATE public.users
   SET 
-    full_name = COALESCE(update_user_profile.full_name, profiles.full_name),
-    bio = COALESCE(update_user_profile.bio, profiles.bio),
-    date_of_birth = COALESCE(update_user_profile.date_of_birth, profiles.date_of_birth),
-    gender = COALESCE(update_user_profile.gender, profiles.gender),
-    learning_language = COALESCE(update_user_profile.learning_language, profiles.learning_language),
-    native_language = COALESCE(update_user_profile.native_language, profiles.native_language),
-    proficiency_level = COALESCE(update_user_profile.proficiency_level, profiles.proficiency_level),
-    avatar_url = COALESCE(update_user_profile.avatar_url, profiles.avatar_url),
-    streak_count = COALESCE(update_user_profile.streak_count, profiles.streak_count),
-    progress_percentage = progress,
+    full_name = COALESCE(update_user_profile.full_name, users.full_name),
+    date_of_birth = COALESCE(update_user_profile.date_of_birth, users.date_of_birth),
+    gender = COALESCE(update_user_profile.gender, users.gender),
+    learning_language = COALESCE(update_user_profile.learning_language, users.learning_language),
+    native_language = COALESCE(update_user_profile.native_language, users.native_language),
+    proficiency_level = COALESCE(update_user_profile.proficiency_level, users.proficiency_level),
+    avatar_url = COALESCE(update_user_profile.avatar_url, users.avatar_url),
+    streak_count = COALESCE(update_user_profile.streak_count, users.streak_count),
     updated_at = NOW()
   WHERE id = update_user_profile.user_id;
 END;
