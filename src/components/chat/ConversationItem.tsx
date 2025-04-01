@@ -43,9 +43,10 @@ export const ConversationItem = ({
           <AvatarImage src={otherParticipant.avatar} alt={otherParticipant.name} />
           <AvatarFallback>{getInitials(otherParticipant.name)}</AvatarFallback>
         </Avatar>
-        {otherParticipant.isOnline && (
-          <span className="absolute bottom-0 right-0 block h-2.5 w-2.5 rounded-full bg-green-500 ring-2 ring-white" />
-        )}
+        <span className={cn(
+          "absolute bottom-0 right-0 block h-2.5 w-2.5 rounded-full ring-2 ring-white",
+          otherParticipant.isOnline ? "bg-green-500" : "bg-gray-400"
+        )} />
       </div>
       <div className="flex-1 min-w-0">
         <div className="flex justify-between items-center">
