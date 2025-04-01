@@ -24,11 +24,11 @@ export const ChatHeader = ({ conversation }: Props) => {
   const participant = conversation?.participant;
 
   if (!participant) {
-    return <div className="flex items-center p-4 border-b">Loading...</div>;
+    return <div className="flex items-center p-4">Loading...</div>;
   }
 
   return (
-    <div className="flex items-center p-4 border-b">
+    <div className="flex items-center p-4">
       <Button 
         variant="ghost" 
         size="icon"
