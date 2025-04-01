@@ -174,64 +174,64 @@ export const ChatScreen = ({ conversation }: Props) => {
             {messages.map((message) => (
               <div
                 key={message.id}
-                className={`flex items-end gap-2 ${message.sender_id === user?.id ? 'flex-row-reverse' : 'flex-row'}`}
+                className={`flex items-start gap-2 mb-4 ${message.sender_id === user?.id ? 'flex-row-reverse' : 'flex-row'}`}
               >
-                <Avatar className="h-8 w-8">
-                  <AvatarImage src={message.sender?.avatar_url || '/placeholder.svg'} />
-                  <AvatarFallback>
-                    {message.sender?.full_name?.substring(0, 2).toUpperCase() || '?'}
-                  </AvatarFallback>
-                </Avatar>
-                <div className="flex items-end gap-1">
-                  <div
-                    className={`max-w-[70%] rounded-lg p-3 break-words ${message.sender_id === user?.id
-                      ? 'bg-primary text-primary-foreground'
-                      : 'bg-muted'
+                {message.sender_id !== user?.id && (
+                  <Avatar className="h-8 w-8 mt-1">
+                    <AvatarImage src={message.sender?.avatar_url || '/placeholder.svg'} />
+                    <AvatarFallback>
+                      {message.sender?.full_name?.substring(0, 2).toUpperCase() || '?'}
+                    </AvatarFallback>
+                  </Avatar>
+                )}
+                <div className="flex flex-col gap-1 max-w-[70%]">
+                  {message.sender_id !== user?.id && (
+                    <span className="text-xs text-muted-foreground ml-1">
+                      {message.sender?.full_name}
+                    </span>
+                  )}
+                  <div className="flex items-end gap-1">
+                    <div
+                      className={`rounded-lg p-3 break-words ${
+                        message.sender_id === user?.id
+                          ? 'bg-primary text-primary-foreground rounded-tr-none'
+                          : 'bg-muted rounded-tl-none'
                       }`}
-                  >
-                  {message.content}
-                  {message.attachment_url && (
-                    <div className="mt-2">
-                      {message.attachment_url.match(/\.(jpg|jpeg|png|gif)$/i) ? (
-                        <img 
-                          src={message.attachment_url} 
-                          alt={message.attachment_name || 'Attachment'} 
-                          className="max-w-[200px] max-h-[200px] object-contain rounded-md"
-                        />
-                      ) : (
-                        <div className="flex items-center gap-2 p-2 bg-background/10 rounded-md">
-                          <FileText className="h-4 w-4" />
-                          <a 
-                            href={message.attachment_url} 
-                            target="_blank" 
-                            rel="noopener noreferrer"
-                            className="text-sm hover:underline"
-                          >
-                            {message.attachment_name || 'Download attachment'}
-                          </a>
+                    >
+                      {message.content}
+                      {message.attachment_url && (
+                        <div className="mt-2">
+                          {message.attachment_url.match(/\.(jpg|jpeg|png|gif)$/i) ? (
+                            <img 
+                              src={message.attachment_url} 
+                              alt={message.attachment_name || 'Attachment'} 
+                              className="max-w-[200px] max-h-[200px] object-contain rounded-md"
+                            />
+                          ) : (
+                            <div className="flex items-center gap-2 p-2 bg-background/10 rounded-md">
+                              <FileText className="h-4 w-4" />
+                              <a 
+                                href={message.attachment_url} 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className="text-sm hover:underline"
+                              >
+                                {message.attachment_name || 'Download attachment'}
+                              </a>
+                            </div>
+                          )}
                         </div>
                       )}
                     </div>
-                  )}
+                    {message.sender_id === user?.id && (
+                      <div className="flex items-center h-3">
+                        <Check className={`h-3 w-3 ${message.is_delivered ? '' : 'opacity-50'}`} />
+                        {message.is_read && (
+                          <Check className="h-3 w-3 -ml-1" />
+                        )}
+                      </div>
+                    )}
                   </div>
-                  {message.sender_id === user?.id && (
-                    <div className="flex items-center">
-                      {message.is_delivered ? (
-                        message.is_read ? (
-                          <Avatar className="h-4 w-4">
-                            <AvatarImage src={message.recipient?.avatar_url || '/placeholder.svg'} />
-                            <AvatarFallback>
-                              {message.recipient?.full_name?.substring(0, 2).toUpperCase() || '?'}
-                            </AvatarFallback>
-                          </Avatar>
-                        ) : (
-                          <Check className="h-3 w-3" />
-                        )
-                      ) : (
-                        <Check className="h-3 w-3 opacity-50" />
-                      )}
-                    </div>
-                  )}
                 </div>
               </div>
             ))}
