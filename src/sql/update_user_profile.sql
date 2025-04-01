@@ -2,17 +2,16 @@
 -- Update profile RPC function
 CREATE OR REPLACE FUNCTION public.update_user_profile(
   user_id UUID,
-  avatar_url TEXT DEFAULT NULL,
-  bio TEXT DEFAULT NULL,
-  date_of_birth DATE DEFAULT NULL,
-  email TEXT DEFAULT NULL,
   full_name TEXT DEFAULT NULL,
+  email TEXT DEFAULT NULL,
   gender TEXT DEFAULT NULL,
-  learning_language TEXT DEFAULT NULL,
   native_language TEXT DEFAULT NULL,
+  learning_language TEXT DEFAULT NULL,
   proficiency_level TEXT DEFAULT NULL,
-  streak_count INTEGER DEFAULT 0,
-  onboarding_completed BOOLEAN DEFAULT FALSE
+  date_of_birth DATE DEFAULT NULL,
+  bio TEXT DEFAULT NULL,
+  avatar_url TEXT DEFAULT NULL,
+  streak_count INTEGER DEFAULT 0
 ) RETURNS VOID AS $$
 BEGIN
   -- Validate UUID
@@ -20,21 +19,30 @@ BEGIN
     RAISE EXCEPTION 'user_id cannot be null';
   END IF;
 
-  -- Perform the update with proper WHERE clause
-  UPDATE public.users
+  -- Update the users table
+  UPDATE auth.users
   SET 
-    avatar_url = COALESCE(update_user_profile.avatar_url, users.avatar_url),
-    bio = COALESCE(update_user_profile.bio, users.bio),
-    date_of_birth = COALESCE(update_user_profile.date_of_birth, users.date_of_birth),
-    email = COALESCE(update_user_profile.email, users.email),
-    full_name = COALESCE(update_user_profile.full_name, users.full_name),
-    gender = COALESCE(update_user_profile.gender, users.gender),
-    learning_language = COALESCE(update_user_profile.learning_language, users.learning_language),
-    native_language = COALESCE(update_user_profile.native_language, users.native_language),
-    proficiency_level = COALESCE(update_user_profile.proficiency_level, users.proficiency_level),
-    streak_count = COALESCE(update_user_profile.streak_count, users.streak_count),
+    raw_user_meta_data = jsonb_set(
+      raw_user_meta_data,
+      '{full_name}',
+      to_jsonb(COALESCE(update_user_profile.full_name, raw_user_meta_data->>'full_name'))
+    )
+  WHERE id = update_user_profile.user_id;
+
+  -- Update the profiles table
+  UPDATE public.profiles
+  SET 
+    full_name = COALESCE(update_user_profile.full_name, profiles.full_name),
+    bio = COALESCE(update_user_profile.bio, profiles.bio),
+    date_of_birth = COALESCE(update_user_profile.date_of_birth, profiles.date_of_birth),
+    gender = COALESCE(update_user_profile.gender, profiles.gender),
+    learning_language = COALESCE(update_user_profile.learning_language, profiles.learning_language),
+    native_language = COALESCE(update_user_profile.native_language, profiles.native_language),
+    proficiency_level = COALESCE(update_user_profile.proficiency_level, profiles.proficiency_level),
+    avatar_url = COALESCE(update_user_profile.avatar_url, profiles.avatar_url),
+    streak_count = COALESCE(update_user_profile.streak_count, profiles.streak_count),
     updated_at = NOW()
-  WHERE users.id = update_user_profile.user_id;
+  WHERE id = update_user_profile.user_id;
 
   -- Check if update was successful
   IF NOT FOUND THEN
