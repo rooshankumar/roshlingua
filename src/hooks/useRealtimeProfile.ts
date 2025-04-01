@@ -27,6 +27,7 @@ export function useRealtimeProfile(userId: string | undefined) {
             proficiency_level,
             learning_goal,
             email,
+            date_of_birth,
             avatar_url,
             gender,
             streak_count,
