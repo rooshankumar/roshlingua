@@ -37,7 +37,16 @@ const Dashboard = () => {
   useEffect(() => {
     if (!user) return;
 
+    const updateUserActivity = async () => {
+      // Update last_active_at to trigger streak calculation
+      await supabase
+        .from('profiles')
+        .update({ last_active_at: new Date().toISOString() })
+        .eq('id', user.id);
+    };
+
     const fetchUserData = async () => {
+      await updateUserActivity();
       // Get user profile data
       const { data: profileData } = await supabase
         .from('profiles')
