@@ -44,8 +44,8 @@ export const ChatInput = ({ onSendMessage, learningLanguage }: ChatInputProps) =
   };
 
   return (
-    <div className="flex flex-col gap-2 p-4 border-t">
-      <div className="flex items-end gap-2">
+    <div className="chat-input-container flex flex-col gap-2 p-4">
+      <div className="flex items-end gap-2 animate-fade-in">
         <Textarea
           ref={textareaRef}
           value={message}
