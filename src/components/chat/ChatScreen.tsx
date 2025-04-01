@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Send, Loader2, FileText } from 'lucide-react';
+import { Send, Loader2, FileText, Check } from 'lucide-react';
 import { ChatAttachment } from './ChatAttachment';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
