@@ -43,11 +43,17 @@ export function MainNav() {
           key={route.path}
           to={route.path}
           onClick={() => setOpen(false)}
-          className={`flex items-center space-x-2 px-3 py-2 rounded-md transition ${
-            isActive(route.path) ? "bg-primary/10 text-primary" : "hover:bg-secondary"
+          className={`flex items-center space-x-2 px-3 py-2 rounded-md transition-all duration-200 group ${
+            isActive(route.path) 
+              ? "bg-primary/10 text-primary translate-x-2" 
+              : "hover:bg-secondary hover:translate-x-1"
           }`}
         >
-          <route.icon className="h-5 w-5" />
+          <route.icon className={`h-5 w-5 transition-transform duration-200 ${
+            isActive(route.path) 
+              ? "scale-110" 
+              : "group-hover:scale-105"
+          }`} />
           <span>{route.label}</span>
         </NavLink>
       ))}
@@ -73,8 +79,19 @@ export function MainNav() {
       </div>
 
       {/* Desktop Navigation */}
-      <nav className="hidden lg:flex flex-col space-y-2 p-4">
+      <nav className="hidden lg:flex sticky top-0 flex-col space-y-2 p-4 min-h-screen bg-background/80 backdrop-blur-lg border-r">
+        <div className="mb-8">
+          <h2 className="text-2xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+            Menu
+          </h2>
+        </div>
         <NavigationItems />
+        <div className="mt-auto pt-4 border-t">
+          <div className="flex items-center space-x-2 px-3 py-2 rounded-md bg-muted/50">
+            <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"/>
+            <span className="text-sm text-muted-foreground">Online</span>
+          </div>
+        </div>
       </nav>
     </>
   );

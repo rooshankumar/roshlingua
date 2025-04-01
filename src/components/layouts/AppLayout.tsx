@@ -43,19 +43,21 @@ const AppLayout = ({ children }: AppLayoutProps) => {
 
       {/* Mobile Bottom Navigation */}
       {!isChatDetailRoute && (
-        <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-background border-t flex justify-around p-2 z-50">
+        <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-background/80 backdrop-blur-lg border-t flex justify-around p-2 z-50 shadow-lg">
           {routes.map((route) => (
             <NavLink
               key={route.path}
               to={route.path}
               className={({ isActive }) =>
-                `flex flex-col items-center p-2 ${
-                  isActive ? "text-primary" : "text-muted-foreground"
+                `flex flex-col items-center p-2 rounded-lg transition-all duration-200 ${
+                  isActive 
+                    ? "text-primary scale-110 bg-primary/10" 
+                    : "text-muted-foreground hover:text-primary hover:bg-primary/5 active:scale-95"
                 }`
               }
             >
-              <route.icon className="h-5 w-5" />
-              <span className="text-xs mt-1">{route.label}</span>
+              <route.icon className={`h-5 w-5 transition-transform duration-200 ${isActive ? 'scale-110' : ''}`} />
+              <span className="text-xs mt-1 font-medium">{route.label}</span>
             </NavLink>
           ))}
         </nav>
