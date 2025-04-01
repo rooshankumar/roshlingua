@@ -381,7 +381,7 @@ const Settings = () => {
                       <Input
                         id="date_of_birth"
                         type="date"
-                        value={profile?.date_of_birth ? new Date(profile.date_of_birth).toISOString().split('T')[0] : ''}
+                        value={localProfile?.date_of_birth ? new Date(localProfile.date_of_birth).toISOString().split('T')[0] : ''}
                         onChange={(e) => handleProfileChange("date_of_birth", e.target.value)}
                         className="h-12"
                       />
