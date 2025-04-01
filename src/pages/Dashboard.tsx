@@ -1,20 +1,13 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { 
-  Activity,
-  Award, 
-  Calendar, 
-  Flame, 
-  Languages, 
-  MessageSquare, 
-  Users 
+  Activity, Award, Calendar, Flame, 
+  Languages, MessageSquare, Users,
+  TrendingUp, Target, Book
 } from "lucide-react";
 import { 
-  Card, 
-  CardContent, 
-  CardDescription, 
-  CardHeader, 
-  CardTitle 
+  Card, CardContent, CardDescription, 
+  CardHeader, CardTitle 
 } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -50,17 +43,13 @@ const Dashboard = () => {
       // Get user profile data
       const { data: profileData } = await supabase
         .from('profiles')
-        .select('streak_count, proficiency_level, xp_points, progress_percentage') // Added progress_percentage
+        .select('streak_count, proficiency_level, xp_points, progress_percentage') 
         .eq('id', user.id)
         .single();
 
       if (profileData) {
         setStreak(profileData.streak_count || 0);
-        setProgress(profileData.progress_percentage || 0); // Use fetched progress_percentage
-        // Calculate progress based on proficiency level - This part is now redundant
-        // const levels = ['beginner', 'intermediate', 'advanced'];
-        // const currentLevel = levels.indexOf(profileData.proficiency_level);
-        // setProgress((currentLevel + 1) * 33);
+        setProgress(profileData.progress_percentage || 0); 
       }
 
       // Get active conversations count
@@ -114,127 +103,129 @@ const Dashboard = () => {
   }, [user]);
 
   return (
-    <div className="container animate-fade-in">
-      <div className="space-y-2 mb-8">
-        <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
-        <p className="text-muted-foreground">
-          Welcome back! Here's an overview of your language learning journey.
+    <div className="container pb-8 animate-fade-up">
+      <div className="relative space-y-2 mb-8 p-8 rounded-xl bg-gradient-to-r from-primary/10 via-primary/5 to-background">
+        <div className="absolute inset-0 bg-grid-white/5 [mask-image:linear-gradient(0deg,white,rgba(255,255,255,0.5))] rounded-xl" />
+        <h1 className="text-4xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/60">
+          Welcome Back!
+        </h1>
+        <p className="text-muted-foreground text-lg">
+          Track your progress and connect with language partners
         </p>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-8">
-        <Card className="glass-card">
+        <Card className="group hover:shadow-lg transition-all duration-200 hover:scale-[1.02] bg-gradient-to-br from-card to-card/95">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Current Streak
+            <CardTitle className="text-sm font-medium group-hover:text-primary transition-colors">
+              Streak
             </CardTitle>
-            <Flame className="h-4 w-4 text-primary" />
+            <Flame className="h-4 w-4 text-primary animate-pulse" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{streak} days</div>
-            <p className="text-xs text-muted-foreground">
-              Keep practicing to maintain your streak!
-            </p>
+            <div className="inline-flex items-center mt-2 text-xs text-muted-foreground">
+              <TrendingUp className="h-3 w-3 mr-1" />
+              Keep it going!
+            </div>
           </CardContent>
         </Card>
 
-        <Card className="glass-card">
+        <Card className="group hover:shadow-lg transition-all duration-200 hover:scale-[1.02] bg-gradient-to-br from-card to-card/95">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Learning Progress
+            <CardTitle className="text-sm font-medium group-hover:text-primary transition-colors">
+              Progress
             </CardTitle>
             <Activity className="h-4 w-4 text-primary" />
           </CardHeader>
           <CardContent>
-            <div className="flex items-center justify-between mb-1">
+            <div className="flex items-center justify-between mb-2">
               <div className="text-2xl font-bold">{progress}%</div>
-              <div className="text-xs text-muted-foreground">
-                {stats.proficiency_level || 'Beginner'}
-              </div>
+              <Badge variant="outline" className="capitalize">
+                {stats.proficiency_level}
+              </Badge>
             </div>
-            <Progress value={progress} className="h-2" />
+            <Progress value={progress} className="h-2 bg-primary/20" />
           </CardContent>
         </Card>
 
-        <Card className="glass-card">
+        <Card className="group hover:shadow-lg transition-all duration-200 hover:scale-[1.02] bg-gradient-to-br from-card to-card/95">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Conversations
+            <CardTitle className="text-sm font-medium group-hover:text-primary transition-colors">
+              Chats
             </CardTitle>
             <MessageSquare className="h-4 w-4 text-primary" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.conversations}</div>
-            <p className="text-xs text-muted-foreground">
-              Active conversations with language partners
-            </p>
+            <div className="inline-flex items-center mt-2 text-xs text-muted-foreground">
+              <Target className="h-3 w-3 mr-1" />
+              Active conversations
+            </div>
           </CardContent>
         </Card>
 
-        <Card className="glass-card">
+        <Card className="group hover:shadow-lg transition-all duration-200 hover:scale-[1.02] bg-gradient-to-br from-card to-card/95">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Achievement Points
+            <CardTitle className="text-sm font-medium group-hover:text-primary transition-colors">
+              XP Points
             </CardTitle>
             <Award className="h-4 w-4 text-primary" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.xp} XP</div>
-            <p className="text-xs text-muted-foreground">
-              Earned from activities and conversations
-            </p>
+            <div className="inline-flex items-center mt-2 text-xs text-muted-foreground">
+              <Book className="h-3 w-3 mr-1" />
+              Learning rewards
+            </div>
           </CardContent>
         </Card>
       </div>
 
-      <div className="mb-8">
-        <Card className="glass-card">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0">
-            <div>
-              <CardTitle>
-                <div className="flex items-center space-x-2">
-                  <Users className="h-5 w-5" />
-                  <span>Active Community Members</span>
-                </div>
-              </CardTitle>
-              <CardDescription>
-                Connect with language partners who are online now
-              </CardDescription>
-            </div>
-            <Button asChild variant="outline" size="sm">
-              <Link to="/community">View All</Link>
-            </Button>
-          </CardHeader>
-          <CardContent>
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-              {activeUsers.map((user) => (
-                <Link to={`/profile/${user.id}`} key={user.id}>
-                  <div className="flex flex-col items-center p-4 rounded-lg border border-border hover:border-primary hover:bg-primary/5 transition-colors text-center">
-                    <div className="relative">
-                      <Avatar className="h-16 w-16 mb-2">
-                        <AvatarImage src={user.avatar_url} alt={user.full_name} />
-                        <AvatarFallback>{user.full_name?.charAt(0)}</AvatarFallback>
-                      </Avatar>
-                      <div className="absolute bottom-2 right-0 w-4 h-4 bg-green-500 rounded-full border-2 border-background"></div>
-                    </div>
-                    <h4 className="font-medium text-sm">{user.full_name}</h4>
-                    <div className="flex items-center space-x-1 mt-1">
-                      <Languages className="h-3 w-3 text-muted-foreground" />
-                      <span className="text-xs text-muted-foreground">{user.learning_language}</span>
-                    </div>
-                    <div className="flex items-center space-x-1 mt-1">
-                      <Flame className="h-3 w-3 text-primary" />
-                      <span className="text-xs font-medium">{user.streak_count || 0} day streak</span>
-                    </div>
+      <Card className="overflow-hidden bg-gradient-to-br from-card to-card/95 hover:shadow-lg transition-all duration-200">
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 bg-muted/50">
+          <div className="space-y-1">
+            <CardTitle>
+              <div className="flex items-center space-x-2">
+                <Users className="h-5 w-5 text-primary" />
+                <span>Active Community</span>
+              </div>
+            </CardTitle>
+            <CardDescription>
+              Connect with language partners online now
+            </CardDescription>
+          </div>
+          <Button asChild variant="outline" size="sm" className="hover:bg-primary hover:text-primary-foreground">
+            <Link to="/community">View All</Link>
+          </Button>
+        </CardHeader>
+        <CardContent className="p-6">
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+            {activeUsers.map((user) => (
+              <Link to={`/profile/${user.id}`} key={user.id} className="group">
+                <div className="flex flex-col items-center p-4 rounded-xl border border-border bg-gradient-to-b from-muted/50 to-transparent backdrop-blur-sm group-hover:border-primary/50 group-hover:shadow-lg transition-all duration-200">
+                  <div className="relative mb-3">
+                    <Avatar className="h-16 w-16 ring-2 ring-border group-hover:ring-primary/50 transition-all">
+                      <AvatarImage src={user.avatar_url} alt={user.full_name} />
+                      <AvatarFallback>{user.full_name?.charAt(0)}</AvatarFallback>
+                    </Avatar>
+                    <div className="absolute bottom-0 right-0 w-4 h-4 bg-green-500 rounded-full ring-2 ring-background"></div>
                   </div>
-                </Link>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-      {/* Daily Goal and Streak Calendar -  Removed for brevity as it's not directly impacted by the data change. */}
-      {/* Language Learning Tips - Removed for brevity as it's not directly impacted by the data change. */}
+                  <h4 className="font-medium text-sm group-hover:text-primary transition-colors">{user.full_name}</h4>
+                  <div className="flex items-center space-x-1 mt-2">
+                    <Languages className="h-3 w-3 text-muted-foreground" />
+                    <span className="text-xs text-muted-foreground">{user.learning_language}</span>
+                  </div>
+                  <div className="flex items-center space-x-1 mt-1">
+                    <Flame className="h-3 w-3 text-primary" />
+                    <span className="text-xs font-medium">{user.streak_count || 0} day streak</span>
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };
