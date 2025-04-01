@@ -50,8 +50,7 @@ export const ChatScreen = ({ conversation }: Props) => {
             sender:sender_id(
               id,
               email,
-              raw_user_meta_data->>'full_name',
-              raw_user_meta_data->>'avatar_url'
+              raw_user_meta_data
             )
           `)
           .eq('conversation_id', conversation.id)
@@ -179,9 +178,9 @@ export const ChatScreen = ({ conversation }: Props) => {
                 className={`flex items-end gap-2 ${message.sender_id === user?.id ? 'flex-row-reverse' : 'flex-row'}`}
               >
                 <Avatar className="h-8 w-8">
-                  <AvatarImage src={message.sender?.avatar_url || '/placeholder.svg'} />
+                  <AvatarImage src={message.sender?.raw_user_meta_data?.avatar_url || '/placeholder.svg'} />
                   <AvatarFallback>
-                    {message.sender?.full_name?.substring(0, 2).toUpperCase() || '?'}
+                    {message.sender?.raw_user_meta_data?.full_name?.substring(0, 2).toUpperCase() || '?'}
                   </AvatarFallback>
                 </Avatar>
                 <div
