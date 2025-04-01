@@ -17,11 +17,20 @@ CREATE OR REPLACE FUNCTION public.update_user_profile(
   avatar_url TEXT DEFAULT NULL,
   streak_count INTEGER DEFAULT 0
 ) RETURNS VOID AS $$
+DECLARE
+  progress INTEGER;
 BEGIN
   -- Validate UUID
   IF user_id IS NULL THEN
     RAISE EXCEPTION 'user_id cannot be null';
   END IF;
+
+  -- Calculate progress based on proficiency level
+  progress := CASE 
+    WHEN proficiency_level = 'advanced' THEN 100
+    WHEN proficiency_level = 'intermediate' THEN 66
+    ELSE 33
+  END;
 
   -- Update the users table
   UPDATE auth.users
@@ -45,6 +54,7 @@ BEGIN
     proficiency_level = COALESCE(update_user_profile.proficiency_level, profiles.proficiency_level),
     avatar_url = COALESCE(update_user_profile.avatar_url, profiles.avatar_url),
     streak_count = COALESCE(update_user_profile.streak_count, profiles.streak_count),
+    progress_percentage = progress,
     updated_at = NOW()
   WHERE id = update_user_profile.user_id;
 END;
