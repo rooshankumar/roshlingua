@@ -33,6 +33,7 @@ interface User {
   is_online: boolean;
   likes_count: number;
   username: string;
+  age: number | null; // Added age property
 }
 
 const Community = () => {
@@ -60,7 +61,8 @@ const Community = () => {
             bio,
             avatar_url,
             streak_count,
-            likes_count
+            likes_count,
+            age // Added age to the selection
           `)
           .neq('id', currentUser?.id);
 
@@ -82,6 +84,7 @@ const Community = () => {
           is_online: user.is_online || false,
           streak_count: user.streak_count || 1, // Added streak_count default, now set to 1
           likes_count: user.likes_count || 0, // Added likes_count default
+          age: user.age || null, //Added age default
         }));
 
         setUsers(usersWithDefaults);
@@ -341,7 +344,7 @@ const Community = () => {
 
                   <div className="pt-12 px-4 text-center">
                     <h3 className="font-semibold text-lg mb-1 truncate">{user.full_name}</h3>
-                    <div className="flex flex-wrap items-center justify-center gap-2 mb-3">
+                    <div className="flex flex-wrap items-center justify-center gap-2 mb-2">
                       <Badge variant="outline" className="bg-green-500/10 text-green-700 border-green-500/30">
                         {user.native_language}
                       </Badge>
@@ -350,6 +353,11 @@ const Community = () => {
                         {user.learning_language}
                       </Badge>
                     </div>
+                    {user.age && (
+                      <Badge variant="outline" className="mb-3">
+                        {user.age} years old
+                      </Badge>
+                    )}
                     <Badge variant="secondary" className="mb-4">
                       {user.proficiency_level || 'Beginner'}
                     </Badge>
