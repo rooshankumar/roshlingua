@@ -41,16 +41,12 @@ export const ChatScreen = ({ conversation }: Props) => {
         const { data, error } = await supabase
           .from('messages')
           .select(`
-            id,
-            content,
-            created_at,
-            conversation_id,
-            sender_id,
-            is_read,
-            sender:sender_id(
+            *,
+            sender:profiles!sender_id(
               id,
-              email,
-              raw_user_meta_data
+              user_id,
+              full_name,
+              avatar_url
             )
           `)
           .eq('conversation_id', conversation.id)
@@ -178,9 +174,9 @@ export const ChatScreen = ({ conversation }: Props) => {
                 className={`flex items-end gap-2 ${message.sender_id === user?.id ? 'flex-row-reverse' : 'flex-row'}`}
               >
                 <Avatar className="h-8 w-8">
-                  <AvatarImage src={message.sender?.raw_user_meta_data?.avatar_url || '/placeholder.svg'} />
+                  <AvatarImage src={message.sender?.avatar_url || '/placeholder.svg'} />
                   <AvatarFallback>
-                    {message.sender?.raw_user_meta_data?.full_name?.substring(0, 2).toUpperCase() || '?'}
+                    {message.sender?.full_name?.substring(0, 2).toUpperCase() || '?'}
                   </AvatarFallback>
                 </Avatar>
                 <div
