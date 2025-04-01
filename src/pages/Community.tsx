@@ -373,7 +373,7 @@ const Community = () => {
                       </Button>
                       <div className="flex items-center ml-2">
                         <Flame className="h-4 w-4 text-primary mr-1" />
-                        <span className="text-xs">{user.streak_count || 1}</span>
+                        <span className="text-xs">{user.streak_count || 0}</span>
                       </div>
                     </div>
 
