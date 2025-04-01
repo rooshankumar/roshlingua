@@ -82,9 +82,9 @@ const Community = () => {
           learning_language: user.learning_language || 'Spanish',
           proficiency_level: user.proficiency_level || 'beginner',
           is_online: user.is_online || false,
-          streak_count: user.streak_count || 1, // Added streak_count default, now set to 1
-          likes_count: user.likes_count || 0, // Added likes_count default
-          age: user.age || null, //Added age default
+          streak_count: user.streak_count || 1,
+          likes_count: user.likes_count || 0,
+          age: user.date_of_birth ? Math.floor((new Date().getTime() - new Date(user.date_of_birth).getTime()) / (365.25 * 24 * 60 * 60 * 1000)) : null,
         }));
 
         setUsers(usersWithDefaults);
