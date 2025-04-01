@@ -41,8 +41,13 @@ export const ChatScreen = ({ conversation }: Props) => {
         const { data, error } = await supabase
           .from('messages')
           .select(`
-            *,
-            sender:auth.users!inner(
+            id,
+            content,
+            created_at,
+            conversation_id,
+            sender_id,
+            is_read,
+            sender:sender_id(
               id,
               email,
               raw_user_meta_data->>'full_name',
