@@ -88,8 +88,18 @@ const ChatList = () => {
 
         if (participantsError) throw participantsError;
 
+        // Create a Map to store unique conversations by ID
+        const uniqueConversations = new Map();
+
         const conversationPreviews = await Promise.all(
-          participantsData.map(async (participant) => {
+          participantsData.filter(participant => {
+            // Only process each conversation_id once
+            if (uniqueConversations.has(participant.conversation_id)) {
+              return false;
+            }
+            uniqueConversations.set(participant.conversation_id, true);
+            return true;
+          }).map(async (participant) => {
             const { data: participants, error: participantError } = await supabase
               .from('conversation_participants')
               .select(`
