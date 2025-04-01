@@ -23,7 +23,8 @@ export function useProfile(userId: string) {
             proficiency_level,
             streak_count,
             avatar_url,
-            likes_count
+            likes_count,
+            date_of_birth
           `)
           .eq('id', userId)
           .single();
