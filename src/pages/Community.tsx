@@ -324,64 +324,66 @@ const Community = () => {
       </div>
 
       {filteredUsers.length > 0 ? (
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {filteredUsers.map((user) => (
-            <div key={user.id} className="relative">
-              <div className="absolute top-0 left-0 right-0 h-1 bg-primary rounded-t-lg" />
-              <Card>
-                <CardContent className="p-6">
-                  <div className="flex items-center space-x-4 mb-4">
-                    <Avatar className="h-12 w-12">
-                      <AvatarImage src={user.avatar_url} />
-                      <AvatarFallback>{user.username?.charAt(0)}</AvatarFallback>
-                    </Avatar>
-                    <div className="flex-1">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <h3 className="font-medium">{user.full_name}</h3>
-                        </div>
-
-                      </div>
-                      <p className="text-sm text-muted-foreground flex items-center gap-2">
-                        <span className="px-2 py-0.5 rounded border-green-500 border bg-green-50/10 text-green-700 transition-all hover:bg-green-100/20 hover:scale-105 duration-300">
-                          {user.native_language}
-                        </span>
-                        →
-                        <span className="px-2 py-0.5 rounded border-blue-500 border bg-blue-50/10 text-blue-700 transition-all hover:bg-blue-100/20 hover:scale-105 duration-300">
-                          {user.learning_language}
-                        </span>
-                        <span className="text-xs px-2 py-0.5 rounded bg-muted">
-                          {user.proficiency_level || 'Beginner'}
-                        </span>
-                      </p>
+            <div key={user.id} className="relative group">
+              <Card className="overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
+                <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-primary to-primary/50" />
+                <CardContent className="p-0">
+                  <div className="relative h-32 bg-gradient-to-b from-primary/10 to-background/5">
+                    <div className="absolute -bottom-10 left-1/2 -translate-x-1/2">
+                      <Avatar className="h-20 w-20 ring-4 ring-background">
+                        <AvatarImage src={user.avatar_url} className="object-cover" />
+                        <AvatarFallback className="text-xl">{user.username?.charAt(0)}</AvatarFallback>
+                      </Avatar>
                     </div>
                   </div>
 
-                  <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
-                    {user.bio || 'No bio available.'}
-                  </p>
+                  <div className="pt-12 px-4 text-center">
+                    <h3 className="font-semibold text-lg mb-1 truncate">{user.full_name}</h3>
+                    <div className="flex flex-wrap items-center justify-center gap-2 mb-3">
+                      <Badge variant="outline" className="bg-green-500/10 text-green-700 border-green-500/30">
+                        {user.native_language}
+                      </Badge>
+                      <span className="text-muted-foreground">→</span>
+                      <Badge variant="outline" className="bg-blue-500/10 text-blue-700 border-blue-500/30">
+                        {user.learning_language}
+                      </Badge>
+                    </div>
+                    <Badge variant="secondary" className="mb-4">
+                      {user.proficiency_level || 'Beginner'}
+                    </Badge>
 
-                  <div className="flex justify-between mt-4 pt-3 border-t border-border">
-                    <div className="flex items-center space-x-2">
+                    <p className="text-sm text-muted-foreground mb-4 line-clamp-2 px-2">
+                      {user.bio || 'No bio available.'}
+                    </p>
+                  </div>
+
+                  <div className="flex items-center justify-between p-4 bg-muted/50">
+                    <div className="flex items-center gap-4">
                       <Button
                         variant="ghost"
                         size="sm"
                         onClick={() => handleLike(user.id)}
+                        className="hover:text-red-500"
                       >
                         <Heart className="h-4 w-4 mr-1" />
                         <span>{user.likes_count || 0}</span>
                       </Button>
-                      <div className="flex items-center ml-2">
-                        <Flame className="h-4 w-4 text-primary mr-1" />
-                        <span className="text-xs">{user.streak_count || 0}</span>
+                      <div className="flex items-center text-orange-500">
+                        <Flame className="h-4 w-4 mr-1" />
+                        <span className="text-sm font-medium">{user.streak_count || 0}</span>
                       </div>
                     </div>
 
-                    <Button onClick={() => handleStartChat(user.id)} asChild variant="outline" size="sm">
-                      <Link to={`/chat/${user.id}`}> {/* Link remains for visual purposes, but navigation is handled by handleStartChat */}
-                        <MessageSquare className="h-4 w-4 mr-2" />
-                        Start Chat
-                      </Link>
+                    <Button 
+                      onClick={() => handleStartChat(user.id)} 
+                      variant="default" 
+                      size="sm"
+                      className="transition-all duration-300 hover:scale-105"
+                    >
+                      <MessageSquare className="h-4 w-4 mr-2" />
+                      Chat
                     </Button>
                   </div>
                 </CardContent>
