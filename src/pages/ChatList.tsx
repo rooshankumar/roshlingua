@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { MessageCircle, Loader2 } from 'lucide-react';
+import { MessageCircle, Loader2, Search, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Input } from '@/components/ui/input';
 import { useAuth } from '@/providers/AuthProvider';
 import { supabase } from '@/lib/supabase';
 import { formatDistanceToNow } from 'date-fns';
@@ -29,6 +30,7 @@ const ChatList = () => {
   const navigate = useNavigate();
   const [conversations, setConversations] = useState<ChatPreview[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
 
   // Track online presence
   useEffect(() => {
@@ -93,12 +95,12 @@ const ChatList = () => {
 
         // Create a Set to track unique user IDs
         const uniqueUserIds = new Set();
-        
+
         const conversationPreviews = await Promise.all(
           participantsData.filter(participant => {
             const otherUserId = participant.users?.id;
             // Filter out duplicates based on both conversation ID and user ID
-            if (uniqueConversations.has(participant.conversation_id) || 
+            if (uniqueConversations.has(participant.conversation_id) ||
                 (otherUserId && uniqueUserIds.has(otherUserId))) {
               return false;
             }
@@ -168,75 +170,95 @@ const ChatList = () => {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-[80vh]">
-        <Loader2 className="w-8 h-8 animate-spin" />
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
       </div>
     );
   }
 
+  const filteredConversations = conversations.filter(conv =>
+    conv.participant.full_name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   return (
-    <div className="container max-w-3xl mx-auto py-6 space-y-4">
+    <div className="container max-w-4xl mx-auto py-6 px-4 space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Messages</h1>
-        <Button asChild variant="outline">
-          <Link to="/community">Find People</Link>
+        <div>
+          <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-primary-foreground bg-clip-text text-transparent">Messages</h1>
+          <p className="text-muted-foreground mt-1">Stay connected with your language partners</p>
+        </div>
+        <Button asChild>
+          <Link to="/community" className="gap-2">
+            <Plus className="w-4 h-4" />
+            New Chat
+          </Link>
         </Button>
       </div>
 
-      {conversations.length === 0 ? (
-        <Card>
+      <div className="relative">
+        <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+        <Input
+          placeholder="Search conversations..."
+          className="pl-10"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+        />
+      </div>
+
+      {filteredConversations.length === 0 && !searchQuery && (
+        <Card className="border-dashed">
           <CardContent className="flex flex-col items-center justify-center py-12 text-center">
-            <MessageCircle className="w-12 h-12 text-muted-foreground mb-4" />
+            <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-4">
+              <MessageCircle className="w-8 h-8 text-primary" />
+            </div>
             <h3 className="text-lg font-medium">No conversations yet</h3>
-            <p className="text-muted-foreground mt-2">
-              Start chatting with people from the community
+            <p className="text-muted-foreground mt-2 max-w-sm">
+              Start chatting with people from the community to practice your language skills
             </p>
-            <Button asChild className="mt-4" variant="outline">
+            <Button asChild className="mt-6" variant="outline">
               <Link to="/community">Browse Community</Link>
             </Button>
           </CardContent>
         </Card>
-      ) : (
-        <div className="space-y-2">
-          {conversations.map((conversation) => (
+      )}
+
+      {filteredConversations.length > 0 && (
+        <div className="grid gap-3">
+          {filteredConversations.map((conversation) => (
             <Link
               key={conversation.id}
               to={`/chat/${conversation.id}`}
               className="block"
             >
-              <Card className="hover:bg-muted/50 transition-colors">
+              <Card className="hover:bg-muted/50 transition-all duration-200 hover:scale-[1.01] hover:shadow-lg">
                 <CardContent className="flex items-center p-4">
-                  <Avatar className="h-12 w-12">
-                    <AvatarImage src={conversation.participant?.avatar_url || '/placeholder.svg'} /> {/*Handle null avatar_url*/}
-                    <AvatarFallback>
-                      {conversation.participant?.full_name?.substring(0, 2).toUpperCase() || 'AB'} {/*Handle null full_name*/}
-                    </AvatarFallback>
-                  </Avatar>
+                  <div className="relative">
+                    <Avatar className="h-12 w-12">
+                      <AvatarImage src={conversation.participant?.avatar_url || '/placeholder.svg'} />
+                      <AvatarFallback>
+                        {conversation.participant?.full_name?.substring(0, 2).toUpperCase() || 'AB'}
+                      </AvatarFallback>
+                    </Avatar>
+                    {conversation.participant?.is_online && (
+                      <span className="absolute bottom-0 right-0 w-3 h-3 rounded-full bg-green-500 border-2 border-background" />
+                    )}
+                  </div>
                   <div className="ml-4 flex-1">
                     <div className="flex items-center justify-between">
-                      <h3 className="font-medium">{conversation.participant?.full_name || 'Unknown User'}</h3> {/*Handle null full_name*/}
-                      <div className="flex flex-col items-end gap-1">
-                        <div className="flex items-center gap-2">
-                          {conversation.participant?.is_online ? (
-                            <div className="flex items-center">
-                              <div className="w-2 h-2 rounded-full bg-green-500 mr-2" />
-                              <span className="text-xs text-green-600">Online</span>
-                            </div>
-                          ) : conversation.participant?.last_seen ? (
-                            <span className="text-xs text-muted-foreground">
-                              {formatDistanceToNow(new Date(conversation.participant.last_seen))} ago
-                            </span>
-                          ) : null}
-                        </div>
-                        {conversation.lastMessage && (
-                          <span className="text-xs text-muted-foreground">
-                            {new Date(conversation.lastMessage.created_at).toLocaleDateString()}
-                          </span>
-                        )}
-                      </div>
+                      <h3 className="font-medium">{conversation.participant?.full_name || 'Unknown User'}</h3>
+                      {conversation.lastMessage && (
+                        <span className="text-xs text-muted-foreground">
+                          {formatDistanceToNow(new Date(conversation.lastMessage.created_at), { addSuffix: true })}
+                        </span>
+                      )}
                     </div>
                     {conversation.lastMessage && (
-                      <p className="text-sm text-muted-foreground truncate">
+                      <p className="text-sm text-muted-foreground truncate mt-1">
                         {conversation.lastMessage.content}
+                      </p>
+                    )}
+                    {conversation.participant?.last_seen && !conversation.participant?.is_online && (
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Last seen {formatDistanceToNow(new Date(conversation.participant.last_seen))} ago
                       </p>
                     )}
                   </div>
