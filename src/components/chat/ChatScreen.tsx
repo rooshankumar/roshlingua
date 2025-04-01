@@ -1,3 +1,4 @@
+
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Send, Loader2, FileText, Check } from 'lucide-react';
@@ -9,6 +10,8 @@ import { useAuth } from '@/providers/AuthProvider';
 import { supabase } from '@/lib/supabase';
 import { ChatHeader } from './ChatHeader';
 import { Textarea } from '../ui/textarea';
+import { ScrollArea } from '../ui/scroll-area';
+import { Card, CardContent } from '../ui/card';
 
 interface Props {
   conversation: {
@@ -80,7 +83,6 @@ export const ChatScreen = ({ conversation }: Props) => {
         table: 'messages',
         filter: `conversation_id=eq.${conversation.id}`,
       }, (payload) => {
-        // Check if message already exists before adding
         setMessages(prev => {
           const exists = prev.some(msg => msg.id === payload.new.id);
           return exists ? prev : [...prev, payload.new as Message];
@@ -94,24 +96,11 @@ export const ChatScreen = ({ conversation }: Props) => {
     };
   }, [conversation?.id, page]);
 
-  const handleSend = async (content: string, attachment?: { url: string; filename: string }) => {
-    if ((!content.trim() && !attachment) || !user || !conversation?.id || isSending) return;
-
-    if (!user?.id) {
-      console.error("User ID is null right before sending message - preventing send.");
-      return;
-    }
+  const handleSend = async (content?: string, attachment?: { url: string; filename: string }) => {
+    const messageContent = content || newMessage;
+    if ((!messageContent.trim() && !attachment) || !user || !conversation?.id || isSending) return;
 
     setIsSending(true);
-    const tempMessage = {
-      id: Math.random().toString(),
-      content: newMessage.trim(),
-      sender_id: user.id,
-      conversation_id: conversation.id,
-      created_at: new Date().toISOString(),
-    };
-
-
     try {
       const { data: currentSession } = await supabase.auth.getSession();
       const currentUser = currentSession?.session?.user;
@@ -124,7 +113,7 @@ export const ChatScreen = ({ conversation }: Props) => {
       const { error } = await supabase
         .from('messages')
         .insert([{
-          content: content,
+          content: messageContent,
           conversation_id: conversation.id,
           sender_id: currentUser.id,
           is_read: false,
@@ -138,7 +127,6 @@ export const ChatScreen = ({ conversation }: Props) => {
       scrollToBottom();
     } catch (error) {
       console.error('Error sending message:', error);
-      setNewMessage(tempMessage.content);
     } finally {
       setIsSending(false);
     }
@@ -147,44 +135,42 @@ export const ChatScreen = ({ conversation }: Props) => {
   const handleKeyPress = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
-      handleSend();
+      handleSend(newMessage);
     }
   };
 
   return (
-    <div className="flex flex-col h-screen">
+    <Card className="flex flex-col h-screen rounded-none border-none">
       <ChatHeader conversation={conversation} />
 
       {user?.id ? (
-        <div className="flex-1 overflow-y-auto p-4">
+        <ScrollArea className="flex-1 p-4">
           {hasMore && (
             <div className="text-center mb-4">
               <Button
                 variant="outline"
-                onClick={() => {
-                  setPage(prev => prev + 1);
-                  fetchMessages(true);
-                }}
+                onClick={() => setPage(prev => prev + 1)}
+                className="w-full max-w-[200px]"
               >
                 Load More
               </Button>
             </div>
           )}
-          <div className="space-y-4">
+          <div className="space-y-4 pb-4">
             {messages.map((message) => (
               <div
                 key={message.id}
-                className={`flex items-start gap-2 mb-4 ${message.sender_id === user?.id ? 'flex-row-reverse' : 'flex-row'}`}
+                className={`flex items-start gap-2 ${message.sender_id === user?.id ? 'flex-row-reverse' : 'flex-row'}`}
               >
                 {message.sender_id !== user?.id && (
-                  <Avatar className="h-8 w-8 mt-1">
+                  <Avatar className="h-8 w-8">
                     <AvatarImage src={message.sender?.avatar_url || '/placeholder.svg'} />
                     <AvatarFallback>
                       {message.sender?.full_name?.substring(0, 2).toUpperCase() || '?'}
                     </AvatarFallback>
                   </Avatar>
                 )}
-                <div className="flex flex-col gap-1 max-w-[70%]">
+                <div className={`flex flex-col gap-1 max-w-[70%] md:max-w-[60%] lg:max-w-[50%]`}>
                   {message.sender_id !== user?.id && (
                     <span className="text-xs text-muted-foreground ml-1">
                       {message.sender?.full_name}
@@ -237,7 +223,7 @@ export const ChatScreen = ({ conversation }: Props) => {
             ))}
             <div ref={messagesEndRef} />
           </div>
-        </div>
+        </ScrollArea>
       ) : (
         <div className="flex-1 flex items-center justify-center">
           <p className="text-muted-foreground">Loading user data...</p>
@@ -245,34 +231,33 @@ export const ChatScreen = ({ conversation }: Props) => {
       )}
 
       {user?.id ? (
-        <div className="border-t p-4">
+        <CardContent className="border-t p-4">
           <div className="flex items-end gap-2">
-            <ChatAttachment onAttach={(url, filename) => {
-              handleSend(newMessage, { url, filename });
-            }} />
+            <ChatAttachment onAttach={(url, filename) => handleSend(newMessage, { url, filename })} />
             <Textarea
               value={newMessage}
               onChange={(e) => setNewMessage(e.target.value)}
               onKeyDown={handleKeyPress}
               placeholder="Type a message..."
-              className="flex-1"
+              className="flex-1 min-h-[60px] max-h-[120px]"
               rows={1}
             />
             <Button
-              onClick={handleSend}
+              onClick={() => handleSend(newMessage)}
               disabled={!newMessage.trim() || isSending || !user}
-              className="self-end"
+              size="icon"
+              className="h-[60px] w-[60px]"
             >
-              {isSending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+              {isSending ? <Loader2 className="h-5 w-5 animate-spin" /> : <Send className="h-5 w-5" />}
             </Button>
           </div>
-        </div>
+        </CardContent>
       ) : (
-        <div className="border-t p-4">
+        <CardContent className="border-t p-4">
           <p className="text-muted-foreground text-center">Please wait for user data to load...</p>
-        </div>
+        </CardContent>
       )}
-    </div>
+    </Card>
   );
 };
 

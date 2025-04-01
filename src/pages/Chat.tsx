@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useAuth } from '@/providers/AuthProvider';
@@ -5,44 +6,36 @@ import { Loader2 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { ChatScreen } from '@/components/chat/ChatScreen';
 
-interface Conversation {
-  id: string;
-  participant: {
-    id: string;
-    email: string;
-    full_name: string;
-    avatar_url: string;
-  };
-}
-
 const ChatPage = () => {
   const { conversationId } = useParams();
   const { user } = useAuth();
-  const [conversation, setConversation] = useState<Conversation | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [conversation, setConversation] = useState<any>(null);
 
   useEffect(() => {
     if (!user || !conversationId) return;
 
     const loadConversation = async () => {
       try {
-        const { data: participants, error } = await supabase
+        const { data: conversationParticipants, error: participantsError } = await supabase
           .from('conversation_participants')
           .select(`
-            users:user_id (
+            users!user_id (
               id,
               email,
-              full_name,
-              avatar_url,
-              profiles:profiles (*)
+              profiles (
+                full_name,
+                avatar_url
+              )
             )
           `)
-          .eq('conversation_id', conversationId)
-          .neq('user_id', user.id);
+          .eq('conversation_id', conversationId);
 
-        if (error) throw error;
+        if (participantsError) throw participantsError;
 
-        const otherParticipant = participants?.[0]?.users;
+        const otherParticipant = conversationParticipants
+          ?.map(cp => cp.users)
+          ?.find(u => u.id !== user.id);
 
         if (otherParticipant) {
           setConversation({
@@ -55,8 +48,6 @@ const ChatPage = () => {
               avatar: otherParticipant.profiles?.avatar_url || '/placeholder.svg'
             }
           });
-        } else {
-          console.error('No other participant found in conversation');
         }
       } catch (error) {
         console.error('Error loading conversation:', error);
@@ -71,7 +62,7 @@ const ChatPage = () => {
   if (!user) {
     return (
       <div className="h-screen flex items-center justify-center">
-        <p>Please log in to access chat</p>
+        <p className="text-muted-foreground">Please log in to access chat</p>
       </div>
     );
   }
@@ -79,7 +70,7 @@ const ChatPage = () => {
   if (isLoading) {
     return (
       <div className="h-screen flex items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin" />
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
       </div>
     );
   }
@@ -87,7 +78,7 @@ const ChatPage = () => {
   if (!conversation) {
     return (
       <div className="h-screen flex items-center justify-center">
-        <p>Conversation not found</p>
+        <p className="text-muted-foreground">Conversation not found</p>
       </div>
     );
   }
