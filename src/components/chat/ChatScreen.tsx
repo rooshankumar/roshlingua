@@ -42,11 +42,11 @@ export const ChatScreen = ({ conversation }: Props) => {
           .from('messages')
           .select(`
             *,
-            sender:users!sender_id(
+            sender:auth.users!sender_id(
               id,
               email,
-              full_name,
-              avatar_url
+              raw_user_meta_data->>'full_name' as full_name,
+              raw_user_meta_data->>'avatar_url' as avatar_url
             )
           `)
           .eq('conversation_id', conversation.id)
