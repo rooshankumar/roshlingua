@@ -91,13 +91,19 @@ const ChatList = () => {
         // Create a Map to store unique conversations by ID
         const uniqueConversations = new Map();
 
+        // Create a Set to track unique user IDs
+        const uniqueUserIds = new Set();
+        
         const conversationPreviews = await Promise.all(
           participantsData.filter(participant => {
-            // Only process each conversation_id once
-            if (uniqueConversations.has(participant.conversation_id)) {
+            const otherUserId = participant.users?.id;
+            // Filter out duplicates based on both conversation ID and user ID
+            if (uniqueConversations.has(participant.conversation_id) || 
+                (otherUserId && uniqueUserIds.has(otherUserId))) {
               return false;
             }
             uniqueConversations.set(participant.conversation_id, true);
+            if (otherUserId) uniqueUserIds.add(otherUserId);
             return true;
           }).map(async (participant) => {
             const { data: participants, error: participantError } = await supabase
