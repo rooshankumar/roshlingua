@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Paperclip } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
@@ -10,7 +11,7 @@ interface ChatAttachmentProps {
 export const ChatAttachment = ({ onAttach }: ChatAttachmentProps) => {
   const [uploading, setUploading] = useState(false);
 
-  const uploadFile = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     try {
       setUploading(true);
 
@@ -36,6 +37,9 @@ export const ChatAttachment = ({ onAttach }: ChatAttachmentProps) => {
         .getPublicUrl(filePath);
 
       onAttach(data.publicUrl, file.name);
+      
+      // Reset the input after successful upload
+      event.target.value = '';
     } catch (error) {
       console.error('Error uploading file:', error);
     } finally {
@@ -47,7 +51,7 @@ export const ChatAttachment = ({ onAttach }: ChatAttachmentProps) => {
     <div className="relative">
       <input
         type="file"
-        onChange={uploadFile}
+        onChange={handleFileChange}
         className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
         disabled={uploading}
       />
