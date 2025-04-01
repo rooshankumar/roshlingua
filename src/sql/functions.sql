@@ -2,8 +2,10 @@
 -- Enable UUID extension
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
--- Drop existing triggers first
+-- Drop all triggers first
 DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
+DROP TRIGGER IF EXISTS on_message_read ON public.messages;
+DROP TRIGGER IF EXISTS on_new_message ON public.messages;
 
 -- Now drop existing functions
 DROP FUNCTION IF EXISTS public.handle_new_user();
