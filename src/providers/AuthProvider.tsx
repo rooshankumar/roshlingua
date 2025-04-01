@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { Session, User } from "@supabase/supabase-js";
-import { supabase, createUserRecord } from "@/lib/supabase";
+import { supabase, createUserRecord } from "@/lib/supabase"; // Assuming this now contains the single Supabase client instance
 import { useToast } from "@/hooks/use-toast";
 
 interface AuthContextType {
@@ -293,8 +293,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
 export function useAuth() {
   const context = useContext(AuthContext);
-  console.log("AuthContext in useAuth:", context); // Add this line
-  console.log("User in AuthContext:", context.user); // Add this line
+  console.log("AuthContext in useAuth:", context);
+  console.log("User in AuthContext:", context.user);
   if (!context) {
     throw new Error("useAuth must be used within an AuthProvider");
   }
