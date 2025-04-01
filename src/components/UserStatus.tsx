@@ -18,8 +18,9 @@ export function UserStatus({ isOnline, lastSeen }: UserStatusProps) {
 
   if (lastSeen) {
     return (
-      <div className="text-sm text-muted-foreground">
-        Last seen {formatDistanceToNow(new Date(lastSeen))} ago
+      <div className="flex items-center text-sm text-muted-foreground">
+        <div className="w-2 h-2 rounded-full bg-gray-400 mr-2" />
+        <span>Last seen {formatDistanceToNow(new Date(lastSeen))} ago</span>
       </div>
     );
   }

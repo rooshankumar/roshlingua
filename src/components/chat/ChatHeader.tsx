@@ -46,6 +46,7 @@ export const ChatHeader = ({ conversation }: Props) => {
           <h2 className="font-semibold">
             {participant.full_name || 'Anonymous User'}
           </h2>
+          <UserStatus isOnline={participant.is_online} lastSeen={participant.last_seen} />
         </div>
       </div>
     </div>
