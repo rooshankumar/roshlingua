@@ -1,7 +1,38 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { supabase, createUserRecord } from "@/lib/supabase";
+import { supabase } from "@/lib/supabase";
 import { Loader2 } from "lucide-react";
+
+// Assuming createUserRecord function is defined in "@/lib/supabase" as mentioned
+async function createUserRecord(userId: string, email: string, fullName: string | null, avatarUrl: string | null): Promise<boolean> {
+  try {
+    const { data: existingProfile, error: fetchError } = await supabase
+      .from('profiles')
+      .select('id')
+      .eq('id', userId)
+      .single();
+
+    if (fetchError) {
+      console.error('Error checking existing profile:', fetchError);
+      return false;
+    }
+
+    if (!existingProfile) {
+      const { error: insertError } = await supabase
+        .from('profiles')
+        .insert([{ id: userId, email: email, full_name: fullName, avatar_url: avatarUrl }]);
+
+      if (insertError) {
+        console.error('Error creating user profile:', insertError);
+        return false;
+      }
+    }
+    return true;
+  } catch (error) {
+    console.error('Error in createUserRecord:', error);
+    return false;
+  }
+}
 
 const AuthCallback = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -44,9 +75,10 @@ const AuthCallback = () => {
         // Extract user info
         const email = user.email || "";
         const fullName = user.user_metadata?.full_name || user.user_metadata?.name || email.split("@")[0];
+        const avatarUrl = user.user_metadata?.avatar_url as string | null;
 
         // Step 4: Save user in database
-        const success = await createUserRecord(user.id, email, fullName, null);
+        const success = await createUserRecord(user.id, email, fullName, avatarUrl);
 
         if (!success) {
           console.warn("User record creation failed, but proceeding...");
