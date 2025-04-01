@@ -93,8 +93,8 @@ export const ChatScreen = ({ conversation }: Props) => {
     };
   }, [conversation?.id, page]);
 
-  const handleSend = async () => {
-    if (!newMessage.trim() || !user || !conversation?.id || isSending) return;
+  const handleSend = async (content: string, attachment?: { url: string; filename: string }) => {
+    if ((!content.trim() && !attachment) || !user || !conversation?.id || isSending) return;
 
     if (!user?.id) {
       console.error("User ID is null right before sending message - preventing send.");

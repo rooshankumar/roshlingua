@@ -1,12 +1,13 @@
 
 import { useState, useRef, KeyboardEvent } from "react";
-import { Send, Languages, Check, X } from "lucide-react";
+import { Send, Languages, Check, X, Paperclip } from "lucide-react";
+import { ChatAttachment } from "./ChatAttachment";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 interface ChatInputProps {
-  onSendMessage: (content: string) => void;
+  onSendMessage: (content: string, attachment?: { url: string; filename: string }) => void;
   learningLanguage: string;
 }
 
@@ -14,12 +15,14 @@ export const ChatInput = ({ onSendMessage, learningLanguage }: ChatInputProps) =
   const [message, setMessage] = useState("");
   const [isChecking, setIsChecking] = useState(false);
   const [suggestions, setSuggestions] = useState<string[]>([]);
+  const [attachment, setAttachment] = useState<{ url: string; filename: string } | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const handleSend = () => {
-    if (message.trim()) {
-      onSendMessage(message.trim());
+    if (message.trim() || attachment) {
+      onSendMessage(message.trim(), attachment || undefined);
       setMessage("");
+      setAttachment(null);
       setSuggestions([]);
     }
   };
@@ -53,6 +56,23 @@ export const ChatInput = ({ onSendMessage, learningLanguage }: ChatInputProps) =
           rows={1}
         />
         <div className="flex gap-2">
+          <ChatAttachment 
+            onAttach={(url, filename) => setAttachment({ url, filename })} 
+          />
+          {attachment && (
+            <div className="flex items-center gap-2 px-2 py-1 bg-muted rounded">
+              <Paperclip className="h-4 w-4" />
+              <span className="text-sm truncate max-w-[100px]">{attachment.filename}</span>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-4 w-4 p-0"
+                onClick={() => setAttachment(null)}
+              >
+                <X className="h-3 w-3" />
+              </Button>
+            </div>
+          )}
           <Popover>
             <PopoverTrigger asChild>
               <Button 
