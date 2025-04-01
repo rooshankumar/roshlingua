@@ -33,6 +33,7 @@ interface User {
   is_online: boolean;
   likes_count: number;
   username: string;
+  date_of_birth: string | null;
   age: number | null; // Added age property
 }
 
@@ -62,6 +63,7 @@ const Community = () => {
             avatar_url,
             streak_count,
             likes_count,
+            date_of_birth,
             age
           `)
           .neq('id', currentUser?.id);
