@@ -56,7 +56,7 @@ const AppLayout = ({ children }: AppLayoutProps) => {
                 }`
               }
             >
-              <route.icon className={`h-5 w-5 transition-transform duration-200 ${isActive ? 'scale-110' : ''}`} />
+              <route.icon className={({ isActive }) => `h-5 w-5 transition-transform duration-200 ${isActive ? 'scale-110' : ''}`} />
               <span className="text-xs mt-1 font-medium">{route.label}</span>
             </NavLink>
           ))}
