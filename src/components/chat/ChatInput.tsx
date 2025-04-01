@@ -52,7 +52,7 @@ export const ChatInput = ({ onSendMessage, learningLanguage }: ChatInputProps) =
           onChange={(e) => setMessage(e.target.value)}
           onKeyDown={handleKeyPress}
           placeholder={`Type your message in ${learningLanguage}...`}
-          className="min-h-[60px] max-h-[120px]"
+          className="message-input min-h-[44px] max-h-[120px] py-2.5"
           rows={1}
         />
         <div className="flex gap-2">

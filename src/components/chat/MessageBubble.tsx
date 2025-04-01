@@ -43,7 +43,7 @@ export const MessageBubble = ({
 
   return (
     <div 
-      className={`flex flex-col gap-1 max-w-[80%] ${isOwnMessage ? "ml-auto items-end" : ""}`}
+      className={`message-bubble flex flex-col gap-1 ${isOwnMessage ? "ml-auto items-end" : ""}`}
     >
       <div
         className={`p-3 rounded-lg ${

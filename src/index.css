@@ -118,6 +118,21 @@
 }
 
 @layer components {
+  .message-bubble {
+    @apply max-w-[85%] md:max-w-[70%] text-[15px] leading-[20px];
+  }
+  
+  .message-input {
+    @apply text-[16px] leading-[20px] placeholder:text-muted-foreground/50;
+  }
+  
+  .chat-container {
+    @apply w-full h-full md:max-w-4xl md:mx-auto md:shadow-lg md:my-4 md:rounded-lg overflow-hidden;
+  }
+  
+  .chat-header {
+    @apply sticky top-0 z-10 backdrop-blur-lg bg-background/80;
+  }
   .glass-card {
     @apply bg-white/70 dark:bg-black/70 backdrop-blur-md border border-white/20 dark:border-white/10 shadow-lg;
   }

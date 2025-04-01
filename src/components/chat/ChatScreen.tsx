@@ -140,11 +140,11 @@ export const ChatScreen = ({ conversation }: Props) => {
   };
 
   return (
-    <Card className="flex flex-col h-screen rounded-none border-none">
+    <Card className="flex flex-col h-screen rounded-none border-none md:max-w-4xl md:mx-auto">
       <ChatHeader conversation={conversation} />
 
       {user?.id ? (
-        <ScrollArea className="flex-1 p-4">
+        <ScrollArea className="flex-1 px-2 md:px-4">
           {hasMore && (
             <div className="text-center mb-4">
               <Button

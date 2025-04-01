@@ -83,7 +83,11 @@ const ChatPage = () => {
     );
   }
 
-  return <ChatScreen conversation={conversation} />;
+  return (
+  <div className="min-h-screen md:bg-muted/30">
+    <ChatScreen conversation={conversation} />
+  </div>
+);
 };
 
 export default ChatPage;

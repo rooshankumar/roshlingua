@@ -37,7 +37,7 @@ const AppLayout = ({ children }: AppLayoutProps) => {
       <div className="hidden md:block">
         <MainNav />
       </div>
-      <main className="flex-1 p-4 pb-24 md:pb-4">{children}</main>
+      <main className="flex-1 pb-24 md:p-4 md:pb-4">{children}</main>
       
       {/* Mobile Bottom Navigation */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-background border-t flex justify-around p-2 z-50">
