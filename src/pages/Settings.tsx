@@ -382,7 +382,10 @@ const Settings = () => {
                         id="date_of_birth"
                         type="date"
                         value={localProfile?.date_of_birth ? new Date(localProfile.date_of_birth).toISOString().split('T')[0] : ''}
-                        onChange={(e) => handleProfileChange("date_of_birth", e.target.value)}
+                        onChange={(e) => {
+                          const date = e.target.value ? new Date(e.target.value) : null;
+                          handleProfileChange("date_of_birth", date?.toISOString().split('T')[0] || '');
+                        }}
                         className="h-12"
                       />
                     </div>

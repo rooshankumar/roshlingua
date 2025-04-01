@@ -24,7 +24,7 @@ export function useProfile(userId: string) {
             streak_count,
             avatar_url,
             likes_count,
-            date_of_birth
+            date_of_birth::text
           `)
           .eq('id', userId)
           .single();
