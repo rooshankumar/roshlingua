@@ -44,9 +44,8 @@ export const ChatHeader = ({ conversation }: Props) => {
         </Avatar>
         <div className="ml-3">
           <h2 className="font-semibold">
-            {participant.full_name || participant.email?.split('@')[0]}
+            {participant.full_name || 'Anonymous User'}
           </h2>
-          <p className="text-sm text-muted-foreground">{participant.email}</p>
         </div>
       </div>
     </div>

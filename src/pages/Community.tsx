@@ -340,7 +340,7 @@ const Community = () => {
                         <div>
                           <h3 className="font-medium">{user.full_name}</h3>
                         </div>
-                        
+
                       </div>
                       <p className="text-sm text-muted-foreground flex items-center gap-2">
                         <span className="px-2 py-0.5 rounded border-green-500 border bg-green-50/10 text-green-700 transition-all hover:bg-green-100/20 hover:scale-105 duration-300">
