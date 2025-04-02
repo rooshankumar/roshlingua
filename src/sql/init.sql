@@ -11,12 +11,11 @@ CREATE TABLE IF NOT EXISTS public.conversations (
 
 -- Create conversation_participants table with proper foreign keys
 CREATE TABLE IF NOT EXISTS public.conversation_participants (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     conversation_id UUID REFERENCES public.conversations(id) ON DELETE CASCADE,
     user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
     last_read_at TIMESTAMPTZ DEFAULT NOW(),
     created_at TIMESTAMPTZ DEFAULT NOW(),
-    UNIQUE(conversation_id, user_id)
+    PRIMARY KEY (conversation_id, user_id)
 );
 
 -- Create messages table with proper references
