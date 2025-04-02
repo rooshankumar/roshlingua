@@ -75,7 +75,7 @@ const ChatList = () => {
           .from('conversation_participants')
           .select(`
             conversation_id,
-            conversations!inner (
+            conversations (
               id,
               created_at,
               messages (
@@ -85,19 +85,17 @@ const ChatList = () => {
                 recipient_id
               )
             ),
-            participants:conversation_participants!conversation_id_fkey (
-              profiles!conversation_participants_user_id_fkey (
-                id,
-                email,
-                full_name,
-                avatar_url,
-                is_online,
-                last_seen
-              )
+            profiles!conversation_participants_user_id_fkey (
+              id,
+              email,
+              full_name,
+              avatar_url,
+              is_online,
+              last_seen
             )
           `)
           .eq('user_id', user.id)
-          .order('conversations.created_at', { ascending: false });
+          .order('created_at', { ascending: false });
 
         if (conversationsError) throw conversationsError;
 
