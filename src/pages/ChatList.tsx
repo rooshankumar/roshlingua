@@ -133,7 +133,16 @@ const ChatList = () => {
           })
         );
 
-        setConversations(conversationPreviews.filter(conv => conv !== null) as ChatPreview[]); //Filter out nulls
+        const validConversations = conversationPreviews.filter(conv => conv !== null) as ChatPreview[];
+        
+        // Sort conversations by last message timestamp, most recent first
+        const sortedConversations = validConversations.sort((a, b) => {
+          const aTime = a?.lastMessage?.created_at ? new Date(a.lastMessage.created_at).getTime() : 0;
+          const bTime = b?.lastMessage?.created_at ? new Date(b.lastMessage.created_at).getTime() : 0;
+          return bTime - aTime;
+        });
+        
+        setConversations(sortedConversations);
       } catch (error) {
         console.error('Error fetching conversations:', error);
       } finally {
