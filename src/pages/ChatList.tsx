@@ -74,11 +74,11 @@ const ChatList = () => {
           .from('conversation_participants')
           .select(`
             conversation_id,
-            conversations:conversations!inner (
+            conversations!inner (
               id,
               created_at
             ),
-            users!inner (
+            users (
               id,
               email,
               full_name,
