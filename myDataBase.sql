@@ -185,3 +185,33 @@
     "column_name": "gender"
   }
 ]
+
+*************************
+  Google OAuth
+Authorized JavaScript origins
+
+URIs 1 
+https://roshlingua.vercel.app
+URIs 2 
+http://localhost:8080
+
+Authorized redirect URIs
+
+URIs 1 
+https://roshlingua.vercel.app/auth/callback
+URIs 2 
+http://localhost:8080/auth/callback
+
+*************************
+Supabase Database Authentication
+  URL Configuration
+  Configure site URL and redirect URLs for authentication
+
+Site URL
+https://roshlingua.vercel.app
+
+Redirect URL
+https://roshlingua.vercel.app/auth/callback
+
+http://localhost:8080/auth/callback
+
