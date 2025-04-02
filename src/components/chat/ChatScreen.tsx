@@ -45,7 +45,7 @@ export const ChatScreen = ({ conversation }: Props) => {
           .from('messages')
           .select(`
             *,
-            sender:profiles!messages_sender_id_fkey(
+            sender:profiles!inner(
               id,
               user_id,
               full_name,
@@ -154,9 +154,13 @@ export const ChatScreen = ({ conversation }: Props) => {
               >
                 {message.sender_id !== user?.id && (
                   <Avatar className="h-8 w-8">
-                    <AvatarImage src={message.sender?.avatar_url || '/placeholder.svg'} alt={message.sender?.full_name || 'User'} />
+                    <AvatarImage 
+                      src={message.sender?.avatar_url || '/placeholder.svg'} 
+                      alt={message.sender?.full_name || 'User'} 
+                      className="object-cover"
+                    />
                     <AvatarFallback>
-                      {message.sender?.full_name?.split(' ').map(n => n[0]).join('').toUpperCase() || '?'}
+                      {message.sender?.full_name?.charAt(0).toUpperCase() || '?'}
                     </AvatarFallback>
                   </Avatar>
                 )}
