@@ -71,7 +71,17 @@ const ChatList = () => {
     setIsLoading(true);
     const fetchConversations = async () => {
       try {
-        const { data: conversations, error } = await supabase
+        // Get unread message counts
+        const { data: unreadMessages, error: unreadError } = await supabase
+          .from('messages')
+          .select('conversation_id')
+          .eq('recipient_id', user?.id)
+          .eq('is_read', false);
+
+        if (unreadError) throw unreadError;
+
+        // Get conversations with participant info
+        const { data: conversations, error: conversationsError } = await supabase
           .from('conversation_participants')
           .select(`
             conversation_id,
@@ -85,8 +95,7 @@ const ChatList = () => {
               full_name,
               avatar_url
             ),
-            unread_count:messages(
-              count(*),
+            messages(
               content,
               created_at
             )
@@ -94,14 +103,18 @@ const ChatList = () => {
           .eq('user_id', user?.id)
           .order('conversation_id', { ascending: false });
 
-        if (error) throw error;
+        if (conversationsError) throw conversationsError;
 
         const conversationPreviews = conversations.map((conv) => {
           const conversationDetails = conv.conversation;
           const otherParticipant = conv.other_participant;
-          const unreadCount = conv.unread_count;
-
+          
           if (!conversationDetails || !otherParticipant) return null;
+
+          // Count unread messages for this conversation
+          const unreadCount = unreadMessages?.filter(
+            msg => msg.conversation_id === conv.conversation_id
+          ).length || 0;
 
           return {
             id: conversationDetails.id,
@@ -111,8 +124,8 @@ const ChatList = () => {
               full_name: otherParticipant.full_name,
               avatar_url: otherParticipant.avatar_url || '/placeholder.svg'
             },
-            lastMessage: unreadCount[0],
-            unreadCount: unreadCount.count || 0,
+            lastMessage: conv.messages?.[0],
+            unreadCount,
           };
         });
 
