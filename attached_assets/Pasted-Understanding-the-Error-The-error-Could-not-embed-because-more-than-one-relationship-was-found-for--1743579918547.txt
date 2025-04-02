@@ -1,0 +1,86 @@
+Understanding the Error
+The error "Could not embed because more than one relationship was found for 'conversation_participants' and 'conversations'" indicates that PostgREST (used in Supabase) is having trouble resolving how to join conversation_participants with conversations. This is because there are multiple foreign key constraints linking these tables.
+
+Issue Breakdown
+Multiple Foreign Keys:
+
+Your conversation_participants table has at least two foreign key constraints referencing the conversations table:
+
+conversation_participants_conversation_id_fkey
+
+fk_conversation
+
+PostgREST does not know which relationship to use when embedding conversations.
+
+Suggested Fix from Supabase's Hint:
+
+The error message suggests explicitly specifying the relationship when querying, like:
+
+sql
+Copy
+Edit
+conversations!conversation_participants_conversation_id_fkey
+or
+
+sql
+Copy
+Edit
+conversations!fk_conversation
+Potential Fixes
+1. Fix Your Supabase Query in fetchConversations
+Modify the query in your fetchConversations function to explicitly specify the correct foreign key:
+
+typescript
+Copy
+Edit
+const { data, error } = await supabase
+  .from('conversation_participants')
+  .select('*, conversations!conversation_participants_conversation_id_fkey(*)')
+  .eq('user_id', user.id);
+
+if (error) {
+  console.error("Error fetching conversations:", error);
+} else {
+  console.log("Fetched conversations:", data);
+}
+OR, if your foreign key should use fk_conversation, use:
+
+typescript
+Copy
+Edit
+const { data, error } = await supabase
+  .from('conversation_participants')
+  .select('*, conversations!fk_conversation(*)')
+  .eq('user_id', user.id);
+2. Check Your Database Schema
+If you do not need multiple foreign keys pointing to the same table, consider removing one. Run this SQL in Supabase SQL Editor:
+
+sql
+Copy
+Edit
+ALTER TABLE conversation_participants 
+DROP CONSTRAINT fk_conversation;
+or
+
+sql
+Copy
+Edit
+ALTER TABLE conversation_participants 
+DROP CONSTRAINT conversation_participants_conversation_id_fkey;
+⚠️ Choose the one that is not essential for your logic.
+
+3. Verify Policies and Permissions
+Ensure that your RLS (Row-Level Security) policies allow fetching conversations. You can temporarily disable RLS and check:
+
+sql
+Copy
+Edit
+ALTER TABLE conversation_participants DISABLE ROW LEVEL SECURITY;
+If it works after disabling, the issue might be in your policy definitions.
+
+Final Steps
+Try Fixing the Query First
+
+If Needed, Remove One Foreign Key
+
+Ensure Your Policies Are Correct
