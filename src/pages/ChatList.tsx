@@ -81,6 +81,8 @@ const ChatList = () => {
           .eq('recipient_id', user?.id)
           .groupBy('conversation_id');
 
+        if (messagesError) throw messagesError;
+
         const unreadCounts = Object.fromEntries(
           userConversations?.map(({ conversation_id, count }) => [conversation_id, parseInt(count)]) || []
         );
@@ -104,7 +106,7 @@ const ChatList = () => {
           .eq('user_id', user.id)
           .order('conversation_id', { ascending: false });
 
-        if (conversationsError) throw conversationsError;
+        if (participantsError) throw participantsError;
 
         const conversationPreviews = await Promise.all(
           userConversations.map(async (conv) => {
