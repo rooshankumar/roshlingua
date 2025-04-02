@@ -274,6 +274,33 @@ export const subscribeToChats = (onChat: (chat: any) => void) => {
   };
 };
 
+// Delete conversation and its messages
+export const deleteConversation = async (conversationId: string, userId: string) => {
+  // First delete messages
+  const { error: messagesError } = await supabase
+    .from('messages')
+    .delete()
+    .eq('conversation_id', conversationId);
+
+  if (messagesError) throw messagesError;
+
+  // Then delete participants
+  const { error: participantsError } = await supabase
+    .from('conversation_participants')
+    .delete()
+    .eq('conversation_id', conversationId);
+
+  if (participantsError) throw participantsError;
+
+  // Finally delete conversation
+  const { error: conversationError } = await supabase
+    .from('conversations')
+    .delete()
+    .eq('id', conversationId);
+
+  if (conversationError) throw conversationError;
+};
+
 // ✅ Send Chat (Ensures Timestamp)
 export const sendChat = async (content: string, senderId: string): Promise<any | null> => {
   const { data, error } = await supabase

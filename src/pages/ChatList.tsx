@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { MessageCircle, Loader2, Search, Plus } from 'lucide-react';
+import { MessageCircle, Loader2, Search, Plus, Trash2 } from 'lucide-react';
+import { deleteConversation } from '@/services/chatService';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -220,8 +221,26 @@ const ChatList = () => {
               to={`/chat/${conversation.id}`}
               className="block"
             >
-              <Card className="hover:bg-muted/50 transition-all duration-200 hover:scale-[1.01] hover:shadow-lg">
-                <CardContent className="flex items-center p-4">
+              <Card className="hover:bg-muted/50 transition-all duration-200 hover:scale-[1.01] hover:shadow-lg group">
+                <CardContent className="flex items-center p-4 relative">
+                  <button 
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      if (window.confirm('Are you sure you want to delete this conversation?')) {
+                        deleteConversation(conversation.id, user?.id || '')
+                          .then(() => {
+                            setConversations(prev => prev.filter(conv => conv.id !== conversation.id));
+                          })
+                          .catch(error => {
+                            console.error('Error deleting conversation:', error);
+                          });
+                      }
+                    }}
+                    className="absolute right-2 top-2 opacity-0 group-hover:opacity-100 transition-opacity p-2 hover:bg-destructive/10 rounded-full"
+                  >
+                    <Trash2 className="w-4 h-4 text-destructive" />
+                  </button>
                   <div className="relative">
                     <Avatar className="h-12 w-12">
                       <AvatarImage src={conversation.participant?.avatar_url || '/placeholder.svg'} />
