@@ -120,8 +120,8 @@ const App = () => {
           <AuthProvider>
             <Toaster />
             <AppRoutes />
-            <Analytics />
-            <SpeedInsights />
+            <Analytics debug={false} />
+            <SpeedInsights debug={false} />
           </AuthProvider>
         </BrowserRouter>
       </ThemeProvider>
