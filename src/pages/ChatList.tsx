@@ -69,21 +69,24 @@ const ChatList = () => {
     setIsLoading(true);
     const fetchConversations = async () => {
       try {
-        // First, get all conversations where the current user is a participant
+        // Get all conversations where the current user is a participant
         const { data: userConversations, error: conversationsError } = await supabase
           .from('conversation_participants')
           .select(`
             conversation_id,
-            users!inner (
-              id,
-              email,
-              profiles!inner (
-                full_name,
-                avatar_url
-              )
-            ),
             conversations:conversation_id (
               created_at
+            ),
+            conversation_participants!conversation_id (
+              user_id,
+              users!inner (
+                id,
+                email,
+                profiles!inner (
+                  full_name,
+                  avatar_url
+                )
+              )
             )
           `)
           .eq('user_id', user.id)
@@ -91,19 +94,13 @@ const ChatList = () => {
 
         if (conversationsError) throw conversationsError;
 
-        // Create a Map to store unique conversations per other user
-        const uniqueUserConversations = new Map();
-
         const conversationPreviews = await Promise.all(
-          userConversations.map(async (participant) => {
-            // Get the participant data directly
-            const otherParticipant = participant.users;
+          userConversations.map(async (conv) => {
+            // Find the other participant in the conversation
+            const otherParticipant = conv.conversation_participants
+              .find(p => p.user_id !== user.id)?.users;
 
-            if (!otherParticipant || uniqueUserConversations.has(otherParticipant.id)) {
-              return null;
-            }
-
-            uniqueUserConversations.set(otherParticipant.id, true);
+            if (!otherParticipant) return null;
           const { data: messages } = await supabase
               .from('messages')
               .select('content, created_at')
