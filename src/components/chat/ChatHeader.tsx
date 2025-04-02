@@ -70,12 +70,10 @@ export const ChatHeader = ({ conversation }: Props) => {
             <h2 className="font-semibold text-foreground">
               {participant?.full_name}
             </h2>
-            <div className="flex items-center text-sm text-muted-foreground">
-              <div className={`w-2 h-2 rounded-full mr-2 ${participant?.is_online ? 'bg-green-500' : 'bg-gray-400'}`} />
-              <span>
-                {participant?.is_online ? 'Online' : participant?.last_seen ? `Last seen ${formatDistanceToNow(new Date(participant.last_seen))} ago` : 'Offline'}
-              </span>
-            </div>
+            <UserStatus 
+              isOnline={participant?.is_online} 
+              lastSeen={participant?.last_seen}
+            />
           </div>
         </div>
       </div>

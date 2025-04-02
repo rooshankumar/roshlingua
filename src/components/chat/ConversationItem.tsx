@@ -44,7 +44,7 @@ export const ConversationItem = ({
           <AvatarFallback>{getInitials(otherParticipant.name)}</AvatarFallback>
         </Avatar>
         <span className={cn(
-          "absolute bottom-0 right-0 block h-2.5 w-2.5 rounded-full ring-2 ring-white",
+          "absolute bottom-0 right-0 block h-3 w-3 rounded-full ring-2 ring-background",
           otherParticipant.isOnline ? "bg-green-500" : "bg-gray-400"
         )} />
       </div>
