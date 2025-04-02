@@ -79,13 +79,13 @@ const ChatList = () => {
               id,
               created_at,
               messages (
-                content,
+                content, 
                 created_at,
                 is_read,
                 recipient_id
               )
             ),
-            profiles!conversation_participants_user_id_fkey (
+            profiles (
               id,
               email,
               full_name,
@@ -103,7 +103,7 @@ const ChatList = () => {
           userConversations.map(async (conv) => {
             // Get conversation details
             const conversationDetails = conv.conversations;
-            const otherParticipant = conv.participants[0]?.profiles; // Assuming only one other participant
+            const otherParticipant = conv.profiles; // Assuming only one other participant
 
             if (!conversationDetails || !otherParticipant) return null;
 
