@@ -16,10 +16,10 @@ CREATE TABLE IF NOT EXISTS public.conversation_participants (
     last_read_at TIMESTAMPTZ DEFAULT NOW(),
     created_at TIMESTAMPTZ DEFAULT NOW(),
     PRIMARY KEY (conversation_id, user_id),
-    CONSTRAINT fk_conversation FOREIGN KEY (conversation_id) 
+    CONSTRAINT conversation_participants_conversation_id_fkey FOREIGN KEY (conversation_id) 
         REFERENCES public.conversations(id) ON DELETE CASCADE,
-    CONSTRAINT fk_user FOREIGN KEY (user_id) 
-        REFERENCES public.profiles(id) ON DELETE CASCADE
+    CONSTRAINT conversation_participants_user_id_fkey FOREIGN KEY (user_id) 
+        REFERENCES public.users(id) ON DELETE CASCADE
 );
 
 -- Add indexes for better performance and relationship clarity
