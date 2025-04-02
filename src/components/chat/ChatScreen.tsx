@@ -151,19 +151,7 @@ export const ChatScreen = ({ conversation }: Props) => {
                 key={message.id}
                 className={`flex items-start gap-2 ${message.sender_id === user?.id ? 'flex-row-reverse' : 'flex-row'}`}
               >
-                {message.sender_id !== user?.id && (
-                  <Avatar className="h-8 w-8">
-                    <AvatarImage 
-                      src={message.sender?.avatar_url || '/placeholder.svg'} 
-                      alt={message.sender?.full_name || 'User'} 
-                      className="object-cover"
-                    />
-                    <AvatarFallback>
-                      {message.sender?.full_name?.charAt(0).toUpperCase() || '?'}
-                    </AvatarFallback>
-                  </Avatar>
-                )}
-                <div className={`flex flex-col gap-1 max-w-[70%] md:max-w-[60%] lg:max-w-[50%]`}>
+                <div className={`flex flex-col gap-1 max-w-[85%] sm:max-w-[75%] md:max-w-[65%]`}>
                   {message.sender_id !== user?.id && (
                     <span className="text-xs text-muted-foreground ml-1">
                       {message.sender?.full_name}
@@ -203,10 +191,20 @@ export const ChatScreen = ({ conversation }: Props) => {
                       )}
                     </div>
                     {message.sender_id === user?.id && (
-                      <div className="flex items-center h-3">
-                        <Check className={`h-3 w-3 ${message.is_delivered ? '' : 'opacity-50'}`} />
-                        {message.is_read && (
-                          <Check className="h-3 w-3 -ml-1" />
+                      <div className="flex items-center h-3 gap-1">
+                        {message.is_read ? (
+                          <Avatar className="h-3 w-3">
+                            <AvatarImage 
+                              src={message.sender?.avatar_url || '/placeholder.svg'} 
+                              alt={message.sender?.full_name || 'User'} 
+                              className="object-cover"
+                            />
+                            <AvatarFallback className="text-[8px]">
+                              {message.sender?.full_name?.charAt(0).toUpperCase() || '?'}
+                            </AvatarFallback>
+                          </Avatar>
+                        ) : (
+                          <Check className={`h-3 w-3 ${message.is_delivered ? '' : 'opacity-50'}`} />
                         )}
                       </div>
                     )}
