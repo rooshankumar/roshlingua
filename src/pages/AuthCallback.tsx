@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/lib/supabase";
@@ -11,39 +12,45 @@ const AuthCallback = () => {
   useEffect(() => {
     const handleAuthCallback = async () => {
       try {
-        const { data, error: sessionError } = await supabase.auth.getSessionFromUrl();
+        // Extract hash parameters
+        const hashParams = new URLSearchParams(window.location.hash.substring(1));
+        const accessToken = hashParams.get("access_token");
+        const refreshToken = hashParams.get("refresh_token");
+
+        if (!accessToken) {
+          throw new Error("No access token found");
+        }
+
+        // Set the session manually
+        const { data: { session }, error: sessionError } = await supabase.auth.setSession({
+          access_token: accessToken,
+          refresh_token: refreshToken || "",
+        });
 
         if (sessionError) {
           throw sessionError;
         }
 
-        if (!data.session) {
-          throw new Error("No session data found");
+        if (!session?.user) {
+          throw new Error("No user in session");
         }
-
-        const user = data.session.user;
-
-        // Basic user info
-        const email = user.email || "";
-        const fullName = user.user_metadata?.full_name || user.user_metadata?.name || null;
-        const avatarUrl = user.user_metadata?.avatar_url || null;
 
         // Check if user exists in profiles table
         const { data: profileData, error: profileError } = await supabase
           .from("profiles")
           .select("onboarding_completed")
-          .eq("id", user.id)
+          .eq("id", session.user.id)
           .single();
 
         if (profileError && profileError.code === "PGRST116") {
           // Profile doesn't exist, create it
           const { error: insertError } = await supabase
             .from("profiles")
-            .insert([{ 
-              id: user.id,
-              email: email,
-              full_name: fullName,
-              avatar_url: avatarUrl
+            .insert([{
+              id: session.user.id,
+              email: session.user.email,
+              full_name: session.user.user_metadata?.full_name,
+              avatar_url: session.user.user_metadata?.avatar_url
             }]);
 
           if (insertError) {
@@ -55,7 +62,6 @@ const AuthCallback = () => {
         }
 
         if (profileError) {
-          console.error("Error checking profile:", profileError);
           throw new Error("Failed to check user profile");
         }
 
