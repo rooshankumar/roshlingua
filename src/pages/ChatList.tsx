@@ -75,6 +75,13 @@ const ChatList = () => {
           .from('conversation_participants')
           .select(`
             conversation_id,
+            users:user_id (
+              id,
+              email,
+              full_name,
+              avatar_url,
+              last_seen
+            ),
             conversations!inner (
               id,
               created_at,
@@ -84,13 +91,6 @@ const ChatList = () => {
                 is_read,
                 recipient_id
               )
-            ),
-            profiles!inner (
-              id,
-              email,
-              full_name,
-              avatar_url,
-              last_seen
             )
           `)
           .eq('user_id', user.id)
