@@ -60,7 +60,11 @@ const AuthCallback = () => {
           if (profileError) throw profileError;
 
           // Redirect based on onboarding status
-          navigate(profileData?.onboarding_completed ? "/dashboard" : "/onboarding", { replace: true });
+          if (!error && profileData?.onboarding_completed) {
+            navigate("/dashboard", { replace: true });
+          } else {
+            navigate("/onboarding", { replace: true });
+          }
         }
       } catch (err) {
         console.error("Auth callback error:", err);

@@ -199,7 +199,7 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
             // Proceed with navigation or other completion logic
             localStorage.setItem("onboarding_completed", "true");
             onComplete();
-            window.location.href = "/dashboard";
+            navigate("/dashboard", { replace: true });
         } catch (error) {
             console.error("Onboarding error:", error);
             toast({
