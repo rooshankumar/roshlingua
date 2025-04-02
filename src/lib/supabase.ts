@@ -15,7 +15,7 @@ export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
 
 export const signInWithGoogle = async () => {
   // Explicitly set the correct redirect URL based on environment
-  const redirectUrl = `${window.location.origin}/auth/callback`;
+  const redirectUrl = import.meta.env.VITE_AUTH_CALLBACK_URL || `${window.location.origin}/auth/callback`;
 
   console.log("Redirecting to Google OAuth with redirectUrl:", redirectUrl);
 
