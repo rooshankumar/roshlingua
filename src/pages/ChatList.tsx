@@ -76,7 +76,7 @@ const ChatList = () => {
           .from('messages')
           .select('conversation_id, count(*, { filter: \'is_read = false and recipient_id = "' + user?.id + '"\' })', { count: 'exact' })
           .eq('recipient_id', user?.id)
-          .groupBy('conversation_id');
+          .group_by('conversation_id');
 
         if (error) throw error;
 
