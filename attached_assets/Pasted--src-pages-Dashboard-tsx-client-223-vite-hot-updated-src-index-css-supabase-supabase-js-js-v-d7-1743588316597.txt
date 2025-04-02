@@ -1,0 +1,56 @@
+/src/pages/Dashboard.tsx
+client:223 [vite] hot updated: /src/index.css
+@supabase_supabase-js.js?v=d7e91fc0:3900 
+            
+            
+           GET https://yekzyvdjjozhhatdefsq.supabase.co/rest/v1/conversation_participants?select=user_id%2Cusers%3Aprofiles%21inner%28id%2Cemail%2Cfull_name%2Cavatar_url%29&conversation_id=eq.0dde6dae-c5b1-4292-b833-3f0d1b80acf7&user_id=neq.7bad0693-9053-423f-a2f0-a61c20b9cbf4 406 (Not Acceptable)
+(anonymous) @ @supabase_supabase-js.js?v=d7e91fc0:3900
+(anonymous) @ @supabase_supabase-js.js?v=d7e91fc0:3921
+fulfilled @ @supabase_supabase-js.js?v=d7e91fc0:3873
+Promise.then
+step @ @supabase_supabase-js.js?v=d7e91fc0:3886
+(anonymous) @ @supabase_supabase-js.js?v=d7e91fc0:3888
+__awaiter6 @ @supabase_supabase-js.js?v=d7e91fc0:3870
+(anonymous) @ @supabase_supabase-js.js?v=d7e91fc0:3911
+then @ @supabase_supabase-js.js?v=d7e91fc0:89Understand this errorAI
+useUserPresence.ts:22 Uncaught (in promise) TypeError: supabase.auth.user is not a function
+    at useUserPresence.ts:22:36
+    at Object.callback (@supabase_supabase-js.js?v=d7e91fc0:2124:23)
+    at @supabase_supabase-js.js?v=d7e91fc0:1770:71
+    at Array.forEach (<anonymous>)
+    at Push._matchReceive (@supabase_supabase-js.js?v=d7e91fc0:1770:54)
+    at Object.callback (@supabase_supabase-js.js?v=d7e91fc0:1744:12)
+    at @supabase_supabase-js.js?v=d7e91fc0:2338:14
+    at Array.map (<anonymous>)
+    at _RealtimeChannel._trigger (@supabase_supabase-js.js?v=d7e91fc0:2323:10)
+    at Object.callback (@supabase_supabase-js.js?v=d7e91fc0:2070:12)
+(anonymous) @ useUserPresence.ts:22
+(anonymous) @ @supabase_supabase-js.js?v=d7e91fc0:2124
+(anonymous) @ @supabase_supabase-js.js?v=d7e91fc0:1770
+_matchReceive @ @supabase_supabase-js.js?v=d7e91fc0:1770
+callback @ @supabase_supabase-js.js?v=d7e91fc0:1744
+(anonymous) @ @supabase_supabase-js.js?v=d7e91fc0:2338
+_trigger @ @supabase_supabase-js.js?v=d7e91fc0:2323
+(anonymous) @ @supabase_supabase-js.js?v=d7e91fc0:2070
+(anonymous) @ @supabase_supabase-js.js?v=d7e91fc0:2338
+_trigger @ @supabase_supabase-js.js?v=d7e91fc0:2323
+(anonymous) @ @supabase_supabase-js.js?v=d7e91fc0:2823
+(anonymous) @ @supabase_supabase-js.js?v=d7e91fc0:2823
+decode @ @supabase_supabase-js.js?v=d7e91fc0:1483
+_onConnMessage @ @supabase_supabase-js.js?v=d7e91fc0:2817
+conn.onmessage @ @supabase_supabase-js.js?v=d7e91fc0:2811Understand this errorAI
+chunk-W6L2VRDA.js?v=d7e91fc0:18625 [Violation] 'click' handler took 155ms
+@supabase_supabase-js.js?v=d7e91fc0:3900 
+            
+            
+           GET https://yekzyvdjjozhhatdefsq.supabase.co/rest/v1/conversation_participants?select=user_id%2Cusers%3Aprofiles%21inner%28id%2Cemail%2Cfull_name%2Cavatar_url%29&conversation_id=eq.0dde6dae-c5b1-4292-b833-3f0d1b80acf7&user_id=neq.7bad0693-9053-423f-a2f0-a61c20b9cbf4 406 (Not Acceptable)
+(anonymous) @ @supabase_supabase-js.js?v=d7e91fc0:3900
+(anonymous) @ @supabase_supabase-js.js?v=d7e91fc0:3921
+fulfilled @ @supabase_supabase-js.js?v=d7e91fc0:3873
+Promise.then
+step @ @supabase_supabase-js.js?v=d7e91fc0:3886
+(anonymous) @ @supabase_supabase-js.js?v=d7e91fc0:3888
+__awaiter6 @ @supabase_supabase-js.js?v=d7e91fc0:3870
+(anonymous) @ @supabase_supabase-js.js?v=d7e91fc0:3911
+then @ @supabase_supabase-js.js?v=d7e91fc0:89Understand this errorAI
+chunk-W6L2VRDA.js?v=d7e91fc0:18625 [Violation] 'click' handler took 196ms
