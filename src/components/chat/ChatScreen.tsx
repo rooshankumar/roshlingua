@@ -139,13 +139,13 @@ export const ChatScreen = ({ conversation }: Props) => {
   };
 
   return (
-    <Card className="flex flex-col h-[100dvh] rounded-none border-none md:max-w-4xl md:mx-auto md:h-screen md:my-0 md:rounded-2xl shadow-2xl overflow-hidden bg-gradient-to-b from-background/95 to-background/90 backdrop-blur-lg relative">
-      <div className="fixed top-0 left-0 right-0 z-50 md:relative">
+    <Card className="fixed inset-0 flex flex-col md:static md:h-screen md:max-w-4xl md:mx-auto md:rounded-2xl border-none shadow-2xl overflow-hidden bg-gradient-to-b from-background/95 to-background/90 backdrop-blur-lg">
+      <div className="sticky top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-xl">
         <ChatHeader conversation={conversation} />
       </div>
 
       {user?.id ? (
-        <ScrollArea className="flex-1 px-4 md:px-6 py-4 overflow-y-auto pr-6 mt-[72px] mb-[100px] md:my-0" data-scrollbar>
+        <ScrollArea className="flex-1 px-4 md:px-6 py-4 overflow-y-auto pr-6" data-scrollbar>
           <div className="space-y-6">
             {messages.map((message, index) => (
               <div
@@ -237,7 +237,7 @@ export const ChatScreen = ({ conversation }: Props) => {
       )}
 
       {user?.id && (
-        <div className="fixed bottom-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-xl border-t border-border/50 md:relative md:bottom-auto">
+        <div className="sticky bottom-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-xl border-t border-border/50">
           <CardContent className="p-4 max-w-4xl mx-auto">
             <div className="flex items-end gap-3">
               <ChatAttachment onAttach={(url, filename) => handleSend(newMessage, { url, filename })} />
