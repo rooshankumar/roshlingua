@@ -73,12 +73,11 @@ const ChatList = () => {
         const { data: userConversations, error: conversationsError } = await supabase
           .from('conversation_participants')
           .select(`
-            conversation_id,
             conversation:conversations!inner (
               id,
               created_at
             ),
-            user:users!inner (
+            user:users (
               id,
               email,
               full_name,
@@ -86,7 +85,7 @@ const ChatList = () => {
             )
           `)
           .eq('user_id', user.id)
-          .order('conversation:created_at', { ascending: false });
+          .order('created_at', { ascending: false });
 
         // Filter out current user and format the response
         const otherParticipants = userConversations?.filter(conv => conv.user.id !== user.id);
