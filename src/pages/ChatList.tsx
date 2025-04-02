@@ -75,64 +75,55 @@ const ChatList = () => {
           .from('conversation_participants')
           .select(`
             conversation_id,
-            conversation:conversations(
+            conversations!inner (
               id,
-              created_at
+              created_at,
+              messages (
+                content,
+                created_at,
+                is_read,
+                recipient_id
+              )
             ),
-            other_participant:profiles(
-              id,
-              email,
-              full_name,
-              avatar_url
+            participants:conversation_participants!conversation_id_fkey (
+              profiles!conversation_participants_user_id_fkey (
+                id,
+                email,
+                full_name,
+                avatar_url,
+                is_online,
+                last_seen
+              )
             )
           `)
           .eq('user_id', user.id)
-          .order('conversation_id', { ascending: false });
+          .order('conversations.created_at', { ascending: false });
 
         if (conversationsError) throw conversationsError;
 
         const conversationPreviews = await Promise.all(
           userConversations.map(async (conv) => {
             // Get conversation details
-            const conversationDetails = conv.conversation;
-            const otherParticipant = conv.other_participant;
+            const conversationDetails = conv.conversations;
+            const otherParticipant = conv.participants[0]?.profiles; // Assuming only one other participant
 
             if (!conversationDetails || !otherParticipant) return null;
 
-            // Ensure we're getting the other participant's data
-            const { data: participants } = await supabase
-              .from('conversation_participants')
-              .select(`
-                user_id,
-                users:profiles!inner(
-                  id,
-                  email,
-                  full_name,
-                  avatar_url
-                )
-              `)
-              .eq('conversation_id', conv.conversation_id)
-              .neq('user_id', user.id)
-              .single();
 
-            if (!participants?.users) return null;
-
-            const { data: messages } = await supabase
-              .from('messages')
-              .select('content, created_at')
-              .eq('conversation_id', conv.conversation_id)
-              .order('created_at', { ascending: false })
-              .limit(1);
+            const messages = conversationDetails.messages;
+            const lastMessage = messages.length > 0 ? messages[0] : null;
 
             return {
               id: conversationDetails.id,
               participant: {
-                id: participants.users.id,
-                email: participants.users.email,
-                full_name: participants.users.full_name,
-                avatar_url: participants.users.avatar_url || '/placeholder.svg'
+                id: otherParticipant.id,
+                email: otherParticipant.email,
+                full_name: otherParticipant.full_name,
+                avatar_url: otherParticipant.avatar_url || '/placeholder.svg',
+                is_online: otherParticipant.is_online,
+                last_seen: otherParticipant.last_seen
               },
-              lastMessage: messages?.[0]
+              lastMessage: lastMessage
             };
           })
         );
