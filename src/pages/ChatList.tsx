@@ -74,10 +74,6 @@ const ChatList = () => {
           .from('conversation_participants')
           .select(`
             conversation_id,
-            conversation:conversation_id (
-              id,
-              created_at
-            ),
             users!inner (
               id,
               email,
@@ -95,42 +91,32 @@ const ChatList = () => {
         const uniqueUserConversations = new Map();
 
         const conversationPreviews = await Promise.all(
-          userConversations.map(async (conversation) => {
-            // Get the other participant (not the current user)
-            const otherParticipant = conversation.conversation_participants
-              .find(p => p.user_id !== user.id)?.users;
+          userConversations.map(async (participant) => {
+            // Get the participant data directly
+            const otherParticipant = participant.users;
 
             if (!otherParticipant || uniqueUserConversations.has(otherParticipant.id)) {
               return null;
             }
 
             uniqueUserConversations.set(otherParticipant.id, true);
-          }).map(async (conversation) => {
-            const otherParticipant = conversation.conversation_participants
-              .find(p => p.user_id !== user.id)?.users;
-
-            if (!otherParticipant) {
-              return null;
-            }
-
-            const { data: messages } = await supabase
+          const { data: messages } = await supabase
               .from('messages')
               .select('content, created_at')
               .eq('conversation_id', participant.conversation_id)
               .order('created_at', { ascending: false })
               .limit(1);
 
-            const participantUser = otherParticipant?.users;
-            return participantUser ? {
+            return {
               id: participant.conversation_id,
               participant: {
-                id: participantUser.id,
-                email: participantUser.email,
-                full_name: participantUser.profiles.full_name || participantUser.email?.split('@')[0],
-                avatar_url: participantUser.profiles.avatar_url || '/placeholder.svg'
+                id: otherParticipant.id,
+                email: otherParticipant.email,
+                full_name: otherParticipant.profiles?.full_name || otherParticipant.email?.split('@')[0],
+                avatar_url: otherParticipant.profiles?.avatar_url || '/placeholder.svg'
               },
               lastMessage: messages?.[0]
-            } : null;
+            };
           })
         );
 
