@@ -72,7 +72,7 @@ const ChatList = () => {
     const fetchConversations = async () => {
       try {
         // Get all conversations where the current user is a participant and unread counts
-        const { data: userConversations, error: messagesError } = await supabase
+        const { data: userConversations, error } = await supabase
           .from('messages')
           .select(`
             conversation_id,
@@ -81,7 +81,7 @@ const ChatList = () => {
           .eq('recipient_id', user?.id)
           .groupBy('conversation_id');
 
-        if (messagesError) throw messagesError;
+        if (error) throw error;
 
         const unreadCounts = Object.fromEntries(
           userConversations?.map(({ conversation_id, count }) => [conversation_id, parseInt(count)]) || []
