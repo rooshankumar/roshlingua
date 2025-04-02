@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/input';
 import { useAuth } from '@/providers/AuthProvider';
 import { supabase } from '@/lib/supabase';
 import { formatDistanceToNow } from 'date-fns';
-import classNames from 'classnames'; // Added import
+import classNames from 'classnames';
 
 interface ChatPreview {
   id: string;
@@ -108,7 +108,7 @@ const ChatList = () => {
         const conversationPreviews = conversations.map((conv) => {
           const conversationDetails = conv.conversation;
           const otherParticipant = conv.other_participant;
-          
+
           if (!conversationDetails || !otherParticipant) return null;
 
           // Count unread messages for this conversation
