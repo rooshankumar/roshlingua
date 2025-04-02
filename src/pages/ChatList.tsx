@@ -73,18 +73,21 @@ const ChatList = () => {
         const { data: userConversations, error: conversationsError } = await supabase
           .from('conversation_participants')
           .select(`
-            conversations (
+            conversation:conversations!inner (
               id,
               created_at
             ),
-            users (
-              id,
-              email,
-              full_name,
-              avatar_url
+            other_participants:conversation_participants!inner(
+              users!inner (
+                id,
+                email,
+                full_name,
+                avatar_url
+              )
             )
           `)
           .eq('user_id', user.id)
+          .not('users.id', 'eq', user.id)
           .order('created_at', { ascending: false });
 
         if (conversationsError) throw conversationsError;
