@@ -190,13 +190,29 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
                 return;
             }
 
+            // Complete onboarding in database
+            const { error: onboardingError } = await supabase
+                .from('profiles')
+                .update({ onboarding_completed: true })
+                .eq('id', user.id);
+
+            if (onboardingError) {
+                console.error('Error updating onboarding status:', onboardingError);
+                toast({
+                    variant: "destructive",
+                    title: "Error",
+                    description: "Failed to complete onboarding. Please try again.",
+                });
+                return;
+            }
+
             // Show success message
             toast({
-                title: "Profile created",
-                description: "Your profile has been successfully set up!",
+                title: "Welcome!",
+                description: "Your profile has been successfully set up.",
             });
 
-            // Proceed with navigation or other completion logic
+            // Navigate to dashboard
             localStorage.setItem("onboarding_completed", "true");
             onComplete();
             navigate("/dashboard", { replace: true });
