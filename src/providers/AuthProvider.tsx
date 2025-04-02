@@ -42,12 +42,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   useEffect(() => {
-    console.log("Setting up auth state listener");
-
-    // Set up auth state listener FIRST
+    // Auth state change handled silently
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, currentSession) => {
-        console.log("Auth state changed:", event, currentSession?.user?.id);
         setSession(currentSession);
         setUser(currentSession?.user ?? null);
         setIsLoading(false);
@@ -63,7 +60,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           setIsLoading(false);
           return;
         }
-        console.log("Initial session:", data.session?.user?.id);
         setSession(data.session);
         setUser(data.session?.user ?? null);
       } catch (error) {
@@ -293,8 +289,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
 export function useAuth() {
   const context = useContext(AuthContext);
-  console.log("AuthContext in useAuth:", context);
-  console.log("User in AuthContext:", context.user);
   if (!context) {
     throw new Error("useAuth must be used within an AuthProvider");
   }
