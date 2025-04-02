@@ -20,14 +20,16 @@ const ChatPage = () => {
         const { data: conversationParticipants, error: participantsError } = await supabase
           .from('conversation_participants')
           .select(`
-            users!user_id (
+            user_id,
+            users:profiles!inner(
               id,
               email,
-              avatar_url,
-              full_name
+              full_name,
+              avatar_url
             )
           `)
-          .eq('conversation_id', conversationId);
+          .eq('conversation_id', conversationId)
+          .neq('user_id', user.id);
 
         if (participantsError) throw participantsError;
 
