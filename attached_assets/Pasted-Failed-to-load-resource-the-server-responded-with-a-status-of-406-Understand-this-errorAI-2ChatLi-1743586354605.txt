@@ -1,0 +1,43 @@
+Failed to load resource: the server responded with a status of 406 ()Understand this errorAI
+2ChatList.tsx:240 Uncaught ReferenceError: cn is not defined
+    at ChatList.tsx:240:38
+    at Array.map (<anonymous>)
+    at ChatList (ChatList.tsx:225:34)
+    at renderWithHooks (chunk-W6L2VRDA.js?v=d7e91fc0:11548:26)
+    at updateFunctionComponent (chunk-W6L2VRDA.js?v=d7e91fc0:14582:28)
+    at beginWork (chunk-W6L2VRDA.js?v=d7e91fc0:15924:22)
+    at HTMLUnknownElement.callCallback2 (chunk-W6L2VRDA.js?v=d7e91fc0:3674:22)
+    at Object.invokeGuardedCallbackDev (chunk-W6L2VRDA.js?v=d7e91fc0:3699:24)
+    at invokeGuardedCallback (chunk-W6L2VRDA.js?v=d7e91fc0:3733:39)
+    at beginWork$1 (chunk-W6L2VRDA.js?v=d7e91fc0:19765:15)Understand this errorAI
+chunk-W6L2VRDA.js?v=d7e91fc0:14032 The above error occurred in the <ChatList> component:
+
+    at ChatList (https://cf2774ac-4917-498c-86e8-5ff393832145-00-150vmfqt1uwvo.sisko.replit.dev/src/pages/ChatList.tsx?t=1743586277591:23:22)
+    at main
+    at div
+    at AppLayout (https://cf2774ac-4917-498c-86e8-5ff393832145-00-150vmfqt1uwvo.sisko.replit.dev/src/components/layouts/AppLayout.tsx:36:22)
+    at ProtectedRoute (https://cf2774ac-4917-498c-86e8-5ff393832145-00-150vmfqt1uwvo.sisko.replit.dev/src/components/auth/ProtectedRoute.tsx?t=1743584392435:15:27)
+    at RenderedRoute (https://cf2774ac-4917-498c-86e8-5ff393832145-00-150vmfqt1uwvo.sisko.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=d7e91fc0:4069:5)
+    at Routes (https://cf2774ac-4917-498c-86e8-5ff393832145-00-150vmfqt1uwvo.sisko.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=d7e91fc0:4508:5)
+    at AppRoutes (https://cf2774ac-4917-498c-86e8-5ff393832145-00-150vmfqt1uwvo.sisko.replit.dev/src/App.tsx?t=1743586187986:37:33)
+    at AuthProvider (https://cf2774ac-4917-498c-86e8-5ff393832145-00-150vmfqt1uwvo.sisko.replit.dev/src/providers/AuthProvider.tsx?t=1743584392435:23:32)
+    at Router (https://cf2774ac-4917-498c-86e8-5ff393832145-00-150vmfqt1uwvo.sisko.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=d7e91fc0:4451:15)
+    at BrowserRouter (https://cf2774ac-4917-498c-86e8-5ff393832145-00-150vmfqt1uwvo.sisko.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=d7e91fc0:5196:5)
+    at ThemeProvider (https://cf2774ac-4917-498c-86e8-5ff393832145-00-150vmfqt1uwvo.sisko.replit.dev/src/components/theme-provider.tsx:17:33)
+    at QueryClientProvider (https://cf2774ac-4917-498c-86e8-5ff393832145-00-150vmfqt1uwvo.sisko.replit.dev/node_modules/.vite/deps/@tanstack_react-query.js?v=d7e91fc0:2794:3)
+    at App
+
+Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://reactjs.org/link/error-boundaries to learn more about error boundaries.
+logCapturedError @ chunk-W6L2VRDA.js?v=d7e91fc0:14032Understand this errorAI
+chunk-W6L2VRDA.js?v=d7e91fc0:19413 Uncaught ReferenceError: cn is not defined
+    at ChatList.tsx:240:38
+    at Array.map (<anonymous>)
+    at ChatList (ChatList.tsx:225:34)
+    at renderWithHooks (chunk-W6L2VRDA.js?v=d7e91fc0:11548:26)
+    at updateFunctionComponent (chunk-W6L2VRDA.js?v=d7e91fc0:14582:28)
+    at beginWork (chunk-W6L2VRDA.js?v=d7e91fc0:15924:22)
+    at beginWork$1 (chunk-W6L2VRDA.js?v=d7e91fc0:19753:22)
+    at performUnitOfWork (chunk-W6L2VRDA.js?v=d7e91fc0:19198:20)
+    at workLoopSync (chunk-W6L2VRDA.js?v=d7e91fc0:19137:13)
+    at renderRootSync (chunk-W6L2VRDA.js?v=d7e91fc0:19116:15)Understand this errorAI
