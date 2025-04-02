@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input';
 import { useAuth } from '@/providers/AuthProvider';
 import { supabase } from '@/lib/supabase';
 import { formatDistanceToNow } from 'date-fns';
+import classNames from 'classnames'; // Added import
 
 interface ChatPreview {
   id: string;
@@ -237,7 +238,7 @@ const ChatList = () => {
                         {conversation.participant?.full_name?.substring(0, 2).toUpperCase() || 'AB'}
                       </AvatarFallback>
                     </Avatar>
-                    <span className={cn(
+                    <span className={classNames(
                       "absolute bottom-0 right-0 w-3 h-3 rounded-full ring-2 ring-background",
                       conversation.participant?.is_online ? "bg-green-500" : "bg-gray-400"
                     )} />
