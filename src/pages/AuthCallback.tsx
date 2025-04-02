@@ -12,60 +12,56 @@ const AuthCallback = () => {
   useEffect(() => {
     const handleAuthCallback = async () => {
       try {
-        // Get session from URL
-        const { data, error } = await supabase.auth.getSession();
-        
-        if (error) {
-          throw error;
-        }
+        // Handle hash fragment
+        if (window.location.hash) {
+          const params = new URLSearchParams(window.location.hash.substring(1));
+          const accessToken = params.get('access_token');
+          const refreshToken = params.get('refresh_token');
+          const expiresIn = params.get('expires_in');
+          const tokenType = params.get('token_type');
 
-        const session = data.session;
-
-        if (sessionError) {
-          throw sessionError;
-        }
-
-        if (!session?.user) {
-          throw new Error("No user in session");
-        }
-
-        // Check if user exists in profiles table
-        const { data: profileData, error: profileError } = await supabase
-          .from("profiles")
-          .select("onboarding_completed")
-          .eq("id", session.user.id)
-          .single();
-
-        if (profileError && profileError.code === "PGRST116") {
-          // Profile doesn't exist, create it
-          const { error: insertError } = await supabase
-            .from("profiles")
-            .insert([{
-              id: session.user.id,
-              email: session.user.email,
-              full_name: session.user.user_metadata?.full_name,
-              avatar_url: session.user.user_metadata?.avatar_url
-            }]);
-
-          if (insertError) {
-            console.error("Error creating profile:", insertError);
+          if (!accessToken) {
+            throw new Error('No access token found');
           }
 
-          navigate("/onboarding", { replace: true });
-          return;
-        }
+          // Set the session with the token
+          const { data: { session }, error: sessionError } = await supabase.auth.setSession({
+            access_token: accessToken,
+            refresh_token: refreshToken || '',
+            expires_in: parseInt(expiresIn || '3600'),
+          });
 
-        if (profileError) {
-          throw new Error("Failed to check user profile");
-        }
+          if (sessionError) throw sessionError;
+          if (!session) throw new Error('No session established');
 
-        // Redirect based on onboarding status
-        if (profileData?.onboarding_completed) {
-          navigate("/dashboard", { replace: true });
-        } else {
-          navigate("/onboarding", { replace: true });
-        }
+          // Check if user exists in profiles table
+          const { data: profileData, error: profileError } = await supabase
+            .from("profiles")
+            .select("onboarding_completed")
+            .eq("id", session.user.id)
+            .single();
 
+          if (profileError && profileError.code === "PGRST116") {
+            // Profile doesn't exist, create it
+            const { error: insertError } = await supabase
+              .from("profiles")
+              .insert([{
+                id: session.user.id,
+                email: session.user.email,
+                full_name: session.user.user_metadata?.full_name,
+                avatar_url: session.user.user_metadata?.avatar_url
+              }]);
+
+            if (insertError) throw insertError;
+            navigate("/onboarding", { replace: true });
+            return;
+          }
+
+          if (profileError) throw profileError;
+
+          // Redirect based on onboarding status
+          navigate(profileData?.onboarding_completed ? "/dashboard" : "/onboarding", { replace: true });
+        }
       } catch (err) {
         console.error("Auth callback error:", err);
         setError(err instanceof Error ? err.message : "Authentication failed");
