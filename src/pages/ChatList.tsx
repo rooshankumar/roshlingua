@@ -87,33 +87,43 @@ const ChatList = () => {
         }, {} as Record<string, number>) || {};
 
         // Get conversations with participant info
+        // Get all conversations where current user is a participant
         const { data: conversations, error: conversationsError } = await supabase
           .from('conversation_participants')
           .select(`
             conversation_id,
             conversation:conversations(
               id,
-              created_at
+              created_at,
+              messages:messages(
+                content,
+                created_at,
+                is_read,
+                recipient_id
+              )
             ),
-            other_participant:profiles!conversation_participants_user_id_fkey(
-              id,
-              email,
-              full_name,
-              avatar_url
-            ),
-            messages(
-              content,
-              created_at
+            participants:conversation_participants(
+              user_id,
+              profiles:profiles(
+                id,
+                email,
+                full_name,
+                avatar_url,
+                is_online,
+                last_seen
+              )
             )
           `)
           .eq('user_id', user?.id)
-          .order('conversation_id', { ascending: false });
+          .order('created_at', { ascending: false });
 
         if (conversationsError) throw conversationsError;
 
         const conversationPreviews = conversations.map((conv) => {
           const conversationDetails = conv.conversation;
-          const otherParticipant = conv.other_participant;
+          // Find the other participant (not the current user)
+          const otherParticipant = conv.participants
+            ?.find(p => p.profiles?.id !== user?.id)?.profiles;
 
           if (!conversationDetails || !otherParticipant) return null;
 
