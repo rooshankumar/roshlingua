@@ -74,11 +74,11 @@ const ChatList = () => {
           .from('conversation_participants')
           .select(`
             conversation_id,
-            conversations!conversation_participants_conversation_id_fkey(
+            conversations(
               id,
               created_at
             ),
-            other_participant:users!conversation_participants_user_id_fkey(
+            other_participant:users(
               id,
               email,
               full_name,
@@ -89,7 +89,7 @@ const ChatList = () => {
           .order('conversations.created_at', { ascending: false });
 
         // Filter out current user and format the response
-        const otherParticipants = userConversations?.filter(conv => conv.user.id !== user.id);
+        //const otherParticipants = userConversations?.filter(conv => conv.user.id !== user.id);
 
         if (conversationsError) throw conversationsError;
 
@@ -97,7 +97,7 @@ const ChatList = () => {
           userConversations.map(async (conv) => {
             // Get conversation details
             const conversationDetails = conv.conversations;
-            const otherParticipant = conv.users;
+            const otherParticipant = conv.other_participant;
 
             if (!conversationDetails || !otherParticipant) return null;
 
@@ -109,12 +109,12 @@ const ChatList = () => {
               .limit(1);
 
             return {
-              id: conv.conversation.id,
+              id: conversationDetails.id,
               participant: {
-                id: conv.other_participant.id,
-                email: conv.other_participant.email,
-                full_name: otherParticipant.profiles?.full_name || otherParticipant.email?.split('@')[0],
-                avatar_url: otherParticipant.profiles?.avatar_url || '/placeholder.svg'
+                id: otherParticipant.id,
+                email: otherParticipant.email,
+                full_name: otherParticipant.full_name,
+                avatar_url: otherParticipant.avatar_url || '/placeholder.svg'
               },
               lastMessage: messages?.[0]
             };
@@ -128,10 +128,10 @@ const ChatList = () => {
         const sortedConversations = validConversations.sort((a, b) => {
           const aTime = a?.lastMessage?.created_at 
             ? new Date(a.lastMessage.created_at).getTime() 
-            : new Date(a.conversation?.created_at || 0).getTime();
+            : new Date(a.id || 0).getTime(); //fallback to conversation ID if no last message
           const bTime = b?.lastMessage?.created_at 
             ? new Date(b.lastMessage.created_at).getTime()
-            : new Date(b.conversation?.created_at || 0).getTime();
+            : new Date(b.id || 0).getTime(); //fallback to conversation ID if no last message
           return bTime - aTime;
         });
 
