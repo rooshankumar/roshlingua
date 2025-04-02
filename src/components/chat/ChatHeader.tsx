@@ -47,6 +47,34 @@ export const ChatHeader = ({ conversation }: Props) => {
   }
 
   return (
+    <div className="chat-header">
+      <div className="container max-w-4xl mx-auto">
+        <div className="flex items-center justify-between p-4">
+          <div className="flex items-center gap-4">
+            <Button variant="ghost" size="icon" onClick={() => navigate(-1)}>
+              <ChevronLeft className="h-5 w-5" />
+            </Button>
+            <div className="relative">
+              <Avatar className="h-10 w-10">
+                <AvatarImage src={participant?.avatar_url || '/placeholder.svg'} />
+                <AvatarFallback>{participant?.full_name?.substring(0, 2).toUpperCase()}</AvatarFallback>
+              </Avatar>
+              {participant?.is_online && (
+                <span className="absolute bottom-0 right-0 w-3 h-3 rounded-full bg-green-500 ring-2 ring-background" />
+              )}
+            </div>
+            <div>
+              <h2 className="font-semibold text-foreground">
+                {participant?.full_name}
+              </h2>
+              <UserStatus 
+                isOnline={participant?.is_online} 
+                lastSeen={participant?.last_seen}
+              />
+            </div>
+          </div>
+
+  return (
     <div className="flex items-center justify-between p-4">
       <div className="flex items-center">
         <Button 

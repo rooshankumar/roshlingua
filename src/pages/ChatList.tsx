@@ -237,9 +237,10 @@ const ChatList = () => {
                         {conversation.participant?.full_name?.substring(0, 2).toUpperCase() || 'AB'}
                       </AvatarFallback>
                     </Avatar>
-                    {conversation.participant?.is_online && (
-                      <span className="absolute bottom-0 right-0 w-3 h-3 rounded-full bg-green-500 border-2 border-background" />
-                    )}
+                    <span className={cn(
+                      "absolute bottom-0 right-0 w-3 h-3 rounded-full ring-2 ring-background",
+                      conversation.participant?.is_online ? "bg-green-500" : "bg-gray-400"
+                    )} />
                   </div>
                   <div className="ml-4 flex-1">
                     <div className="flex items-center justify-between">
