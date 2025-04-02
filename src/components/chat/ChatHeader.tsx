@@ -60,20 +60,22 @@ export const ChatHeader = ({ conversation }: Props) => {
           <Avatar>
             <AvatarImage 
               src={participant?.avatar_url || '/placeholder.svg'} 
-              alt={participant?.full_name || 'User avatar'}
+              alt={participant?.full_name || 'User'}
             />
             <AvatarFallback>
-              {participant?.full_name?.split(' ').map(n => n[0]).join('').toUpperCase() || 'U'}
+              {participant?.full_name?.charAt(0).toUpperCase() || 'U'}
             </AvatarFallback>
           </Avatar>
           <div className="ml-3">
-            <h2 className="font-semibold">
-              {participant?.full_name || 'Anonymous User'}
+            <h2 className="font-semibold text-foreground">
+              {participant?.full_name}
             </h2>
-            <UserStatus 
-              isOnline={participant?.is_online} 
-              lastSeen={participant?.last_seen}
-            />
+            <div className="flex items-center text-sm text-muted-foreground">
+              <div className={`w-2 h-2 rounded-full mr-2 ${participant?.is_online ? 'bg-green-500' : 'bg-gray-400'}`} />
+              <span>
+                {participant?.is_online ? 'Online' : participant?.last_seen ? `Last seen ${formatDistanceToNow(new Date(participant.last_seen))} ago` : 'Offline'}
+              </span>
+            </div>
           </div>
         </div>
       </div>

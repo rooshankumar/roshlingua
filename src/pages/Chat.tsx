@@ -42,10 +42,10 @@ const ChatPage = () => {
             id: conversationId,
             participant: {
               id: otherParticipant.id,
-              email: otherParticipant.email,
-              full_name: otherParticipant.profiles?.full_name || otherParticipant.email?.split('@')[0],
-              avatar_url: otherParticipant.profiles?.avatar_url || '/placeholder.svg',
-              avatar: otherParticipant.profiles?.avatar_url || '/placeholder.svg'
+              full_name: otherParticipant.full_name,
+              avatar_url: otherParticipant.avatar_url,
+              is_online: otherParticipant.is_online,
+              last_seen: otherParticipant.last_seen
             }
           });
         }
