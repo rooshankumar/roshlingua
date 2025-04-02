@@ -9,6 +9,21 @@ CREATE TABLE IF NOT EXISTS public.conversations (
     updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+-- Drop existing constraints safely
+ALTER TABLE profiles DROP CONSTRAINT IF EXISTS profiles_user_id_fkey;
+ALTER TABLE conversation_participants DROP CONSTRAINT IF EXISTS conversation_participants_user_id_fkey;
+ALTER TABLE messages DROP CONSTRAINT IF EXISTS messages_sender_id_fkey;
+
+-- Add foreign keys
+ALTER TABLE profiles ADD CONSTRAINT profiles_user_id_fkey
+FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE;
+
+ALTER TABLE conversation_participants ADD CONSTRAINT conversation_participants_user_id_fkey
+FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE;
+
+ALTER TABLE messages ADD CONSTRAINT messages_sender_id_fkey
+FOREIGN KEY (sender_id) REFERENCES users(id) ON DELETE CASCADE;
+
 -- Create conversation_participants table with proper foreign keys
 CREATE TABLE IF NOT EXISTS public.conversation_participants (
     conversation_id UUID,
