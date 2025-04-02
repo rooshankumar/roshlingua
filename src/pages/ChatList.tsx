@@ -74,10 +74,7 @@ const ChatList = () => {
         // Get all conversations where the current user is a participant and unread counts
         const { data: userConversations, error } = await supabase
           .from('messages')
-          .select(`
-            conversation_id,
-            count(*) filter (where is_read = false and recipient_id = '${user?.id}')::integer
-          `)
+          .select('conversation_id, count(*, { filter: \'is_read = false and recipient_id = "' + user?.id + '"\' })', { count: 'exact' })
           .eq('recipient_id', user?.id)
           .groupBy('conversation_id');
 
@@ -109,7 +106,7 @@ const ChatList = () => {
         if (participantsError) throw participantsError;
 
         const conversationPreviews = await Promise.all(
-          userConversations.map(async (conv) => {
+          conversations.map(async (conv) => {
             // Get conversation details
             const conversationDetails = conv.conversation;
             const otherParticipant = conv.other_participant;
@@ -137,7 +134,7 @@ const ChatList = () => {
             const { data: messages } = await supabase
               .from('messages')
               .select('content, created_at')
-              .eq('conversation_id', conv.conversation_id)
+              .eq('conversation_id', conversationDetails.id)
               .order('created_at', { ascending: false })
               .limit(1);
 
@@ -149,7 +146,8 @@ const ChatList = () => {
                 full_name: participants.users.full_name,
                 avatar_url: participants.users.avatar_url || '/placeholder.svg'
               },
-              lastMessage: messages?.[0]
+              lastMessage: messages?.[0],
+              unreadCount: unreadCounts[conversationDetails.id] || 0,
             };
           })
         );
