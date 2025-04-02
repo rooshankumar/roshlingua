@@ -77,7 +77,7 @@ const ChatList = () => {
               id,
               created_at
             ),
-            other_participant:users!conversation_participants_user_id_fkey(
+            other_participant:users(
               id,
               email,
               full_name,
