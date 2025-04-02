@@ -20,7 +20,8 @@ import { supabase } from '@/lib/supabase';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from "@/components/ui/badge";
 import { toast } from '@/hooks/use-toast';
-import cn from 'classnames';
+import classNames from 'classnames';
+import { cn } from "@/lib/utils";
 
 interface User {
   id: string;
