@@ -138,7 +138,7 @@ export const ChatScreen = ({ conversation }: Props) => {
   };
 
   return (
-    <Card className="flex flex-col h-[100dvh] rounded-none border-none md:max-w-4xl md:mx-auto md:h-screen md:my-0 shadow-2xl overflow-hidden">
+    <Card className="flex flex-col h-[100dvh] rounded-none border-none md:max-w-4xl md:mx-auto md:h-screen md:my-0 md:rounded-lg shadow-2xl overflow-hidden bg-gradient-to-b from-background to-background/95">
       <div className="fixed top-0 left-0 right-0 z-50 md:absolute">
         <ChatHeader conversation={conversation} />
       </div>
