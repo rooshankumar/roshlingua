@@ -58,16 +58,19 @@ export const ChatHeader = ({ conversation }: Props) => {
         </Button>
         <div className="flex items-center ml-4">
           <Avatar>
-            <AvatarImage src={participant.avatar_url || '/placeholder.svg'} />
+            <AvatarImage src={participant?.avatar_url || '/placeholder.svg'} />
             <AvatarFallback>
-              {participant.full_name?.substring(0, 2).toUpperCase() || participant.email?.substring(0, 2).toUpperCase() || 'U'}
+              {participant?.full_name?.charAt(0).toUpperCase() || participant?.email?.charAt(0).toUpperCase() || 'U'}
             </AvatarFallback>
           </Avatar>
           <div className="ml-3">
             <h2 className="font-semibold">
-              {participant.full_name || 'Anonymous User'}
+              {participant?.full_name || participant?.email?.split('@')[0] || 'Anonymous User'}
             </h2>
-            <UserStatus isOnline={participant.is_online} lastSeen={participant.last_seen} />
+            <UserStatus 
+              isOnline={participant?.is_online} 
+              lastSeen={participant?.last_seen} 
+            />
           </div>
         </div>
       </div>
