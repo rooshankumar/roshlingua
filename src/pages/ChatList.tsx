@@ -71,14 +71,15 @@ const ChatList = () => {
       try {
         // Get all conversations where the current user is a participant
         const { data: userConversations, error: conversationsError } = await supabase
-          .from('conversation_participants as cp')
+          .from('conversation_participants')
           .select(`
             conversation_id,
             conversations!inner (
               id,
               created_at
             ),
-            participant:conversation_participants!inner (
+            other_participant:conversation_participants!inner (
+              user_id,
               users (
                 id,
                 email,
@@ -87,8 +88,7 @@ const ChatList = () => {
               )
             )
           `)
-          .eq('cp.user_id', user.id)
-          .neq('participant.user_id', user.id)
+          .eq('user_id', user.id)
           .order('created_at', { ascending: false });
 
         if (conversationsError) throw conversationsError;
