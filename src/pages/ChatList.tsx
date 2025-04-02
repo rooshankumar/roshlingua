@@ -71,23 +71,23 @@ const ChatList = () => {
       try {
         // First, get all conversations where the current user is a participant
         const { data: userConversations, error: conversationsError } = await supabase
-          .from('conversations')
+          .from('conversation_participants')
           .select(`
-            id,
-            created_at,
-            conversation_participants!inner (
-              user_id,
-              users:user_id (
-                id,
-                email,
-                profiles:profiles (
-                  full_name,
-                  avatar_url
-                )
+            conversation_id,
+            conversation:conversation_id (
+              id,
+              created_at
+            ),
+            users!inner (
+              id,
+              email,
+              profiles!inner (
+                full_name,
+                avatar_url
               )
             )
           `)
-          .contains('conversation_participants', [{ user_id: user.id }]);
+          .eq('user_id', user.id);
 
         if (conversationsError) throw conversationsError;
 
