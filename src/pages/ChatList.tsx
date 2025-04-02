@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/input';
 import { useAuth } from '@/providers/AuthProvider';
 import { supabase } from '@/lib/supabase';
 import { formatDistanceToNow } from 'date-fns';
-import classNames from 'classnames';
+import classNames from 'classnames'; // Added import
 
 interface ChatPreview {
   id: string;
@@ -25,7 +25,6 @@ interface ChatPreview {
     content: string;
     created_at: string;
   };
-  unreadCount?: number;
 }
 
 const ChatList = () => {
@@ -71,84 +70,72 @@ const ChatList = () => {
     setIsLoading(true);
     const fetchConversations = async () => {
       try {
-        // Get unread message counts
-        const { data: unreadMessages, error: unreadError } = await supabase
-          .from('messages')
-          .select('conversation_id')
-          .eq('recipient_id', user?.id)
-          .eq('is_read', false);
-
-        if (unreadError) throw unreadError;
-
-        // Count unread messages per conversation
-        const unreadCounts = unreadMessages?.reduce((acc, msg) => {
-          acc[msg.conversation_id] = (acc[msg.conversation_id] || 0) + 1;
-          return acc;
-        }, {} as Record<string, number>) || {};
-
-        // Get conversations with participant info
-        // Get all conversations where current user is a participant
-        const { data: conversations, error: conversationsError } = await supabase
+        // Get all conversations where the current user is a participant
+        const { data: userConversations, error: conversationsError } = await supabase
           .from('conversation_participants')
           .select(`
             conversation_id,
-            conversations!inner (
+            conversation:conversations(
               id,
               created_at
             ),
-            profiles!conversation_participants_user_id_fkey (
+            other_participant:profiles(
               id,
               email,
               full_name,
-              avatar_url,
-              is_online,
-              last_seen
+              avatar_url
             )
           `)
-          .eq('user_id', user?.id)
-          .order('created_at', { ascending: false });
-
-        // Fetch messages separately for each conversation
-        const conversationsWithMessages = await Promise.all(
-          conversations?.map(async (conv) => {
-            const { data: messages } = await supabase
-              .from('messages')
-              .select('*')
-              .eq('conversation_id', conv.conversation_id)
-              .order('created_at', { ascending: false })
-              .limit(1);
-            
-            return {
-              ...conv,
-              messages: messages || []
-            };
-          }) || []
-        );
+          .eq('user_id', user.id)
+          .order('conversation_id', { ascending: false });
 
         if (conversationsError) throw conversationsError;
 
-        const conversationPreviews = conversationsWithMessages.map((conv) => {
-          const conversationDetails = conv.conversations;
-          const otherParticipant = conv.profiles;
+        const conversationPreviews = await Promise.all(
+          userConversations.map(async (conv) => {
+            // Get conversation details
+            const conversationDetails = conv.conversation;
+            const otherParticipant = conv.other_participant;
 
-          if (!conversationDetails || !otherParticipant) return null;
+            if (!conversationDetails || !otherParticipant) return null;
 
-          // Count unread messages for this conversation
-          const unreadCount = unreadCounts[conv.conversation_id] || 0;
+            // Ensure we're getting the other participant's data
+            const { data: participants } = await supabase
+              .from('conversation_participants')
+              .select(`
+                user_id,
+                users:profiles!inner(
+                  id,
+                  email,
+                  full_name,
+                  avatar_url
+                )
+              `)
+              .eq('conversation_id', conv.conversation_id)
+              .neq('user_id', user.id)
+              .single();
 
-          return {
-            id: conversationDetails.id,
-            participant: {
-              id: otherParticipant.id,
-              email: otherParticipant.email,
-              full_name: otherParticipant.full_name,
-              avatar_url: otherParticipant.avatar_url || '/placeholder.svg'
-            },
-            lastMessage: conv.messages?.[0],
-            unreadCount,
-          };
-        });
+            if (!participants?.users) return null;
 
+            const { data: messages } = await supabase
+              .from('messages')
+              .select('content, created_at')
+              .eq('conversation_id', conv.conversation_id)
+              .order('created_at', { ascending: false })
+              .limit(1);
+
+            return {
+              id: conversationDetails.id,
+              participant: {
+                id: participants.users.id,
+                email: participants.users.email,
+                full_name: participants.users.full_name,
+                avatar_url: participants.users.avatar_url || '/placeholder.svg'
+              },
+              lastMessage: messages?.[0]
+            };
+          })
+        );
 
         const validConversations = conversationPreviews.filter(conv => conv !== null) as ChatPreview[];
 
