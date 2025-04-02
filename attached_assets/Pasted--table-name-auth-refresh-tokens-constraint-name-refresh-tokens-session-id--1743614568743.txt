@@ -1,0 +1,152 @@
+[
+  {
+    "table_name": "auth.refresh_tokens",
+    "constraint_name": "refresh_tokens_session_id_fkey",
+    "fk_definition": "FOREIGN KEY (session_id) REFERENCES auth.sessions(id) ON DELETE CASCADE"
+  },
+  {
+    "table_name": "storage.objects",
+    "constraint_name": "objects_bucketId_fkey",
+    "fk_definition": "FOREIGN KEY (bucket_id) REFERENCES storage.buckets(id)"
+  },
+  {
+    "table_name": "pgsodium.key",
+    "constraint_name": "key_parent_key_fkey",
+    "fk_definition": "FOREIGN KEY (parent_key) REFERENCES pgsodium.key(id)"
+  },
+  {
+    "table_name": "vault.secrets",
+    "constraint_name": "secrets_key_id_fkey",
+    "fk_definition": "FOREIGN KEY (key_id) REFERENCES pgsodium.key(id)"
+  },
+  {
+    "table_name": "auth.identities",
+    "constraint_name": "identities_user_id_fkey",
+    "fk_definition": "FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+  },
+  {
+    "table_name": "auth.sessions",
+    "constraint_name": "sessions_user_id_fkey",
+    "fk_definition": "FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+  },
+  {
+    "table_name": "auth.mfa_factors",
+    "constraint_name": "mfa_factors_user_id_fkey",
+    "fk_definition": "FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+  },
+  {
+    "table_name": "auth.mfa_challenges",
+    "constraint_name": "mfa_challenges_auth_factor_id_fkey",
+    "fk_definition": "FOREIGN KEY (factor_id) REFERENCES auth.mfa_factors(id) ON DELETE CASCADE"
+  },
+  {
+    "table_name": "auth.mfa_amr_claims",
+    "constraint_name": "mfa_amr_claims_session_id_fkey",
+    "fk_definition": "FOREIGN KEY (session_id) REFERENCES auth.sessions(id) ON DELETE CASCADE"
+  },
+  {
+    "table_name": "auth.sso_domains",
+    "constraint_name": "sso_domains_sso_provider_id_fkey",
+    "fk_definition": "FOREIGN KEY (sso_provider_id) REFERENCES auth.sso_providers(id) ON DELETE CASCADE"
+  },
+  {
+    "table_name": "auth.saml_providers",
+    "constraint_name": "saml_providers_sso_provider_id_fkey",
+    "fk_definition": "FOREIGN KEY (sso_provider_id) REFERENCES auth.sso_providers(id) ON DELETE CASCADE"
+  },
+  {
+    "table_name": "auth.saml_relay_states",
+    "constraint_name": "saml_relay_states_sso_provider_id_fkey",
+    "fk_definition": "FOREIGN KEY (sso_provider_id) REFERENCES auth.sso_providers(id) ON DELETE CASCADE"
+  },
+  {
+    "table_name": "auth.saml_relay_states",
+    "constraint_name": "saml_relay_states_flow_state_id_fkey",
+    "fk_definition": "FOREIGN KEY (flow_state_id) REFERENCES auth.flow_state(id) ON DELETE CASCADE"
+  },
+  {
+    "table_name": "auth.one_time_tokens",
+    "constraint_name": "one_time_tokens_user_id_fkey",
+    "fk_definition": "FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+  },
+  {
+    "table_name": "storage.s3_multipart_uploads",
+    "constraint_name": "s3_multipart_uploads_bucket_id_fkey",
+    "fk_definition": "FOREIGN KEY (bucket_id) REFERENCES storage.buckets(id)"
+  },
+  {
+    "table_name": "storage.s3_multipart_uploads_parts",
+    "constraint_name": "s3_multipart_uploads_parts_bucket_id_fkey",
+    "fk_definition": "FOREIGN KEY (bucket_id) REFERENCES storage.buckets(id)"
+  },
+  {
+    "table_name": "storage.s3_multipart_uploads_parts",
+    "constraint_name": "s3_multipart_uploads_parts_upload_id_fkey",
+    "fk_definition": "FOREIGN KEY (upload_id) REFERENCES storage.s3_multipart_uploads(id) ON DELETE CASCADE"
+  },
+  {
+    "table_name": "conversations",
+    "constraint_name": "conversations_creator_id_fkey",
+    "fk_definition": "FOREIGN KEY (creator_id) REFERENCES auth.users(id)"
+  },
+  {
+    "table_name": "conversation_participants",
+    "constraint_name": "conversation_participants_message_id_fkey",
+    "fk_definition": "FOREIGN KEY (message_id) REFERENCES messages(id) ON DELETE CASCADE"
+  },
+  {
+    "table_name": "conversation_participants",
+    "constraint_name": "conversation_participants_user_id_fkey",
+    "fk_definition": "FOREIGN KEY (user_id) REFERENCES profiles(id) ON DELETE CASCADE"
+  },
+  {
+    "table_name": "conversation_participants",
+    "constraint_name": "fk_user_id",
+    "fk_definition": "FOREIGN KEY (user_id) REFERENCES profiles(id) ON DELETE CASCADE"
+  },
+  {
+    "table_name": "conversation_participants",
+    "constraint_name": "conversation_participants_conversation_id_fkey",
+    "fk_definition": "FOREIGN KEY (conversation_id) REFERENCES conversations(id) ON DELETE CASCADE"
+  },
+  {
+    "table_name": "messages",
+    "constraint_name": "messages_sender_id_fkey",
+    "fk_definition": "FOREIGN KEY (sender_id) REFERENCES users(id) ON DELETE CASCADE"
+  },
+  {
+    "table_name": "messages",
+    "constraint_name": "messages_user_id_fkey",
+    "fk_definition": "FOREIGN KEY (user_id) REFERENCES auth.users(id)"
+  },
+  {
+    "table_name": "messages",
+    "constraint_name": "fk_sender",
+    "fk_definition": "FOREIGN KEY (sender_id) REFERENCES profiles(id)"
+  },
+  {
+    "table_name": "messages",
+    "constraint_name": "messages_conversation_id_fkey",
+    "fk_definition": "FOREIGN KEY (conversation_id) REFERENCES conversations(id) ON DELETE CASCADE"
+  },
+  {
+    "table_name": "message_reactions",
+    "constraint_name": "message_reactions_user_id_fkey",
+    "fk_definition": "FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+  },
+  {
+    "table_name": "message_reactions",
+    "constraint_name": "message_reactions_message_id_fkey",
+    "fk_definition": "FOREIGN KEY (message_id) REFERENCES messages(id) ON DELETE CASCADE"
+  },
+  {
+    "table_name": "profiles",
+    "constraint_name": "profiles_user_id_fkey",
+    "fk_definition": "FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE"
+  },
+  {
+    "table_name": "notifications",
+    "constraint_name": "notifications_user_id_fkey",
+    "fk_definition": "FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+  }
+]
