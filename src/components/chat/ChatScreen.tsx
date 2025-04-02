@@ -47,7 +47,6 @@ export const ChatScreen = ({ conversation }: Props) => {
             *,
             sender:profiles!inner(
               id,
-              user_id,
               full_name,
               avatar_url
             )
