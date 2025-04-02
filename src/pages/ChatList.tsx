@@ -78,11 +78,13 @@ const ChatList = () => {
               id,
               created_at
             ),
-            users (
+            users!inner (
               id,
               email,
-              full_name,
-              avatar_url
+              profiles (
+                full_name,
+                avatar_url
+              )
             )
           `)
           .eq('user_id', user.id)
@@ -106,7 +108,7 @@ const ChatList = () => {
               .limit(1);
 
             return {
-              id: participant.conversation_id,
+              id: conv.conversation_id,
               participant: {
                 id: otherParticipant.id,
                 email: otherParticipant.email,
@@ -119,7 +121,7 @@ const ChatList = () => {
         );
 
         const validConversations = conversationPreviews.filter(conv => conv !== null) as ChatPreview[];
-        
+
         // Sort conversations by last message timestamp, most recent first
         // Sort by last message time, fallback to conversation creation time
         const sortedConversations = validConversations.sort((a, b) => {
