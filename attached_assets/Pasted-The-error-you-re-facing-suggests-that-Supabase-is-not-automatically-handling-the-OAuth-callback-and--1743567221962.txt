@@ -1,0 +1,80 @@
+The error you’re facing suggests that Supabase is not automatically handling the OAuth callback and storing the session correctly. You need to manually retrieve and store the session after Google redirects back to your app.
+
+✅ Fix: Handle the OAuth Callback Manually in Your Auth Callback Page
+🔹 1. Extract the Session from the URL and Store It
+Inside your /auth/callback route/page, add the following code:
+
+tsx
+Copy
+Edit
+import { useEffect } from "react";
+import { supabase } from "../supabaseClient"; // Adjust path as needed
+import { useNavigate } from "react-router-dom"; // If using React Router
+
+const AuthCallback = () => {
+  const navigate = useNavigate(); // If using React Router
+
+  useEffect(() => {
+    const storeSession = async () => {
+      const { data, error } = await supabase.auth.getSessionFromUrl();
+      if (error) {
+        console.error("Error handling OAuth callback:", error);
+      } else {
+        console.log("OAuth session stored successfully:", data);
+      }
+
+      // Redirect user to home or dashboard
+      navigate("/");
+    };
+
+    storeSession();
+  }, [navigate]);
+
+  return <p>Processing login...</p>;
+};
+
+export default AuthCallback;
+🛠 2. Ensure Your Route is Correctly Set in Your App Router
+If using React Router, define the route in App.tsx (or equivalent):
+
+tsx
+Copy
+Edit
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import AuthCallback from "./pages/AuthCallback"; // Adjust path as needed
+
+<Router>
+  <Routes>
+    <Route path="/auth/callback" element={<AuthCallback />} />
+  </Routes>
+</Router>;
+✅ Final Steps to Fix the Issue
+1️⃣ Check Your Google Console Redirect URIs
+
+Ensure https://roshlingua.vercel.app/auth/callback is registered in Google Cloud Console.
+
+Also, ensure that Supabase’s default redirect URI is added:
+
+bash
+Copy
+Edit
+https://[your-supabase-project-id].supabase.co/auth/v1/callback
+2️⃣ Ensure Supabase is Configured to Persist Sessions
+
+In supabaseClient.ts:
+
+tsx
+Copy
+Edit
+export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+  auth: {
+    persistSession: true,
+    autoRefreshToken: true,
+    detectSessionInUrl: true,  // Ensure this is enabled
+  }
+});
+3️⃣ Manually Handle OAuth Callback with getSessionFromUrl()
+
+As shown in Step 1, use supabase.auth.getSessionFromUrl() to properly handle the OAuth response.
+
+✅ Try This and Let Me Know if You Still Have Issues! 
