@@ -18,6 +18,10 @@ CREATE TABLE IF NOT EXISTS public.conversation_participants (
     PRIMARY KEY (conversation_id, user_id)
 );
 
+-- Add indexes for better performance and relationship clarity
+CREATE INDEX IF NOT EXISTS idx_conversation_participants_user ON conversation_participants(user_id);
+CREATE INDEX IF NOT EXISTS idx_conversation_participants_conversation ON conversation_participants(conversation_id);
+
 -- Create messages table with proper references
 CREATE TABLE IF NOT EXISTS public.messages (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
