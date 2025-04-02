@@ -3,37 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/lib/supabase";
 import { Loader2 } from "lucide-react";
 
-// Assuming createUserRecord function is defined in "@/lib/supabase" as mentioned
-async function createUserRecord(userId: string, email: string, fullName: string | null, avatarUrl: string | null): Promise<boolean> {
-  try {
-    const { data: existingProfile, error: fetchError } = await supabase
-      .from('profiles')
-      .select('id')
-      .eq('id', userId)
-      .single();
-
-    if (fetchError) {
-      console.error('Error checking existing profile:', fetchError);
-      return false;
-    }
-
-    if (!existingProfile) {
-      const { error: insertError } = await supabase
-        .from('profiles')
-        .insert([{ id: userId, email: email, full_name: fullName, avatar_url: avatarUrl }]);
-
-      if (insertError) {
-        console.error('Error creating user profile:', insertError);
-        return false;
-      }
-    }
-    return true;
-  } catch (error) {
-    console.error('Error in createUserRecord:', error);
-    return false;
-  }
-}
-
 const AuthCallback = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -42,49 +11,23 @@ const AuthCallback = () => {
   useEffect(() => {
     const handleAuthCallback = async () => {
       try {
-        // Step 1: Extract tokens from URL fragment
-        const hashParams = new URLSearchParams(window.location.hash.substring(1)); // Remove `#`
-        const accessToken = hashParams.get("access_token");
-        const refreshToken = hashParams.get("refresh_token");
-        const expiresIn = hashParams.get("expires_in");
+        const { data, error: sessionError } = await supabase.auth.getSessionFromUrl();
 
-        if (!accessToken || !refreshToken) {
-          throw new Error("Missing authentication tokens.");
+        if (sessionError) {
+          throw sessionError;
         }
 
-        // Step 2: Store session in Supabase
-        const { data, error } = await supabase.auth.setSession({
-          access_token: accessToken,
-          refresh_token: refreshToken,
-        });
-
-        if (error) {
-          throw error;
+        if (!data.session) {
+          throw new Error("No session data found");
         }
 
-        // Step 3: Get the user session from Supabase
-        const { data: userData, error: userError } = await supabase.auth.getUser();
+        const user = data.session.user;
 
-        if (userError || !userData?.user) {
-          throw new Error("Failed to retrieve user session.");
-        }
-
-        const user = userData.user;
-        console.log("User authenticated:", user.id);
-
-        // Extract user info
+        // Basic user info
         const email = user.email || "";
-        const fullName = user.user_metadata?.full_name || user.user_metadata?.name || email.split("@")[0];
-        const avatarUrl = user.user_metadata?.avatar_url as string | null;
+        const fullName = user.user_metadata?.full_name || user.user_metadata?.name || null;
+        const avatarUrl = user.user_metadata?.avatar_url || null;
 
-        // Step 4: Save user in database
-        const success = await createUserRecord(user.id, email, fullName, avatarUrl);
-
-        if (!success) {
-          console.warn("User record creation failed, but proceeding...");
-        }
-
-        // Step 5: Redirect user based on onboarding status
         // Check if user exists in profiles table
         const { data: profileData, error: profileError } = await supabase
           .from("profiles")
@@ -92,23 +35,40 @@ const AuthCallback = () => {
           .eq("id", user.id)
           .single();
 
-        if (profileError && profileError.code === 'PGRST116') {
-          // Profile doesn't exist, redirect to onboarding
+        if (profileError && profileError.code === "PGRST116") {
+          // Profile doesn't exist, create it
+          const { error: insertError } = await supabase
+            .from("profiles")
+            .insert([{ 
+              id: user.id,
+              email: email,
+              full_name: fullName,
+              avatar_url: avatarUrl
+            }]);
+
+          if (insertError) {
+            console.error("Error creating profile:", insertError);
+          }
+
           navigate("/onboarding", { replace: true });
-        } else if (profileError) {
+          return;
+        }
+
+        if (profileError) {
           console.error("Error checking profile:", profileError);
           throw new Error("Failed to check user profile");
-        } else {
-          // Profile exists, check onboarding status
-          if (profileData?.onboarding_completed) {
-            navigate("/dashboard", { replace: true });
-          } else {
-            navigate("/onboarding", { replace: true });
-          }
         }
+
+        // Redirect based on onboarding status
+        if (profileData?.onboarding_completed) {
+          navigate("/dashboard", { replace: true });
+        } else {
+          navigate("/onboarding", { replace: true });
+        }
+
       } catch (err) {
         console.error("Auth callback error:", err);
-        setError(err instanceof Error ? err.message : "Authentication failed.");
+        setError(err instanceof Error ? err.message : "Authentication failed");
       } finally {
         setIsLoading(false);
       }
