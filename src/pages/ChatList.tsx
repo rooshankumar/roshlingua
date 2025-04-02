@@ -74,7 +74,7 @@ const ChatList = () => {
           .from('conversation_participants')
           .select(`
             conversation_id,
-            conversations:conversations!inner (
+            conversations!inner (
               created_at
             ),
             other_participants:conversation_participants!conversation_id (
@@ -89,7 +89,7 @@ const ChatList = () => {
             )
           `)
           .eq('user_id', user.id)
-          .order('conversations.created_at', { ascending: false });
+          .order('created_at', { ascending: false });
 
         if (conversationsError) throw conversationsError;
 
