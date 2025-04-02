@@ -25,6 +25,7 @@ interface ChatPreview {
     content: string;
     created_at: string;
   };
+  unreadCount?: number;
 }
 
 const ChatList = () => {
@@ -70,8 +71,22 @@ const ChatList = () => {
     setIsLoading(true);
     const fetchConversations = async () => {
       try {
-        // Get all conversations where the current user is a participant
+        // Get all conversations where the current user is a participant and unread counts
         const { data: userConversations, error: conversationsError } = await supabase
+          .from('messages')
+          .select(`
+            conversation_id,
+            count(*) filter (where is_read = false and recipient_id = '${user?.id}')
+          `)
+          .eq('recipient_id', user?.id)
+          .group_by('conversation_id');
+
+        const unreadCounts = Object.fromEntries(
+          userConversations?.map(({ conversation_id, count }) => [conversation_id, parseInt(count)]) || []
+        );
+
+        // Get all conversations where the current user is a participant
+        const { data: conversations, error: conversationsError } = await supabase
           .from('conversation_participants')
           .select(`
             conversation_id,
