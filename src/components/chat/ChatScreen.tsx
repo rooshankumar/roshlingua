@@ -143,7 +143,7 @@ export const ChatScreen = ({ conversation }: Props) => {
       <ChatHeader conversation={conversation} />
 
       {user?.id ? (
-        <ScrollArea className="flex-1 px-4 md:px-6 py-4 overflow-y-auto" data-scrollbar>
+        <ScrollArea className="flex-1 px-4 md:px-6 py-4 overflow-y-auto pr-6" data-scrollbar>
           <div className="space-y-6">
             {messages.map((message, index) => (
               <div
@@ -195,7 +195,13 @@ export const ChatScreen = ({ conversation }: Props) => {
                       )}
                     </div>
                     {message.sender_id === user?.id && (
-                      <div className="flex items-center h-3 gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                      <div 
+                        className="flex items-center h-3 gap-1 opacity-0 cursor-pointer transition-opacity duration-200"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          e.currentTarget.classList.toggle('opacity-100');
+                        }}
+                      >
                         {message.is_read ? (
                           <Avatar className="h-3 w-3">
                             <AvatarImage 
