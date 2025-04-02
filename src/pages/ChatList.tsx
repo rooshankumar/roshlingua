@@ -98,6 +98,24 @@ const ChatList = () => {
 
             if (!conversationDetails || !otherParticipant) return null;
 
+            // Ensure we're getting the other participant's data
+            const { data: participants } = await supabase
+              .from('conversation_participants')
+              .select(`
+                user_id,
+                users:profiles!inner(
+                  id,
+                  email,
+                  full_name,
+                  avatar_url
+                )
+              `)
+              .eq('conversation_id', conv.conversation_id)
+              .neq('user_id', user.id)
+              .single();
+
+            if (!participants?.users) return null;
+
             const { data: messages } = await supabase
               .from('messages')
               .select('content, created_at')
@@ -108,10 +126,10 @@ const ChatList = () => {
             return {
               id: conversationDetails.id,
               participant: {
-                id: otherParticipant.id,
-                email: otherParticipant.email,
-                full_name: otherParticipant.full_name,
-                avatar_url: otherParticipant.avatar_url || '/placeholder.svg'
+                id: participants.users.id,
+                email: participants.users.email,
+                full_name: participants.users.full_name,
+                avatar_url: participants.users.avatar_url || '/placeholder.svg'
               },
               lastMessage: messages?.[0]
             };
