@@ -80,6 +80,12 @@ const ChatList = () => {
 
         if (unreadError) throw unreadError;
 
+        // Count unread messages per conversation
+        const unreadCounts = unreadMessages?.reduce((acc, msg) => {
+          acc[msg.conversation_id] = (acc[msg.conversation_id] || 0) + 1;
+          return acc;
+        }, {} as Record<string, number>) || {};
+
         // Get conversations with participant info
         const { data: conversations, error: conversationsError } = await supabase
           .from('conversation_participants')
@@ -112,9 +118,7 @@ const ChatList = () => {
           if (!conversationDetails || !otherParticipant) return null;
 
           // Count unread messages for this conversation
-          const unreadCount = unreadMessages?.filter(
-            msg => msg.conversation_id === conv.conversation_id
-          ).length || 0;
+          const unreadCount = unreadCounts[conv.conversation_id] || 0;
 
           return {
             id: conversationDetails.id,
