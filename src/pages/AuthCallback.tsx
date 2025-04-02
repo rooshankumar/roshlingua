@@ -85,16 +85,26 @@ const AuthCallback = () => {
         }
 
         // Step 5: Redirect user based on onboarding status
-        const { data: onboardingData } = await supabase
-          .from("onboarding_status")
-          .select("is_complete")
-          .eq("user_id", user.id)
-          .maybeSingle();
+        // Check if user exists in profiles table
+        const { data: profileData, error: profileError } = await supabase
+          .from("profiles")
+          .select("onboarding_completed")
+          .eq("id", user.id)
+          .single();
 
-        if (onboardingData?.is_complete) {
-          navigate("/dashboard", { replace: true });
-        } else {
+        if (profileError && profileError.code === 'PGRST116') {
+          // Profile doesn't exist, redirect to onboarding
           navigate("/onboarding", { replace: true });
+        } else if (profileError) {
+          console.error("Error checking profile:", profileError);
+          throw new Error("Failed to check user profile");
+        } else {
+          // Profile exists, check onboarding status
+          if (profileData?.onboarding_completed) {
+            navigate("/dashboard", { replace: true });
+          } else {
+            navigate("/onboarding", { replace: true });
+          }
         }
       } catch (err) {
         console.error("Auth callback error:", err);

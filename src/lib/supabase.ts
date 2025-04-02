@@ -12,7 +12,10 @@ export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
 });
 
 export const signInWithGoogle = async () => {
-  const redirectUrl = window.location.origin + '/auth/callback';
+  // Use the environment-specific redirect URL
+  const redirectUrl = import.meta.env.PROD 
+    ? 'https://roshlingua.vercel.app/auth/callback'
+    : 'http://localhost:8080/auth/callback';
 
   console.log("Redirecting to Google OAuth with redirectUrl:", redirectUrl);
 
@@ -23,6 +26,7 @@ export const signInWithGoogle = async () => {
       queryParams: {
         access_type: 'offline',
         prompt: 'consent',
+        scope: 'profile email',
       },
     },
   });
