@@ -3,6 +3,7 @@ import { AuthProvider, useAuth } from "@/providers/AuthProvider";
 import { Toaster } from "@/components/ui/toaster";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ThemeProvider } from "@/components/theme-provider";
+import { Analytics } from '@vercel/analytics/react';
 
 
 // Pages
@@ -118,6 +119,7 @@ const App = () => {
           <AuthProvider>
             <Toaster />
             <AppRoutes />
+            <Analytics />
           </AuthProvider>
         </BrowserRouter>
       </ThemeProvider>
