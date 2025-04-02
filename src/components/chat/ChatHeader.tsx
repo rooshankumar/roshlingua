@@ -44,9 +44,8 @@ export const ChatHeader = ({ conversation }: Props) => {
   }
 
   return (
-    <div className="chat-header w-full bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container max-w-4xl mx-auto">
-        <div className="flex items-center justify-between p-2 md:p-4">
+    <div className="w-full">
+      <div className="flex items-center justify-between p-2 md:p-4">
           <div className="flex items-center gap-2 md:gap-4">
             <Button variant="ghost" size="icon" className="md:hidden" onClick={() => navigate(-1)}>
               <ChevronLeft className="h-5 w-5" />
