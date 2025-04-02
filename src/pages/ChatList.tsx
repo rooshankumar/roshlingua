@@ -75,22 +75,21 @@ const ChatList = () => {
           .from('conversation_participants')
           .select(`
             conversation_id,
-            users:user_id (
+            conversations:conversation_id (
+              id,
+              created_at,
+              messages (
+                content,
+                created_at,
+                is_read
+              )
+            ),
+            users!conversation_participants_user_id_fkey (
               id,
               email,
               full_name,
               avatar_url,
               last_seen
-            ),
-            conversations!inner (
-              id,
-              created_at,
-              messages (
-                content, 
-                created_at,
-                is_read,
-                recipient_id
-              )
             )
           `)
           .eq('user_id', user.id)
@@ -102,7 +101,7 @@ const ChatList = () => {
           userConversations.map(async (conv) => {
             // Get conversation details
             const conversationDetails = conv.conversations;
-            const otherParticipant = conv.other_participant[0]?.profiles; // Assuming only one other participant
+            const otherParticipant = conv.users; // Assuming only one other participant
 
             if (!conversationDetails || !otherParticipant) return null;
 
