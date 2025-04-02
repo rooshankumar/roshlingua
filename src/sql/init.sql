@@ -64,9 +64,9 @@ FOR SELECT USING (
 CREATE POLICY "Users can view conversation participants" ON public.conversation_participants
 FOR SELECT USING (
     user_id = auth.uid() OR
-    EXISTS (
-        SELECT 1 FROM public.conversation_participants cp
-        WHERE cp.conversation_id = conversation_participants.conversation_id
-        AND cp.user_id = auth.uid()
+    conversation_id IN (
+        SELECT conversation_id 
+        FROM public.conversation_participants
+        WHERE user_id = auth.uid()
     )
 );
