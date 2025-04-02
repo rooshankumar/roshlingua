@@ -1,0 +1,36 @@
+produce undefined behavior when used concurrently under the same storage key.
+_GoTrueClient @ @supabase_supabase-js.js?v=b60662a6:5040
+SupabaseAuthClient @ @supabase_supabase-js.js?v=b60662a6:6906
+_initSupabaseAuthClient @ @supabase_supabase-js.js?v=b60662a6:7102
+SupabaseClient @ @supabase_supabase-js.js?v=b60662a6:6975
+createClient @ @supabase_supabase-js.js?v=b60662a6:7142
+(anonymous) @ supabaseClient.ts:11Understand this warning
+ChatList.tsx:171 Error fetching conversations: TypeError: supabase.from(...).select(...).eq(...).groupBy is not a function
+    at fetchConversations (ChatList.tsx:82:12)
+    at ChatList.tsx:177:5
+    at commitHookEffectListMount (chunk-W6L2VRDA.js?v=b60662a6:16915:34)
+    at commitPassiveMountOnFiber (chunk-W6L2VRDA.js?v=b60662a6:18156:19)
+    at commitPassiveMountEffects_complete (chunk-W6L2VRDA.js?v=b60662a6:18129:17)
+    at commitPassiveMountEffects_begin (chunk-W6L2VRDA.js?v=b60662a6:18119:15)
+    at commitPassiveMountEffects (chunk-W6L2VRDA.js?v=b60662a6:18109:11)
+    at flushPassiveEffectsImpl (chunk-W6L2VRDA.js?v=b60662a6:19490:11)
+    at flushPassiveEffects (chunk-W6L2VRDA.js?v=b60662a6:19447:22)
+    at performSyncWorkOnRoot (chunk-W6L2VRDA.js?v=b60662a6:18868:11)
+fetchConversations @ ChatList.tsx:171
+(anonymous) @ ChatList.tsx:177
+commitHookEffectListMount @ chunk-W6L2VRDA.js?v=b60662a6:16915
+commitPassiveMountOnFiber @ chunk-W6L2VRDA.js?v=b60662a6:18156
+commitPassiveMountEffects_complete @ chunk-W6L2VRDA.js?v=b60662a6:18129
+commitPassiveMountEffects_begin @ chunk-W6L2VRDA.js?v=b60662a6:18119
+commitPassiveMountEffects @ chunk-W6L2VRDA.js?v=b60662a6:18109
+flushPassiveEffectsImpl @ chunk-W6L2VRDA.js?v=b60662a6:19490
+flushPassiveEffects @ chunk-W6L2VRDA.js?v=b60662a6:19447
+performSyncWorkOnRoot @ chunk-W6L2VRDA.js?v=b60662a6:18868
+flushSyncCallbacks @ chunk-W6L2VRDA.js?v=b60662a6:9119
+commitRootImpl @ chunk-W6L2VRDA.js?v=b60662a6:19432
+commitRoot @ chunk-W6L2VRDA.js?v=b60662a6:19277
+finishConcurrentRender @ chunk-W6L2VRDA.js?v=b60662a6:18805
+performConcurrentWorkOnRoot @ chunk-W6L2VRDA.js?v=b60662a6:18718
+workLoop @ chunk-W6L2VRDA.js?v=b60662a6:197
+flushWork @ chunk-W6L2VRDA.js?v=b60662a6:176
+performWorkUntilDeadline @ chunk-W6L2VRDA.js?v=b60662a6:384Understand this error
