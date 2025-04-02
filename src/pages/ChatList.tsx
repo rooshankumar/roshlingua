@@ -92,7 +92,7 @@ const ChatList = () => {
             )
           `)
           .eq('user_id', user.id)
-          .order('conversations.created_at', { ascending: false });
+          .order('conversation_id', { ascending: false });
 
         if (conversationsError) throw conversationsError;
 
