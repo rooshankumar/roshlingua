@@ -81,9 +81,13 @@ const ChatList = () => {
                 full_name,
                 avatar_url
               )
+            ),
+            conversations:conversation_id (
+              created_at
             )
           `)
-          .eq('user_id', user.id);
+          .eq('user_id', user.id)
+          .order('conversations(created_at)', { ascending: false });
 
         if (conversationsError) throw conversationsError;
 
@@ -123,12 +127,17 @@ const ChatList = () => {
         const validConversations = conversationPreviews.filter(conv => conv !== null) as ChatPreview[];
         
         // Sort conversations by last message timestamp, most recent first
+        // Sort by last message time, fallback to conversation creation time
         const sortedConversations = validConversations.sort((a, b) => {
-          const aTime = a?.lastMessage?.created_at ? new Date(a.lastMessage.created_at).getTime() : 0;
-          const bTime = b?.lastMessage?.created_at ? new Date(b.lastMessage.created_at).getTime() : 0;
+          const aTime = a?.lastMessage?.created_at 
+            ? new Date(a.lastMessage.created_at).getTime() 
+            : new Date(a.conversation?.created_at || 0).getTime();
+          const bTime = b?.lastMessage?.created_at 
+            ? new Date(b.lastMessage.created_at).getTime()
+            : new Date(b.conversation?.created_at || 0).getTime();
           return bTime - aTime;
         });
-        
+
         setConversations(sortedConversations);
       } catch (error) {
         console.error('Error fetching conversations:', error);
