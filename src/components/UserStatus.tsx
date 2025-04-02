@@ -17,10 +17,13 @@ export function UserStatus({ isOnline, lastSeen }: UserStatusProps) {
   }
 
   if (lastSeen) {
+    const lastSeenDate = new Date(lastSeen);
+    const timeAgo = formatDistanceToNow(lastSeenDate, { addSuffix: false });
+    
     return (
       <div className="flex items-center text-sm text-muted-foreground">
         <div className="w-2 h-2 rounded-full bg-gray-400 mr-2" />
-        <span>Last seen {formatDistanceToNow(new Date(lastSeen))} ago</span>
+        <span>Last seen {timeAgo} ago</span>
       </div>
     );
   }
