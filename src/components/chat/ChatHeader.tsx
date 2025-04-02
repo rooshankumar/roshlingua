@@ -86,11 +86,30 @@ export const ChatHeader = ({ conversation }: Props) => {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-          <DropdownMenuItem onClick={handleReport} className="text-destructive">
+          <DropdownMenuItem onClick={handleReport}>
             Report User
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={handleBlock} className="text-destructive">
+          <DropdownMenuItem onClick={handleBlock}>
             Block User
+          </DropdownMenuItem>
+          <DropdownMenuItem 
+            onClick={() => {
+              if (window.confirm('Are you sure you want to delete this conversation?')) {
+                supabase
+                  .from('conversations')
+                  .delete()
+                  .eq('id', conversation.id)
+                  .then(() => {
+                    navigate('/chat');
+                  })
+                  .catch((error) => {
+                    console.error('Error deleting conversation:', error);
+                  });
+              }
+            }} 
+            className="text-destructive"
+          >
+            Delete Conversation
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
