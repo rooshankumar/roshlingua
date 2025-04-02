@@ -1,11 +1,7 @@
-
-import { useNavigate, useParams } from 'react-router-dom';
-import { ArrowLeft, MoreVertical } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { ChevronLeft, MoreVertical } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { useAuth } from '@/providers/AuthProvider';
-import { supabase } from '@/lib/supabase';
-import { useEffect, useState } from 'react';
 import { UserStatus } from '@/components/UserStatus';
 import {
   DropdownMenu,
@@ -13,6 +9,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { supabase } from '@/lib/supabase';
 
 interface Props {
   conversation: {
@@ -59,9 +56,7 @@ export const ChatHeader = ({ conversation }: Props) => {
                 <AvatarImage src={participant?.avatar_url || '/placeholder.svg'} />
                 <AvatarFallback>{participant?.full_name?.substring(0, 2).toUpperCase()}</AvatarFallback>
               </Avatar>
-              {participant?.is_online && (
-                <span className="absolute bottom-0 right-0 w-3 h-3 rounded-full bg-green-500 ring-2 ring-background" />
-              )}
+              <span className={`absolute bottom-0 right-0 w-3 h-3 rounded-full ring-2 ring-background ${participant?.is_online ? "bg-green-500" : "bg-gray-400"}`} />
             </div>
             <div>
               <h2 className="font-semibold text-foreground">
@@ -73,72 +68,42 @@ export const ChatHeader = ({ conversation }: Props) => {
               />
             </div>
           </div>
-
-  return (
-    <div className="flex items-center justify-between p-4">
-      <div className="flex items-center">
-        <Button 
-          variant="ghost" 
-          size="icon"
-          onClick={() => navigate('/chat')}
-        >
-          <ArrowLeft className="h-5 w-5" />
-        </Button>
-        <div className="flex items-center ml-4">
-          <Avatar>
-            <AvatarImage 
-              src={participant?.avatar_url || '/placeholder.svg'} 
-              alt={participant?.full_name || 'User'}
-            />
-            <AvatarFallback>
-              {participant?.full_name?.charAt(0).toUpperCase() || 'U'}
-            </AvatarFallback>
-          </Avatar>
-          <div className="ml-3">
-            <h2 className="font-semibold text-foreground">
-              {participant?.full_name}
-            </h2>
-            <UserStatus 
-              isOnline={participant?.is_online} 
-              lastSeen={participant?.last_seen}
-            />
-          </div>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon">
+                <MoreVertical className="h-5 w-5" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={handleReport}>
+                Report User
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={handleBlock}>
+                Block User
+              </DropdownMenuItem>
+              <DropdownMenuItem 
+                onClick={() => {
+                  if (window.confirm('Are you sure you want to delete this conversation?')) {
+                    supabase
+                      .from('conversations')
+                      .delete()
+                      .eq('id', conversation.id)
+                      .then(() => {
+                        navigate('/chat');
+                      })
+                      .catch((error) => {
+                        console.error('Error deleting conversation:', error);
+                      });
+                  }
+                }} 
+                className="text-destructive"
+              >
+                Delete Conversation
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant="ghost" size="icon">
-            <MoreVertical className="h-5 w-5" />
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
-          <DropdownMenuItem onClick={handleReport}>
-            Report User
-          </DropdownMenuItem>
-          <DropdownMenuItem onClick={handleBlock}>
-            Block User
-          </DropdownMenuItem>
-          <DropdownMenuItem 
-            onClick={() => {
-              if (window.confirm('Are you sure you want to delete this conversation?')) {
-                supabase
-                  .from('conversations')
-                  .delete()
-                  .eq('id', conversation.id)
-                  .then(() => {
-                    navigate('/chat');
-                  })
-                  .catch((error) => {
-                    console.error('Error deleting conversation:', error);
-                  });
-              }
-            }} 
-            className="text-destructive"
-          >
-            Delete Conversation
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
     </div>
   );
 };
