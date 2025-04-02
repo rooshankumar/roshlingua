@@ -106,3 +106,28 @@ DROP TRIGGER IF EXISTS on_message_read ON public.messages;
 CREATE TRIGGER on_message_read
   AFTER UPDATE OF is_read ON public.messages
   FOR EACH ROW EXECUTE FUNCTION notify_message_read();
+-- Function to delete user and all related data
+CREATE OR REPLACE FUNCTION public.delete_user_cascade(user_id uuid)
+RETURNS void AS $$
+BEGIN
+  -- Delete user's messages
+  DELETE FROM public.messages 
+  WHERE sender_id = user_id;
+  
+  -- Delete user's conversation participants
+  DELETE FROM public.conversation_participants 
+  WHERE user_id = user_id;
+  
+  -- Delete user's profile
+  DELETE FROM public.profiles 
+  WHERE id = user_id;
+  
+  -- Delete user record
+  DELETE FROM public.users 
+  WHERE id = user_id;
+  
+  -- Delete auth user (requires admin rights)
+  DELETE FROM auth.users 
+  WHERE id = user_id;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;

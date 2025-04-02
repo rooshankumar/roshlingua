@@ -23,3 +23,20 @@ export async function createUserRecord(userId: string, email: string, fullName: 
     return false;
   }
 }
+export async function deleteUserAccount(userId: string) {
+  try {
+    const { error } = await supabase.rpc('delete_user_cascade', {
+      user_id: userId
+    });
+    
+    if (error) {
+      console.error('Error deleting user:', error);
+      return { success: false, error };
+    }
+    
+    return { success: true };
+  } catch (err) {
+    console.error('Exception deleting user:', err);
+    return { success: false, error: err };
+  }
+}
