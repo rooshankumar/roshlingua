@@ -76,10 +76,10 @@ const ChatList = () => {
           .from('messages')
           .select(`
             conversation_id,
-            count(*) filter (where is_read = false and recipient_id = '${user?.id}')
+            count(*) filter (where is_read = false and recipient_id = '${user?.id}')::integer
           `)
           .eq('recipient_id', user?.id)
-          .group_by('conversation_id');
+          .groupBy('conversation_id');
 
         const unreadCounts = Object.fromEntries(
           userConversations?.map(({ conversation_id, count }) => [conversation_id, parseInt(count)]) || []

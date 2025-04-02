@@ -18,8 +18,9 @@ export function useUserPresence() {
       })
       .subscribe(async (status) => {
         if (status === 'SUBSCRIBED') {
+          const { data: { user } } = await supabase.auth.getUser();
           await channel.track({
-            user_id: supabase.auth.user()?.id,
+            user_id: user?.id,
             online_at: new Date().toISOString(),
           });
         }
