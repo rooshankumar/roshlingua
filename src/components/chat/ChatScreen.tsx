@@ -138,10 +138,8 @@ export const ChatScreen = ({ conversation }: Props) => {
   };
 
   return (
-    <Card className="flex flex-col h-screen rounded-none border-none md:max-w-4xl md:mx-auto shadow-2xl">
-      <div className="sticky top-0 z-50 bg-background/95 backdrop-blur-xl border-b">
-        <ChatHeader conversation={conversation} />
-      </div>
+    <Card className="flex flex-col h-[100dvh] rounded-none border-none md:max-w-4xl md:mx-auto md:h-screen md:my-0 shadow-2xl">
+      <ChatHeader conversation={conversation} />
 
       {user?.id ? (
         <ScrollArea className="flex-1 px-3 md:px-6 pt-4">
@@ -224,8 +222,8 @@ export const ChatScreen = ({ conversation }: Props) => {
       )}
 
       {user?.id ? (
-        <div className="fixed bottom-0 left-0 right-0 md:static bg-background/95 backdrop-blur-sm border-t">
-          <CardContent className="p-4 md:pb-4">
+        <div className="sticky bottom-0 left-0 right-0 bg-background/95 backdrop-blur-sm border-t">
+          <CardContent className="p-2 md:p-4">
             <div className="flex items-end gap-2">
               <ChatAttachment onAttach={(url, filename) => handleSend(newMessage, { url, filename })} />
               <Textarea
