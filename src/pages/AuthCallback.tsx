@@ -12,23 +12,14 @@ const AuthCallback = () => {
   useEffect(() => {
     const handleAuthCallback = async () => {
       try {
-        const hashParams = new URLSearchParams(window.location.hash.substring(1));
-        const accessToken = hashParams.get("access_token");
-        const refreshToken = hashParams.get("refresh_token");
-        const expiresIn = hashParams.get("expires_in");
-        const tokenType = hashParams.get("token_type");
-
-        if (!accessToken) {
-          throw new Error("No access token found");
+        // Get session from URL
+        const { data, error } = await supabase.auth.getSession();
+        
+        if (error) {
+          throw error;
         }
 
-        // Set the session manually with full token details
-        const { data: { session }, error: sessionError } = await supabase.auth.setSession({
-          access_token: accessToken,
-          refresh_token: refreshToken || "",
-          expires_in: parseInt(expiresIn || "3600"),
-          token_type: tokenType || "bearer"
-        });
+        const session = data.session;
 
         if (sessionError) {
           throw sessionError;
