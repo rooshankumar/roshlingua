@@ -108,26 +108,43 @@ CREATE TRIGGER on_message_read
   FOR EACH ROW EXECUTE FUNCTION notify_message_read();
 -- Function to delete user and all related data
 CREATE OR REPLACE FUNCTION public.delete_user_cascade(user_id uuid)
-RETURNS void AS $$
+RETURNS jsonb AS $$
+DECLARE
+  deleted_counts jsonb;
 BEGIN
-  -- Delete user's messages
-  DELETE FROM public.messages 
-  WHERE sender_id = user_id;
-  
-  -- Delete user's conversation participants
-  DELETE FROM public.conversation_participants 
-  WHERE user_id = user_id;
-  
-  -- Delete user's profile
-  DELETE FROM public.profiles 
-  WHERE id = user_id;
-  
-  -- Delete user record
-  DELETE FROM public.users 
-  WHERE id = user_id;
-  
-  -- Delete auth user (requires admin rights)
-  DELETE FROM auth.users 
-  WHERE id = user_id;
+  -- Start with child tables first
+  WITH deletions AS (
+    SELECT 
+      COUNT(*) FILTER (WHERE table_name = 'messages') as messages_count,
+      COUNT(*) FILTER (WHERE table_name = 'conversation_participants') as participants_count,
+      COUNT(*) FILTER (WHERE table_name = 'profiles') as profiles_count,
+      COUNT(*) FILTER (WHERE table_name = 'users') as users_count,
+      COUNT(*) FILTER (WHERE table_name = 'auth.users') as auth_count
+    FROM (
+      -- Delete messages
+      (DELETE FROM public.messages WHERE sender_id = user_id RETURNING 'messages' as table_name)
+      UNION ALL
+      -- Delete conversation participants
+      (DELETE FROM public.conversation_participants WHERE user_id = user_id RETURNING 'conversation_participants')
+      UNION ALL
+      -- Delete profile
+      (DELETE FROM public.profiles WHERE id = user_id RETURNING 'profiles')
+      UNION ALL
+      -- Delete user record
+      (DELETE FROM public.users WHERE id = user_id RETURNING 'users')
+      UNION ALL
+      -- Try to delete auth user if exists
+      (DELETE FROM auth.users WHERE id = user_id RETURNING 'auth.users')
+    ) deletions
+  )
+  SELECT jsonb_build_object(
+    'messages', messages_count,
+    'participants', participants_count,
+    'profiles', profiles_count,
+    'users', users_count,
+    'auth', auth_count
+  ) INTO deleted_counts FROM deletions;
+
+  RETURN deleted_counts;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
