@@ -2,65 +2,68 @@
 -- Enable UUID extension
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
--- Create users table with minimal info
-CREATE TABLE IF NOT EXISTS public.users (
-    id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
-    email TEXT UNIQUE NOT NULL,
+-- Create conversations table first
+CREATE TABLE IF NOT EXISTS public.conversations (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- Create profiles table for user details
-CREATE TABLE IF NOT EXISTS public.profiles (
+-- Create conversation_participants table with proper foreign keys
+CREATE TABLE IF NOT EXISTS public.conversation_participants (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    user_id UUID REFERENCES public.users(id) ON DELETE CASCADE,
-    full_name TEXT,
-    gender TEXT,
-    date_of_birth DATE,
-    native_language TEXT,
-    learning_language TEXT,
-    proficiency_level TEXT,
-    learning_goal TEXT,
-    avatar_url TEXT,
-    onboarding_completed BOOLEAN DEFAULT FALSE,
+    conversation_id UUID REFERENCES public.conversations(id) ON DELETE CASCADE,
+    user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
+    last_read_at TIMESTAMPTZ DEFAULT NOW(),
     created_at TIMESTAMPTZ DEFAULT NOW(),
-    updated_at TIMESTAMPTZ DEFAULT NOW(),
-    UNIQUE(user_id)
+    UNIQUE(conversation_id, user_id)
 );
 
--- Create secure function for user creation
-CREATE OR REPLACE FUNCTION handle_new_user()
-RETURNS TRIGGER AS $$
-BEGIN
-    INSERT INTO public.users (id, email, full_name, created_at, updated_at)
-    VALUES (
-        NEW.id,
-        NEW.email,
-        NEW.raw_user_meta_data->>'full_name',
-        NOW(),
-        NOW()
-    );
-    RETURN NEW;
-END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+-- Create messages table with proper references
+CREATE TABLE IF NOT EXISTS public.messages (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    conversation_id UUID REFERENCES public.conversations(id) ON DELETE CASCADE,
+    sender_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
+    content TEXT NOT NULL,
+    is_read BOOLEAN DEFAULT false,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW()
+);
 
--- Create trigger to handle new user signup
-DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
-CREATE TRIGGER on_auth_user_created
-    AFTER INSERT ON auth.users
-    FOR EACH ROW EXECUTE FUNCTION handle_new_user();
+-- Create users table with minimal info
+CREATE TABLE IF NOT EXISTS public.users (
+    id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+    email TEXT UNIQUE NOT NULL,
+    full_name TEXT NOT NULL,
+    avatar_url TEXT,
+    last_seen TIMESTAMPTZ DEFAULT NOW(),
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW()
+);
 
--- Grant necessary permissions
+-- Add RLS policies
+ALTER TABLE public.conversations ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.conversation_participants ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.messages ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.users ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "Users can view own data"
-    ON public.users FOR SELECT
-    USING (auth.uid() = id);
+-- Conversation policies
+CREATE POLICY "Users can view conversations they are part of" ON public.conversations 
+FOR SELECT USING (
+    EXISTS (
+        SELECT 1 FROM public.conversation_participants
+        WHERE conversation_participants.conversation_id = conversations.id
+        AND conversation_participants.user_id = auth.uid()
+    )
+);
 
-CREATE POLICY "Users can update own data"
-    ON public.users FOR UPDATE
-    USING (auth.uid() = id);
-
-CREATE POLICY "Users can insert own data"
-    ON public.users FOR INSERT
-    WITH CHECK (auth.uid() = id);
+-- Conversation participants policies
+CREATE POLICY "Users can view conversation participants" ON public.conversation_participants
+FOR SELECT USING (
+    user_id = auth.uid() OR
+    EXISTS (
+        SELECT 1 FROM public.conversation_participants cp
+        WHERE cp.conversation_id = conversation_participants.conversation_id
+        AND cp.user_id = auth.uid()
+    )
+);
