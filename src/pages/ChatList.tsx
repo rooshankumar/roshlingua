@@ -71,21 +71,7 @@ const ChatList = () => {
     setIsLoading(true);
     const fetchConversations = async () => {
       try {
-        // Get all conversations where the current user is a participant and unread counts
-        const { data: userConversations, error } = await supabase
-          .from('messages')
-          .select('conversation_id, count(*, { filter: \'is_read = false and recipient_id = "' + user?.id + '"\' })', { count: 'exact' })
-          .eq('recipient_id', user?.id)
-          .group_by('conversation_id');
-
-        if (error) throw error;
-
-        const unreadCounts = Object.fromEntries(
-          userConversations?.map(({ conversation_id, count }) => [conversation_id, parseInt(count)]) || []
-        );
-
-        // Get all conversations where the current user is a participant
-        const { data: conversations, error: participantsError } = await supabase
+        const { data: conversations, error } = await supabase
           .from('conversation_participants')
           .select(`
             conversation_id,
@@ -93,64 +79,43 @@ const ChatList = () => {
               id,
               created_at
             ),
-            other_participant:profiles(
+            other_participant:profiles!conversation_participants_user_id_fkey(
               id,
               email,
               full_name,
               avatar_url
+            ),
+            unread_count:messages(
+              count(*),
+              content,
+              created_at
             )
           `)
-          .eq('user_id', user.id)
+          .eq('user_id', user?.id)
           .order('conversation_id', { ascending: false });
 
-        if (participantsError) throw participantsError;
+        if (error) throw error;
 
-        const conversationPreviews = await Promise.all(
-          conversations.map(async (conv) => {
-            // Get conversation details
-            const conversationDetails = conv.conversation;
-            const otherParticipant = conv.other_participant;
+        const conversationPreviews = conversations.map((conv) => {
+          const conversationDetails = conv.conversation;
+          const otherParticipant = conv.other_participant;
+          const unreadCount = conv.unread_count;
 
-            if (!conversationDetails || !otherParticipant) return null;
+          if (!conversationDetails || !otherParticipant) return null;
 
-            // Ensure we're getting the other participant's data
-            const { data: participants } = await supabase
-              .from('conversation_participants')
-              .select(`
-                user_id,
-                users:profiles!inner(
-                  id,
-                  email,
-                  full_name,
-                  avatar_url
-                )
-              `)
-              .eq('conversation_id', conv.conversation_id)
-              .neq('user_id', user.id)
-              .single();
+          return {
+            id: conversationDetails.id,
+            participant: {
+              id: otherParticipant.id,
+              email: otherParticipant.email,
+              full_name: otherParticipant.full_name,
+              avatar_url: otherParticipant.avatar_url || '/placeholder.svg'
+            },
+            lastMessage: unreadCount[0],
+            unreadCount: unreadCount.count || 0,
+          };
+        });
 
-            if (!participants?.users) return null;
-
-            const { data: messages } = await supabase
-              .from('messages')
-              .select('content, created_at')
-              .eq('conversation_id', conversationDetails.id)
-              .order('created_at', { ascending: false })
-              .limit(1);
-
-            return {
-              id: conversationDetails.id,
-              participant: {
-                id: participants.users.id,
-                email: participants.users.email,
-                full_name: participants.users.full_name,
-                avatar_url: participants.users.avatar_url || '/placeholder.svg'
-              },
-              lastMessage: messages?.[0],
-              unreadCount: unreadCounts[conversationDetails.id] || 0,
-            };
-          })
-        );
 
         const validConversations = conversationPreviews.filter(conv => conv !== null) as ChatPreview[];
 
