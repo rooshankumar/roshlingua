@@ -73,11 +73,11 @@ const ChatList = () => {
         const { data: userConversations, error: conversationsError } = await supabase
           .from('conversation_participants')
           .select(`
-            conversation:conversations!inner (
+            conversations (
               id,
               created_at
             ),
-            user:users (
+            profiles!user_id (
               id,
               email,
               full_name,
