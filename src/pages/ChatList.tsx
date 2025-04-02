@@ -78,13 +78,11 @@ const ChatList = () => {
               id,
               created_at
             ),
-            participants:conversation_participants!inner (
-              users (
-                id,
-                email,
-                full_name,
-                avatar_url
-              )
+            users!inner (
+              id,
+              email,
+              full_name,
+              avatar_url
             )
           `)
           .eq('user_id', user.id)
@@ -94,11 +92,11 @@ const ChatList = () => {
 
         const conversationPreviews = await Promise.all(
           userConversations.map(async (conv) => {
-            // Find the other participant in the conversation
-            const otherParticipant = conv.participants
-              ?.find(p => p.users?.id !== user.id)?.users;
+            // Get conversation details
+            const conversationDetails = conv.conversations;
+            const otherParticipant = conv.users;
 
-            if (!otherParticipant) return null;
+            if (!conversationDetails || !otherParticipant) return null;
 
             const { data: messages } = await supabase
               .from('messages')
