@@ -1,3 +1,4 @@
+
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Send, Loader2, FileText, Check } from 'lucide-react';
@@ -138,50 +139,53 @@ export const ChatScreen = ({ conversation }: Props) => {
   };
 
   return (
-    <Card className="flex flex-col h-[100dvh] rounded-none border-none md:max-w-4xl md:mx-auto md:h-screen md:my-0 md:rounded-lg shadow-2xl overflow-hidden">
-      <div className="sticky top-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <ChatHeader conversation={conversation} />
-      </div>
+    <Card className="flex flex-col h-[100dvh] rounded-none border-none md:max-w-4xl md:mx-auto md:h-screen md:my-0 md:rounded-xl shadow-2xl overflow-hidden bg-gradient-to-b from-background/95 to-background/90 backdrop-blur-lg">
+      <ChatHeader conversation={conversation} />
 
       {user?.id ? (
-        <ScrollArea className="flex-1 px-3 md:px-6 pt-2">
-          <div className="space-y-4 pb-4">
-            {messages.map((message) => (
+        <ScrollArea className="flex-1 px-4 md:px-6 py-4 overflow-y-auto" data-scrollbar>
+          <div className="space-y-6">
+            {messages.map((message, index) => (
               <div
                 key={message.id}
-                className={`flex items-start gap-2 ${message.sender_id === user?.id ? 'flex-row-reverse' : 'flex-row'}`}
+                className={`flex items-start gap-3 animate-slide-up ${
+                  message.sender_id === user?.id ? 'flex-row-reverse' : 'flex-row'
+                }`}
+                style={{
+                  animationDelay: `${index * 0.1}s`
+                }}
               >
-                <div className={`flex flex-col gap-1 max-w-[85%] sm:max-w-[75%] md:max-w-[65%]`}>
+                <div className={`flex flex-col gap-2 max-w-[85%] sm:max-w-[70%] group transition-all duration-300`}>
                   {message.sender_id !== user?.id && (
                     <span className="text-xs text-muted-foreground ml-1">
                       {message.sender?.full_name}
                     </span>
                   )}
-                  <div className="flex items-end gap-1">
+                  <div className="flex items-end gap-2">
                     <div
-                      className={`rounded-lg p-3 break-words ${
+                      className={`rounded-2xl p-4 break-words shadow-lg transition-all duration-300 hover:shadow-xl ${
                         message.sender_id === user?.id
-                          ? 'bg-primary text-primary-foreground rounded-tr-none'
-                          : 'bg-muted rounded-tl-none'
+                          ? 'bg-gradient-to-br from-primary to-primary/90 text-primary-foreground rounded-br-sm'
+                          : 'bg-muted/80 backdrop-blur-sm rounded-bl-sm'
                       }`}
                     >
-                      {message.content}
+                      <p className="leading-relaxed">{message.content}</p>
                       {message.attachment_url && (
-                        <div className="mt-2">
+                        <div className="mt-3 rounded-lg overflow-hidden">
                           {message.attachment_url.match(/\.(jpg|jpeg|png|gif)$/i) ? (
                             <img 
                               src={message.attachment_url} 
                               alt={message.attachment_name || 'Attachment'} 
-                              className="max-w-[200px] max-h-[200px] object-contain rounded-md"
+                              className="max-w-[200px] max-h-[200px] object-cover rounded-lg hover:scale-105 transition-transform duration-300"
                             />
                           ) : (
-                            <div className="flex items-center gap-2 p-2 bg-background/10 rounded-md">
-                              <FileText className="h-4 w-4" />
+                            <div className="flex items-center gap-3 p-3 bg-background/10 rounded-lg hover:bg-background/20 transition-colors duration-200">
+                              <FileText className="h-5 w-5" />
                               <a 
                                 href={message.attachment_url} 
                                 target="_blank" 
                                 rel="noopener noreferrer"
-                                className="text-sm hover:underline"
+                                className="text-sm font-medium hover:underline"
                               >
                                 {message.attachment_name || 'Download attachment'}
                               </a>
@@ -191,7 +195,7 @@ export const ChatScreen = ({ conversation }: Props) => {
                       )}
                     </div>
                     {message.sender_id === user?.id && (
-                      <div className="flex items-center h-3 gap-1">
+                      <div className="flex items-center h-3 gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                         {message.is_read ? (
                           <Avatar className="h-3 w-3">
                             <AvatarImage 
@@ -217,38 +221,41 @@ export const ChatScreen = ({ conversation }: Props) => {
         </ScrollArea>
       ) : (
         <div className="flex-1 flex items-center justify-center">
-          <p className="text-muted-foreground">Loading user data...</p>
+          <div className="text-center space-y-2 animate-fade-up">
+            <Loader2 className="h-8 w-8 animate-spin text-primary mx-auto" />
+            <p className="text-muted-foreground">Loading chat...</p>
+          </div>
         </div>
       )}
 
-      {user?.id ? (
-        <div className="sticky bottom-0 left-0 right-0 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-t">
-          <CardContent className="p-2 md:p-4">
-            <div className="flex items-end gap-2">
+      {user?.id && (
+        <div className="sticky bottom-0 left-0 right-0 bg-background/80 backdrop-blur-xl border-t border-border/50 shadow-lg">
+          <CardContent className="p-4">
+            <div className="flex items-end gap-3">
               <ChatAttachment onAttach={(url, filename) => handleSend(newMessage, { url, filename })} />
               <Textarea
                 value={newMessage}
                 onChange={(e) => setNewMessage(e.target.value)}
                 onKeyDown={handleKeyPress}
                 placeholder="Type a message..."
-                className="flex-1 min-h-[60px] max-h-[120px]"
+                className="flex-1 min-h-[60px] max-h-[120px] rounded-2xl bg-muted/50 backdrop-blur-sm focus:bg-background transition-colors duration-200"
                 rows={1}
               />
               <Button
                 onClick={() => handleSend(newMessage)}
                 disabled={!newMessage.trim() || isSending || !user}
                 size="icon"
-                className="h-[60px] w-[60px]"
+                className="h-[60px] w-[60px] rounded-2xl bg-primary hover:bg-primary/90 transition-all duration-200 hover:scale-105 active:scale-95"
               >
-                {isSending ? <Loader2 className="h-5 w-5 animate-spin" /> : <Send className="h-5 w-5" />}
+                {isSending ? (
+                  <Loader2 className="h-5 w-5 animate-spin" />
+                ) : (
+                  <Send className="h-5 w-5" />
+                )}
               </Button>
             </div>
           </CardContent>
         </div>
-      ) : (
-        <CardContent className="border-t p-4">
-          <p className="text-muted-foreground text-center">Please wait for user data to load...</p>
-        </CardContent>
       )}
     </Card>
   );
