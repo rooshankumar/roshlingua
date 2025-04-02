@@ -23,10 +23,8 @@ const ChatPage = () => {
             users!user_id (
               id,
               email,
-              profiles (
-                full_name,
-                avatar_url
-              )
+              avatar_url,
+              full_name
             )
           `)
           .eq('conversation_id', conversationId);
