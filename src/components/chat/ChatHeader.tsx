@@ -43,7 +43,7 @@ export const ChatHeader = ({ conversation }: Props) => {
   }
 
   return (
-    <div className="w-full sticky top-0 z-50 bg-background/95 backdrop-blur-xl border-b">
+    <div className="w-full bg-background/95 backdrop-blur-xl border-b">
       <div className="flex items-center justify-between p-4 max-w-4xl mx-auto">
         <div className="flex items-center gap-2 md:gap-4">
           <Button variant="ghost" size="icon" className="md:hidden" onClick={() => navigate(-1)}>
