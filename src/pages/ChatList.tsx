@@ -92,38 +92,44 @@ const ChatList = () => {
           .from('conversation_participants')
           .select(`
             conversation_id,
-            conversation:conversations(
+            conversations!inner (
               id,
-              created_at,
-              messages:messages(
-                content,
-                created_at,
-                is_read,
-                recipient_id
-              )
+              created_at
             ),
-            participants:conversation_participants(
-              user_id,
-              profiles:profiles(
-                id,
-                email,
-                full_name,
-                avatar_url,
-                is_online,
-                last_seen
-              )
+            profiles!conversation_participants_user_id_fkey (
+              id,
+              email,
+              full_name,
+              avatar_url,
+              is_online,
+              last_seen
             )
           `)
           .eq('user_id', user?.id)
           .order('created_at', { ascending: false });
 
+        // Fetch messages separately for each conversation
+        const conversationsWithMessages = await Promise.all(
+          conversations?.map(async (conv) => {
+            const { data: messages } = await supabase
+              .from('messages')
+              .select('*')
+              .eq('conversation_id', conv.conversation_id)
+              .order('created_at', { ascending: false })
+              .limit(1);
+            
+            return {
+              ...conv,
+              messages: messages || []
+            };
+          }) || []
+        );
+
         if (conversationsError) throw conversationsError;
 
-        const conversationPreviews = conversations.map((conv) => {
-          const conversationDetails = conv.conversation;
-          // Find the other participant (not the current user)
-          const otherParticipant = conv.participants
-            ?.find(p => p.profiles?.id !== user?.id)?.profiles;
+        const conversationPreviews = conversationsWithMessages.map((conv) => {
+          const conversationDetails = conv.conversations;
+          const otherParticipant = conv.profiles;
 
           if (!conversationDetails || !otherParticipant) return null;
 
