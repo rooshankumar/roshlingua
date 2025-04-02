@@ -107,6 +107,10 @@ const Auth = () => {
 
       if (email && password && name) {
         await signup(email, password, name);
+        toast({
+          title: "Signup successful",
+          description: "Please check your email (including spam folder) for the confirmation link.",
+        });
         // The session will be set via auth change listener
       } else {
         toast({
