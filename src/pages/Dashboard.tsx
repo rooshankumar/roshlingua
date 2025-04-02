@@ -236,6 +236,9 @@ const Dashboard = () => {
           </div>
         </CardContent>
       </Card>
+
+      {/* Notifications Card */}
+      <NotificationCard />
     </div>
   );
 };
