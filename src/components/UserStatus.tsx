@@ -10,7 +10,7 @@ export function UserStatus({ isOnline, lastSeen }: UserStatusProps) {
   if (isOnline) {
     return (
       <div className="flex items-center text-sm">
-        <div className="w-2 h-2 rounded-full bg-green-500 mr-2" />
+        <div className="w-3 h-3 rounded-full bg-green-500 ring-2 ring-background mr-2" />
         <span className="text-green-600">Online</span>
       </div>
     );

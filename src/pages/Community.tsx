@@ -20,6 +20,7 @@ import { supabase } from '@/lib/supabase';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from "@/components/ui/badge";
 import { toast } from '@/hooks/use-toast';
+import cn from 'classnames';
 
 interface User {
   id: string;
@@ -337,10 +338,16 @@ const Community = () => {
                 <CardContent className="p-0 flex flex-col h-full">
                   <div className="relative h-32 bg-gradient-to-b from-primary/10 to-background/5">
                     <div className="absolute -bottom-10 left-1/2 -translate-x-1/2">
-                      <Avatar className="h-20 w-20 ring-4 ring-background">
-                        <AvatarImage src={user.avatar_url} className="object-cover" />
-                        <AvatarFallback className="text-xl">{user.username?.charAt(0)}</AvatarFallback>
-                      </Avatar>
+                      <div className="relative">
+                        <Avatar className="h-20 w-20 ring-4 ring-background">
+                          <AvatarImage src={user.avatar_url} className="object-cover" />
+                          <AvatarFallback className="text-xl">{user.username?.charAt(0)}</AvatarFallback>
+                        </Avatar>
+                        <span className={cn(
+                          "absolute bottom-0 right-0 block h-4 w-4 rounded-full ring-2 ring-background",
+                          user.is_online ? "bg-green-500" : "bg-gray-400"
+                        )} />
+                      </div>
                     </div>
                   </div>
 
