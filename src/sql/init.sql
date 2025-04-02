@@ -11,11 +11,15 @@ CREATE TABLE IF NOT EXISTS public.conversations (
 
 -- Create conversation_participants table with proper foreign keys
 CREATE TABLE IF NOT EXISTS public.conversation_participants (
-    conversation_id UUID REFERENCES public.conversations(id) ON DELETE CASCADE,
-    user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
+    conversation_id UUID,
+    user_id UUID,
     last_read_at TIMESTAMPTZ DEFAULT NOW(),
     created_at TIMESTAMPTZ DEFAULT NOW(),
-    PRIMARY KEY (conversation_id, user_id)
+    PRIMARY KEY (conversation_id, user_id),
+    CONSTRAINT fk_conversation FOREIGN KEY (conversation_id) 
+        REFERENCES public.conversations(id) ON DELETE CASCADE,
+    CONSTRAINT fk_user FOREIGN KEY (user_id) 
+        REFERENCES public.profiles(id) ON DELETE CASCADE
 );
 
 -- Add indexes for better performance and relationship clarity
