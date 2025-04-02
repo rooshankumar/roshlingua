@@ -68,67 +68,49 @@ const ChatList = () => {
     setIsLoading(true);
     const fetchConversations = async () => {
       try {
-        const { data: participantsData, error: participantsError } = await supabase
-          .from('conversation_participants')
+        // First, get all conversations where the current user is a participant
+        const { data: userConversations, error: conversationsError } = await supabase
+          .from('conversations')
           .select(`
-            conversation_id,
-            conversations:conversation_id (
-              id,
-              title,
-              created_at
-            ),
-            users:user_id (
-              id,
-              email,
-              profiles:profiles (
-                full_name,
-                avatar_url
+            id,
+            created_at,
+            conversation_participants!inner (
+              user_id,
+              users:user_id (
+                id,
+                email,
+                profiles:profiles (
+                  full_name,
+                  avatar_url
+                )
               )
             )
           `)
-          .neq('user_id', user.id);
+          .contains('conversation_participants', [{ user_id: user.id }]);
 
-        if (participantsError) throw participantsError;
+        if (conversationsError) throw conversationsError;
 
-        // Create a Map to store unique conversations by ID
-        const uniqueConversations = new Map();
-
-        // Create a Set to track unique user IDs
-        const uniqueUserIds = new Set();
+        // Create a Map to store unique conversations per other user
+        const uniqueUserConversations = new Map();
 
         const conversationPreviews = await Promise.all(
-          participantsData.filter(participant => {
-            const otherUserId = participant.users?.id;
-            // Filter out duplicates based on both conversation ID and user ID
-            if (uniqueConversations.has(participant.conversation_id) ||
-                (otherUserId && uniqueUserIds.has(otherUserId))) {
-              return false;
-            }
-            uniqueConversations.set(participant.conversation_id, true);
-            if (otherUserId) uniqueUserIds.add(otherUserId);
-            return true;
-          }).map(async (participant) => {
-            const { data: participants, error: participantError } = await supabase
-              .from('conversation_participants')
-              .select(`
-                users:user_id (
-                  id,
-                  email,
-                  profiles:profiles (
-                    full_name,
-                    avatar_url
-                  )
-                )
-              `)
-              .eq('conversation_id', participant.conversation_id)
-              .neq('user_id', user.id);
+          userConversations.map(async (conversation) => {
+            // Get the other participant (not the current user)
+            const otherParticipant = conversation.conversation_participants
+              .find(p => p.user_id !== user.id)?.users;
 
-            if (participantError) {
-              console.error('Error fetching other participant:', participantError);
+            if (!otherParticipant || uniqueUserConversations.has(otherParticipant.id)) {
               return null;
             }
 
-            const otherParticipant = participants?.[0];
+            uniqueUserConversations.set(otherParticipant.id, true);
+          }).map(async (conversation) => {
+            const otherParticipant = conversation.conversation_participants
+              .find(p => p.user_id !== user.id)?.users;
+
+            if (!otherParticipant) {
+              return null;
+            }
 
             const { data: messages } = await supabase
               .from('messages')
