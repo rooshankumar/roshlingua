@@ -238,6 +238,11 @@ const ChatList = () => {
                         {conversation.participant?.full_name?.substring(0, 2).toUpperCase() || 'AB'}
                       </AvatarFallback>
                     </Avatar>
+                    {conversation.unreadCount > 0 && (
+                      <div className="absolute -top-1 -right-1 bg-destructive text-destructive-foreground rounded-full min-w-[20px] h-5 flex items-center justify-center text-xs font-medium px-1">
+                        {conversation.unreadCount}
+                      </div>
+                    )}
                     <span className={classNames(
                       "absolute bottom-0 right-0 w-3 h-3 rounded-full ring-2 ring-background",
                       conversation.participant?.is_online ? "bg-green-500" : "bg-gray-400"

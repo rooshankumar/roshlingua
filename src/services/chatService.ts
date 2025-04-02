@@ -68,7 +68,8 @@ export const subscribeToMessages = async (conversationId: string, onMessage: (me
 };
 
 // Fetch messages for a conversation
-export const fetchMessages = async (conversationId: string): Promise<Message[]> => {
+export const fetchMessages = async (conversationId: string, currentUserId: string): Promise<Message[]> => {
+  // Fetch messages
   const { data, error } = await supabase
     .from('messages')
     .select('*')
@@ -79,7 +80,36 @@ export const fetchMessages = async (conversationId: string): Promise<Message[]> 
     console.error('Error fetching messages:', error);
     throw error;
   }
+
+  // Mark messages as read when fetching
+  const unreadMessages = data?.filter(msg => 
+    !msg.is_read && msg.sender_id !== currentUserId
+  ) || [];
+
+  if (unreadMessages.length > 0) {
+    await supabase
+      .from('messages')
+      .update({ is_read: true })
+      .in('id', unreadMessages.map(msg => msg.id));
+  }
+
   return data || [];
+};
+
+export const getUnreadCount = async (conversationId: string, userId: string): Promise<number> => {
+  const { count, error } = await supabase
+    .from('messages')
+    .select('*', { count: 'exact', head: true })
+    .eq('conversation_id', conversationId)
+    .eq('is_read', false)
+    .neq('sender_id', userId);
+
+  if (error) {
+    console.error('Error getting unread count:', error);
+    return 0;
+  }
+
+  return count || 0;
 };
 
 // Send a new message

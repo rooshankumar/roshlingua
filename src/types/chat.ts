@@ -1,4 +1,3 @@
-
 export interface User {
   id: string;
   name: string;
@@ -30,5 +29,5 @@ export interface Conversation {
   lastMessage?: Message;
   createdAt: string;
   lastMessageAt: string;
-  unreadCount?: number;
+  unreadCount: number; // Added unreadCount
 }
