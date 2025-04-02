@@ -15,9 +15,12 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/hooks/useAuth";
+import { useUserPresence } from "@/hooks/useUserPresence";
+import { cn } from "@/lib/utils";
 
 const Dashboard = () => {
   const { user } = useAuth();
+  const { onlineUsers } = useUserPresence();
   const [streak, setStreak] = useState(0);
   const [progress, setProgress] = useState(0);
   const [activeUsers, setActiveUsers] = useState([]);
@@ -191,8 +194,12 @@ const Dashboard = () => {
                 <span>Active Community</span>
               </div>
             </CardTitle>
-            <CardDescription>
-              Connect with language partners online now
+            <CardDescription className="flex items-center gap-2">
+              Connect with language partners 
+              <span className="flex items-center gap-1">
+                <span className="h-2 w-2 rounded-full bg-green-500 animate-pulse"/>
+                online now
+              </span>
             </CardDescription>
           </div>
           <Button asChild variant="outline" size="sm" className="hover:bg-primary hover:text-primary-foreground">
@@ -209,7 +216,10 @@ const Dashboard = () => {
                       <AvatarImage src={user.avatar_url} alt={user.full_name} />
                       <AvatarFallback>{user.full_name?.charAt(0)}</AvatarFallback>
                     </Avatar>
-                    <div className="absolute bottom-0 right-0 w-4 h-4 bg-green-500 rounded-full ring-2 ring-background"></div>
+                    <div className={cn(
+                      "absolute bottom-0 right-0 w-4 h-4 rounded-full ring-2 ring-background transition-colors",
+                      user.is_online ? "bg-green-500" : "bg-gray-400"
+                    )}></div>
                   </div>
                   <h4 className="font-medium text-sm group-hover:text-primary transition-colors">{user.full_name}</h4>
                   <div className="flex items-center space-x-1 mt-2">
