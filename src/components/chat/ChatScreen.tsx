@@ -139,7 +139,7 @@ export const ChatScreen = ({ conversation }: Props) => {
   };
 
   return (
-    <Card className="flex flex-col h-[100dvh] rounded-none border-none md:max-w-4xl md:mx-auto md:h-screen md:my-0 md:rounded-xl shadow-2xl overflow-hidden bg-gradient-to-b from-background/95 to-background/90 backdrop-blur-lg">
+    <Card className="flex flex-col h-[100dvh] rounded-none border-none md:max-w-4xl md:mx-auto md:h-screen md:my-0 md:rounded-2xl shadow-2xl overflow-hidden bg-gradient-to-b from-background/95 to-background/90 backdrop-blur-lg">
       <ChatHeader conversation={conversation} />
 
       {user?.id ? (
@@ -163,10 +163,10 @@ export const ChatScreen = ({ conversation }: Props) => {
                   )}
                   <div className="flex items-end gap-2">
                     <div
-                      className={`rounded-2xl p-4 break-words shadow-lg transition-all duration-300 hover:shadow-xl ${
+                      className={`rounded-[22px] p-4 break-words shadow-sm transition-all duration-300 ${
                         message.sender_id === user?.id
-                          ? 'bg-gradient-to-br from-primary to-primary/90 text-primary-foreground rounded-br-sm'
-                          : 'bg-muted/80 backdrop-blur-sm rounded-bl-sm'
+                          ? 'bg-primary text-primary-foreground rounded-br-md'
+                          : 'bg-muted/90 backdrop-blur-sm rounded-bl-md'
                       }`}
                     >
                       <p className="leading-relaxed">{message.content}</p>
@@ -229,8 +229,8 @@ export const ChatScreen = ({ conversation }: Props) => {
       )}
 
       {user?.id && (
-        <div className="sticky bottom-0 left-0 right-0 bg-background/80 backdrop-blur-xl border-t border-border/50 shadow-lg">
-          <CardContent className="p-4">
+        <div className="sticky bottom-0 left-0 right-0 bg-background/80 backdrop-blur-xl border-t border-border/50">
+          <CardContent className="p-4 max-w-4xl mx-auto">
             <div className="flex items-end gap-3">
               <ChatAttachment onAttach={(url, filename) => handleSend(newMessage, { url, filename })} />
               <Textarea
