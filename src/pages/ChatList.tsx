@@ -74,11 +74,11 @@ const ChatList = () => {
           .from('conversation_participants')
           .select(`
             conversation_id,
-            conversations(
+            conversation:conversations!conversation_id(
               id,
               created_at
             ),
-            other_participant:users(
+            other_participant:profiles!conversation_participants_user_id_fkey(
               id,
               email,
               full_name,
@@ -86,17 +86,14 @@ const ChatList = () => {
             )
           `)
           .eq('user_id', user.id)
-          .order('conversations.created_at', { ascending: false });
-
-        // Filter out current user and format the response
-        //const otherParticipants = userConversations?.filter(conv => conv.user.id !== user.id);
+          .order('conversation.created_at.desc');
 
         if (conversationsError) throw conversationsError;
 
         const conversationPreviews = await Promise.all(
           userConversations.map(async (conv) => {
             // Get conversation details
-            const conversationDetails = conv.conversations;
+            const conversationDetails = conv.conversation;
             const otherParticipant = conv.other_participant;
 
             if (!conversationDetails || !otherParticipant) return null;
@@ -126,10 +123,10 @@ const ChatList = () => {
         // Sort conversations by last message timestamp, most recent first
         // Sort by last message time, fallback to conversation creation time
         const sortedConversations = validConversations.sort((a, b) => {
-          const aTime = a?.lastMessage?.created_at 
-            ? new Date(a.lastMessage.created_at).getTime() 
+          const aTime = a?.lastMessage?.created_at
+            ? new Date(a.lastMessage.created_at).getTime()
             : new Date(a.id || 0).getTime(); //fallback to conversation ID if no last message
-          const bTime = b?.lastMessage?.created_at 
+          const bTime = b?.lastMessage?.created_at
             ? new Date(b.lastMessage.created_at).getTime()
             : new Date(b.id || 0).getTime(); //fallback to conversation ID if no last message
           return bTime - aTime;
@@ -215,7 +212,7 @@ const ChatList = () => {
             >
               <Card className="hover:bg-muted/50 transition-all duration-200 hover:scale-[1.01] hover:shadow-lg group">
                 <CardContent className="flex items-center p-4 relative">
-                  <button 
+                  <button
                     onClick={(e) => {
                       e.preventDefault();
                       e.stopPropagation();
