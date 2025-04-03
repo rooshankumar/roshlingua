@@ -163,8 +163,7 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
             const { error: profileError } = await supabase
                 .from('profiles')
                 .upsert({
-                    id: user.id, // Use id from auth.users as the key in profiles
-                    user_id: user.id, // Also set the user_id column
+                    id: user.id,
                     gender: formData.gender,
                     date_of_birth: formData.date_of_birth instanceof Date ?
                         formData.date_of_birth.toISOString().split('T')[0] :

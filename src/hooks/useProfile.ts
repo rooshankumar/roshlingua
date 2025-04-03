@@ -12,18 +12,20 @@ export function useProfile(userId: string) {
     const fetchProfile = async () => {
       try {
         const { data, error } = await supabase
-          .from('users')
+          .from('profiles')
           .select(`
             id,
             full_name,
             bio,
+            gender,
             native_language,
-            learning_language, 
+            learning_language,
             proficiency_level,
+            learning_goal,
             streak_count,
             avatar_url,
             likes_count,
-            date_of_birth::text,
+            date_of_birth,
             onboarding_completed
           `)
           .eq('id', userId)
