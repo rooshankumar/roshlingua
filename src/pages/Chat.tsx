@@ -20,7 +20,7 @@ const ChatPage = () => {
           .from('conversation_participants')
           .select(`
             user_id,
-            users:users!inner(
+            users!conversation_participants_user_id_fkey (
               id,
               email,
               full_name,
@@ -30,7 +30,8 @@ const ChatPage = () => {
             )
           `)
           .eq('conversation_id', conversationId)
-          .neq('user_id', user.id);
+          .neq('user_id', user.id)
+          .single();
 
         if (participantsError) throw participantsError;
 
