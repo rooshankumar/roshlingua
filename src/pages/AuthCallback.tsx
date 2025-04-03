@@ -2,115 +2,79 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/lib/supabase";
 import { Loader2 } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 const AuthCallback = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
+  const { toast } = useToast();
 
   useEffect(() => {
     const handleAuthCallback = async () => {
       try {
-        // Handle hash fragment
-        if (window.location.hash) {
-          const params = new URLSearchParams(window.location.hash.substring(1));
-          const accessToken = params.get('access_token');
-          const refreshToken = params.get('refresh_token');
-          const expiresIn = params.get('expires_in');
-          const tokenType = params.get('token_type');
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
 
-          if (!accessToken) {
-            throw new Error('No access token found');
-          }
+        if (sessionError) throw sessionError;
+        if (!session) throw new Error('No session established');
 
-          // Set the session with the token
-          const { data: { session }, error: sessionError } = await supabase.auth.setSession({
-            access_token: accessToken,
-            refresh_token: refreshToken || '',
-            expires_in: parseInt(expiresIn || '3600'),
-          });
+        // Check if user exists in profiles table
+        const { data: profileData, error: profileError } = await supabase
+          .from("users")
+          .select("onboarding_completed")
+          .eq("id", session.user.id)
+          .single();
 
-          if (sessionError) throw sessionError;
-          if (!session) throw new Error('No session established');
+        if (profileError && profileError.code === "PGRST116") {
+          // Profile doesn't exist, create it
+          const { error: insertError } = await supabase
+            .from("users")
+            .insert([{
+              id: session.user.id,
+              email: session.user.email,
+              full_name: session.user.user_metadata?.full_name,
+              avatar_url: session.user.user_metadata?.avatar_url
+            }]);
 
-          // Check if user exists in profiles table
-          const { data: profileData, error: profileError } = await supabase
-            .from("profiles")
-            .select("onboarding_completed")
-            .eq("id", session.user.id)
-            .single();
-
-          if (profileError && profileError.code === "PGRST116") {
-            // Profile doesn't exist, create it
-            const { error: insertError } = await supabase
-              .from("profiles")
-              .insert([{
-                id: session.user.id,
-                email: session.user.email,
-                full_name: session.user.user_metadata?.full_name,
-                avatar_url: session.user.user_metadata?.avatar_url
-              }]);
-
-            if (insertError) throw insertError;
-            navigate("/onboarding", { replace: true });
+          if (insertError) {
+            console.error("Error creating user profile:", insertError);
+            toast({
+              variant: "destructive",
+              title: "Error",
+              description: "Failed to create user profile"
+            });
+            navigate("/auth", { replace: true });
             return;
           }
 
-          if (profileError) throw profileError;
+          navigate("/onboarding", { replace: true });
+          return;
+        }
 
-          // Redirect based on onboarding status
-          if (!error && profileData?.onboarding_completed) {
-            navigate("/dashboard", { replace: true });
-          } else {
-            navigate("/onboarding", { replace: true });
-          }
+        if (profileError) throw profileError;
+
+        // Redirect based on onboarding status
+        if (profileData?.onboarding_completed) {
+          navigate("/dashboard", { replace: true });
+        } else {
+          navigate("/onboarding", { replace: true });
         }
       } catch (err) {
         console.error("Auth callback error:", err);
         setError(err instanceof Error ? err.message : "Authentication failed");
+        toast({
+          variant: "destructive",
+          title: "Authentication Error",
+          description: "Failed to complete authentication"
+        });
+        navigate("/auth", { replace: true });
       } finally {
         setIsLoading(false);
       }
     };
 
     handleAuthCallback();
-  }, [navigate]);
-
-  useEffect(() => {
-    const { data: authListener } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (event === 'SIGNED_IN' && session?.user) {
-        try {
-          // Ensure user exists in our users table
-          const { error: upsertError } = await supabase
-            .from('users')
-            .upsert({
-              id: session.user.id,
-              email: session.user.email,
-              full_name: session.user.user_metadata.full_name,
-              avatar_url: session.user.user_metadata.avatar_url,
-              last_sign_in: new Date().toISOString(),
-            }, {
-              onConflict: 'id'
-            });
-
-          if (upsertError) {
-            console.error('Error saving user data:', upsertError);
-            navigate('/?error=database_error');
-            return;
-          }
-
-          navigate('/dashboard');
-        } catch (error) {
-          console.error('Auth callback error:', error);
-          navigate('/?error=server_error');
-        }
-      }
-    });
-
-    return () => {
-      authListener?.subscription.unsubscribe();
-    };
-  }, [navigate]);
+  }, [navigate, toast]);
 
   if (isLoading) {
     return (
@@ -137,14 +101,7 @@ const AuthCallback = () => {
     );
   }
 
-  return (
-    <div className="flex items-center justify-center min-h-screen">
-      <div className="flex flex-col items-center gap-4">
-        <Loader2 className="h-12 w-12 animate-spin text-primary" />
-        <p className="text-lg font-medium">Redirecting you...</p>
-      </div>
-    </div>
-  );
+  return null;
 };
 
 export default AuthCallback;
