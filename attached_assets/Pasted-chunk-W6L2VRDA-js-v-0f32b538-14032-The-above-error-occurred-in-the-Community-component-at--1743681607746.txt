@@ -1,0 +1,25 @@
+chunk-W6L2VRDA.js?v=0f32b538:14032 The above error occurred in the <Community> component:
+
+    at Community (https://1f133c42-3225-48ac-a10d-b4e9afa80dde-00-332ojwn7j1qex.pike.replit.dev/src/pages/Community.tsx?t=1743681586851:28:31)
+    at main
+    at div
+    at AppLayout (https://1f133c42-3225-48ac-a10d-b4e9afa80dde-00-332ojwn7j1qex.pike.replit.dev/src/components/layouts/AppLayout.tsx:36:22)
+    at ProtectedRoute (https://1f133c42-3225-48ac-a10d-b4e9afa80dde-00-332ojwn7j1qex.pike.replit.dev/src/components/auth/ProtectedRoute.tsx:15:27)
+    at RenderedRoute (https://1f133c42-3225-48ac-a10d-b4e9afa80dde-00-332ojwn7j1qex.pike.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=0f32b538:4069:5)
+    at Routes (https://1f133c42-3225-48ac-a10d-b4e9afa80dde-00-332ojwn7j1qex.pike.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=0f32b538:4508:5)
+    at AppRoutes (https://1f133c42-3225-48ac-a10d-b4e9afa80dde-00-332ojwn7j1qex.pike.replit.dev/src/App.tsx?t=1743681586851:37:33)
+    at AuthProvider (https://1f133c42-3225-48ac-a10d-b4e9afa80dde-00-332ojwn7j1qex.pike.replit.dev/src/providers/AuthProvider.tsx:23:32)
+    at Router (https://1f133c42-3225-48ac-a10d-b4e9afa80dde-00-332ojwn7j1qex.pike.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=0f32b538:4451:15)
+    at BrowserRouter (https://1f133c42-3225-48ac-a10d-b4e9afa80dde-00-332ojwn7j1qex.pike.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=0f32b538:5196:5)
+    at ThemeProvider (https://1f133c42-3225-48ac-a10d-b4e9afa80dde-00-332ojwn7j1qex.pike.replit.dev/src/components/theme-provider.tsx:17:33)
+    at QueryClientProvider (https://1f133c42-3225-48ac-a10d-b4e9afa80dde-00-332ojwn7j1qex.pike.replit.dev/node_modules/.vite/deps/@tanstack_react-query.js?v=0f32b538:2794:3)
+    at App
+
+Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://reactjs.org/link/error-boundaries to learn more about error boundaries.
+chunk-W6L2VRDA.js?v=0f32b538:19413 Uncaught ReferenceError: LikeButton is not defined
+    at Community.tsx:379:24
+    at Array.map (<anonymous>)
+    at Community (Community.tsx:330:26)
+﻿
+
