@@ -1,7 +1,7 @@
+
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { MessageCircle, Loader2, Search, Plus, Trash2 } from 'lucide-react';
-import { deleteConversation } from '@/services/chatService';
+import { MessageCircle, Loader2, Search, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/input';
 import { useAuth } from '@/providers/AuthProvider';
 import { supabase } from '@/lib/supabase';
 import { formatDistanceToNow } from 'date-fns';
-import classNames from 'classnames'; // Added import
+import classNames from 'classnames';
 
 interface ChatPreview {
   id: string;
@@ -35,37 +35,6 @@ const ChatList = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Track online presence
-  useEffect(() => {
-    if (!user) return;
-
-    const channel = supabase.channel('online-users')
-      .on('presence', { event: 'sync' }, () => {
-        const state = channel.presenceState();
-        const presenceData = Object.values(state).flat() as any[];
-        setConversations(prev => prev.map(conv => ({
-          ...conv,
-          participant: {
-            ...conv.participant,
-            is_online: presenceData.some(p => p.user_id === conv.participant.id),
-            last_seen: presenceData.find(p => p.user_id === conv.participant.id)?.last_seen
-          }
-        })));
-      })
-      .subscribe(async (status) => {
-        if (status === 'SUBSCRIBED') {
-          await channel.track({
-            user_id: user.id,
-            last_seen: new Date().toISOString()
-          });
-        }
-      });
-
-    return () => {
-      channel.unsubscribe();
-    };
-  }, [user]);
-
   useEffect(() => {
     if (!user) return;
     setIsLoading(true);
@@ -80,7 +49,6 @@ const ChatList = () => {
 
         if (unreadError) throw unreadError;
 
-        // Implement client-side grouping to count unread messages per conversation
         const unreadCountsClientSide: { [key: string]: number } = unreadMessages?.reduce((acc, message) => {
           acc[message.conversation_id] = (acc[message.conversation_id] || 0) + 1;
           return acc;
@@ -91,64 +59,72 @@ const ChatList = () => {
           .from('conversation_participants')
           .select(`
             conversation_id,
-            conversation:conversations(
+            conversations!inner(
               id,
               created_at
             ),
-            other_participant:users(
+            other_users:users!conversation_participants_user_id_fkey(
               id,
               email,
               full_name,
               avatar_url,
-              last_login,
               last_seen
             )
           `)
-          .eq('user_id', user.id)
-          .order('created_at', { ascending: false })
-          .order('conversation_id', { ascending: false });
+          .eq('user_id', user.id);
 
         if (participantsError) throw participantsError;
 
-        const conversationPreviews = await Promise.all(
+        // Get other participants for each conversation
+        const otherParticipants = await Promise.all(
           conversationsData.map(async (conv) => {
-            const conversationDetails = conv.conversation;
-            const otherParticipant = conv.other_participant;
+            const { data: otherParticipant } = await supabase
+              .from('conversation_participants')
+              .select(`
+                users!conversation_participants_user_id_fkey (
+                  id,
+                  email,
+                  full_name,
+                  avatar_url,
+                  last_seen
+                )
+              `)
+              .eq('conversation_id', conv.conversation_id)
+              .neq('user_id', user.id)
+              .single();
 
-            if (!conversationDetails || !otherParticipant) return null;
-
-            const { data: messages, error: messagesError } = await supabase
+            const { data: lastMessage } = await supabase
               .from('messages')
               .select('content, created_at')
-              .eq('conversation_id', conversationDetails.id)
+              .eq('conversation_id', conv.conversation_id)
               .order('created_at', { ascending: false })
-              .limit(1);
-
-            if (messagesError) console.error("Error fetching last message:", messagesError);
+              .limit(1)
+              .single();
 
             return {
-              id: conversationDetails.id,
+              id: conv.conversation_id,
               participant: {
-                id: otherParticipant.id,
-                email: otherParticipant.email,
-                full_name: otherParticipant.full_name,
-                avatar_url: otherParticipant.avatar_url || '/placeholder.svg'
+                id: otherParticipant?.users?.id || '',
+                email: otherParticipant?.users?.email || '',
+                full_name: otherParticipant?.users?.full_name || 'Unknown User',
+                avatar_url: otherParticipant?.users?.avatar_url || '/placeholder.svg',
+                last_seen: otherParticipant?.users?.last_seen
               },
-              lastMessage: messages?.[0],
-              unreadCount: unreadCountsClientSide[conversationDetails.id] || 0,
+              lastMessage,
+              unreadCount: unreadCountsClientSide[conv.conversation_id] || 0
             };
           })
         );
 
-        const validConversations = conversationPreviews.filter(conv => conv !== null) as ChatPreview[];
+        const validConversations = otherParticipants.filter(conv => conv.participant.id !== '') as ChatPreview[];
 
         const sortedConversations = validConversations.sort((a, b) => {
           const aTime = a?.lastMessage?.created_at
             ? new Date(a.lastMessage.created_at).getTime()
-            : new Date(a.id || 0).getTime();
+            : 0;
           const bTime = b?.lastMessage?.created_at
             ? new Date(b.lastMessage.created_at).getTime()
-            : new Date(b.id || 0).getTime();
+            : 0;
           return bTime - aTime;
         });
 
