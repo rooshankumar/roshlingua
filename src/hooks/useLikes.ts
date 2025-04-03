@@ -66,43 +66,60 @@ export function useLikes(targetUserId: string, currentUserId: string) {
     setIsLoading(true);
 
     try {
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('id')
-        .eq('id', targetUserId)
-        .single();
-
-      if (!profile) {
-        throw new Error('Profile not found');
-      }
-
+      // Start a transaction-like operation
       if (isLiked) {
-        // Unlike
-        await supabase
+        // Unlike - First remove the like
+        const { error: deleteError } = await supabase
           .from('user_likes')
           .delete()
           .eq('liker_id', currentUserId)
           .eq('liked_id', targetUserId);
 
-        await supabase
+        if (deleteError) throw deleteError;
+
+        // Get current like count
+        const { data: likes } = await supabase
+          .from('user_likes')
+          .select('*', { count: 'exact' })
+          .eq('liked_id', targetUserId);
+
+        const newCount = (likes?.length || 0);
+
+        // Update profile with accurate count
+        const { error: updateError } = await supabase
           .from('profiles')
-          .update({ likes_count: likeCount - 1 })
+          .update({ likes_count: newCount })
           .eq('id', targetUserId);
 
-        setLikeCount(prev => prev - 1);
+        if (updateError) throw updateError;
+
+        setLikeCount(newCount);
         setIsLiked(false);
       } else {
-        // Like
-        await supabase
+        // Like - First add the like
+        const { error: insertError } = await supabase
           .from('user_likes')
           .insert([{ liker_id: currentUserId, liked_id: targetUserId }]);
 
-        await supabase
+        if (insertError) throw insertError;
+
+        // Get current like count
+        const { data: likes } = await supabase
+          .from('user_likes')
+          .select('*', { count: 'exact' })
+          .eq('liked_id', targetUserId);
+
+        const newCount = (likes?.length || 0);
+
+        // Update profile with accurate count
+        const { error: updateError } = await supabase
           .from('profiles')
-          .update({ likes_count: likeCount + 1 })
+          .update({ likes_count: newCount })
           .eq('id', targetUserId);
 
-        setLikeCount(prev => prev + 1);
+        if (updateError) throw updateError;
+
+        setLikeCount(newCount);
         setIsLiked(true);
       }
     } catch (error) {
