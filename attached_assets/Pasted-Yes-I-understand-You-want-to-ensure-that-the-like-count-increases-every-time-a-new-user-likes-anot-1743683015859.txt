@@ -1,0 +1,113 @@
+Yes, I understand! You want to ensure that the like count increases every time a new user likes another user's profile. Essentially, you want to allow multiple users to like the same profile, and each new like from a different user should increment the like count.
+
+Here's the breakdown of how to implement that logic:
+
+Logic:
+Track the Likes: When a user likes another user's profile, insert a record into the user_likes table.
+
+Ensure Unique Likes: Ensure that only one like per user per profile exists. If the same user tries to like the profile again, it shouldn't insert a duplicate record.
+
+Increment Like Count: After a successful like (insertion), update the like count for that user’s profile.
+
+Step-by-Step Approach
+1. Ensure Unique Likes for Each User
+You should make sure that a user can only like another user's profile once. This can be achieved by using a unique constraint on the combination of liker_id and liked_id.
+
+Here’s an example schema that enforces this:
+
+sql
+Copy
+Edit
+CREATE TABLE user_likes (
+  liker_id UUID REFERENCES users(id),
+  liked_id UUID REFERENCES users(id),
+  PRIMARY KEY (liker_id, liked_id)
+);
+This ensures that a liker_id (the user who likes) and liked_id (the user being liked) can only appear once as a combination.
+
+2. Upsert Logic for Liking a Profile
+When a user likes a profile, you want to upsert the like. This means:
+
+If the user has already liked the profile, don’t insert it again (i.e., don’t duplicate).
+
+If it’s a new like, insert a new record.
+
+Here’s an example of the upsert logic:
+
+js
+Copy
+Edit
+const toggleLike = async (likerId, likedId) => {
+  try {
+    // Upsert operation: insert new like or do nothing if it already exists
+    const { data, error } = await supabase
+      .from('user_likes')
+      .upsert([{ liker_id: likerId, liked_id: likedId }]);
+
+    if (error) {
+      console.error('Error liking the profile:', error);
+      return;
+    }
+
+    console.log('Profile liked successfully:', data);
+  } catch (err) {
+    console.error('Unexpected error:', err);
+  }
+};
+The upsert() method ensures that the like is added if the user has not liked the profile before. If the user has already liked it, it does nothing.
+
+3. Incrementing the Like Count
+After the like is added, you need to update the like count for the liked_id user. Here's how you can do that:
+
+js
+Copy
+Edit
+const getLikesCount = async (likedId) => {
+  // Fetch the count of likes for a given user (liked_id)
+  const { data, error } = await supabase
+    .from('user_likes')
+    .select('*')
+    .eq('liked_id', likedId);
+
+  if (error) {
+    console.error('Error fetching likes count:', error);
+    return 0;
+  }
+
+  return data.length; // The number of likes the user has received
+};
+
+const handleLikeToggle = async (likerId, likedId) => {
+  await toggleLike(likerId, likedId); // Add or update like
+  const updatedLikesCount = await getLikesCount(likedId); // Get the updated like count
+  console.log('Updated like count:', updatedLikesCount);
+  // You can now update the UI with the new like count
+};
+Here, getLikesCount(likedId) queries the user_likes table for all likes related to the likedId and returns the total number of likes.
+
+4. Handling the Refresh Issue
+When you refresh the page, the like count and state should persist because you are storing the likes in the user_likes table in Supabase. To ensure the like count is correctly displayed after refreshing the page, you should call the getLikesCount(likedId) function when the page loads.
+
+For example, you can call this function when the component mounts in a React app:
+
+js
+Copy
+Edit
+useEffect(() => {
+  const fetchLikes = async () => {
+    const likes = await getLikesCount(likedId);
+    setLikeCount(likes); // Update the like count in the state
+  };
+
+  fetchLikes();
+}, [likedId]); // Re-run whenever the likedId changes
+This ensures that the like count is reloaded after the page refresh.
+
+Summary of Key Changes:
+Unique Likes: Ensure users can only like a profile once using a PRIMARY KEY on liker_id and liked_id.
+
+Upsert Logic: Use upsert() to add a like if it’s not already present, and do nothing if it is.
+
+Like Count Update: After a like is added, fetch and update the like count for the profile.
+
+Persisting Likes on Refresh: Fetch the like count from the database after the page refresh to display it correctly.
