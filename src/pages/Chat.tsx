@@ -74,6 +74,7 @@ const ChatPage = () => {
             messages: messages || [],
             participant: {
               id: otherParticipant.id,
+              email: otherParticipant.email,
               full_name: otherParticipant.full_name,
               avatar_url: otherParticipant.avatar_url,
               is_online: otherParticipant.is_online,
