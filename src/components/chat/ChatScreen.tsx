@@ -49,18 +49,14 @@ export const ChatScreen = ({ conversation }: Props) => {
             sender:users(
               id,
               email,
-              profiles(
-                full_name,
-                avatar_url
-              )
+              full_name,
+              avatar_url
             ),
             recipient:users(
               id,
               email,
-              profiles(
-                full_name,
-                avatar_url
-              )
+              full_name,
+              avatar_url
             )
           `)
           .eq('conversation_id', conversation.id)
