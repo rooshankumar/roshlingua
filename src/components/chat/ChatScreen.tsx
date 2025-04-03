@@ -48,6 +48,13 @@ export const ChatScreen = ({ conversation }: Props) => {
             *,
             sender:profiles!messages_sender_id_fkey(
               id,
+              email,
+              full_name,
+              avatar_url
+            ),
+            recipient:profiles!messages_recipient_id_fkey(
+              id,
+              email,
               full_name,
               avatar_url
             )
