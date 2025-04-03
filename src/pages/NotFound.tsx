@@ -104,9 +104,26 @@ const NotFound = () => {
           ))}
         </div>
 
-        <a href="/" className="text-primary hover:text-primary/80 underline transition-colors">
-          Return to Home
-        </a>
+        <div className="relative group">
+          <a 
+            href="/" 
+            className="relative inline-flex items-center px-8 py-4 text-lg font-medium text-white bg-primary rounded-full overflow-hidden transition-transform transform hover:scale-105 hover:shadow-xl"
+          >
+            <span className="absolute inset-0 bg-gradient-to-r from-primary via-primary/80 to-primary opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
+            <span className="relative flex items-center">
+              <svg 
+                className="w-6 h-6 mr-2 transform transition-transform group-hover:-translate-x-1" 
+                fill="none" 
+                stroke="currentColor" 
+                viewBox="0 0 24 24"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+              </svg>
+              Return Home
+            </span>
+          </a>
+          <div className="absolute -inset-1 bg-gradient-to-r from-primary/20 to-primary/0 rounded-full blur opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+        </div>
       </div>
     </div>
   );
