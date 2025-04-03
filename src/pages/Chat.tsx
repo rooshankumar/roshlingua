@@ -46,8 +46,31 @@ const ChatPage = () => {
         const otherParticipant = participant?.users;
 
         if (otherParticipant) {
+          // Fetch messages with sender profile info
+          const { data: messages, error: messagesError } = await supabase
+            .from('messages')
+            .select(`
+              id,
+              content,
+              created_at,
+              sender_id,
+              profiles!messages_sender_id_fkey (
+                id,
+                full_name,
+                avatar_url
+              )
+            `)
+            .eq('conversation_id', conversationId)
+            .order('created_at', { ascending: true });
+
+          if (messagesError) {
+            console.error('Error fetching messages:', messagesError);
+            throw messagesError;
+          }
+
           setConversation({
             id: conversationId,
+            messages: messages || [],
             participant: {
               id: otherParticipant.id,
               full_name: otherParticipant.full_name,
