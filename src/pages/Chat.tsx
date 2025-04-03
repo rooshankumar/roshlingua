@@ -54,11 +54,11 @@ const ChatPage = () => {
               content,
               created_at,
               sender_id,
-              sender:sender_id (
+              sender:users!sender_id_fkey (
                 id,
                 email,
-                raw_user_meta_data->>'full_name' as full_name,
-                raw_user_meta_data->>'avatar_url' as avatar_url
+                full_name,
+                avatar_url
               )
             `)
             .eq('conversation_id', conversationId)
