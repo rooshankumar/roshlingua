@@ -78,13 +78,15 @@ const ChatList = () => {
             conversations!inner (
               id,
               created_at,
-              messages (
+              messages!inner (
+                id,
                 content,
                 created_at,
-                is_read
+                is_read,
+                sender_id
               )
             ),
-            users!inner (
+            users:user_id (
               id,
               email,
               full_name,
@@ -93,6 +95,7 @@ const ChatList = () => {
             )
           `)
           .eq('user_id', user.id)
+          .order('created_at', { foreignTable: 'messages', ascending: false })
           .order('created_at', { ascending: false });
 
         if (conversationsError) throw conversationsError;
