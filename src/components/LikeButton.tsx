@@ -17,10 +17,15 @@ export function LikeButton({ targetUserId, currentUserId, className }: LikeButto
     <Button
       variant="ghost"
       size="sm"
-      disabled={isLoading}
+      disabled={isLoading || isLiked}
       onClick={toggleLike}
       data-user-id={targetUserId}
-      className={cn("gap-2", className)}
+      className={cn(
+        "gap-2",
+        isLiked && "cursor-not-allowed opacity-80",
+        className
+      )}
+      title={isLiked ? "Already liked" : "Like profile"}
     >
       <Heart className={cn(
         "h-5 w-5",
