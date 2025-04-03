@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useAuth } from '@/providers/AuthProvider';
 import { Loader2 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { supabase } from '@/lib/supabase';
 import { ChatScreen } from '@/components/chat/ChatScreen';
 
@@ -111,9 +112,39 @@ const ChatPage = () => {
   }
 
   if (!conversation) {
+    const createNewConversation = async () => {
+      try {
+        const { data: participant, error: participantError } = await supabase
+          .from('conversations')
+          .insert([{
+            created_by: user.id,
+            last_message_at: new Date().toISOString()
+          }])
+          .select()
+          .single();
+
+        if (participantError) throw participantError;
+
+        // Add participants
+        const { error: participantsError } = await supabase
+          .from('conversation_participants')
+          .insert([
+            { conversation_id: participant.id, user_id: user.id }
+          ]);
+
+        if (participantsError) throw participantsError;
+
+        // Navigate to the new conversation
+        window.location.href = `/chat/${participant.id}`;
+      } catch (error) {
+        console.error('Error creating conversation:', error);
+      }
+    };
+
     return (
-      <div className="h-screen flex items-center justify-center">
-        <p className="text-muted-foreground">Conversation not found</p>
+      <div className="h-screen flex flex-col items-center justify-center gap-4">
+        <p className="text-muted-foreground">No conversation found</p>
+        <Button onClick={createNewConversation}>Start New Conversation</Button>
       </div>
     );
   }
