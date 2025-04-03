@@ -20,11 +20,12 @@ const ChatPage = () => {
           .from('conversation_participants')
           .select(`
             user_id,
-            users:user_id (
+            users:profiles!user_id (
               id,
-              email,
               full_name,
-              avatar_url
+              avatar_url,
+              is_online,
+              last_seen
             )
           `)
           .eq('conversation_id', conversationId)
