@@ -1,0 +1,72 @@
+Your foreign keys seem correctly set up. Now, let's debug why the conversation is not found.
+
+Next Steps for Debugging:
+✅ 1. Check if the Conversation ID Exists
+Run this query to ensure the conversation ID exists in the conversations table:
+
+sql
+Copy
+Edit
+SELECT * FROM conversations WHERE id = '0dde6dae-c5b1-4292-b833-3f0d1b80acf7';
+If no results: The conversation ID does not exist. It might have been deleted or never created.
+
+If it exists: Move to the next step.
+
+✅ 2. Verify the User is a Participant
+Run this to check if the user is part of the conversation:
+
+sql
+Copy
+Edit
+SELECT * FROM conversation_participants 
+WHERE conversation_id = '0dde6dae-c5b1-4292-b833-3f0d1b80acf7';
+If no results: The user is not linked to this conversation.
+
+If results exist: Move to the next step.
+
+✅ 3. Debug Your Supabase Query
+If you are using Supabase with JavaScript, try logging the query:
+
+js
+Copy
+Edit
+const { data, error } = await supabase
+  .from('conversation_participants')
+  .select('conversation_id')
+  .eq('user_id', CURRENT_USER_ID);
+
+console.log('Conversation Data:', data);
+console.log('Error:', error);
+If data is empty: The user has no linked conversations.
+
+If error exists: The query might have an issue.
+
+✅ 4. Ensure API is Receiving the Correct ID
+If you're using an API like /chat/:conversationId, log the request:
+
+js
+Copy
+Edit
+app.get('/chat/:conversationId', async (req, res) => {
+  console.log('Received Conversation ID:', req.params.conversationId);
+});
+If the logged ID is wrong: The frontend is not sending the correct ID.
+
+If correct, but still not found: Check if the backend query matches the database structure.
+
+✅ 5. Check if Any Cascading Deletes Happened
+Run:
+
+sql
+Copy
+Edit
+SELECT * FROM conversations WHERE id NOT IN 
+  (SELECT DISTINCT conversation_id FROM conversation_participants);
+If this returns your missing conversation ID, it means the conversation_participants entry was deleted, but the conversation was not.
+
+Final Fixes
+If the conversation does not exist → It may have been deleted; recreate it.
+
+If the user is not in conversation_participants → Add them back.
+
+If the frontend sends the wrong conversationId → Fix the request.
