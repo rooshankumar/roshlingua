@@ -29,7 +29,7 @@ export function LikeButton({ targetUserId, currentUserId, className }: LikeButto
     >
       <Heart className={cn(
         "h-5 w-5",
-        isLiked && "fill-current text-red-500"
+        isLiked && "fill-current heart-liked"
       )} />
       <span>{likeCount}</span>
     </Button>
