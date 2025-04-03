@@ -20,7 +20,7 @@ const ChatPage = () => {
           .from('conversation_participants')
           .select(`
             user_id,
-            users:auth.users!user_id(
+            users:auth.users!user_id (
               id,
               email,
               raw_user_meta_data->>'full_name' as full_name,
