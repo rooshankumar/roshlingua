@@ -19,6 +19,7 @@ export function LikeButton({ targetUserId, currentUserId, className }: LikeButto
       size="sm"
       disabled={isLoading}
       onClick={toggleLike}
+      data-user-id={targetUserId}
       className={cn("gap-2", className)}
     >
       <Heart className={cn(

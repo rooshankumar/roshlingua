@@ -147,51 +147,45 @@ const Community = () => {
   }, [users, searchQuery, languageFilter, onlineOnly]);
 
   const handleLike = async (userId: string) => {
-    const currentUser = (await supabase.auth.getUser()).data.user?.id;
-
-    // Check if already liked
-    const { data: existingLike } = await supabase
-      .from('user_likes')
-      .select()
-      .eq('liker_id', currentUser)
-      .eq('liked_id', userId)
-      .single();
-
-    if (existingLike) {
-      // Unlike if already liked
-      const { error } = await supabase
-        .from('user_likes')
-        .delete()
-        .eq('liker_id', currentUser)
-        .eq('liked_id', userId);
-
-      if (error) {
-        console.error('Error unliking user:', error);
+    try {
+      const currentUser = (await supabase.auth.getUser()).data.user;
+      if (!currentUser) {
+        toast({
+          title: "Error",
+          description: "You must be logged in to like users",
+          variant: "destructive",
+        });
         return;
       }
-    } else {
-      // Like if not already liked
-      const { error } = await supabase
-        .from('user_likes')
-        .insert([{ liker_id: currentUser, liked_id: userId }]);
 
-      if (error) {
-        console.error('Error liking user:', error);
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('id', userId)
+        .single();
+
+      if (!profile) {
+        toast({
+          title: "Error",
+          description: "User not found",
+          variant: "destructive",
+        });
         return;
       }
+
+      // Use LikeButton component instead of direct DB operations
+      const likeButton = document.querySelector(`button[data-user-id="${userId}"]`);
+      if (likeButton) {
+        likeButton.click();
+      }
+    } catch (error) {
+      console.error('Error handling like:', error);
+      toast({
+        title: "Error",
+        description: "Failed to process like action",
+        variant: "destructive",
+      });
     }
-
-    // Refresh users to get updated likes count
-    const { data: updatedUsers, error: fetchError } = await supabase
-      .from('profiles')
-      .select('*');
-
-    if (fetchError) {
-      console.error('Error fetching updated users:', fetchError);
-      return;
-    }
-
-    setUsers(updatedUsers || []);
   };
 
   const { user } = useAuth();
@@ -382,15 +376,11 @@ const Community = () => {
 
                   <div className="mt-auto flex items-center justify-between p-4 bg-muted/50">
                     <div className="flex items-center gap-4">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleLike(user.id)}
+                      <LikeButton
+                        targetUserId={user.id}
+                        currentUserId={user?.id || ''}
                         className="hover:text-red-500"
-                      >
-                        <Heart className="h-4 w-4 mr-1" />
-                        <span>{user.likes_count || 0}</span>
-                      </Button>
+                      />
                       <div className="flex items-center text-orange-500">
                         <Flame className="h-4 w-4 mr-1" />
                         <span className="text-sm font-medium">{user.streak_count || 0}</span>
