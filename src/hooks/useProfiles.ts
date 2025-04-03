@@ -30,7 +30,7 @@ export const useUpdateProfile = () => {
       updates: { username?: string; bio?: string; avatar_url?: string; }
     }) => {
       const { data, error } = await supabase
-        .from('profiles')
+        .from('users')
         .update(updates)
         .eq('id', userId)
         .select()
