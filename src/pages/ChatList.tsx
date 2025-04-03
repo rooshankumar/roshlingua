@@ -95,14 +95,16 @@ const ChatList = () => {
               id,
               created_at
             ),
-            other_participant:users(
+            other_participant:users!conversation_participants_user_id_fkey(
               id,
               email,
               full_name,
-              avatar_url
+              avatar_url,
+              last_login
             )
           `)
           .eq('user_id', user.id)
+          .order('created_at', { ascending: false })
           .order('conversation_id', { ascending: false });
 
         if (participantsError) throw participantsError;

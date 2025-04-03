@@ -1,4 +1,3 @@
-
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Send, Loader2, FileText, Check } from 'lucide-react';
@@ -50,24 +49,26 @@ export const ChatScreen = ({ conversation }: Props) => {
               id,
               email,
               full_name,
-              avatar_url
+              avatar_url,
+              last_login
             ),
             recipient:recipient_id(
               id,
               email,
               full_name,
-              avatar_url
+              avatar_url,
+              last_login
             )
           `)
           .eq('conversation_id', conversation.id)
-          .order('created_at', { ascending: false })
+          .order('created_at', { ascending: true })
           .range((page - 1) * MESSAGES_PER_PAGE, page * MESSAGES_PER_PAGE - 1);
 
         if (error) throw error;
 
         setHasMore(data.length === MESSAGES_PER_PAGE);
         setMessages(prev => {
-          const newMessages = loadMore ? [...prev, ...data.reverse()] : data.reverse();
+          const newMessages = loadMore ? [...prev, ...data] : data;
           return newMessages;
         });
 
