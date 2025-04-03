@@ -18,22 +18,22 @@ export function useLikes(targetUserId: string, currentUserId: string) {
     try {
       // Get like count
       const { data: user } = await supabase
-        .from('users')
+        .from('profiles')
         .select('likes_count')
         .eq('id', targetUserId)
         .single();
 
       if (user) {
-        setLikeCount(user.likes_count);
+        setLikeCount(user.likes_count || 0);
       }
 
       // Check if current user has liked
       const { data: like } = await supabase
         .from('user_likes')
-        .select('*')
+        .select()
         .eq('liker_id', currentUserId)
         .eq('liked_id', targetUserId)
-        .single();
+        .maybeSingle();
 
       setIsLiked(!!like);
     } catch (error) {
@@ -43,15 +43,15 @@ export function useLikes(targetUserId: string, currentUserId: string) {
 
   const subscribeToLikes = () => {
     const channel = supabase
-      .channel(`user-likes:${targetUserId}`)
+      .channel(`profile-likes:${targetUserId}`)
       .on('postgres_changes', {
         event: '*',
         schema: 'public',
-        table: 'users',
+        table: 'profiles',
         filter: `id=eq.${targetUserId}`,
       }, (payload) => {
         if (payload.new) {
-          setLikeCount(payload.new.likes_count);
+          setLikeCount(payload.new.likes_count || 0);
         }
       })
       .subscribe();
@@ -62,34 +62,54 @@ export function useLikes(targetUserId: string, currentUserId: string) {
   };
 
   const toggleLike = async () => {
-    if (isLoading) return;
+    if (isLoading || !currentUserId) return;
     setIsLoading(true);
 
     try {
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('id', targetUserId)
+        .single();
+
+      if (!profile) {
+        throw new Error('Profile not found');
+      }
+
       if (isLiked) {
-        const { error } = await supabase
+        // Unlike
+        await supabase
           .from('user_likes')
           .delete()
           .eq('liker_id', currentUserId)
           .eq('liked_id', targetUserId);
 
-        if (error) throw error;
+        await supabase
+          .from('profiles')
+          .update({ likes_count: likeCount - 1 })
+          .eq('id', targetUserId);
+
+        setLikeCount(prev => prev - 1);
+        setIsLiked(false);
       } else {
-        const { error } = await supabase
+        // Like
+        await supabase
           .from('user_likes')
           .insert([{ liker_id: currentUserId, liked_id: targetUserId }]);
 
-        if (error) throw error;
+        await supabase
+          .from('profiles')
+          .update({ likes_count: likeCount + 1 })
+          .eq('id', targetUserId);
+
+        setLikeCount(prev => prev + 1);
+        setIsLiked(true);
       }
-
-      setIsLiked(!isLiked);
-      setLikeCount(prev => isLiked ? prev - 1 : prev + 1);
-
     } catch (error) {
       console.error('Error toggling like:', error);
       toast({
         title: 'Error',
-        description: 'Failed to update like status. Please try again.',
+        description: 'Failed to update like status',
         variant: 'destructive',
       });
     } finally {
