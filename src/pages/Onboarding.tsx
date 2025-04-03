@@ -160,25 +160,30 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
             console.log("Authenticated User ID:", user.id);
 
             console.log("Attempting to upsert profile for user ID:", user.id);
+            // Prepare profile data
+            const profileData = {
+                id: user.id,
+                full_name: formData.full_name,
+                gender: formData.gender,
+                native_language: formData.native_language,
+                learning_language: formData.learning_language,
+                proficiency_level: formData.proficiency_level,
+                learning_goal: formData.learning_goal,
+                onboarding_completed: true,
+                updated_at: new Date().toISOString()
+            };
+
+            // Add optional fields if they exist
+            if (formData.date_of_birth instanceof Date) {
+                profileData.date_of_birth = formData.date_of_birth.toISOString().split('T')[0];
+            }
+            if (formData.avatar_url) {
+                profileData.avatar_url = formData.avatar_url;
+            }
+
             const { error: profileError } = await supabase
                 .from('profiles')
-                .upsert({
-                    id: user.id,
-                    gender: formData.gender,
-                    date_of_birth: formData.date_of_birth instanceof Date ?
-                        formData.date_of_birth.toISOString().split('T')[0] :
-                        null,
-                    native_language: formData.native_language,
-                    learning_language: formData.learning_language,
-                    proficiency_level: formData.proficiency_level,
-                    learning_goal: formData.learning_goal,
-                    avatar_url: formData.avatar_url,
-                    full_name: formData.full_name,
-                    onboarding_completed: true,
-                    updated_at: new Date().toISOString()
-                }, {
-                    onConflict: 'id'
-                });
+                .upsert(profileData);
 
             if (profileError) {
                 console.error('Error updating profile data:', profileError);
