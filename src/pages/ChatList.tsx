@@ -75,10 +75,10 @@ const ChatList = () => {
           .from('conversation_participants')
           .select(`
             conversation_id,
-            conversations!inner (
+            conversations:conversation_id (
               id,
               created_at,
-              messages!inner (
+              messages (
                 id,
                 content,
                 created_at,
