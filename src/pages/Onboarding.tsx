@@ -160,22 +160,32 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
             console.log("Authenticated User ID:", user.id);
 
             console.log("Attempting to upsert profile for user ID:", user.id);
-            
+
+            // Update profile with minimal required fields first
             const { error: profileError } = await supabase
                 .from('profiles')
                 .upsert({
                     id: user.id,
-                    full_name: formData.full_name || '',
-                    gender: formData.gender || '',
-                    native_language: formData.native_language || '',
-                    learning_language: formData.learning_language || '',
-                    proficiency_level: formData.proficiency_level || '',
-                    learning_goal: formData.learning_goal || '',
-                    date_of_birth: formData.date_of_birth instanceof Date ? formData.date_of_birth.toISOString().split('T')[0] : null,
-                    avatar_url: formData.avatar_url || null,
+                    full_name: formData.full_name,
                     onboarding_completed: true,
                     updated_at: new Date().toISOString()
                 });
+
+            // Then update the rest of the fields
+            if (!profileError) {
+                await supabase
+                    .from('profiles')
+                    .update({
+                        gender: formData.gender,
+                        native_language: formData.native_language,
+                        learning_language: formData.learning_language,
+                        proficiency_level: formData.proficiency_level,
+                        learning_goal: formData.learning_goal,
+                        date_of_birth: formData.date_of_birth instanceof Date ? formData.date_of_birth.toISOString().split('T')[0] : null,
+                        avatar_url: formData.avatar_url
+                    })
+                    .eq('id', user.id);
+            }
 
             if (profileError) {
                 console.error('Error updating profile data:', profileError);
@@ -187,21 +197,6 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
                 return;
             }
 
-            // Complete onboarding in database
-            const { error: onboardingError } = await supabase
-                .from('profiles')
-                .update({ onboarding_completed: true })
-                .eq('id', user.id);
-
-            if (onboardingError) {
-                console.error('Error updating onboarding status:', onboardingError);
-                toast({
-                    variant: "destructive",
-                    title: "Error",
-                    description: "Failed to complete onboarding. Please try again.",
-                });
-                return;
-            }
 
             // Show success message
             toast({
