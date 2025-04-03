@@ -5,7 +5,9 @@ const subscriptions = new Map(); // To prevent duplicate subscriptions
 
 // Subscribe to new messages in a conversation (Prevents Duplicates)
 export const subscribeToMessages = async (conversationId: string, onMessage: (message: Message) => void, onRead: (messageId: string) => void) => {
-  if (subscriptions.has(conversationId)) return subscriptions.get(conversationId);
+  if (subscriptions.has(conversationId)) {
+    subscriptions.get(conversationId)?.unsubscribe();
+  }
 
   const channel = supabase
     .channel(`messages:${conversationId}`)
