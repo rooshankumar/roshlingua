@@ -95,14 +95,13 @@ const ChatList = () => {
               id,
               created_at
             ),
-            other_participant:auth.users!conversation_participants_user_id_fkey(
+            other_participant:users(
               id,
-              email
-            ),
-            other_participant_profile:profiles!profiles_id_fkey(
-              id,
-              full_name,
-              avatar_url
+              email,
+              profiles(
+                full_name,
+                avatar_url
+              )
             )
           `)
           .eq('user_id', user.id)
