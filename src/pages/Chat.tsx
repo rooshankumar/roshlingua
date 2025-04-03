@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useAuth } from '@/providers/AuthProvider';
@@ -21,11 +20,13 @@ const ChatPage = () => {
           .from('conversation_participants')
           .select(`
             user_id,
-            users:profiles!inner(
+            users:users!inner(
               id,
               email,
               full_name,
-              avatar_url
+              avatar_url,
+              is_online,
+              last_seen
             )
           `)
           .eq('conversation_id', conversationId)
@@ -84,10 +85,10 @@ const ChatPage = () => {
   }
 
   return (
-  <div className="min-h-screen md:bg-muted/30">
-    <ChatScreen conversation={conversation} />
-  </div>
-);
+    <div className="min-h-screen md:bg-muted/30">
+      <ChatScreen conversation={conversation} />
+    </div>
+  );
 };
 
 export default ChatPage;

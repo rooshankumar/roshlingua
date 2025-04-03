@@ -25,6 +25,7 @@ interface ChatPreview {
     content: string;
     created_at: string;
   };
+  unreadCount?: number;
 }
 
 const ChatList = () => {
@@ -70,47 +71,57 @@ const ChatList = () => {
     setIsLoading(true);
     const fetchConversations = async () => {
       try {
+        // Fetch all unread messages for the current user
+        const { data: unreadMessages, error: unreadError } = await supabase
+          .from('messages')
+          .select('conversation_id')
+          .eq('recipient_id', user?.id)
+          .is('is_read', false);
+
+        if (unreadError) throw unreadError;
+
+        // Implement client-side grouping to count unread messages per conversation
+        const unreadCountsClientSide: { [key: string]: number } = unreadMessages?.reduce((acc, message) => {
+          acc[message.conversation_id] = (acc[message.conversation_id] || 0) + 1;
+          return acc;
+        }, {}) || {};
+
         // Get all conversations where the current user is a participant
-        const { data: userConversations, error: conversationsError } = await supabase
+        const { data: conversationsData, error: participantsError } = await supabase
           .from('conversation_participants')
           .select(`
             conversation_id,
-            conversations!inner (
+            conversation:conversations(
               id,
-              created_at,
-              messages (
-                id,
-                content,
-                created_at,
-                is_read,
-                sender_id
-              )
+              created_at
             ),
-            users!inner (
+            other_participant:users(
               id,
               email,
               full_name,
-              avatar_url,
-              last_seen
+              avatar_url
             )
           `)
           .eq('user_id', user.id)
-          .order('created_at', { foreignTable: 'messages', ascending: false })
-          .order('created_at', { ascending: false });
+          .order('conversation_id', { ascending: false });
 
-        if (conversationsError) throw conversationsError;
+        if (participantsError) throw participantsError;
 
         const conversationPreviews = await Promise.all(
-          userConversations.map(async (conv) => {
-            // Get conversation details
-            const conversationDetails = conv.conversations;
-            const otherParticipant = conv.users; // Assuming only one other participant
+          conversationsData.map(async (conv) => {
+            const conversationDetails = conv.conversation;
+            const otherParticipant = conv.other_participant;
 
             if (!conversationDetails || !otherParticipant) return null;
 
+            const { data: messages, error: messagesError } = await supabase
+              .from('messages')
+              .select('content, created_at')
+              .eq('conversation_id', conversationDetails.id)
+              .order('created_at', { ascending: false })
+              .limit(1);
 
-            const messages = conversationDetails.messages;
-            const lastMessage = messages.length > 0 ? messages[0] : null;
+            if (messagesError) console.error("Error fetching last message:", messagesError);
 
             return {
               id: conversationDetails.id,
@@ -118,26 +129,23 @@ const ChatList = () => {
                 id: otherParticipant.id,
                 email: otherParticipant.email,
                 full_name: otherParticipant.full_name,
-                avatar_url: otherParticipant.avatar_url || '/placeholder.svg',
-                is_online: otherParticipant.is_online,
-                last_seen: otherParticipant.last_seen
+                avatar_url: otherParticipant.avatar_url || '/placeholder.svg'
               },
-              lastMessage: lastMessage
+              lastMessage: messages?.[0],
+              unreadCount: unreadCountsClientSide[conversationDetails.id] || 0,
             };
           })
         );
 
         const validConversations = conversationPreviews.filter(conv => conv !== null) as ChatPreview[];
 
-        // Sort conversations by last message timestamp, most recent first
-        // Sort by last message time, fallback to conversation creation time
         const sortedConversations = validConversations.sort((a, b) => {
           const aTime = a?.lastMessage?.created_at
             ? new Date(a.lastMessage.created_at).getTime()
-            : new Date(a.id || 0).getTime(); //fallback to conversation ID if no last message
+            : new Date(a.id || 0).getTime();
           const bTime = b?.lastMessage?.created_at
             ? new Date(b.lastMessage.created_at).getTime()
-            : new Date(b.id || 0).getTime(); //fallback to conversation ID if no last message
+            : new Date(b.id || 0).getTime();
           return bTime - aTime;
         });
 
