@@ -75,7 +75,7 @@ const ChatList = () => {
           .from('conversation_participants')
           .select(`
             conversation_id,
-            conversations:conversation_id (
+            conversations!inner (
               id,
               created_at,
               messages (
@@ -84,7 +84,7 @@ const ChatList = () => {
                 is_read
               )
             ),
-            users!conversation_participants_user_id_fkey (
+            users!inner (
               id,
               email,
               full_name,
