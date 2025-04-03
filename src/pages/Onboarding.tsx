@@ -69,6 +69,7 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
             learning_goal: "",
             avatar_url: "",
             date_of_birth: undefined as Date | undefined,
+            onboarding_completed: false,
         },
         async validate(values) {
             const errors: Record<string, string> = {};
@@ -168,11 +169,11 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
                     date_of_birth: formData.date_of_birth instanceof Date ?
                         formData.date_of_birth.toISOString().split('T')[0] :
                         null,
-                    native_language: formData.nativeLanguage,
-                    learning_language: formData.learningLanguage,
-                    proficiency_level: formData.proficiencyLevel,
-                    learning_goal: formData.learningGoal,
-                    avatar_url: formData.avatarUrl,
+                    native_language: formData.native_language,
+                    learning_language: formData.learning_language,
+                    proficiency_level: formData.proficiency_level,
+                    learning_goal: formData.learning_goal,
+                    avatar_url: formData.avatar_url,
                     full_name: formData.full_name,
                     onboarding_completed: true,
                     updated_at: new Date().toISOString()
