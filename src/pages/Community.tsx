@@ -229,19 +229,19 @@ const Community = () => {
         }
       }
 
-      // Create new conversation
+      // Create new conversation and get the ID back
       const { data: newConversation, error: conversationError } = await supabase
         .from('conversations')
         .insert([{
-          creator_id: user.id,
+          created_by: user.id,
           last_message_at: new Date().toISOString()
         }])
-        .select('*')
+        .select()
         .single();
 
       if (conversationError) throw conversationError;
 
-      // Add participants
+      // Add both participants in parallel
       const { error: participantsError2 } = await supabase
         .from('conversation_participants')
         .insert([
@@ -251,7 +251,8 @@ const Community = () => {
 
       if (participantsError2) throw participantsError2;
 
-      navigate(`/chat/${newConversation.id}`);
+      // Navigate immediately to the new chat
+      window.location.href = `/chat/${newConversation.id}`;
     } catch (error) {
       console.error('Error starting chat:', error);
       toast({
