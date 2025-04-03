@@ -20,7 +20,7 @@ const ChatPage = () => {
           .from('conversation_participants')
           .select(`
             user_id,
-            users!inner (
+            users:user_id (
               id,
               email,
               full_name,
@@ -29,7 +29,17 @@ const ChatPage = () => {
           `)
           .eq('conversation_id', conversationId)
           .neq('user_id', user.id)
-          .single();
+          .maybeSingle();
+
+        if (participantsError) {
+          console.error('Error loading participants:', participantsError);
+          throw participantsError;
+        }
+
+        if (!participant) {
+          console.error('No participant found for conversation:', conversationId);
+          return;
+        }
 
         if (participantsError) throw participantsError;
 
