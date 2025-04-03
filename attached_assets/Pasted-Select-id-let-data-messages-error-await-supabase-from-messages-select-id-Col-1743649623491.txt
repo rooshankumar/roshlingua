@@ -1,0 +1,318 @@
+Select id
+let { data: messages, error } = await supabase
+  .from('messages')
+  .select('id')
+Column
+conversation_id
+Required
+Type
+string
+Format
+uuid
+Description
+Click to edit.
+
+Cancel
+
+Save
+Select conversation_id
+let { data: messages, error } = await supabase
+  .from('messages')
+  .select('conversation_id')
+Column
+sender_id
+Required
+Type
+string
+Format
+uuid
+Description
+Click to edit.
+
+Cancel
+
+Save
+Select sender_id
+let { data: messages, error } = await supabase
+  .from('messages')
+  .select('sender_id')
+Column
+content
+Required
+Type
+string
+Format
+text
+Description
+Click to edit.
+
+Cancel
+
+Save
+Select content
+let { data: messages, error } = await supabase
+  .from('messages')
+  .select('content')
+Column
+created_at
+Required
+Type
+string
+Format
+timestamp with time zone
+Description
+Click to edit.
+
+Cancel
+
+Save
+Select created_at
+let { data: messages, error } = await supabase
+  .from('messages')
+  .select('created_at')
+Column
+is_read
+Optional
+Type
+boolean
+Format
+boolean
+Description
+Click to edit.
+
+Cancel
+
+Save
+Select is_read
+let { data: messages, error } = await supabase
+  .from('messages')
+  .select('is_read')
+Column
+user_id
+Required
+Type
+string
+Format
+uuid
+Description
+Click to edit.
+
+Cancel
+
+Save
+Select user_id
+let { data: messages, error } = await supabase
+  .from('messages')
+  .select('user_id')
+Column
+attachment_name
+Optional
+Type
+string
+Format
+character varying
+Description
+Click to edit.
+
+Cancel
+
+Save
+Select attachment_name
+let { data: messages, error } = await supabase
+  .from('messages')
+  .select('attachment_name')
+Column
+attachment_url
+Optional
+Type
+string
+Format
+character varying
+Description
+Click to edit.
+
+Cancel
+
+Save
+Select attachment_url
+let { data: messages, error } = await supabase
+  .from('messages')
+  .select('attachment_url')
+Column
+recipient_id
+Optional
+Type
+string
+Format
+uuid
+Description
+Click to edit.
+
+Cancel
+
+Save
+Select recipient_id
+let { data: messages, error } = await supabase
+  .from('messages')
+  .select('recipient_id')
+Read rows
+To read rows in messages, use the select method.
+
+Learn more
+
+Read all rows
+let { data: messages, error } = await supabase
+  .from('messages')
+  .select('*')
+Read specific columns
+let { data: messages, error } = await supabase
+  .from('messages')
+  .select('some_column,other_column')
+Read referenced tables
+let { data: messages, error } = await supabase
+  .from('messages')
+  .select(`
+    some_column,
+    other_table (
+      foreign_key
+    )
+  `)
+With pagination
+let { data: messages, error } = await supabase
+  .from('messages')
+  .select('*')
+  .range(0, 9)
+Filtering
+Supabase provides a wide range of filters.
+
+Learn more
+
+With filtering
+let { data: messages, error } = await supabase
+  .from('messages')
+  .select("*")
+
+  // Filters
+  .eq('column', 'Equal to')
+  .gt('column', 'Greater than')
+  .lt('column', 'Less than')
+  .gte('column', 'Greater than or equal to')
+  .lte('column', 'Less than or equal to')
+  .like('column', '%CaseSensitive%')
+  .ilike('column', '%CaseInsensitive%')
+  .is('column', null)
+  .in('column', ['Array', 'Values'])
+  .neq('column', 'Not equal to')
+
+  // Arrays
+  .contains('array_column', ['array', 'contains'])
+  .containedBy('array_column', ['contained', 'by'])
+
+  // Logical operators
+  .not('column', 'like', 'Negate filter')
+  .or('some_column.eq.Some value, other_column.eq.Other value')
+Insert rows
+insert lets you insert into your tables. You can also insert in bulk and do UPSERT.
+
+insert will also return the replaced values for UPSERT.
+
+Learn more
+
+Insert a row
+const { data, error } = await supabase
+  .from('messages')
+  .insert([
+    { some_column: 'someValue', other_column: 'otherValue' },
+  ])
+  .select()
+Insert many rows
+const { data, error } = await supabase
+  .from('messages')
+  .insert([
+    { some_column: 'someValue' },
+    { some_column: 'otherValue' },
+  ])
+  .select()
+Upsert matching rows
+const { data, error } = await supabase
+  .from('messages')
+  .upsert({ some_column: 'someValue' })
+  .select()
+Update rows
+update lets you update rows. update will match all rows by default. You can update specific rows using horizontal filters, e.g. eq, lt, and is.
+
+update will also return the replaced values for UPDATE.
+
+Learn more
+
+Update matching rows
+const { data, error } = await supabase
+  .from('messages')
+  .update({ other_column: 'otherValue' })
+  .eq('some_column', 'someValue')
+  .select()
+Delete rows
+delete lets you delete rows. delete will match all rows by default, so remember to specify your filters!
+
+Learn more
+
+Delete matching rows
+const { error } = await supabase
+  .from('messages')
+  .delete()
+  .eq('some_column', 'someValue')
+Subscribe to changes
+Supabase provides realtime functionality and broadcasts database changes to authorized users depending on Row Level Security (RLS) policies.
+
+Learn more
+
+Subscribe to all events
+const messages = supabase.channel('custom-all-channel')
+  .on(
+    'postgres_changes',
+    { event: '*', schema: 'public', table: 'messages' },
+    (payload) => {
+      console.log('Change received!', payload)
+    }
+  )
+  .subscribe()
+Subscribe to inserts
+const messages = supabase.channel('custom-insert-channel')
+  .on(
+    'postgres_changes',
+    { event: 'INSERT', schema: 'public', table: 'messages' },
+    (payload) => {
+      console.log('Change received!', payload)
+    }
+  )
+  .subscribe()
+Subscribe to updates
+const messages = supabase.channel('custom-update-channel')
+  .on(
+    'postgres_changes',
+    { event: 'UPDATE', schema: 'public', table: 'messages' },
+    (payload) => {
+      console.log('Change received!', payload)
+    }
+  )
+  .subscribe()
+Subscribe to deletes
+const messages = supabase.channel('custom-delete-channel')
+  .on(
+    'postgres_changes',
+    { event: 'DELETE', schema: 'public', table: 'messages' },
+    (payload) => {
+      console.log('Change received!', payload)
+    }
+  )
+  .subscribe()
+Subscribe to specific rows
+const messages = supabase.channel('custom-filter-channel')
+  .on(
+    'postgres_changes',
+    { event: '*', schema: 'public', table: 'messages', filter: 'column_name=eq.someValue' },
+    (payload) => {
+      console.log('Change received!', payload)
+    }
+  )
+  .subscribe()
