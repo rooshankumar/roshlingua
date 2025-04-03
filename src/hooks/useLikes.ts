@@ -16,16 +16,23 @@ export function useLikes(targetUserId: string, currentUserId: string) {
 
   const fetchLikeStatus = async () => {
     try {
-      // Get like count
-      const { data: user } = await supabase
-        .from('profiles')
-        .select('likes_count')
-        .eq('id', targetUserId)
-        .single();
+      // Get actual like count from user_likes table
+      const { data: likes, error: likesError } = await supabase
+        .from('user_likes')
+        .select('*', { count: 'exact' })
+        .eq('liked_id', targetUserId);
 
-      if (user) {
-        setLikeCount(user.likes_count || 0);
-      }
+      if (likesError) throw likesError;
+      
+      const actualLikeCount = likes?.length || 0;
+
+      // Update profiles table with accurate count if needed
+      await supabase
+        .from('profiles')
+        .update({ likes_count: actualLikeCount })
+        .eq('id', targetUserId);
+
+      setLikeCount(actualLikeCount);
 
       // Check if current user has liked
       const { data: like } = await supabase
