@@ -75,8 +75,8 @@ const ChatPage = () => {
             participant: {
               id: otherParticipant.id,
               email: otherParticipant.email,
-              full_name: otherParticipant.full_name,
-              avatar_url: otherParticipant.avatar_url,
+              full_name: otherParticipant.full_name || 'Unknown User',
+              avatar_url: otherParticipant.avatar_url || '/placeholder.svg',
               is_online: otherParticipant.is_online,
               last_seen: otherParticipant.last_seen
             }
