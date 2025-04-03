@@ -144,7 +144,7 @@ export const fetchConversations = async (userId: string): Promise<Conversation[]
       *,
       conversation_participants!inner (
         user_id,
-        users:users!conversation_participants_user_id_fkey (
+        users!conversation_participants_user_id_fkey (
           id,
           email,
           full_name,

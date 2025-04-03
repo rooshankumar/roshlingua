@@ -34,10 +34,18 @@ export async function debugSupabaseSchema() {
     
     console.log("Participant relationship test:", { participantTest, participantError });
     
+    // Test foreign key relationships
+    const { data: fkTest, error: fkError } = await supabase
+      .from('conversation_participants')
+      .select('user_id')
+      .limit(1);
+      
+    console.log("Foreign key test:", { fkTest, fkError });
+    
     return { 
       success: true, 
-      data: { data, creatorTest, participantTest }, 
-      error: error || creatorError || participantError 
+      data: { data, creatorTest, participantTest, fkTest }, 
+      error: error || creatorError || participantError || fkError 
     };
   } catch (err) {
     console.error("Debug error:", err);
