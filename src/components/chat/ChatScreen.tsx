@@ -46,7 +46,7 @@ export const ChatScreen = ({ conversation }: Props) => {
           .from('messages')
           .select(`
             *,
-            sender:profiles!inner(
+            sender:profiles!messages_sender_id_fkey(
               id,
               full_name,
               avatar_url
