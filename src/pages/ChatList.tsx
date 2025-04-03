@@ -75,10 +75,10 @@ const ChatList = () => {
           .from('conversation_participants')
           .select(`
             conversation_id,
-            conversations:conversation_id (
+            conversations!conversation_id (
               id,
               created_at,
-              messages (
+              messages!conversation_id (
                 id,
                 content,
                 created_at,
@@ -86,7 +86,7 @@ const ChatList = () => {
                 sender_id
               )
             ),
-            users:user_id (
+            users!user_id (
               id,
               email,
               full_name,
