@@ -16,17 +16,15 @@ export function useProfile(userId: string) {
           .select(`
             id,
             full_name,
+            age,
             bio,
-            gender,
             native_language,
             learning_language,
             proficiency_level,
-            learning_goal,
             streak_count,
             avatar_url,
             likes_count,
-            date_of_birth,
-            onboarding_completed
+            date_of_birth::text
           `)
           .eq('id', userId)
           .single();
