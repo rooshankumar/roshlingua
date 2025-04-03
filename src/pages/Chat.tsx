@@ -24,9 +24,9 @@ const ChatPage = () => {
               id,
               email,
               raw_user_meta_data->>'full_name' as full_name,
-              avatar_url,
-              is_online,
-              last_seen
+              raw_user_meta_data->>'avatar_url' as avatar_url,
+              raw_user_meta_data->>'is_online' as is_online,
+              raw_user_meta_data->>'last_seen' as last_seen
             )
           `)
           .eq('conversation_id', conversationId)
