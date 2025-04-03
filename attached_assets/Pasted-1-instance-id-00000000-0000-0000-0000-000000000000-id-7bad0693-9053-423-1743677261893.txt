@@ -1,0 +1,83 @@
+1.
+[
+  {
+    "instance_id": "00000000-0000-0000-0000-000000000000",
+    "id": "7bad0693-9053-423f-a2f0-a61c20b9cbf4",
+    "aud": "authenticated",
+    "role": "authenticated",
+    "email": "isthisroshan@gmail.com",
+    "encrypted_password": "$2a$10$p2oDxunsjI9SDdKWNIbYV.bfMPaBYWNx747OcGWjtKIQYTZf8YEM.",
+    "email_confirmed_at": "2025-03-24 06:14:24.781766+00",
+    "invited_at": null,
+    "confirmation_token": "",
+    "confirmation_sent_at": "2025-03-24 06:14:06.719412+00",
+    "recovery_token": "",
+    "recovery_sent_at": "2025-04-02 08:50:27.80624+00",
+    "email_change_token_new": "",
+    "email_change": "",
+    "email_change_sent_at": null,
+    "last_sign_in_at": "2025-04-03 03:59:36.563579+00",
+    "raw_app_meta_data": {
+      "provider": "email",
+      "providers": [
+        "email",
+        "google"
+      ]
+    },
+    "raw_user_meta_data": {
+      "id": "7bad0693-9053-423f-a2f0-a61c20b9cbf4",
+      "age": 25,
+      "bio": "This  is my first 1st account.",
+      "iss": "https://accounts.google.com",
+      "sub": "106953344191144128084",
+      "name": "Roshan Kumar",
+      "email": "isthisroshan@gmail.com",
+      "gender": "Female",
+      "picture": "https://lh3.googleusercontent.com/a/ACg8ocLzRg2hwF5Vk6-GaDRYK5ZjPy8wg9PInK6iOsXgR7sJl_8iw5c=s96-c",
+      "username": "Unknown",
+      "full_name": "Roshan Kumar",
+      "is_online": false,
+      "onboarded": true,
+      "avatar_url": "https://lh3.googleusercontent.com/a/ACg8ocLzRg2hwF5Vk6-GaDRYK5ZjPy8wg9PInK6iOsXgR7sJl_8iw5c=s96-c",
+      "created_at": "2025-03-24T06:14:06.708746+00:00",
+      "last_login": "2025-03-27T03:35:39.685112+00:00",
+      "updated_at": "2025-03-30T05:21:47.630Z",
+      "likes_count": 0,
+      "provider_id": "106953344191144128084",
+      "streak_count": 0,
+      "date_of_birth": "2000-01-01",
+      "email_verified": true,
+      "phone_verified": false,
+      "native_language": "English",
+      "learning_language": "German",
+      "proficiency_level": "Upper Intermediate (B2)"
+    },
+    "is_super_admin": null,
+    "created_at": "2025-03-24 06:14:06.708746+00",
+    "updated_at": "2025-04-03 10:34:29.792534+00",
+    "phone": null,
+    "phone_confirmed_at": null,
+    "phone_change": "",
+    "phone_change_token": "",
+    "phone_change_sent_at": null,
+    "confirmed_at": "2025-03-24 06:14:24.781766+00",
+    "email_change_token_current": "",
+    "email_change_confirm_status": 0,
+    "banned_until": null,
+    "reauthentication_token": "",
+    "reauthentication_sent_at": null,
+    "is_sso_user": false,
+    "deleted_at": null,
+    "is_anonymous": false
+  }
+]
+2.
+[
+  {
+    "id": "f5e5e262-edaf-437a-a1fb-c04a0a084863",
+    "conversation_id": "c56738af-3855-4ae3-9deb-ed36685bb4c7",
+    "user_id": "7bad0693-9053-423f-a2f0-a61c20b9cbf4",
+    "created_at": "2025-04-03 10:42:57.09413+00",
+    "message_id": null
+  }
+]

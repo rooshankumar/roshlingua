@@ -1,0 +1,40 @@
+hema cache"}
+loadConversation @ Chat.tsx:37
+await in loadConversation
+(anonymous) @ Chat.tsx:94
+commitHookEffectListMount @ chunk-W6L2VRDA.js?v=0f32b538:16915
+commitPassiveMountOnFiber @ chunk-W6L2VRDA.js?v=0f32b538:18156
+commitPassiveMountEffects_complete @ chunk-W6L2VRDA.js?v=0f32b538:18129
+commitPassiveMountEffects_begin @ chunk-W6L2VRDA.js?v=0f32b538:18119
+commitPassiveMountEffects @ chunk-W6L2VRDA.js?v=0f32b538:18109
+flushPassiveEffectsImpl @ chunk-W6L2VRDA.js?v=0f32b538:19490
+flushPassiveEffects @ chunk-W6L2VRDA.js?v=0f32b538:19447
+performSyncWorkOnRoot @ chunk-W6L2VRDA.js?v=0f32b538:18868
+flushSyncCallbacks @ chunk-W6L2VRDA.js?v=0f32b538:9119
+commitRootImpl @ chunk-W6L2VRDA.js?v=0f32b538:19432
+commitRoot @ chunk-W6L2VRDA.js?v=0f32b538:19277
+finishConcurrentRender @ chunk-W6L2VRDA.js?v=0f32b538:18805
+performConcurrentWorkOnRoot @ chunk-W6L2VRDA.js?v=0f32b538:18718
+workLoop @ chunk-W6L2VRDA.js?v=0f32b538:197
+flushWork @ chunk-W6L2VRDA.js?v=0f32b538:176
+performWorkUntilDeadline @ chunk-W6L2VRDA.js?v=0f32b538:384Understand this error
+Chat.tsx:88 Error loading conversation: {code: 'PGRST200', details: "Searched for a foreign key relationship between 'c…n the schema 'public', but no matches were found.", hint: null, message: "Could not find a relationship between 'conversation_participants' and 'users' in the schema cache"}code: "PGRST200"details: "Searched for a foreign key relationship between 'conversation_participants' and 'users' using the hint 'user_id' in the schema 'public', but no matches were found."hint: nullmessage: "Could not find a relationship between 'conversation_participants' and 'users' in the schema cache"[[Prototype]]: Object
+loadConversation @ Chat.tsx:88
+await in loadConversation
+(anonymous) @ Chat.tsx:94
+commitHookEffectListMount @ chunk-W6L2VRDA.js?v=0f32b538:16915
+commitPassiveMountOnFiber @ chunk-W6L2VRDA.js?v=0f32b538:18156
+commitPassiveMountEffects_complete @ chunk-W6L2VRDA.js?v=0f32b538:18129
+commitPassiveMountEffects_begin @ chunk-W6L2VRDA.js?v=0f32b538:18119
+commitPassiveMountEffects @ chunk-W6L2VRDA.js?v=0f32b538:18109
+flushPassiveEffectsImpl @ chunk-W6L2VRDA.js?v=0f32b538:19490
+flushPassiveEffects @ chunk-W6L2VRDA.js?v=0f32b538:19447
+performSyncWorkOnRoot @ chunk-W6L2VRDA.js?v=0f32b538:18868
+flushSyncCallbacks @ chunk-W6L2VRDA.js?v=0f32b538:9119
+commitRootImpl @ chunk-W6L2VRDA.js?v=0f32b538:19432
+commitRoot @ chunk-W6L2VRDA.js?v=0f32b538:19277
+finishConcurrentRender @ chunk-W6L2VRDA.js?v=0f32b538:18805
+performConcurrentWorkOnRoot @ chunk-W6L2VRDA.js?v=0f32b538:18718
+workLoop @ chunk-W6L2VRDA.js?v=0f32b538:197
+flushWork @ chunk-W6L2VRDA.js?v=0f32b538:176
+performWorkUntilDeadline @ chunk-W6L2VRDA.js?v=0f32b538:384Understand this error
