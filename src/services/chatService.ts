@@ -74,7 +74,16 @@ export const fetchMessages = async (conversationId: string, currentUserId: strin
   // Fetch messages
   const { data, error } = await supabase
     .from('messages')
-    .select('*')
+    .select(`
+      *,
+      sender:users!messages_sender_id_fkey(
+        id,
+        email,
+        full_name,
+        avatar_url,
+        last_seen
+      )
+    `)
     .eq('conversation_id', conversationId)
     .order('created_at', { ascending: false });
 

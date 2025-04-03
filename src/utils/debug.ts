@@ -42,6 +42,20 @@ export async function debugSupabaseSchema() {
       
     console.log("Foreign key test:", { fkTest, fkError });
     
+    // Test message-user relationship
+    const { data: messageTest, error: messageError } = await supabase
+      .from('messages')
+      .select(`
+        id,
+        sender:users!messages_sender_id_fkey (
+          id,
+          email
+        )
+      `)
+      .limit(1);
+    
+    console.log("Message relationship test:", { messageTest, messageError });
+    
     return { 
       success: true, 
       data: { data, creatorTest, participantTest, fkTest }, 
