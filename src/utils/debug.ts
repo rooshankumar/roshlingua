@@ -19,7 +19,26 @@ export async function debugSupabaseSchema() {
     
     console.log("Creator ID test:", { creatorTest, creatorError });
     
-    return { success: true, data: { data, creatorTest }, error: error || creatorError };
+    // Test conversation participants query
+    const { data: participantTest, error: participantError } = await supabase
+      .from('conversation_participants')
+      .select(`
+        user_id,
+        users:users!conversation_participants_user_id_fkey (
+          id,
+          email,
+          full_name
+        )
+      `)
+      .limit(1);
+    
+    console.log("Participant relationship test:", { participantTest, participantError });
+    
+    return { 
+      success: true, 
+      data: { data, creatorTest, participantTest }, 
+      error: error || creatorError || participantError 
+    };
   } catch (err) {
     console.error("Debug error:", err);
     return { success: false, error: err };
