@@ -16,17 +16,15 @@ const ChatPage = () => {
 
     const loadConversation = async () => {
       try {
-        const { data: conversationParticipants, error: participantsError } = await supabase
+        const { data: participant, error: participantsError } = await supabase
           .from('conversation_participants')
           .select(`
             user_id,
-            users!conversation_participants_user_id_fkey (
+            users!inner (
               id,
               email,
               full_name,
-              avatar_url,
-              is_online,
-              last_seen
+              avatar_url
             )
           `)
           .eq('conversation_id', conversationId)
@@ -35,9 +33,7 @@ const ChatPage = () => {
 
         if (participantsError) throw participantsError;
 
-        const otherParticipant = conversationParticipants
-          ?.map(cp => cp.users)
-          ?.find(u => u.id !== user.id);
+        const otherParticipant = participant?.users;
 
         if (otherParticipant) {
           setConversation({
