@@ -196,3 +196,4 @@ export type Conversation = Database['public']['Tables']['conversations']['Row'] 
 };
 export type ConversationParticipant = Database['public']['Tables']['conversation_participants']['Row'];
 export type MessageReaction = Database['public']['Tables']['message_reactions']['Row'];
+export type UserLike = Database['public']['Tables']['user_likes']['Row'];

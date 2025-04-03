@@ -66,3 +66,40 @@ export async function debugSupabaseSchema() {
     return { success: false, error: err };
   }
 }
+export async function debugLikes(userId: string) {
+  try {
+    // Test like count query
+    const { data: likeCount, error: likeCountError } = await supabase
+      .from('users')
+      .select('likes_count')
+      .eq('id', userId)
+      .single();
+    
+    console.log("Like count test:", { likeCount, likeCountError });
+
+    // Test likes table query
+    const { data: userLikes, error: likesError } = await supabase
+      .from('user_likes')
+      .select('*')
+      .eq('liked_id', userId);
+    
+    console.log("User likes test:", { userLikes, likesError });
+
+    // Verify no duplicate likes
+    const { data: duplicates } = await supabase
+      .from('user_likes')
+      .select('liker_id, count(*)')
+      .eq('liked_id', userId)
+      .group('liker_id')
+      .having('count(*) > 1');
+
+    if (duplicates && duplicates.length > 0) {
+      console.error("Found duplicate likes:", duplicates);
+    }
+
+    return { success: true, data: { likeCount, userLikes, duplicates }};
+  } catch (error) {
+    console.error("Debug likes error:", error);
+    return { success: false, error };
+  }
+}
