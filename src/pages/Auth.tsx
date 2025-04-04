@@ -133,7 +133,8 @@ const Auth = () => {
             password,
             options: {
               data: {
-                full_name: name
+                full_name: name,
+                onboarding_completed: false
               },
               emailRedirectTo: `${window.location.origin}/auth/callback`
             }
