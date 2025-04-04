@@ -42,14 +42,14 @@ const Auth = () => {
 
       try {
         const { data, error } = await supabase
-          .from('users')
-          .select('onboarding_completed')
-          .eq('id', user.id)
+          .from('onboarding_status')
+          .select('*')
+          .eq('user_id', user.id)
           .single();
 
         if (error) throw error;
 
-        if (data?.onboarding_completed) {
+        if (data) {
           navigate('/dashboard', { replace: true });
         } else {
           navigate('/onboarding', { replace: true });
@@ -129,13 +129,12 @@ const Auth = () => {
           }
 
           try {
-            const { data: { user }, error } = await supabase.auth.signUp({
+            const { data, error } = await supabase.auth.signUp({
               email,
               password,
               options: {
                 data: {
-                  full_name: name,
-                  onboarding_completed: false
+                  full_name: name
                 },
                 emailRedirectTo: `${window.location.origin}/auth/callback`
               }
@@ -145,26 +144,22 @@ const Auth = () => {
               throw error;
             }
 
-            if (!user) {
+            if (!data?.user) {
               throw new Error("No user data returned");
             }
 
-            // Create user profile after signup
-            const { error: profileError } = await supabase
-              .from('users')
-              .insert([{
-                id: user.id,
-                email: email,
-                full_name: name,
-                onboarding_completed: false
-              }]);
+            // Create onboarding status entry
+            const { error: onboardingError } = await supabase
+              .from('onboarding_status')
+              .insert([{ user_id: data.user.id }]);
 
-            if (profileError) {
-              console.error("Profile creation error:", profileError);
-              // Delete auth user if profile creation fails
-              await supabase.auth.admin.deleteUser(user.id);
-              throw new Error("Failed to create user profile");
+            if (onboardingError) {
+              console.error("Error creating onboarding status:", onboardingError);
+              // Delete auth user if onboarding status creation fails
+              await supabase.auth.admin.deleteUser(data.user.id);
+              throw new Error("Failed to initialize onboarding status");
             }
+
 
             toast({
               title: "Signup successful",
@@ -173,7 +168,7 @@ const Auth = () => {
           } catch (error) {
             console.error("Signup error:", error);
             let errorMessage = "An error occurred during signup.";
-            
+
             if (error.message?.includes("Database error")) {
               errorMessage = "Our servers are experiencing issues. Please try again in a few minutes.";
             } else if (error.message?.includes("User already registered")) {
@@ -181,20 +176,13 @@ const Auth = () => {
             } else if (error.status === 500) {
               errorMessage = "A server error occurred. Please try again later.";
             }
-            
+
             toast({
               variant: "destructive",
               title: "Signup failed",
               description: errorMessage,
             });
             return;
-          }
-
-          if (data?.user) {
-            toast({
-              title: "Signup successful",
-              description: "Please check your email (including spam folder) for the confirmation link. This may take a few minutes.",
-            });
           }
         } catch (error) {
           console.error("Signup error:", error);

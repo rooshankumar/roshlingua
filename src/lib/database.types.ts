@@ -6,64 +6,57 @@ export interface Database {
           id: string;
           email: string;
           full_name: string;
-          username: string;
-          bio: string;
-          gender: string;
-          date_of_birth: string | null;
+          avatar_url: string | null;
+          bio: string | null;
           native_language: string;
           learning_language: string;
           proficiency_level: string;
           learning_goal: string | null;
-          avatar_url: string | null;
+          date_of_birth: string | null;
+          gender: string | null;
           is_online: boolean;
-          likes_count: number;
-          created_at: string;
-          updated_at: string;
           last_seen: string | null;
           streak_count: number;
           streak_last_date: string | null;
+          created_at: string;
+          updated_at: string;
         };
         Insert: {
           id?: string;
           email: string;
           full_name: string;
-          username?: string;
-          bio?: string;
-          gender?: string;
-          date_of_birth?: string | null;
+          avatar_url?: string | null;
+          bio?: string | null;
           native_language?: string;
           learning_language?: string;
           proficiency_level?: string;
           learning_goal?: string | null;
-          avatar_url?: string | null;
+          date_of_birth?: string | null;
+          gender?: string | null;
           is_online?: boolean;
-          likes_count?: number;
-          created_at?: string;
-          updated_at?: string;
           last_seen?: string | null;
           streak_count?: number;
           streak_last_date?: string | null;
+          created_at?: string;
+          updated_at?: string;
         };
         Update: {
           id?: string;
           email?: string;
           full_name?: string;
-          username?: string;
-          bio?: string;
-          gender?: string;
-          date_of_birth?: string | null;
+          avatar_url?: string | null;
+          bio?: string | null;
           native_language?: string;
           learning_language?: string;
           proficiency_level?: string;
           learning_goal?: string | null;
-          avatar_url?: string | null;
+          date_of_birth?: string | null;
+          gender?: string | null;
           is_online?: boolean;
-          likes_count?: number;
-          created_at?: string;
-          updated_at?: string;
           last_seen?: string | null;
           streak_count?: number;
           streak_last_date?: string | null;
+          updated_at?: string;
         };
       };
       conversations: {
@@ -187,8 +180,11 @@ export interface Database {
   };
 }
 
-// Type shortcuts
-export type Profile = Database['public']['Tables']['profiles']['Row'];
+export type Tables<T extends keyof Database['public']['Tables']> = Database['public']['Tables'][T]['Row'];
+export type Insertable<T extends keyof Database['public']['Tables']> = Database['public']['Tables'][T]['Insert'];
+export type Updateable<T extends keyof Database['public']['Tables']> = Database['public']['Tables'][T]['Update'];
+
+export type Profile = Database['public']['Tables']['users']['Row'];
 export type Message = Database['public']['Tables']['messages']['Row'];
 export type Conversation = Database['public']['Tables']['conversations']['Row'] & {
   participants?: Profile[];
