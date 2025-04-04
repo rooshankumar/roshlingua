@@ -128,25 +128,55 @@ const Auth = () => {
             return;
           }
 
-          const { data, error } = await supabase.auth.signUp({
-            email,
-            password,
-            options: {
-              data: {
+          try {
+            const { data: { user }, error } = await supabase.auth.signUp({
+              email,
+              password,
+              options: {
+                data: {
+                  full_name: name,
+                  onboarding_completed: false
+                },
+                emailRedirectTo: `${window.location.origin}/auth/callback`
+              }
+            });
+
+            if (error) {
+              throw error;
+            }
+
+            if (!user) {
+              throw new Error("No user data returned");
+            }
+
+            // Create user profile after signup
+            const { error: profileError } = await supabase
+              .from('users')
+              .insert([{
+                id: user.id,
+                email: email,
                 full_name: name,
                 onboarding_completed: false
-              },
-              emailRedirectTo: `${window.location.origin}/auth/callback`
-            }
-          });
+              }]);
 
-          if (error) {
+            if (profileError) {
+              console.error("Profile creation error:", profileError);
+              // Delete auth user if profile creation fails
+              await supabase.auth.admin.deleteUser(user.id);
+              throw new Error("Failed to create user profile");
+            }
+
+            toast({
+              title: "Signup successful",
+              description: "Please check your email (including spam folder) for the confirmation link.",
+            });
+          } catch (error) {
             console.error("Signup error:", error);
             let errorMessage = "An error occurred during signup.";
             
-            if (error.message.includes("Database error")) {
+            if (error.message?.includes("Database error")) {
               errorMessage = "Our servers are experiencing issues. Please try again in a few minutes.";
-            } else if (error.message.includes("User already registered")) {
+            } else if (error.message?.includes("User already registered")) {
               errorMessage = "This email is already registered.";
             } else if (error.status === 500) {
               errorMessage = "A server error occurred. Please try again later.";
