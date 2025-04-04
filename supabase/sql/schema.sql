@@ -70,3 +70,24 @@ CREATE TABLE IF NOT EXISTS public.onboarding_status (
   current_step TEXT,
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT now()
 );
+
+-- Notifications Table
+CREATE TABLE IF NOT EXISTS public.notifications (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id UUID REFERENCES public.users(id) ON DELETE CASCADE,
+  type TEXT NOT NULL,
+  content TEXT NOT NULL,
+  related_entity_id UUID,
+  is_read BOOLEAN DEFAULT false,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT now()
+);
+
+-- Notification Settings Table
+CREATE TABLE IF NOT EXISTS public.notification_settings (
+  user_id UUID PRIMARY KEY REFERENCES public.users(id) ON DELETE CASCADE,
+  new_messages BOOLEAN DEFAULT true,
+  profile_views BOOLEAN DEFAULT true,
+  learning_reminders BOOLEAN DEFAULT true,
+  streak_reminders BOOLEAN DEFAULT true,
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT now()
+);

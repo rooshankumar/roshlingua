@@ -23,3 +23,9 @@ DROP TRIGGER IF EXISTS on_new_message ON public.messages;
 CREATE TRIGGER on_new_message
   AFTER INSERT ON public.messages
   FOR EACH ROW EXECUTE FUNCTION public.handle_new_message();
+
+-- Message notification trigger
+DROP TRIGGER IF EXISTS on_message_notification ON public.messages;
+CREATE TRIGGER on_message_notification
+  AFTER INSERT ON public.messages
+  FOR EACH ROW EXECUTE FUNCTION public.handle_message_notification();

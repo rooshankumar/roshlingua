@@ -1,4 +1,3 @@
-
 -- Users table policies
 ALTER TABLE public.users ENABLE ROW LEVEL SECURITY;
 
@@ -45,3 +44,25 @@ CREATE POLICY "Users can insert messages in their conversations"
       AND user_id = auth.uid()
     )
   );
+
+-- Notifications policies
+ALTER TABLE public.notifications ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users can view their own notifications"
+  ON public.notifications FOR SELECT
+  USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can update their own notifications"
+  ON public.notifications FOR UPDATE
+  USING (auth.uid() = user_id);
+
+-- Notification settings policies
+ALTER TABLE public.notification_settings ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users can view their own notification settings"
+  ON public.notification_settings FOR SELECT
+  USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can update their own notification settings"
+  ON public.notification_settings FOR UPDATE
+  USING (auth.uid() = user_id);
