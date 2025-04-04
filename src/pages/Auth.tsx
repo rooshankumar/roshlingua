@@ -107,26 +107,35 @@ const Auth = () => {
       }
 
       if (email && password && name) {
-        const { data, error } = await supabase.auth.signUp({
-          email,
-          password,
-          options: {
-            data: {
-              full_name: name
-            },
-            emailRedirectTo: `${window.location.origin}/auth/callback`
-          }
-        });
-
-        if (error) {
-          console.error("Signup error:", error);
-          toast({
-            variant: "destructive",
-            title: "Signup failed",
-            description: error.message || "An error occurred during signup.",
+        try {
+          const { data, error } = await supabase.auth.signUp({
+            email,
+            password,
+            options: {
+              data: {
+                full_name: name
+              },
+              emailRedirectTo: `${window.location.origin}/auth/callback`
+            }
           });
-          return;
-        }
+
+          if (error) {
+            console.error("Signup error:", error);
+            let errorMessage = "An error occurred during signup.";
+            
+            if (error.message.includes("Database error")) {
+              errorMessage = "Unable to create user account. Please try again later.";
+            } else if (error.message.includes("User already registered")) {
+              errorMessage = "This email is already registered.";
+            }
+            
+            toast({
+              variant: "destructive",
+              title: "Signup failed",
+              description: errorMessage,
+            });
+            return;
+          }
 
         if (data?.user) {
           toast({
