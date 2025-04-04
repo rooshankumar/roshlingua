@@ -108,6 +108,26 @@ const Auth = () => {
 
       if (email && password && name) {
         try {
+          // Validate email format
+          if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+            toast({
+              variant: "destructive",
+              title: "Invalid email",
+              description: "Please enter a valid email address",
+            });
+            return;
+          }
+
+          // Validate password length
+          if (password.length < 8) {
+            toast({
+              variant: "destructive",
+              title: "Invalid password",
+              description: "Password must be at least 8 characters long",
+            });
+            return;
+          }
+
           const { data, error } = await supabase.auth.signUp({
             email,
             password,
@@ -124,9 +144,11 @@ const Auth = () => {
             let errorMessage = "An error occurred during signup.";
             
             if (error.message.includes("Database error")) {
-              errorMessage = "Unable to create user account. Please try again later.";
+              errorMessage = "Our servers are experiencing issues. Please try again in a few minutes.";
             } else if (error.message.includes("User already registered")) {
               errorMessage = "This email is already registered.";
+            } else if (error.status === 500) {
+              errorMessage = "A server error occurred. Please try again later.";
             }
             
             toast({
