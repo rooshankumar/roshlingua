@@ -1,64 +1,105 @@
+export type Json =
+  | string
+  | number
+  | boolean
+  | null
+  | { [key: string]: Json | undefined }
+  | Json[]
+
 export interface Database {
   public: {
     Tables: {
       users: {
         Row: {
-          id: string;
-          email: string;
-          full_name: string;
-          avatar_url: string | null;
-          bio: string | null;
-          native_language: string;
-          learning_language: string;
-          proficiency_level: string;
-          learning_goal: string | null;
-          date_of_birth: string | null;
-          gender: string | null;
-          is_online: boolean;
-          last_seen: string | null;
-          streak_count: number;
-          streak_last_date: string | null;
-          created_at: string;
-          updated_at: string;
-        };
+          id: string
+          email: string
+          full_name: string | null
+          avatar_url: string | null
+          bio: string | null
+          native_language: string | null
+          learning_language: string | null
+          proficiency_level: string | null
+          learning_goal: string | null
+          date_of_birth: string | null
+          gender: string | null
+          is_online: boolean
+          last_seen: string | null
+          streak_count: number
+          streak_last_date: string | null
+          onboarding_completed: boolean
+          created_at: string
+          updated_at: string
+        }
         Insert: {
-          id?: string;
-          email: string;
-          full_name: string;
-          avatar_url?: string | null;
-          bio?: string | null;
-          native_language?: string;
-          learning_language?: string;
-          proficiency_level?: string;
-          learning_goal?: string | null;
-          date_of_birth?: string | null;
-          gender?: string | null;
-          is_online?: boolean;
-          last_seen?: string | null;
-          streak_count?: number;
-          streak_last_date?: string | null;
-          created_at?: string;
-          updated_at?: string;
-        };
+          id: string
+          email: string
+          full_name?: string | null
+          avatar_url?: string | null
+          bio?: string | null
+          native_language?: string | null
+          learning_language?: string | null
+          proficiency_level?: string | null
+          learning_goal?: string | null
+          date_of_birth?: string | null
+          gender?: string | null
+          is_online?: boolean
+          last_seen?: string | null
+          streak_count?: number
+          streak_last_date?: string | null
+          onboarding_completed?: boolean
+          created_at?: string
+          updated_at?: string
+        }
         Update: {
-          id?: string;
-          email?: string;
-          full_name?: string;
-          avatar_url?: string | null;
-          bio?: string | null;
-          native_language?: string;
-          learning_language?: string;
-          proficiency_level?: string;
-          learning_goal?: string | null;
-          date_of_birth?: string | null;
-          gender?: string | null;
-          is_online?: boolean;
-          last_seen?: string | null;
-          streak_count?: number;
-          streak_last_date?: string | null;
-          updated_at?: string;
-        };
-      };
+          id?: string
+          email?: string
+          full_name?: string | null
+          avatar_url?: string | null
+          bio?: string | null
+          native_language?: string | null
+          learning_language?: string | null
+          proficiency_level?: string | null
+          learning_goal?: string | null
+          date_of_birth?: string | null
+          gender?: string | null
+          is_online?: boolean
+          last_seen?: string | null
+          streak_count?: number
+          streak_last_date?: string | null
+          onboarding_completed?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+      }
+      profiles: {
+        Row: {
+          id: string
+          username: string | null
+          bio: string | null
+          likes_count: number | null
+          is_online: boolean | null
+          created_at: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          id: string
+          username?: string | null
+          bio?: string | null
+          likes_count?: number | null
+          is_online?: boolean | null
+          created_at?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          id?: string
+          username?: string | null
+          bio?: string | null
+          likes_count?: number | null
+          is_online?: boolean | null
+          created_at?: string | null
+          updated_at?: string | null
+        }
+      }
       conversations: {
         Row: {
           id: string;
@@ -158,26 +199,26 @@ export interface Database {
       };
       onboarding_status: {
         Row: {
-          user_id: string;
-          is_complete: boolean;
-          current_step: string;
-          updated_at: string;
-        };
+          user_id: string
+          is_complete: boolean
+          current_step: string | null
+          updated_at: string
+        }
         Insert: {
-          user_id: string;
-          is_complete?: boolean;
-          current_step?: string;
-          updated_at?: string;
-        };
+          user_id: string
+          is_complete?: boolean
+          current_step?: string | null
+          updated_at?: string
+        }
         Update: {
-          user_id?: string;
-          is_complete?: boolean;
-          current_step?: string;
-          updated_at?: string;
-        };
-      };
-    };
-  };
+          user_id?: string
+          is_complete?: boolean
+          current_step?: string | null
+          updated_at?: string
+        }
+      }
+    }
+  }
 }
 
 export type Tables<T extends keyof Database['public']['Tables']> = Database['public']['Tables'][T]['Row'];

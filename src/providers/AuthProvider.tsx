@@ -153,6 +153,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           console.error("Error creating user profile:", profileError);
         }
       }
+      await updateOnboardingStatus(data.user.id); // Call the new function after successful login
     } catch (error) {
       console.error("Login error:", error);
       throw error;
@@ -231,6 +232,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         title: "Account created",
         description: "Please check your email to confirm your account.",
       });
+      await updateOnboardingStatus(authData.user.id); // Call the new function after successful signup
     } catch (error) {
       console.error("Signup error:", error);
       throw error;
@@ -263,6 +265,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (session) {
           setSession(session);
           setUser(session.user);
+          await updateOnboardingStatus(session.user.id); // Call the new function after successful Google login
           break;
         }
         await new Promise(resolve => setTimeout(resolve, 1000));
@@ -296,6 +299,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         description: "There was an error signing out.",
       });
       throw error;
+    }
+  };
+
+  const updateOnboardingStatus = async (userId: string) => {
+    try {
+      const { error: onboardingError } = await supabase
+        .from('onboarding_status')
+        .update({ is_complete: true })
+        .eq('user_id', userId);
+      if (onboardingError) {
+        console.error("Error updating onboarding status:", onboardingError);
+      }
+    } catch (error) {
+      console.error("Error updating onboarding status:", error);
     }
   };
 

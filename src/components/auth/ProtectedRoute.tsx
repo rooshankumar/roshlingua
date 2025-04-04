@@ -19,16 +19,14 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
       if (!user) return;
 
       // Check profile completion in profiles table
-      const { data: profileData, error: profileError } = await supabase
-        .from('profiles')
-        .select('full_name, gender, native_language, learning_language, proficiency_level')
-        .eq('id', user.id)
+      const { data: onboardingData, error: onboardingError } = await supabase
+        .from('onboarding_status')
+        .select('is_complete')
+        .eq('user_id', user.id)
         .single();
 
-      if (!profileError && profileData) {
-        const requiredFields = ['full_name', 'gender', 'native_language', 'learning_language', 'proficiency_level'];
-        const isComplete = requiredFields.every(field => !!profileData[field]);
-        setHasCompletedOnboarding(isComplete);
+      if (!onboardingError && onboardingData) {
+        setHasCompletedOnboarding(onboardingData.is_complete);
       }
 
       setIsCheckingOnboarding(false);
