@@ -6,7 +6,44 @@ export type Json =
   | { [key: string]: Json | undefined }
   | Json[]
 
-export interface Database {
+export type Database = {
+  storage: {
+    buckets: {
+      Row: {
+        id: string
+        name: string
+        public: boolean
+        created_at: string | null
+        updated_at: string | null
+      }
+      Insert: {
+        id: string
+        name: string
+        public: boolean
+        created_at?: string | null
+        updated_at?: string | null
+      }
+      Update: {
+        id?: string
+        name?: string
+        public?: boolean
+        created_at?: string | null
+        updated_at?: string | null
+      }
+    }
+    objects: {
+      Row: {
+        id: string
+        bucket_id: string
+        name: string
+        owner: string
+        created_at: string
+        updated_at: string
+        last_accessed_at: string
+        metadata: Record<string, any>
+      }
+    }
+  }
   public: {
     Tables: {
       users: {

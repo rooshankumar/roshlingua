@@ -1,4 +1,27 @@
 
+-- Enable storage extension if not already enabled
+CREATE EXTENSION IF NOT EXISTS "storage" SCHEMA "extensions";
+
+-- Create storage bucket for chat attachments
+INSERT INTO storage.buckets (id, name, public) 
+VALUES ('attachments', 'attachments', true)
+ON CONFLICT (id) DO NOTHING;
+
+-- Set up storage policy for authenticated users
+CREATE POLICY "Allow authenticated users to upload files"
+ON storage.objects
+FOR INSERT
+TO authenticated
+WITH CHECK (bucket_id = 'attachments');
+
+CREATE POLICY "Allow public to read files"
+ON storage.objects
+FOR SELECT
+TO public
+USING (bucket_id = 'attachments');
+
+
+
 -- Enable PostgreSQL extensions
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
