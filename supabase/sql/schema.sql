@@ -87,6 +87,7 @@ CREATE TABLE IF NOT EXISTS public.messages (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   conversation_id UUID REFERENCES public.conversations(id) ON DELETE CASCADE,
   sender_id UUID REFERENCES public.users(id) ON DELETE SET NULL,
+  recipient_id UUID REFERENCES public.users(id) ON DELETE SET NULL,
   content TEXT NOT NULL,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT now(),
   is_read BOOLEAN DEFAULT false,

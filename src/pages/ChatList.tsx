@@ -42,10 +42,9 @@ const ChatList = () => {
       try {
         // Fetch all unread messages for the current user
         const { data: unreadMessages, error: unreadError } = await supabase
-          .from('messages')
-          .select('conversation_id')
-          .eq('recipient_id', user?.id)
-          .is('is_read', false);
+          .from('conversation_participants')
+          .select('conversation_id, unread_count')
+          .eq('user_id', user?.id);
 
         if (unreadError) throw unreadError;
 
