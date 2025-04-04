@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/lib/supabase";
@@ -74,42 +75,6 @@ const AuthCallback = () => {
     };
 
     handleAuthCallback();
-  }, [navigate]);
-
-  useEffect(() => {
-    const { data: authListener } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (event === 'SIGNED_IN' && session?.user) {
-        try {
-          // Ensure user exists in our users table
-          const { error: upsertError } = await supabase
-            .from('users')
-            .upsert({
-              id: session.user.id,
-              email: session.user.email,
-              full_name: session.user.user_metadata.full_name,
-              avatar_url: session.user.user_metadata.avatar_url,
-              last_sign_in: new Date().toISOString(),
-            }, {
-              onConflict: 'id'
-            });
-
-          if (upsertError) {
-            console.error('Error saving user data:', upsertError);
-            navigate('/?error=database_error');
-            return;
-          }
-
-          navigate('/dashboard');
-        } catch (error) {
-          console.error('Auth callback error:', error);
-          navigate('/?error=server_error');
-        }
-      }
-    });
-
-    return () => {
-      authListener?.subscription.unsubscribe();
-    };
   }, [navigate]);
 
   if (isLoading) {
