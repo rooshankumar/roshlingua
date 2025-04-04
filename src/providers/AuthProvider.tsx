@@ -109,21 +109,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       });
 
       if (error) {
-        // Handle specific error cases
+        // Handle specific database errors
         if (error.message.includes('Database error')) {
-          if (!userExists) {
-            toast({
-              variant: "destructive",
-              title: "Account not found",
-              description: "Please check your email or sign up for a new account."
-            });
-          } else {
-            toast({
-              variant: "destructive",
-              title: "Login error",
-              description: "There was an issue accessing your account. Please try again later."
-            });
-          }
+          console.error('Database error during login:', error);
+          toast({
+            variant: "destructive",
+            title: "Login error",
+            description: "There was an issue accessing your account. Please try again in a few moments."
+          });
         } else {
           // Update login attempts for other errors
           loginAttempts.set(email, {
@@ -135,7 +128,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           toast({
             variant: "destructive",
             title: "Login failed",
-            description: `${error.message}${attemptsLeft > 0 ? ` (${attemptsLeft} attempts remaining)` : ''}`
+            description: `Invalid credentials${attemptsLeft > 0 ? ` (${attemptsLeft} attempts remaining)` : ''}`
           });
         }
         throw error;
@@ -143,7 +136,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       // Reset login attempts on successful login
       loginAttempts.delete(email);
-      
+
       // Ensure user record exists
       if (data.user && !userExists) {
         const { error: profileError } = await supabase
