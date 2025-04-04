@@ -40,6 +40,13 @@ CREATE TABLE IF NOT EXISTS public.onboarding_status (
   user_id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
   is_complete BOOLEAN DEFAULT false,
   current_step TEXT,
+  native_language TEXT,
+  learning_language TEXT,
+  proficiency_level TEXT,
+  learning_goal TEXT,
+  date_of_birth DATE,
+  gender TEXT,
+  avatar_url TEXT,
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT now()
 );
 

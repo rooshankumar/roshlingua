@@ -202,18 +202,39 @@ export interface Database {
           user_id: string
           is_complete: boolean
           current_step: string | null
+          native_language: string | null
+          learning_language: string | null
+          proficiency_level: string | null
+          learning_goal: string | null
+          date_of_birth: string | null
+          gender: string | null
+          avatar_url: string | null
           updated_at: string
         }
         Insert: {
           user_id: string
           is_complete?: boolean
           current_step?: string | null
+          native_language?: string | null
+          learning_language?: string | null
+          proficiency_level?: string | null
+          learning_goal?: string | null
+          date_of_birth?: string | null
+          gender?: string | null
+          avatar_url?: string | null
           updated_at?: string
         }
         Update: {
           user_id?: string
           is_complete?: boolean
           current_step?: string | null
+          native_language?: string | null
+          learning_language?: string | null
+          proficiency_level?: string | null
+          learning_goal?: string | null
+          date_of_birth?: string | null
+          gender?: string | null
+          avatar_url?: string | null
           updated_at?: string
         }
       }
