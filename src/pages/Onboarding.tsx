@@ -603,8 +603,17 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
                             className="button-hover"
                             disabled={isLoading}
                         >
-                            {isLoading ? "Loading..." : (step < 4 ? "Next" : "Complete Profile")}
-                            {step === 4 && !isLoading && <Check className="ml-2 h-4 w-4" />}
+                            {isLoading ? (
+                                <div className="flex items-center">
+                                    <div className="animate-spin mr-2 h-4 w-4 border-2 border-current border-t-transparent rounded-full" />
+                                    Redirecting...
+                                </div>
+                            ) : (
+                                <>
+                                    {step < 4 ? "Next" : "Complete Profile"}
+                                    {step === 4 && <Check className="ml-2 h-4 w-4" />}
+                                </>
+                            )}
                         </Button>
                     </CardFooter>
                 </Card>
