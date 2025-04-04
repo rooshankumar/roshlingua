@@ -106,12 +106,33 @@ const Auth = () => {
       }
 
       if (email && password && name) {
-        await signup(email, password, name);
-        toast({
-          title: "Signup successful",
-          description: "Please check your email (including spam folder) for the confirmation link.",
+        const { data, error } = await supabase.auth.signUp({
+          email,
+          password,
+          options: {
+            data: {
+              full_name: name
+            },
+            emailRedirectTo: `${window.location.origin}/auth/callback`
+          }
         });
-        // The session will be set via auth change listener
+
+        if (error) {
+          console.error("Signup error:", error);
+          toast({
+            variant: "destructive",
+            title: "Signup failed",
+            description: error.message || "An error occurred during signup.",
+          });
+          return;
+        }
+
+        if (data?.user) {
+          toast({
+            title: "Signup successful",
+            description: "Please check your email (including spam folder) for the confirmation link. This may take a few minutes.",
+          });
+        }
       } else {
         toast({
           variant: "destructive",
@@ -121,6 +142,11 @@ const Auth = () => {
       }
     } catch (error) {
       console.error("Signup error in component:", error);
+      toast({
+        variant: "destructive",
+        title: "Unexpected error",
+        description: "An unexpected error occurred during signup.",
+      });
     } finally {
       setIsLoading(false);
     }
