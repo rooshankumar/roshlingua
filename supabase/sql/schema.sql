@@ -32,17 +32,10 @@ CREATE TABLE IF NOT EXISTS public.users (
   full_name TEXT,
   avatar_url TEXT,
   bio TEXT,
-  native_language TEXT,
-  learning_language TEXT,
-  proficiency_level TEXT,
-  learning_goal TEXT,
-  date_of_birth DATE,
-  gender TEXT,
   is_online BOOLEAN DEFAULT false,
   last_seen TIMESTAMP WITH TIME ZONE,
   streak_count INTEGER DEFAULT 0,
   streak_last_date DATE,
-  onboarding_completed BOOLEAN DEFAULT false,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT now(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT now()
 );
