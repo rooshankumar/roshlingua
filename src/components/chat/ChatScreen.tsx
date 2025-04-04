@@ -137,6 +137,13 @@ export const ChatScreen = ({ conversation }: Props) => {
       e.preventDefault();
       handleSend(newMessage);
     }
+    // Update typing status
+    const channel = supabase.channel(`typing:${conversation.id}`);
+    channel.send({
+      type: 'broadcast',
+      event: 'typing',
+      payload: { user_id: user?.id }
+    });
   };
 
   return (

@@ -89,7 +89,8 @@ CREATE TABLE IF NOT EXISTS public.messages (
   sender_id UUID REFERENCES public.users(id) ON DELETE SET NULL,
   content TEXT NOT NULL,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT now(),
-  is_read BOOLEAN DEFAULT false
+  is_read BOOLEAN DEFAULT false,
+  unread_count INTEGER DEFAULT 0
 );
 
 -- User Likes Table
