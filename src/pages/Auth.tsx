@@ -137,10 +137,18 @@ const Auth = () => {
             return;
           }
 
-        if (data?.user) {
+          if (data?.user) {
+            toast({
+              title: "Signup successful",
+              description: "Please check your email (including spam folder) for the confirmation link. This may take a few minutes.",
+            });
+          }
+        } catch (error) {
+          console.error("Signup error:", error);
           toast({
-            title: "Signup successful",
-            description: "Please check your email (including spam folder) for the confirmation link. This may take a few minutes.",
+            variant: "destructive",
+            title: "Signup failed",
+            description: "An unexpected error occurred during signup.",
           });
         }
       } else {
