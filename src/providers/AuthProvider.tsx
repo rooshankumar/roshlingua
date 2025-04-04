@@ -96,36 +96,72 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return;
       }
 
+      // First check if the user exists
+      const { data: userExists } = await supabase
+        .from('users')
+        .select('id')
+        .eq('email', email)
+        .single();
+
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
       if (error) {
-        // Update login attempts
-        loginAttempts.set(email, {
-          count: attempts.count + 1,
-          lastAttempt: now
-        });
+        // Handle specific error cases
+        if (error.message.includes('Database error')) {
+          if (!userExists) {
+            toast({
+              variant: "destructive",
+              title: "Account not found",
+              description: "Please check your email or sign up for a new account."
+            });
+          } else {
+            toast({
+              variant: "destructive",
+              title: "Login error",
+              description: "There was an issue accessing your account. Please try again later."
+            });
+          }
+        } else {
+          // Update login attempts for other errors
+          loginAttempts.set(email, {
+            count: attempts.count + 1,
+            lastAttempt: now
+          });
 
-        const attemptsLeft = MAX_LOGIN_ATTEMPTS - (attempts.count + 1);
-        toast({
-          variant: "destructive",
-          title: "Login failed",
-          description: `${error.message}${attemptsLeft > 0 ? ` (${attemptsLeft} attempts remaining)` : ''}`
-        });
+          const attemptsLeft = MAX_LOGIN_ATTEMPTS - (attempts.count + 1);
+          toast({
+            variant: "destructive",
+            title: "Login failed",
+            description: `${error.message}${attemptsLeft > 0 ? ` (${attemptsLeft} attempts remaining)` : ''}`
+          });
+        }
         throw error;
       }
 
       // Reset login attempts on successful login
       loginAttempts.delete(email);
+      
+      // Ensure user record exists
+      if (data.user && !userExists) {
+        const { error: profileError } = await supabase
+          .from('users')
+          .insert([{
+            id: data.user.id,
+            email: data.user.email,
+            full_name: data.user.user_metadata?.full_name || '',
+            created_at: new Date().toISOString(),
+            last_active_at: new Date().toISOString(),
+          }]);
+
+        if (profileError) {
+          console.error("Error creating user profile:", profileError);
+        }
+      }
     } catch (error) {
       console.error("Login error:", error);
-      toast({
-        variant: "destructive",
-        title: "Authentication error",
-        description: error instanceof Error ? error.message : "Failed to authenticate"
-      });
       throw error;
     }
   };
