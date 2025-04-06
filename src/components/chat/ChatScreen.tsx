@@ -224,19 +224,12 @@ export const ChatScreen = ({ conversation }: Props) => {
                       {message.attachment_url && (
                         <div className="mt-1 rounded-lg overflow-hidden">
                           {message.attachment_url.match(/\.(jpg|jpeg|png|gif|webp|avif)$/i) ? (
-                            <div className="flex flex-col gap-1">
-                              <img 
-                                src={message.attachment_url} 
-                                alt={message.attachment_name || 'Attachment'} 
-                                className="max-w-[300px] max-h-[300px] object-cover rounded-lg hover:scale-105 transition-transform duration-300 cursor-pointer"
-                                onClick={() => window.open(message.attachment_url, '_blank')}
-                              />
-                              {message.attachment_name && (
-                                <span className="text-sm text-muted-foreground">
-                                  {message.attachment_name}
-                                </span>
-                              )}
-                            </div>
+                            <img 
+                              src={message.attachment_url} 
+                              alt="Image" 
+                              className="max-w-[300px] max-h-[300px] object-cover rounded-lg hover:scale-105 transition-transform duration-300 cursor-pointer"
+                              onClick={() => window.open(message.attachment_url, '_blank')}
+                            />
                           ) : message.attachment_url.match(/\.(mp4|webm|ogg)$/i) ? (
                             <video 
                               src={message.attachment_url}
