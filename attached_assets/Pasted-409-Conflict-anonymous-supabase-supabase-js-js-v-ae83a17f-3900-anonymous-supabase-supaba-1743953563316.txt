@@ -1,0 +1,72 @@
+409 (Conflict)
+(anonymous) @ @supabase_supabase-js.js?v=ae83a17f:3900
+(anonymous) @ @supabase_supabase-js.js?v=ae83a17f:3921
+fulfilled @ @supabase_supabase-js.js?v=ae83a17f:3873
+Promise.then
+step @ @supabase_supabase-js.js?v=ae83a17f:3886
+(anonymous) @ @supabase_supabase-js.js?v=ae83a17f:3888
+__awaiter6 @ @supabase_supabase-js.js?v=ae83a17f:3870
+(anonymous) @ @supabase_supabase-js.js?v=ae83a17f:3911
+then @ @supabase_supabase-js.js?v=ae83a17f:89Understand this error
+Auth.tsx:157 Error creating onboarding status: {code: '23505', details: 'Key (user_id)=(8e08664a-c10c-4554-ab4f-1fe614c4c4fd) already exists.', hint: null, message: 'duplicate key value violates unique constraint "onboarding_status_pkey"'}
+handleSignup @ Auth.tsx:157
+await in handleSignup
+callCallback2 @ chunk-W6L2VRDA.js?v=ae83a17f:3674
+invokeGuardedCallbackDev @ chunk-W6L2VRDA.js?v=ae83a17f:3699
+invokeGuardedCallback @ chunk-W6L2VRDA.js?v=ae83a17f:3733
+invokeGuardedCallbackAndCatchFirstError @ chunk-W6L2VRDA.js?v=ae83a17f:3736
+executeDispatch @ chunk-W6L2VRDA.js?v=ae83a17f:7014
+processDispatchQueueItemsInOrder @ chunk-W6L2VRDA.js?v=ae83a17f:7034
+processDispatchQueue @ chunk-W6L2VRDA.js?v=ae83a17f:7043
+dispatchEventsForPlugins @ chunk-W6L2VRDA.js?v=ae83a17f:7051
+(anonymous) @ chunk-W6L2VRDA.js?v=ae83a17f:7174
+batchedUpdates$1 @ chunk-W6L2VRDA.js?v=ae83a17f:18913
+batchedUpdates @ chunk-W6L2VRDA.js?v=ae83a17f:3579
+dispatchEventForPluginEventSystem @ chunk-W6L2VRDA.js?v=ae83a17f:7173
+dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay @ chunk-W6L2VRDA.js?v=ae83a17f:5478
+dispatchEvent @ chunk-W6L2VRDA.js?v=ae83a17f:5472
+dispatchDiscreteEvent @ chunk-W6L2VRDA.js?v=ae83a17f:5449Understand this error
+Auth.tsx:159 
+            
+            
+           DELETE https://wqojeesjtgfcftpnzaet.supabase.co/auth/v1/admin/users/8e08664a-c10c-4554-ab4f-1fe614c4c4fd 403 (Forbidden)
+(anonymous) @ @supabase_supabase-js.js?v=ae83a17f:4309
+_handleRequest2 @ @supabase_supabase-js.js?v=ae83a17f:4558
+_request @ @supabase_supabase-js.js?v=ae83a17f:4548
+deleteUser @ @supabase_supabase-js.js?v=ae83a17f:4834
+handleSignup @ Auth.tsx:159
+await in handleSignup
+callCallback2 @ chunk-W6L2VRDA.js?v=ae83a17f:3674
+invokeGuardedCallbackDev @ chunk-W6L2VRDA.js?v=ae83a17f:3699
+invokeGuardedCallback @ chunk-W6L2VRDA.js?v=ae83a17f:3733
+invokeGuardedCallbackAndCatchFirstError @ chunk-W6L2VRDA.js?v=ae83a17f:3736
+executeDispatch @ chunk-W6L2VRDA.js?v=ae83a17f:7014
+processDispatchQueueItemsInOrder @ chunk-W6L2VRDA.js?v=ae83a17f:7034
+processDispatchQueue @ chunk-W6L2VRDA.js?v=ae83a17f:7043
+dispatchEventsForPlugins @ chunk-W6L2VRDA.js?v=ae83a17f:7051
+(anonymous) @ chunk-W6L2VRDA.js?v=ae83a17f:7174
+batchedUpdates$1 @ chunk-W6L2VRDA.js?v=ae83a17f:18913
+batchedUpdates @ chunk-W6L2VRDA.js?v=ae83a17f:3579
+dispatchEventForPluginEventSystem @ chunk-W6L2VRDA.js?v=ae83a17f:7173
+dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay @ chunk-W6L2VRDA.js?v=ae83a17f:5478
+dispatchEvent @ chunk-W6L2VRDA.js?v=ae83a17f:5472
+dispatchDiscreteEvent @ chunk-W6L2VRDA.js?v=ae83a17f:5449Understand this error
+Auth.tsx:169 Signup error: Error: Failed to initialize onboarding status
+    at handleSignup (Auth.tsx:160:21)
+handleSignup @ Auth.tsx:169
+await in handleSignup
+callCallback2 @ chunk-W6L2VRDA.js?v=ae83a17f:3674
+invokeGuardedCallbackDev @ chunk-W6L2VRDA.js?v=ae83a17f:3699
+invokeGuardedCallback @ chunk-W6L2VRDA.js?v=ae83a17f:3733
+invokeGuardedCallbackAndCatchFirstError @ chunk-W6L2VRDA.js?v=ae83a17f:3736
+executeDispatch @ chunk-W6L2VRDA.js?v=ae83a17f:7014
+processDispatchQueueItemsInOrder @ chunk-W6L2VRDA.js?v=ae83a17f:7034
+processDispatchQueue @ chunk-W6L2VRDA.js?v=ae83a17f:7043
+dispatchEventsForPlugins @ chunk-W6L2VRDA.js?v=ae83a17f:7051
+(anonymous) @ chunk-W6L2VRDA.js?v=ae83a17f:7174
+batchedUpdates$1 @ chunk-W6L2VRDA.js?v=ae83a17f:18913
+batchedUpdates @ chunk-W6L2VRDA.js?v=ae83a17f:3579
+dispatchEventForPluginEventSystem @ chunk-W6L2VRDA.js?v=ae83a17f:7173
+dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay @ chunk-W6L2VRDA.js?v=ae83a17f:5478
+dispatchEvent @ chunk-W6L2VRDA.js?v=ae83a17f:5472
+dispatchDiscreteEvent @ chunk-W6L2VRDA.js?v=ae83a17f:5449Understand this error
