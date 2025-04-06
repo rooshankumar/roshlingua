@@ -80,13 +80,13 @@ const AuthCallback = () => {
         }
 
         // Redirect to appropriate page
-        const { data: onboardingStatus } = await supabase
+        const { data: onboardingCompletion } = await supabase
           .from('onboarding_status')
           .select('is_complete')
           .eq('user_id', session.user.id)
           .single();
 
-        navigate(onboardingStatus?.is_complete ? '/dashboard' : '/onboarding', { replace: true });
+        navigate(onboardingCompletion?.is_complete ? '/dashboard' : '/onboarding', { replace: true });
       } catch (error) {
         console.error('Auth callback error:', error);
         setError(error.message);
