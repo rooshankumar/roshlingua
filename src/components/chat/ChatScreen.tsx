@@ -82,12 +82,30 @@ export const ChatScreen = ({ conversation }: Props) => {
         schema: 'public',
         table: 'messages',
         filter: `conversation_id=eq.${conversation.id}`,
-      }, (payload) => {
-        setMessages(prev => {
-          const exists = prev.some(msg => msg.id === payload.new.id);
-          return exists ? prev : [...prev, payload.new as Message];
-        });
-        scrollToBottom();
+      }, async (payload) => {
+        // Fetch the complete message with sender info
+        const { data: newMessage } = await supabase
+          .from('messages')
+          .select(`
+            *,
+            sender:users!messages_sender_id_fkey(
+              id,
+              email,
+              full_name,
+              avatar_url,
+              last_seen
+            )
+          `)
+          .eq('id', payload.new.id)
+          .single();
+
+        if (newMessage) {
+          setMessages(prev => {
+            const exists = prev.some(msg => msg.id === newMessage.id);
+            return exists ? prev : [...prev, newMessage];
+          });
+          scrollToBottom();
+        }
       })
       .subscribe();
 
