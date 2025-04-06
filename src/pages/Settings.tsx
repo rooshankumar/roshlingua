@@ -176,8 +176,7 @@ const Settings = () => {
       }
 
       const { publicUrl } = await uploadAvatar(e.target.files[0], user.id);
-        .getPublicUrl(filePath);
-
+      
       if (!publicUrl) throw new Error('Failed to get public URL');
 
       await updateProfile({ ...profile, avatar_url: publicUrl });
