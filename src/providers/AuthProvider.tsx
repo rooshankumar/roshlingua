@@ -244,33 +244,32 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: import.meta.env.VITE_AUTH_CALLBACK_URL || `${window.location.origin}/auth/callback`,
+          redirectTo: `${window.location.origin}/auth/callback`,
           queryParams: {
             access_type: 'offline',
-            prompt: 'consent'
-          }
+            prompt: 'consent',
+            hd: 'domain.com' // Optional: restrict to specific domain
+          },
+          scopes: 'email profile'
         }
       });
 
       if (error) {
         console.error("Google auth error:", error);
+        toast({
+          variant: "destructive",
+          title: "Google Authentication Failed",
+          description: error.message
+        });
         throw error;
       }
 
-      // Wait for session to be established
-      const maxAttempts = 10;
-      let attempts = 0;
-      while (attempts < maxAttempts) {
-        const { data: { session } } = await supabase.auth.getSession();
-        if (session) {
-          setSession(session);
-          setUser(session.user);
-          await updateOnboardingStatus(session.user.id); // Call the new function after successful Google login
-          break;
-        }
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        attempts++;
+      if (!data.url) {
+        throw new Error("No OAuth URL returned");
       }
+
+      // Redirect to Google OAuth
+      window.location.href = data.url;
     } catch (error) {
       console.error("Google login error:", error);
       toast({
