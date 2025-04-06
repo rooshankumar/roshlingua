@@ -11,14 +11,21 @@ const AuthCallback = () => {
   useEffect(() => {
     const handleAuthCallback = async () => {
       try {
+        // Get the session from URL if present
         const { data: { session }, error: sessionError } = await supabase.auth.getSession();
 
         if (sessionError) {
+          console.error("Session error:", sessionError);
           throw sessionError;
         }
 
         if (!session) {
-          throw new Error('No session established');
+          const params = new URLSearchParams(window.location.search);
+          const errorDescription = params.get('error_description');
+          if (errorDescription) {
+            throw new Error(errorDescription);
+          }
+          throw new Error('Authentication failed - no session established');
         }
 
         // Check if user record exists

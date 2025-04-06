@@ -214,14 +214,25 @@ const Auth = () => {
   const handleGoogleAuth = async () => {
     try {
       setIsLoading(true);
-      await loginWithGoogle({
-        options: {
-          scopes: 'https://www.googleapis.com/auth/user.birthday.read'
-        }
-      });
+      const { error } = await loginWithGoogle();
+      
+      if (error) {
+        toast({
+          variant: "destructive",
+          title: "Authentication Failed",
+          description: error.message
+        });
+        setIsLoading(false);
+        return;
+      }
       // Redirection is handled by the callback URL
     } catch (error) {
-      console.error("Google auth error in component:", error);
+      console.error("Google auth error:", error);
+      toast({
+        variant: "destructive",
+        title: "Authentication Failed",
+        description: "Failed to connect to Google. Please try again."
+      });
       setIsLoading(false);
     }
   };

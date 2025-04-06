@@ -6,29 +6,24 @@ const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
 export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
   auth: {
-    persistSession: true,
     autoRefreshToken: true,
-    storageKey: 'supabase.auth.token',
-    detectSessionInUrl: true
+    persistSession: true,
+    detectSessionInUrl: true,
+    flowType: 'pkce'
   }
 });
 
 export const signInWithGoogle = async () => {
-  // Explicitly set the correct redirect URL based on environment
-  const redirectUrl = import.meta.env.VITE_AUTH_CALLBACK_URL || `${window.location.origin}/auth/callback`;
-
-  console.log("Redirecting to Google OAuth with redirectUrl:", redirectUrl);
-
+  const redirectUrl = `${window.location.origin}/auth/callback`;
   return await supabase.auth.signInWithOAuth({
     provider: 'google',
     options: {
       redirectTo: redirectUrl,
       queryParams: {
         access_type: 'offline',
-        prompt: 'consent',
-        scope: 'profile email',
-      },
-    },
+        prompt: 'consent'
+      }
+    }
   });
 };
 
