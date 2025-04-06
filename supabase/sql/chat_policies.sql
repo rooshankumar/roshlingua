@@ -37,14 +37,16 @@ WITH CHECK (EXISTS (
   AND creator_id = auth.uid()
 ));
 
--- Allow users to view participants of their conversations
+-- Allow users to view participants of conversations they're in
 CREATE POLICY "Users can view conversation participants"
 ON public.conversation_participants FOR SELECT
-USING (EXISTS (
-  SELECT 1 FROM public.conversation_participants
-  WHERE conversation_id = conversation_id
-  AND user_id = auth.uid()
-));
+USING (
+  conversation_id IN (
+    SELECT conversation_id 
+    FROM public.conversation_participants 
+    WHERE user_id = auth.uid()
+  )
+);
 
 -- Enable RLS on messages table
 ALTER TABLE public.messages ENABLE ROW LEVEL SECURITY;
