@@ -9,6 +9,7 @@ BEGIN
     email,
     full_name,
     avatar_url,
+    bio,
     date_of_birth,
     gender,
     native_language,
@@ -17,6 +18,9 @@ BEGIN
     learning_goal,
     is_online,
     streak_count,
+    username,
+    likes_count,
+    onboarding_completed,
     created_at,
     updated_at
   ) 
@@ -26,22 +30,27 @@ BEGIN
     NEW.email,
     NEW.full_name,
     NEW.avatar_url,
+    NEW.bio,
     NEW.date_of_birth,
     NEW.gender,
     NEW.native_language,
     NEW.learning_language,
     NEW.proficiency_level,
     NEW.learning_goal,
-    NEW.is_online,
-    NEW.streak_count,
-    NEW.created_at,
-    NEW.updated_at
+    COALESCE(NEW.is_online, false),
+    COALESCE(NEW.streak_count, 0),
+    NEW.username,
+    COALESCE(NEW.likes_count, 0),
+    COALESCE(NEW.onboarding_completed, false),
+    COALESCE(NEW.created_at, NOW()),
+    COALESCE(NEW.updated_at, NOW())
   )
   ON CONFLICT (id) 
   DO UPDATE SET
     email = EXCLUDED.email,
     full_name = EXCLUDED.full_name,
     avatar_url = EXCLUDED.avatar_url,
+    bio = EXCLUDED.bio,
     date_of_birth = EXCLUDED.date_of_birth,
     gender = EXCLUDED.gender,
     native_language = EXCLUDED.native_language,
@@ -50,6 +59,9 @@ BEGIN
     learning_goal = EXCLUDED.learning_goal,
     is_online = EXCLUDED.is_online,
     streak_count = EXCLUDED.streak_count,
+    username = EXCLUDED.username,
+    likes_count = EXCLUDED.likes_count,
+    onboarding_completed = EXCLUDED.onboarding_completed,
     updated_at = EXCLUDED.updated_at;
     
   RETURN NEW;
@@ -65,15 +77,18 @@ BEGIN
     email = NEW.email,
     full_name = NEW.full_name,
     avatar_url = NEW.avatar_url,
+    bio = NEW.bio,
     date_of_birth = NEW.date_of_birth,
     gender = NEW.gender,
     native_language = NEW.native_language,
     learning_language = NEW.learning_language,
     proficiency_level = NEW.proficiency_level,
     learning_goal = NEW.learning_goal,
-    is_online = NEW.is_online,
-    streak_count = NEW.streak_count,
-    updated_at = NEW.updated_at
+    is_online = COALESCE(NEW.is_online, false),
+    streak_count = COALESCE(NEW.streak_count, 0),
+    username = NEW.username,
+    onboarding_completed = COALESCE(NEW.onboarding_completed, false),
+    updated_at = COALESCE(NEW.updated_at, NOW())
   WHERE id = NEW.user_id;
   
   RETURN NEW;
@@ -100,6 +115,7 @@ INSERT INTO public.profiles (
   email,
   full_name,
   avatar_url,
+  bio,
   date_of_birth,
   gender,
   native_language,
@@ -108,6 +124,9 @@ INSERT INTO public.profiles (
   learning_goal,
   is_online,
   streak_count,
+  username,
+  likes_count,
+  onboarding_completed,
   created_at,
   updated_at
 )
@@ -117,21 +136,26 @@ SELECT
   email,
   full_name,
   avatar_url,
+  bio,
   date_of_birth,
   gender,
   native_language,
   learning_language,
   proficiency_level,
   learning_goal,
-  is_online,
-  streak_count,
-  created_at,
-  updated_at
+  COALESCE(is_online, false),
+  COALESCE(streak_count, 0),
+  username,
+  COALESCE(likes_count, 0),
+  COALESCE(onboarding_completed, false),
+  COALESCE(created_at, NOW()),
+  COALESCE(updated_at, NOW())
 FROM public.users
 ON CONFLICT (id) DO UPDATE SET
   email = EXCLUDED.email,
   full_name = EXCLUDED.full_name,
   avatar_url = EXCLUDED.avatar_url,
+  bio = EXCLUDED.bio,
   date_of_birth = EXCLUDED.date_of_birth,
   gender = EXCLUDED.gender,
   native_language = EXCLUDED.native_language,
@@ -140,4 +164,7 @@ ON CONFLICT (id) DO UPDATE SET
   learning_goal = EXCLUDED.learning_goal,
   is_online = EXCLUDED.is_online,
   streak_count = EXCLUDED.streak_count,
+  username = EXCLUDED.username,
+  likes_count = EXCLUDED.likes_count,
+  onboarding_completed = EXCLUDED.onboarding_completed,
   updated_at = EXCLUDED.updated_at;
