@@ -224,18 +224,33 @@ const Auth = () => {
   const handleGoogleAuth = async () => {
     try {
       setIsLoading(true);
-      const { error } = await loginWithGoogle();
-      
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+          queryParams: {
+            access_type: 'offline',
+            prompt: 'consent'
+          }
+        }
+      });
+
       if (error) {
+        console.error("Google auth error:", error);
         toast({
           variant: "destructive",
           title: "Authentication Failed",
           description: error.message
         });
-        setIsLoading(false);
         return;
       }
-      // Redirection is handled by the callback URL
+
+      if (!data.url) {
+        throw new Error("No OAuth URL returned");
+      }
+
+      // Redirect to Google OAuth
+      window.location.href = data.url;
     } catch (error) {
       console.error("Google auth error:", error);
       toast({
@@ -243,6 +258,7 @@ const Auth = () => {
         title: "Authentication Failed",
         description: "Failed to connect to Google. Please try again."
       });
+    } finally {
       setIsLoading(false);
     }
   };

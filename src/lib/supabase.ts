@@ -9,7 +9,10 @@ export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
     autoRefreshToken: true,
     persistSession: true,
     detectSessionInUrl: true,
-    flowType: 'pkce'
+    flowType: 'pkce',
+    redirectTo: process.env.NODE_ENV === 'production' 
+      ? 'https://roshlingua.vercel.app/auth/callback'
+      : `${window.location.origin}/auth/callback`
   }
 });
 
