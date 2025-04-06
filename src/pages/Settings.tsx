@@ -169,7 +169,7 @@ const Settings = () => {
     const file = e.target.files[0];
     const fileExt = file.name.split('.').pop();
     const fileName = `${Date.now()}.${fileExt}`;
-    const filePath = `public/${user.id}_${fileName}`;
+    const filePath = `${user.id}/${fileName}`;
 
     try {
       setIsLoading(true);
@@ -177,10 +177,10 @@ const Settings = () => {
       // Remove old avatar if exists
       if (profile?.avatar_url) {
         const oldPath = profile.avatar_url.split('/').pop();
-        if (oldPath) {
+        if (oldPath && user.id) {
           await supabase.storage
             .from('avatars')
-            .remove([`public/${oldPath}`]);
+            .remove([`${user.id}/${oldPath}`]);
         }
       }
 
@@ -189,7 +189,8 @@ const Settings = () => {
         .from('avatars')
         .upload(filePath, file, {
           cacheControl: '3600',
-          upsert: true
+          upsert: true,
+          contentType: file.type
         });
 
       if (uploadError) throw uploadError;
