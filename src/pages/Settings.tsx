@@ -65,31 +65,31 @@ const Settings = () => {
         if (updateEmailError) throw updateEmailError;
       }
 
+      // Ensure we have the current user ID
+      if (!currentUser?.id) {
+        throw new Error("User ID not found");
+      }
+
       const profileData = {
         id: currentUser.id,
         user_id: currentUser.id,
-        avatar_url: localProfile.avatar_url || null,
-        bio: localBio || null,
-        full_name: localProfile.full_name || null,
-        email: currentUser.email || null,
-        gender: localProfile.gender || null,
-        date_of_birth: localProfile.date_of_birth || null,
-        learning_language: localProfile.learning_language || null,
-        native_language: localProfile.native_language || null,
-        proficiency_level: localProfile.proficiency_level || null,
+        avatar_url: localProfile.avatar_url,
+        bio: localBio,
+        full_name: localProfile.full_name,
+        email: currentUser.email,
+        gender: localProfile.gender?.toLowerCase(),
+        date_of_birth: localProfile.date_of_birth,
+        learning_language: localProfile.learning_language,
+        native_language: localProfile.native_language,
+        proficiency_level: localProfile.proficiency_level,
         streak_count: localProfile.streak_count || 0,
         updated_at: new Date().toISOString()
       };
 
-      // Filter out null/undefined values
-      const cleanedProfileData = Object.fromEntries(
-        Object.entries(profileData).filter(([_, value]) => value !== undefined)
-      );
-
       const { error: profileUpdateError } = await supabase
         .from('profiles')
-        .upsert(cleanedProfileData, {
-          onConflict: 'user_id',
+        .upsert(profileData, {
+          onConflict: 'id',
           ignoreDuplicates: false
         });
 
