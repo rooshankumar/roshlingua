@@ -59,16 +59,20 @@ const Settings = () => {
         throw new Error("User ID not found");
       }
 
-      if (localProfile.email !== currentUser.email && localProfile.email) {
+      // Get current profile for the email
+      const { data: currentProfile, error: profileError } = await supabase
+        .from('profiles')
+        .select('email')
+        .eq('id', currentUser.id)
+        .single();
+
+      if (profileError) throw profileError;
+
+      if (localProfile.email !== currentProfile.email && localProfile.email) {
         const { error: updateEmailError } = await supabase.auth.updateUser({
           email: localProfile.email
         });
         if (updateEmailError) throw updateEmailError;
-      }
-
-      // Ensure we have the current user ID
-      if (!currentUser?.id) {
-        throw new Error("User ID not found");
       }
 
       const profileData = {
@@ -77,7 +81,7 @@ const Settings = () => {
         avatar_url: localProfile.avatar_url,
         bio: localBio,
         full_name: localProfile.full_name,
-        email: currentUser.email,
+        email: currentProfile.email,
         gender: localProfile.gender?.toLowerCase(),
         date_of_birth: localProfile.date_of_birth,
         learning_language: localProfile.learning_language,
@@ -344,7 +348,7 @@ const Settings = () => {
                       <Input
                         id="email"
                         type="email"
-                        value={profile?.email || ""}
+                        value={localProfile?.email || profile?.email || ""}
                         disabled
                         className="h-12 bg-muted/50"
                       />
