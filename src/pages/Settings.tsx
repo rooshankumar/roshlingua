@@ -99,6 +99,28 @@ const Settings = () => {
         title: "Success",
         description: "Profile updated successfully",
       });
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("No authenticated user");
+
+      const { error: rpcError } = await supabase.rpc('update_user_profile', {
+        p_user_id: user.id,
+        p_full_name: profileData.full_name,
+        p_avatar_url: profileData.avatar_url,
+        p_bio: profileData.bio,
+        p_email: profileData.email,
+        p_gender: profileData.gender,
+        p_date_of_birth: profileData.date_of_birth,
+        p_native_language: profileData.native_language,
+        p_learning_language: profileData.learning_language,
+        p_proficiency_level: profileData.proficiency_level,
+        p_streak_count: profileData.streak_count || 0
+      });
+
+      if (rpcError) {
+        console.error("Error updating user profile via RPC:", rpcError);
+        throw rpcError;
+      }
+
     } catch (error: any) {
       console.error('Error updating profile:', error);
       toast({
@@ -108,40 +130,6 @@ const Settings = () => {
       });
     } finally {
       setIsLoading(false);
-    }
-
-    if (user?.id) {
-      try {
-        const { error: rpcError } = await supabase.rpc('update_user_profile', {
-          user_id: user.id,
-          full_name: localProfile.full_name,
-          email: localProfile.email,
-          gender: localProfile.gender,
-          native_language: localProfile.native_language,
-          learning_language: localProfile.learning_language,
-          proficiency_level: localProfile.proficiency_level,
-          date_of_birth: localProfile.date_of_birth,
-          bio: localBio,
-          avatar_url: localProfile.avatar_url,
-          streak_count: localProfile.streak_count || 0
-        });
-
-        if (rpcError) {
-          console.error('Error updating user profile via RPC:', rpcError);
-          toast({
-            title: "Error",
-            description: rpcError.message || "Failed to update profile details.",
-            variant: "destructive"
-          });
-        }
-      } catch (error) {
-        console.error('Error calling update_user_profile RPC:', error);
-        toast({
-          title: "Error",
-          description: "Failed to update profile details.",
-          variant: "destructive"
-        });
-      }
     }
   };
 

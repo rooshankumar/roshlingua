@@ -120,3 +120,70 @@ BEGIN
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
+
+CREATE OR REPLACE FUNCTION public.update_user_profile(
+  p_user_id UUID,
+  p_full_name TEXT,
+  p_avatar_url TEXT,
+  p_bio TEXT,
+  p_email TEXT,
+  p_gender TEXT,
+  p_date_of_birth DATE,
+  p_native_language TEXT,
+  p_learning_language TEXT,
+  p_proficiency_level TEXT,
+  p_streak_count INTEGER
+) RETURNS void AS $$
+BEGIN
+  -- Update users table
+  UPDATE auth.users 
+  SET raw_user_meta_data = jsonb_set(
+    raw_user_meta_data,
+    '{full_name}',
+    to_jsonb(p_full_name)
+  )
+  WHERE id = p_user_id;
+
+  -- Update or insert into profiles table
+  INSERT INTO public.profiles (
+    user_id,
+    full_name,
+    avatar_url,
+    bio,
+    email,
+    gender,
+    date_of_birth,
+    native_language,
+    learning_language,
+    proficiency_level,
+    streak_count,
+    updated_at
+  ) VALUES (
+    p_user_id,
+    p_full_name,
+    p_avatar_url,
+    p_bio,
+    p_email,
+    p_gender,
+    p_date_of_birth,
+    p_native_language,
+    p_learning_language,
+    p_proficiency_level,
+    p_streak_count,
+    NOW()
+  )
+  ON CONFLICT (user_id) 
+  DO UPDATE SET
+    full_name = EXCLUDED.full_name,
+    avatar_url = EXCLUDED.avatar_url,
+    bio = EXCLUDED.bio,
+    email = EXCLUDED.email,
+    gender = EXCLUDED.gender,
+    date_of_birth = EXCLUDED.date_of_birth,
+    native_language = EXCLUDED.native_language,
+    learning_language = EXCLUDED.learning_language,
+    proficiency_level = EXCLUDED.proficiency_level,
+    streak_count = EXCLUDED.streak_count,
+    updated_at = NOW();
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
