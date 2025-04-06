@@ -220,11 +220,29 @@ export const ChatScreen = ({ conversation }: Props) => {
                       <p className="leading-relaxed">{message.content}</p>
                       {message.attachment_url && (
                         <div className="mt-3 rounded-lg overflow-hidden">
-                          {message.attachment_url.match(/\.(jpg|jpeg|png|gif)$/i) ? (
+                          {message.attachment_url.match(/\.(jpg|jpeg|png|gif|webp|avif)$/i) ? (
                             <img 
                               src={message.attachment_url} 
                               alt={message.attachment_name || 'Attachment'} 
-                              className="max-w-[200px] max-h-[200px] object-cover rounded-lg hover:scale-105 transition-transform duration-300"
+                              className="max-w-[300px] max-h-[300px] object-cover rounded-lg hover:scale-105 transition-transform duration-300 cursor-pointer"
+                              onClick={() => window.open(message.attachment_url, '_blank')}
+                            />
+                          ) : message.attachment_url.match(/\.(mp4|webm|ogg)$/i) ? (
+                            <video 
+                              src={message.attachment_url}
+                              controls
+                              className="max-w-[300px] rounded-lg"
+                            />
+                          ) : message.attachment_url.match(/\.(mp3|wav|aac)$/i) ? (
+                            <audio 
+                              src={message.attachment_url}
+                              controls
+                              className="max-w-[300px]"
+                            />
+                          ) : message.attachment_url.match(/\.(pdf)$/i) ? (
+                            <iframe
+                              src={message.attachment_url}
+                              className="w-[300px] h-[400px] rounded-lg border border-border"
                             />
                           ) : (
                             <div className="flex items-center gap-3 p-3 bg-background/10 rounded-lg hover:bg-background/20 transition-colors duration-200">
