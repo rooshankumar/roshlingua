@@ -67,6 +67,7 @@ const Settings = () => {
 
       const profileData = {
         id: currentUser.id,
+        user_id: currentUser.id,
         avatar_url: localProfile.avatar_url || null,
         bio: localBio || null,
         full_name: localProfile.full_name || null,
@@ -88,7 +89,7 @@ const Settings = () => {
       const { error: profileUpdateError } = await supabase
         .from('profiles')
         .upsert(cleanedProfileData, {
-          onConflict: 'id',
+          onConflict: 'user_id',
           ignoreDuplicates: false
         });
 
