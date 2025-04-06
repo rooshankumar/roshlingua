@@ -168,33 +168,24 @@ const Settings = () => {
     if (!e.target.files || !e.target.files[0] || !user?.id) return;
     const file = e.target.files[0];
     const fileExt = file.name.split('.').pop();
-    const fileName = `${Date.now()}.${fileExt}`;
-    const filePath = `${user.id}/${fileName}`;
+    const fileName = `avatar-${Date.now()}.${fileExt}`;
 
     try {
       setIsLoading(true);
-      
-      // Remove old avatar if exists
-      if (profile?.avatar_url) {
-        const oldPath = profile.avatar_url.split('/').pop();
-        if (oldPath && user.id) {
-          await supabase.storage
-            .from('avatars')
-            .remove([`${user.id}/${oldPath}`]);
-        }
-      }
+      console.log('Starting avatar upload...');
 
       // Upload new avatar
       const { error: uploadError, data } = await supabase.storage
         .from('avatars')
-        .upload(filePath, file, {
+        .upload(fileName, file, {
           cacheControl: '3600',
-          upsert: true,
-          contentType: file.type,
-          duplex: 'half'
+          upsert: true
         });
 
-      if (uploadError) throw uploadError;
+      if (uploadError) {
+        console.error('Upload error:', uploadError);
+        throw uploadError;
+      }
 
       const { data: { publicUrl } } = supabase.storage
         .from('avatars')
