@@ -50,18 +50,15 @@ const Settings = () => {
   };
 
   const handleSaveProfile = async () => {
-    if (!user?.id) {
-      toast({
-        title: "Error",
-        description: "User ID not found",
-        variant: "destructive"
-      });
-      return;
-    }
-
     setIsLoading(true);
     try {
-      if (localProfile.email !== user.email && localProfile.email) {
+      const { data: { user: currentUser } } = await supabase.auth.getUser();
+      
+      if (!currentUser?.id) {
+        throw new Error("User ID not found");
+      }
+
+      if (localProfile.email !== currentUser.email && localProfile.email) {
         const { error: updateEmailError } = await supabase.auth.updateUser({
           email: localProfile.email
         });
@@ -69,7 +66,7 @@ const Settings = () => {
       }
 
       const profileData = {
-        id: user.id,
+        id: currentUser.id,
         avatar_url: localProfile.avatar_url || null,
         bio: localBio || null,
         full_name: localProfile.full_name || null,
