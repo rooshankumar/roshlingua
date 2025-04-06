@@ -190,7 +190,8 @@ const Settings = () => {
         .upload(filePath, file, {
           cacheControl: '3600',
           upsert: true,
-          contentType: file.type
+          contentType: file.type,
+          duplex: 'half'
         });
 
       if (uploadError) throw uploadError;
