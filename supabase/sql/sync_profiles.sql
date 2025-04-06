@@ -1,4 +1,3 @@
-
 -- Function to sync from users to profiles
 CREATE OR REPLACE FUNCTION sync_users_to_profiles()
 RETURNS TRIGGER AS $$
@@ -37,7 +36,7 @@ BEGIN
     NEW.learning_goal,
     COALESCE(NEW.is_online, false),
     COALESCE(NEW.streak_count, 0),
-    NEW.username,
+    NEW.full_name, -- Default username to full_name
     COALESCE(NEW.likes_count, 0),
     COALESCE(NEW.onboarding_completed, false),
     COALESCE(NEW.created_at, NOW()),
@@ -60,7 +59,7 @@ BEGIN
     likes_count = EXCLUDED.likes_count,
     onboarding_completed = EXCLUDED.onboarding_completed,
     updated_at = EXCLUDED.updated_at;
-    
+
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
@@ -74,7 +73,6 @@ BEGIN
     email = NEW.email,
     full_name = NEW.full_name,
     avatar_url = NEW.avatar_url,
-    bio = NEW.bio,
     date_of_birth = NEW.date_of_birth,
     gender = NEW.gender,
     native_language = NEW.native_language,
@@ -83,11 +81,10 @@ BEGIN
     learning_goal = NEW.learning_goal,
     is_online = COALESCE(NEW.is_online, false),
     streak_count = COALESCE(NEW.streak_count, 0),
-    username = NEW.username,
     onboarding_completed = COALESCE(NEW.onboarding_completed, false),
     updated_at = COALESCE(NEW.updated_at, NOW())
-  WHERE id = NEW.user_id;
-  
+  WHERE id = NEW.id;
+
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
