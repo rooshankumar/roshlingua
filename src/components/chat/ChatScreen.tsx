@@ -119,30 +119,50 @@ export const ChatScreen = ({ conversation }: Props) => {
     if ((!messageContent.trim() && !attachment) || !user || !conversation?.id || isSending) return;
 
     setIsSending(true);
-    try {
-      const { data: currentSession } = await supabase.auth.getSession();
-      const currentUser = currentSession?.session?.user;
-
-      if (!currentUser?.id) {
-        console.error("User ID is null right before database insert.");
-        return;
+    const tempId = crypto.randomUUID();
+    const timestamp = new Date().toISOString();
+    
+    // Add optimistic message
+    const optimisticMessage = {
+      id: tempId,
+      content: messageContent,
+      conversation_id: conversation.id,
+      sender_id: user.id,
+      is_read: false,
+      attachment_url: attachment?.url,
+      attachment_name: attachment?.filename,
+      created_at: timestamp,
+      sender: {
+        id: user.id,
+        email: user.email,
+        full_name: user.user_metadata?.full_name || '',
+        avatar_url: user.user_metadata?.avatar_url,
+        last_seen: timestamp
       }
+    };
+    
+    setMessages(prev => [...prev, optimisticMessage]);
+    setNewMessage('');
+    scrollToBottom();
 
+    try {
       const { error } = await supabase
         .from('messages')
         .insert([{
           content: messageContent,
           conversation_id: conversation.id,
-          sender_id: currentUser.id,
+          sender_id: user.id,
           is_read: false,
           attachment_url: attachment?.url,
           attachment_name: attachment?.filename,
-          created_at: new Date().toISOString()
+          created_at: timestamp
         }]);
 
-      if (error) throw error;
-      setNewMessage('');
-      scrollToBottom();
+      if (error) {
+        // Remove the optimistic message on error
+        setMessages(prev => prev.filter(msg => msg.id !== tempId));
+        throw error;
+      }
     } catch (error) {
       console.error('Error sending message:', error);
     } finally {
