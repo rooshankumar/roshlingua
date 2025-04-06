@@ -1,0 +1,30 @@
+ttps://wqojeesjtgfcftpnzaet.supabase.co/rest/v1/messages?select=*%2Csender%3Ausers%21messages_sender_id_fkey%28id%2Cemail%2Cfull_name%2Cavatar_url%2Clast_login%29&conversation_id=eq.5457c9b0-3963-4e7e-8a5c-c409de8ce0e8&order=created_at.asc&offset=0&limit=50 400 (Bad Request)
+(anonymous) @ @supabase_supabase-js.js?v=ae83a17f:3900
+(anonymous) @ @supabase_supabase-js.js?v=ae83a17f:3921
+fulfilled @ @supabase_supabase-js.js?v=ae83a17f:3873
+Promise.then
+step @ @supabase_supabase-js.js?v=ae83a17f:3886
+(anonymous) @ @supabase_supabase-js.js?v=ae83a17f:3888
+__awaiter6 @ @supabase_supabase-js.js?v=ae83a17f:3870
+(anonymous) @ @supabase_supabase-js.js?v=ae83a17f:3911
+then @ @supabase_supabase-js.js?v=ae83a17f:89Understand this error
+ChatScreen.tsx:70 Error fetching messages: {code: '42703', details: null, hint: null, message: 'column users_1.last_login does not exist'}code: "42703"details: nullhint: nullmessage: "column users_1.last_login does not exist"[[Prototype]]: Object
+fetchMessages @ ChatScreen.tsx:70
+await in fetchMessages
+(anonymous) @ ChatScreen.tsx:76
+commitHookEffectListMount @ chunk-W6L2VRDA.js?v=ae83a17f:16915
+commitPassiveMountOnFiber @ chunk-W6L2VRDA.js?v=ae83a17f:18156
+commitPassiveMountEffects_complete @ chunk-W6L2VRDA.js?v=ae83a17f:18129
+commitPassiveMountEffects_begin @ chunk-W6L2VRDA.js?v=ae83a17f:18119
+commitPassiveMountEffects @ chunk-W6L2VRDA.js?v=ae83a17f:18109
+flushPassiveEffectsImpl @ chunk-W6L2VRDA.js?v=ae83a17f:19490
+flushPassiveEffects @ chunk-W6L2VRDA.js?v=ae83a17f:19447
+performSyncWorkOnRoot @ chunk-W6L2VRDA.js?v=ae83a17f:18868
+flushSyncCallbacks @ chunk-W6L2VRDA.js?v=ae83a17f:9119
+commitRootImpl @ chunk-W6L2VRDA.js?v=ae83a17f:19432
+commitRoot @ chunk-W6L2VRDA.js?v=ae83a17f:19277
+finishConcurrentRender @ chunk-W6L2VRDA.js?v=ae83a17f:18805
+performConcurrentWorkOnRoot @ chunk-W6L2VRDA.js?v=ae83a17f:18718
+workLoop @ chunk-W6L2VRDA.js?v=ae83a17f:197
+flushWork @ chunk-W6L2VRDA.js?v=ae83a17f:176
+performWorkUntilDeadline @ chunk-W6L2VRDA.js?v=ae83a17f:384Understand this error
