@@ -217,10 +217,7 @@ export const ChatScreen = ({ conversation }: Props) => {
                           : 'bg-muted/90 backdrop-blur-sm rounded-bl-md'
                       }`}
                     >
-                      <p className="leading-relaxed">{message.content}</p>
-                      {message.content && (
-                        <p className="leading-relaxed mb-2">{message.content}</p>
-                      )}
+                      <p className="leading-relaxed mb-2">{message.content}</p>
                       {message.attachment_url && (
                         <div className="mt-1 rounded-lg overflow-hidden">
                           {message.attachment_url.match(/\.(jpg|jpeg|png|gif|webp|avif)$/i) ? (
