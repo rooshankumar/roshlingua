@@ -50,7 +50,7 @@ export const ChatScreen = ({ conversation }: Props) => {
               email,
               full_name,
               avatar_url,
-              last_login
+              last_seen
             )
           `)
           .eq('conversation_id', conversation.id)
