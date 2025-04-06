@@ -1,8 +1,8 @@
-
 import { useState } from 'react';
 import { Paperclip } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { Button } from '../ui/button';
+import { Loader2 } from 'lucide-react'; // Import Loader2
 
 interface ChatAttachmentProps {
   onAttach: (url: string, filename: string) => void;
@@ -37,7 +37,7 @@ export const ChatAttachment = ({ onAttach }: ChatAttachmentProps) => {
         .getPublicUrl(filePath);
 
       onAttach(data.publicUrl, file.name);
-      
+
       // Reset the input after successful upload
       event.target.value = '';
     } catch (error) {
@@ -54,14 +54,19 @@ export const ChatAttachment = ({ onAttach }: ChatAttachmentProps) => {
         onChange={handleFileChange}
         className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
         disabled={uploading}
+        accept="image/*,video/*,audio/*,.pdf,.doc,.docx,.txt"
       />
-      <Button 
-        variant="ghost" 
+      <Button
+        variant="ghost"
         size="icon"
-        className="h-10 w-10"
+        className="h-[60px] w-[60px] rounded-2xl hover:bg-muted/50"
         disabled={uploading}
       >
-        <Paperclip className="h-5 w-5" />
+        {uploading ? (
+          <Loader2 className="h-5 w-5 animate-spin" />
+        ) : (
+          <Paperclip className="h-5 w-5" />
+        )}
       </Button>
     </div>
   );
