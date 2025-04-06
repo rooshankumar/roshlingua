@@ -51,8 +51,8 @@ export const ChatHeader = ({ conversation }: Props) => {
           </Button>
           <div className="relative">
             <Avatar className="h-8 w-8 md:h-10 md:w-10">
-              <AvatarImage src={participant?.avatar_url || '/placeholder.svg'} />
-              <AvatarFallback>{participant?.full_name?.substring(0, 2).toUpperCase()}</AvatarFallback>
+              <AvatarImage src={participant?.avatar_url || '/placeholder.svg'} alt={participant?.full_name || 'User'} />
+              <AvatarFallback>{participant?.full_name?.substring(0, 2).toUpperCase() || '?'}</AvatarFallback>
             </Avatar>
             <span className={`absolute bottom-0 right-0 w-2 h-2 md:w-3 md:h-3 rounded-full ring-2 ring-background ${participant?.is_online ? "bg-green-500" : "bg-gray-400"}`} />
           </div>

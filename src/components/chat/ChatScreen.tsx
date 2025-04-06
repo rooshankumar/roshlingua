@@ -121,7 +121,7 @@ export const ChatScreen = ({ conversation }: Props) => {
     setIsSending(true);
     const tempId = crypto.randomUUID();
     const timestamp = new Date().toISOString();
-    
+
     // Add optimistic message
     const optimisticMessage = {
       id: tempId,
@@ -140,7 +140,7 @@ export const ChatScreen = ({ conversation }: Props) => {
         last_seen: timestamp
       }
     };
-    
+
     setMessages(prev => [...prev, optimisticMessage]);
     setNewMessage('');
     scrollToBottom();
@@ -270,11 +270,7 @@ export const ChatScreen = ({ conversation }: Props) => {
                       >
                         {message.is_read ? (
                           <Avatar className="h-3 w-3">
-                            <AvatarImage 
-                              src={message.sender?.avatar_url || '/placeholder.svg'} 
-                              alt={message.sender?.full_name || 'User'} 
-                              className="object-cover"
-                            />
+                            <AvatarImage src={message.sender?.avatar_url || '/placeholder.svg'} alt={message.sender?.full_name || 'User'} />
                             <AvatarFallback className="text-[8px]">
                               {message.sender?.full_name?.charAt(0).toUpperCase() || '?'}
                             </AvatarFallback>
