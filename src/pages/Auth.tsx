@@ -148,16 +148,26 @@ const Auth = () => {
               throw new Error("No user data returned");
             }
 
-            // Create onboarding status entry
-            const { error: onboardingError } = await supabase
+            // Check if onboarding status exists first
+            const { data: existingStatus } = await supabase
               .from('onboarding_status')
-              .insert([{ user_id: data.user.id }]);
+              .select('user_id')
+              .eq('user_id', data.user.id)
+              .single();
 
-            if (onboardingError) {
-              console.error("Error creating onboarding status:", onboardingError);
-              // Delete auth user if onboarding status creation fails
-              await supabase.auth.admin.deleteUser(data.user.id);
-              throw new Error("Failed to initialize onboarding status");
+            // Only create if it doesn't exist
+            if (!existingStatus) {
+              const { error: onboardingError } = await supabase
+                .from('onboarding_status')
+                .insert([{ 
+                  user_id: data.user.id,
+                  is_complete: false
+                }]);
+
+              if (onboardingError) {
+                console.error("Error creating onboarding status:", onboardingError);
+                throw new Error("Failed to initialize onboarding status");
+              }
             }
 
 
