@@ -169,13 +169,28 @@ const Settings = () => {
     const file = e.target.files[0];
     const fileExt = file.name.split('.').pop();
     const fileName = `${Date.now()}.${fileExt}`;
-    const filePath = `${user.id}/${fileName}`;
+    const filePath = `public/${user.id}_${fileName}`;
 
     try {
       setIsLoading(true);
-      const { error: uploadError } = await supabase.storage
+      
+      // Remove old avatar if exists
+      if (profile?.avatar_url) {
+        const oldPath = profile.avatar_url.split('/').pop();
+        if (oldPath) {
+          await supabase.storage
+            .from('avatars')
+            .remove([`public/${oldPath}`]);
+        }
+      }
+
+      // Upload new avatar
+      const { error: uploadError, data } = await supabase.storage
         .from('avatars')
-        .upload(filePath, file);
+        .upload(filePath, file, {
+          cacheControl: '3600',
+          upsert: true
+        });
 
       if (uploadError) throw uploadError;
 
@@ -183,18 +198,20 @@ const Settings = () => {
         .from('avatars')
         .getPublicUrl(filePath);
 
+      if (!publicUrl) throw new Error('Failed to get public URL');
+
       await updateProfile({ ...profile, avatar_url: publicUrl });
       setLocalProfile({...localProfile, avatar_url: publicUrl});
 
       toast({
-        title: "Avatar updated",
-        description: "Your profile picture has been updated successfully.",
+        title: "Success",
+        description: "Profile picture updated successfully",
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error uploading avatar:', error);
       toast({
         title: "Error",
-        description: "Failed to upload avatar. Please try again.",
+        description: error?.message || "Failed to upload avatar. Please try again.",
         variant: "destructive"
       });
     } finally {
