@@ -54,7 +54,7 @@ const Settings = () => {
     setIsLoading(true);
     try {
       const { data: { user: currentUser } } = await supabase.auth.getUser();
-      
+
       if (!currentUser?.id) {
         throw new Error("User ID not found");
       }
@@ -112,9 +112,9 @@ const Settings = () => {
       const { error: rpcError } = await supabase.rpc('update_user_profile', {
         p_user_id: user.id,
         p_full_name: profileData.full_name,
+        p_email: user.email,
         p_avatar_url: profileData.avatar_url,
         p_bio: profileData.bio,
-        p_email: profileData.email,
         p_gender: profileData.gender,
         p_date_of_birth: profileData.date_of_birth,
         p_native_language: profileData.native_language,
@@ -167,7 +167,7 @@ const Settings = () => {
 
   const handleUploadAvatar = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files || !e.target.files[0] || !user?.id) return;
-    
+
     try {
       setIsLoading(true);
       console.log('Starting avatar upload...');
@@ -177,7 +177,7 @@ const Settings = () => {
       }
 
       const { publicUrl } = await uploadAvatar(e.target.files[0], user.id);
-      
+
       if (!publicUrl) throw new Error('Failed to get public URL');
 
       await updateProfile({ ...profile, avatar_url: publicUrl });
