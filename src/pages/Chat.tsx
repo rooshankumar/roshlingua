@@ -23,16 +23,9 @@ const ChatPage = () => {
             user_id,
             users!conversation_participants_user_id_fkey (
               id,
-              email,
               full_name,
               avatar_url,
-              is_online,
-              last_seen,
-              native_language,
-              learning_language,
-              proficiency_level,
-              bio,
-              streak_count
+              is_online
             )
           `)
           .eq('conversation_id', conversationId)
@@ -64,9 +57,9 @@ const ChatPage = () => {
               sender_id,
               sender:users!messages_sender_id_fkey (
                 id,
-                email,
                 full_name,
-                avatar_url
+                avatar_url,
+                is_online
               )
             `)
             .eq('conversation_id', conversationId)
@@ -82,11 +75,9 @@ const ChatPage = () => {
             messages: messages || [],
             participant: {
               id: otherParticipant.id,
-              email: otherParticipant.email,
               full_name: otherParticipant.full_name || 'Unknown User',
               avatar_url: otherParticipant.avatar_url || '/placeholder.svg',
               is_online: otherParticipant.is_online,
-              last_seen: otherParticipant.last_seen
             }
           });
         }

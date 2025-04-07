@@ -64,16 +64,10 @@ const ChatList = () => {
             ),
             other_users:users!conversation_participants_user_id_fkey(
               id,
-              email,
               full_name,
               avatar_url,
               last_seen,
-              is_online,
-              native_language,
-              learning_language,
-              proficiency_level,
-              bio,
-              streak_count
+              is_online
             )
           `)
           .eq('user_id', user.id);
