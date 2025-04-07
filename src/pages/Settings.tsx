@@ -95,7 +95,7 @@ const Settings = () => {
         .upsert({ 
           id: currentUser.id,
           user_id: currentUser.id,
-          email: user.email
+          email: currentUser.email
         });
 
       if (upsertError) {
@@ -120,8 +120,6 @@ const Settings = () => {
         title: "Success",
         description: "Profile updated successfully",
       });
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("No authenticated user");
 
       const { error: rpcError } = await supabase.rpc('update_user_profile', {
         p_user_id: user.id,
