@@ -32,20 +32,18 @@ export const ChatScreen = ({ conversation }: Props) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  const scrollToLatestMessage = (smooth = true) => {
+    const chatContainer = document.querySelector('[data-scrollbar]');
+    if (chatContainer) {
+      chatContainer.scrollTo({
+        top: chatContainer.scrollHeight,
+        behavior: smooth ? 'smooth' : 'auto'
+      });
+    }
   };
 
   useEffect(() => {
     if (!conversation?.id) return;
-
-    // Scroll to bottom on initial load
-    const scrollToLatestMessage = () => {
-      const chatContainer = document.querySelector('[data-scrollbar]');
-      if (chatContainer) {
-        chatContainer.scrollTop = chatContainer.scrollHeight;
-      }
-    };
 
     const fetchMessages = async (loadMore = false) => {
       try {
@@ -125,6 +123,13 @@ export const ChatScreen = ({ conversation }: Props) => {
     };
   }, [conversation?.id, page]);
 
+  // Auto-scroll when messages change
+  useEffect(() => {
+    if (messages.length > 0) {
+      scrollToLatestMessage();
+    }
+  }, [messages]);
+
   const handleSend = async (content?: string, attachment?: { url: string; filename: string }) => {
     const messageContent = content || newMessage;
     if ((!messageContent.trim() && !attachment) || !user || !conversation?.id || isSending) return;
@@ -193,6 +198,10 @@ export const ChatScreen = ({ conversation }: Props) => {
       event: 'typing',
       payload: { user_id: user?.id }
     });
+  };
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
   return (
