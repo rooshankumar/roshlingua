@@ -16,10 +16,6 @@ BEGIN
     learning_goal,
     is_online,
     streak_count,
-    username,
-    likes_count,
-    onboarding_completed,
-    created_at,
     updated_at
   ) 
   VALUES (
@@ -36,10 +32,6 @@ BEGIN
     NEW.learning_goal,
     COALESCE(NEW.is_online, false),
     COALESCE(NEW.streak_count, 0),
-    NEW.full_name, -- Default username to full_name
-    COALESCE(NEW.likes_count, 0),
-    COALESCE(NEW.onboarding_completed, false),
-    COALESCE(NEW.created_at, NOW()),
     COALESCE(NEW.updated_at, NOW())
   )
   ON CONFLICT (id) 
@@ -50,14 +42,11 @@ BEGIN
     date_of_birth = EXCLUDED.date_of_birth,
     gender = EXCLUDED.gender,
     native_language = EXCLUDED.native_language,
-    learning_language = EXCLUDED.learning_language,
+    learning_language = EXCLUDED.learning_language, 
     proficiency_level = EXCLUDED.proficiency_level,
     learning_goal = EXCLUDED.learning_goal,
     is_online = EXCLUDED.is_online,
     streak_count = EXCLUDED.streak_count,
-    username = EXCLUDED.username,
-    likes_count = EXCLUDED.likes_count,
-    onboarding_completed = EXCLUDED.onboarding_completed,
     updated_at = EXCLUDED.updated_at;
 
   RETURN NEW;
@@ -81,7 +70,6 @@ BEGIN
     learning_goal = NEW.learning_goal,
     is_online = COALESCE(NEW.is_online, false),
     streak_count = COALESCE(NEW.streak_count, 0),
-    onboarding_completed = COALESCE(NEW.onboarding_completed, false),
     updated_at = COALESCE(NEW.updated_at, NOW())
   WHERE id = NEW.id;
 
@@ -98,7 +86,7 @@ CREATE TRIGGER sync_users_trigger
 
 DROP TRIGGER IF EXISTS sync_profiles_trigger ON public.profiles;
 CREATE TRIGGER sync_profiles_trigger
-  AFTER UPDATE ON public.profiles
+  AFTER INSERT OR UPDATE ON public.profiles
   FOR EACH ROW
   EXECUTE FUNCTION sync_profiles_to_users();
 
