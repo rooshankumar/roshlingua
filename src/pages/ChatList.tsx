@@ -134,6 +134,36 @@ const ChatList = () => {
         });
 
         setConversations(sortedConversations);
+
+        // Subscribe to real-time updates for all participants
+        const participantIds = sortedConversations.map(conv => conv.participant.id);
+        const channel = supabase
+          .channel(`public:users:${participantIds.join(',')}`)
+          .on('postgres_changes', 
+            {
+              event: '*',
+              schema: 'public',
+              table: 'users',
+              filter: `id=in.(${participantIds.join(',')})`
+            }, 
+            (payload) => {
+              setConversations(prevConvs => 
+                prevConvs.map(conv => 
+                  conv.participant.id === payload.new.id 
+                    ? {
+                        ...conv,
+                        participant: {
+                          ...conv.participant,
+                          ...payload.new
+                        }
+                      }
+                    : conv
+                )
+              );
+            }
+          )
+          .subscribe();
+
       } catch (error) {
         console.error('Error fetching conversations:', error);
       } finally {

@@ -54,6 +54,27 @@ const ChatPage = () => {
         const otherParticipant = participant?.users;
 
         if (otherParticipant) {
+          // Subscribe to real-time updates for the participant
+          const channel = supabase
+            .channel(`public:users:${otherParticipant.id}`)
+            .on('postgres_changes', 
+              {
+                event: '*',
+                schema: 'public',
+                table: 'users',
+                filter: `id=eq.${otherParticipant.id}`
+              }, 
+              (payload) => {
+                setConversation(prev => ({
+                  ...prev,
+                  participant: {
+                    ...prev.participant,
+                    ...payload.new
+                  }
+                }));
+              }
+            )
+            .subscribe();
           // Fetch messages with sender profile info
           const { data: messages, error: messagesError } = await supabase
             .from('messages')
