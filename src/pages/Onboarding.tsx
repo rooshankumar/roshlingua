@@ -212,10 +212,14 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
                 description: "Your profile has been successfully set up.",
             });
 
-            // Navigate to dashboard
+            // Set loading state and navigate
+            setIsLoading(true);
             localStorage.setItem("onboarding_completed", "true");
             onComplete();
-            navigate("/dashboard", { replace: true });
+            // Small delay to ensure UI updates before navigation
+            setTimeout(() => {
+              navigate("/dashboard", { replace: true });
+            }, 100);
         } catch (error) {
             console.error("Onboarding error:", error);
             toast({
@@ -267,7 +271,15 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
     };
 
     return (
-        <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-gradient-to-b from-background to-secondary">
+        <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-gradient-to-b from-background to-secondary relative">
+            {isLoading && (
+                <div className="absolute inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center z-50">
+                    <div className="flex flex-col items-center gap-4">
+                        <div className="h-8 w-8 rounded-full border-4 border-primary border-t-transparent animate-spin"></div>
+                        <p className="text-muted-foreground">Completing setup...</p>
+                    </div>
+                </div>
+            )}
             <div className="w-full max-w-md">
                 <Card className="shadow-lg animate-fade-in">
                     <CardHeader>
