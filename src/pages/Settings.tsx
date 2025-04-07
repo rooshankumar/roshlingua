@@ -77,11 +77,9 @@ const Settings = () => {
 
       const profileData = {
         id: currentUser.id,
-        user_id: currentUser.id,
         avatar_url: localProfile.avatar_url,
         bio: localBio,
         full_name: localProfile.full_name,
-        email: currentProfile.email,
         gender: localProfile.gender?.toLowerCase(),
         date_of_birth: localProfile.date_of_birth,
         learning_language: localProfile.learning_language,
@@ -93,10 +91,8 @@ const Settings = () => {
 
       const { error: profileUpdateError } = await supabase
         .from('profiles')
-        .upsert(profileData, {
-          onConflict: 'id',
-          ignoreDuplicates: false
-        });
+        .update(profileData)
+        .eq('id', currentUser.id);
 
       if (profileUpdateError) {
         throw profileUpdateError;
