@@ -27,7 +27,12 @@ const ChatPage = () => {
               full_name,
               avatar_url,
               is_online,
-              last_seen
+              last_seen,
+              native_language,
+              learning_language,
+              proficiency_level,
+              bio,
+              streak_count
             )
           `)
           .eq('conversation_id', conversationId)

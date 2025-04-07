@@ -67,7 +67,13 @@ const ChatList = () => {
               email,
               full_name,
               avatar_url,
-              last_seen
+              last_seen,
+              is_online,
+              native_language,
+              learning_language,
+              proficiency_level,
+              bio,
+              streak_count
             )
           `)
           .eq('user_id', user.id);
