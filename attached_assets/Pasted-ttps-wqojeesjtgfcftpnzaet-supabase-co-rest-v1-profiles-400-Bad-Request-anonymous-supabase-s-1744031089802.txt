@@ -1,0 +1,28 @@
+ttps://wqojeesjtgfcftpnzaet.supabase.co/rest/v1/profiles 400 (Bad Request)
+(anonymous) @ @supabase_supabase-js.js?v=ae83a17f:3900
+(anonymous) @ @supabase_supabase-js.js?v=ae83a17f:3921
+fulfilled @ @supabase_supabase-js.js?v=ae83a17f:3873
+Promise.then
+step @ @supabase_supabase-js.js?v=ae83a17f:3886
+(anonymous) @ @supabase_supabase-js.js?v=ae83a17f:3888
+__awaiter6 @ @supabase_supabase-js.js?v=ae83a17f:3870
+(anonymous) @ @supabase_supabase-js.js?v=ae83a17f:3911
+then @ @supabase_supabase-js.js?v=ae83a17f:89Understand this error
+Settings.tsx:149 Error updating profile: {code: '23502', details: 'Failing row contains (ed1c374e-3823-4ea2-aa28-3999…c21d1140, null, 0, null, isthisroshan@gmail.com).', hint: null, message: 'null value in column "learning_language" of relation "profiles" violates not-null constraint'}code: "23502"details: "Failing row contains (ed1c374e-3823-4ea2-aa28-3999c21d1140, null, null, 0, f, 2025-04-07 13:04:40.024364+00, 2025-04-07 13:04:40.024364+00, null, null, null, null, null, null, f, null, ed1c374e-3823-4ea2-aa28-3999c21d1140, null, 0, null, isthisroshan@gmail.com)."hint: nullmessage: "null value in column \"learning_language\" of relation \"profiles\" violates not-null constraint"[[Prototype]]: Object
+handleSaveProfile @ Settings.tsx:149
+await in handleSaveProfile
+callCallback2 @ chunk-W6L2VRDA.js?v=ae83a17f:3674
+invokeGuardedCallbackDev @ chunk-W6L2VRDA.js?v=ae83a17f:3699
+invokeGuardedCallback @ chunk-W6L2VRDA.js?v=ae83a17f:3733
+invokeGuardedCallbackAndCatchFirstError @ chunk-W6L2VRDA.js?v=ae83a17f:3736
+executeDispatch @ chunk-W6L2VRDA.js?v=ae83a17f:7014
+processDispatchQueueItemsInOrder @ chunk-W6L2VRDA.js?v=ae83a17f:7034
+processDispatchQueue @ chunk-W6L2VRDA.js?v=ae83a17f:7043
+dispatchEventsForPlugins @ chunk-W6L2VRDA.js?v=ae83a17f:7051
+(anonymous) @ chunk-W6L2VRDA.js?v=ae83a17f:7174
+batchedUpdates$1 @ chunk-W6L2VRDA.js?v=ae83a17f:18913
+batchedUpdates @ chunk-W6L2VRDA.js?v=ae83a17f:3579
+dispatchEventForPluginEventSystem @ chunk-W6L2VRDA.js?v=ae83a17f:7173
+dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay @ chunk-W6L2VRDA.js?v=ae83a17f:5478
+dispatchEvent @ chunk-W6L2VRDA.js?v=ae83a17f:5472
+dispatchDiscreteEvent @ chunk-W6L2VRDA.js?v=ae83a17f:5449Understand this error
