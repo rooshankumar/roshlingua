@@ -148,6 +148,11 @@ BEGIN
         proficiency_level = p_proficiency_level,
         streak_count = p_streak_count,
         updated_at = NOW()
-    WHERE id = p_user_id;
+    WHERE user_id = p_user_id;
+
+    -- Ensure profile exists
+    INSERT INTO public.profiles (id, user_id, email)
+    VALUES (p_user_id, p_user_id, p_email)
+    ON CONFLICT (id) DO NOTHING;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
