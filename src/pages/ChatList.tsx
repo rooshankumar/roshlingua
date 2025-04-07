@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { MessageCircle, Loader2, Search, Plus } from 'lucide-react';
@@ -62,7 +61,7 @@ const ChatList = () => {
               id,
               created_at
             ),
-            other_users:users!conversation_participants_user_id_fkey(
+            other_users:profiles!conversation_participants_user_id_fkey(
               id,
               email,
               full_name,
@@ -86,7 +85,7 @@ const ChatList = () => {
             const { data: otherParticipant } = await supabase
               .from('conversation_participants')
               .select(`
-                users!conversation_participants_user_id_fkey (
+                profiles!conversation_participants_user_id_fkey (
                   id,
                   email,
                   full_name,
@@ -109,11 +108,11 @@ const ChatList = () => {
             return {
               id: conv.conversation_id,
               participant: {
-                id: otherParticipant?.users?.id || '',
-                email: otherParticipant?.users?.email || '',
-                full_name: otherParticipant?.users?.full_name || 'Unknown User',
-                avatar_url: otherParticipant?.users?.avatar_url || '/placeholder.svg',
-                last_seen: otherParticipant?.users?.last_seen
+                id: otherParticipant?.profiles?.id || '',
+                email: otherParticipant?.profiles?.email || '',
+                full_name: otherParticipant?.profiles?.full_name || 'Unknown User',
+                avatar_url: otherParticipant?.profiles?.avatar_url || '/placeholder.svg',
+                last_seen: otherParticipant?.profiles?.last_seen
               },
               lastMessage,
               unreadCount: unreadCountsClientSide[conv.conversation_id] || 0
@@ -138,12 +137,12 @@ const ChatList = () => {
         // Subscribe to real-time updates for all participants
         const participantIds = sortedConversations.map(conv => conv.participant.id);
         const channel = supabase
-          .channel(`public:users:${participantIds.join(',')}`)
+          .channel(`public:profiles:${participantIds.join(',')}`)
           .on('postgres_changes', 
             {
               event: '*',
               schema: 'public',
-              table: 'users',
+              table: 'profiles',
               filter: `id=in.(${participantIds.join(',')})`
             }, 
             (payload) => {
