@@ -39,6 +39,14 @@ export const ChatScreen = ({ conversation }: Props) => {
   useEffect(() => {
     if (!conversation?.id) return;
 
+    // Scroll to bottom on initial load
+    const scrollToLatestMessage = () => {
+      const chatContainer = document.querySelector('[data-scrollbar]');
+      if (chatContainer) {
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+      }
+    };
+
     const fetchMessages = async (loadMore = false) => {
       try {
         const { data, error } = await supabase
@@ -65,7 +73,10 @@ export const ChatScreen = ({ conversation }: Props) => {
           return newMessages;
         });
 
-        if (!loadMore) scrollToBottom();
+        if (!loadMore) {
+          // Use a small timeout to ensure DOM is updated
+          setTimeout(scrollToLatestMessage, 100);
+        }
       } catch (error) {
         console.error('Error fetching messages:', error);
       } finally {
