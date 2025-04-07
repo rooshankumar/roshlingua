@@ -52,7 +52,7 @@ type OnboardingFormData = {
     native_language: string;
     learning_language: string;
     proficiency_level: string;
-    learning_goal: string;
+    bio: string; // Changed from learning_goal
     avatar_url: string;
 }
 
@@ -66,7 +66,7 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
             native_language: "",
             learning_language: "",
             proficiency_level: "",
-            learning_goal: "",
+            bio: "", // Changed from learning_goal
             avatar_url: "",
             date_of_birth: undefined as Date | undefined,
         },
@@ -112,7 +112,7 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
             case 2:
                 return !!values.nativeLanguage && !!values.learningLanguage && !!values.proficiencyLevel;
             case 3:
-                return !!values.learningGoal;
+                return !!values.bio; // Changed from learningGoal
             default:
                 return true;
         }
@@ -171,7 +171,7 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
                     native_language: formData.nativeLanguage,
                     learning_language: formData.learningLanguage,
                     proficiency_level: formData.proficiencyLevel,
-                    learning_goal: formData.learningGoal,
+                    bio: formData.bio, // Changed from learningGoal
                     avatar_url: formData.avatarUrl,
                     full_name: formData.full_name,
                     onboarding_completed: true,
@@ -488,13 +488,13 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
                                 <div className="space-y-4">
                                     <FormField
                                         control={form.control}
-                                        name="learningGoal"
+                                        name="bio" // Changed from learningGoal
                                         render={({ field }) => (
                                             <FormItem>
-                                                <FormLabel>Learning Goal</FormLabel>
+                                                <FormLabel>Bio</FormLabel>  {/* Changed Label */}
                                                 <FormControl>
                                                     <Textarea
-                                                        placeholder="What do you want to achieve with this language? (e.g., travel, work, cultural interest)"
+                                                        placeholder="Tell us about yourself"
                                                         className="min-h-[120px]"
                                                         {...field}
                                                     />
@@ -593,8 +593,8 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
                                         </div>
 
                                         <div>
-                                            <p className="text-muted-foreground">Learning Goal</p>
-                                            <p className="text-sm">{form.getValues("learningGoal")}</p>
+                                            <p className="text-muted-foreground">Bio</p> {/* Changed Label */}
+                                            <p className="text-sm">{form.getValues("bio")}</p> {/* Changed field */}
                                         </div>
                                     </div>
                                 </div>
