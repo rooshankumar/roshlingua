@@ -77,17 +77,22 @@ const Settings = () => {
 
       const profileData = {
         user_id: currentUser.id,
-        avatar_url: localProfile.avatar_url,
-        bio: localBio,
-        full_name: localProfile.full_name,
-        gender: localProfile.gender?.toLowerCase(),
-        date_of_birth: localProfile.date_of_birth,
-        learning_language: localProfile.learning_language,
-        native_language: localProfile.native_language,
-        proficiency_level: localProfile.proficiency_level,
+        avatar_url: localProfile.avatar_url || null,
+        bio: localBio || '',
+        full_name: localProfile.full_name || '',
+        gender: localProfile.gender?.toLowerCase() || 'rather not say',
+        date_of_birth: localProfile.date_of_birth || null,
+        learning_language: localProfile.learning_language || 'English', // Default value
+        native_language: localProfile.native_language || 'English', // Default value
+        proficiency_level: localProfile.proficiency_level || 'Beginner (A1)', // Default value
         streak_count: localProfile.streak_count || 0,
         updated_at: new Date().toISOString()
       };
+
+      // Validate required fields
+      if (!profileData.learning_language || !profileData.native_language || !profileData.proficiency_level) {
+        throw new Error("Language preferences are required");
+      }
 
       // First ensure profile exists
       const { error: upsertError } = await supabase
