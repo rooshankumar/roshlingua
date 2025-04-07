@@ -458,22 +458,7 @@ const Settings = () => {
                   </div>
                 </div>
 
-                <div className="rounded-lg bg-muted/50 p-6 space-y-4">
-                  <h4 className="font-semibold text-lg">Learning Progress</h4>
-                  <div className="grid grid-cols-2 gap-6">
-                    <div className="space-y-2">
-                      <p className="text-sm text-muted-foreground">Current Streak</p>
-                      <p className="text-2xl font-bold text-primary">{profile?.streak_count || 0} days</p>
-                    </div>
-                    <div className="space-y-2">
-                      <p className="text-sm text-muted-foreground">Last Active</p>
-                      <p className="text-lg">
-                        {profile?.streak_last_date ? new Date(profile.streak_last_date).toLocaleDateString() : 'Never'}
-                      </p>
-                    </div>
-                  </div>
                 </div>
-              </div>
             </CardContent>
             <CardFooter>
               <Button 
