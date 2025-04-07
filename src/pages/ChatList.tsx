@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { MessageCircle, Loader2, Search, Plus } from 'lucide-react';
@@ -61,7 +62,7 @@ const ChatList = () => {
               id,
               created_at
             ),
-            other_users:profiles!conversation_participants_user_id_fkey(
+            other_users:users!conversation_participants_user_id_fkey(
               id,
               email,
               full_name,
@@ -85,7 +86,7 @@ const ChatList = () => {
             const { data: otherParticipant } = await supabase
               .from('conversation_participants')
               .select(`
-                profiles!conversation_participants_user_id_fkey (
+                users!conversation_participants_user_id_fkey (
                   id,
                   email,
                   full_name,
@@ -108,11 +109,11 @@ const ChatList = () => {
             return {
               id: conv.conversation_id,
               participant: {
-                id: otherParticipant?.profiles?.id || '',
-                email: otherParticipant?.profiles?.email || '',
-                full_name: otherParticipant?.profiles?.full_name || 'Unknown User',
-                avatar_url: otherParticipant?.profiles?.avatar_url || '/placeholder.svg',
-                last_seen: otherParticipant?.profiles?.last_seen
+                id: otherParticipant?.users?.id || '',
+                email: otherParticipant?.users?.email || '',
+                full_name: otherParticipant?.users?.full_name || 'Unknown User',
+                avatar_url: otherParticipant?.users?.avatar_url || '/placeholder.svg',
+                last_seen: otherParticipant?.users?.last_seen
               },
               lastMessage,
               unreadCount: unreadCountsClientSide[conv.conversation_id] || 0
@@ -133,36 +134,6 @@ const ChatList = () => {
         });
 
         setConversations(sortedConversations);
-
-        // Subscribe to real-time updates for all participants
-        const participantIds = sortedConversations.map(conv => conv.participant.id);
-        const channel = supabase
-          .channel(`public:profiles:${participantIds.join(',')}`)
-          .on('postgres_changes', 
-            {
-              event: '*',
-              schema: 'public',
-              table: 'profiles',
-              filter: `id=in.(${participantIds.join(',')})`
-            }, 
-            (payload) => {
-              setConversations(prevConvs => 
-                prevConvs.map(conv => 
-                  conv.participant.id === payload.new.id 
-                    ? {
-                        ...conv,
-                        participant: {
-                          ...conv.participant,
-                          ...payload.new
-                        }
-                      }
-                    : conv
-                )
-              );
-            }
-          )
-          .subscribe();
-
       } catch (error) {
         console.error('Error fetching conversations:', error);
       } finally {

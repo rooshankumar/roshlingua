@@ -54,27 +54,6 @@ const ChatPage = () => {
         const otherParticipant = participant?.users;
 
         if (otherParticipant) {
-          // Subscribe to real-time updates for the participant
-          const channel = supabase
-            .channel(`public:profiles:${otherParticipant.id}`) // Changed table name here
-            .on('postgres_changes', 
-              {
-                event: '*',
-                schema: 'public',
-                table: 'profiles', // Changed table name here
-                filter: `id=eq.${otherParticipant.id}`
-              }, 
-              (payload) => {
-                setConversation(prev => ({
-                  ...prev,
-                  participant: {
-                    ...prev.participant,
-                    ...payload.new
-                  }
-                }));
-              }
-            )
-            .subscribe();
           // Fetch messages with sender profile info
           const { data: messages, error: messagesError } = await supabase
             .from('messages')
@@ -83,13 +62,13 @@ const ChatPage = () => {
               content,
               created_at,
               sender_id,
-              sender:profiles!messages_sender_id_fkey (
+              sender:users!messages_sender_id_fkey (
                 id,
                 email,
                 full_name,
                 avatar_url
               )
-            `) // Changed table name here
+            `)
             .eq('conversation_id', conversationId)
             .order('created_at', { ascending: true });
 
