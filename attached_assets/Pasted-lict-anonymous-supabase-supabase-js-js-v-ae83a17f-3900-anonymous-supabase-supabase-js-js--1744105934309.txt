@@ -1,0 +1,47 @@
+lict)
+(anonymous) @ @supabase_supabase-js.js?v=ae83a17f:3900
+(anonymous) @ @supabase_supabase-js.js?v=ae83a17f:3921
+fulfilled @ @supabase_supabase-js.js?v=ae83a17f:3873
+Promise.then
+step @ @supabase_supabase-js.js?v=ae83a17f:3886
+(anonymous) @ @supabase_supabase-js.js?v=ae83a17f:3888
+__awaiter6 @ @supabase_supabase-js.js?v=ae83a17f:3870
+(anonymous) @ @supabase_supabase-js.js?v=ae83a17f:3911
+then @ @supabase_supabase-js.js?v=ae83a17f:89Understand this error
+Auth.tsx:173 Error creating onboarding status: {code: '23503', details: 'Key (user_id)=(e0a85418-c7e7-4e96-90f6-22c7982838c2) is not present in table "users".', hint: null, message: 'insert or update on table "onboarding_status" viol…n key constraint "onboarding_status_user_id_fkey"'}code: "23503"details: "Key (user_id)=(e0a85418-c7e7-4e96-90f6-22c7982838c2) is not present in table \"users\"."hint: nullmessage: "insert or update on table \"onboarding_status\" violates foreign key constraint \"onboarding_status_user_id_fkey\""[[Prototype]]: Object
+handleSignup @ Auth.tsx:173
+await in handleSignup
+callCallback2 @ chunk-W6L2VRDA.js?v=ae83a17f:3674
+invokeGuardedCallbackDev @ chunk-W6L2VRDA.js?v=ae83a17f:3699
+invokeGuardedCallback @ chunk-W6L2VRDA.js?v=ae83a17f:3733
+invokeGuardedCallbackAndCatchFirstError @ chunk-W6L2VRDA.js?v=ae83a17f:3736
+executeDispatch @ chunk-W6L2VRDA.js?v=ae83a17f:7014
+processDispatchQueueItemsInOrder @ chunk-W6L2VRDA.js?v=ae83a17f:7034
+processDispatchQueue @ chunk-W6L2VRDA.js?v=ae83a17f:7043
+dispatchEventsForPlugins @ chunk-W6L2VRDA.js?v=ae83a17f:7051
+(anonymous) @ chunk-W6L2VRDA.js?v=ae83a17f:7174
+batchedUpdates$1 @ chunk-W6L2VRDA.js?v=ae83a17f:18913
+batchedUpdates @ chunk-W6L2VRDA.js?v=ae83a17f:3579
+dispatchEventForPluginEventSystem @ chunk-W6L2VRDA.js?v=ae83a17f:7173
+dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay @ chunk-W6L2VRDA.js?v=ae83a17f:5478
+dispatchEvent @ chunk-W6L2VRDA.js?v=ae83a17f:5472
+dispatchDiscreteEvent @ chunk-W6L2VRDA.js?v=ae83a17f:5449Understand this error
+Auth.tsx:184 Signup error: Error: Failed to initialize onboarding status
+    at handleSignup (Auth.tsx:174:23)
+handleSignup @ Auth.tsx:184
+await in handleSignup
+callCallback2 @ chunk-W6L2VRDA.js?v=ae83a17f:3674
+invokeGuardedCallbackDev @ chunk-W6L2VRDA.js?v=ae83a17f:3699
+invokeGuardedCallback @ chunk-W6L2VRDA.js?v=ae83a17f:3733
+invokeGuardedCallbackAndCatchFirstError @ chunk-W6L2VRDA.js?v=ae83a17f:3736
+executeDispatch @ chunk-W6L2VRDA.js?v=ae83a17f:7014
+processDispatchQueueItemsInOrder @ chunk-W6L2VRDA.js?v=ae83a17f:7034
+processDispatchQueue @ chunk-W6L2VRDA.js?v=ae83a17f:7043
+dispatchEventsForPlugins @ chunk-W6L2VRDA.js?v=ae83a17f:7051
+(anonymous) @ chunk-W6L2VRDA.js?v=ae83a17f:7174
+batchedUpdates$1 @ chunk-W6L2VRDA.js?v=ae83a17f:18913
+batchedUpdates @ chunk-W6L2VRDA.js?v=ae83a17f:3579
+dispatchEventForPluginEventSystem @ chunk-W6L2VRDA.js?v=ae83a17f:7173
+dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay @ chunk-W6L2VRDA.js?v=ae83a17f:5478
+dispatchEvent @ chunk-W6L2VRDA.js?v=ae83a17f:5472
+dispatchDiscreteEvent @ chunk-W6L2VRDA.js?v=ae83a17f:5449Understand this error
