@@ -174,8 +174,9 @@ const Auth = () => {
 
             toast({
               title: "Signup successful",
-              description: "Please check your email (including spam folder) for the confirmation link.",
+              description: "Redirecting to dashboard...",
             });
+            navigate("/dashboard", { replace: true });
           } catch (error) {
             console.error("Signup error:", error);
             let errorMessage = "An error occurred during signup.";
