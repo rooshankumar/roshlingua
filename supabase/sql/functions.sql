@@ -1,11 +1,8 @@
-
 -- Handle new user creation
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS TRIGGER AS $$
-DECLARE
-  user_record_id UUID;
 BEGIN
-  -- Insert basic user record and get the ID
+  -- Insert basic user record first
   INSERT INTO public.users (
     id,
     email,
@@ -16,24 +13,20 @@ BEGIN
     NEW.email,
     COALESCE(NEW.raw_user_meta_data->>'full_name', ''),
     NOW()
-  ) RETURNING id INTO user_record_id;
+  );
 
-  -- Only create onboarding status if user was successfully created
-  IF user_record_id IS NOT NULL THEN
-    INSERT INTO public.onboarding_status (
-      user_id,
-      is_complete,
-      created_at,
-      updated_at
-    ) VALUES (
-      user_record_id,
-      false,
-      NOW(),
-      NOW()
-    );
-  END IF;
-
-  -- Create notification settings
+  -- Create onboarding status after user creation
+  INSERT INTO public.onboarding_status (
+    user_id,
+    is_complete,
+    created_at,
+    updated_at
+  ) VALUES (
+    NEW.id,
+    false,
+    NOW(),
+    NOW()
+  );
 
   -- Create notification settings with defaults
   INSERT INTO public.notification_settings (
