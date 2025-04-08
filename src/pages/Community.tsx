@@ -202,21 +202,47 @@ const Community = () => {
         return;
       }
 
-      // First check if both profiles exist
-      const { data: profiles, error: profilesError } = await supabase
-        .from('profiles')
-        .select('id')
-        .in('id', [user.id, otherUserId]);
+      // Create new conversation first
+      const { data: newConversation, error: conversationError } = await supabase
+        .from('conversations')
+        .insert([{
+          created_by: user.id,
+          last_message_at: new Date().toISOString()
+        }])
+        .select()
+        .single();
 
-      if (profilesError) throw profilesError;
+      if (conversationError) throw conversationError;
 
-      if (!profiles || profiles.length !== 2) {
-        toast({
-          title: "Error",
-          description: "One or both user profiles do not exist",
-          variant: "destructive",
-        });
-        return;
+      // Add participants one by one to better handle errors
+      try {
+        const { error: currentUserError } = await supabase
+          .from('conversation_participants')
+          .insert({ 
+            conversation_id: newConversation.id, 
+            user_id: user.id 
+          });
+
+        if (currentUserError) throw currentUserError;
+
+        const { error: otherUserError } = await supabase
+          .from('conversation_participants')
+          .insert({ 
+            conversation_id: newConversation.id, 
+            user_id: otherUserId 
+          });
+
+        if (otherUserError) throw otherUserError;
+
+        navigate(`/chat/${newConversation.id}`);
+      } catch (error) {
+        // Cleanup the conversation if participant creation fails
+        await supabase
+          .from('conversations')
+          .delete()
+          .eq('id', newConversation.id);
+          
+        throw error;
       }
 
       // First check for existing conversation
