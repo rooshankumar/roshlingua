@@ -202,7 +202,29 @@ const Community = () => {
         return;
       }
 
-      // Create new conversation first
+      // First check for existing conversation
+      const { data: participants, error: participantsError } = await supabase
+        .from('conversation_participants')
+        .select('conversation_id')
+        .eq('user_id', user.id);
+
+      if (participantsError) throw participantsError;
+
+      if (participants && participants.length > 0) {
+        const { data: existingChat } = await supabase
+          .from('conversation_participants')
+          .select('conversation_id')
+          .in('conversation_id', participants.map(p => p.conversation_id))
+          .eq('user_id', otherUserId)
+          .maybeSingle();
+
+        if (existingChat) {
+          navigate(`/chat/${existingChat.conversation_id}`);
+          return;
+        }
+      }
+
+      // Create new conversation if none exists
       const { data: newConversation, error: conversationError } = await supabase
         .from('conversations')
         .insert([{
@@ -244,31 +266,6 @@ const Community = () => {
           
         throw error;
       }
-
-      // First check for existing conversation
-      const { data: participants, error: participantsError } = await supabase
-        .from('conversation_participants')
-        .select('conversation_id')
-        .eq('user_id', user.id);
-
-      if (participantsError) throw participantsError;
-
-      if (participants && participants.length > 0) {
-        const { data: existingChat } = await supabase
-          .from('conversation_participants')
-          .select('conversation_id')
-          .in('conversation_id', participants.map(p => p.conversation_id))
-          .eq('user_id', otherUserId)
-          .maybeSingle();
-
-        if (existingChat) {
-          navigate(`/chat/${existingChat.conversation_id}`);
-          return;
-        }
-      }
-
-      // Create new conversation and get the ID back
-      const { data: newConversation, error: conversationError } = await supabase
         .from('conversations')
         .insert([{
           created_by: user.id,
