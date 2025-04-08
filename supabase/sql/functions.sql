@@ -15,13 +15,15 @@ BEGIN
     NOW()
   );
 
-  -- Create onboarding status after user creation
-  INSERT INTO public.onboarding_status (
+  -- Create profile with onboarding status
+  INSERT INTO public.profiles (
+    id,
     user_id,
-    is_complete,
+    onboarding_completed,
     created_at,
     updated_at
   ) VALUES (
+    NEW.id,
     NEW.id,
     false,
     NOW(),

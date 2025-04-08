@@ -1,40 +1,39 @@
+
 import { supabase } from '@/lib/supabase';
 
 export const checkOnboardingStatus = async (userId: string) => {
   try {
-    if (!userId) return { isComplete: false, currentStep: null };
+    if (!userId) return { isComplete: false };
 
     const { data, error } = await supabase
-      .from('onboarding_status')
-      .select('*')
-      .eq('user_id', userId)
+      .from('profiles')
+      .select('onboarding_completed')
+      .eq('id', userId)
       .single();
 
     if (error) {
       console.error("Error fetching onboarding status:", error);
-      return { isComplete: false, currentStep: 'profile' };
+      return { isComplete: false };
     }
 
     return { 
-      isComplete: data?.is_complete || false, 
-      currentStep: data?.current_step || 'profile',
-      profile: data
+      isComplete: data?.onboarding_completed || false
     };
   } catch (err) {
     console.error("Onboarding check error:", err);
-    return { isComplete: false, currentStep: 'profile' };
+    return { isComplete: false };
   }
 };
 
-export const updateOnboardingStatus = async (userId: string, data: any) => {
+export const updateOnboardingStatus = async (userId: string, isComplete: boolean) => {
   try {
     const { error } = await supabase
-      .from('onboarding_status')
-      .upsert({
-        user_id: userId,
-        ...data,
+      .from('profiles')
+      .update({
+        onboarding_completed: isComplete,
         updated_at: new Date().toISOString()
-      });
+      })
+      .eq('id', userId);
 
     if (error) {
       console.error("Error updating onboarding status:", error);
