@@ -54,29 +54,21 @@ const AuthCallback = () => {
           if (createError) throw createError;
         }
 
-        // Check existing onboarding status
-        const { data: onboardingStatus, error: statusCheckError } = await supabase
-          .from('onboarding_status')
-          .select('*')
-          .eq('user_id', session.user.id)
-          .single();
+        // Ensure profile exists with onboarding_completed set to false
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .upsert({
+            id: session.user.id,
+            email: session.user.email,
+            onboarding_completed: false,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          }, {
+            onConflict: 'id'
+          });
 
-        if (statusCheckError && statusCheckError.code !== 'PGRST116') {
-          console.error("Error checking onboarding status:", statusCheckError);
-        }
-
-        // Only create if it doesn't exist
-        if (!onboardingStatus) {
-          const { error: onboardingError } = await supabase
-            .from('onboarding_status')
-            .insert([{
-              user_id: session.user.id,
-              is_complete: false
-            }]);
-
-          if (onboardingError) {
-            console.error("Error creating onboarding status:", onboardingError);
-          }
+        if (profileError) {
+          console.error("Error creating profile:", profileError);
         }
 
         // Redirect to appropriate page

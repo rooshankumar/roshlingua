@@ -18,13 +18,13 @@ BEGIN
   -- Create profile with onboarding status
   INSERT INTO public.profiles (
     id,
-    user_id,
+    email,
     onboarding_completed,
     created_at,
     updated_at
   ) VALUES (
     NEW.id,
-    NEW.id,
+    NEW.email,
     false,
     NOW(),
     NOW()

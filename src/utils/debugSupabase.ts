@@ -57,15 +57,15 @@ export async function debugConversations(conversationId?: string) {
       console.log("Messages error:", msgError);
     }
 
-    // 6. Check onboarding status
-    const { data: onboardingStatus, error: onboardingError } = await supabase
-      .from('onboarding_status')
-      .select('*')
-      .eq('user_id', user?.id)
+    // 6. Check onboarding status from profiles
+    const { data: profile, error: profileError } = await supabase
+      .from('profiles')
+      .select('onboarding_completed')
+      .eq('id', user?.id)
       .single();
     
-    console.log("Onboarding status:", onboardingStatus);
-    console.log("Onboarding error:", onboardingError);
+    console.log("Profile onboarding status:", profile?.onboarding_completed);
+    console.log("Profile error:", profileError);
     
     return { success: true };
   } catch (error) {
