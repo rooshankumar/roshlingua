@@ -2,21 +2,44 @@
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS TRIGGER AS $$
 BEGIN
+  -- Insert into users table with default values for required fields
   INSERT INTO public.users (
     id,
     email,
     full_name,
-    created_at
+    created_at,
+    learning_language,
+    native_language,
+    proficiency_level
   ) VALUES (
     NEW.id,
     NEW.email,
-    NEW.raw_user_meta_data->>'full_name',
-    NOW()
+    COALESCE(NEW.raw_user_meta_data->>'full_name', ''),
+    NOW(),
+    'English',  -- Default value
+    'English',  -- Default value
+    'Beginner (A1)'  -- Default value
+  );
+
+  -- Create initial profile
+  INSERT INTO public.profiles (
+    id,
+    user_id,
+    email
+  ) VALUES (
+    NEW.id,
+    NEW.id,
+    NEW.email
   );
 
   -- Create onboarding status
-  INSERT INTO public.onboarding_status (user_id)
-  VALUES (NEW.id);
+  INSERT INTO public.onboarding_status (
+    user_id,
+    is_complete
+  ) VALUES (
+    NEW.id,
+    false
+  );
 
   RETURN NEW;
 END;
