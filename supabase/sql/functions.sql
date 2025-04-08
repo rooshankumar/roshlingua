@@ -2,7 +2,7 @@
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS TRIGGER AS $$
 BEGIN
-  -- Insert into users table
+  -- Insert basic user record
   INSERT INTO public.users (
     id,
     email,
@@ -15,13 +15,28 @@ BEGIN
     NOW()
   );
 
-  -- Create onboarding status
+  -- Create onboarding status with safe defaults
   INSERT INTO public.onboarding_status (
     user_id,
     is_complete
   ) VALUES (
     NEW.id,
     false
+  );
+
+  -- Create notification settings with defaults
+  INSERT INTO public.notification_settings (
+    user_id,
+    new_messages,
+    profile_views,
+    learning_reminders,
+    streak_reminders
+  ) VALUES (
+    NEW.id,
+    true,
+    true,
+    true,
+    true
   );
 
   RETURN NEW;

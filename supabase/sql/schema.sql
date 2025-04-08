@@ -1,4 +1,3 @@
-
 -- Enable storage extension if not already enabled
 CREATE EXTENSION IF NOT EXISTS "storage" SCHEMA "extensions";
 
@@ -21,23 +20,24 @@ TO public
 USING (bucket_id = 'attachments');
 
 
-
 -- Enable PostgreSQL extensions
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 -- Users Table
 CREATE TABLE IF NOT EXISTS public.users (
-  id UUID PRIMARY KEY REFERENCES auth.users(id),
-  email TEXT UNIQUE NOT NULL,
+  id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+  email TEXT NOT NULL,
   full_name TEXT,
   avatar_url TEXT,
-  bio TEXT,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   is_online BOOLEAN DEFAULT false,
   last_seen TIMESTAMP WITH TIME ZONE,
+  learning_language TEXT,
+  native_language TEXT,
+  proficiency_level TEXT,
   streak_count INTEGER DEFAULT 0,
-  streak_last_date DATE,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT now(),
-  updated_at TIMESTAMP WITH TIME ZONE DEFAULT now()
+  streak_last_date DATE
 );
 
 -- Profiles Table (for public profile info)
@@ -53,17 +53,10 @@ CREATE TABLE IF NOT EXISTS public.profiles (
 
 -- Onboarding Status Table
 CREATE TABLE IF NOT EXISTS public.onboarding_status (
-  user_id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+  user_id UUID PRIMARY KEY REFERENCES public.users(id) ON DELETE CASCADE,
   is_complete BOOLEAN DEFAULT false,
-  current_step TEXT,
-  native_language TEXT,
-  learning_language TEXT,
-  proficiency_level TEXT,
-  learning_goal TEXT,
-  date_of_birth DATE,
-  gender TEXT,
-  avatar_url TEXT,
-  updated_at TIMESTAMP WITH TIME ZONE DEFAULT now()
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
 -- Conversations Table
@@ -120,5 +113,6 @@ CREATE TABLE IF NOT EXISTS public.notification_settings (
   profile_views BOOLEAN DEFAULT true,
   learning_reminders BOOLEAN DEFAULT true,
   streak_reminders BOOLEAN DEFAULT true,
-  updated_at TIMESTAMP WITH TIME ZONE DEFAULT now()
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
