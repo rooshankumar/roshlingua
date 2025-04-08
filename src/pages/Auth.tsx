@@ -157,12 +157,12 @@ const Auth = () => {
             const { error: profileError } = await supabase
               .from('profiles')
               .upsert({
-                id: data.user.id,
+                user_id: data.user.id,
                 onboarding_completed: false,
                 created_at: new Date().toISOString(),
                 updated_at: new Date().toISOString()
               }, {
-                onConflict: 'id'
+                onConflict: 'user_id'
               });
 
             if (profileError) {
