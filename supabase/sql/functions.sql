@@ -1,3 +1,4 @@
+
 -- Handle new user creation
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS TRIGGER AS $$
@@ -18,10 +19,14 @@ BEGIN
   -- Create onboarding status with safe defaults
   INSERT INTO public.onboarding_status (
     user_id,
-    is_complete
+    is_complete,
+    created_at,
+    updated_at
   ) VALUES (
     NEW.id,
-    false
+    false,
+    NOW(),
+    NOW()
   );
 
   -- Create notification settings with defaults
@@ -30,22 +35,28 @@ BEGIN
     new_messages,
     profile_views,
     learning_reminders,
-    streak_reminders
+    streak_reminders,
+    created_at,
+    updated_at
   ) VALUES (
     NEW.id,
     true,
     true,
     true,
-    true
+    true,
+    NOW(),
+    NOW()
   );
 
   RETURN NEW;
 EXCEPTION WHEN OTHERS THEN
+  -- Log any errors for debugging
   RAISE LOG 'Error in handle_new_user: %', SQLERRM;
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
+-- Keep existing functions below
 -- Update user presence
 CREATE OR REPLACE FUNCTION public.update_user_presence()
 RETURNS TRIGGER AS $$
