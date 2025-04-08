@@ -202,6 +202,23 @@ const Community = () => {
         return;
       }
 
+      // First check if both profiles exist
+      const { data: profiles, error: profilesError } = await supabase
+        .from('profiles')
+        .select('id')
+        .in('id', [user.id, otherUserId]);
+
+      if (profilesError) throw profilesError;
+
+      if (!profiles || profiles.length !== 2) {
+        toast({
+          title: "Error",
+          description: "One or both user profiles do not exist",
+          variant: "destructive",
+        });
+        return;
+      }
+
       // First check for existing conversation
       const { data: participants, error: participantsError } = await supabase
         .from('conversation_participants')
