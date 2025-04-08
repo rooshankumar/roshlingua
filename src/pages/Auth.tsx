@@ -140,6 +140,11 @@ const Auth = () => {
               }
             });
 
+            if (error?.message?.includes('Database error')) {
+              console.error('Detailed signup error:', error);
+              throw new Error('Server is temporarily unavailable. Please try again in a few moments.');
+            }
+
             if (error) {
               throw error;
             }
