@@ -259,35 +259,17 @@ const Community = () => {
         navigate(`/chat/${newConversation.id}`);
       } catch (error) {
         // Cleanup the conversation if participant creation fails
-        await supabase
-          .from('conversations')
-          .delete()
-          .eq('id', newConversation.id);
-          
+        if (newConversation?.id) {
+          await supabase
+            .from('conversations')
+            .delete()
+            .eq('id', newConversation.id);
+        }
         throw error;
       }
-        .from('conversations')
-        .insert([{
-          created_by: user.id,
-          last_message_at: new Date().toISOString()
-        }])
-        .select()
-        .single();
 
-      if (conversationError) throw conversationError;
-
-      // Add both participants in parallel
-      const { error: participantsError2 } = await supabase
-        .from('conversation_participants')
-        .insert([
-          { conversation_id: newConversation.id, user_id: user.id },
-          { conversation_id: newConversation.id, user_id: otherUserId }
-        ]);
-
-      if (participantsError2) throw participantsError2;
-
-      // Navigate immediately to the new chat
-      window.location.href = `/chat/${newConversation.id}`;
+      // Navigate to the new chat
+      navigate(`/chat/${newConversation.id}`);
     } catch (error) {
       console.error('Error starting chat:', error);
       toast({
