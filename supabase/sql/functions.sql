@@ -2,10 +2,8 @@
 -- Handle new user creation
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS TRIGGER AS $$
-DECLARE
-  v_user_id UUID;
 BEGIN
-  -- Insert basic user record and get the ID
+  -- Insert basic user record
   INSERT INTO public.users (
     id,
     email,
@@ -16,22 +14,22 @@ BEGIN
     NEW.email,
     COALESCE(NEW.raw_user_meta_data->>'full_name', ''),
     NOW()
-  ) RETURNING id INTO v_user_id;
+  );
 
-  -- Only create onboarding status if user was created
-  IF v_user_id IS NOT NULL THEN
-    INSERT INTO public.onboarding_status (
-      user_id,
-      is_complete,
-      created_at,
-      updated_at
-    ) VALUES (
-      v_user_id,
-      false,
-      NOW(),
-      NOW()
-    );
-  END IF;
+  -- Create onboarding status
+  INSERT INTO public.onboarding_status (
+    user_id,
+    is_complete,
+    created_at,
+    updated_at
+  ) VALUES (
+    NEW.id,
+    false,
+    NOW(),
+    NOW()
+  );
+
+  -- Create notification settings
 
   -- Create notification settings with defaults
   INSERT INTO public.notification_settings (
