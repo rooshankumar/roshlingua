@@ -42,14 +42,14 @@ const Auth = () => {
 
       try {
         const { data, error } = await supabase
-          .from('onboarding_status')
-          .select('*')
-          .eq('user_id', user.id)
+          .from('profiles')
+          .select('onboarding_completed')
+          .eq('id', user.id)
           .single();
 
         if (error) throw error;
 
-        if (data) {
+        if (data && data.onboarding_completed) {
           navigate('/dashboard', { replace: true });
         } else {
           navigate('/onboarding', { replace: true });
@@ -153,26 +153,21 @@ const Auth = () => {
               throw new Error("No user data returned");
             }
 
-            // Check if onboarding status exists first
-            const { data: existingStatus } = await supabase
-              .from('onboarding_status')
-              .select('user_id')
-              .eq('user_id', data.user.id)
-              .single();
+            // Set onboarding_completed to false in profiles table
+            const { error: profileError } = await supabase
+              .from('profiles')
+              .upsert({
+                id: data.user.id,
+                onboarding_completed: false,
+                created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString()
+              }, {
+                onConflict: 'id'
+              });
 
-            // Only create if it doesn't exist
-            if (!existingStatus) {
-              const { error: onboardingError } = await supabase
-                .from('onboarding_status')
-                .insert([{ 
-                  user_id: data.user.id,
-                  is_complete: false
-                }]);
-
-              if (onboardingError) {
-                console.error("Error creating onboarding status:", onboardingError);
-                throw new Error("Failed to initialize onboarding status");
-              }
+            if (profileError) {
+              console.error("Error updating profile:", profileError);
+              throw new Error("Failed to initialize profile");
             }
 
 
