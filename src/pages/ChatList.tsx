@@ -63,10 +63,8 @@ const ChatList = () => {
             ),
             other_users:profiles!conversation_participants_user_id_fkey(
               id,
-              user_id,
               full_name,
               avatar_url,
-              last_seen,
               is_online
             )
           `)
