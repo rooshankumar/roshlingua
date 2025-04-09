@@ -1,0 +1,22 @@
+chunk-W6L2VRDA.js?v=ae83a17f:14032 The above error occurred in the <MainNav> component:
+
+    at MainNav (https://fd1d76f1-aef7-4ad3-bdf1-732966a22b80-00-968slrt8f8f4.sisko.replit.dev/src/components/navigation/MainNav.tsx:43:22)
+    at div
+    at div
+    at AppLayout (https://fd1d76f1-aef7-4ad3-bdf1-732966a22b80-00-968slrt8f8f4.sisko.replit.dev/src/components/layouts/AppLayout.tsx:36:22)
+    at ProtectedRoute (https://fd1d76f1-aef7-4ad3-bdf1-732966a22b80-00-968slrt8f8f4.sisko.replit.dev/src/components/auth/ProtectedRoute.tsx:15:27)
+    at RenderedRoute (https://fd1d76f1-aef7-4ad3-bdf1-732966a22b80-00-968slrt8f8f4.sisko.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=ae83a17f:4069:5)
+    at Routes (https://fd1d76f1-aef7-4ad3-bdf1-732966a22b80-00-968slrt8f8f4.sisko.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=ae83a17f:4508:5)
+    at AppRoutes (https://fd1d76f1-aef7-4ad3-bdf1-732966a22b80-00-968slrt8f8f4.sisko.replit.dev/src/App.tsx:37:33)
+    at AuthProvider (https://fd1d76f1-aef7-4ad3-bdf1-732966a22b80-00-968slrt8f8f4.sisko.replit.dev/src/providers/AuthProvider.tsx:23:32)
+    at Router (https://fd1d76f1-aef7-4ad3-bdf1-732966a22b80-00-968slrt8f8f4.sisko.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=ae83a17f:4451:15)
+    at BrowserRouter (https://fd1d76f1-aef7-4ad3-bdf1-732966a22b80-00-968slrt8f8f4.sisko.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=ae83a17f:5196:5)
+    at ThemeProvider (https://fd1d76f1-aef7-4ad3-bdf1-732966a22b80-00-968slrt8f8f4.sisko.replit.dev/src/components/theme-provider.tsx:17:33)
+    at QueryClientProvider (https://fd1d76f1-aef7-4ad3-bdf1-732966a22b80-00-968slrt8f8f4.sisko.replit.dev/node_modules/.vite/deps/@tanstack_react-query.js?v=ae83a17f:2794:3)
+    at App
+
+Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://reactjs.org/link/error-boundaries to learn more about error boundaries.
+chunk-W6L2VRDA.js?v=ae83a17f:19413 Uncaught TypeError: Cannot convert undefined or null to object
+    at Object.values (<anonymous>)
+    at MainNav (MainNav.tsx:39:30)
