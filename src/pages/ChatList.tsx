@@ -79,9 +79,9 @@ const ChatList = () => {
             const { data: otherParticipant } = await supabase
               .from('conversation_participants')
               .select(`
-                profiles!conversation_participants_user_id_fkey (
+                user:profiles!conversation_participants_user_id_fkey (
                   id,
-                  email,
+                  user_id,
                   full_name,
                   avatar_url,
                   last_seen
@@ -102,11 +102,11 @@ const ChatList = () => {
             return {
               id: conv.conversation_id,
               participant: {
-                id: otherParticipant?.profiles?.id || '',
-                email: otherParticipant?.profiles?.email || '',
-                full_name: otherParticipant?.profiles?.full_name || 'Unknown User',
-                avatar_url: otherParticipant?.profiles?.avatar_url || '/placeholder.svg',
-                last_seen: otherParticipant?.profiles?.last_seen
+                id: otherParticipant?.user?.id || '',
+                email: otherParticipant?.user?.email || '',
+                full_name: otherParticipant?.user?.full_name || 'Unknown User',
+                avatar_url: otherParticipant?.user?.avatar_url || '/placeholder.svg',
+                last_seen: otherParticipant?.user?.last_seen
               },
               lastMessage,
               unreadCount: unreadCountsClientSide[conv.conversation_id] || 0
