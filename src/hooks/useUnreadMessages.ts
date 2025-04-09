@@ -26,13 +26,15 @@ export function useUnreadMessages(userId: string | undefined) {
         event: 'UPDATE',
         schema: 'public',
         table: 'messages',
-        filter: `recipient_id=eq.${userId} AND is_read=eq.true`,
+        filter: `recipient_id=eq.${userId}`,
       }, (payload) => {
         const message = payload.new as any;
-        setUnreadCounts(prev => ({
-          ...prev,
-          [message.conversation_id]: Math.max(0, (prev[message.conversation_id] || 0) - 1)
-        }));
+        if (message.is_read) {
+          setUnreadCounts(prev => ({
+            ...prev,
+            [message.conversation_id]: 0 // Reset count when messages are read
+          }));
+        }
       })
       .subscribe();
 

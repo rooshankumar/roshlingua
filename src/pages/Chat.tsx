@@ -65,6 +65,18 @@ const ChatPage = () => {
             throw messagesError;
           }
 
+          // Mark messages as read
+          const { error: readError } = await supabase
+            .from('messages')
+            .update({ is_read: true })
+            .eq('conversation_id', conversationId)
+            .eq('recipient_id', user.id)
+            .eq('is_read', false);
+
+          if (readError) {
+            console.error('Error marking messages as read:', readError);
+          }
+
           setConversation({
             id: conversationId,
             messages: messages || [],
