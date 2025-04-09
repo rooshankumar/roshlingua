@@ -21,7 +21,7 @@ const ChatPage = () => {
           .from('conversation_participants')
           .select(`
             user_id,
-            users!conversation_participants_user_id_fkey (
+            profiles!conversation_participants_user_id_fkey (
               id,
               full_name,
               avatar_url,
