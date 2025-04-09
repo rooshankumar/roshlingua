@@ -193,7 +193,9 @@ const Community = () => {
 
   const handleStartChat = async (otherUserId: string) => {
     try {
-      if (!user) {
+      const { data: { user: authUser }, error: authError } = await supabase.auth.getUser();
+      if (authError) throw authError;
+      if (!authUser) {
         toast({
           title: "Error",
           description: "You must be logged in to start a chat",
@@ -206,7 +208,7 @@ const Community = () => {
       const { data: participants, error: participantsError } = await supabase
         .from('conversation_participants')
         .select('conversation_id')
-        .eq('user_id', user.id);
+        .eq('user_id', authUser.id); // Use authUser.id
 
       if (participantsError) throw participantsError;
 
@@ -228,7 +230,7 @@ const Community = () => {
       const { data: newConversation, error: conversationError } = await supabase
         .from('conversations')
         .insert([{
-          created_by: user.id,
+          created_by: authUser.id, // Use authUser.id
           last_message_at: new Date().toISOString()
         }])
         .select()
@@ -236,39 +238,16 @@ const Community = () => {
 
       if (conversationError) throw conversationError;
 
-      // Add participants one by one to better handle errors
-      try {
-        const { error: currentUserError } = await supabase
-          .from('conversation_participants')
-          .insert({ 
-            conversation_id: newConversation.id, 
-            user_id: user.id 
-          });
+      // Add both participants in one operation
+      const { error: participantsError } = await supabase
+        .from('conversation_participants')
+        .insert([
+          { conversation_id: newConversation.id, user_id: authUser.id },
+          { conversation_id: newConversation.id, user_id: otherUserId }
+        ]);
 
-        if (currentUserError) throw currentUserError;
+      if (participantsError) throw participantsError;
 
-        const { error: otherUserError } = await supabase
-          .from('conversation_participants')
-          .insert({ 
-            conversation_id: newConversation.id, 
-            user_id: otherUserId 
-          });
-
-        if (otherUserError) throw otherUserError;
-
-        navigate(`/chat/${newConversation.id}`);
-      } catch (error) {
-        // Cleanup the conversation if participant creation fails
-        if (newConversation?.id) {
-          await supabase
-            .from('conversations')
-            .delete()
-            .eq('id', newConversation.id);
-        }
-        throw error;
-      }
-
-      // Navigate to the new chat
       navigate(`/chat/${newConversation.id}`);
     } catch (error) {
       console.error('Error starting chat:', error);

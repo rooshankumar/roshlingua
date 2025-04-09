@@ -5,20 +5,11 @@ ALTER TABLE public.conversations ENABLE ROW LEVEL SECURITY;
 -- Allow users to create conversations
 CREATE POLICY "Users can create conversations"
 ON public.conversations FOR INSERT
-WITH CHECK (auth.uid() = creator_id);
+WITH CHECK (auth.uid() = created_by);
 
 -- Allow users to view conversations they're part of
 CREATE POLICY "Users can view their conversations"
 ON public.conversations FOR SELECT
-USING (EXISTS (
-  SELECT 1 FROM public.conversation_participants
-  WHERE conversation_id = id
-  AND user_id = auth.uid()
-));
-
--- Allow users to update conversations they're part of
-CREATE POLICY "Users can update their conversations"
-ON public.conversations FOR UPDATE
 USING (EXISTS (
   SELECT 1 FROM public.conversation_participants
   WHERE conversation_id = id
@@ -34,7 +25,7 @@ ON public.conversation_participants FOR INSERT
 WITH CHECK (EXISTS (
   SELECT 1 FROM public.conversations
   WHERE id = conversation_id
-  AND creator_id = auth.uid()
+  AND created_by = auth.uid()
 ));
 
 -- Allow users to view participants of conversations they're in
