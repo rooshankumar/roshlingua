@@ -49,10 +49,7 @@ const ChatPage = () => {
           const { data: messages, error: messagesError } = await supabase
             .from('messages')
             .select(`
-              id,
-              content,
-              created_at,
-              sender_id,
+              *,
               sender:profiles!messages_sender_id_fkey (
                 id,
                 full_name,
