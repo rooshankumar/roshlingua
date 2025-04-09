@@ -3,6 +3,7 @@ import * as React from "react"
 import { NavLink, useLocation } from "react-router-dom";
 import { Home, Users, MessageSquare, Settings, Menu, X } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
+import { useUnreadMessages } from "@/hooks/useUnreadMessages";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 
