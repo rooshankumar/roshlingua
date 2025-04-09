@@ -41,5 +41,5 @@ export function useUnreadMessages(userId: string | undefined) {
     };
   }, [userId]);
 
-  return unreadCounts;
+  return { unreadCounts };
 }

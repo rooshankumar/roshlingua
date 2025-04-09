@@ -36,7 +36,7 @@ export function MainNav() {
   const [open, setOpen] = React.useState(false);
   const { user } = useAuth();
   const { unreadCounts } = useUnreadMessages(user?.id);
-  const totalUnread = Object.values(unreadCounts).reduce((sum, count) => sum + count, 0);
+  const totalUnread = unreadCounts ? Object.values(unreadCounts).reduce((sum, count) => sum + count, 0) : 0;
   
   const isActive = (path: string) => {
     return location.pathname === path;
