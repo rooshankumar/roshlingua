@@ -239,14 +239,14 @@ const Community = () => {
       if (conversationError) throw conversationError;
 
       // Add both participants in one operation
-      const { error: participantsError } = await supabase
+      const { error: participantsInsertError } = await supabase
         .from('conversation_participants')
         .insert([
           { conversation_id: newConversation.id, user_id: authUser.id },
           { conversation_id: newConversation.id, user_id: otherUserId }
         ]);
 
-      if (participantsError) throw participantsError;
+      if (participantsInsertError) throw participantsInsertError;
 
       navigate(`/chat/${newConversation.id}`);
     } catch (error) {
