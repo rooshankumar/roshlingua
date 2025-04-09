@@ -1,0 +1,49 @@
+[plugin:vite:react-swc] × the name `participantsError` is defined multiple times
+     ╭─[/home/runner/workspace/src/pages/Community.tsx:208:1]
+ 205 │       }
+ 206 │ 
+ 207 │       // First check for existing conversation
+ 208 │       const { data: participants, error: participantsError } = await supabase
+     ·                                          ────────┬────────
+     ·                                                  ╰── previous definition of `participantsError` here
+ 209 │         .from('conversation_participants')
+ 210 │         .select('conversation_id')
+ 211 │         .eq('user_id', authUser.id); // Use authUser.id
+ 212 │ 
+ 213 │       if (participantsError) throw participantsError;
+ 214 │ 
+ 215 │       if (participants && participants.length > 0) {
+ 216 │         const { data: existingChat } = await supabase
+ 217 │           .from('conversation_participants')
+ 218 │           .select('conversation_id')
+ 219 │           .in('conversation_id', participants.map(p => p.conversation_id))
+ 220 │           .eq('user_id', otherUserId)
+ 221 │           .maybeSingle();
+ 222 │ 
+ 223 │         if (existingChat) {
+ 224 │           navigate(`/chat/${existingChat.conversation_id}`);
+ 225 │           return;
+ 226 │         }
+ 227 │       }
+ 228 │ 
+ 229 │       // Create new conversation if none exists
+ 230 │       const { data: newConversation, error: conversationError } = await supabase
+ 231 │         .from('conversations')
+ 232 │         .insert([{
+ 233 │           created_by: authUser.id, // Use authUser.id
+ 234 │           last_message_at: new Date().toISOString()
+ 235 │         }])
+ 236 │         .select()
+ 237 │         .single();
+ 238 │ 
+ 239 │       if (conversationError) throw conversationError;
+ 240 │ 
+ 241 │       // Add both participants in one operation
+ 242 │       const { error: participantsError } = await supabase
+     ·                      ────────┬────────
+     ·                              ╰── `participantsError` redefined here
+ 243 │         .from('conversation_participants')
+ 244 │         .insert([
+ 245 │           { conversation_id: newConversation.id, user_id: authUser.id },
+     ╰────
+/home/runner/workspace/src/pages/Community.tsx:208:1
