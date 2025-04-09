@@ -59,18 +59,18 @@ const ChatList = () => {
             conversation_id,
             conversations!inner(
               id,
-              created_at
+              created_at,
+              messages(
+                content,
+                created_at,
+                sender_id
+              )
             ),
             other_users:profiles!conversation_participants_user_id_fkey(
               id,
               full_name,
               avatar_url,
               is_online
-            ),
-            messages(
-              content,
-              created_at,
-              sender_id
             )
           `)
           .eq('user_id', user.id)
