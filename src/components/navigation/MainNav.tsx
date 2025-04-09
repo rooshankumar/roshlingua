@@ -19,7 +19,8 @@ const routes = [
   {
     path: "/chat",
     label: "Chat",
-    icon: MessageSquare
+    icon: MessageSquare,
+    notificationCount: (notifications) => notifications?.unreadMessages || 0
   },
   {
     path: "/settings",
@@ -31,6 +32,9 @@ const routes = [
 export function MainNav() {
   const location = useLocation();
   const [open, setOpen] = React.useState(false);
+  const { user } = useAuth();
+  const { unreadCounts } = useUnreadMessages(user?.id);
+  const totalUnread = Object.values(unreadCounts).reduce((sum, count) => sum + count, 0);
   
   const isActive = (path: string) => {
     return location.pathname === path;
@@ -49,11 +53,18 @@ export function MainNav() {
               : "hover:bg-secondary hover:translate-x-1"
           }`}
         >
-          <route.icon className={`h-5 w-5 transition-transform duration-200 ${
-            isActive(route.path) 
-              ? "scale-110" 
-              : "group-hover:scale-105"
-          }`} />
+          <div className="relative">
+            <route.icon className={`h-5 w-5 transition-transform duration-200 ${
+              isActive(route.path) 
+                ? "scale-110" 
+                : "group-hover:scale-105"
+            }`} />
+            {route.notificationCount && route.path === '/chat' && totalUnread > 0 && (
+              <span className="absolute -top-2 -right-2 bg-destructive text-destructive-foreground text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                {totalUnread}
+              </span>
+            )}
+          </div>
           <span>{route.label}</span>
         </NavLink>
       ))}

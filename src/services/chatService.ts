@@ -20,8 +20,12 @@ export const subscribeToMessages = async (conversationId: string, onMessage: (me
         filter: `conversation_id=eq.${conversationId}`
       },
       payload => {
-        console.log("New Message Received:", payload.new);
-        onMessage(payload.new as Message);
+        const message = payload.new as Message;
+        console.log("New Message Received:", message);
+        // Only trigger notification if message is from another user
+        if (message.sender_id !== (supabase.auth.getUser())?.data?.user?.id) {
+          onMessage(message);
+        }
       }
     )
     .on(
