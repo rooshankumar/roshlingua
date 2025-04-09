@@ -46,6 +46,9 @@ export const ChatHeader = ({ conversation }: Props) => {
     <div className="w-full bg-background/95 backdrop-blur-xl border-b">
       <div className="flex items-center justify-between p-4 max-w-4xl mx-auto">
         <div className="flex items-center gap-2 md:gap-4">
+          <Button variant="ghost" size="icon" onClick={() => navigate('/chat')}>
+            <ChevronLeft className="h-5 w-5" />
+          </Button>
           <Button variant="ghost" size="icon" className="md:hidden" onClick={() => navigate(-1)}>
             <ChevronLeft className="h-5 w-5" />
           </Button>
