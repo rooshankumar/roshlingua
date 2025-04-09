@@ -128,7 +128,7 @@ const Settings = () => {
         description: "Profile updated successfully",
       });
 
-      const { error: rpcError } = await supabase.rpc('update_user_profile', {
+      const { data: userProfile, error: rpcError } = await supabase.rpc('update_user_profile', {
         p_user_id: user.id,
         p_full_name: profileData.full_name,
         p_email: user.email,
