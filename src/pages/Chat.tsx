@@ -53,7 +53,7 @@ const ChatPage = () => {
               content,
               created_at,
               sender_id,
-              sender:users!messages_sender_id_fkey (
+              sender:profiles!messages_sender_id_fkey (
                 id,
                 full_name,
                 avatar_url,
