@@ -42,9 +42,7 @@ const ChatPage = () => {
           return;
         }
 
-        if (participantsError) throw participantsError;
-
-        const otherParticipant = participant?.users;
+        const otherParticipant = participant.profiles;
 
         if (otherParticipant) {
           // Fetch messages with sender profile info
