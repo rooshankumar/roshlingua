@@ -45,7 +45,7 @@ CREATE TABLE IF NOT EXISTS public.conversation_participants (
 CREATE TABLE IF NOT EXISTS public.messages (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   conversation_id UUID REFERENCES public.conversations(id) ON DELETE CASCADE,
-  sender_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE,
+  sender_id UUID REFERENCES auth.users(id) ON DELETE SET NULL,
   content TEXT NOT NULL,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT now(),
   is_read BOOLEAN DEFAULT false

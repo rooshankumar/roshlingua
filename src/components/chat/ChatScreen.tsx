@@ -51,9 +51,9 @@ export const ChatScreen = ({ conversation }: Props) => {
           .from('messages')
           .select(`
             *,
-            sender:profiles!messages_sender_id_fkey(
+            sender:users!messages_sender_id_fkey(
               id,
-              user_id,
+              email,
               full_name,
               avatar_url,
               last_seen
@@ -97,9 +97,9 @@ export const ChatScreen = ({ conversation }: Props) => {
           .from('messages')
           .select(`
             *,
-            sender:profiles!messages_sender_id_fkey(
+            sender:users!messages_sender_id_fkey(
               id,
-              user_id,
+              email,
               full_name,
               avatar_url,
               last_seen
@@ -162,18 +162,12 @@ export const ChatScreen = ({ conversation }: Props) => {
     scrollToBottom();
 
     try {
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('id')
-        .eq('user_id', user.id)
-        .single();
-
       const { error } = await supabase
         .from('messages')
         .insert([{
           content: messageContent,
           conversation_id: conversation.id,
-          sender_id: profile.id,
+          sender_id: user.id,
           is_read: false,
           attachment_url: attachment?.url,
           attachment_name: attachment?.filename,
