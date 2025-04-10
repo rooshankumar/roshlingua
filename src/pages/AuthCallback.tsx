@@ -29,24 +29,27 @@ const AuthCallback = () => {
           throw new Error('No user in session');
         }
 
-        // Check if user profile exists
-        const { data: profile, error: profileError } = await supabase
-          .from('users')
-          .select('onboarding_completed')
-          .eq('id', session.user.id)
-          .single();
+        // Create or update profile
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .upsert({
+            id: session.user.id,
+            email: session.user.email,
+            full_name: session.user.user_metadata?.full_name || '',
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+            onboarding_completed: false
+          }, {
+            onConflict: 'id'
+          });
 
-        if (profileError && profileError.code !== 'PGRST116') {
-          console.error('Profile error:', profileError);
+        if (profileError) {
+          console.error('Profile creation error:', profileError);
           throw profileError;
         }
 
-        // Navigate based on profile status
-        if (!profile || !profile.onboarding_completed) {
-          navigate('/onboarding', { replace: true });
-        } else {
-          navigate('/dashboard', { replace: true });
-        }
+        // Always redirect to onboarding after OAuth
+        navigate('/onboarding', { replace: true });
       } catch (error) {
         console.error('Auth callback error:', error);
         toast({
