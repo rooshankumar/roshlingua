@@ -29,18 +29,24 @@ const AuthCallback = () => {
           throw new Error('No user in session');
         }
 
-        // Create or update profile
+        // Create or update profile with required fields
         const { error: profileError } = await supabase
           .from('profiles')
           .upsert({
             id: session.user.id,
+            user_id: session.user.id,
             email: session.user.email,
             full_name: session.user.user_metadata?.full_name || '',
+            username: session.user.email?.split('@')[0], // Generate temporary username
+            bio: '',
+            likes_count: 0,
+            is_online: true,
+            onboarding_completed: false,
             created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString(),
-            onboarding_completed: false
+            updated_at: new Date().toISOString()
           }, {
-            onConflict: 'id'
+            onConflict: 'id',
+            ignoreDuplicates: false
           });
 
         if (profileError) {
