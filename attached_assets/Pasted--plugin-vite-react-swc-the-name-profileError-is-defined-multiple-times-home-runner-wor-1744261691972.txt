@@ -1,0 +1,46 @@
+[plugin:vite:react-swc] × the name `profileError` is defined multiple times
+    ╭─[/home/runner/workspace/src/pages/AuthCallback.tsx:33:1]
+ 30 │         }
+ 31 │ 
+ 32 │         // Check if profile exists and onboarding status
+ 33 │         const { data: profile, error: profileError } = await supabase
+    ·                                       ──────┬─────
+    ·                                             ╰── previous definition of `profileError` here
+ 34 │           .from('profiles')
+ 35 │           .select('onboarding_completed')
+ 36 │           .eq('id', session.user.id)
+ 37 │           .single();
+ 38 │ 
+ 39 │         if (profileError && profileError.code !== 'PGRST116') {
+ 40 │           console.error("Error checking profile:", profileError);
+ 41 │           throw profileError;
+ 42 │         }
+ 43 │ 
+ 44 │         // If no profile exists, create one
+ 45 │         if (!profile) {
+ 46 │           const { error: createError } = await supabase
+ 47 │             .from('profiles')
+ 48 │             .insert([{
+ 49 │               id: session.user.id,
+ 50 │               email: session.user.email,
+ 51 │               full_name: session.user.user_metadata?.full_name || '',
+ 52 │               created_at: new Date().toISOString(),
+ 53 │               updated_at: new Date().toISOString(),
+ 54 │               onboarding_completed: false
+ 55 │             }]);
+ 56 │ 
+ 57 │           if (createError) throw createError;
+ 58 │           
+ 59 │           navigate('/onboarding', { replace: true });
+ 60 │           return;
+ 61 │         }
+ 62 │ 
+ 63 │         // Ensure profile exists with onboarding_completed set to false
+ 64 │         const { error: profileError } = await supabase
+    ·                        ──────┬─────
+    ·                              ╰── `profileError` redefined here
+ 65 │           .from('profiles')
+ 66 │           .upsert({
+ 67 │             id: session.user.id,
+    ╰────
+/home/runner/workspace/src/pages/AuthCallback.tsx:33:1
