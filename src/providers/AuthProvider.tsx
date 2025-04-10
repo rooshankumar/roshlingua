@@ -244,11 +244,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
+          redirectTo: 'https://roshlingua.vercel.app/auth/callback',
           queryParams: {
             access_type: 'offline',
             prompt: 'consent',
-            response_type: 'code'
+            hd: 'domain.com' // Optional: restrict to specific domain
           },
           scopes: 'email profile'
         }

@@ -12,27 +12,26 @@ export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
   auth: {
     autoRefreshToken: true,
     persistSession: true,
-    detectSessionInUrl: false, // We handle this manually in AuthCallback
+    detectSessionInUrl: true,
     flowType: 'pkce',
     storage: window.localStorage,
     storageKey: 'supabase.auth.token',
+    debug: true
   }
 });
 
 export const signInWithGoogle = async () => {
-  const { data, error } = await supabase.auth.signInWithOAuth({
+  const redirectUrl = `${window.location.origin}/auth/callback`;
+  return await supabase.auth.signInWithOAuth({
     provider: 'google',
     options: {
-      redirectTo: `${window.location.origin}/auth/callback`,
+      redirectTo: redirectUrl,
       queryParams: {
         access_type: 'offline',
         prompt: 'consent'
       }
     }
   });
-
-  if (error) throw error;
-  return data;
 };
 
 export const signOut = async () => {

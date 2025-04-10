@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useNavigate, useSearchParams, useLocation } from "react-router-dom";
 import { 
   Card, 
   CardContent, 
@@ -14,6 +14,7 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { Eye, EyeOff, Mail, Loader2 } from "lucide-react";
+import { useAuth } from "@/providers/AuthProvider";
 import { supabase } from "@/lib/supabase";
 
 const Auth = () => {
@@ -26,40 +27,66 @@ const Auth = () => {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  
+  const [name, setName] = useState("");
 
   const { toast } = useToast();
   const navigate = useNavigate();
+  const location = useLocation();
+  const { login, signup, loginWithGoogle, user } = useAuth();
+
+  const from = (location.state as any)?.from || "/dashboard";
+
+  useEffect(() => {
+    const checkOnboardingStatus = async () => {
+      if (!user) return;
+
+      try {
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('onboarding_completed')
+          .eq('id', user.id)
+          .single();
+
+        if (error) throw error;
+
+        if (data && data.onboarding_completed) {
+          navigate('/dashboard', { replace: true });
+        } else {
+          navigate('/onboarding', { replace: true });
+        }
+      } catch (error) {
+        console.error('Error checking onboarding status:', error);
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Failed to check onboarding status"
+        });
+      }
+    };
+
+    if (user) {
+      checkOnboardingStatus();
+    }
+  }, [user, navigate, toast]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-
-      if (error) {
+      if (email && password) {
+        await login(email, password);
+        // The redirection is handled by the useEffect above 
+        // when the user state is updated
+      } else {
         toast({
           variant: "destructive",
           title: "Login failed",
-          description: error.message
+          description: "Please enter both email and password.",
         });
-        return;
-      }
-
-      if (data?.user) {
-        navigate("/dashboard", { replace: true });
       }
     } catch (error) {
-      console.error("Login error:", error);
-      toast({
-        variant: "destructive",
-        title: "Login error",
-        description: "An unexpected error occurred"
-      });
+      console.error("Login error in component:", error);
     } finally {
       setIsLoading(false);
     }
@@ -79,53 +106,159 @@ const Auth = () => {
         return;
       }
 
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password
-      });
+      if (email && password && name) {
+        try {
+          // Validate email format
+          if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+            toast({
+              variant: "destructive",
+              title: "Invalid email",
+              description: "Please enter a valid email address",
+            });
+            return;
+          }
 
-      if (error) {
+          // Validate password length
+          if (password.length < 8) {
+            toast({
+              variant: "destructive",
+              title: "Invalid password",
+              description: "Password must be at least 8 characters long",
+            });
+            return;
+          }
+
+          try {
+            const { data, error } = await supabase.auth.signUp({
+              email,
+              password,
+              options: {
+                data: {
+                  full_name: name
+                },
+                emailRedirectTo: `${window.location.origin}/auth/callback`
+              }
+            });
+
+            if (error?.message?.includes('Database error')) {
+              console.error('Detailed signup error:', error);
+              throw new Error('Server is temporarily unavailable. Please try again in a few moments.');
+            }
+
+            if (error) {
+              throw error;
+            }
+
+            if (!data?.user) {
+              throw new Error("No user data returned");
+            }
+
+            // Set onboarding_completed to false in profiles table
+            const { error: profileError } = await supabase
+              .from('profiles')
+              .upsert({
+                id: data.user.id,
+                user_id: data.user.id,
+                email: email,
+                full_name: name,
+                onboarding_completed: false,
+                created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString()
+              });
+
+            if (profileError) {
+              console.error("Error updating profile:", profileError);
+              throw new Error("Failed to initialize profile");
+            }
+
+
+            toast({
+              title: "Signup successful",
+              description: "Redirecting to dashboard...",
+            });
+            navigate("/dashboard", { replace: true });
+          } catch (error) {
+            console.error("Signup error:", error);
+            let errorMessage = "An error occurred during signup.";
+
+            if (error.message?.includes("Database error")) {
+              errorMessage = "Our servers are experiencing issues. Please try again in a few minutes.";
+            } else if (error.message?.includes("User already registered")) {
+              errorMessage = "This email is already registered.";
+            } else if (error.status === 500) {
+              errorMessage = "A server error occurred. Please try again later.";
+            }
+
+            toast({
+              variant: "destructive",
+              title: "Signup failed",
+              description: errorMessage,
+            });
+            return;
+          }
+        } catch (error) {
+          console.error("Signup error:", error);
+          toast({
+            variant: "destructive",
+            title: "Signup failed",
+            description: "An unexpected error occurred during signup.",
+          });
+        }
+      } else {
         toast({
           variant: "destructive",
           title: "Signup failed",
+          description: "Please fill in all fields.",
+        });
+      }
+    } catch (error) {
+      console.error("Signup error in component:", error);
+      toast({
+        variant: "destructive",
+        title: "Unexpected error",
+        description: "An unexpected error occurred during signup.",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleGoogleAuth = async () => {
+    try {
+      setIsLoading(true);
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+          queryParams: {
+            access_type: 'offline',
+            prompt: 'consent'
+          }
+        }
+      });
+
+      if (error) {
+        console.error("Google auth error:", error);
+        toast({
+          variant: "destructive",
+          title: "Authentication Failed",
           description: error.message
         });
         return;
       }
 
-      if (data?.user) {
-        const { error: profileError } = await supabase
-          .from('users')
-          .insert({
-            id: data.user.id,
-            email: email,
-            full_name: email.split('@')[0],
-            created_at: new Date().toISOString(),
-            last_active_at: new Date().toISOString()
-          });
-
-        if (profileError) {
-          console.error("Profile creation error:", profileError);
-          toast({
-            variant: "destructive",
-            title: "Profile creation failed",
-            description: "Failed to create user profile"
-          });
-          return;
-        }
-
-        toast({
-          title: "Account created",
-          description: "Please check your email to verify your account.",
-        });
-        navigate("/auth", { replace: true });
+      if (!data.url) {
+        throw new Error("No OAuth URL returned");
       }
+
+      // Redirect to Google OAuth
+      window.location.href = data.url;
     } catch (error) {
-      console.error("Signup error:", error);
+      console.error("Google auth error:", error);
       toast({
         variant: "destructive",
-        title: "Signup error",
-        description: "An unexpected error occurred"
+        title: "Authentication Failed",
+        description: "Failed to connect to Google. Please try again."
       });
     } finally {
       setIsLoading(false);
@@ -156,7 +289,7 @@ const Auth = () => {
                   <Input 
                     id="email" 
                     type="email" 
-                    placeholder="name@example.com" 
+                    placeholder="name@gmail.com" 
                     className="pl-10"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
@@ -166,7 +299,12 @@ const Auth = () => {
                 </div>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="password">Password</Label>
+                  <Button variant="link" size="sm" className="p-0 h-auto text-xs">
+                    Forgot password?
+                  </Button>
+                </div>
                 <div className="relative">
                   <Input 
                     id="password" 
@@ -176,6 +314,7 @@ const Auth = () => {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
+                    autoComplete="current-password"
                     disabled={isLoading}
                   />
                   <Button 
@@ -187,23 +326,72 @@ const Auth = () => {
                     disabled={isLoading}
                   >
                     {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    <span className="sr-only">
+                      {showPassword ? "Hide password" : "Show password"}
+                    </span>
                   </Button>
                 </div>
               </div>
             </CardContent>
-            <CardFooter>
+            <CardFooter className="flex flex-col space-y-4">
               <Button 
                 type="submit" 
-                className="w-full" 
+                className="w-full button-hover" 
                 disabled={isLoading}
               >
                 {isLoading ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Signing in...
+                    Logging in...
                   </>
                 ) : (
-                  "Sign In"
+                  "Login"
+                )}
+              </Button>
+              <div className="relative w-full">
+                <div className="absolute inset-0 flex items-center">
+                  <span className="w-full border-t border-border" />
+                </div>
+                <div className="relative flex justify-center text-xs uppercase">
+                  <span className="bg-card px-2 text-muted-foreground">
+                    Or continue with
+                  </span>
+                </div>
+              </div>
+              <Button 
+                type="button" 
+                variant="outline" 
+                className="w-full button-hover"
+                onClick={handleGoogleAuth}
+                disabled={isLoading}
+              >
+                {isLoading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Connecting to Google...
+                  </>
+                ) : (
+                  <>
+                    <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
+                      <path
+                        d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                        fill="#4285F4"
+                      />
+                      <path
+                        d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                        fill="#34A853"
+                      />
+                      <path
+                        d="M5.84 14.1c-.22-.66-.35-1.36-.35-2.1s.13-1.44.35-2.1V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.61z"
+                        fill="#FBBC05"
+                      />
+                      <path
+                        d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+                        fill="#EA4335"
+                      />
+                    </svg>
+                    Google
+                  </>
                 )}
               </Button>
             </CardFooter>
@@ -215,11 +403,21 @@ const Auth = () => {
             <CardHeader>
               <CardTitle>Create an account</CardTitle>
               <CardDescription>
-                Enter your details to create your account
+                Join roshLingua's global community today
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              
+              <div className="space-y-2">
+                <Label htmlFor="name">Full Name</Label>
+                <Input 
+                  id="name" 
+                  placeholder="John Doe" 
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  required 
+                  disabled={isLoading}
+                />
+              </div>
               <div className="space-y-2">
                 <Label htmlFor="email-signup">Email</Label>
                 <div className="relative">
@@ -227,7 +425,7 @@ const Auth = () => {
                   <Input 
                     id="email-signup" 
                     type="email" 
-                    placeholder="name@example.com" 
+                    placeholder="name@gmail.com" 
                     className="pl-10"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
@@ -258,8 +456,14 @@ const Auth = () => {
                     disabled={isLoading}
                   >
                     {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    <span className="sr-only">
+                      {showPassword ? "Hide password" : "Show password"}
+                    </span>
                   </Button>
                 </div>
+                <p className="text-xs text-muted-foreground">
+                  Must be at least 8 characters long.
+                </p>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="confirm-password">Confirm Password</Label>
@@ -274,10 +478,15 @@ const Auth = () => {
                 />
               </div>
             </CardContent>
-            <CardFooter>
+            <CardFooter className="flex flex-col space-y-4">
+              <p className="text-xs text-muted-foreground text-center">
+                By signing up, you agree to our{" "}
+                <a href="/terms" className="underline">Terms of Service</a> and{" "}
+                <a href="/privacy-policy" className="underline">Privacy Policy</a>.
+              </p>
               <Button 
                 type="submit" 
-                className="w-full"
+                className="w-full button-hover"
                 disabled={isLoading}
               >
                 {isLoading ? (
@@ -287,6 +496,52 @@ const Auth = () => {
                   </>
                 ) : (
                   "Create Account"
+                )}
+              </Button>
+              <div className="relative w-full">
+                <div className="absolute inset-0 flex items-center">
+                  <span className="w-full border-t border-border" />
+                </div>
+                <div className="relative flex justify-center text-xs uppercase">
+                  <span className="bg-card px-2 text-muted-foreground">
+                    Or continue with
+                  </span>
+                </div>
+              </div>
+              <Button 
+                type="button" 
+                variant="outline" 
+                className="w-full button-hover"
+                onClick={handleGoogleAuth}
+                disabled={isLoading}
+              >
+                {isLoading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Connecting to Google...
+                  </>
+                ) : (
+                  <>
+                    <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
+                      <path
+                        d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                        fill="#4285F4"
+                      />
+                      <path
+                        d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                        fill="#34A853"
+                      />
+                      <path
+                        d="M5.84 14.1c-.22-.66-.35-1.36-.35-2.1s.13-1.44.35-2.1V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.61z"
+                        fill="#FBBC05"
+                      />
+                      <path
+                        d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+                        fill="#EA4335"
+                      />
+                    </svg>
+                    Google
+                  </>
                 )}
               </Button>
             </CardFooter>
