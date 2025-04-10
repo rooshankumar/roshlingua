@@ -95,13 +95,13 @@ const Auth = () => {
 
       if (data?.user) {
         const { error: profileError } = await supabase
-          .from('profiles')
+          .from('users')
           .insert({
             id: data.user.id,
-            username: email.split('@')[0],
-            bio: '',
-            likes_count: 0,
-            is_online: true
+            email: email,
+            full_name: email.split('@')[0],
+            created_at: new Date().toISOString(),
+            last_active_at: new Date().toISOString()
           });
 
         if (profileError) {
