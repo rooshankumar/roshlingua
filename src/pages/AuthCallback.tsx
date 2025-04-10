@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/lib/supabase';
 import { useToast } from '@/hooks/use-toast';
+import { checkOnboardingStatus } from '@/utils/onboardingUtils';
 
 const AuthCallback = () => {
   const navigate = useNavigate();
@@ -11,15 +12,9 @@ const AuthCallback = () => {
   useEffect(() => {
     const handleAuthCallback = async () => {
       try {
-        // Exchange code for session
-        const code = new URLSearchParams(window.location.search).get('code');
-        if (!code) {
-          throw new Error('No code provided in callback');
-        }
-
         // Get current session
         const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-        
+
         if (sessionError) {
           console.error("Session error:", sessionError);
           throw sessionError;
@@ -55,29 +50,12 @@ const AuthCallback = () => {
             }]);
 
           if (createError) throw createError;
-          
+
           navigate('/onboarding', { replace: true });
           return;
         }
 
-        // Ensure profile exists with onboarding_completed set to false
-        const { error: upsertError } = await supabase
-          .from('profiles')
-          .upsert({
-            id: session.user.id,
-            email: session.user.email,
-            onboarding_completed: false,
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString()
-          }, {
-            onConflict: 'id'
-          });
-
-        if (upsertError) {
-          console.error("Error creating profile:", upsertError);
-        }
-
-        // Redirect based on onboarding status
+        // Navigate based on onboarding status
         navigate(profile.onboarding_completed ? '/dashboard' : '/onboarding', { replace: true });
       } catch (error) {
         console.error('Auth callback error:', error);
