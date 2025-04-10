@@ -1,30 +1,25 @@
-import { useEffect, useState } from 'react';
+
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/lib/supabase';
 import { useToast } from '@/hooks/use-toast';
-import { checkOnboardingStatus } from '@/utils/onboardingUtils';
 
 const AuthCallback = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const handleAuthCallback = async () => {
       try {
-        // Get current session
         const { data: { session }, error: sessionError } = await supabase.auth.getSession();
 
-        if (sessionError) {
-          console.error("Session error:", sessionError);
-          throw sessionError;
+        if (sessionError) throw sessionError;
+
+        if (!session?.user) {
+          throw new Error('No session or user found');
         }
 
-        if (!session) {
-          throw new Error('Authentication failed - no session established');
-        }
-
-        // Check if profile exists and onboarding status
+        // Check if profile exists
         const { data: profile, error: profileError } = await supabase
           .from('profiles')
           .select('onboarding_completed')
@@ -32,7 +27,6 @@ const AuthCallback = () => {
           .single();
 
         if (profileError && profileError.code !== 'PGRST116') {
-          console.error("Error checking profile:", profileError);
           throw profileError;
         }
 
@@ -50,7 +44,7 @@ const AuthCallback = () => {
             }]);
 
           if (createError) throw createError;
-
+          
           navigate('/onboarding', { replace: true });
           return;
         }
@@ -59,11 +53,10 @@ const AuthCallback = () => {
         navigate(profile.onboarding_completed ? '/dashboard' : '/onboarding', { replace: true });
       } catch (error) {
         console.error('Auth callback error:', error);
-        setError(error.message);
         toast({
           variant: "destructive",
           title: "Authentication Error",
-          description: "Failed to complete authentication."
+          description: "Failed to complete authentication. Please try again."
         });
         navigate('/auth', { replace: true });
       }
@@ -72,11 +65,14 @@ const AuthCallback = () => {
     handleAuthCallback();
   }, [navigate, toast]);
 
-  if (error) {
-    return <div>Authentication error: {error}</div>;
-  }
-
-  return <div>Completing authentication...</div>;
+  return (
+    <div className="h-screen w-full flex items-center justify-center">
+      <div className="animate-pulse flex flex-col items-center gap-4">
+        <div className="h-12 w-12 rounded-full bg-primary/20"></div>
+        <div className="h-2 w-24 rounded-full bg-primary/20"></div>
+      </div>
+    </div>
+  );
 };
 
 export default AuthCallback;
