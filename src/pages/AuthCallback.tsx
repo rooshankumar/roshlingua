@@ -11,7 +11,7 @@ const AuthCallback = () => {
   useEffect(() => {
     const handleAuthCallback = async () => {
       try {
-        // First try to get auth code from URL
+        // Get code from URL
         const code = new URLSearchParams(window.location.search).get('code');
         if (!code) {
           throw new Error('No code found in URL');
@@ -20,47 +20,39 @@ const AuthCallback = () => {
         // Exchange code for session
         const { data: { session }, error: authError } = await supabase.auth.exchangeCodeForSession(code);
         
-        if (authError) throw authError;
-        if (!session?.user) throw new Error('No session or user found');
+        if (authError) {
+          console.error('Auth error:', authError);
+          throw authError;
+        }
 
-        // Check if profile exists
+        if (!session?.user) {
+          throw new Error('No user in session');
+        }
+
+        // Check if user profile exists
         const { data: profile, error: profileError } = await supabase
-          .from('profiles')
+          .from('users')
           .select('onboarding_completed')
           .eq('id', session.user.id)
           .single();
 
         if (profileError && profileError.code !== 'PGRST116') {
+          console.error('Profile error:', profileError);
           throw profileError;
         }
 
-        // If no profile exists, create one
-        if (!profile) {
-          const { error: createError } = await supabase
-            .from('profiles')
-            .insert([{
-              id: session.user.id,
-              email: session.user.email,
-              full_name: session.user.user_metadata?.full_name || '',
-              created_at: new Date().toISOString(),
-              updated_at: new Date().toISOString(),
-              onboarding_completed: false
-            }]);
-
-          if (createError) throw createError;
-          
+        // Navigate based on profile status
+        if (!profile || !profile.onboarding_completed) {
           navigate('/onboarding', { replace: true });
-          return;
+        } else {
+          navigate('/dashboard', { replace: true });
         }
-
-        // Navigate based on onboarding status
-        navigate(profile.onboarding_completed ? '/dashboard' : '/onboarding', { replace: true });
       } catch (error) {
         console.error('Auth callback error:', error);
         toast({
           variant: "destructive",
           title: "Authentication Error",
-          description: "Failed to complete authentication. Please try again."
+          description: "There was a problem signing you in. Please try again."
         });
         navigate('/auth', { replace: true });
       }
