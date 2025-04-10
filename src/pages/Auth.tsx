@@ -96,15 +96,13 @@ const Auth = () => {
       if (data?.user) {
         const { error: profileError } = await supabase
           .from('profiles')
-          .insert([{
+          .insert({
             id: data.user.id,
             username: email.split('@')[0],
             bio: '',
             likes_count: 0,
-            is_online: true,
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString()
-          }]);
+            is_online: true
+          });
 
         if (profileError) {
           console.error("Profile creation error:", profileError);
