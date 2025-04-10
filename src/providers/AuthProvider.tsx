@@ -42,39 +42,50 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   useEffect(() => {
-    // Auth state change handled silently
+    setIsLoading(true);
+    
+    // Get initial session
+    supabase.auth.getSession().then(({ data: { session }, error }) => {
+      if (error) {
+        console.error("Error getting session:", error);
+        toast({
+          variant: "destructive",
+          title: "Authentication Error",
+          description: "Failed to restore session"
+        });
+      }
+      setSession(session);
+      setUser(session?.user ?? null);
+      setIsLoading(false);
+    });
+
+    // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, currentSession) => {
         setSession(currentSession);
         setUser(currentSession?.user ?? null);
-        setIsLoading(false);
+        
+        if (event === 'SIGNED_IN') {
+          // Ensure user record exists on sign in
+          const { error: profileError } = await supabase
+            .from('profiles')
+            .upsert({ 
+              id: currentSession.user.id,
+              email: currentSession.user.email,
+              updated_at: new Date().toISOString()
+            }, { onConflict: 'id' });
+
+          if (profileError) {
+            console.error("Error updating profile:", profileError);
+          }
+        }
       }
     );
-
-    // THEN check for existing session
-    const getInitialSession = async () => {
-      try {
-        const { data, error } = await supabase.auth.getSession();
-        if (error) {
-          console.error("Error getting session:", error);
-          setIsLoading(false);
-          return;
-        }
-        setSession(data.session);
-        setUser(data.session?.user ?? null);
-      } catch (error) {
-        console.error("Unexpected error getting session:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    getInitialSession();
 
     return () => {
       subscription.unsubscribe();
     };
-  }, []);
+  }, [toast]);
 
   const login = async (email: string, password: string) => {
     const MAX_LOGIN_ATTEMPTS = 5;

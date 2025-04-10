@@ -130,18 +130,14 @@ const Auth = () => {
             }
           });
 
-          if (signUpError) {
+          if (signUpError || !data?.user) {
             console.error('Signup error:', signUpError);
             toast({
-              variant: "destructive",
+              variant: "destructive", 
               title: "Signup failed",
-              description: signUpError.message
+              description: signUpError?.message || "Failed to create account"
             });
             return;
-          }
-
-          if (!data?.user) {
-            throw new Error("No user data returned");
           }
 
           try {
