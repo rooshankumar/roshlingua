@@ -11,47 +11,53 @@ const AuthCallback = () => {
   useEffect(() => {
     const handleAuthCallback = async () => {
       try {
-        // Get the session from URL if present
-        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+        // Exchange code for session
+        const code = new URLSearchParams(window.location.search).get('code');
+        if (!code) {
+          throw new Error('No code provided in callback');
+        }
 
+        // Get current session
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+        
         if (sessionError) {
           console.error("Session error:", sessionError);
           throw sessionError;
         }
 
         if (!session) {
-          const params = new URLSearchParams(window.location.search);
-          const errorDescription = params.get('error_description');
-          if (errorDescription) {
-            throw new Error(errorDescription);
-          }
           throw new Error('Authentication failed - no session established');
         }
 
-        // Check if user record exists
-        const { data: userExists, error: userCheckError } = await supabase
-          .from('users')
-          .select('id')
+        // Check if profile exists and onboarding status
+        const { data: profile, error: profileError } = await supabase
+          .from('profiles')
+          .select('onboarding_completed')
           .eq('id', session.user.id)
           .single();
 
-        if (userCheckError && userCheckError.code !== 'PGRST116') {
-          throw userCheckError;
+        if (profileError && profileError.code !== 'PGRST116') {
+          console.error("Error checking profile:", profileError);
+          throw profileError;
         }
 
-        // Create user record if it doesn't exist
-        if (!userExists) {
+        // If no profile exists, create one
+        if (!profile) {
           const { error: createError } = await supabase
-            .from('users')
+            .from('profiles')
             .insert([{
               id: session.user.id,
               email: session.user.email,
               full_name: session.user.user_metadata?.full_name || '',
               created_at: new Date().toISOString(),
-              last_active_at: new Date().toISOString(),
+              updated_at: new Date().toISOString(),
+              onboarding_completed: false
             }]);
 
           if (createError) throw createError;
+          
+          navigate('/onboarding', { replace: true });
+          return;
         }
 
         // Ensure profile exists with onboarding_completed set to false
@@ -71,14 +77,8 @@ const AuthCallback = () => {
           console.error("Error creating profile:", profileError);
         }
 
-        // Redirect to appropriate page
-        const { data: onboardingCompletion } = await supabase
-          .from('onboarding_status')
-          .select('is_complete')
-          .eq('user_id', session.user.id)
-          .single();
-
-        navigate(onboardingCompletion?.is_complete ? '/dashboard' : '/onboarding', { replace: true });
+        // Redirect based on onboarding status
+        navigate(profile.onboarding_completed ? '/dashboard' : '/onboarding', { replace: true });
       } catch (error) {
         console.error('Auth callback error:', error);
         setError(error.message);
