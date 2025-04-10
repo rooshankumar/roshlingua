@@ -156,29 +156,23 @@ const Auth = () => {
         return;
       }
 
-      // Create initial profile
-      const { error: profileError } = await supabase
-        .from('profiles')
-        .insert([
-          {
-            id: authData.user.id,
-            user_id: authData.user.id,
-            email: email,
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString()
-          }
-        ]);
+      try {
+        // Create initial profile
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .insert([
+            {
+              id: authData.user.id,
+              user_id: authData.user.id,
+              email: email,
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString()
+            }
+          ]);
 
-      if (profileError) {
-        console.error("Error creating profile:", profileError);
-        await supabase.auth.signOut();
-        toast({
-          variant: "destructive",
-          title: "Account setup failed", 
-          description: "There was an error creating your account. Please try again."
-        });
-        return;
-      }
+        if (profileError) {
+          throw profileError;
+        }
 
         toast({
           title: "Account created",
