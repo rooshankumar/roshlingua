@@ -119,7 +119,7 @@ const Auth = () => {
 
           // No need to check auth.users - Supabase handles this
 
-          const { data, error } = await supabase.auth.signUp({
+          const { data, error: signUpError } = await supabase.auth.signUp({
             email,
             password,
             options: {
@@ -130,12 +130,12 @@ const Auth = () => {
             }
           });
 
-          if (error) {
-            console.error('Signup error:', error);
+          if (signUpError) {
+            console.error('Signup error:', signUpError);
             toast({
               variant: "destructive",
               title: "Signup failed",
-              description: error.message
+              description: signUpError.message
             });
             return;
           }
@@ -144,36 +144,39 @@ const Auth = () => {
             throw new Error("No user data returned");
           }
 
-          // Create user record first
-          const { error: userError } = await supabase
-            .from('users')
-            .insert({
-              id: data.user.id,
-              email: email,
-              full_name: '',
-              created_at: new Date().toISOString(),
-              updated_at: new Date().toISOString(),
-              onboarding_completed: false
+          try {
+            // Let's use RPC to handle this atomically on the database side
+            const { error: setupError } = await supabase.rpc('setup_new_user', {
+              user_id: data.user.id,
+              user_email: email
             });
 
-          if (userError) {
-            console.error("Error creating user record:", userError);
-            throw userError;
-          }
+            if (setupError) {
+              console.error("Error setting up user:", setupError);
+              // Try to clean up the auth user since setup failed
+              await supabase.auth.signOut();
+              toast({
+                variant: "destructive",
+                title: "Account setup failed",
+                description: "There was an error creating your account. Please try again."
+              });
+              return;
+            }
 
-          // Then create profile record
-          const { error: profileError } = await supabase
-            .from('profiles')
-            .insert({
-              id: data.user.id,
-              username: null,
-              created_at: new Date().toISOString(),
-              updated_at: new Date().toISOString()
+            toast({
+              title: "Account created",
+              description: "Please check your email to verify your account."
             });
 
-          if (profileError) {
-            console.error("Error creating profile:", profileError);
-            throw profileError;
+            // Don't navigate yet - wait for email verification
+            setActiveTab("login");
+          } catch (err) {
+            console.error("Setup error:", err);
+            toast({
+              variant: "destructive",
+              title: "Setup failed",
+              description: "An unexpected error occurred. Please try again."
+            });
           }
 
 
