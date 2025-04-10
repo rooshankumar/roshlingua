@@ -106,93 +106,85 @@ const Auth = () => {
         return;
       }
 
-      if (email && password) { //Removed name check
+      if (email && password) {
         try {
-          // Validate email format
           if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
             toast({
               variant: "destructive",
               title: "Invalid email",
-              description: "Please enter a valid email address",
+              description: "Please enter a valid email address"
             });
             return;
           }
 
-          // Validate password length
-          if (password.length < 8) {
+          // First check if user exists
+          const { data: existingUser } = await supabase
+            .from('users')
+            .select('id')
+            .eq('email', email)
+            .single();
+
+          if (existingUser) {
             toast({
               variant: "destructive",
-              title: "Invalid password",
-              description: "Password must be at least 8 characters long",
+              title: "Email already registered",
+              description: "This email is already in use. Please try logging in instead."
             });
             return;
           }
 
-          try {
-            const { data, error } = await supabase.auth.signUp({
-              email,
-              password,
-              options: {
-                emailRedirectTo: `${window.location.origin}/auth/callback`
-              }
-            });
-
-            if (error?.message?.includes('Database error')) {
-              console.error('Detailed signup error:', error);
-              throw new Error('Server is temporarily unavailable. Please try again in a few moments.');
-            }
-
-            if (error) {
-              throw error;
-            }
-
-            if (!data?.user) {
-              throw new Error("No user data returned");
-            }
-
-            // Set onboarding_completed to false in profiles table
-            const { error: profileError } = await supabase
-              .from('profiles')
-              .upsert({
-                id: data.user.id,
-                user_id: data.user.id,
+          const { data, error } = await supabase.auth.signUp({
+            email,
+            password,
+            options: {
+              emailRedirectTo: `${window.location.origin}/auth/callback`,
+              data: {
                 email: email,
-                //full_name: name, //Removed
-                onboarding_completed: false,
-                created_at: new Date().toISOString(),
-                updated_at: new Date().toISOString()
-              });
-
-            if (profileError) {
-              console.error("Error updating profile:", profileError);
-              throw new Error("Failed to initialize profile");
+              }
             }
+          });
 
-
-            toast({
-              title: "Signup successful",
-              description: "Redirecting to dashboard...",
-            });
-            navigate("/dashboard", { replace: true });
-          } catch (error) {
-            console.error("Signup error:", error);
-            let errorMessage = "An error occurred during signup.";
-
-            if (error.message?.includes("Database error")) {
-              errorMessage = "Our servers are experiencing issues. Please try again in a few minutes.";
-            } else if (error.message?.includes("User already registered")) {
-              errorMessage = "This email is already registered.";
-            } else if (error.status === 500) {
-              errorMessage = "A server error occurred. Please try again later.";
-            }
-
+          if (error) {
+            console.error('Signup error:', error);
             toast({
               variant: "destructive",
               title: "Signup failed",
-              description: errorMessage,
+              description: error.message
             });
             return;
           }
+
+          if (!data?.user) {
+            throw new Error("No user data returned");
+          }
+
+          // Create user profile
+          const { error: userError } = await supabase
+            .from('users')
+            .insert({
+              id: data.user.id,
+              email: email,
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString(),
+              onboarding_completed: false
+            });
+
+          if (userError) {
+            console.error("Error creating user profile:", userError);
+            toast({
+              variant: "destructive",
+              title: "Signup failed",
+              description: "Failed to create user profile."
+            });
+            return;
+          }
+
+
+          toast({
+            title: "Signup successful",
+            description: "Redirecting to dashboard...",
+          });
+          navigate("/dashboard", { replace: true });
         } catch (error) {
           console.error("Signup error:", error);
           toast({
