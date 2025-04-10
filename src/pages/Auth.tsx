@@ -157,23 +157,6 @@ const Auth = () => {
       }
 
       try {
-        // Create initial profile
-        const { error: profileError } = await supabase
-          .from('profiles')
-          .insert([
-            {
-              id: authData.user.id,
-              user_id: authData.user.id,
-              email: email,
-              created_at: new Date().toISOString(),
-              updated_at: new Date().toISOString()
-            }
-          ]);
-
-        if (profileError) {
-          throw profileError;
-        }
-
         toast({
           title: "Account created",
           description: "Please check your email to verify your account."
