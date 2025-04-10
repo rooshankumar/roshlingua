@@ -97,6 +97,7 @@ const Auth = () => {
     setIsLoading(true);
 
     try {
+      // Validate inputs
       if (password !== confirmPassword) {
         toast({
           variant: "destructive",
@@ -133,67 +134,65 @@ const Auth = () => {
         return;
       }
 
-      const { data, error: signUpError } = await supabase.auth.signUp({
+      // Sign up the user
+      const { data: authData, error: signUpError } = await supabase.auth.signUp({
         email,
         password,
         options: {
-          emailRedirectTo: `${window.location.origin}/auth/callback`,
-          data: {
-            email: email
-          }
+          emailRedirectTo: `${window.location.origin}/auth/callback`
         }
       });
 
-          if (signUpError || !data?.user) {
-            console.error('Signup error:', signUpError);
-            toast({
-              variant: "destructive", 
-              title: "Signup failed",
-              description: signUpError?.message || "Failed to create account"
-            });
-            return;
-          }
+      if (signUpError || !authData?.user) {
+        console.error('Signup error:', signUpError);
+        toast({
+          variant: "destructive", 
+          title: "Signup failed",
+          description: signUpError?.message || "Failed to create account"
+        });
+        return;
+      }
 
-          try {
-            const { error: setupError } = await supabase.rpc('setup_new_user', {
-              user_id: data.user.id,
-              user_email: email
-            });
+      try {
+        const { error: setupError } = await supabase.rpc('setup_new_user', {
+          user_id: authData.user.id,
+          user_email: email
+        });
 
-            if (setupError) {
-              console.error("Error setting up user:", setupError);
-              await supabase.auth.signOut();
-              toast({
-                variant: "destructive",
-                title: "Account setup failed",
-                description: "There was an error creating your account. Please try again."
-              });
-              return;
-            }
-
-            toast({
-              title: "Account created",
-              description: "Please check your email to verify your account."
-            });
-            setActiveTab("login");
-          } catch (error) {
-            console.error("Setup error:", error);
-            toast({
-              variant: "destructive",
-              title: "Setup failed", 
-              description: "An unexpected error occurred. Please try again."
-            });
-          }
-        } catch (error) {
-          console.error("Signup error:", error);
+        if (setupError) {
+          console.error("Error setting up user:", setupError);
+          await supabase.auth.signOut();
           toast({
             variant: "destructive",
-            title: "Signup failed",
-            description: "An unexpected error occurred during signup."
+            title: "Account setup failed",
+            description: "There was an error creating your account. Please try again."
           });
-        } finally {
-          setIsLoading(false);
+          return;
         }
+
+        toast({
+          title: "Account created",
+          description: "Please check your email to verify your account."
+        });
+        setActiveTab("login");
+      } catch (error) {
+        console.error("Setup error:", error);
+        toast({
+          variant: "destructive",
+          title: "Setup failed", 
+          description: "An unexpected error occurred. Please try again."
+        });
+      }
+    } catch (error) {
+      console.error("Signup error:", error);
+      toast({
+        variant: "destructive",
+        title: "Signup failed",
+        description: "An unexpected error occurred during signup."
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleGoogleAuth = async () => {
