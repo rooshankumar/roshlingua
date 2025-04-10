@@ -208,9 +208,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       if (signUpError) {
         console.error("Signup error:", signUpError);
-        const errorMessage = signUpError.message === 'User already registered'
-          ? 'This email is already registered. Please log in instead.'
-          : signUpError.message;
+        let errorMessage = 'Failed to create account. Please try again.';
+        
+        if (signUpError.message === 'User already registered') {
+          errorMessage = 'This email is already registered. Please log in instead.';
+        } else if (signUpError.message.includes('Database error')) {
+          errorMessage = 'There was an issue creating your account. Please try again in a few moments.';
+          // Log detailed error for debugging
+          console.error('Database error during signup:', signUpError);
+        }
 
         toast({
           variant: "destructive",

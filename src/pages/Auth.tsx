@@ -106,29 +106,43 @@ const Auth = () => {
         return;
       }
 
-      if (email && password) {
-        try {
-          if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-            toast({
-              variant: "destructive",
-              title: "Invalid email",
-              description: "Please enter a valid email address"
-            });
-            return;
+      if (!email || !password) {
+        toast({
+          variant: "destructive",
+          title: "Missing fields",
+          description: "Please fill in all required fields.",
+        });
+        return;
+      }
+
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        toast({
+          variant: "destructive",
+          title: "Invalid email",
+          description: "Please enter a valid email address"
+        });
+        return;
+      }
+
+      if (password.length < 8) {
+        toast({
+          variant: "destructive",
+          title: "Invalid password",
+          description: "Password must be at least 8 characters long"
+        });
+        return;
+      }
+
+      const { data, error: signUpError } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          emailRedirectTo: `${window.location.origin}/auth/callback`,
+          data: {
+            email: email
           }
-
-          // No need to check auth.users - Supabase handles this
-
-          const { data, error: signUpError } = await supabase.auth.signUp({
-            email,
-            password,
-            options: {
-              emailRedirectTo: `${window.location.origin}/auth/callback`,
-              data: {
-                email: email,
-              }
-            }
-          });
+        }
+      });
 
           if (signUpError || !data?.user) {
             console.error('Signup error:', signUpError);
