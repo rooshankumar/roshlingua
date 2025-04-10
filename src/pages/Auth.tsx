@@ -117,21 +117,7 @@ const Auth = () => {
             return;
           }
 
-          // First check if user exists
-          const { data: existingUser } = await supabase
-            .from('users')
-            .select('id')
-            .eq('email', email)
-            .single();
-
-          if (existingUser) {
-            toast({
-              variant: "destructive",
-              title: "Email already registered",
-              description: "This email is already in use. Please try logging in instead."
-            });
-            return;
-          }
+          // No need to check auth.users - Supabase handles this
 
           const { data, error } = await supabase.auth.signUp({
             email,
@@ -158,9 +144,9 @@ const Auth = () => {
             throw new Error("No user data returned");
           }
 
-          // Create user profile
-          const { error: userError } = await supabase
-            .from('users')
+          // Create profile record
+          const { error: profileError } = await supabase
+            .from('profiles')
             .insert({
               id: data.user.id,
               email: email,
@@ -169,14 +155,14 @@ const Auth = () => {
               onboarding_completed: false
             });
 
-          if (userError) {
-            console.error("Error creating user profile:", userError);
+          if (profileError) {
+            console.error("Error creating profile:", profileError);
             toast({
               variant: "destructive",
-              title: "Signup failed",
-              description: "Failed to create user profile."
+              title: "Profile Creation Failed",
+              description: "Account created but profile setup failed. Please contact support."
             });
-            return;
+            // Don't return - let them proceed since auth account is created
           }
 
 
