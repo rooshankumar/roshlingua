@@ -144,25 +144,24 @@ const Auth = () => {
             throw new Error("No user data returned");
           }
 
-          // Create profile record
+          // Create profile record with upsert to handle duplicates
           const { error: profileError } = await supabase
             .from('profiles')
-            .insert({
+            .upsert({
               id: data.user.id,
               email: email,
               created_at: new Date().toISOString(),
               updated_at: new Date().toISOString(),
               onboarding_completed: false
+            }, {
+              onConflict: 'id'
             });
 
           if (profileError) {
             console.error("Error creating profile:", profileError);
-            toast({
-              variant: "destructive",
-              title: "Profile Creation Failed",
-              description: "Account created but profile setup failed. Please contact support."
-            });
-            // Don't return - let them proceed since auth account is created
+            // Delete the auth user if profile creation fails
+            await supabase.auth.admin.deleteUser(data.user.id);
+            throw new Error("Failed to create user profile");
           }
 
 
