@@ -61,7 +61,7 @@ const AuthCallback = () => {
         }
 
         // Ensure profile exists with onboarding_completed set to false
-        const { error: profileError } = await supabase
+        const { error: upsertError } = await supabase
           .from('profiles')
           .upsert({
             id: session.user.id,
@@ -73,8 +73,8 @@ const AuthCallback = () => {
             onConflict: 'id'
           });
 
-        if (profileError) {
-          console.error("Error creating profile:", profileError);
+        if (upsertError) {
+          console.error("Error creating profile:", upsertError);
         }
 
         // Redirect based on onboarding status
