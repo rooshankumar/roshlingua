@@ -1,4 +1,3 @@
-
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/lib/supabase';
@@ -11,17 +10,9 @@ const AuthCallback = () => {
   useEffect(() => {
     const handleAuthCallback = async () => {
       try {
-        // Get code from URL
-        const code = new URLSearchParams(window.location.search).get('code');
-        if (!code) {
-          throw new Error('No code found in URL');
-        }
+        const { data: { session }, error: authError } = await supabase.auth.getSession();
 
-        // Exchange code for session
-        const { data: { session }, error: authError } = await supabase.auth.exchangeCodeForSession(code);
-        
         if (authError) {
-          console.error('Auth error:', authError);
           throw authError;
         }
 
@@ -29,7 +20,6 @@ const AuthCallback = () => {
           throw new Error('No user in session');
         }
 
-        // Create minimal profile first
         const { error: profileError } = await supabase
           .from('profiles')
           .upsert({
@@ -45,12 +35,10 @@ const AuthCallback = () => {
           });
 
         if (profileError) {
-          console.error('Profile creation error:', profileError);
           throw profileError;
         }
 
-        // Always redirect to onboarding after OAuth
-        navigate('/onboarding', { replace: true });
+        navigate('/dashboard', { replace: true });
       } catch (error) {
         console.error('Auth callback error:', error);
         toast({
