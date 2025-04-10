@@ -29,25 +29,15 @@ const AuthCallback = () => {
           throw new Error('No user in session');
         }
 
-        // First create initial profile
+        // Create minimal profile first
         const { error: profileError } = await supabase
           .from('profiles')
           .upsert({
             id: session.user.id,
             username: session.user.email?.split('@')[0] || 'user',
-            full_name: session.user.user_metadata?.full_name || session.user.email?.split('@')[0] || 'New User',
-            email: session.user.email,
-            avatar_url: session.user.user_metadata?.avatar_url || null,
-            onboarding_completed: false,
-            native_language: null,
-            learning_language: null,
-            proficiency_level: null,
-            learning_goal: null,
             bio: '',
-            streak_count: 0,
-            streak_last_date: null,
+            likes_count: 0,
             is_online: true,
-            last_seen: new Date().toISOString(),
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString()
           }, {
