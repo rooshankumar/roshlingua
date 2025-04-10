@@ -27,7 +27,7 @@ const Auth = () => {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [name, setName] = useState("");
+  //const [name, setName] = useState(""); //Removed
 
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -106,7 +106,7 @@ const Auth = () => {
         return;
       }
 
-      if (email && password && name) {
+      if (email && password) { //Removed name check
         try {
           // Validate email format
           if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
@@ -133,9 +133,6 @@ const Auth = () => {
               email,
               password,
               options: {
-                data: {
-                  full_name: name
-                },
                 emailRedirectTo: `${window.location.origin}/auth/callback`
               }
             });
@@ -160,7 +157,7 @@ const Auth = () => {
                 id: data.user.id,
                 user_id: data.user.id,
                 email: email,
-                full_name: name,
+                //full_name: name, //Removed
                 onboarding_completed: false,
                 created_at: new Date().toISOString(),
                 updated_at: new Date().toISOString()
@@ -407,17 +404,6 @@ const Auth = () => {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="name">Full Name</Label>
-                <Input 
-                  id="name" 
-                  placeholder="John Doe" 
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  required 
-                  disabled={isLoading}
-                />
-              </div>
               <div className="space-y-2">
                 <Label htmlFor="email-signup">Email</Label>
                 <div className="relative">
