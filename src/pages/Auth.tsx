@@ -139,7 +139,10 @@ const Auth = () => {
         email,
         password,
         options: {
-          emailRedirectTo: `${window.location.origin}/auth/callback`
+          emailRedirectTo: `${window.location.origin}/auth/callback`,
+          data: {
+            email: email
+          }
         }
       });
 
@@ -153,22 +156,29 @@ const Auth = () => {
         return;
       }
 
-      try {
-        const { error: setupError } = await supabase.rpc('setup_new_user', {
-          user_id: authData.user.id,
-          user_email: email
-        });
+      // Create initial profile
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .insert([
+          {
+            id: authData.user.id,
+            user_id: authData.user.id,
+            email: email,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          }
+        ]);
 
-        if (setupError) {
-          console.error("Error setting up user:", setupError);
-          await supabase.auth.signOut();
-          toast({
-            variant: "destructive",
-            title: "Account setup failed",
-            description: "There was an error creating your account. Please try again."
-          });
-          return;
-        }
+      if (profileError) {
+        console.error("Error creating profile:", profileError);
+        await supabase.auth.signOut();
+        toast({
+          variant: "destructive",
+          title: "Account setup failed", 
+          description: "There was an error creating your account. Please try again."
+        });
+        return;
+      }
 
         toast({
           title: "Account created",
