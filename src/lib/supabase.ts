@@ -12,7 +12,7 @@ export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
   auth: {
     autoRefreshToken: true,
     persistSession: true,
-    detectSessionInUrl: true,
+    detectSessionInUrl: false, // Disable auto detection since we handle it manually
     flowType: 'pkce',
     storage: window.localStorage,
     storageKey: 'supabase.auth.token',

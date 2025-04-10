@@ -11,13 +11,17 @@ const AuthCallback = () => {
   useEffect(() => {
     const handleAuthCallback = async () => {
       try {
-        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-
-        if (sessionError) throw sessionError;
-
-        if (!session?.user) {
-          throw new Error('No session or user found');
+        // First try to get auth code from URL
+        const code = new URLSearchParams(window.location.search).get('code');
+        if (!code) {
+          throw new Error('No code found in URL');
         }
+
+        // Exchange code for session
+        const { data: { session }, error: authError } = await supabase.auth.exchangeCodeForSession(code);
+        
+        if (authError) throw authError;
+        if (!session?.user) throw new Error('No session or user found');
 
         // Check if profile exists
         const { data: profile, error: profileError } = await supabase
