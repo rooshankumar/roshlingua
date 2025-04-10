@@ -144,24 +144,36 @@ const Auth = () => {
             throw new Error("No user data returned");
           }
 
-          // Create profile record with upsert to handle duplicates
-          const { error: profileError } = await supabase
-            .from('profiles')
-            .upsert({
+          // Create user record first
+          const { error: userError } = await supabase
+            .from('users')
+            .insert({
               id: data.user.id,
               email: email,
+              full_name: '',
               created_at: new Date().toISOString(),
               updated_at: new Date().toISOString(),
               onboarding_completed: false
-            }, {
-              onConflict: 'id'
+            });
+
+          if (userError) {
+            console.error("Error creating user record:", userError);
+            throw userError;
+          }
+
+          // Then create profile record
+          const { error: profileError } = await supabase
+            .from('profiles')
+            .insert({
+              id: data.user.id,
+              username: null,
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString()
             });
 
           if (profileError) {
             console.error("Error creating profile:", profileError);
-            // Delete the auth user if profile creation fails
-            await supabase.auth.admin.deleteUser(data.user.id);
-            throw new Error("Failed to create user profile");
+            throw profileError;
           }
 
 
