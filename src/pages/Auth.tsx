@@ -26,7 +26,7 @@ const Auth = () => {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [name, setName] = useState("");
+  
 
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -81,12 +81,7 @@ const Auth = () => {
 
       const { data, error } = await supabase.auth.signUp({
         email,
-        password,
-        options: {
-          data: {
-            full_name: name
-          }
-        }
+        password
       });
 
       if (error) {
@@ -226,17 +221,7 @@ const Auth = () => {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="name">Full Name</Label>
-                <Input 
-                  id="name" 
-                  placeholder="John Doe" 
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  required 
-                  disabled={isLoading}
-                />
-              </div>
+              
               <div className="space-y-2">
                 <Label htmlFor="email-signup">Email</Label>
                 <div className="relative">
