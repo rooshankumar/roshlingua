@@ -155,7 +155,6 @@ const Auth = () => {
           }
 
           try {
-            // Let's use RPC to handle this atomically on the database side
             const { error: setupError } = await supabase.rpc('setup_new_user', {
               user_id: data.user.id,
               user_email: email
@@ -163,7 +162,6 @@ const Auth = () => {
 
             if (setupError) {
               console.error("Error setting up user:", setupError);
-              // Try to clean up the auth user since setup failed
               await supabase.auth.signOut();
               toast({
                 variant: "destructive",
@@ -177,49 +175,25 @@ const Auth = () => {
               title: "Account created",
               description: "Please check your email to verify your account."
             });
-
-            // Don't navigate yet - wait for email verification
             setActiveTab("login");
-          } catch (err) {
-            console.error("Setup error:", err);
+          } catch (error) {
+            console.error("Setup error:", error);
             toast({
               variant: "destructive",
-              title: "Setup failed",
+              title: "Setup failed", 
               description: "An unexpected error occurred. Please try again."
             });
           }
-
-
-          toast({
-            title: "Signup successful",
-            description: "Redirecting to dashboard...",
-          });
-          navigate("/dashboard", { replace: true });
         } catch (error) {
           console.error("Signup error:", error);
           toast({
             variant: "destructive",
             title: "Signup failed",
-            description: "An unexpected error occurred during signup.",
+            description: "An unexpected error occurred during signup."
           });
+        } finally {
+          setIsLoading(false);
         }
-      } else {
-        toast({
-          variant: "destructive",
-          title: "Signup failed",
-          description: "Please fill in all fields.",
-        });
-      }
-    } catch (error) {
-      console.error("Signup error in component:", error);
-      toast({
-        variant: "destructive",
-        title: "Unexpected error",
-        description: "An unexpected error occurred during signup.",
-      });
-    } finally {
-      setIsLoading(false);
-    }
   };
 
   const handleGoogleAuth = async () => {
