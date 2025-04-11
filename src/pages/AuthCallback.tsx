@@ -1,35 +1,33 @@
+// app/auth/callback/page.tsx or pages/auth/callback.tsx (depending on your routing system)
+"use client"
+
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useRouter } from "next/navigation"; // ✅ Next.js router
 import { supabase } from "@/lib/supabase";
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@/hooks/use-toast"; // your own toast hook
 
 const AuthCallback = () => {
-  const navigate = useNavigate();
+  const router = useRouter();
   const { toast } = useToast();
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const handleAuthCallback = async () => {
       try {
-        const { data: { session }, error: sessionError } = await supabase.auth.exchangeCodeForSession(
-          window.location.href
-        );
+        const { data: { session }, error: sessionError } = await supabase.auth.exchangeCodeForSession(window.location.href);
 
         if (sessionError) throw sessionError;
-
-        if (!session) {
-          throw new Error("No session established");
-        }
+        if (!session) throw new Error("No session established");
 
         // Get profile status
         const { data: profile } = await supabase
-          .from('profiles')
-          .select('onboarding_completed')
-          .eq('id', session.user.id)
+          .from("profiles")
+          .select("onboarding_completed")
+          .eq("id", session.user.id)
           .single();
 
-        // Redirect based on onboarding status
-        navigate(profile?.onboarding_completed ? '/dashboard' : '/onboarding', { replace: true });
+        // ✅ Redirect using Next.js router
+        router.replace(profile?.onboarding_completed ? "/dashboard" : "/onboarding");
 
       } catch (error: any) {
         console.error("Auth callback error:", error);
@@ -38,15 +36,15 @@ const AuthCallback = () => {
         toast({
           variant: "destructive",
           title: "Authentication Error",
-          description: "Failed to complete authentication."
+          description: "Failed to complete authentication.",
         });
 
-        navigate("/auth", { replace: true });
+        router.replace("/auth");
       }
     };
 
     handleAuthCallback();
-  }, [navigate, toast]);
+  }, [router, toast]);
 
   if (error) {
     return (
