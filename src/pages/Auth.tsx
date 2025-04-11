@@ -1,21 +1,15 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams, useLocation } from "react-router-dom";
-import { 
-  Card, 
-  CardContent, 
-  CardDescription, 
-  CardFooter, 
-  CardHeader, 
-  CardTitle 
-} from "@/components/ui/card";
+import { useAuth } from "@/providers/AuthProvider";
+import { supabase } from "@/lib/supabase";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { Eye, EyeOff, Mail, Loader2 } from "lucide-react";
-import { useAuth } from "@/providers/AuthProvider";
-import { supabase } from "@/lib/supabase";
+
 const Auth = () => {
   const [searchParams] = useSearchParams();
   const defaultTab = searchParams.get("mode") === "signup" ? "signup" : "login";
@@ -365,17 +359,6 @@ const Auth = () => {
                   />
                 </svg>
                 Continue with Google
-              </Button>
-            </CardFooter>
-              <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Creating account...
-                  </>
-                ) : (
-                  "Create account"
-                )}
               </Button>
             </CardFooter>
           </form>
