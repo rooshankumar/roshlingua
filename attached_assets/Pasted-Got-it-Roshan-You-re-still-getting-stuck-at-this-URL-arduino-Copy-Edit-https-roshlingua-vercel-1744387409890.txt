@@ -1,0 +1,99 @@
+Got it, Roshan! You're still getting stuck at this URL:
+
+arduino
+Copy
+Edit
+https://roshlingua.vercel.app/auth/callback?code=fd6970c6-dc18-4dfc-a15f-65711231b62b
+Let’s troubleshoot like pros, step-by-step. We'll figure it out 👇
+
+✅ 1. Do you have this file?
+bash
+Copy
+Edit
+/pages/auth/callback.tsx
+If NO — create it and paste this code inside:
+
+tsx
+Copy
+Edit
+// pages/auth/callback.tsx
+
+import { useEffect } from 'react'
+import { useRouter } from 'next/router'
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
+
+export default function Callback() {
+  const router = useRouter()
+
+  useEffect(() => {
+    const handleAuth = async () => {
+      const supabase = createClientComponentClient()
+
+      const { data, error } = await supabase.auth.exchangeCodeForSession()
+
+      if (error) {
+        console.error('Login failed:', error.message)
+        return
+      }
+
+      // ✅ Logged in → redirect
+      router.replace('/')
+    }
+
+    handleAuth()
+  }, [])
+
+  return <p>Signing you in...</p>
+}
+Then push to Vercel.
+
+✅ 2. Do you have SSR middleware?
+You need this in:
+
+bash
+Copy
+Edit
+/middleware.ts
+Here’s the required setup if you're using Supabase:
+
+ts
+Copy
+Edit
+// middleware.ts
+import { createMiddlewareClient } from '@supabase/auth-helpers-nextjs'
+import { NextResponse } from 'next/server'
+import type { NextRequest } from 'next/server'
+
+export async function middleware(req: NextRequest) {
+  const res = NextResponse.next()
+  const supabase = createMiddlewareClient({ req, res })
+  await supabase.auth.getSession()
+  return res
+}
+✅ 3. Did you enable the redirect URL in Supabase?
+Go to your Supabase Project Settings → Authentication → URL Configuration and check this:
+
+Setting	Value
+Site URL	https://roshlingua.vercel.app
+Redirect URLs (list)	https://roshlingua.vercel.app/auth/callback
+Make sure /auth/callback is there! If not, Supabase won't redirect properly.
+
+✅ 4. Did you re-deploy your app to Vercel?
+If you added /auth/callback.tsx locally but didn’t push to Vercel — the route won’t exist online. After adding the file, do:
+
+bash
+Copy
+Edit
+git add .
+git commit -m "Add auth callback page"
+git push
+Then check your deployed site again.
+
+🔍 Final test
+Go to this URL again:
+
+arduino
+Copy
+Edit
+https://roshlingua.vercel.app/auth/callback?code=fd6970c6-dc18-4dfc-a15f-65711231b62b
+If you did everything above, it should say “Signing you in...” for a moment, then redirect you to /.
