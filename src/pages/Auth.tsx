@@ -180,30 +180,6 @@ const Auth = () => {
     }
   };
 
-  const handleGoogleLogin = async () => {
-    try {
-      setIsLoading(true);
-      const { data, error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          redirectTo: `${window.location.origin}/auth/callback`
-        }
-      });
-
-      if (error) throw error;
-      if (!data.url) throw new Error("No OAuth URL returned");
-
-      window.location.href = data.url;
-    } catch (error: any) {
-      toast({
-        variant: "destructive",
-        title: "Google login failed",
-        description: error.message
-      });
-      setIsLoading(false);
-    }
-  };
-
   return (
     <Card className="w-full max-w-md mx-auto">
       <Tabs value={activeTab} onValueChange={setActiveTab}>
