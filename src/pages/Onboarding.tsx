@@ -163,9 +163,7 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
                     id: user.id,
                     user_id: user.id,
                     gender: formData.gender,
-                    date_of_birth: formData.date_of_birth instanceof Date ?
-                        formData.date_of_birth.toISOString().split('T')[0] :
-                        null,
+                    date_of_birth: formData.date_of_birth ? new Date(formData.date_of_birth).toISOString().split('T')[0] : null,
                     native_language: formData.nativeLanguage,
                     learning_language: formData.learningLanguage,
                     proficiency_level: formData.proficiencyLevel,
