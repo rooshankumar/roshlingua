@@ -16,9 +16,6 @@ import { useToast } from "@/hooks/use-toast";
 import { Eye, EyeOff, Mail, Loader2 } from "lucide-react";
 import { useAuth } from "@/providers/AuthProvider";
 import { supabase } from "@/lib/supabase";
-import Image from 'next/image'; // Assuming Next.js for Image component
-
-
 const Auth = () => {
   const [searchParams] = useSearchParams();
   const defaultTab = searchParams.get("mode") === "signup" ? "signup" : "login";
@@ -337,7 +334,7 @@ const Auth = () => {
                 onClick={handleGoogleLogin}
                 disabled={isLoading}
               >
-                <Image src="/google.svg" alt="Google" width={20} height={20} className="mr-2"/> {/*Added Google OAuth button*/}
+                <img src="/google.svg" alt="Google" width={20} height={20} className="mr-2"/>
                 Continue with Google
               </Button>
             </CardContent>
