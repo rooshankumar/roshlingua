@@ -100,18 +100,19 @@ const Settings = () => {
         updated_at: new Date().toISOString()
       };
 
-      // Update profile data
+      // Single upsert operation
       const { error: profileUpdateError } = await supabase
         .from('profiles')
         .upsert(profileData, {
-          onConflict: 'id'
+          onConflict: 'id',
+          ignoreDuplicates: false
         });
 
       if (profileUpdateError) {
         throw profileUpdateError;
       }
 
-      // Then update via RPC
+      // Then update via RPC with rate limiting
       const { data: userProfile, error: rpcError } = await supabase.rpc('update_user_profile', {
         p_user_id: currentUser.id,
         p_full_name: profileData.full_name,
