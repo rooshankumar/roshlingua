@@ -100,7 +100,7 @@ const Settings = () => {
         updated_at: new Date().toISOString()
       };
 
-      // Update the profile with a single upsert
+      // Update profile data
       const { error: profileUpdateError } = await supabase
         .from('profiles')
         .upsert(profileData, {
@@ -109,23 +109,6 @@ const Settings = () => {
 
       if (profileUpdateError) {
         throw profileUpdateError;
-      }
-
-      // Update profile data first
-      const { error: profileError } = await supabase
-        .from('profiles')
-        .upsert({
-          ...profileData,
-          id: currentUser.id,
-          user_id: currentUser.id,
-          email: currentUser.email,
-          updated_at: new Date().toISOString()
-        }, {
-          onConflict: 'id'
-        });
-
-      if (profileError) {
-        throw profileError;
       }
 
       // Then update via RPC
