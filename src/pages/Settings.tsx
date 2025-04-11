@@ -111,7 +111,24 @@ const Settings = () => {
         throw profileUpdateError;
       }
 
-      // First update via RPC
+      // Update profile data first
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .upsert({
+          ...profileData,
+          id: currentUser.id,
+          user_id: currentUser.id,
+          email: currentUser.email,
+          updated_at: new Date().toISOString()
+        }, {
+          onConflict: 'id'
+        });
+
+      if (profileError) {
+        throw profileError;
+      }
+
+      // Then update via RPC
       const { data: userProfile, error: rpcError } = await supabase.rpc('update_user_profile', {
         p_user_id: currentUser.id,
         p_full_name: profileData.full_name,
