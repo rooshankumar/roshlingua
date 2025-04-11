@@ -1,13 +1,11 @@
-// app/auth/callback/page.tsx or pages/auth/callback.tsx (depending on your routing system)
-"use client"
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation"; // ✅ Next.js router
+import { useNavigate } from "react-router-dom";
 import { supabase } from "@/lib/supabase";
-import { useToast } from "@/hooks/use-toast"; // your own toast hook
+import { useToast } from "@/hooks/use-toast";
 
 const AuthCallback = () => {
-  const router = useRouter();
+  const navigate = useNavigate();
   const { toast } = useToast();
   const [error, setError] = useState<string | null>(null);
 
@@ -26,8 +24,7 @@ const AuthCallback = () => {
           .eq("id", session.user.id)
           .single();
 
-        // ✅ Redirect using Next.js router
-        router.replace(profile?.onboarding_completed ? "/dashboard" : "/onboarding");
+        navigate(profile?.onboarding_completed ? "/dashboard" : "/onboarding", { replace: true });
 
       } catch (error: any) {
         console.error("Auth callback error:", error);
@@ -39,12 +36,12 @@ const AuthCallback = () => {
           description: "Failed to complete authentication.",
         });
 
-        router.replace("/auth");
+        navigate("/auth", { replace: true });
       }
     };
 
     handleAuthCallback();
-  }, [router, toast]);
+  }, [navigate, toast]);
 
   if (error) {
     return (
