@@ -70,8 +70,15 @@ export function useLikes(targetUserId: string, currentUserId: string) {
   const toggleLike = async () => {
     if (isLoading || !currentUserId) return;
 
-    // Prevent unliking - only allow one-time likes
-    if (isLiked) {
+    // Check if current user has already liked this profile
+    const { data: existingLike } = await supabase
+      .from('user_likes')
+      .select()
+      .eq('liker_id', currentUserId)
+      .eq('liked_id', targetUserId)
+      .maybeSingle();
+
+    if (existingLike) {
       toast({
         title: "Already liked",
         description: "You can only like a profile once",
