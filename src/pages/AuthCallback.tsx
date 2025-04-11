@@ -12,16 +12,21 @@ const AuthCallback = () => {
   useEffect(() => {
     const handleAuthCallback = async () => {
       try {
-        const { data: { session }, error: sessionError } = await supabase.auth.exchangeCodeForSession(window.location.href);
+        // Get code from URL
+        const code = new URLSearchParams(window.location.search).get('code');
+        if (!code) throw new Error('No code provided');
 
-        if (sessionError) throw sessionError;
-        if (!session) throw new Error("No session established");
+        // Exchange code for session
+        const { data, error: authError } = await supabase.auth.exchangeCodeForSession(code);
+        
+        if (authError) throw authError;
+        if (!data.session) throw new Error("No session established");
 
         // Get profile status
         const { data: profile } = await supabase
           .from("profiles")
           .select("onboarding_completed")
-          .eq("id", session.user.id)
+          .eq("id", data.session.user.id)
           .single();
 
         navigate(profile?.onboarding_completed ? "/dashboard" : "/onboarding", { replace: true });
