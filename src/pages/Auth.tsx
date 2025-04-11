@@ -109,33 +109,14 @@ const Auth = () => {
         options: {
           emailRedirectTo: `${window.location.origin}/auth/callback`,
           data: {
-            email: email
+            email: email,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
           }
         }
       });
 
       if (signUpError) throw signUpError;
-
-      if (data.user) {
-        // Create initial profile
-        const { error: profileError } = await supabase
-          .from('profiles')
-          .insert([
-            {
-              id: data.user.id,
-              email: email,
-              created_at: new Date().toISOString(),
-              updated_at: new Date().toISOString()
-            }
-          ]);
-
-        if (profileError) {
-          console.error("Profile creation error:", profileError);
-          // Clean up the auth user if profile creation fails
-          await supabase.auth.signOut();
-          throw new Error("Failed to create user profile");
-        }
-      }
 
       toast({
         title: "Success",
