@@ -1,4 +1,3 @@
-
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/lib/supabase";
@@ -11,30 +10,20 @@ const AuthCallback = () => {
   useEffect(() => {
     const handleCallback = async () => {
       try {
-        // Get the full URL including hash
-        const fullUrl = window.location.href;
-        
-        // Exchange the code for a session
-        const { data, error } = await supabase.auth.exchangeCodeForSession(fullUrl);
+        const code = new URLSearchParams(window.location.search).get('code');
+        if (!code) throw new Error('No code provided');
 
-        if (error) {
-          throw error;
-        }
+        const { data, error } = await supabase.auth.exchangeCodeForSession(code);
 
-        if (!data.session) {
-          throw new Error("No session established");
-        }
+        if (error) throw error;
 
-        // Get profile status
         const { data: profile } = await supabase
-          .from("profiles")
-          .select("onboarding_completed")
-          .eq("id", data.session.user.id)
+          .from('profiles')
+          .select('onboarding_completed')
+          .eq('id', data.session?.user.id)
           .single();
 
-        // Redirect based on onboarding status
         navigate(profile?.onboarding_completed ? "/dashboard" : "/onboarding", { replace: true });
-
       } catch (error: any) {
         console.error("Auth callback error:", error);
         toast({
