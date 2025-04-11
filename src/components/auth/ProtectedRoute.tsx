@@ -60,6 +60,11 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
     return <Navigate to="/dashboard" replace />;
   }
 
+  // If onboarding was just completed via localStorage flag, redirect to dashboard
+  if (localStorage.getItem("onboarding_completed") === "true" && location.pathname === "/onboarding") {
+    return <Navigate to="/dashboard" replace />;
+  }
+
   return <>{children}</>;
 };
 
