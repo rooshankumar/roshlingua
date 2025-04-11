@@ -80,6 +80,10 @@ const Settings = () => {
         throw new Error("Please select your language preferences before saving");
       }
 
+      if (!currentUser?.id) {
+        throw new Error("User ID not found");
+      }
+
       const profileData = {
         id: currentUser.id,
         user_id: currentUser.id,
@@ -96,13 +100,11 @@ const Settings = () => {
         updated_at: new Date().toISOString()
       };
 
-      // Update or insert the profile
+      // Update the profile with a single upsert
       const { error: profileUpdateError } = await supabase
         .from('profiles')
-        .upsert({
-          ...profileData,
-          id: currentUser.id,
-          user_id: currentUser.id
+        .upsert(profileData, {
+          onConflict: 'id'
         });
 
       if (profileUpdateError) {
