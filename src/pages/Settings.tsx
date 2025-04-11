@@ -101,15 +101,17 @@ const Settings = () => {
       };
 
       // Single upsert operation
-      const { error: profileUpdateError } = await supabase
+      const { error: secondProfileError } = await supabase
         .from('profiles')
-        .upsert(profileData, {
+        .upsert({
+          ...profileData,
+        }, {
           onConflict: 'id',
           ignoreDuplicates: false
         });
 
-      if (profileUpdateError) {
-        throw profileUpdateError;
+      if (secondProfileError) {
+        throw secondProfileError;
       }
 
       // Then update via RPC with rate limiting
