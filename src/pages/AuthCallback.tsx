@@ -1,5 +1,5 @@
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/lib/supabase";
 import { useToast } from "@/hooks/use-toast";
@@ -7,19 +7,23 @@ import { useToast } from "@/hooks/use-toast";
 const AuthCallback = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const handleAuthCallback = async () => {
+    const handleCallback = async () => {
       try {
-        // Get the full URL
+        // Get the full URL including hash
         const fullUrl = window.location.href;
         
-        // Exchange code for session
-        const { data, error: authError } = await supabase.auth.exchangeCodeForSession(fullUrl);
-        
-        if (authError) throw authError;
-        if (!data.session) throw new Error("No session established");
+        // Exchange the code for a session
+        const { data, error } = await supabase.auth.exchangeCodeForSession(fullUrl);
+
+        if (error) {
+          throw error;
+        }
+
+        if (!data.session) {
+          throw new Error("No session established");
+        }
 
         // Get profile status
         const { data: profile } = await supabase
@@ -33,32 +37,24 @@ const AuthCallback = () => {
 
       } catch (error: any) {
         console.error("Auth callback error:", error);
-        setError(error.message);
-
         toast({
           variant: "destructive",
           title: "Authentication Error",
-          description: "Failed to complete authentication.",
+          description: error.message || "Failed to complete authentication"
         });
-
         navigate("/auth", { replace: true });
       }
     };
 
-    handleAuthCallback();
+    handleCallback();
   }, [navigate, toast]);
 
-  if (error) {
-    return (
-      <div className="flex h-screen items-center justify-center text-red-500 text-lg">
-        Authentication error: {error}
-      </div>
-    );
-  }
-
   return (
-    <div className="flex h-screen items-center justify-center text-gray-600 text-lg">
-      Completing authentication...
+    <div className="flex min-h-screen items-center justify-center">
+      <div className="text-center">
+        <h2 className="text-2xl font-semibold mb-2">Completing authentication...</h2>
+        <p className="text-muted-foreground">Please wait while we log you in.</p>
+      </div>
     </div>
   );
 };
