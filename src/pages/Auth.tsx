@@ -94,33 +94,43 @@ const Auth = () => {
     setIsLoading(true);
 
     try {
+      // Validate password
+      if (password.length < 6) {
+        throw new Error("Password must be at least 6 characters");
+      }
+      
       if (password !== confirmPassword) {
-        toast({
-          variant: "destructive",
-          title: "Passwords do not match",
-          description: "Please make sure your passwords match."
-        });
-        return;
+        throw new Error("Passwords do not match");
       }
 
+      // Create auth user
       const { data, error: signUpError } = await supabase.auth.signUp({
         email,
         password,
         options: {
           emailRedirectTo: `${window.location.origin}/auth/callback`,
           data: {
-            email: email
+            email: email,
+            created_at: new Date().toISOString()
           }
         }
       });
 
-      if (signUpError) {
-        throw signUpError;
-      }
+      if (signUpError) throw signUpError;
+      if (!data?.user) throw new Error("Signup failed - no user returned");
 
-      if (!data?.user) {
-        throw new Error("Signup failed - no user returned");
-      }
+      // Create profile record
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .insert([{
+          id: data.user.id,
+          email: email,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        }])
+        .single();
+
+      if (profileError) throw profileError;
 
       toast({
         title: "Success",
@@ -129,12 +139,43 @@ const Auth = () => {
 
       setActiveTab("login");
     } catch (error: any) {
+      console.error("Signup error:", error);
       toast({
         variant: "destructive",
         title: "Signup failed",
-        description: error.message
+        description: error.message || "Failed to create account"
       });
     } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleGoogleLogin = async () => {
+    try {
+      setIsLoading(true);
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+          queryParams: {
+            access_type: 'offline',
+            prompt: 'consent'
+          }
+        }
+      });
+
+      if (error) throw error;
+      if (!data.url) throw new Error("No OAuth URL returned");
+
+      // Redirect to Google OAuth
+      window.location.href = data.url;
+    } catch (error: any) {
+      console.error("Google login error:", error);
+      toast({
+        variant: "destructive",
+        title: "Google login failed",
+        description: error.message || "Failed to authenticate with Google"
+      });
       setIsLoading(false);
     }
   };
