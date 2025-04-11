@@ -161,7 +161,12 @@ const Settings = () => {
 
   useEffect(() => {
     if (profile) {
-      setLocalProfile(profile);
+      // Ensure date is properly formatted
+      const formattedProfile = {
+        ...profile,
+        date_of_birth: profile.date_of_birth ? new Date(profile.date_of_birth).toISOString().split('T')[0] : ''
+      };
+      setLocalProfile(formattedProfile);
       setLocalBio(profile.bio || "");
     }
   }, [profile]);
@@ -363,7 +368,7 @@ const Settings = () => {
                       <Input
                         id="email"
                         type="email"
-                        value={localProfile?.email || profile?.email || ""}
+                        value={user?.email || ""}
                         disabled
                         className="h-12 bg-muted/50"
                       />
