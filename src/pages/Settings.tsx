@@ -96,24 +96,14 @@ const Settings = () => {
         updated_at: new Date().toISOString()
       };
 
-      // First ensure profile exists
-      const { error: upsertError } = await supabase
-        .from('profiles')
-        .upsert({ 
-          id: currentUser.id,
-          user_id: currentUser.id,
-          email: currentUser.email
-        });
-
-      if (upsertError) {
-        throw upsertError;
-      }
-
-      // Then update the profile
+      // Update or insert the profile
       const { error: profileUpdateError } = await supabase
         .from('profiles')
-        .update(profileData)
-        .eq('user_id', currentUser.id);
+        .upsert({
+          ...profileData,
+          id: currentUser.id,
+          user_id: currentUser.id
+        });
 
       if (profileUpdateError) {
         throw profileUpdateError;
