@@ -42,48 +42,72 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   useEffect(() => {
-    setIsLoading(true);
+    let mounted = true;
     
-    // Get initial session
-    supabase.auth.getSession().then(({ data: { session }, error }) => {
-      if (error) {
-        console.error("Error getting session:", error);
-        toast({
-          variant: "destructive",
-          title: "Authentication Error",
-          description: "Failed to restore session"
-        });
-      }
-      setSession(session);
-      setUser(session?.user ?? null);
-      setIsLoading(false);
-    });
-
-    // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, currentSession) => {
-        setSession(currentSession);
-        setUser(currentSession?.user ?? null);
+    async function initializeAuth() {
+      try {
+        setIsLoading(true);
         
-        if (event === 'SIGNED_IN') {
-          // Ensure user record exists on sign in
-          const { error: profileError } = await supabase
-            .from('profiles')
-            .upsert({ 
-              id: currentSession.user.id,
-              email: currentSession.user.email,
-              updated_at: new Date().toISOString()
-            }, { onConflict: 'id' });
+        // Get initial session
+        const { data: { session }, error } = await supabase.auth.getSession();
+        
+        if (error) throw error;
+        
+        if (mounted) {
+          setSession(session);
+          setUser(session?.user ?? null);
+        }
+        
+        // Listen for auth changes
+        const { data: { subscription } } = supabase.auth.onAuthStateChange(
+          async (event, currentSession) => {
+            if (mounted) {
+              setSession(currentSession);
+              setUser(currentSession?.user ?? null);
+            }
+            
+            if (event === 'SIGNED_IN' && currentSession) {
+              try {
+                const { error: profileError } = await supabase
+                  .from('profiles')
+                  .upsert({ 
+                    id: currentSession.user.id,
+                    email: currentSession.user.email,
+                    updated_at: new Date().toISOString()
+                  }, { onConflict: 'id' });
 
-          if (profileError) {
-            console.error("Error updating profile:", profileError);
+                if (profileError) throw profileError;
+              } catch (err) {
+                console.error("Error updating profile:", err);
+              }
+            }
           }
+        );
+
+        return () => {
+          mounted = false;
+          subscription.unsubscribe();
+        };
+      } catch (error) {
+        console.error("Auth initialization error:", error);
+        if (mounted) {
+          toast({
+            variant: "destructive",
+            title: "Authentication Error",
+            description: "Failed to restore session"
+          });
+        }
+      } finally {
+        if (mounted) {
+          setIsLoading(false);
         }
       }
-    );
+    }
+
+    initializeAuth();
 
     return () => {
-      subscription.unsubscribe();
+      mounted = false;
     };
   }, [toast]);
 
