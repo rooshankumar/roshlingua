@@ -111,19 +111,11 @@ const Settings = () => {
         throw profileUpdateError;
       }
 
-      if (updateProfile) {
-        updateProfile(localProfile);
-      }
-
-      toast({
-        title: "Success",
-        description: "Profile updated successfully",
-      });
-
+      // First update via RPC
       const { data: userProfile, error: rpcError } = await supabase.rpc('update_user_profile', {
-        p_user_id: user.id,
+        p_user_id: currentUser.id,
         p_full_name: profileData.full_name,
-        p_email: user.email,
+        p_email: currentUser.email,
         p_avatar_url: profileData.avatar_url,
         p_bio: profileData.bio,
         p_gender: profileData.gender,
@@ -138,6 +130,16 @@ const Settings = () => {
         console.error("Error updating user profile via RPC:", rpcError);
         throw rpcError;
       }
+
+      // Then update local state and show success
+      if (updateProfile) {
+        updateProfile(profileData);
+      }
+
+      toast({
+        title: "Success",
+        description: "Profile updated successfully",
+      });
 
     } catch (error: any) {
       console.error('Error updating profile:', error);
