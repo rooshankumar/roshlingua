@@ -307,31 +307,6 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
                         <Form {...form}>
                             {step === 1 && (
                                 <div className="space-y-4">
-                                    <div className="grid gap-2">
-                                        <Label htmlFor="avatar">Profile Picture</Label>
-                                        <Input
-                                            type="file"
-                                            id="avatar"
-                                            accept="image/*"
-                                            className="col-span-3"
-                                            onChange={(e) => {
-                                                const file = e.target.files?.[0];
-                                                if (file) {
-                                                    uploadAvatar(file);
-                                                }
-                                            }}
-                                        />
-                                        {form.getValues("avatarUrl") && (
-                                            <div className="mt-2">
-                                                <img
-                                                    src={form.getValues("avatarUrl")}
-                                                    alt="Profile preview"
-                                                    className="w-24 h-24 rounded-full object-cover"
-                                                />
-                                            </div>
-                                        )}
-                                    </div>
-
                                     <FormField
                                         control={form.control}
                                         name="full_name"
