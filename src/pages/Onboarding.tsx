@@ -147,6 +147,7 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
             const { data: { user }, error: authError } = await supabase.auth.getUser();
 
             if (authError || !user) {
+                setIsLoading(false);
                 toast({
                     variant: "destructive",
                     title: "Authentication error",
@@ -156,14 +157,11 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
                 return;
             }
 
-            console.log("Authenticated User ID:", user.id);
-
-            console.log("Attempting to upsert profile for user ID:", user.id);
             const { error: profileError } = await supabase
                 .from('profiles')
                 .upsert({
-                    id: user.id, // Use id from auth.users as the key in profiles
-                    user_id: user.id, // Also set the user_id column
+                    id: user.id,
+                    user_id: user.id,
                     gender: formData.gender,
                     date_of_birth: formData.date_of_birth instanceof Date ?
                         formData.date_of_birth.toISOString().split('T')[0] :
@@ -171,7 +169,7 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
                     native_language: formData.nativeLanguage,
                     learning_language: formData.learningLanguage,
                     proficiency_level: formData.proficiencyLevel,
-                    bio: formData.bio, // Changed from learningGoal
+                    bio: formData.bio,
                     avatar_url: formData.avatarUrl,
                     full_name: formData.full_name,
                     onboarding_completed: true,
@@ -181,6 +179,7 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
                 });
 
             if (profileError) {
+                setIsLoading(false);
                 console.error('Error updating profile data:', profileError);
                 toast({
                     variant: "destructive",
@@ -190,36 +189,14 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
                 return;
             }
 
-            // Complete onboarding in database
-            const { error: onboardingError } = await supabase
-                .from('profiles')
-                .update({ onboarding_completed: true })
-                .eq('id', user.id);
-
-            if (onboardingError) {
-                console.error('Error updating onboarding status:', onboardingError);
-                toast({
-                    variant: "destructive",
-                    title: "Error",
-                    description: "Failed to complete onboarding. Please try again.",
-                });
-                return;
-            }
-
-            // Show success message
             toast({
                 title: "Welcome!",
                 description: "Your profile has been successfully set up.",
             });
 
-            // Set loading state and navigate
-            setIsLoading(true);
             localStorage.setItem("onboarding_completed", "true");
             onComplete();
-            // Small delay to ensure UI updates before navigation
-            setTimeout(() => {
-              navigate("/dashboard", { replace: true });
-            }, 100);
+            navigate("/dashboard", { replace: true });
         } catch (error) {
             console.error("Onboarding error:", error);
             toast({
