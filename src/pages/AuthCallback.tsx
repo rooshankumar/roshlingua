@@ -12,12 +12,11 @@ const AuthCallback = () => {
   useEffect(() => {
     const handleAuthCallback = async () => {
       try {
-        // Get code from URL
-        const code = new URLSearchParams(window.location.search).get('code');
-        if (!code) throw new Error('No code provided');
-
+        // Get the full URL
+        const fullUrl = window.location.href;
+        
         // Exchange code for session
-        const { data, error: authError } = await supabase.auth.exchangeCodeForSession(code);
+        const { data, error: authError } = await supabase.auth.exchangeCodeForSession(fullUrl);
         
         if (authError) throw authError;
         if (!data.session) throw new Error("No session established");
@@ -29,6 +28,7 @@ const AuthCallback = () => {
           .eq("id", data.session.user.id)
           .single();
 
+        // Redirect based on onboarding status
         navigate(profile?.onboarding_completed ? "/dashboard" : "/onboarding", { replace: true });
 
       } catch (error: any) {
