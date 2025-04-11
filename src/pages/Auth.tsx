@@ -107,26 +107,19 @@ const Auth = () => {
         email,
         password,
         options: {
-          emailRedirectTo: `${window.location.origin}/auth/callback`
+          emailRedirectTo: `${window.location.origin}/auth/callback`,
+          data: {
+            email: email
+          }
         }
       });
 
-      if (signUpError) throw signUpError;
+      if (signUpError) {
+        throw signUpError;
+      }
 
-      // Create initial profile
-      if (data.user) {
-        const { error: profileError } = await supabase.from('profiles').insert({
-          id: data.user.id,
-          email: email,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
-        });
-
-        if (profileError) {
-          console.error("Profile creation error:", profileError);
-          await supabase.auth.signOut();
-          throw new Error("Failed to create user profile");
-        }
+      if (!data?.user) {
+        throw new Error("Signup failed - no user returned");
       }
 
       toast({
