@@ -16,6 +16,8 @@ import { useToast } from "@/hooks/use-toast";
 import { Eye, EyeOff, Mail, Loader2 } from "lucide-react";
 import { useAuth } from "@/providers/AuthProvider";
 import { supabase } from "@/lib/supabase";
+import Image from 'next/image'; // Assuming Next.js for Image component
+
 
 const Auth = () => {
   const [searchParams] = useSearchParams();
@@ -98,7 +100,7 @@ const Auth = () => {
       if (password.length < 6) {
         throw new Error("Password must be at least 6 characters");
       }
-      
+
       if (password !== confirmPassword) {
         throw new Error("Passwords do not match");
       }
@@ -328,6 +330,16 @@ const Auth = () => {
                   required
                 />
               </div>
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full mt-4"
+                onClick={handleGoogleLogin}
+                disabled={isLoading}
+              >
+                <Image src="/google.svg" alt="Google" width={20} height={20} className="mr-2"/> {/*Added Google OAuth button*/}
+                Continue with Google
+              </Button>
             </CardContent>
             <CardFooter>
               <Button type="submit" className="w-full" disabled={isLoading}>

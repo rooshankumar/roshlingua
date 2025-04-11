@@ -75,15 +75,15 @@ const AuthCallback = () => {
           console.error("Error creating profile:", profileError);
         }
 
-        // Redirect to appropriate page
-        const { data: onboardingCompletion } = await supabase
-          .from("onboarding_status")
-          .select("is_complete")
-          .eq("user_id", session.user.id)
+        // Check onboarding status from profiles table
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("onboarding_completed")
+          .eq("id", session.user.id)
           .single();
 
         navigate(
-          onboardingCompletion?.is_complete ? "/dashboard" : "/onboarding",
+          profile?.onboarding_completed ? "/dashboard" : "/onboarding",
           { replace: true },
         );
       } catch (error) {
