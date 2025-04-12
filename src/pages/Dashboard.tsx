@@ -22,8 +22,12 @@ import { cn } from "@/lib/utils";
 const Dashboard = () => {
   const { user } = useAuth();
   const { onlineUsers } = useUserPresence();
-  const [streak, setStreak] = useState(0);
-  const [progress, setProgress] = useState(0);
+  const [userStats, setUserStats] = useState({
+    streak: 0,
+    xp: 0,
+    progress: 0,
+    level: 'Beginner'
+  });
   const [activeUsers, setActiveUsers] = useState([]);
   const [stats, setStats] = useState({
     conversations: 0,
@@ -31,50 +35,62 @@ const Dashboard = () => {
     proficiency_level: 'beginner'
   });
 
+  const getXP = async (userId) => {
+    //Implementation for fetching XP from Supabase based on userId
+    try{
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('xp_points')
+          .eq('id', userId)
+          .single();
+        if (error) throw error;
+        return data.xp_points || 0;
+    } catch (error) {
+        console.error("Error fetching XP:", error);
+        return 0;
+    }
+  };
+
+  const getProgress = async (userId) => {
+    //Implementation for fetching progress from Supabase based on userId
+    try{
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('progress_percentage')
+          .eq('id', userId)
+          .single();
+        if (error) throw error;
+        return data.progress_percentage || 0;
+    } catch (error) {
+        console.error("Error fetching progress:", error);
+        return 0;
+    }
+  };
+
+  const getLevel = (xp) => {
+    //Implementation for determining level based on XP points
+    if (xp >= 1000) return "Advanced";
+    if (xp >= 500) return "Intermediate";
+    return "Beginner";
+  };
+
+
   useEffect(() => {
-    if (!user) return;
-
     const fetchUserData = async () => {
+      if (!user) return;
+
       try {
-        // Get user profile data
-        const { data: profileData, error } = await supabase
-          .from('profiles')
-          .select(`
-            streak_count,
-            proficiency_level,
-            xp_points,
-            progress_percentage,
-            last_seen
-          `) 
-          .eq('id', user.id)
-          .single();
+        const [xpData, progressData] = await Promise.all([
+          getXP(user.id),
+          getProgress(user.id)
+        ]);
 
-        if (error) {
-          console.error('Error fetching profile data:', error);
-          return;
-        }
-
-        // Update last_seen to trigger streak calculation
-        const { error: updateError } = await supabase
-          .from('profiles')
-          .update({ last_seen: new Date().toISOString() })
-          .eq('id', user.id);
-
-        if (updateError) {
-          console.error('Error updating last_seen:', updateError);
-        }
-
-        // Fetch updated profile data to get new streak count
-        const { data: updatedProfile } = await supabase
-          .from('profiles')
-          .select('streak_count, progress_percentage')
-          .eq('id', user.id)
-          .single();
-
-        if (updatedProfile) {
-          setStreak(updatedProfile.streak_count || 0);
-          setProgress(updatedProfile.progress_percentage || 0);
-        }
+        setUserStats({
+          streak: 0, // Will be updated by streak trigger
+          xp: xpData,
+          progress: progressData,
+          level: getLevel(xpData)
+        });
 
         // Get active conversations count
         const { count: conversationsCount } = await supabase
@@ -84,8 +100,8 @@ const Dashboard = () => {
 
         setStats({
           conversations: conversationsCount || 0,
-          xp: profileData?.xp_points || 0,
-          proficiency_level: profileData?.proficiency_level || 'beginner'
+          xp: xpData || 0,
+          proficiency_level: getLevel(xpData) || 'beginner'
         });
 
         // Get active users
@@ -150,7 +166,7 @@ const Dashboard = () => {
             <Flame className="h-4 w-4 text-primary animate-pulse" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{streak} days</div>
+            <div className="text-2xl font-bold">{userStats.streak} days</div>
             <div className="inline-flex items-center mt-2 text-xs text-muted-foreground">
               <TrendingUp className="h-3 w-3 mr-1" />
               Keep it going!
@@ -167,12 +183,12 @@ const Dashboard = () => {
           </CardHeader>
           <CardContent>
             <div className="flex items-center justify-between mb-2">
-              <div className="text-2xl font-bold">{progress}%</div>
+              <div className="text-2xl font-bold">{userStats.progress}%</div>
               <Badge variant="outline" className="capitalize">
-                {stats.proficiency_level}
+                {userStats.level}
               </Badge>
             </div>
-            <Progress value={progress} className="h-2 bg-primary/20" />
+            <Progress value={userStats.progress} className="h-2 bg-primary/20" />
           </CardContent>
         </Card>
 
@@ -200,7 +216,7 @@ const Dashboard = () => {
             <Award className="h-4 w-4 text-primary" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.xp} XP</div>
+            <div className="text-2xl font-bold">{userStats.xp} XP</div>
             <div className="inline-flex items-center mt-2 text-xs text-muted-foreground">
               <Book className="h-3 w-3 mr-1" />
               Learning rewards
