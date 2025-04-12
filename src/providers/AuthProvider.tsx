@@ -289,10 +289,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           redirectTo: 'https://roshlingua.vercel.app/auth/callback',
           queryParams: {
             access_type: 'offline',
-            prompt: 'consent',
-            hd: 'domain.com' // Optional: restrict to specific domain
+            prompt: 'consent'
           },
-          scopes: 'email profile'
+          scopes: 'email profile openid'
         }
       });
 
