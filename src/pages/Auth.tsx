@@ -147,27 +147,26 @@ const Auth = () => {
     try {
       setIsLoading(true);
       const { data, error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
+        provider: "google",
         options: {
-          redirectTo: 'https://roshlingua.vercel.app/auth/callback',
+          redirectTo: window.location.origin + "/auth/callback",
           queryParams: {
-            access_type: 'offline',
-            prompt: 'consent'
-          }
-        }
+            access_type: "offline",
+            prompt: "consent",
+          },
+        },
       });
 
       if (error) throw error;
       if (!data.url) throw new Error("No OAuth URL returned");
 
-      // Redirect to Google OAuth
-      window.location.href = data.url;
+      window.location.href = data.url; // Redirects to Google login
     } catch (error: any) {
       console.error("Google login error:", error);
       toast({
         variant: "destructive",
         title: "Google login failed",
-        description: error.message || "Failed to authenticate with Google"
+        description: error.message || "Failed to authenticate with Google",
       });
       setIsLoading(false);
     }
@@ -195,7 +194,7 @@ const Auth = () => {
                 <Input
                   id="email"
                   type="email"
-                  placeholder="m@example.com"
+                  placeholder="name@example.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   disabled={isLoading}
@@ -208,6 +207,7 @@ const Auth = () => {
                   <Input
                     id="password"
                     type={showPassword ? "text" : "password"}
+                    placeholder="*********"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     disabled={isLoading}
@@ -281,7 +281,7 @@ const Auth = () => {
                 <Input
                   id="email"
                   type="email"
-                  placeholder="m@example.com"
+                  placeholder="name@example.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   disabled={isLoading}
@@ -294,6 +294,7 @@ const Auth = () => {
                   <Input
                     id="password"
                     type={showPassword ? "text" : "password"}
+                  placeholder="********"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     disabled={isLoading}
@@ -315,6 +316,7 @@ const Auth = () => {
                 <Input
                   id="confirm-password"
                   type={showPassword ? "text" : "password"}
+                  placeholder="********"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   disabled={isLoading}
