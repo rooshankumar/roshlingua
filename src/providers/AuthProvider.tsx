@@ -173,19 +173,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       loginAttempts.delete(email);
 
       // Ensure user record exists
-      if (data.user && !userExists) {
-        const { error: profileError } = await supabase
-          .from('users')
-          .insert([{
+      if (data.user) {
+        // Update last_seen for streak calculation
+        const { error: updateError } = await supabase
+          .from('profiles')
+          .upsert({
             id: data.user.id,
-            email: data.user.email,
-            full_name: data.user.user_metadata?.full_name || '',
-            created_at: new Date().toISOString(),
-            last_active_at: new Date().toISOString(),
-          }]);
+            last_seen: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          }, { onConflict: 'id' });
 
-        if (profileError) {
-          console.error("Error creating user profile:", profileError);
+        if (updateError) {
+          console.error("Error updating last_seen:", updateError);
         }
       }
       await updateOnboardingStatus(data.user.id); // Call the new function after successful login

@@ -65,7 +65,17 @@ const Dashboard = () => {
       }
 
       if (profileData) {
-        setStreak(profileData.streak_count || 0);
+        // Ensure streak is properly initialized
+        const currentStreak = profileData.streak_count ?? 0;
+        setStreak(currentStreak);
+        
+        // If no streak and no last_seen, initialize it
+        if (currentStreak === 0 && !profileData.last_seen) {
+          await supabase
+            .from('profiles')
+            .update({ last_seen: new Date().toISOString() })
+            .eq('id', user.id);
+        }
         setProgress(profileData.progress_percentage || 0); 
       }
 
