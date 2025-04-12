@@ -80,40 +80,46 @@ const Dashboard = () => {
     };
 
     const fetchUserData = async () => {
-      await updateUserActivity();
-      
-      // Get user profile data
-      const { data: profileData, error } = await supabase
-        .from('profiles')
-        .select(`
-          streak_count,
-          proficiency_level,
-          xp_points,
-          progress_percentage,
-          last_seen
-        `) 
-        .eq('id', user.id)
-        .single();
+      try {
+        // Get user profile data
+        const { data: profileData, error } = await supabase
+          .from('profiles')
+          .select(`
+            streak_count,
+            proficiency_level,
+            xp_points,
+            progress_percentage,
+            last_seen
+          `) 
+          .eq('id', user.id)
+          .single();
 
-      if (error) {
-        console.error('Error fetching profile data:', error);
-        return;
-      }
-
-      if (profileData) {
-        // Ensure streak is properly initialized
-        const currentStreak = profileData.streak_count ?? 0;
-        setStreak(currentStreak);
-        
-        // If no streak and no last_seen, initialize it
-        if (currentStreak === 0 && !profileData.last_seen) {
-          await supabase
-            .from('profiles')
-            .update({ last_seen: new Date().toISOString() })
-            .eq('id', user.id);
+        if (error) {
+          console.error('Error fetching profile data:', error);
+          return;
         }
-        setProgress(profileData.progress_percentage || 0); 
-      }
+
+        // Update last_seen to trigger streak calculation
+        const { error: updateError } = await supabase
+          .from('profiles')
+          .update({ last_seen: new Date().toISOString() })
+          .eq('id', user.id);
+
+        if (updateError) {
+          console.error('Error updating last_seen:', updateError);
+        }
+
+        // Fetch updated profile data to get new streak count
+        const { data: updatedProfile } = await supabase
+          .from('profiles')
+          .select('streak_count, progress_percentage')
+          .eq('id', user.id)
+          .single();
+
+        if (updatedProfile) {
+          setStreak(updatedProfile.streak_count || 0);
+          setProgress(updatedProfile.progress_percentage || 0);
+        }
 
       // Get active conversations count
       const { count: conversationsCount } = await supabase
