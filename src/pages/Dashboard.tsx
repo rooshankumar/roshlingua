@@ -36,15 +36,34 @@ const Dashboard = () => {
 
     const updateUserActivity = async () => {
       try {
+        // Daily login XP reward and streak update
+        const today = new Date().toISOString().split('T')[0];
+        const { data: lastLogin } = await supabase
+          .from('profiles')
+          .select('last_seen, streak_count')
+          .eq('id', user.id)
+          .single();
+
+        const lastLoginDate = lastLogin?.last_seen ? new Date(lastLogin.last_seen).toISOString().split('T')[0] : null;
+
+        // If it's a new day, award XP
+        if (lastLoginDate !== today) {
+          await awardXP(user.id, 'DAILY_LOGIN');
+          
+          // Check for streak milestone (every 7 days)
+          if (lastLogin?.streak_count && lastLogin.streak_count % 7 === 0) {
+            await awardXP(user.id, 'STREAK_MILESTONE');
+          }
+        }
+
         // Update last_seen to trigger streak calculation
         const { error: activityError } = await supabase
           .from('profiles')
           .update({ 
             last_seen: new Date().toISOString(),
-            streak_count: 1 // Initialize streak if not set
+            streak_count: lastLogin?.streak_count ? undefined : 1 // Initialize streak if not set
           })
-          .eq('id', user.id)
-          .is('streak_count', null);
+          .eq('id', user.id);
           
         if (activityError) console.error('Error updating activity:', activityError);
 
