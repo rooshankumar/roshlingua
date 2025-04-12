@@ -359,10 +359,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const updateUserActivity = async (userId: string) => {
-    // Placeholder:  This function needs a robust implementation to update the streak in the database.
-    // It should consider the user's last active date and the current date to increment the streak accordingly.
-    console.log("Updating user activity for:", userId);
-    //  Implementation to update streak in database would go here.
+    if (!userId) return;
+    
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({ 
+          last_seen: new Date().toISOString() 
+        })
+        .eq('id', userId);
+
+      if (error) throw error;
+    } catch (error) {
+      console.error('Error updating user activity:', error);
+    }
   };
 
   const value: AuthContextType = {
@@ -374,6 +384,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     loginWithGoogle,
     signOut,
   };
+
+  useEffect(() => {
+    if (user?.id) {
+      // Update last_seen on mount
+      updateUserActivity(user.id);
+
+      // Update last_seen every 5 minutes while user is active
+      const interval = setInterval(() => {
+        updateUserActivity(user.id);
+      }, 5 * 60 * 1000);
+
+      return () => clearInterval(interval);
+    }
+  }, [user?.id]);
 
   return (
     <AuthContext.Provider value={value}>
