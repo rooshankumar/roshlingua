@@ -10,28 +10,45 @@ const AuthCallback = () => {
   useEffect(() => {
     const handleCallback = async () => {
       try {
-        const code = new URLSearchParams(window.location.search).get('code');
-        if (!code) throw new Error('No code provided');
+        const code = new URLSearchParams(window.location.search).get("code");
+        if (!code) throw new Error("No authorization code found in URL.");
 
-        const { data, error } = await supabase.auth.exchangeCodeForSession(code);
+        const { data: sessionData, error: sessionError } = await supabase.auth.exchangeCodeForSession(code);
+        if (sessionError || !sessionData.session) {
+          throw new Error(sessionError?.message || "Failed to establish session.");
+        }
 
-        if (error) throw error;
+        const userId = sessionData.session.user.id;
 
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('onboarding_completed')
-          .eq('id', data.session?.user.id)
+        // Fetch profile using user_id, not id
+        const { data: profile, error: profileError } = await supabase
+          .from("profiles")
+          .select("onboarding_completed")
+          .eq("user_id", userId)
           .single();
 
-        navigate(profile?.onboarding_completed ? "/dashboard" : "/onboarding", { replace: true });
+        if (profileError) {
+          console.error("Profile fetch error:", profileError);
+          throw new Error("Could not load profile information.");
+        }
+
+        // Redirect based on onboarding status
+        const redirectTo = profile?.onboarding_completed ? "/dashboard" : "/onboarding";
+        navigate(redirectTo, { replace: true });
+
       } catch (error: any) {
         console.error("Auth callback error:", error);
+
         toast({
           variant: "destructive",
-          title: "Authentication Error",
-          description: error.message || "Failed to complete authentication"
+          title: "Authentication Failed",
+          description: error.message || "Something went wrong during login.",
         });
-        navigate("/auth", { replace: true });
+
+        // Redirect to login after delay
+        setTimeout(() => {
+          navigate("/auth", { replace: true });
+        }, 2000);
       }
     };
 
@@ -40,8 +57,8 @@ const AuthCallback = () => {
 
   return (
     <div className="flex min-h-screen items-center justify-center">
-      <div className="text-center">
-        <h2 className="text-2xl font-semibold mb-2">Completing authentication...</h2>
+      <div className="text-center space-y-2">
+        <h2 className="text-2xl font-semibold">Completing authentication...</h2>
         <p className="text-muted-foreground">Please wait while we log you in.</p>
       </div>
     </div>
