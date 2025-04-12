@@ -35,21 +35,34 @@ const Dashboard = () => {
     if (!user) return;
 
     const updateUserActivity = async () => {
-      // Update last_active_at to trigger streak calculation
-      await supabase
+      // Update last_seen to trigger streak calculation
+      const { error } = await supabase
         .from('profiles')
-        .update({ last_active_at: new Date().toISOString() })
+        .update({ last_seen: new Date().toISOString() })
         .eq('id', user.id);
+        
+      if (error) console.error('Error updating activity:', error);
     };
 
     const fetchUserData = async () => {
       await updateUserActivity();
       // Get user profile data
-      const { data: profileData } = await supabase
+      const { data: profileData, error } = await supabase
         .from('profiles')
-        .select('streak_count, proficiency_level, xp_points, progress_percentage') 
+        .select(`
+          streak_count,
+          proficiency_level,
+          xp_points,
+          progress_percentage,
+          last_seen
+        `) 
         .eq('id', user.id)
         .single();
+
+      if (error) {
+        console.error('Error fetching profile data:', error);
+        return;
+      }
 
       if (profileData) {
         setStreak(profileData.streak_count || 0);
