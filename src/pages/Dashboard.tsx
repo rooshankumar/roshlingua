@@ -35,17 +35,34 @@ const Dashboard = () => {
     if (!user) return;
 
     const updateUserActivity = async () => {
-      // Update last_seen to trigger streak calculation
-      const { error } = await supabase
-        .from('profiles')
-        .update({ last_seen: new Date().toISOString() })
-        .eq('id', user.id);
-        
-      if (error) console.error('Error updating activity:', error);
+      try {
+        // Update last_seen to trigger streak calculation
+        const { error: activityError } = await supabase
+          .from('profiles')
+          .update({ 
+            last_seen: new Date().toISOString(),
+            streak_count: 1 // Initialize streak if not set
+          })
+          .eq('id', user.id)
+          .is('streak_count', null);
+          
+        if (activityError) console.error('Error updating activity:', activityError);
+
+        // Regular last_seen update
+        const { error } = await supabase
+          .from('profiles')
+          .update({ last_seen: new Date().toISOString() })
+          .eq('id', user.id);
+          
+        if (error) console.error('Error updating activity:', error);
+      } catch (error) {
+        console.error('Error in updateUserActivity:', error);
+      }
     };
 
     const fetchUserData = async () => {
       await updateUserActivity();
+      
       // Get user profile data
       const { data: profileData, error } = await supabase
         .from('profiles')
