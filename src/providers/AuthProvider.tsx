@@ -43,21 +43,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     let mounted = true;
-    
+
     async function initializeAuth() {
       try {
         setIsLoading(true);
-        
+
         // Get initial session
         const { data: { session }, error } = await supabase.auth.getSession();
-        
+
         if (error) throw error;
-        
+
         if (mounted) {
           setSession(session);
           setUser(session?.user ?? null);
         }
-        
+
         // Listen for auth changes
         const { data: { subscription } } = supabase.auth.onAuthStateChange(
           async (event, currentSession) => {
@@ -65,7 +65,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               setSession(currentSession);
               setUser(currentSession?.user ?? null);
             }
-            
+
             if (event === 'SIGNED_IN' && currentSession) {
               try {
                 const { error: profileError } = await supabase
@@ -189,6 +189,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
       }
       await updateOnboardingStatus(data.user.id); // Call the new function after successful login
+      await updateUserActivity(data.user.id); // Add streak update after successful login
     } catch (error) {
       console.error("Login error:", error);
       throw error;
@@ -233,7 +234,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (signUpError) {
         console.error("Signup error:", signUpError);
         let errorMessage = 'Failed to create account. Please try again.';
-        
+
         if (signUpError.message === 'User already registered') {
           errorMessage = 'This email is already registered. Please log in instead.';
         } else if (signUpError.message.includes('Database error')) {
@@ -274,6 +275,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         description: "Please check your email to confirm your account.",
       });
       await updateOnboardingStatus(authData.user.id); // Call the new function after successful signup
+      await updateUserActivity(authData.user.id); // Add streak update after successful signup
     } catch (error) {
       console.error("Signup error:", error);
       throw error;
@@ -354,6 +356,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } catch (error) {
       console.error("Error updating onboarding status:", error);
     }
+  };
+
+  const updateUserActivity = async (userId: string) => {
+    // Placeholder:  This function needs a robust implementation to update the streak in the database.
+    // It should consider the user's last active date and the current date to increment the streak accordingly.
+    console.log("Updating user activity for:", userId);
+    //  Implementation to update streak in database would go here.
   };
 
   const value: AuthContextType = {
