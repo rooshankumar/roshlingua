@@ -1,71 +1,63 @@
 
-import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { supabase } from '@/lib/supabase';
-import { useToast } from '@/hooks/use-toast';
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { supabase } from "@/lib/supabase";
+import { useToast } from "@/components/ui/use-toast";
+import { Loader2 } from "lucide-react";
 
 const AuthCallback = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
 
   useEffect(() => {
-    const handleCallback = async () => {
+    const handleAuth = async () => {
       try {
-        const { data, error } = await supabase.auth.getSession();
-        
-        // If we already have a session, go to dashboard
-        if (data?.session) {
-          const { data: profile } = await supabase
-            .from('profiles')
-            .select('onboarding_completed')
-            .eq('id', data.session.user.id)
-            .single();
+        const code = new URLSearchParams(window.location.search).get("code");
+        if (!code) throw new Error("No authorization code found");
 
-          if (profile?.onboarding_completed) {
-            navigate('/dashboard', { replace: true });
-          } else {
-            navigate('/onboarding', { replace: true });
-          }
-          return;
+        const { data: sessionData, error: sessionError } = 
+          await supabase.auth.exchangeCodeForSession(code);
+
+        if (sessionError || !sessionData.session) {
+          throw new Error(sessionError?.message || "Failed to establish session");
         }
 
-        // Otherwise exchange the code
-        const { data: authData, error: authError } = await supabase.auth.exchangeCodeForSession(window.location.href);
-        
-        if (authError) throw authError;
-        if (!authData.session) throw new Error('No session returned');
+        const userId = sessionData.session.user.id;
 
-        // Check onboarding status
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('onboarding_completed')
-          .eq('id', authData.session.user.id)
+        const { data: profile, error: profileError } = await supabase
+          .from("profiles")
+          .select("onboarding_completed")
+          .eq("id", userId)
           .single();
 
-        if (profile?.onboarding_completed) {
-          navigate('/dashboard', { replace: true });
-        } else {
-          navigate('/onboarding', { replace: true });
+        if (profileError) {
+          await supabase.from("profiles").insert([{ id: userId }]);
+          return navigate("/onboarding", { replace: true });
         }
+
+        const redirectTo = profile?.onboarding_completed ? "/dashboard" : "/onboarding";
+        navigate(redirectTo, { replace: true });
+
       } catch (error: any) {
-        console.error('Auth callback error:', error);
+        console.error("Auth error:", error);
         toast({
-          variant: "destructive", 
-          title: "Authentication Error",
-          description: error.message || "Failed to complete authentication"
+          variant: "destructive",
+          title: "Authentication Failed",
+          description: error.message || "Something went wrong",
         });
-        navigate('/auth', { replace: true });
+        navigate("/auth", { replace: true });
       }
     };
 
-    handleCallback();
+    handleAuth();
   }, [navigate, toast]);
 
   return (
-    <div className="flex items-center justify-center min-h-screen">
-      <div className="text-center">
-        <h2 className="text-lg font-semibold">Completing authentication...</h2>
-        <p className="text-sm text-muted-foreground">Please wait while we sign you in</p>
+    <div className="flex min-h-screen items-center justify-center">
+      <div className="text-center space-y-4">
+        <Loader2 className="h-8 w-8 animate-spin mx-auto text-primary" />
+        <h2 className="text-2xl font-semibold">Signing you in...</h2>
+        <p className="text-muted-foreground">Please wait while we verify your account</p>
       </div>
     </div>
   );
