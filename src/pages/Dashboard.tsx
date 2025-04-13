@@ -74,6 +74,18 @@ const Dashboard = () => {
     return "Beginner";
   };
 
+  const updateUserActivity = async (userId) => {
+    //Implementation to update user activity in Supabase
+    try {
+      await supabase
+        .from('profiles')
+        .update({ last_active: new Date() })
+        .eq('id', userId);
+    } catch (error) {
+      console.error("Error updating user activity:", error);
+    }
+  };
+
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -125,9 +137,8 @@ const Dashboard = () => {
           .select('*', { count: 'exact' })
           .eq('user_id', user.id);
 
-        return () => {
-          profileSubscription.unsubscribe();
-        };
+        // Update user activity to trigger streak calculation
+        await updateUserActivity(user.id);
 
         return () => {
           profileSubscription.unsubscribe();
@@ -260,7 +271,7 @@ const Dashboard = () => {
         </Card>
       </div>
 
-      
+
 
       <NotificationCard />
     </div>
