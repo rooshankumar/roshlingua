@@ -286,12 +286,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: 'https://roshlingua.vercel.app/auth/callback',
+          redirectTo: `${window.location.origin}/auth/callback`,
           queryParams: {
             access_type: 'offline',
-            prompt: 'consent'
+            prompt: 'consent',
           },
-          scopes: 'email profile openid'
+          skipBrowserRedirect: true
         }
       });
 
@@ -310,7 +310,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
 
       // Redirect to Google OAuth
-      window.location.href = data.url;
+      window.location.replace(data.url);
     } catch (error) {
       console.error("Google login error:", error);
       toast({

@@ -1,3 +1,4 @@
+
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/lib/supabase";
@@ -10,41 +11,34 @@ const AuthCallback = () => {
   useEffect(() => {
     const handleCallback = async () => {
       try {
-        // ✅ Use full URL for PKCE flow
-        const { data: sessionData, error: sessionError } =
-          await supabase.auth.exchangeCodeForSession(window.location.href);
-
-        if (sessionError || !sessionData.session) {
-          throw new Error(sessionError?.message || "Failed to establish session.");
+        // Get the code from URL
+        const code = new URL(window.location.href).searchParams.get("code");
+        
+        if (!code) {
+          throw new Error("No code found in URL");
         }
 
-        const userId = sessionData.session.user.id;
+        const { data, error } = await supabase.auth.exchangeCodeForSession(code);
 
-        // ✅ Fetch profile with user_id
-        const { data: profile, error: profileError } = await supabase
-          .from("profiles")
-          .select("onboarding_completed")
-          .eq("user_id", userId)
-          .single();
-
-        if (profileError) {
-          console.error("Profile fetch error:", profileError);
-          throw new Error("Could not load profile information.");
+        if (error) {
+          throw error;
         }
 
-        // ✅ Redirect accordingly
-        const redirectTo = profile?.onboarding_completed ? "/dashboard" : "/onboarding";
-        navigate(redirectTo, { replace: true });
+        if (!data.session) {
+          throw new Error("No session returned");
+        }
 
+        // Redirect to dashboard on success
+        navigate("/dashboard", { replace: true });
       } catch (error: any) {
         console.error("Auth callback error:", error);
         toast({
           variant: "destructive",
           title: "Authentication Failed",
-          description: error.message || "Something went wrong during login.",
+          description: error.message || "Failed to complete authentication",
         });
-
-        // Redirect to login after brief delay
+        
+        // Redirect to login after error
         setTimeout(() => {
           navigate("/auth", { replace: true });
         }, 2000);
