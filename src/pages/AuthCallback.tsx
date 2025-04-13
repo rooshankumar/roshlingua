@@ -1,8 +1,8 @@
 
-import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { supabase } from "@/lib/supabase";
-import { useToast } from "@/hooks/use-toast";
+import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { supabase } from '@/lib/supabase';
+import { useToast } from '@/hooks/use-toast';
 
 const AuthCallback = () => {
   const navigate = useNavigate();
@@ -11,41 +11,54 @@ const AuthCallback = () => {
   useEffect(() => {
     const handleCallback = async () => {
       try {
+        // Get code from either hash or query params
         const hashParams = new URLSearchParams(window.location.hash.substring(1));
         const queryParams = new URLSearchParams(window.location.search);
         
-        // Check both hash and query parameters for the code
-        const code = hashParams.get("code") || queryParams.get("code");
-        
-        if (!code) {
-          throw new Error("No code found in URL");
-        }
-
-        // Exchange the code for a session
-        const { data, error } = await supabase.auth.exchangeCodeForSession(window.location.href);
+        const code = hashParams.get('code') || queryParams.get('code');
+        const error = hashParams.get('error') || queryParams.get('error');
+        const error_description = hashParams.get('error_description') || queryParams.get('error_description');
 
         if (error) {
-          throw error;
+          throw new Error(error_description || error);
+        }
+
+        if (!code) {
+          throw new Error('No authentication code found');
+        }
+
+        // Exchange code for session
+        const { data, error: sessionError } = await supabase.auth.exchangeCodeForSession(code);
+        
+        if (sessionError) {
+          throw sessionError;
         }
 
         if (!data.session) {
-          throw new Error("No session returned");
+          throw new Error('No session returned');
         }
 
-        // Redirect to dashboard on success
-        navigate("/dashboard", { replace: true });
+        // Check onboarding status
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('onboarding_completed')
+          .eq('id', data.session.user.id)
+          .single();
+
+        // Redirect based on onboarding status
+        if (profile?.onboarding_completed) {
+          navigate('/dashboard', { replace: true });
+        } else {
+          navigate('/onboarding', { replace: true });
+        }
       } catch (error: any) {
-        console.error("Auth callback error:", error);
+        console.error('Auth callback error:', error);
         toast({
           variant: "destructive",
-          title: "Authentication Failed",
-          description: error.message || "Failed to complete authentication",
+          title: "Authentication Error",
+          description: error.message || "Failed to complete authentication"
         });
-        
-        // Redirect to login after error
-        setTimeout(() => {
-          navigate("/auth", { replace: true });
-        }, 2000);
+        navigate('/auth', { replace: true });
       }
     };
 
@@ -53,10 +66,10 @@ const AuthCallback = () => {
   }, [navigate, toast]);
 
   return (
-    <div className="flex min-h-screen items-center justify-center">
-      <div className="text-center space-y-2">
-        <h2 className="text-2xl font-semibold">Completing authentication...</h2>
-        <p className="text-muted-foreground">Please wait while we log you in.</p>
+    <div className="flex items-center justify-center min-h-screen">
+      <div className="text-center">
+        <h2 className="text-lg font-semibold">Completing authentication...</h2>
+        <p className="text-sm text-muted-foreground">Please wait while we sign you in</p>
       </div>
     </div>
   );
