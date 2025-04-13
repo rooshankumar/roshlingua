@@ -209,10 +209,7 @@ const ChatList = () => {
               to={`/chat/${conversation.id}`}
               className="block"
             >
-              <Card className={classNames(
-                "transition-all duration-200 hover:scale-[1.01] hover:shadow-lg",
-                conversation.lastMessage?.sender_id !== user?.id && !conversation.lastMessage?.is_read ? "bg-muted/10" : "hover:bg-muted/50"
-              )}>
+              <Card className="hover:bg-muted/50 transition-all duration-200 hover:scale-[1.01] hover:shadow-lg">
                 <CardContent className="flex items-center p-4">
                   <div className="relative">
                     <Avatar className="h-12 w-12">
@@ -221,9 +218,9 @@ const ChatList = () => {
                         {conversation.participant?.full_name?.substring(0, 2).toUpperCase() || 'AB'}
                       </AvatarFallback>
                     </Avatar>
-                    {conversation.lastMessage?.sender_id !== user?.id && !conversation.lastMessage?.is_read && (
+                    {conversation.unreadCount > 0 && (
                       <div className="absolute -top-1 -right-1 bg-destructive text-destructive-foreground rounded-full min-w-[20px] h-5 flex items-center justify-center text-xs font-medium px-1">
-                        1
+                        {conversation.unreadCount}
                       </div>
                     )}
                     <span className={classNames(
