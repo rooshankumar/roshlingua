@@ -15,20 +15,12 @@ const AuthCallback = () => {
         const hashParams = new URLSearchParams(window.location.hash.substring(1));
         const queryParams = new URLSearchParams(window.location.search);
         
-        const code = hashParams.get('code') || queryParams.get('code');
-        const error = hashParams.get('error') || queryParams.get('error');
-        const error_description = hashParams.get('error_description') || queryParams.get('error_description');
-
-        if (error) {
-          throw new Error(error_description || error);
+        // Handle the callback directly with the full URL
+        const { data, error: sessionError } = await supabase.auth.exchangeCodeForSession(window.location.href);
+        
+        if (sessionError) {
+          throw sessionError;
         }
-
-        if (!code) {
-          throw new Error('No authentication code found');
-        }
-
-        // Exchange code for session
-        const { data, error: sessionError } = await supabase.auth.exchangeCodeForSession(code);
         
         if (sessionError) {
           throw sessionError;
