@@ -11,24 +11,15 @@ const AuthCallback = () => {
   useEffect(() => {
     const handleCallback = async () => {
       try {
-        // Get code from either hash or query params
-        const hashParams = new URLSearchParams(window.location.hash.substring(1));
-        const queryParams = new URLSearchParams(window.location.search);
-        
-        // Handle the callback directly with the full URL
-        const { data, error: sessionError } = await supabase.auth.exchangeCodeForSession(window.location.href);
-        
-        if (sessionError) {
-          throw sessionError;
-        }
-        
-        if (sessionError) {
-          throw sessionError;
-        }
+        // Get the full URL for the callback
+        const hash = window.location.hash;
+        const query = window.location.search;
+        const url = window.location.origin + window.location.pathname + query + hash;
 
-        if (!data.session) {
-          throw new Error('No session returned');
-        }
+        const { data, error } = await supabase.auth.exchangeCodeForSession(url);
+
+        if (error) throw error;
+        if (!data.session) throw new Error('No session returned');
 
         // Check onboarding status
         const { data: profile } = await supabase
