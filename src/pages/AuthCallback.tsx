@@ -10,17 +10,16 @@ const AuthCallback = () => {
   useEffect(() => {
     const handleCallback = async () => {
       try {
-        const code = new URLSearchParams(window.location.search).get("code");
-        if (!code) throw new Error("No authorization code found in URL.");
+        // ✅ Use the full URL
+        const { data: sessionData, error: sessionError } = await supabase.auth.exchangeCodeForSession(window.location.href);
 
-        const { data: sessionData, error: sessionError } = await supabase.auth.exchangeCodeForSession(code);
         if (sessionError || !sessionData.session) {
           throw new Error(sessionError?.message || "Failed to establish session.");
         }
 
         const userId = sessionData.session.user.id;
 
-        // Fetch profile using user_id, not id
+        // ✅ Fetch profile using user_id
         const { data: profile, error: profileError } = await supabase
           .from("profiles")
           .select("onboarding_completed")
@@ -32,7 +31,7 @@ const AuthCallback = () => {
           throw new Error("Could not load profile information.");
         }
 
-        // Redirect based on onboarding status
+        // ✅ Redirect based on onboarding status
         const redirectTo = profile?.onboarding_completed ? "/dashboard" : "/onboarding";
         navigate(redirectTo, { replace: true });
 
@@ -45,7 +44,6 @@ const AuthCallback = () => {
           description: error.message || "Something went wrong during login.",
         });
 
-        // Redirect to login after delay
         setTimeout(() => {
           navigate("/auth", { replace: true });
         }, 2000);
