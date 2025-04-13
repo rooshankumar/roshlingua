@@ -28,19 +28,22 @@ const AuthCallback = () => {
         const { data: { user }, error: userError } = await supabase.auth.getUser();
         if (userError || !user) throw userError || new Error('No user found');
 
-        // Check onboarding status
+        // Create profile if it doesn't exist and check onboarding status
         const { data: profile, error: profileError } = await supabase
           .from('profiles')
+          .upsert({ 
+            id: user.id,
+            email: user.email,
+            onboarding_completed: false,
+            created_at: new Date().toISOString()
+          }, { 
+            onConflict: 'id'
+          })
           .select('onboarding_completed')
-          .eq('id', user.id)
           .single();
 
-        if (profileError && profileError.code !== 'PGRST116') {
-          throw profileError;
-        }
-
-        // If no profile or onboarding not completed, redirect to onboarding
-        if (!profile || !profile.onboarding_completed) {
+        // If error in profile creation/check, or onboarding not completed, redirect to onboarding
+        if (profileError || !profile?.onboarding_completed) {
           navigate('/onboarding', { replace: true });
           return;
         }
