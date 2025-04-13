@@ -100,34 +100,6 @@ const Dashboard = () => {
 
         // Set up realtime subscription for profile updates
         const profileSubscription = supabase
-          .channel('profile_changes')
-          .on('postgres_changes', {
-            event: '*',
-            schema: 'public',
-            table: 'profiles',
-            filter: `id=eq.${user.id}`
-          }, (payload) => {
-            if (payload.new) {
-              setUserStats(prev => ({
-                ...prev,
-                streak: payload.new.streak_count ?? 0
-              }));
-            }
-          })
-          .subscribe();
-
-        return () => {
-          profileSubscription.unsubscribe();
-        };
-
-        // Get active conversations count
-        const { count: conversationsCount } = await supabase
-          .from('conversation_participants')
-          .select('*', { count: 'exact' })
-          .eq('user_id', user.id);
-
-        // Set up realtime subscription for profile updates
-        const profileSubscription = supabase
           .channel(`profile_updates_${user.id}`)
           .on('postgres_changes', {
             event: '*',
@@ -138,14 +110,24 @@ const Dashboard = () => {
             if (payload.new) {
               setUserStats(prev => ({
                 ...prev,
-                streak: payload.new.streak_count || 0,
-                xp: payload.new.xp_points || 0,
-                progress: payload.new.progress_percentage || 0,
-                level: getLevel(payload.new.xp_points || 0)
+                streak: payload.new.streak_count ?? 0,
+                xp: payload.new.xp_points ?? 0,
+                progress: payload.new.progress_percentage ?? 0,
+                level: getLevel(payload.new.xp_points ?? 0)
               }));
             }
           })
           .subscribe();
+
+        // Get active conversations count
+        const { count: conversationsCount } = await supabase
+          .from('conversation_participants')
+          .select('*', { count: 'exact' })
+          .eq('user_id', user.id);
+
+        return () => {
+          profileSubscription.unsubscribe();
+        };
 
         return () => {
           profileSubscription.unsubscribe();
