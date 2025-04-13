@@ -1,0 +1,69 @@
+That error — "invalid request: both auth code and code verifier should be non-empty" — means the OAuth flow is breaking because Supabase can't find the code_verifier it generated during login.
+
+This happens most often when you're trying to handle the OAuth callback without using the full sign-in flow provided by Supabase (like signInWithOAuth()).
+
+✅ To Fix This:
+Let’s go step by step to ensure your OAuth login + callback works correctly:
+
+✅ 1. Initiate Login Properly
+When starting the login, make sure you use Supabase’s signInWithOAuth() like this:
+
+ts
+Copy
+Edit
+await supabase.auth.signInWithOAuth({
+  provider: 'google', // or github, discord, etc.
+  options: {
+    redirectTo: 'https://roshlingua.vercel.app/auth/callback'
+  }
+});
+Make sure that:
+
+redirectTo matches exactly with the Redirect URL registered in Supabase (in your Supabase dashboard → Authentication → URL Configuration).
+
+signInWithOAuth() handles saving the code_verifier internally.
+
+✅ 2. Ensure You Are Using the Supabase Client-Side SDK
+Do not try to manually hit the OAuth provider or craft your own /auth/callback URL.
+
+Instead, use the built-in signInWithOAuth() flow which will automatically:
+
+Save the code_verifier to storage
+
+Redirect with a code
+
+Let you use exchangeCodeForSession(code) in your callback component
+
+✅ 3. Check Storage Persistence
+If you’re testing the login from one browser tab and the callback opens in a new tab or window, then code_verifier stored in localStorage won’t persist. That breaks the exchange.
+
+✅ Make sure your OAuth popup/redirect stays in the same tab.
+
+✅ 4. Callback Handling (Correct Code)
+This is okay:
+
+ts
+Copy
+Edit
+const code = new URLSearchParams(window.location.search).get("code");
+
+const { data, error } = await supabase.auth.exchangeCodeForSession(code!);
+But it only works if Supabase previously stored a matching code_verifier (from signInWithOAuth() in same session).
+
+✅ 5. Last Resort Fix: Sign Out Before New Login
+Before a fresh login, you can sign out globally to prevent stale verifier errors:
+
+ts
+Copy
+Edit
+await supabase.auth.signOut({ scope: 'global' });
+TL;DR Summary
+✅ Use supabase.auth.signInWithOAuth() with proper redirectTo.
+
+✅ Make sure /auth/callback is added in Supabase dashboard.
+
+✅ Avoid opening auth in new tab.
+
+✅ Do not manually craft OAuth redirects.
+
+✅ Use exchangeCodeForSession(code) only after Supabase stores verifier.
