@@ -11,24 +11,37 @@ const AuthCallback = () => {
   useEffect(() => {
     const handleCallback = async () => {
       try {
-        // Get the full URL for the callback
-        const hash = window.location.hash;
-        const query = window.location.search;
-        const url = window.location.origin + window.location.pathname + query + hash;
+        const { data, error } = await supabase.auth.getSession();
+        
+        // If we already have a session, go to dashboard
+        if (data?.session) {
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('onboarding_completed')
+            .eq('id', data.session.user.id)
+            .single();
 
-        const { data, error } = await supabase.auth.exchangeCodeForSession(url);
+          if (profile?.onboarding_completed) {
+            navigate('/dashboard', { replace: true });
+          } else {
+            navigate('/onboarding', { replace: true });
+          }
+          return;
+        }
 
-        if (error) throw error;
-        if (!data.session) throw new Error('No session returned');
+        // Otherwise exchange the code
+        const { data: authData, error: authError } = await supabase.auth.exchangeCodeForSession(window.location.href);
+        
+        if (authError) throw authError;
+        if (!authData.session) throw new Error('No session returned');
 
         // Check onboarding status
         const { data: profile } = await supabase
           .from('profiles')
           .select('onboarding_completed')
-          .eq('id', data.session.user.id)
+          .eq('id', authData.session.user.id)
           .single();
 
-        // Redirect based on onboarding status
         if (profile?.onboarding_completed) {
           navigate('/dashboard', { replace: true });
         } else {
@@ -37,7 +50,7 @@ const AuthCallback = () => {
       } catch (error: any) {
         console.error('Auth callback error:', error);
         toast({
-          variant: "destructive",
+          variant: "destructive", 
           title: "Authentication Error",
           description: error.message || "Failed to complete authentication"
         });

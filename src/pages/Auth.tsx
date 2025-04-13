@@ -149,18 +149,16 @@ const Auth = () => {
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
-          redirectTo: window.location.origin + "/auth/callback",
+          redirectTo: `${window.location.origin}/auth/callback`,
           queryParams: {
             access_type: "offline",
             prompt: "consent",
           },
+          skipBrowserRedirect: false
         },
       });
 
       if (error) throw error;
-      if (!data.url) throw new Error("No OAuth URL returned");
-
-      window.location.href = data.url; // Redirects to Google login
     } catch (error: any) {
       console.error("Google login error:", error);
       toast({
