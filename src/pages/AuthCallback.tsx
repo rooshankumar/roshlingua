@@ -12,40 +12,50 @@ const AuthCallback = () => {
   useEffect(() => {
     const handleAuth = async () => {
       try {
-        const code = new URLSearchParams(window.location.search).get("code");
-        if (!code) throw new Error("No authorization code found");
+        // First get the session
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+        
+        if (sessionError) throw sessionError;
 
-        const { data: sessionData, error: sessionError } = 
-          await supabase.auth.exchangeCodeForSession(code);
-
-        if (sessionError || !sessionData.session) {
-          throw new Error(sessionError?.message || "Failed to establish session");
+        // If no session found, try to exchange the code
+        if (!session) {
+          const { data, error } = await supabase.auth.exchangeCodeForSession(window.location.href);
+          if (error) throw error;
+          if (!data.session) throw new Error('No session returned');
         }
 
-        const userId = sessionData.session.user.id;
+        // Get the current user
+        const { data: { user }, error: userError } = await supabase.auth.getUser();
+        if (userError || !user) throw userError || new Error('No user found');
 
+        // Check onboarding status
         const { data: profile, error: profileError } = await supabase
-          .from("profiles")
-          .select("onboarding_completed")
-          .eq("id", userId)
+          .from('profiles')
+          .select('onboarding_completed')
+          .eq('id', user.id)
           .single();
 
-        if (profileError) {
-          await supabase.from("profiles").insert([{ id: userId }]);
-          return navigate("/onboarding", { replace: true });
+        if (profileError && profileError.code !== 'PGRST116') {
+          throw profileError;
         }
 
-        const redirectTo = profile?.onboarding_completed ? "/dashboard" : "/onboarding";
-        navigate(redirectTo, { replace: true });
+        // If no profile or onboarding not completed, redirect to onboarding
+        if (!profile || !profile.onboarding_completed) {
+          navigate('/onboarding', { replace: true });
+          return;
+        }
+
+        // If everything is good, go to dashboard
+        navigate('/dashboard', { replace: true });
 
       } catch (error: any) {
-        console.error("Auth error:", error);
+        console.error('Auth callback error:', error);
         toast({
           variant: "destructive",
-          title: "Authentication Failed",
-          description: error.message || "Something went wrong",
+          title: "Authentication Error",
+          description: error.message || "Failed to complete authentication"
         });
-        navigate("/auth", { replace: true });
+        navigate('/auth', { replace: true });
       }
     };
 
