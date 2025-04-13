@@ -1,60 +1,56 @@
 
-import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { supabase } from "@/lib/supabase";
-import { useToast } from "@/components/ui/use-toast";
-import { Loader2 } from "lucide-react";
+import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { supabase } from '@/lib/supabase';
+import { useToast } from '@/hooks/use-toast';
 
 const AuthCallback = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
 
   useEffect(() => {
-    const handleAuth = async () => {
+    const handleCallback = async () => {
       try {
-        // First get the session
-        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+        const { data, error } = await supabase.auth.getSession();
         
-        if (sessionError) throw sessionError;
+        // If we already have a session, go to dashboard
+        if (data?.session) {
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('onboarding_completed')
+            .eq('id', data.session.user.id)
+            .single();
 
-        // If no session found, try to exchange the code
-        if (!session) {
-          const { data, error } = await supabase.auth.exchangeCodeForSession(window.location.href);
-          if (error) throw error;
-          if (!data.session) throw new Error('No session returned');
-        }
-
-        // Get the current user
-        const { data: { user }, error: userError } = await supabase.auth.getUser();
-        if (userError || !user) throw userError || new Error('No user found');
-
-        // Create profile if it doesn't exist and check onboarding status
-        const { data: profile, error: profileError } = await supabase
-          .from('profiles')
-          .upsert({ 
-            id: user.id,
-            email: user.email,
-            onboarding_completed: false,
-            created_at: new Date().toISOString()
-          }, { 
-            onConflict: 'id'
-          })
-          .select('onboarding_completed')
-          .single();
-
-        // If error in profile creation/check, or onboarding not completed, redirect to onboarding
-        if (profileError || !profile?.onboarding_completed) {
-          navigate('/onboarding', { replace: true });
+          if (profile?.onboarding_completed) {
+            navigate('/dashboard', { replace: true });
+          } else {
+            navigate('/onboarding', { replace: true });
+          }
           return;
         }
 
-        // If everything is good, go to dashboard
-        navigate('/dashboard', { replace: true });
+        // Otherwise exchange the code
+        const { data: authData, error: authError } = await supabase.auth.exchangeCodeForSession(window.location.href);
+        
+        if (authError) throw authError;
+        if (!authData.session) throw new Error('No session returned');
 
+        // Check onboarding status
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('onboarding_completed')
+          .eq('id', authData.session.user.id)
+          .single();
+
+        if (profile?.onboarding_completed) {
+          navigate('/dashboard', { replace: true });
+        } else {
+          navigate('/onboarding', { replace: true });
+        }
       } catch (error: any) {
         console.error('Auth callback error:', error);
         toast({
-          variant: "destructive",
+          variant: "destructive", 
           title: "Authentication Error",
           description: error.message || "Failed to complete authentication"
         });
@@ -62,15 +58,14 @@ const AuthCallback = () => {
       }
     };
 
-    handleAuth();
+    handleCallback();
   }, [navigate, toast]);
 
   return (
-    <div className="flex min-h-screen items-center justify-center">
-      <div className="text-center space-y-4">
-        <Loader2 className="h-8 w-8 animate-spin mx-auto text-primary" />
-        <h2 className="text-2xl font-semibold">Signing you in...</h2>
-        <p className="text-muted-foreground">Please wait while we verify your account</p>
+    <div className="flex items-center justify-center min-h-screen">
+      <div className="text-center">
+        <h2 className="text-lg font-semibold">Completing authentication...</h2>
+        <p className="text-sm text-muted-foreground">Please wait while we sign you in</p>
       </div>
     </div>
   );
