@@ -11,14 +11,18 @@ const AuthCallback = () => {
   useEffect(() => {
     const handleCallback = async () => {
       try {
-        // Get the code from URL
-        const code = new URL(window.location.href).searchParams.get("code");
+        const hashParams = new URLSearchParams(window.location.hash.substring(1));
+        const queryParams = new URLSearchParams(window.location.search);
+        
+        // Check both hash and query parameters for the code
+        const code = hashParams.get("code") || queryParams.get("code");
         
         if (!code) {
           throw new Error("No code found in URL");
         }
 
-        const { data, error } = await supabase.auth.exchangeCodeForSession(code);
+        // Exchange the code for a session
+        const { data, error } = await supabase.auth.exchangeCodeForSession(window.location.href);
 
         if (error) {
           throw error;
