@@ -80,23 +80,58 @@ const Dashboard = () => {
       if (!user) return;
 
       try {
-        const [xpData, progressData] = await Promise.all([
-          getXP(user.id),
-          getProgress(user.id)
-        ]);
+        // Get initial profile data including streak
+        const { data: profileData, error } = await supabase
+          .from('profiles')
+          .select('streak_count, xp_points, progress_percentage')
+          .eq('id', user.id)
+          .single();
 
-        setUserStats({
-          streak: 0, // Will be updated by streak trigger
-          xp: xpData,
-          progress: progressData,
-          level: getLevel(xpData)
-        });
+        if (error) throw error;
+
+        if (profileData) {
+          setUserStats({
+            streak: profileData.streak_count ?? 0, // Use nullish coalescing to only default to 0 if null/undefined
+            xp: profileData.xp_points || 0,
+            progress: profileData.progress_percentage || 0,
+            level: getLevel(profileData.xp_points || 0)
+          });
+        }
+
+        // Set up realtime subscription for profile updates
+        const profileSubscription = supabase
+          .channel(`profile_updates_${user.id}`)
+          .on('postgres_changes', {
+            event: '*',
+            schema: 'public',
+            table: 'profiles',
+            filter: `id=eq.${user.id}`
+          }, (payload) => {
+            if (payload.new) {
+              setUserStats(prev => ({
+                ...prev,
+                streak: payload.new.streak_count ?? 0,
+                xp: payload.new.xp_points ?? 0,
+                progress: payload.new.progress_percentage ?? 0,
+                level: getLevel(payload.new.xp_points ?? 0)
+              }));
+            }
+          })
+          .subscribe();
 
         // Get active conversations count
         const { count: conversationsCount } = await supabase
           .from('conversation_participants')
           .select('*', { count: 'exact' })
           .eq('user_id', user.id);
+
+        return () => {
+          profileSubscription.unsubscribe();
+        };
+
+        return () => {
+          profileSubscription.unsubscribe();
+        };
 
         setStats({
           conversations: conversationsCount || 0,
