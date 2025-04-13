@@ -260,57 +260,7 @@ const Dashboard = () => {
         </Card>
       </div>
 
-      <Card className="overflow-hidden bg-gradient-to-br from-card to-card/95 hover:shadow-lg transition-all duration-200">
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 bg-muted/50">
-          <div className="space-y-1">
-            <CardTitle>
-              <div className="flex items-center space-x-2">
-                <Users className="h-5 w-5 text-primary" />
-                <span>Active Community</span>
-              </div>
-            </CardTitle>
-            <CardDescription className="flex items-center gap-2">
-              Connect with language partners 
-              <span className="flex items-center gap-1">
-                <span className="h-2 w-2 rounded-full bg-green-500 animate-pulse"/>
-                online now
-              </span>
-            </CardDescription>
-          </div>
-          <Button asChild variant="outline" size="sm" className="hover:bg-primary hover:text-primary-foreground">
-            <Link to="/community">View All</Link>
-          </Button>
-        </CardHeader>
-        <CardContent className="p-6">
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-            {activeUsers.map((user) => (
-              <Link to={`/profile/${user.id}`} key={user.id} className="group">
-                <div className="flex flex-col items-center p-4 rounded-xl border border-border bg-gradient-to-b from-muted/50 to-transparent backdrop-blur-sm group-hover:border-primary/50 group-hover:shadow-lg transition-all duration-200">
-                  <div className="relative mb-3">
-                    <Avatar className="h-16 w-16 ring-2 ring-border group-hover:ring-primary/50 transition-all">
-                      <AvatarImage src={user.avatar_url} alt={user.full_name} />
-                      <AvatarFallback>{user.full_name?.charAt(0)}</AvatarFallback>
-                    </Avatar>
-                    <div className={cn(
-                      "absolute bottom-0 right-0 w-4 h-4 rounded-full ring-2 ring-background transition-colors",
-                      user.is_online ? "bg-green-500" : "bg-gray-400"
-                    )}></div>
-                  </div>
-                  <h4 className="font-medium text-sm group-hover:text-primary transition-colors">{user.full_name}</h4>
-                  <div className="flex items-center space-x-1 mt-2">
-                    <Languages className="h-3 w-3 text-muted-foreground" />
-                    <span className="text-xs text-muted-foreground">{user.learning_language}</span>
-                  </div>
-                  <div className="flex items-center space-x-1 mt-1">
-                    <Flame className="h-3 w-3 text-primary" />
-                    <span className="text-xs font-medium">{user.streak_count || 0} day streak</span>
-                  </div>
-                </div>
-              </Link>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+      
 
       <NotificationCard />
     </div>
