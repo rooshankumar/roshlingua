@@ -24,9 +24,25 @@ export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
       path: '/',
       sameSite: 'lax'
     },
-    // Ensure these are set correctly
-    pkceTimeout: 5 * 60, // 5 minutes to complete authentication
-    pkceLeeway: 30 // 30 second leeway for clock skew
+    // Increase timeout for auth completion
+    pkceTimeout: 15 * 60, // 15 minutes to complete authentication
+    pkceLeeway: 60 // 60 second leeway for clock skew
+  },
+  // Add global error handler for debugging
+  global: {
+    fetch: (...args) => {
+      return fetch(...args).then(response => {
+        if (!response.ok) {
+          console.error(`Supabase API error: ${response.status} ${response.statusText}`, {
+            url: response.url
+          });
+        }
+        return response;
+      }).catch(error => {
+        console.error('Supabase fetch error:', error);
+        throw error;
+      });
+    }
   }
 });
 

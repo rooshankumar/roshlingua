@@ -21,15 +21,14 @@ const AuthCodeHandler = () => {
 
       const handleAuthWithCode = async () => {
         try {
-          // Check if code verifier exists
+          // Check for code verifier in localStorage with the exact key Supabase uses
           const codeVerifier = localStorage.getItem('supabase.auth.code_verifier');
           console.log("Code verifier exists:", !!codeVerifier);
           console.log("Code verifier length:", codeVerifier?.length || 0);
+          console.log("localStorage keys:", Object.keys(localStorage));
           
           if (!codeVerifier) {
             console.error("Missing code verifier in localStorage");
-            // Generating a new code verifier here won't work for the current authentication request
-            // as it needs to match what was used to start the flow
             toast({
               variant: "destructive",
               title: "Authentication Failed",
@@ -39,9 +38,27 @@ const AuthCodeHandler = () => {
             return;
           }
           
-          // Manually construct the exchange parameters
+          // Ensure both code and verifier are strings and not empty
+          if (typeof code !== 'string' || !code.trim() || typeof codeVerifier !== 'string' || !codeVerifier.trim()) {
+            console.error("Code or code verifier is invalid:", {
+              codeType: typeof code,
+              codeEmpty: !code?.trim(),
+              verifierType: typeof codeVerifier,
+              verifierEmpty: !codeVerifier?.trim()
+            });
+            
+            toast({
+              variant: "destructive",
+              title: "Authentication Failed",
+              description: "Invalid authentication data. Please try logging in again."
+            });
+            navigate('/auth', { replace: true });
+            return;
+          }
+          
           console.log("Exchanging auth code for session...");
-          // Using the explicit parameter method instead of passing the URL
+          
+          // Use the Supabase function to exchange the code for a session
           const { data, error } = await supabase.auth.exchangeCodeForSession(code, codeVerifier);
 
           if (error) {

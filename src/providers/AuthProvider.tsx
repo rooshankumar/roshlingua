@@ -332,20 +332,36 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       console.log("Initiating Google login...");
       
-      // Generate a fresh code verifier
-      const codeVerifier = generateCodeVerifier();
+      // First, clear any existing code verifiers to avoid conflicts
+      localStorage.removeItem('supabase.auth.code_verifier');
+      
+      // Generate a fresh code verifier - ensuring it's valid for PKCE
+      const randomBytes = new Uint8Array(43); // 43 bytes = ~64 characters in base64
+      crypto.getRandomValues(randomBytes);
+      
+      const codeVerifier = btoa(String.fromCharCode(...randomBytes))
+        .replace(/\+/g, '-')
+        .replace(/\//g, '_')
+        .replace(/=+$/, '');
+      
       console.log("Generated fresh code verifier with length:", codeVerifier.length);
       
-      // Store it in localStorage - critically important for PKCE flow
+      // Store it in localStorage with the EXACT key Supabase expects
       localStorage.setItem('supabase.auth.code_verifier', codeVerifier);
       
-      // Log storage for debugging
+      // Verify storage for debugging
       const storedVerifier = localStorage.getItem('supabase.auth.code_verifier');
       console.log("Stored code verifier exists:", !!storedVerifier);
       console.log("Stored code verifier length:", storedVerifier?.length || 0);
+      console.log("Stored matches generated:", storedVerifier === codeVerifier);
       
-      // Use explicit PKCE parameters
+      // Log all localStorage keys for debugging
+      console.log("All localStorage keys:", Object.keys(localStorage));
+      
+      // Use explicit PKCE parameters with correct callback URL
       const redirectUrl = `${window.location.origin}/auth/callback`;
+      console.log("Redirect URL:", redirectUrl);
+      
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
@@ -354,6 +370,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             access_type: 'offline',
             prompt: 'consent'
           },
+          // Pass the same code verifier that we stored
           codeVerifier: codeVerifier,
           skipBrowserRedirect: false
         }
@@ -374,6 +391,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
 
       console.log("Redirecting to Google OAuth with code_verifier in localStorage...");
+      console.log("OAuth URL:", data.url);
+      
       // Let the browser handle the redirect naturally
       window.location.href = data.url;
     } catch (error) {
@@ -387,16 +406,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
   
-  // Helper function to generate code verifier
-  function generateCodeVerifier() {
-    const array = new Uint8Array(64);
-    crypto.getRandomValues(array);
-    return btoa(String.fromCharCode.apply(null, [...array]))
-      .replace(/\+/g, '-')
-      .replace(/\//g, '_')
-      .replace(/=+$/, '')
-      .substring(0, 128);
-  }
+  // We don't need this separate function anymore, it's inlined in loginWithGoogle
 
   const signOut = async () => {
     try {

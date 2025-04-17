@@ -16,6 +16,9 @@ const Callback = () => {
         // Log the URL for debugging
         console.log("Current URL:", window.location.href);
         
+        // Dump all localStorage keys for debugging
+        console.log("localStorage keys:", Object.keys(localStorage));
+        
         // Check for code verifier in localStorage
         const codeVerifier = localStorage.getItem('supabase.auth.code_verifier');
         console.log("Code verifier exists:", !!codeVerifier);
@@ -42,13 +45,26 @@ const Callback = () => {
           throw new Error("Authentication verification failed. Please try logging in again.");
         }
         
+        // Ensure both code and verifier are strings and not empty
+        if (typeof code !== 'string' || !code.trim() || typeof codeVerifier !== 'string' || !codeVerifier.trim()) {
+          console.error("Code or code verifier is invalid:", {
+            codeType: typeof code,
+            codeEmpty: !code?.trim(),
+            verifierType: typeof codeVerifier,
+            verifierEmpty: !codeVerifier?.trim()
+          });
+          
+          throw new Error("Invalid authentication data. Please try logging in again.");
+        }
+        
         console.log("Exchanging code for session with code:", code.substring(0, 5) + "...");
         console.log("Using code verifier of length:", codeVerifier.length);
         
-        // Use the explicit method for better control
+        // Use the explicit method with directly passed parameters
         const { data, error } = await supabase.auth.exchangeCodeForSession(code, codeVerifier);
         
         if (error) {
+          console.error("Exchange error:", error);
           throw error;
         }
         
@@ -72,9 +88,27 @@ const Callback = () => {
               id: data.session.user.id,
               email: data.session.user.email,
               created_at: new Date().toISOString(),
-              updated_at: new Date().toISOString()
+              updated_at: new Date().toISOString(),
+              last_seen: new Date().toISOString(),
+              onboarding_completed: false
             });
+            
+            // Clear the code verifier after successful use
+            localStorage.removeItem('supabase.auth.code_verifier');
+            
+            // Redirect new user to onboarding
+            navigate('/onboarding', { replace: true });
+            return;
           }
+          
+          // Update last seen timestamp
+          await supabase
+            .from('profiles')
+            .update({ last_seen: new Date().toISOString() })
+            .eq('id', data.session.user.id);
+          
+          // Clear the code verifier after successful use
+          localStorage.removeItem('supabase.auth.code_verifier');
           
           // Redirect based on onboarding status
           if (profile?.onboarding_completed) {
