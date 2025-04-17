@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { AuthProvider, useAuth } from "@/providers/AuthProvider";
 import { Toaster } from "@/components/ui/toaster";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -112,14 +112,31 @@ const AppRoutes = () => {
   );
 };
 
+const AuthCodeHandler = () => {
+  const location = useLocation();
+  const { setUser } = useAuth();
+  const code = new URLSearchParams(location.search).get('code');
+
+  if (code) {
+    // Handle the code here (e.g., send it to your backend for token exchange)
+    // ... your code to handle the auth code ...
+    console.log("Auth code received:", code);
+    // Example: Simulate successful authentication
+    setUser({ id: 1, name: 'Test User', email: 'test@example.com' }); // Replace with your actual user data retrieval
+    return <Navigate to="/dashboard" replace />;
+  }
+  return null;
+};
+
 const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
-      <ThemeProvider defaultTheme="light">
+      <ThemeProvider defaultTheme="dark" storageKey="ui-theme">
         <BrowserRouter>
           <AuthProvider>
-            <Toaster />
+            <AuthCodeHandler />
             <AppRoutes />
+            <Toaster />
             <Analytics debug={false} />
             <SpeedInsights debug={false} />
           </AuthProvider>
