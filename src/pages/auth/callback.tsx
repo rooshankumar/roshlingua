@@ -4,39 +4,84 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/lib/supabase';
 import { useToast } from '@/hooks/use-toast';
 
-export default function Callback() {
+const Callback = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
 
   useEffect(() => {
-    const handleAuth = async () => {
+    const handleAuthCallback = async () => {
       try {
+        console.log("Processing authentication callback...");
+        
+        // The code exchange happens using the current URL
         const { data, error } = await supabase.auth.exchangeCodeForSession(window.location.href);
         
-        if (error) throw error;
-        if (!data.session) throw new Error('No session returned');
-
-        navigate('/', { replace: true });
+        if (error) {
+          throw error;
+        }
+        
+        if (data?.session) {
+          console.log("Authentication successful, retrieving profile...");
+          
+          // Session exists, check if profile exists
+          const { data: profile, error: profileError } = await supabase
+            .from('profiles')
+            .select('onboarding_completed')
+            .eq('id', data.session.user.id)
+            .single();
+            
+          if (profileError && profileError.code !== 'PGRST116') {
+            console.error("Error fetching profile:", profileError);
+          }
+          
+          // Create profile if it doesn't exist
+          if (!profile) {
+            await supabase.from('profiles').insert({
+              id: data.session.user.id,
+              email: data.session.user.email,
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString()
+            });
+          }
+          
+          // Redirect based on onboarding status
+          if (profile?.onboarding_completed) {
+            navigate('/dashboard', { replace: true });
+          } else {
+            navigate('/onboarding', { replace: true });
+          }
+        } else {
+          // No session - redirect to login
+          toast({
+            variant: "destructive",
+            title: "Authentication Failed",
+            description: "Failed to complete authentication."
+          });
+          navigate('/auth', { replace: true });
+        }
       } catch (error: any) {
-        console.error('Login failed:', error.message);
+        console.error('Auth callback error:', error);
         toast({
           variant: "destructive",
           title: "Authentication Failed",
-          description: error.message
+          description: error.message || "Failed to complete authentication"
         });
         navigate('/auth', { replace: true });
       }
     };
 
-    handleAuth();
+    handleAuthCallback();
   }, [navigate, toast]);
 
   return (
-    <div className="flex items-center justify-center min-h-screen">
-      <div className="text-center">
-        <h2 className="text-lg font-semibold">Signing you in...</h2>
-        <p className="text-sm text-muted-foreground">Please wait</p>
+    <div className="h-screen w-full flex items-center justify-center">
+      <div className="animate-pulse flex flex-col items-center gap-4">
+        <div className="h-12 w-12 rounded-full bg-primary/20"></div>
+        <div className="h-2 w-24 rounded-full bg-primary/20"></div>
+        <p className="text-muted-foreground">Completing authentication...</p>
       </div>
     </div>
   );
-}
+};
+
+export default Callback;

@@ -19,20 +19,35 @@ const AuthCodeHandler = () => {
     const code = query.get('code');
     
     if (code) {
+      console.log("Auth code detected, processing...");
+      
       const handleOAuthCode = async () => {
         try {
-          // Exchange the code for a session
+          console.log("Exchanging code for session...");
+          
+          // Exchange the code for a session using the full URL
           const { data, error } = await supabase.auth.exchangeCodeForSession(window.location.href);
           
-          if (error) throw error;
-          if (!data.session) throw new Error('No session returned');
+          if (error) {
+            throw error;
+          }
+          
+          if (!data.session) {
+            throw new Error('No session returned');
+          }
+          
+          console.log("Session successfully created");
           
           // Get user profile
-          const { data: profile } = await supabase
+          const { data: profile, error: profileError } = await supabase
             .from('profiles')
             .select('onboarding_completed')
             .eq('id', data.session.user.id)
             .single();
+          
+          if (profileError && profileError.code !== 'PGRST116') {
+            console.error("Error fetching profile:", profileError);
+          }
           
           // Create profile if it doesn't exist
           if (!profile) {
@@ -55,7 +70,7 @@ const AuthCodeHandler = () => {
           toast({
             variant: "destructive",
             title: "Authentication Failed",
-            description: error.message
+            description: error.message || "Failed to complete authentication"
           });
           navigate('/auth', { replace: true });
         }

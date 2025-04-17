@@ -51,8 +51,9 @@ const AppRoutes = () => {
         </AuthLayout>
       } />
 
-      {/* Auth callback route for OAuth */}
+      {/* Auth callback routes for OAuth - support both paths for compatibility */}
       <Route path="/auth/callback" element={<AuthCallback />} />
+      <Route path="/callback" element={<AuthCallback />} />
 
       {/* Protected routes with AppLayout */}
       <Route path="/onboarding" element={
