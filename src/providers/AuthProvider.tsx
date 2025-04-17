@@ -284,10 +284,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const loginWithGoogle = async () => {
     try {
+      // Ensure we have a specific callback URL to handle the OAuth response
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}`,
+          redirectTo: `${window.location.origin}/auth/callback`,
           queryParams: {
             access_type: 'offline',
             prompt: 'consent',
@@ -309,7 +310,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         throw new Error("No OAuth URL returned");
       }
 
-      // Redirect to Google OAuth - don't use replace to avoid browser history issues
+      console.log("Redirecting to Google OAuth...");
+      // Redirect to Google OAuth
       window.location.href = data.url;
     } catch (error) {
       console.error("Google login error:", error);

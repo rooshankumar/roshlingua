@@ -19,13 +19,14 @@ const AuthCodeHandler = () => {
     const code = query.get('code');
     
     if (code) {
-      console.log("Auth code detected in URL, processing...");
+      console.log("Auth code detected, processing...");
       
       const handleOAuthCode = async () => {
         try {
           console.log("Exchanging code for session...");
-          // Exchange the code for a session
-          const { data, error } = await supabase.auth.exchangeCodeForSession(window.location.href);
+          
+          // Exchange the code for a session - full URL is required
+          const { data, error } = await supabase.auth.exchangeCodeForSession(code);
           
           if (error) {
             console.error("Auth code exchange error:", error);
