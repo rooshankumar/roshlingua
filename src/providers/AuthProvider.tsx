@@ -285,7 +285,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const loginWithGoogle = async () => {
     try {
       console.log("Initiating Google login...");
-      
+
       // Ensure we use the correct callback URL that matches vercel.json routes
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',

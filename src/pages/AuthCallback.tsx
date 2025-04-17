@@ -13,15 +13,15 @@ const AuthCallback = () => {
       try {
         console.log("Processing authentication callback...");
         
-        // The code is in the URL - exchange it for a session
-        const { data, error } = await supabase.auth.exchangeCodeForSession(window.location.href);
+        // Get the current session - code exchange should have happened automatically
+        const { data, error } = await supabase.auth.getSession();
         
         if (error) {
-          console.error("Auth code exchange error:", error);
+          console.error("Session error:", error);
           throw error;
         }
         
-        console.log("Session created successfully:", data.session ? "Yes" : "No");
+        console.log("Session check result:", data.session ? "Session exists" : "No session");
         
         if (data?.session) {
           // Session exists, check if profile exists
@@ -56,7 +56,7 @@ const AuthCallback = () => {
           toast({
             variant: "destructive", 
             title: "Authentication Failed",
-            description: "Could not create session from the auth code."
+            description: "Could not find an active session. Please try logging in again."
           });
           navigate('/auth', { replace: true });
         }
