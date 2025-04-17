@@ -12,13 +12,14 @@ const AuthCodeHandler = () => {
   useEffect(() => {
     const url = new URL(window.location.href);
     const code = url.searchParams.get('code');
-
-    if (code && window.location.pathname === '/') {
+    
+    if (code) {
       console.log("Detected code parameter, handling OAuth callback...");
 
       const handleAuthWithCode = async () => {
         try {
-          // Exchange the authorization code for a session
+          console.log("Exchanging auth code for session...");
+          // The full URL is needed as it contains both the code and state parameters
           const { data, error } = await supabase.auth.exchangeCodeForSession(window.location.href);
 
           if (error) {

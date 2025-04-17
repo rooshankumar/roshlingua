@@ -16,7 +16,14 @@ export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
     flowType: 'pkce',
     storage: window.localStorage,
     storageKey: 'supabase.auth.token',
-    debug: true
+    debug: true,
+    cookieOptions: {
+      name: 'sb-auth-token',
+      lifetime: 60 * 60 * 8,
+      domain: window.location.hostname,
+      path: '/',
+      sameSite: 'lax'
+    }
   }
 });
 

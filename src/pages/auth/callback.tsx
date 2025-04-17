@@ -11,7 +11,10 @@ const Callback = () => {
   useEffect(() => {
     const handleAuthCallback = async () => {
       try {
-        console.log("Processing authentication callback...");
+        console.log("Processing authentication callback on dedicated callback page...");
+        
+        // Log the URL for debugging
+        console.log("Current URL:", window.location.href);
         
         // The code exchange happens using the current URL
         const { data, error } = await supabase.auth.exchangeCodeForSession(window.location.href);

@@ -332,6 +332,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       console.log("Initiating Google login...");
 
+      // Store the code verifier in localStorage before initiating OAuth
+      // This helps ensure the PKCE flow works properly
+      localStorage.setItem('supabase.auth.code_verifier', crypto.randomUUID());
+      
       // Ensure we use the correct callback URL that matches vercel.json routes
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
@@ -340,7 +344,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           queryParams: {
             access_type: 'offline',
             prompt: 'consent',
-          }
+          },
+          skipBrowserRedirect: false
         }
       });
 
