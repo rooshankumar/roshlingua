@@ -154,11 +154,17 @@ const Auth = () => {
             access_type: "offline",
             prompt: "consent",
           },
-          skipBrowserRedirect: false
         },
       });
 
       if (error) throw error;
+      
+      if (!data.url) {
+        throw new Error("No OAuth URL returned");
+      }
+
+      // Redirect to Google OAuth
+      window.location.href = data.url;
     } catch (error: any) {
       console.error("Google login error:", error);
       toast({
