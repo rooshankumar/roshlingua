@@ -309,7 +309,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         throw new Error("No OAuth URL returned");
       }
 
-      // Create or update profile after successful Google sign-in
+      // Create or update profile record
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
         const { error: profileError } = await supabase
@@ -317,12 +317,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           .upsert({
             id: user.id,
             email: user.email,
+            full_name: user.user_metadata?.full_name || '',
+            created_at: new Date().toISOString(),
             updated_at: new Date().toISOString(),
             onboarding_completed: false
-          }, { onConflict: 'id' });
+          }, { 
+            onConflict: 'id'
+          });
 
         if (profileError) {
           console.error("Error creating profile:", profileError);
+          throw profileError;
         }
       }
 
@@ -347,7 +352,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       // Clear any local state
       setUser(null);
       setSession(null);
-      
+
       // Force navigation to auth page
       // Debounce navigation to prevent flooding
       setTimeout(() => {
@@ -385,7 +390,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const updateUserActivity = async (userId: string) => {
     if (!userId) return;
-    
+
     try {
       const { error } = await supabase
         .from('profiles')

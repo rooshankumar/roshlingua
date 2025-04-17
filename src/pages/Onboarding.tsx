@@ -303,6 +303,17 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
         }
     };
 
+    if (isLoading) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-background to-secondary">
+                <div className="text-center space-y-4">
+                    <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent mx-auto"></div>
+                    <p className="text-lg font-medium">Loading your profile...</p>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-gradient-to-b from-background to-secondary relative">
             {isLoading && (
