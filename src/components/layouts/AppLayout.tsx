@@ -36,8 +36,7 @@ const AppLayout = ({ children }: AppLayoutProps) => {
 
   return (
     <div className="min-h-screen flex flex-col md:flex-row">
-      {/* Always show sidebar on large screens, but keep it hidden on mobile */}
-      <div className="hidden md:block md:sticky md:top-0 md:h-screen">
+      <div className="hidden md:block">
         <MainNav />
       </div>
       <main className="flex-1 pb-24 md:p-4 md:pb-4">{children}</main>
