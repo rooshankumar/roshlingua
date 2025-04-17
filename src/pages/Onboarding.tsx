@@ -58,65 +58,7 @@ type OnboardingFormData = {
 
 const Onboarding = ({ onComplete }: OnboardingProps) => {
     const [step, setStep] = useState(1);
-    const [isLoading, setIsLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
-    const { user } = useAuth();
-
-    useEffect(() => {
-        const initializeOnboarding = async () => {
-            try {
-                if (!user) {
-                    setError("No user found");
-                    return;
-                }
-
-                const { data: profile, error: profileError } = await supabase
-                    .from('profiles')
-                    .select('*')
-                    .eq('id', user.id)
-                    .single();
-
-                if (profileError) {
-                    console.error("Error fetching profile:", profileError);
-                    setError("Failed to load profile data");
-                    return;
-                }
-
-                if (profile) {
-                    form.reset({
-                        full_name: profile.full_name || "",
-                        gender: profile.gender || "",
-                        native_language: profile.native_language || "",
-                        learning_language: profile.learning_language || "",
-                        proficiency_level: profile.proficiency_level || "",
-                        bio: profile.bio || "",
-                        avatar_url: profile.avatar_url || "",
-                        date_of_birth: profile.date_of_birth ? new Date(profile.date_of_birth) : undefined,
-                    });
-                }
-            } catch (err) {
-                console.error("Onboarding initialization error:", err);
-                setError("Failed to initialize onboarding");
-            } finally {
-                setIsLoading(false);
-            }
-        };
-
-        initializeOnboarding();
-    }, [user]);
-
-    if (error) {
-        return (
-            <div className="flex items-center justify-center min-h-screen">
-                <div className="text-center">
-                    <h2 className="text-lg font-semibold text-destructive">{error}</h2>
-                    <Button onClick={() => window.location.reload()} className="mt-4">
-                        Try Again
-                    </Button>
-                </div>
-            </div>
-        );
-    }
+    const [isLoading, setIsLoading] = useState(false);
     const form = useForm<OnboardingFormData>({
         defaultValues: {
             full_name: "",
@@ -302,17 +244,6 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
             setIsLoading(false);
         }
     };
-
-    if (isLoading) {
-        return (
-            <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-background to-secondary">
-                <div className="text-center space-y-4">
-                    <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent mx-auto"></div>
-                    <p className="text-lg font-medium">Loading your profile...</p>
-                </div>
-            </div>
-        );
-    }
 
     return (
         <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-gradient-to-b from-background to-secondary relative">

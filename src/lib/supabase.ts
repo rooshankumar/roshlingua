@@ -17,10 +17,6 @@ export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
     storage: window.localStorage,
     storageKey: 'supabase.auth.token',
     debug: true
-  },
-  headers: {
-    'Accept': 'application/json',
-    'Content-Type': 'application/json'
   }
 });
 

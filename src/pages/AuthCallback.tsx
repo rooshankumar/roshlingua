@@ -36,30 +36,11 @@ const AuthCallback = () => {
         if (!authData.session) throw new Error('No session returned');
 
         // Check onboarding status
-        const { data: profile, error: profileError } = await supabase
+        const { data: profile } = await supabase
           .from('profiles')
-          .select('*')
+          .select('onboarding_completed')
           .eq('id', authData.session.user.id)
           .single();
-
-        if (profileError) {
-          // If profile doesn't exist, create it
-          const user = authData.session.user;
-          const { error: createError } = await supabase
-            .from('profiles')
-            .insert({
-              id: user.id,
-              email: user.email,
-              full_name: user.user_metadata?.full_name || '',
-              created_at: new Date().toISOString(),
-              updated_at: new Date().toISOString(),
-              onboarding_completed: false
-            });
-
-          if (createError) throw createError;
-          navigate('/onboarding', { replace: true });
-          return;
-        }
 
         if (profile?.onboarding_completed) {
           navigate('/dashboard', { replace: true });
