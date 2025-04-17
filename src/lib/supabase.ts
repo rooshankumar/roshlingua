@@ -26,10 +26,14 @@ export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
     },
     // Increase timeout for auth completion
     pkceTimeout: 15 * 60, // 15 minutes to complete authentication
-    pkceLeeway: 60 // 60 second leeway for clock skew
+    pkceLeeway: 60, // 60 second leeway for clock skew
+    detectSessionInUrl: true // Ensure this is enabled
   },
   // Add global error handler for debugging
   global: {
+    headers: {
+      'X-Client-Info': 'supabase-js/2.x'
+    },
     fetch: (...args) => {
       return fetch(...args).then(response => {
         if (!response.ok) {
@@ -42,6 +46,11 @@ export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
         console.error('Supabase fetch error:', error);
         throw error;
       });
+    }
+  },
+  realtime: {
+    params: {
+      eventsPerSecond: 10
     }
   }
 });

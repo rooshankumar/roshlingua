@@ -332,22 +332,36 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       console.log("Initiating Google login...");
       
-      // First, clear any existing code verifiers to avoid conflicts
-      localStorage.removeItem('supabase.auth.code_verifier');
+      // Clear authentication state completely for a fresh start
+      localStorage.removeItem('supabase.auth.token');
+      localStorage.removeItem('supabase.auth.expires_at');
+      localStorage.removeItem('supabase.auth.refresh_token');
       
-      // Generate a fresh code verifier - ensuring it's valid for PKCE
-      const randomBytes = new Uint8Array(43); // 43 bytes = ~64 characters in base64
-      crypto.getRandomValues(randomBytes);
+      // Remove any existing code verifiers to avoid conflicts
+      Object.keys(localStorage).forEach(key => {
+        if (key.includes('code_verifier')) {
+          localStorage.removeItem(key);
+        }
+      });
       
-      const codeVerifier = btoa(String.fromCharCode(...randomBytes))
+      // Generate a fresh code verifier that meets PKCE requirements
+      // Using crypto.getRandomValues for secure random generation
+      const array = new Uint8Array(64); // 64 bytes for better security
+      crypto.getRandomValues(array);
+      
+      // Convert to base64url format (RFC 7636 compliant)
+      const codeVerifier = btoa(String.fromCharCode.apply(null, [...array]))
         .replace(/\+/g, '-')
         .replace(/\//g, '_')
-        .replace(/=+$/, '');
+        .replace(/=+$/, '')
+        .substring(0, 128); // Ensure it's right length (43-128 chars)
       
       console.log("Generated fresh code verifier with length:", codeVerifier.length);
       
-      // Store it in localStorage with the EXACT key Supabase expects
+      // Store it using multiple keys to ensure it's available
       localStorage.setItem('supabase.auth.code_verifier', codeVerifier);
+      localStorage.setItem('pkce-verifier', codeVerifier); // Backup key
+      localStorage.setItem('supabase-code-verifier', codeVerifier); // Another backup
       
       // Verify storage for debugging
       const storedVerifier = localStorage.getItem('supabase.auth.code_verifier');
@@ -362,15 +376,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const redirectUrl = `${window.location.origin}/auth/callback`;
       console.log("Redirect URL:", redirectUrl);
       
+      // Make sure our URL doesn't have trailing slashes or other issues
+      const cleanRedirectUrl = redirectUrl.replace(/\/+$/, '');
+      console.log("Clean redirect URL:", cleanRedirectUrl);
+      
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: redirectUrl,
+          redirectTo: cleanRedirectUrl,
           queryParams: {
             access_type: 'offline',
             prompt: 'consent'
           },
-          // Pass the same code verifier that we stored
+          // Pass the same code verifier we stored
           codeVerifier: codeVerifier,
           skipBrowserRedirect: false
         }

@@ -16,11 +16,28 @@ const Callback = () => {
         // Log the URL for debugging
         console.log("Current URL:", window.location.href);
         
-        // Dump all localStorage keys for debugging
-        console.log("localStorage keys:", Object.keys(localStorage));
+        // Important: Get all possible verifier keys for debugging
+        const allKeys = Object.keys(localStorage);
+        const verifierKeys = allKeys.filter(key => key.includes('code_verifier'));
+        console.log("All localStorage keys:", allKeys);
+        console.log("All code verifier keys:", verifierKeys);
         
-        // Check for code verifier in localStorage
-        const codeVerifier = localStorage.getItem('supabase.auth.code_verifier');
+        // Check for code verifier in localStorage - try multiple possible keys
+        let codeVerifier = localStorage.getItem('supabase.auth.code_verifier');
+        
+        if (!codeVerifier) {
+          console.log("Trying alternative storage keys for code verifier...");
+          // Try other possible keys if the standard one fails
+          if (localStorage.getItem('pkce-verifier')) {
+            codeVerifier = localStorage.getItem('pkce-verifier');
+          } else if (localStorage.getItem('supabase-code-verifier')) {
+            codeVerifier = localStorage.getItem('supabase-code-verifier');
+          } else if (verifierKeys.length > 0) {
+            // If any verifier-like key exists, try it
+            codeVerifier = localStorage.getItem(verifierKeys[0]);
+          }
+        }
+        
         console.log("Code verifier exists:", !!codeVerifier);
         console.log("Code verifier length:", codeVerifier?.length || 0);
         
@@ -42,6 +59,10 @@ const Callback = () => {
         
         if (!codeVerifier) {
           console.error("No code verifier in localStorage");
+          // Force a clean restart of the auth flow
+          localStorage.removeItem('supabase.auth.token');
+          localStorage.removeItem('supabase.auth.expires_at');
+          localStorage.removeItem('supabase.auth.refresh_token');
           throw new Error("Authentication verification failed. Please try logging in again.");
         }
         
@@ -65,6 +86,8 @@ const Callback = () => {
         
         if (error) {
           console.error("Exchange error:", error);
+          // Clean up all auth-related storage to ensure fresh start on next attempt
+          verifierKeys.forEach(key => localStorage.removeItem(key));
           throw error;
         }
         
@@ -93,8 +116,8 @@ const Callback = () => {
               onboarding_completed: false
             });
             
-            // Clear the code verifier after successful use
-            localStorage.removeItem('supabase.auth.code_verifier');
+            // Clear all code verifiers after successful use
+            verifierKeys.forEach(key => localStorage.removeItem(key));
             
             // Redirect new user to onboarding
             navigate('/onboarding', { replace: true });
@@ -107,8 +130,8 @@ const Callback = () => {
             .update({ last_seen: new Date().toISOString() })
             .eq('id', data.session.user.id);
           
-          // Clear the code verifier after successful use
-          localStorage.removeItem('supabase.auth.code_verifier');
+          // Clear all code verifiers after successful use
+          verifierKeys.forEach(key => localStorage.removeItem(key));
           
           // Redirect based on onboarding status
           if (profile?.onboarding_completed) {
@@ -123,6 +146,8 @@ const Callback = () => {
             title: "Authentication Failed",
             description: "Failed to complete authentication."
           });
+          // Clean up authentication state
+          verifierKeys.forEach(key => localStorage.removeItem(key));
           navigate('/auth', { replace: true });
         }
       } catch (error: any) {
