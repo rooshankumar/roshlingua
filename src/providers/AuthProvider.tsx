@@ -67,7 +67,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             console.log("Checking profile for user:", session.user.id);
             const { data: profileData, error: profileCheckError } = await supabase
               .from('profiles')
-              .select('id')
+              .select('id, onboarding_completed')
               .eq('id', session.user.id)
               .single();
               
@@ -83,7 +83,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 email: session.user.email,
                 created_at: new Date().toISOString(),
                 updated_at: new Date().toISOString(),
-                last_seen: new Date().toISOString()
+                last_seen: new Date().toISOString(),
+                onboarding_completed: false
               });
             } else {
               // Update last_seen

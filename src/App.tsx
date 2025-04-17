@@ -78,7 +78,10 @@ const AppRoutes = () => {
         {/* Protected routes with AppLayout */}
         <Route path="/onboarding" element={
           <ProtectedRoute>
-            <Onboarding onComplete={() => console.log("Onboarding completed")} />
+            <Onboarding onComplete={() => {
+              localStorage.setItem("onboarding_completed", "true");
+              window.location.href = "/dashboard";
+            }} />
           </ProtectedRoute>
         } />
 

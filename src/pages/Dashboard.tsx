@@ -92,7 +92,14 @@ const Dashboard = () => {
         
         if (error) {
           console.error("Profile data fetch error:", error);
-          throw error;
+          // Don't throw, just use defaults
+          setUserStats({
+            streak: 0,
+            xp: 0,
+            progress: 0,
+            level: 'Beginner'
+          });
+          return;
         }
 
         if (profileData) {

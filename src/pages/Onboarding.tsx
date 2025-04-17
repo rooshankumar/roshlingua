@@ -193,8 +193,12 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
             });
 
             localStorage.setItem("onboarding_completed", "true");
-            onComplete();
-            navigate("/dashboard", { replace: true });
+            
+            // Force reload to ensure proper redirection
+            setTimeout(() => {
+              onComplete();
+              window.location.href = "/dashboard";
+            }, 200);
         } catch (error) {
             console.error("Onboarding error:", error);
             toast({

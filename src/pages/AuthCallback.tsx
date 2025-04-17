@@ -26,10 +26,10 @@ const AuthCallback = () => {
         console.log("Session check result:", data.session ? "Session exists" : "No session");
         
         if (data?.session) {
-          // Session exists, check if profile exists
+          // Session exists, check if profile exists and if onboarding was completed
           const { data: profile, error: profileError } = await supabase
             .from('profiles')
-            .select('*')
+            .select('onboarding_completed')
             .eq('id', data.session.user.id)
             .single();
             
@@ -39,12 +39,14 @@ const AuthCallback = () => {
           
           // Create profile if it doesn't exist
           if (!profile) {
+            console.log("Creating new profile for user:", data.session.user.id);
             const { error: insertError } = await supabase.from('profiles').insert({
               id: data.session.user.id,
               email: data.session.user.email,
               created_at: new Date().toISOString(),
               updated_at: new Date().toISOString(),
-              last_seen: new Date().toISOString()
+              last_seen: new Date().toISOString(),
+              onboarding_completed: false
             });
             
             if (insertError) {
@@ -58,9 +60,15 @@ const AuthCallback = () => {
             .update({ last_seen: new Date().toISOString() })
             .eq('id', data.session.user.id);
           
-          // Redirect to dashboard with a slight delay to ensure data is processed
+          // Redirect based on onboarding status
           setTimeout(() => {
-            navigate('/dashboard', { replace: true });
+            if (profile?.onboarding_completed) {
+              console.log("Onboarding completed, redirecting to dashboard");
+              navigate('/dashboard', { replace: true });
+            } else {
+              console.log("Onboarding not completed, redirecting to onboarding");
+              navigate('/onboarding', { replace: true });
+            }
           }, 500);
         } else {
           toast({
