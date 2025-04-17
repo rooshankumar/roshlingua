@@ -18,7 +18,7 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
     const checkOnboardingStatus = async () => {
       if (!user) return;
 
-      // Check profile completion in profiles table
+      // Check both profile existence and completion
       const { data: profileData, error: profileError } = await supabase
         .from('profiles')
         .select('onboarding_completed')

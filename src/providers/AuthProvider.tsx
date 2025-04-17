@@ -186,6 +186,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (updateError) {
           console.error("Error updating last_seen:", updateError);
         }
+        await handlePostAuth(data.user.id);
       }
       await updateOnboardingStatus(data.user.id); // Call the new function after successful login
       await updateUserActivity(data.user.id); // Add streak update after successful login
@@ -330,7 +331,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       // Clear any local state
       setUser(null);
       setSession(null);
-      
+
       // Force navigation to auth page
       window.location.href = '/auth';
 
@@ -365,7 +366,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const updateUserActivity = async (userId: string) => {
     if (!userId) return;
-    
+
     try {
       const { error } = await supabase
         .from('profiles')
@@ -379,6 +380,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       console.error('Error updating user activity:', error);
     }
   };
+
+  const handlePostAuth = async (userId: string) => {
+    const { data: onboardingStatus, error: onboardingError } = await supabase
+      .from('onboarding_status')
+      .select('is_complete')
+      .eq('user_id', userId)
+      .single();
+
+    if (onboardingError) {
+      console.error("Error checking onboarding status:", onboardingError);
+      return;
+    }
+
+    if (onboardingStatus && onboardingStatus.is_complete) {
+      window.location.href = '/dashboard'; // Redirect to dashboard if onboarding is complete
+    }
+  };
+
 
   const value: AuthContextType = {
     user,
