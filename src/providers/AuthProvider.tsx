@@ -309,6 +309,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         throw new Error("No OAuth URL returned");
       }
 
+      // Create or update profile after successful Google sign-in
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .upsert({
+            id: user.id,
+            email: user.email,
+            updated_at: new Date().toISOString(),
+            onboarding_completed: false
+          }, { onConflict: 'id' });
+
+        if (profileError) {
+          console.error("Error creating profile:", profileError);
+        }
+      }
+
       // Redirect to Google OAuth
       window.location.replace(data.url);
     } catch (error) {
