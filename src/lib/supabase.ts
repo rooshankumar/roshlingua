@@ -29,6 +29,13 @@ export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
 
 export const signInWithGoogle = async () => {
   const redirectUrl = `${window.location.origin}/auth/callback`;
+  
+  // Generate a random string for PKCE code verifier
+  const codeVerifier = generateCodeVerifier();
+  
+  // Store it in localStorage - critically important for PKCE flow
+  localStorage.setItem('supabase.auth.code_verifier', codeVerifier);
+  
   return await supabase.auth.signInWithOAuth({
     provider: 'google',
     options: {
@@ -36,10 +43,20 @@ export const signInWithGoogle = async () => {
       queryParams: {
         access_type: 'offline',
         prompt: 'consent'
-      }
+      },
+      // Make sure to pass the code verifier when initiating the OAuth flow
+      codeVerifier,
+      skipBrowserRedirect: false
     }
   });
 };
+
+// Helper function to generate a random string for the code verifier
+function generateCodeVerifier() {
+  const array = new Uint8Array(40);
+  crypto.getRandomValues(array);
+  return Array.from(array, byte => byte.toString(16).padStart(2, '0')).join('');
+}
 
 export const signOut = async () => {
   return await supabase.auth.signOut();

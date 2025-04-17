@@ -16,7 +16,11 @@ const Callback = () => {
         // Log the URL for debugging
         console.log("Current URL:", window.location.href);
         
-        // The code exchange happens using the current URL
+        // Check for code verifier in localStorage
+        const codeVerifier = localStorage.getItem('supabase.auth.code_verifier');
+        console.log("Code verifier exists:", !!codeVerifier);
+        
+        // The code exchange happens using the current URL and the stored code verifier
         const { data, error } = await supabase.auth.exchangeCodeForSession(window.location.href);
         
         if (error) {

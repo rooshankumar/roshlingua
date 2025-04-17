@@ -12,12 +12,26 @@ const AuthCodeHandler = () => {
   useEffect(() => {
     const url = new URL(window.location.href);
     const code = url.searchParams.get('code');
+    const state = url.searchParams.get('state');
     
     if (code) {
       console.log("Detected code parameter, handling OAuth callback...");
+      console.log("Code:", code.substring(0, 5) + "...");
+      console.log("State exists:", !!state);
 
       const handleAuthWithCode = async () => {
         try {
+          // Check if code verifier exists
+          const codeVerifier = localStorage.getItem('supabase.auth.code_verifier');
+          console.log("Code verifier exists:", !!codeVerifier);
+          
+          if (!codeVerifier) {
+            console.error("Missing code verifier in localStorage");
+            // Try to reconstruct it (in case it was lost)
+            localStorage.setItem('supabase.auth.code_verifier', generateCodeVerifier());
+            console.log("Generated new code verifier as fallback");
+          }
+          
           console.log("Exchanging auth code for session...");
           // The full URL is needed as it contains both the code and state parameters
           const { data, error } = await supabase.auth.exchangeCodeForSession(window.location.href);
@@ -111,3 +125,11 @@ const AuthCodeHandler = () => {
 };
 
 export default AuthCodeHandler;
+
+
+// Helper function to generate a random string for the code verifier
+function generateCodeVerifier() {
+  const array = new Uint8Array(40);
+  crypto.getRandomValues(array);
+  return Array.from(array, byte => byte.toString(16).padStart(2, '0')).join('');
+}
