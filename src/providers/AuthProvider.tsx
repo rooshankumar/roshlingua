@@ -332,11 +332,32 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       console.log("Initiating Google login...");
       
-      // Clear any existing code verifier to avoid OAuth conflicts
-      localStorage.removeItem('supabase.auth.code_verifier');
+      // Generate a fresh code verifier
+      const codeVerifier = generateCodeVerifier();
+      console.log("Generated fresh code verifier with length:", codeVerifier.length);
       
-      // Use the signInWithGoogle function that handles code verifier properly
-      const { data, error } = await signInWithGoogle();
+      // Store it in localStorage - critically important for PKCE flow
+      localStorage.setItem('supabase.auth.code_verifier', codeVerifier);
+      
+      // Log storage for debugging
+      const storedVerifier = localStorage.getItem('supabase.auth.code_verifier');
+      console.log("Stored code verifier exists:", !!storedVerifier);
+      console.log("Stored code verifier length:", storedVerifier?.length || 0);
+      
+      // Use explicit PKCE parameters
+      const redirectUrl = `${window.location.origin}/auth/callback`;
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: redirectUrl,
+          queryParams: {
+            access_type: 'offline',
+            prompt: 'consent'
+          },
+          codeVerifier: codeVerifier,
+          skipBrowserRedirect: false
+        }
+      });
       
       if (error) {
         console.error("Google auth error:", error);
@@ -352,7 +373,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         throw new Error("No OAuth URL returned");
       }
 
-      console.log("Redirecting to Google OAuth...");
+      console.log("Redirecting to Google OAuth with code_verifier in localStorage...");
       // Let the browser handle the redirect naturally
       window.location.href = data.url;
     } catch (error) {
@@ -365,6 +386,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       throw error;
     }
   };
+  
+  // Helper function to generate code verifier
+  function generateCodeVerifier() {
+    const array = new Uint8Array(64);
+    crypto.getRandomValues(array);
+    return btoa(String.fromCharCode.apply(null, [...array]))
+      .replace(/\+/g, '-')
+      .replace(/\//g, '_')
+      .replace(/=+$/, '')
+      .substring(0, 128);
+  }
 
   const signOut = async () => {
     try {

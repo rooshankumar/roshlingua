@@ -43,8 +43,10 @@ const Callback = () => {
         }
         
         console.log("Exchanging code for session with code:", code.substring(0, 5) + "...");
-        // The code exchange happens using the current URL and the stored code verifier
-        const { data, error } = await supabase.auth.exchangeCodeForSession(window.location.href);
+        console.log("Using code verifier of length:", codeVerifier.length);
+        
+        // Use the explicit method for better control
+        const { data, error } = await supabase.auth.exchangeCodeForSession(code, codeVerifier);
         
         if (error) {
           throw error;

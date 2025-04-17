@@ -68,12 +68,13 @@ export const signInWithGoogle = async () => {
 // Helper function to generate a random string for the code verifier
 // Using a more robust method recommended by Supabase
 function generateCodeVerifier() {
-  const array = new Uint8Array(56);
+  const array = new Uint8Array(64); // Use 64 bytes for better security
   crypto.getRandomValues(array);
   return btoa(String.fromCharCode.apply(null, [...array]))
     .replace(/\+/g, '-')
     .replace(/\//g, '_')
-    .replace(/=+$/, '');
+    .replace(/=+$/, '')
+    .substring(0, 128); // Ensure it's the right length (max 128 chars)
 }
 
 export const signOut = async () => {

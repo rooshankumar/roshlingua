@@ -39,9 +39,10 @@ const AuthCodeHandler = () => {
             return;
           }
           
+          // Manually construct the exchange parameters
           console.log("Exchanging auth code for session...");
-          // The full URL is needed as it contains both the code and state parameters
-          const { data, error } = await supabase.auth.exchangeCodeForSession(window.location.href);
+          // Using the explicit parameter method instead of passing the URL
+          const { data, error } = await supabase.auth.exchangeCodeForSession(code, codeVerifier);
 
           if (error) {
             console.error("Error exchanging code for session:", error);
