@@ -1,13 +1,15 @@
+
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/lib/supabase';
+import { useToast } from '@/hooks/use-toast';
 
 const AuthCodeHandler = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
 
   // Handle the code parameter in the URL (for Google OAuth)
   useEffect(() => {
-    // Skip if not on the main app page with a code param
     const url = new URL(window.location.href);
     const code = url.searchParams.get('code');
 
@@ -17,11 +19,16 @@ const AuthCodeHandler = () => {
       const handleAuthWithCode = async () => {
         try {
           // Exchange the authorization code for a session
-          // Using the full URL ensures we have access to all needed parameters
           const { data, error } = await supabase.auth.exchangeCodeForSession(window.location.href);
 
           if (error) {
             console.error("Error exchanging code for session:", error);
+            toast({
+              variant: "destructive",
+              title: "Authentication Failed",
+              description: error.message || "Failed to complete authentication"
+            });
+            navigate('/auth', { replace: true });
             return;
           }
 
@@ -37,12 +44,11 @@ const AuthCodeHandler = () => {
 
             if (profileError && profileError.code !== 'PGRST116') {
               console.error("Error fetching profile:", profileError);
-              navigate('/auth', { replace: true });
-              return;
             }
 
             // Create profile if it doesn't exist
             if (!profile) {
+              console.log("Creating new profile for user");
               const { error: insertError } = await supabase.from('profiles').insert({
                 id: data.session.user.id,
                 email: data.session.user.email,
@@ -56,24 +62,49 @@ const AuthCodeHandler = () => {
                 console.error("Error creating profile:", insertError);
               }
 
-              // New user, redirect to onboarding
-              navigate('/onboarding', { replace: true });
-            } else if (profile.onboarding_completed) {
-              // Existing user with completed onboarding
-              navigate('/dashboard', { replace: true });
-            } else {
-              // Existing user who hasn't completed onboarding
-              navigate('/onboarding', { replace: true });
+              // Redirect new user to onboarding
+              console.log("Redirecting to onboarding");
+              window.location.href = '/onboarding';
+              return;
             }
+
+            // Update last seen timestamp
+            await supabase
+              .from('profiles')
+              .update({ last_seen: new Date().toISOString() })
+              .eq('id', data.session.user.id);
+
+            // Redirect based on onboarding status
+            if (profile.onboarding_completed) {
+              console.log("Redirecting to dashboard");
+              window.location.href = '/dashboard';
+            } else {
+              console.log("Redirecting to onboarding");
+              window.location.href = '/onboarding';
+            }
+          } else {
+            console.error("No session after code exchange");
+            toast({
+              variant: "destructive", 
+              title: "Authentication Failed",
+              description: "Failed to complete authentication"
+            });
+            navigate('/auth', { replace: true });
           }
         } catch (error) {
-          console.error("Error in OAuth code exchange:", error);
+          console.error("Error in OAuth flow:", error);
+          toast({
+            variant: "destructive",
+            title: "Authentication Failed",
+            description: "An unexpected error occurred during authentication"
+          });
+          navigate('/auth', { replace: true });
         }
       };
 
       handleAuthWithCode();
     }
-  }, [navigate]);
+  }, [navigate, toast]);
 
   return null;
 };

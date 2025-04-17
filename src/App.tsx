@@ -27,22 +27,8 @@ import AuthLayout from "./components/layouts/AuthLayout";
 
 const queryClient = new QueryClient();
 
-const AuthCodeHandler = () => {
-  const location = useLocation();
-  const searchParams = new URLSearchParams(location.search);
-  const code = searchParams.get('code');
-
-  // Placeholder for actual authentication logic using the 'code'
-  // This should handle the authentication with Supabase using the code
-  // and redirect appropriately.  Replace this with your actual Supabase
-  // authentication handling.
-  if (code) {
-    //Simulate successful authentication for demonstration purposes. Replace with your actual auth logic
-    localStorage.setItem('supabase_auth', 'true');
-    return <Navigate to="/dashboard" replace />;
-  }
-  return null; //If no code, do nothing
-};
+// The AuthCodeHandler component is imported and handles OAuth code parameters
+import AuthCodeHandler from "./components/auth/AuthCodeHandler";
 
 
 const AppRoutes = () => {
