@@ -349,7 +349,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setSession(null);
       
       // Force navigation to auth page
-      window.location.href = '/auth';
+      // Debounce navigation to prevent flooding
+      setTimeout(() => {
+        window.location.href = '/auth';
+      }, 100);
 
       toast({
         title: "Logged out",
