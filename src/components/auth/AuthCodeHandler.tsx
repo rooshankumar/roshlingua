@@ -24,12 +24,19 @@ const AuthCodeHandler = () => {
           // Check if code verifier exists
           const codeVerifier = localStorage.getItem('supabase.auth.code_verifier');
           console.log("Code verifier exists:", !!codeVerifier);
+          console.log("Code verifier length:", codeVerifier?.length || 0);
           
           if (!codeVerifier) {
             console.error("Missing code verifier in localStorage");
-            // Try to reconstruct it (in case it was lost)
-            localStorage.setItem('supabase.auth.code_verifier', generateCodeVerifier());
-            console.log("Generated new code verifier as fallback");
+            // Generating a new code verifier here won't work for the current authentication request
+            // as it needs to match what was used to start the flow
+            toast({
+              variant: "destructive",
+              title: "Authentication Failed",
+              description: "OAuth verification failed. Please try logging in again."
+            });
+            navigate('/auth', { replace: true });
+            return;
           }
           
           console.log("Exchanging auth code for session...");
@@ -125,11 +132,3 @@ const AuthCodeHandler = () => {
 };
 
 export default AuthCodeHandler;
-
-
-// Helper function to generate a random string for the code verifier
-function generateCodeVerifier() {
-  const array = new Uint8Array(40);
-  crypto.getRandomValues(array);
-  return Array.from(array, byte => byte.toString(16).padStart(2, '0')).join('');
-}

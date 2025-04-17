@@ -332,10 +332,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       console.log("Initiating Google login...");
       
+      // Clear any existing code verifier to avoid OAuth conflicts
+      localStorage.removeItem('supabase.auth.code_verifier');
+      
       // Use the signInWithGoogle function that handles code verifier properly
       const { data, error } = await signInWithGoogle();
-        // We've replaced the direct supabase call with signInWithGoogle()
-
+      
       if (error) {
         console.error("Google auth error:", error);
         toast({

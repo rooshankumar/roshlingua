@@ -23,39 +23,57 @@ export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
       domain: window.location.hostname,
       path: '/',
       sameSite: 'lax'
-    }
+    },
+    // Ensure these are set correctly
+    pkceTimeout: 5 * 60, // 5 minutes to complete authentication
+    pkceLeeway: 30 // 30 second leeway for clock skew
   }
 });
 
 export const signInWithGoogle = async () => {
   const redirectUrl = `${window.location.origin}/auth/callback`;
   
-  // Generate a random string for PKCE code verifier
-  const codeVerifier = generateCodeVerifier();
-  
-  // Store it in localStorage - critically important for PKCE flow
-  localStorage.setItem('supabase.auth.code_verifier', codeVerifier);
-  
-  return await supabase.auth.signInWithOAuth({
-    provider: 'google',
-    options: {
-      redirectTo: redirectUrl,
-      queryParams: {
-        access_type: 'offline',
-        prompt: 'consent'
-      },
-      // Make sure to pass the code verifier when initiating the OAuth flow
-      codeVerifier,
-      skipBrowserRedirect: false
-    }
-  });
+  try {
+    // Generate a random string for PKCE code verifier
+    const codeVerifier = generateCodeVerifier();
+    console.log("Generated code verifier length:", codeVerifier.length);
+    
+    // Store it in localStorage - critically important for PKCE flow
+    localStorage.setItem('supabase.auth.code_verifier', codeVerifier);
+    
+    // Log storage for debugging
+    const storedVerifier = localStorage.getItem('supabase.auth.code_verifier');
+    console.log("Stored code verifier exists:", !!storedVerifier);
+    console.log("Stored code verifier length:", storedVerifier?.length || 0);
+    
+    return await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: redirectUrl,
+        queryParams: {
+          access_type: 'offline',
+          prompt: 'consent'
+        },
+        // Make sure to pass the code verifier when initiating the OAuth flow
+        codeVerifier,
+        skipBrowserRedirect: false
+      }
+    });
+  } catch (error) {
+    console.error("Error in signInWithGoogle:", error);
+    throw error;
+  }
 };
 
 // Helper function to generate a random string for the code verifier
+// Using a more robust method recommended by Supabase
 function generateCodeVerifier() {
-  const array = new Uint8Array(40);
+  const array = new Uint8Array(56);
   crypto.getRandomValues(array);
-  return Array.from(array, byte => byte.toString(16).padStart(2, '0')).join('');
+  return btoa(String.fromCharCode.apply(null, [...array]))
+    .replace(/\+/g, '-')
+    .replace(/\//g, '_')
+    .replace(/=+$/, '');
 }
 
 export const signOut = async () => {

@@ -19,7 +19,30 @@ const Callback = () => {
         // Check for code verifier in localStorage
         const codeVerifier = localStorage.getItem('supabase.auth.code_verifier');
         console.log("Code verifier exists:", !!codeVerifier);
+        console.log("Code verifier length:", codeVerifier?.length || 0);
         
+        // Get URL parameters for debugging
+        const url = new URL(window.location.href);
+        const code = url.searchParams.get('code');
+        const error_param = url.searchParams.get('error');
+        const error_description = url.searchParams.get('error_description');
+        
+        if (error_param) {
+          console.error("OAuth error:", error_param, error_description);
+          throw new Error(`${error_param}: ${error_description}`);
+        }
+        
+        if (!code) {
+          console.error("No code parameter in URL");
+          throw new Error("No authentication code provided");
+        }
+        
+        if (!codeVerifier) {
+          console.error("No code verifier in localStorage");
+          throw new Error("Authentication verification failed. Please try logging in again.");
+        }
+        
+        console.log("Exchanging code for session with code:", code.substring(0, 5) + "...");
         // The code exchange happens using the current URL and the stored code verifier
         const { data, error } = await supabase.auth.exchangeCodeForSession(window.location.href);
         
