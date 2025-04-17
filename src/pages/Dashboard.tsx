@@ -80,6 +80,7 @@ const Dashboard = () => {
       if (!user) return;
 
       try {
+        console.log("Fetching user data for dashboard...");
         // Get initial profile data including streak
         const { data: profileData, error } = await supabase
           .from('profiles')
@@ -87,14 +88,28 @@ const Dashboard = () => {
           .eq('id', user.id)
           .single();
 
-        if (error) throw error;
+        console.log("Profile data fetch result:", error ? "Error" : "Success");
+        
+        if (error) {
+          console.error("Profile data fetch error:", error);
+          throw error;
+        }
 
         if (profileData) {
+          console.log("Setting user stats with profile data");
           setUserStats({
             streak: profileData.streak_count ?? 0, // Use nullish coalescing to only default to 0 if null/undefined
             xp: profileData.xp_points || 0,
             progress: profileData.progress_percentage || 0,
             level: getLevel(profileData.xp_points || 0)
+          });
+        } else {
+          console.log("No profile data found, using defaults");
+          setUserStats({
+            streak: 0,
+            xp: 0,
+            progress: 0,
+            level: 'Beginner'
           });
         }
 

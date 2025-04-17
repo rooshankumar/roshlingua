@@ -47,20 +47,60 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     async function initializeAuth() {
       try {
         setIsLoading(true);
+        console.log("Initializing auth state...");
 
         // Get initial session
         const { data: { session }, error } = await supabase.auth.getSession();
 
-        if (error) throw error;
+        if (error) {
+          console.error("Session retrieval error:", error);
+          throw error;
+        }
 
         if (mounted) {
+          console.log("Setting initial session:", session ? "Session exists" : "No session");
           setSession(session);
           setUser(session?.user ?? null);
+          
+          // If session exists, ensure profile exists
+          if (session?.user) {
+            console.log("Checking profile for user:", session.user.id);
+            const { data: profileData, error: profileCheckError } = await supabase
+              .from('profiles')
+              .select('id')
+              .eq('id', session.user.id)
+              .single();
+              
+            if (profileCheckError && profileCheckError.code !== 'PGRST116') {
+              console.error("Profile check error:", profileCheckError);
+            }
+            
+            // Create profile if it doesn't exist
+            if (!profileData) {
+              console.log("Creating profile for user:", session.user.id);
+              await supabase.from('profiles').insert({
+                id: session.user.id,
+                email: session.user.email,
+                created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString(),
+                last_seen: new Date().toISOString()
+              });
+            } else {
+              // Update last_seen
+              console.log("Updating last_seen for user:", session.user.id);
+              await supabase
+                .from('profiles')
+                .update({ last_seen: new Date().toISOString() })
+                .eq('id', session.user.id);
+            }
+          }
         }
 
         // Listen for auth changes
         const { data: { subscription } } = supabase.auth.onAuthStateChange(
           async (event, currentSession) => {
+            console.log("Auth state changed:", event, currentSession ? "Session exists" : "No session");
+            
             if (mounted) {
               setSession(currentSession);
               setUser(currentSession?.user ?? null);
@@ -68,15 +108,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
             if (event === 'SIGNED_IN' && currentSession) {
               try {
+                console.log("User signed in, updating profile");
                 const { error: profileError } = await supabase
                   .from('profiles')
                   .upsert({ 
                     id: currentSession.user.id,
                     email: currentSession.user.email,
-                    updated_at: new Date().toISOString()
+                    updated_at: new Date().toISOString(),
+                    last_seen: new Date().toISOString()
                   }, { onConflict: 'id' });
 
-                if (profileError) throw profileError;
+                if (profileError) {
+                  console.error("Error updating profile on sign in:", profileError);
+                  throw profileError;
+                }
               } catch (err) {
                 console.error("Error updating profile:", err);
               }

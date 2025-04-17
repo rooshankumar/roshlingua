@@ -1,23 +1,25 @@
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { supabase } from '@/lib/supabase';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/lib/supabase';
 
 const AuthCallback = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const handleCallback = async () => {
       try {
         console.log("Processing authentication callback...");
+        setIsLoading(true);
         
-        // Get the current session - code exchange should have happened automatically
-        const { data, error } = await supabase.auth.getSession();
+        // Exchange the code in the URL for a session
+        const { data, error } = await supabase.auth.exchangeCodeForSession(window.location.href);
         
         if (error) {
-          console.error("Session error:", error);
+          console.error("Authentication error:", error);
           throw error;
         }
         
@@ -27,7 +29,7 @@ const AuthCallback = () => {
           // Session exists, check if profile exists
           const { data: profile, error: profileError } = await supabase
             .from('profiles')
-            .select('onboarding_completed')
+            .select('*')
             .eq('id', data.session.user.id)
             .single();
             
@@ -37,43 +39,53 @@ const AuthCallback = () => {
           
           // Create profile if it doesn't exist
           if (!profile) {
-            await supabase.from('profiles').insert({
+            const { error: insertError } = await supabase.from('profiles').insert({
               id: data.session.user.id,
               email: data.session.user.email,
               created_at: new Date().toISOString(),
-              updated_at: new Date().toISOString()
+              updated_at: new Date().toISOString(),
+              last_seen: new Date().toISOString()
             });
+            
+            if (insertError) {
+              console.error("Error creating profile:", insertError);
+            }
           }
           
-          // Redirect based on onboarding status
-          if (profile?.onboarding_completed) {
+          // Update last seen
+          await supabase
+            .from('profiles')
+            .update({ last_seen: new Date().toISOString() })
+            .eq('id', data.session.user.id);
+          
+          // Redirect to dashboard with a slight delay to ensure data is processed
+          setTimeout(() => {
             navigate('/dashboard', { replace: true });
-          } else {
-            navigate('/onboarding', { replace: true });
-          }
+          }, 500);
         } else {
-          // No session - redirect to login
           toast({
-            variant: "destructive", 
-            title: "Authentication Failed",
-            description: "Could not find an active session. Please try logging in again."
+            title: "Authentication failed",
+            description: "Could not authenticate with the provider",
+            variant: "destructive"
           });
           navigate('/auth', { replace: true });
         }
-      } catch (error: any) {
-        console.error('Auth callback error:', error);
+      } catch (error) {
+        console.error("Authentication callback error:", error);
         toast({
-          variant: "destructive",
-          title: "Authentication Failed",
-          description: error.message || "Failed to complete authentication"
+          title: "Authentication failed",
+          description: "An error occurred during authentication",
+          variant: "destructive"
         });
         navigate('/auth', { replace: true });
+      } finally {
+        setIsLoading(false);
       }
     };
-
+    
     handleCallback();
   }, [navigate, toast]);
-
+  
   return (
     <div className="h-screen w-full flex items-center justify-center">
       <div className="animate-pulse flex flex-col items-center gap-4">
