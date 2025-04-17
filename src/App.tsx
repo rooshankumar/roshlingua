@@ -1,35 +1,37 @@
-import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
-import { AuthProvider, useAuth } from "@/providers/AuthProvider";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { AuthProvider } from "@/providers/AuthProvider";
 import { Toaster } from "@/components/ui/toaster";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ThemeProvider } from "@/components/theme-provider";
-import { Analytics } from '@vercel/analytics/react';
-import { SpeedInsights } from '@vercel/speed-insights/react';
-
+import AuthCodeHandler from "@/components/auth/AuthCodeHandler";
+import { Analytics } from "@vercel/analytics/react";
+import { SpeedInsights } from "@vercel/speed-insights/react";
 
 // Pages
-import Home from "./pages/Home";
-import Auth from "./pages/Auth";
-import AuthCallback from "./pages/AuthCallback";
-import Dashboard from "./pages/Dashboard";
-import Profile from "./pages/Profile";
-import NotFound from "./pages/NotFound";
-import Onboarding from "./pages/Onboarding";
-import Community from "./pages/Community";
-import Chat from "./pages/Chat";
-import Settings from "./pages/Settings"; // Added
-import ChatList from "./pages/ChatList"; // Added
+import Home from "@/pages/Home";
+import Auth from "@/pages/Auth";
+import Callback from "@/pages/auth/callback";
+import Dashboard from "@/pages/Dashboard";
+import Profile from "@/pages/Profile";
+import Settings from "@/pages/Settings";
+import NotFound from "@/pages/NotFound";
+import Onboarding from "@/pages/Onboarding";
+import Chat from "@/pages/Chat";
+import ChatList from "@/pages/ChatList";
+import Community from "@/pages/Community";
+import Contact from "@/pages/Contact";
+import Terms from "@/pages/Terms";
+import PrivacyPolicy from "@/pages/PrivacyPolicy";
+import { useAuth } from "@/providers/AuthProvider";
+import "@/App.css";
 
-// Components
-import ProtectedRoute from "./components/auth/ProtectedRoute";
-import AppLayout from "./components/layouts/AppLayout";
-import AuthLayout from "./components/layouts/AuthLayout";
-
+// Create QueryClient instance
 const queryClient = new QueryClient();
 
 const AppRoutes = () => {
   const { user, isLoading } = useAuth();
 
+  // Show loading indicator - using improved loading indicator from original
   if (isLoading) {
     return (
       <div className="h-screen w-full flex items-center justify-center">
@@ -43,89 +45,22 @@ const AppRoutes = () => {
 
   return (
     <Routes>
-      {/* Public routes */}
       <Route path="/" element={<Home />} />
-      <Route path="/auth" element={
-        <AuthLayout>
-          {user ? <Navigate to="/dashboard" replace /> : <Auth />}
-        </AuthLayout>
-      } />
-
-      {/* Auth callback route for OAuth */}
-      <Route path="/auth/callback" element={<AuthCallback />} />
-
-      {/* Protected routes with AppLayout */}
-      <Route path="/onboarding" element={
-        <ProtectedRoute>
-          <Onboarding onComplete={() => console.log("Onboarding completed")} />
-        </ProtectedRoute>
-      } />
-
-      <Route path="/dashboard" element={
-        <ProtectedRoute>
-          <AppLayout>
-            <Dashboard />
-          </AppLayout>
-        </ProtectedRoute>
-      } />
-
-      <Route path="/profile" element={
-        <ProtectedRoute>
-          <AppLayout>
-            <Profile />
-          </AppLayout>
-        </ProtectedRoute>
-      } />
-      <Route path="/community" element={
-        <ProtectedRoute>
-          <AppLayout>
-            <Community />
-          </AppLayout>
-        </ProtectedRoute>
-      } />
-      <Route path="/chat" element={
-        <ProtectedRoute>
-          <AppLayout>
-            <ChatList /> {/* Updated */}
-          </AppLayout>
-        </ProtectedRoute>
-      } />
-      <Route path="/chat/:conversationId" element={
-        <ProtectedRoute>
-          <AppLayout>
-            <Chat />
-          </AppLayout>
-        </ProtectedRoute>
-      } />
-      <Route path="/settings" element={
-        <ProtectedRoute>
-          <AppLayout>
-            <Settings />
-          </AppLayout>
-        </ProtectedRoute>
-      } />
-
-
-      {/* Catch all for 404 */}
+      <Route path="/auth" element={user ? <Navigate to="/dashboard" /> : <Auth />} />
+      <Route path="/auth/callback" element={<Callback />} />
+      <Route path="/onboarding" element={user ? <Onboarding /> : <Navigate to="/auth" />} />
+      <Route path="/dashboard" element={user ? <Dashboard /> : <Navigate to="/auth" />} />
+      <Route path="/profile" element={user ? <Profile /> : <Navigate to="/auth" />} />
+      <Route path="/settings" element={user ? <Settings /> : <Navigate to="/auth" />} />
+      <Route path="/chat" element={user ? <ChatList /> : <Navigate to="/auth" />} />
+      <Route path="/chat/:id" element={user ? <Chat /> : <Navigate to="/auth" />} />
+      <Route path="/community" element={user ? <Community /> : <Navigate to="/auth" />} />
+      <Route path="/contact" element={<Contact />} />
+      <Route path="/terms" element={<Terms />} />
+      <Route path="/privacy" element={<PrivacyPolicy />} />
       <Route path="*" element={<NotFound />} />
     </Routes>
   );
-};
-
-const AuthCodeHandler = () => {
-  const location = useLocation();
-  const { setUser } = useAuth();
-  const code = new URLSearchParams(location.search).get('code');
-
-  if (code) {
-    // Handle the code here (e.g., send it to your backend for token exchange)
-    // ... your code to handle the auth code ...
-    console.log("Auth code received:", code);
-    // Example: Simulate successful authentication
-    setUser({ id: 1, name: 'Test User', email: 'test@example.com' }); // Replace with your actual user data retrieval
-    return <Navigate to="/dashboard" replace />;
-  }
-  return null;
 };
 
 const App = () => {

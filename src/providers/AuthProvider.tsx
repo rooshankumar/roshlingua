@@ -287,12 +287,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
+          redirectTo: `${window.location.origin}`,
           queryParams: {
             access_type: 'offline',
             prompt: 'consent',
-          },
-          skipBrowserRedirect: true
+          }
         }
       });
 
@@ -310,8 +309,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         throw new Error("No OAuth URL returned");
       }
 
-      // Redirect to Google OAuth
-      window.location.replace(data.url);
+      // Redirect to Google OAuth - don't use replace to avoid browser history issues
+      window.location.href = data.url;
     } catch (error) {
       console.error("Google login error:", error);
       toast({
