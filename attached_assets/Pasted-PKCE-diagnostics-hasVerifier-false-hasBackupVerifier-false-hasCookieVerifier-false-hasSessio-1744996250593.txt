@@ -1,0 +1,120 @@
+PKCE diagnostics: {hasVerifier: false, hasBackupVerifier: false, hasCookieVerifier: false, hasSessionVerifier: false, hasCodeParam: false}
+index-ChFWAo6t.js:523 ===== AUTH CODE HANDLER =====
+index-ChFWAo6t.js:523 Auth code present: false
+index-ChFWAo6t.js:523 Auth error present: false
+index-ChFWAo6t.js:523 URL: https://roshlingua.vercel.app/dashboard
+index-ChFWAo6t.js:523 PKCE Debug Info
+index-ChFWAo6t.js:523 Verifier in localStorage: NOT FOUND
+index-ChFWAo6t.js:523 Verifier in sessionStorage: NOT FOUND
+index-ChFWAo6t.js:523 Backup verifier: NOT FOUND
+index-ChFWAo6t.js:523 Cookie verifier: NOT FOUND
+index-ChFWAo6t.js:523 URL code param: NOT FOUND
+index-ChFWAo6t.js:523 PKCE diagnostics: {hasVerifier: false, hasBackupVerifier: false, hasCookieVerifier: false, hasSessionVerifier: false, hasCodeParam: false}
+index-ChFWAo6t.js:523 ===== AUTH CODE HANDLER =====
+index-ChFWAo6t.js:523 Auth code present: false
+index-ChFWAo6t.js:523 Auth error present: false
+index-ChFWAo6t.js:523 URL: https://roshlingua.vercel.app/onboarding
+index-ChFWAo6t.js:523 PKCE Debug Info
+index-ChFWAo6t.js:523 Verifier in localStorage: NOT FOUND
+index-ChFWAo6t.js:523 Verifier in sessionStorage: NOT FOUND
+index-ChFWAo6t.js:523 Backup verifier: NOT FOUND
+index-ChFWAo6t.js:523 Cookie verifier: NOT FOUND
+index-ChFWAo6t.js:523 URL code param: NOT FOUND
+index-ChFWAo6t.js:523 PKCE diagnostics: {hasVerifier: false, hasBackupVerifier: false, hasCookieVerifier: false, hasSessionVerifier: false, hasCodeParam: false}
+index-ChFWAo6t.js:523 ===== AUTH CODE HANDLER =====
+index-ChFWAo6t.js:523 Auth code present: false
+index-ChFWAo6t.js:523 Auth error present: false
+index-ChFWAo6t.js:523 URL: https://roshlingua.vercel.app/dashboard
+index-ChFWAo6t.js:523 PKCE Debug Info
+index-ChFWAo6t.js:523 Verifier in localStorage: NOT FOUND
+index-ChFWAo6t.js:523 Verifier in sessionStorage: NOT FOUND
+index-ChFWAo6t.js:523 Backup verifier: NOT FOUND
+index-ChFWAo6t.js:523 Cookie verifier: NOT FOUND
+index-ChFWAo6t.js:523 URL code param: NOT FOUND
+index-ChFWAo6t.js:523 PKCE diagnostics: {hasVerifier: false, hasBackupVerifier: false, hasCookieVerifier: false, hasSessionVerifier: false, hasCodeParam: false}
+index-ChFWAo6t.js:523 ===== AUTH CODE HANDLER =====
+index-ChFWAo6t.js:523 Auth code present: false
+index-ChFWAo6t.js:523 Auth error present: false
+index-ChFWAo6t.js:523 URL: https://roshlingua.vercel.app/onboarding
+index-ChFWAo6t.js:523 PKCE Debug Info
+index-ChFWAo6t.js:523 Verifier in localStorage: NOT FOUND
+index-ChFWAo6t.js:523 Verifier in sessionStorage: NOT FOUND
+index-ChFWAo6t.js:523 Backup verifier: NOT FOUND
+index-ChFWAo6t.js:523 Cookie verifier: NOT FOUND
+index-ChFWAo6t.js:523 URL code param: NOT FOUND
+index-ChFWAo6t.js:523 PKCE diagnostics: {hasVerifier: false, hasBackupVerifier: false, hasCookieVerifier: false, hasSessionVerifier: false, hasCodeParam: false}
+index-ChFWAo6t.js:523 ===== AUTH CODE HANDLER =====
+index-ChFWAo6t.js:523 Auth code present: false
+index-ChFWAo6t.js:523 Auth error present: false
+index-ChFWAo6t.js:523 URL: https://roshlingua.vercel.app/dashboard
+index-ChFWAo6t.js:523 PKCE Debug Info
+index-ChFWAo6t.js:523 Verifier in localStorage: NOT FOUND
+index-ChFWAo6t.js:523 Verifier in sessionStorage: NOT FOUND
+index-ChFWAo6t.js:523 Backup verifier: NOT FOUND
+index-ChFWAo6t.js:523 Cookie verifier: NOT FOUND
+index-ChFWAo6t.js:523 URL code param: NOT FOUND
+index-ChFWAo6t.js:523 PKCE diagnostics: {hasVerifier: false, hasBackupVerifier: false, hasCookieVerifier: false, hasSessionVerifier: false, hasCodeParam: false}
+index-ChFWAo6t.js:523 ===== AUTH CODE HANDLER =====
+index-ChFWAo6t.js:523 Auth code present: false
+index-ChFWAo6t.js:523 Auth error present: false
+index-ChFWAo6t.js:523 URL: https://roshlingua.vercel.app/onboarding
+index-ChFWAo6t.js:523 PKCE Debug Info
+index-ChFWAo6t.js:523 Verifier in localStorage: NOT FOUND
+index-ChFWAo6t.js:523 Verifier in sessionStorage: NOT FOUND
+index-ChFWAo6t.js:523 Backup verifier: NOT FOUND
+index-ChFWAo6t.js:523 Cookie verifier: NOT FOUND
+index-ChFWAo6t.js:523 URL code param: NOT FOUND
+index-ChFWAo6t.js:523 PKCE diagnostics: {hasVerifier: false, hasBackupVerifier: false, hasCookieVerifier: false, hasSessionVerifier: false, hasCodeParam: false}
+index-ChFWAo6t.js:523 ===== AUTH CODE HANDLER =====
+index-ChFWAo6t.js:523 Auth code present: false
+index-ChFWAo6t.js:523 Auth error present: false
+index-ChFWAo6t.js:523 URL: https://roshlingua.vercel.app/dashboard
+index-ChFWAo6t.js:523 PKCE Debug Info
+index-ChFWAo6t.js:523 Verifier in localStorage: NOT FOUND
+index-ChFWAo6t.js:523 Verifier in sessionStorage: NOT FOUND
+index-ChFWAo6t.js:523 Backup verifier: NOT FOUND
+index-ChFWAo6t.js:523 Cookie verifier: NOT FOUND
+index-ChFWAo6t.js:523 URL code param: NOT FOUND
+index-ChFWAo6t.js:523 PKCE diagnostics: {hasVerifier: false, hasBackupVerifier: false, hasCookieVerifier: false, hasSessionVerifier: false, hasCodeParam: false}
+index-ChFWAo6t.js:523 ===== AUTH CODE HANDLER =====
+index-ChFWAo6t.js:523 Auth code present: false
+index-ChFWAo6t.js:523 Auth error present: false
+index-ChFWAo6t.js:523 URL: https://roshlingua.vercel.app/onboarding
+index-ChFWAo6t.js:523 PKCE Debug Info
+index-ChFWAo6t.js:523 Verifier in localStorage: NOT FOUND
+index-ChFWAo6t.js:523 Verifier in sessionStorage: NOT FOUND
+index-ChFWAo6t.js:523 Backup verifier: NOT FOUND
+index-ChFWAo6t.js:523 Cookie verifier: NOT FOUND
+index-ChFWAo6t.js:523 URL code param: NOT FOUND
+index-ChFWAo6t.js:523 PKCE diagnostics: {hasVerifier: false, hasBackupVerifier: false, hasCookieVerifier: false, hasSessionVerifier: false, hasCodeParam: false}
+index-ChFWAo6t.js:523 ===== AUTH CODE HANDLER =====
+index-ChFWAo6t.js:523 Auth code present: false
+index-ChFWAo6t.js:523 Auth error present: false
+index-ChFWAo6t.js:523 URL: https://roshlingua.vercel.app/dashboard
+index-ChFWAo6t.js:523 PKCE Debug Info
+index-ChFWAo6t.js:523 Verifier in localStorage: NOT FOUND
+index-ChFWAo6t.js:523 Verifier in sessionStorage: NOT FOUND
+index-ChFWAo6t.js:523 Backup verifier: NOT FOUND
+index-ChFWAo6t.js:523 Cookie verifier: NOT FOUND
+index-ChFWAo6t.js:523 URL code param: NOT FOUND
+index-ChFWAo6t.js:523 PKCE diagnostics: {hasVerifier: false, hasBackupVerifier: false, hasCookieVerifier: false, hasSessionVerifier: false, hasCodeParam: false}
+index-ChFWAo6t.js:523 ===== AUTH CODE HANDLER =====
+index-ChFWAo6t.js:523 Auth code present: false
+index-ChFWAo6t.js:523 Auth error present: false
+index-ChFWAo6t.js:523 URL: https://roshlingua.vercel.app/onboarding
+index-ChFWAo6t.js:523 PKCE Debug Info
+index-ChFWAo6t.js:523 Verifier in localStorage: NOT FOUND
+index-ChFWAo6t.js:523 Verifier in sessionStorage: NOT FOUND
+index-ChFWAo6t.js:523 Backup verifier: NOT FOUND
+index-ChFWAo6t.js:523 Cookie verifier: NOT FOUND
+index-ChFWAo6t.js:523 URL code param: NOT FOUND
+index-ChFWAo6t.js:523 PKCE diagnostics: {hasVerifier: false, hasBackupVerifier: false, hasCookieVerifier: false, hasSessionVerifier: false, hasCodeParam: false}
+index-ChFWAo6t.js:49 Throttling navigation to prevent the browser from hanging. See https://crbug.com/1038223. Command line switch --disable-ipc-flooding-protection can be used to bypass the protection
+y @ index-ChFWAo6t.js:49
+(anonymous) @ index-ChFWAo6t.js:58
+(anonymous) @ index-ChFWAo6t.js:58
+Wc @ index-ChFWAo6t.js:40
+Po @ index-ChFWAo6t.js:40
+(anonymous) @ index-ChFWAo6t.js:40
+S @ index-ChFWAo6t.js:25
+M @ index-ChFWAo6t.js:25Understand this warning
