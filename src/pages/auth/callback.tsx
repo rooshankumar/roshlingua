@@ -3,11 +3,13 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/lib/supabase';
 import { useToast } from '@/hooks/use-toast';
+import { exchangeAuthCode, getPKCEVerifier } from '@/utils/pkceHelper';
 
 const Callback = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [isProcessing, setIsProcessing] = useState(true);
+  const [errorDetails, setErrorDetails] = useState<string | null>(null);
 
   useEffect(() => {
     const handleAuthCallback = async () => {
@@ -21,6 +23,7 @@ const Callback = () => {
         
         if (error) {
           console.error(`Auth error: ${error} - ${errorDescription}`);
+          setErrorDetails(errorDescription || error);
           throw new Error(`OAuth error: ${errorDescription || error}`);
         }
 
@@ -28,21 +31,34 @@ const Callback = () => {
         const code = url.searchParams.get('code');
         if (!code) {
           console.error("No authentication code in URL");
+          setErrorDetails("Missing authentication code");
           throw new Error("Missing authentication code");
         }
 
         console.log("Found auth code in URL:", code.substring(0, 5) + "...");
         
-        // Let Supabase handle the session exchange
-        const { data, error: sessionError } = await supabase.auth.exchangeCodeForSession(code);
+        // Verify PKCE verifier exists
+        const verifier = getPKCEVerifier();
+        if (!verifier) {
+          console.error("No code verifier found in storage");
+          setErrorDetails("Missing security verifier");
+          throw new Error("Authentication failed - missing verifier");
+        }
+        
+        console.log("Found verifier, length:", verifier.length);
+        
+        // Exchange code for session
+        const { data, error: sessionError } = await exchangeAuthCode(code);
         
         if (sessionError) {
           console.error("Error exchanging code for session:", sessionError);
+          setErrorDetails(sessionError.message);
           throw sessionError;
         }
 
         if (!data.session) {
           console.error("No session returned from code exchange");
+          setErrorDetails("No session returned");
           throw new Error("Authentication failed - no session returned");
         }
 
@@ -100,7 +116,7 @@ const Callback = () => {
         toast({
           variant: "destructive", 
           title: "Authentication Failed",
-          description: error.message || "Please try logging in again."
+          description: errorDetails || error.message || "Please try logging in again."
         });
 
         navigate('/auth', { replace: true });
@@ -110,7 +126,7 @@ const Callback = () => {
     };
 
     handleAuthCallback();
-  }, [navigate, toast]);
+  }, [navigate, toast, errorDetails]);
 
   return (
     <div className="h-screen w-full flex items-center justify-center">
@@ -120,6 +136,11 @@ const Callback = () => {
         <p className="text-muted-foreground">
           {isProcessing ? "Completing authentication..." : "Redirecting..."}
         </p>
+        {errorDetails && (
+          <div className="text-destructive text-sm mt-2 max-w-md text-center">
+            Error: {errorDetails}
+          </div>
+        )}
       </div>
     </div>
   );

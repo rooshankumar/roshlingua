@@ -1,3 +1,4 @@
+
 import { createClient } from '@supabase/supabase-js';
 import type { Database } from './database.types';
 
@@ -8,13 +9,37 @@ if (!supabaseUrl || !supabaseAnonKey) {
   throw new Error('Missing Supabase environment variables');
 }
 
+// Prepare a unique device identifier for better debugging
+const getDeviceId = () => {
+  let deviceId = localStorage.getItem('supabase_device_id');
+  if (!deviceId) {
+    deviceId = Date.now().toString(36) + Math.random().toString(36).substring(2);
+    localStorage.setItem('supabase_device_id', deviceId);
+  }
+  return deviceId;
+};
+
 export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
   auth: {
     autoRefreshToken: true,
     persistSession: true,
     detectSessionInUrl: true,
     flowType: 'pkce',
-    storage: localStorage
+    storage: localStorage,
+    debug: true, // Enable debug logs from Supabase Auth
+    cookieOptions: {
+      name: 'sb-auth-token',
+      lifetime: 60 * 60 * 24 * 7, // 1 week
+      domain: window.location.hostname,
+      path: '/',
+      sameSite: 'Lax'
+    }
+  },
+  global: {
+    headers: {
+      'X-Device-ID': getDeviceId(),
+      'Accept': 'application/json'
+    }
   }
 });
 
@@ -28,9 +53,31 @@ export const signInWithGoogle = async () => {
     // Clear localStorage of any previous PKCE data
     localStorage.removeItem('supabase.auth.code_verifier');
     sessionStorage.removeItem('supabase.auth.code_verifier');
+    document.cookie = 'pkce_verifier=; max-age=0; path=/';
+
+    // Create a proper length verifier
+    const generateVerifier = () => {
+      const array = new Uint8Array(32);
+      window.crypto.getRandomValues(array);
+      return Array.from(array, byte => byte.toString(16).padStart(2, '0')).join('');
+    };
+    
+    // Generate a verifier and store it securely
+    const verifier = generateVerifier();
+    console.log("Generated new verifier:", verifier.substring(0, 5) + "...", "length:", verifier.length);
+    
+    // Ensure it's stored everywhere before redirect
+    localStorage.setItem('supabase.auth.code_verifier', verifier);
+    sessionStorage.setItem('supabase.auth.code_verifier', verifier);
+    document.cookie = `pkce_verifier=${verifier};max-age=600;path=/;SameSite=Lax`;
+    
+    // Additional backup with unique ID
+    const sessionId = Date.now().toString(36);
+    localStorage.setItem('auth_session_id', sessionId);
+    localStorage.setItem(`pkce_verifier_${sessionId}`, verifier);
 
     // Start OAuth flow
-    return await supabase.auth.signInWithOAuth({
+    const result = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
         redirectTo: `${window.location.origin}/auth/callback`,
@@ -40,6 +87,12 @@ export const signInWithGoogle = async () => {
         }
       }
     });
+
+    // Verify verifier is still there after signInWithOAuth but before redirect happens
+    console.log("Pre-redirect verification - PKCE verifier exists:", 
+      !!localStorage.getItem('supabase.auth.code_verifier'));
+
+    return result;
   } catch (error) {
     console.error("Error in signInWithGoogle:", error);
     throw error;

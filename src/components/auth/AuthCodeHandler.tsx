@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/lib/supabase';
+import { getPKCEVerifier, exchangeAuthCode } from '@/utils/pkceHelper';
 
 const AuthCodeHandler = () => {
   const navigate = useNavigate();
@@ -41,8 +42,23 @@ const AuthCodeHandler = () => {
           return;
         }
 
-        // Let Supabase handle the code exchange with its built-in mechanisms
-        const { data, error: sessionError } = await supabase.auth.exchangeCodeForSession(code);
+        // Check for code verifier
+        const verifier = getPKCEVerifier();
+        if (!verifier) {
+          console.error("Critical: No code verifier found for auth exchange");
+          toast({
+            variant: "destructive",
+            title: "Authentication Failed",
+            description: "Missing security code verifier. Please try again."
+          });
+          navigate('/auth', { replace: true });
+          return;
+        }
+
+        console.log("Found code verifier, proceeding with exchange");
+        
+        // Exchange auth code for session
+        const { data, error: sessionError } = await exchangeAuthCode(code);
 
         if (sessionError) {
           console.error("Code exchange error:", sessionError);
