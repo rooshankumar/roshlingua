@@ -50,31 +50,24 @@ export const signInWithGoogle = async () => {
     // Always sign out first to ensure a clean auth state
     await supabase.auth.signOut();
 
-    // Clear localStorage of any previous PKCE data
-    localStorage.removeItem('supabase.auth.code_verifier');
-    sessionStorage.removeItem('supabase.auth.code_verifier');
-    document.cookie = 'pkce_verifier=; max-age=0; path=/';
-
-    // Create a proper length verifier
-    const generateVerifier = () => {
-      const array = new Uint8Array(32);
-      window.crypto.getRandomValues(array);
-      return Array.from(array, byte => byte.toString(16).padStart(2, '0')).join('');
-    };
+    // Import helpers for PKCE
+    const { generateVerifier, storePKCEVerifier, clearPKCEVerifier } = await import('@/utils/pkceHelper');
     
-    // Generate a verifier and store it securely
+    // Clear any existing verifiers
+    clearPKCEVerifier();
+    
+    // Generate a proper verifier for PKCE
     const verifier = generateVerifier();
     console.log("Generated new verifier:", verifier.substring(0, 5) + "...", "length:", verifier.length);
     
-    // Ensure it's stored everywhere before redirect
-    localStorage.setItem('supabase.auth.code_verifier', verifier);
-    sessionStorage.setItem('supabase.auth.code_verifier', verifier);
-    document.cookie = `pkce_verifier=${verifier};max-age=600;path=/;SameSite=Lax`;
+    // Store verifier in all locations
+    storePKCEVerifier(verifier);
     
-    // Additional backup with unique ID
-    const sessionId = Date.now().toString(36);
-    localStorage.setItem('auth_session_id', sessionId);
-    localStorage.setItem(`pkce_verifier_${sessionId}`, verifier);
+    // Verify storage before continuing
+    if (!localStorage.getItem('supabase.auth.code_verifier')) {
+      console.error("Critical: Failed to store verifier in localStorage");
+      throw new Error("Authentication setup failed");
+    }
 
     // Start OAuth flow
     const result = await supabase.auth.signInWithOAuth({
@@ -88,9 +81,19 @@ export const signInWithGoogle = async () => {
       }
     });
 
-    // Verify verifier is still there after signInWithOAuth but before redirect happens
-    console.log("Pre-redirect verification - PKCE verifier exists:", 
-      !!localStorage.getItem('supabase.auth.code_verifier'));
+    // Double-check verifier after OAuth setup
+    console.log("Pre-redirect verification - PKCE verifier exists:", !!localStorage.getItem('supabase.auth.code_verifier'));
+    if (!localStorage.getItem('supabase.auth.code_verifier')) {
+      // This is a critical failure - attempt emergency recovery
+      console.error("Critical: Verifier was removed during OAuth setup");
+      
+      // Restore from backup if possible
+      const backupVerifier = localStorage.getItem('pkce_verifier_backup');
+      if (backupVerifier) {
+        localStorage.setItem('supabase.auth.code_verifier', backupVerifier);
+        console.log("Recovered verifier from backup");
+      }
+    }
 
     return result;
   } catch (error) {

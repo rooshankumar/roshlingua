@@ -1,6 +1,9 @@
+
 /**
- * Utility for debugging authentication issues
+ * Comprehensive auth debugging utility
  */
+import { supabase } from '@/lib/supabase';
+import { getPKCEVerifier } from './pkceHelper';
 
 export const clearAllAuthData = () => {
   console.log('Clearing all auth data...');
@@ -12,6 +15,7 @@ export const clearAllAuthData = () => {
   localStorage.removeItem('sb-pkce-verifier');
   localStorage.removeItem('auth_session_id');
   localStorage.removeItem('supabase_device_id');
+  localStorage.removeItem('pkce_verifier_backup');
 
   // Clear sessionStorage
   sessionStorage.removeItem('supabase.auth.token');
@@ -25,12 +29,6 @@ export const clearAllAuthData = () => {
   console.log('Auth data cleared');
   return true;
 };
-
-/**
- * Comprehensive auth debugging utility
- */
-import { supabase } from '@/lib/supabase';
-import { getPKCEVerifier } from './pkceHelper';
 
 export const debugAuth = () => {
   console.group('🔍 Auth Debug Information');
@@ -64,8 +62,11 @@ export const debugAuth = () => {
   const authKeys = [];
   for (let i = 0; i < localStorage.length; i++) {
     const key = localStorage.key(i);
-    if (key && (key.includes('auth') || key.includes('supabase'))) {
-      authKeys.push(key);
+    if (key && (key.includes('auth') || key.includes('supabase') || key.includes('pkce'))) {
+      authKeys.push({
+        key,
+        valueLength: localStorage.getItem(key)?.length || 0
+      });
     }
   }
   console.log('Auth-related localStorage keys:', authKeys);
@@ -78,6 +79,18 @@ export const debugAuth = () => {
     c.includes('pkce')
   );
   console.log('Auth-related cookies:', authCookies);
+
+  // Check current URL for auth parameters
+  const url = new URL(window.location.href);
+  const urlParams = {};
+  url.searchParams.forEach((value, key) => {
+    if (key === 'code') {
+      urlParams[key] = value.substring(0, 8) + '... (length: ' + value.length + ')';
+    } else {
+      urlParams[key] = value;
+    }
+  });
+  console.log('URL parameters:', urlParams);
 
   // Get current session state from Supabase
   supabase.auth.getSession().then(({ data, error }) => {
@@ -95,7 +108,8 @@ export const debugAuth = () => {
     hasVerifier: !!codeVerifier,
     hasSession: !!session,
     authKeys,
-    authCookies
+    authCookies,
+    urlParams
   };
 };
 
@@ -142,57 +156,34 @@ export const diagnoseAuthUrl = (url = window.location.href) => {
   }
 };
 
-// Test function for authentication
-export const testAuthFlow = async () => {
-  console.group('🧪 Testing Auth Flow');
+// Reset authentication and start a fresh, clean auth flow
+export const resetAndStartAuth = async () => {
+  console.group('🧹 Resetting Authentication');
 
-  // 1. Clear current auth state
-  console.log('1. Clearing current auth state...');
-  await supabase.auth.signOut();
+  // 1. Sign out from Supabase
+  console.log('1. Signing out...');
+  await supabase.auth.signOut({ scope: 'global' });
+  
+  // 2. Clear all stored auth data
+  console.log('2. Clearing auth data...');
   clearAllAuthData();
-
-  // 2. Initiate login flow
-  console.log('2. Initiating sign-in flow...');
-  try {
-    const { data, error } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: `${window.location.origin}/auth/callback?test=true`,
-        skipBrowserRedirect: true, // We'll handle the redirect manually
-      }
-    });
-
-    if (error) {
-      console.error('Sign-in error:', error);
-      console.groupEnd();
-      return { success: false, error };
-    }
-
-    console.log('OAuth URL generated:', !!data.url);
-
-    // 3. Verify verifier is stored
-    const verifier = getPKCEVerifier();
-    console.log('3. Verifier stored:', !!verifier);
-    if (verifier) {
-      console.log('Verifier length:', verifier.length);
-    }
-
-    // 4. Ready for redirect
-    console.log('4. Ready for redirect. URL:', data.url?.substring(0, 50) + '...');
-    console.log('5. Manual redirect required. Copy this URL and open in a new tab:');
-    console.log(data.url);
-
-    console.groupEnd();
-    return { success: true, url: data.url, verifier };
-  } catch (err) {
-    console.error('Test auth flow error:', err);
-    console.groupEnd();
-    return { success: false, error: err };
-  }
+  
+  // 3. Import necessary functions to re-initiate login
+  console.log('3. Initiating fresh sign-in...');
+  const { signInWithGoogle } = await import('@/lib/supabase');
+  const result = await signInWithGoogle();
+  
+  console.log('Sign-in initiated, URL generated:', !!result.data.url);
+  console.groupEnd();
+  
+  return result;
 };
 
-// Export a helper function to quickly debug in the browser console
-window.debugAuth = debugAuth;
-window.clearAllAuthData = clearAllAuthData;
-window.diagnoseAuthUrl = diagnoseAuthUrl;
-window.testAuthFlow = testAuthFlow;
+// Export these functions to the global window object for easy debugging
+// from browser console
+if (typeof window !== 'undefined') {
+  window.debugAuth = debugAuth;
+  window.clearAllAuthData = clearAllAuthData;
+  window.diagnoseAuthUrl = diagnoseAuthUrl;
+  window.resetAndStartAuth = resetAndStartAuth;
+}

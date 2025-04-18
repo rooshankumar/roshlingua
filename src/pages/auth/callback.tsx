@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/lib/supabase';
 import { useToast } from '@/hooks/use-toast';
-import { exchangeAuthCode, getPKCEVerifier } from '@/utils/pkceHelper';
+import { exchangeAuthCode, getPKCEVerifier, debugPKCEState } from '@/utils/pkceHelper';
 
 const Callback = () => {
   const navigate = useNavigate();
@@ -15,6 +15,10 @@ const Callback = () => {
     const handleAuthCallback = async () => {
       try {
         console.log("===== AUTH CALLBACK PROCESSING =====");
+        
+        // Run diagnostic checks first
+        const diagnostics = debugPKCEState();
+        console.log("Auth diagnostics:", diagnostics);
 
         // Check for error parameter in URL
         const url = new URL(window.location.href);
@@ -35,17 +39,31 @@ const Callback = () => {
           throw new Error("Missing authentication code");
         }
 
-        console.log("Found auth code in URL:", code.substring(0, 5) + "...");
+        console.log("Found auth code in URL:", code.substring(0, 5) + "...", "length:", code.length);
         
         // Verify PKCE verifier exists
-        const verifier = getPKCEVerifier();
+        let verifier = getPKCEVerifier();
+        
+        // Last-ditch effort if no verifier is found
         if (!verifier) {
-          console.error("No code verifier found in storage");
-          setErrorDetails("Missing security verifier");
-          throw new Error("Authentication failed - missing verifier");
+          console.error("No code verifier found in any storage location");
+          console.log("Attempting emergency verifier recovery...");
+          
+          // Try to extract from cookies directly
+          const pkceVerifierCookie = document.cookie.split(';')
+            .find(c => c.trim().startsWith('pkce_verifier='));
+            
+          if (pkceVerifierCookie) {
+            verifier = pkceVerifierCookie.split('=')[1];
+            localStorage.setItem('supabase.auth.code_verifier', verifier);
+            console.log("Recovered verifier from direct cookie access");
+          } else {
+            setErrorDetails("Missing security verifier");
+            throw new Error("Authentication failed - missing verifier");
+          }
         }
         
-        console.log("Found verifier, length:", verifier.length);
+        console.log("Using verifier, length:", verifier.length);
         
         // Exchange code for session
         const { data, error: sessionError } = await exchangeAuthCode(code);
