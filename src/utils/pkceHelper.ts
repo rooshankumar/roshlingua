@@ -300,10 +300,55 @@ export const getPKCEVerifier = () => {
 
 // Clear PKCE verifier from all storage locations
 export const clearPKCEVerifier = () => {
-  localStorage.removeItem('supabase.auth.code_verifier');
-  sessionStorage.removeItem('supabase.auth.code_verifier');
-  localStorage.removeItem('pkce_verifier_backup');
-  document.cookie = 'pkce_verifier=; max-age=0; path=/';
+  console.log('[PKCE] Clearing all verifiers');
+  
+  // Clear from localStorage with all possible keys
+  const storageKeys = [
+    'supabase.auth.code_verifier',
+    'pkce_verifier_backup',
+    'sb-pkce-verifier',
+    'pkce_verifier',
+    'code_verifier',
+    'sb-code-verifier',
+    'auth.code_verifier',
+    'oauth_verifier'
+  ];
+  
+  storageKeys.forEach(key => {
+    localStorage.removeItem(key);
+    sessionStorage.removeItem(key);
+  });
+  
+  // Clear from cookies with multiple patterns
+  const domain = window.location.hostname;
+  const cookieKeys = [
+    'pkce_verifier',
+    'supabase_code_verifier', 
+    'sb_pkce_verifier',
+    'code_verifier'
+  ];
+  
+  cookieKeys.forEach(key => {
+    document.cookie = `${key}=; max-age=0; path=/;`;
+    document.cookie = `${key}=; max-age=0; path=/; domain=${domain};`;
+    
+    // For top-level domain too
+    if (domain.includes('.')) {
+      const topDomain = domain.split('.').slice(-2).join('.');
+      document.cookie = `${key}=; max-age=0; path=/; domain=.${topDomain};`;
+    }
+  });
+  
+  // Try to clear backup input if it exists
+  try {
+    const backupInput = document.getElementById('pkce-verifier-store');
+    if (backupInput) (backupInput as HTMLInputElement).value = '';
+    
+    const backupInput2 = document.getElementById('pkce-backup');
+    if (backupInput2) (backupInput2 as HTMLInputElement).value = '';
+  } catch (e) {
+    console.warn('[PKCE] Error clearing backup input:', e);
+  }
   
   console.log('[PKCE] All verifiers cleared');
 };

@@ -9,37 +9,52 @@ const AuthCodeHandler = () => {
   const { toast } = useToast();
   const [processingAuth, setProcessingAuth] = useState(false);
 
+  // Check and restore verifier on component mount
   useEffect(() => {
-    const checkForEmergencyRecovery = () => {
-      // This function tries to recover verifier from any possible source
-      console.log("Performing emergency verifier recovery checks...");
+    // Try to recover verifier from cookie on every page load
+    recoverVerifierFromCookie();
+  }, []);
 
-      // Look for anything in cookies that could be a verifier
-      const cookies = document.cookie.split(';');
-      for (const cookie of cookies) {
-        const [name, value] = cookie.trim().split('=');
-        if ((name.includes('verifier') || name.includes('code') || name.includes('pkce')) && value && value.length > 20) {
-          console.log("Found potential verifier in cookie:", name);
+  const recoverVerifierFromCookie = () => {
+    // Check for cookie verifier immediately
+    const cookies = document.cookie.split(';');
+    for (const cookie of cookies) {
+      const [name, value] = cookie.trim().split('=');
+      if ((name.includes('verifier') || name.includes('code') || name.includes('pkce')) && value && value.length > 20) {
+        console.log("Found verifier in cookie, restoring to storage:", name);
+        localStorage.setItem('supabase.auth.code_verifier', value);
+        sessionStorage.setItem('supabase.auth.code_verifier', value);
+        return true;
+      }
+    }
+    return false;
+  };
+
+  const checkForEmergencyRecovery = () => {
+    // This function tries to recover verifier from any possible source
+    console.log("Performing emergency verifier recovery checks...");
+
+    // First try cookie recovery
+    if (recoverVerifierFromCookie()) {
+      return localStorage.getItem('supabase.auth.code_verifier');
+    }
+
+    // Search local and session storage for anything that could be a verifier
+    const storageKeys = [...Object.keys(localStorage), ...Object.keys(sessionStorage)];
+    for (const key of storageKeys) {
+      if (key.includes('verifier') || key.includes('code') || key.includes('pkce')) {
+        const value = localStorage.getItem(key) || sessionStorage.getItem(key);
+        if (value && value.length > 20) {
+          console.log("Found potential verifier in storage:", key);
           localStorage.setItem('supabase.auth.code_verifier', value);
+          sessionStorage.setItem('supabase.auth.code_verifier', value);
           return value;
         }
       }
+    }
 
-      // Search local and session storage for anything that could be a verifier
-      const storageKeys = [...Object.keys(localStorage), ...Object.keys(sessionStorage)];
-      for (const key of storageKeys) {
-        if (key.includes('verifier') || key.includes('code') || key.includes('pkce')) {
-          const value = localStorage.getItem(key) || sessionStorage.getItem(key);
-          if (value && value.length > 20) {
-            console.log("Found potential verifier in storage:", key);
-            localStorage.setItem('supabase.auth.code_verifier', value);
-            return value;
-          }
-        }
-      }
-
-      return null;
-    };
+    return null;
+  };
 
     const handleAuthRedirect = async () => {
       // Prevent multiple processing attempts

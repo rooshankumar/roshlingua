@@ -423,12 +423,29 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signOut = async () => {
     try {
-      const { error } = await supabase.auth.signOut();
+      console.log("Starting sign out process...");
+      
+      // Import clearPKCEVerifier function to ensure all verifiers are cleared
+      const { clearPKCEVerifier } = await import('@/utils/pkceHelper');
+      
+      // First clear all PKCE verifiers to ensure clean state
+      clearPKCEVerifier();
+      
+      // Then sign out through Supabase (our enhanced version)
+      const { error } = await supabase.auth.signOut({ scope: 'global' });
       if (error) throw error;
 
       // Clear any local state
       setUser(null);
       setSession(null);
+      
+      // Clear all possible auth data
+      localStorage.removeItem('supabase.auth.token');
+      sessionStorage.removeItem('supabase.auth.token');
+      localStorage.removeItem('sb-auth-token');
+      sessionStorage.removeItem('sb-auth-token');
+      
+      console.log("Sign out complete, redirecting to auth page");
 
       // Force navigation to auth page
       window.location.href = '/auth';

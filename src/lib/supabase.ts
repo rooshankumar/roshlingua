@@ -173,7 +173,28 @@ export const signInWithGoogle = async () => {
 };
 
 export const signOut = async () => {
-  return await supabase.auth.signOut();
+  // Import clearPKCEVerifier function to ensure all verifiers are cleared
+  const { clearPKCEVerifier } = await import('@/utils/pkceHelper');
+  
+  // Clear all browser storage related to authentication
+  localStorage.removeItem('supabase.auth.token');
+  sessionStorage.removeItem('supabase.auth.token');
+  clearPKCEVerifier(); // This clears all verifiers in different storage locations
+  
+  // Clear all authentication cookies
+  document.cookie = 'sb-auth-token=; max-age=0; path=/;';
+  document.cookie = 'pkce_verifier=; max-age=0; path=/;';
+  document.cookie = 'supabase_code_verifier=; max-age=0; path=/;';
+  document.cookie = 'sb_pkce_verifier=; max-age=0; path=/;';
+  document.cookie = 'code_verifier=; max-age=0; path=/;';
+  
+  // Also clear with domain
+  const domain = window.location.hostname;
+  document.cookie = `sb-auth-token=; max-age=0; path=/; domain=${domain};`;
+  document.cookie = `pkce_verifier=; max-age=0; path=/; domain=${domain};`;
+  
+  // Finally call Supabase signOut to complete the process
+  return await supabase.auth.signOut({ scope: 'global' });
 };
 
 export const getCurrentSession = async () => {
