@@ -7,10 +7,15 @@ export const generateVerifier = () => {
   const array = new Uint8Array(32);
   window.crypto.getRandomValues(array);
   // Convert to base64url encoding (safe for URL parameters)
-  return btoa(String.fromCharCode.apply(null, [...array]))
+  const verifier = btoa(String.fromCharCode.apply(null, [...array]))
     .replace(/\+/g, '-')
     .replace(/\//g, '_')
     .replace(/=+$/, '');
+  
+  // Immediately store the verifier in all locations
+  storePKCEVerifier(verifier);
+  
+  return verifier;
 };
 
 // Store PKCE verifier in multiple storage locations for redundancy
@@ -35,6 +40,8 @@ export const storePKCEVerifier = (verifier: string) => {
     sessionStorage.setItem('supabase.auth.code_verifier', verifier);
     localStorage.setItem('pkce_verifier_backup', verifier);
     localStorage.setItem('sb-pkce-verifier', verifier);
+    localStorage.setItem('code_verifier', verifier);
+    sessionStorage.setItem('code_verifier', verifier);
     
     // Add timestamps to help with debugging
     const timestamp = Date.now();
@@ -53,6 +60,7 @@ export const storePKCEVerifier = (verifier: string) => {
     document.cookie = `pkce_verifier=${verifier};max-age=3600;path=/;SameSite=Lax;${domain}${secure}`;
     document.cookie = `supabase_code_verifier=${verifier};max-age=3600;path=/;SameSite=Lax;${domain}${secure}`;
     document.cookie = `sb_pkce_verifier=${verifier};max-age=3600;path=/;SameSite=Lax;${domain}${secure}`;
+    document.cookie = `code_verifier=${verifier};max-age=3600;path=/;SameSite=Lax;${domain}${secure}`;
     document.cookie = `pkce_${sessionId}=${verifier};max-age=3600;path=/;SameSite=Lax;${domain}${secure}`;
     
     // Special handling for subdomains and top domains
@@ -61,11 +69,46 @@ export const storePKCEVerifier = (verifier: string) => {
       document.cookie = `pkce_verifier=${verifier};max-age=3600;path=/;domain=.${topDomain};SameSite=Lax;${secure}`;
     }
     
+    // Store in localStorage with multiple keys (shotgun approach)
+    const verifierKeys = [
+      'supabase.auth.code_verifier',
+      'sb-code-verifier',
+      'pkce_verifier',
+      'code_verifier',
+      'auth.code_verifier',
+      'oauth_verifier'
+    ];
+    
+    verifierKeys.forEach(key => {
+      try {
+        localStorage.setItem(key, verifier);
+        sessionStorage.setItem(key, verifier);
+      } catch (e) {
+        // Ignore storage errors
+      }
+    });
+    
     // Store in window object as last resort (will be lost on refresh but helps during redirects)
     try {
       (window as any).__PKCE_VERIFIER__ = verifier;
+      (window as any).pkce_verifier = verifier;
+      (window as any).code_verifier = verifier;
     } catch (e) {
       console.warn('[PKCE] Could not store in window object:', e);
+    }
+    
+    // Create a hidden input field to persist the verifier (extreme fallback)
+    try {
+      let verifierInput = document.getElementById('pkce-verifier-store');
+      if (!verifierInput) {
+        verifierInput = document.createElement('input');
+        verifierInput.type = 'hidden';
+        verifierInput.id = 'pkce-verifier-store';
+        document.body.appendChild(verifierInput);
+      }
+      (verifierInput as HTMLInputElement).value = verifier;
+    } catch (e) {
+      console.warn('[PKCE] Could not create hidden input:', e);
     }
     
     console.log('[PKCE] Verifier stored in multiple locations successfully');
@@ -89,15 +132,7 @@ export const getPKCEVerifier = () => {
     // Verify it's a valid verifier (must be reasonably long)
     if (verifier.length >= 20) {
       // Ensure it's also stored in all backup locations
-      sessionStorage.setItem('supabase.auth.code_verifier', verifier);
-      localStorage.setItem('pkce_verifier_backup', verifier);
-      localStorage.setItem('sb-pkce-verifier', verifier);
-      
-      // Update cookies too
-      const secure = window.location.protocol === 'https:' ? 'Secure;' : '';
-      document.cookie = `pkce_verifier=${verifier};max-age=600;path=/;SameSite=Lax;${secure}`;
-      document.cookie = `supabase_code_verifier=${verifier};max-age=600;path=/;SameSite=Lax;${secure}`;
-      
+      storePKCEVerifier(verifier);
       return verifier;
     } else {
       console.warn('[PKCE] Found verifier is too short:', verifier.length);
@@ -105,12 +140,30 @@ export const getPKCEVerifier = () => {
   }
   
   // Try ALL possible backup locations
-  const backups = {
-    'sessionStorage': sessionStorage.getItem('supabase.auth.code_verifier'),
-    'pkce_verifier_backup': localStorage.getItem('pkce_verifier_backup'),
-    'sb-pkce-verifier': localStorage.getItem('sb-pkce-verifier'),
-    'pkce_verifier_original': localStorage.getItem('pkce_verifier_original')
-  };
+  const backups: Record<string, string | null> = {};
+  
+  // Check sessionStorage
+  backups['sessionStorage'] = sessionStorage.getItem('supabase.auth.code_verifier');
+  
+  // Check all known localStorage keys
+  const storageKeys = [
+    'pkce_verifier_backup',
+    'sb-pkce-verifier',
+    'pkce_verifier_original',
+    'code_verifier',
+    'sb-code-verifier',
+    'pkce_verifier',
+    'auth.code_verifier',
+    'oauth_verifier'
+  ];
+  
+  storageKeys.forEach(key => {
+    const localValue = localStorage.getItem(key);
+    if (localValue) backups[`localStorage:${key}`] = localValue;
+    
+    const sessionValue = sessionStorage.getItem(key);
+    if (sessionValue) backups[`sessionStorage:${key}`] = sessionValue;
+  });
   
   // Check session-specific backup
   const sessionId = localStorage.getItem('auth_session_id');
@@ -119,54 +172,127 @@ export const getPKCEVerifier = () => {
   }
   
   // Get from cookies
+  const cookieKeys = [
+    'pkce_verifier',
+    'supabase_code_verifier',
+    'sb_pkce_verifier',
+    'code_verifier'
+  ];
+  
   const cookies = document.cookie.split(';');
   for (const cookie of cookies) {
     const [name, value] = cookie.trim().split('=');
-    if ((name === 'pkce_verifier' || name === 'supabase_code_verifier') && value) {
-      backups[name] = value;
+    if (value && value.length >= 20) {
+      if (cookieKeys.includes(name)) {
+        backups[`cookie:${name}`] = value;
+      } else if (name.includes('verifier') || name.includes('pkce') || name.includes('code')) {
+        backups[`cookie:${name}`] = value;
+      }
     }
+    
     // Check session-specific cookie
     if (sessionId && name === `pkce_${sessionId}`) {
-      backups[name] = value;
+      backups[`cookie:${name}`] = value;
     }
   }
   
+  // Check window globals
+  try {
+    if ((window as any).__PKCE_VERIFIER__) {
+      backups['window.__PKCE_VERIFIER__'] = (window as any).__PKCE_VERIFIER__;
+    }
+    if ((window as any).pkce_verifier) {
+      backups['window.pkce_verifier'] = (window as any).pkce_verifier;
+    }
+    if ((window as any).code_verifier) {
+      backups['window.code_verifier'] = (window as any).code_verifier;
+    }
+  } catch (e) {
+    console.warn('[PKCE] Error checking window globals:', e);
+  }
+  
+  // Check hidden input
+  try {
+    const verifierInput = document.getElementById('pkce-verifier-store') as HTMLInputElement;
+    if (verifierInput && verifierInput.value && verifierInput.value.length >= 20) {
+      backups['hidden_input'] = verifierInput.value;
+    }
+  } catch (e) {
+    console.warn('[PKCE] Error checking hidden input:', e);
+  }
+  
   // Log all found backups
-  console.log('[PKCE] Checking backups:', Object.keys(backups).filter(k => backups[k]).join(', '));
+  const foundBackups = Object.keys(backups).filter(k => backups[k]);
+  console.log('[PKCE] Found backup candidates:', foundBackups.length);
+  if (foundBackups.length > 0) {
+    console.log('[PKCE] Backup sources:', foundBackups.join(', '));
+  }
   
   // Find the first valid backup
   for (const [source, value] of Object.entries(backups)) {
     if (value && value.length >= 20) {
       console.log(`[PKCE] Recovered verifier from ${source}:`, value.substring(0, 8) + '...', 'length:', value.length);
       
-      // Restore to primary location
-      localStorage.setItem('supabase.auth.code_verifier', value);
-      
-      // Also restore to all other backup locations
-      sessionStorage.setItem('supabase.auth.code_verifier', value);
-      localStorage.setItem('pkce_verifier_backup', value);
-      localStorage.setItem('sb-pkce-verifier', value);
-      
-      // Update cookies
-      const secure = window.location.protocol === 'https:' ? 'Secure;' : '';
-      document.cookie = `pkce_verifier=${value};max-age=600;path=/;SameSite=Lax;${secure}`;
-      document.cookie = `supabase_code_verifier=${value};max-age=600;path=/;SameSite=Lax;${secure}`;
-      
+      // Store in all locations
+      storePKCEVerifier(value);
       return value;
     }
   }
   
   console.warn('[PKCE] No valid verifier found in any storage location');
   
-  // Last resort - check localStorage for anything that looks like a verifier
-  const allLocalStorage = { ...localStorage };
-  for (const [key, value] of Object.entries(allLocalStorage)) {
-    if (typeof value === 'string' && value.length >= 40 && 
-        (key.includes('verifier') || key.includes('pkce') || key.includes('code'))) {
-      console.log('[PKCE] Found potential verifier in:', key);
-      localStorage.setItem('supabase.auth.code_verifier', value);
-      return value;
+  // Super aggressive last resort - check ALL storage for ANY string that looks like a verifier
+  try {
+    // Combine all localStorage and sessionStorage
+    const allStorage: Record<string, string> = {};
+    
+    // Check ALL localStorage
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key) {
+        const value = localStorage.getItem(key);
+        if (value) allStorage[`localStorage:${key}`] = value;
+      }
     }
+    
+    // Check ALL sessionStorage
+    for (let i = 0; i < sessionStorage.length; i++) {
+      const key = sessionStorage.key(i);
+      if (key) {
+        const value = sessionStorage.getItem(key);
+        if (value) allStorage[`sessionStorage:${key}`] = value;
+      }
+    }
+    
+    // Look for any string that could be a verifier (length 40+ characters)
+    for (const [key, value] of Object.entries(allStorage)) {
+      if (typeof value === 'string' && value.length >= 40) {
+        console.log('[PKCE] Found potential verifier by length check in:', key);
+        localStorage.setItem('supabase.auth.code_verifier', value);
+        storePKCEVerifier(value);
+        return value;
+      }
+    }
+  } catch (e) {
+    console.error('[PKCE] Error in last resort check:', e);
+  }
+  
+  // URL fragment check - sometimes verifiers are in URL fragments
+  try {
+    const fragment = window.location.hash.substring(1);
+    const fragmentParams = new URLSearchParams(fragment);
+    const fragmentVerifier = fragmentParams.get('code_verifier') || 
+                            fragmentParams.get('verifier') ||
+                            fragmentParams.get('pkce');
+    
+    if (fragmentVerifier && fragmentVerifier.length >= 20) {
+      console.log('[PKCE] Found verifier in URL fragment');
+      localStorage.setItem('supabase.auth.code_verifier', fragmentVerifier);
+      storePKCEVerifier(fragmentVerifier);
+      return fragmentVerifier;
+    }
+  } catch (e) {
+    console.error('[PKCE] Error checking URL fragment:', e);
   }
   
   return null;

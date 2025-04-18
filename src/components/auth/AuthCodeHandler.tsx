@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
@@ -14,7 +13,7 @@ const AuthCodeHandler = () => {
     const checkForEmergencyRecovery = () => {
       // This function tries to recover verifier from any possible source
       console.log("Performing emergency verifier recovery checks...");
-      
+
       // Look for anything in cookies that could be a verifier
       const cookies = document.cookie.split(';');
       for (const cookie of cookies) {
@@ -25,7 +24,7 @@ const AuthCodeHandler = () => {
           return value;
         }
       }
-      
+
       // Search local and session storage for anything that could be a verifier
       const storageKeys = [...Object.keys(localStorage), ...Object.keys(sessionStorage)];
       for (const key of storageKeys) {
@@ -38,7 +37,7 @@ const AuthCodeHandler = () => {
           }
         }
       }
-      
+
       return null;
     };
 
@@ -58,11 +57,11 @@ const AuthCodeHandler = () => {
         console.log("Auth code present:", !!code);
         console.log("Auth error present:", !!error);
         console.log("URL:", window.location.href);
-        
+
         // Run PKCE debug diagnostics
         const diagnostics = debugPKCEState();
         console.log("PKCE diagnostics:", diagnostics);
-        
+
         if (error) {
           console.error(`Auth error: ${error} - ${errorDescription}`);
           toast({
@@ -84,34 +83,94 @@ const AuthCodeHandler = () => {
 
         // Get code verifier using our robust recovery function
         let verifier = getPKCEVerifier();
-        
+
         // If no verifier found, try emergency recovery
         if (!verifier) {
           console.error("Critical: No code verifier found for auth exchange");
-          
+
           // Try our emergency recovery function
           verifier = checkForEmergencyRecovery();
-          
+
           // If still no verifier, try to check directly in cookies and sessionStorage
           if (!verifier) {
             console.log("Trying direct recovery from cookies and other sources...");
-            
+
             // Try direct cookie access
             const cookieVerifier = document.cookie.split(';')
-              .find(c => c.trim().startsWith('pkce_verifier=') || c.trim().startsWith('supabase_code_verifier='))
+              .find(c => c.trim().startsWith('pkce_verifier=') || c.trim().startsWith('supabase_code_verifier=') || c.trim().startsWith('code_verifier='))
               ?.split('=')[1];
-              
+
             // Try session storage
             const sessionVerifier = sessionStorage.getItem('supabase.auth.code_verifier');
-            
-            // Try other backup locations
-            const backupVerifier = localStorage.getItem('pkce_verifier_backup') || 
-                                  localStorage.getItem('sb-pkce-verifier') ||
-                                  localStorage.getItem('pkce_verifier_original');
-            
+
+            // Try other backup locations (check ALL possible storage keys)
+            const backupKeys = [
+              'pkce_verifier_backup',
+              'sb-pkce-verifier',
+              'pkce_verifier_original',
+              'code_verifier',
+              'sb-code-verifier',
+              'pkce_verifier',
+              'auth.code_verifier',
+              'oauth_verifier'
+            ];
+
+            let backupVerifier = null;
+            for (const key of backupKeys) {
+              const value = localStorage.getItem(key) || sessionStorage.getItem(key);
+              if (value && value.length >= 20) {
+                backupVerifier = value;
+                console.log(`Found verifier in backup location: ${key}`);
+                break;
+              }
+            }
+
+            // Try hidden input field
+            let hiddenVerifier = null;
+            try {
+              const backupInput = document.getElementById('pkce-backup') as HTMLInputElement;
+              if (backupInput && backupInput.value && backupInput.value.length >= 20) {
+                hiddenVerifier = backupInput.value;
+                console.log("Found verifier in hidden input field");
+              }
+            } catch (e) {
+              console.warn("Error checking hidden input field:", e);
+            }
+
+            // Check window global
+            let windowVerifier = null;
+            try {
+              if ((window as any).__PKCE_VERIFIER__ && (window as any).__PKCE_VERIFIER__.length >= 20) {
+                windowVerifier = (window as any).__PKCE_VERIFIER__;
+                console.log("Found verifier in window global");
+              } else if ((window as any).pkce_verifier && (window as any).pkce_verifier.length >= 20) {
+                windowVerifier = (window as any).pkce_verifier;
+                console.log("Found verifier in window.pkce_verifier");
+              }
+            } catch (e) {
+              console.warn("Error checking window globals:", e);
+            }
+
+            // Try extracting from URL state parameter
+            let stateVerifier = null;
+            try {
+              const url = new URL(window.location.href);
+              const state = url.searchParams.get('state');
+              if (state) {
+                const stateObj = JSON.parse(atob(state));
+                if (stateObj && stateObj.verifier && stateObj.verifier.length >= 20) {
+                  stateVerifier = stateObj.verifier;
+                  console.log("Found verifier in state parameter");
+                }
+              }
+            } catch (e) {
+              console.warn("Error extracting from state parameter:", e);
+            }
+
             // Use the first valid verifier we find
-            const recoveredVerifier = cookieVerifier || sessionVerifier || backupVerifier;
-            
+            const recoveredVerifier = cookieVerifier || sessionVerifier || backupVerifier || 
+                                     hiddenVerifier || windowVerifier || stateVerifier;
+
             if (recoveredVerifier) {
               console.log("Recovered verifier from direct source check");
               localStorage.setItem('supabase.auth.code_verifier', recoveredVerifier);
@@ -142,7 +201,7 @@ const AuthCodeHandler = () => {
         }
 
         console.log("Using verifier:", verifier.substring(0, 5) + "...", "length:", verifier.length);
-        
+
         // Exchange auth code for session
         const { data, error: sessionError } = await exchangeAuthCode(code);
 
@@ -161,7 +220,7 @@ const AuthCodeHandler = () => {
         if (data.session) {
           console.log("Authentication successful!");
           clearPKCEVerifier(); // Clear verifier after successful authentication
-          
+
           // Try to check user's profile
           try {
             // Fix headers to avoid 406 errors
@@ -174,12 +233,12 @@ const AuthCodeHandler = () => {
                 'Accept': '*/*',
                 'Content-Type': 'application/json'
               });
-            
+
             if (profileError) {
               console.error("Profile fetch error:", profileError);
               throw profileError;
             }
-            
+
             // Redirect based on onboarding status
             if (profileData && profileData.onboarding_completed) {
               console.log("User has completed onboarding, redirecting to dashboard");
@@ -191,7 +250,7 @@ const AuthCodeHandler = () => {
           } catch (profileError) {
             // If profile check fails, just go to dashboard
             console.error("Error checking profile:", profileError);
-            
+
             // Try a direct check with modified headers as a fallback
             try {
               const { data, error } = await supabase.rpc('get_profile_status', {
@@ -200,7 +259,7 @@ const AuthCodeHandler = () => {
                 'Accept': '*/*',
                 'Content-Type': 'application/json'
               });
-              
+
               if (!error && data && data.onboarding_completed) {
                 navigate('/dashboard', { replace: true });
                 return;
@@ -208,7 +267,7 @@ const AuthCodeHandler = () => {
             } catch (e) {
               console.error("Fallback profile check failed:", e);
             }
-            
+
             // Default to dashboard if everything fails
             navigate('/dashboard', { replace: true });
           }
