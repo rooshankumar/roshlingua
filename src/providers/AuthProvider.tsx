@@ -332,90 +332,81 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       console.log("Initiating Google login...");
       
-      // Clear authentication state completely for a fresh start
+      // Clear any potentially conflicting auth state
       localStorage.removeItem('supabase.auth.token');
-      localStorage.removeItem('supabase.auth.expires_at');
-      localStorage.removeItem('supabase.auth.refresh_token');
       
-      // Remove any existing code verifiers to avoid conflicts
+      // Create unique session ID to identify this specific login attempt
+      const sessionId = `auth-${Date.now()}-${Math.random().toString(36).substring(2, 10)}`;
+      localStorage.setItem('auth_session_id', sessionId);
+      console.log("Created auth session ID:", sessionId);
+      
+      // Remove potentially conflicting code verifiers
       Object.keys(localStorage).forEach(key => {
         if (key.includes('code_verifier') || key.includes('verifier')) {
+          console.log("Removing old verifier key:", key);
           localStorage.removeItem(key);
         }
       });
       
-      // Generate a fresh code verifier that meets PKCE requirements
-      // Using crypto API directly for better entropy
+      // Generate a cryptographically secure code verifier with proper length (43-128 chars)
       const generateSecureVerifier = () => {
-        // Generate random bytes - 32 bytes gives us 256 bits of randomness
-        const randomBytes = new Uint8Array(32);
-        crypto.getRandomValues(randomBytes);
-        
-        // Convert to base64url format (RFC 7636 compliant)
-        const base64 = btoa(String.fromCharCode.apply(null, [...randomBytes]));
-        const base64url = base64
+        // Use the most robust method available
+        const array = new Uint8Array(64); // 64 bytes = 512 bits of randomness
+        crypto.getRandomValues(array);
+        return btoa(String.fromCharCode.apply(null, [...array]))
           .replace(/\+/g, '-')
           .replace(/\//g, '_')
-          .replace(/=+$/, '');
-        
-        // PKCE verifier must be between 43-128 chars
-        return base64url.substring(0, 96); // Safe length that's not too short or long
+          .replace(/=+$/, '')
+          .substring(0, 128); // Safe maximum length
       };
       
       const codeVerifier = generateSecureVerifier();
-      console.log("Generated fresh code verifier with length:", codeVerifier.length);
       
-      // Store in the primary location
-      localStorage.setItem('supabase.auth.code_verifier', codeVerifier);
+      // Store securely with multiple keys for redundancy
+      const verifierKeys = [
+        'supabase.auth.code_verifier',
+        `verifier_${sessionId}`, // Session-specific key
+        'sb-pkce-verifier',
+        'pkce-verifier'
+      ];
       
-      // Also store in several backup locations to ensure it's available after redirect
-      localStorage.setItem('pkce-verifier', codeVerifier);
-      localStorage.setItem('supabase-code-verifier', codeVerifier);
-      localStorage.setItem('code_verifier', codeVerifier);
-      localStorage.setItem('sb-pkce-verifier', codeVerifier);
+      verifierKeys.forEach(key => {
+        localStorage.setItem(key, codeVerifier);
+        console.log(`Stored verifier in '${key}':`, !!localStorage.getItem(key));
+      });
       
-      // Verify storage for debugging
-      const storedVerifier = localStorage.getItem('supabase.auth.code_verifier');
-      console.log("Stored code verifier exists:", !!storedVerifier);
-      console.log("Stored code verifier length:", storedVerifier?.length || 0);
-      console.log("Stored matches generated:", storedVerifier === codeVerifier);
+      // Double-check storage
+      console.log("Code verifier length:", codeVerifier.length);
+      console.log("First 5 chars:", codeVerifier.substring(0, 5));
+      console.log("Successfully stored in all keys:", verifierKeys.every(k => 
+        localStorage.getItem(k) === codeVerifier
+      ));
       
-      // Log all localStorage keys for debugging
-      console.log("All localStorage keys:", Object.keys(localStorage));
+      // Determine correct callback URL with specific parameters to help debugging
+      const callbackBase = window.location.hostname.includes('vercel.app')
+        ? 'https://roshlingua.vercel.app'
+        : window.location.origin;
       
-      // Determine correct redirect URL based on environment
-      let redirectUrl;
-      if (window.location.hostname.includes('vercel.app')) {
-        // Production deployment on Vercel
-        redirectUrl = 'https://roshlingua.vercel.app/auth/callback';
-        console.log("Using production Vercel callback URL");
-      } else {
-        // Local development or other environment
-        redirectUrl = `${window.location.origin}/auth/callback`;
-        console.log("Using dynamic callback URL for development");
-      }
+      // Add session ID as a parameter to track this specific login attempt
+      const redirectUrl = `${callbackBase}/auth/callback?session_id=${sessionId}`;
+      console.log("Using callback URL:", redirectUrl);
       
-      // Make sure our URL doesn't have trailing slashes or other issues
-      const cleanRedirectUrl = redirectUrl.replace(/\/+$/, '');
-      console.log("Final redirect URL:", cleanRedirectUrl);
-      
+      // Initiate OAuth flow with explicit code verifier
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: cleanRedirectUrl,
+          redirectTo: redirectUrl,
           queryParams: {
             access_type: 'offline',
-            prompt: 'consent',
-            hd: 'domain.com' // Optional: restrict to specific domain
+            prompt: 'consent'
           },
-          // Pass the same code verifier we stored
           codeVerifier: codeVerifier,
           skipBrowserRedirect: false
         }
       });
       
       if (error) {
-        console.error("Google auth error:", error);
+        console.error("Google auth initiation error:", error);
         toast({
           variant: "destructive",
           title: "Google Authentication Failed",
@@ -428,17 +419,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         throw new Error("No OAuth URL returned");
       }
 
-      console.log("Redirecting to Google OAuth with code_verifier in localStorage...");
-      console.log("OAuth URL:", data.url);
+      console.log("Redirecting to OAuth URL:", data.url.substring(0, 100) + "...");
       
-      // Let the browser handle the redirect naturally
+      // One final check before redirect
+      const finalCheck = localStorage.getItem('supabase.auth.code_verifier');
+      console.log("Final verification - code verifier exists:", !!finalCheck);
+      console.log("Code verifier length before redirect:", finalCheck?.length);
+      
+      // Record timestamp to help debug timing issues
+      localStorage.setItem('auth_redirect_time', Date.now().toString());
+      
+      // Let browser handle redirect
       window.location.href = data.url;
     } catch (error) {
       console.error("Google login error:", error);
       toast({
         variant: "destructive",
         title: "Authentication failed",
-        description: "There was an error with Google authentication.",
+        description: "There was an error with Google authentication."
       });
       throw error;
     }

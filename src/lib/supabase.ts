@@ -24,27 +24,37 @@ export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
       path: '/',
       sameSite: 'lax'
     },
-    // Increase timeout for auth completion
-    pkceTimeout: 15 * 60, // 15 minutes to complete authentication
-    pkceLeeway: 60, // 60 second leeway for clock skew
-    detectSessionInUrl: true, // Ensure this is enabled
-    // Production site URL for deployments
+    pkceTimeout: 30 * 60, // 30 minutes to complete authentication (increased)
+    pkceLeeway: 120, // 2 minutes leeway for clock skew (increased)
+    detectSessionInUrl: true,
+    // Ensure clean URL format for callback
     redirectTo: import.meta.env.MODE === 'production' 
       ? 'https://roshlingua.vercel.app/auth/callback' 
       : `${window.location.origin}/auth/callback`
   },
-  // Add global error handler for debugging
+  // Enhanced error handling and debug logging
   global: {
     headers: {
       'X-Client-Info': 'supabase-js/2.x'
     },
     fetch: (...args) => {
+      // Log the request for debugging
+      const request = args[0] as Request;
+      if (request && request.url && request.url.includes('auth')) {
+        console.log(`Supabase auth request: ${request.method} ${request.url.split('?')[0]}`);
+      }
+      
       return fetch(...args).then(response => {
-        if (!response.ok) {
-          console.error(`Supabase API error: ${response.status} ${response.statusText}`, {
-            url: response.url
-          });
+        // Log detailed auth response for debugging
+        if (response.url && response.url.includes('auth')) {
+          console.log(`Supabase auth response: ${response.status} ${response.statusText}`);
+          if (!response.ok) {
+            console.error(`Supabase auth error: ${response.status} ${response.statusText}`, {
+              url: response.url.split('?')[0]
+            });
+          }
         }
+        
         return response;
       }).catch(error => {
         console.error('Supabase fetch error:', error);

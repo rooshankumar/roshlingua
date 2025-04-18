@@ -11,15 +11,28 @@ const Callback = () => {
   useEffect(() => {
     const handleAuthCallback = async () => {
       try {
+        console.log("===== AUTH CALLBACK PROCESSING =====");
         console.log("Processing authentication callback on dedicated callback page...");
+        
+        // Log timing information
+        const redirectTime = localStorage.getItem('auth_redirect_time');
+        if (redirectTime) {
+          const timeSinceRedirect = Date.now() - parseInt(redirectTime);
+          console.log(`Time since redirect: ${timeSinceRedirect}ms`);
+        }
         
         // Log the URL for debugging
         console.log("Current URL:", window.location.href);
+        console.log("Hostname:", window.location.hostname);
         console.log("Vercel deployment:", window.location.hostname.includes('vercel.app') ? 'Yes' : 'No');
         
-        // Try to use Supabase's built-in session handling first
-        const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+        // Extract session ID if available to track specific login attempt
+        const url = new URL(window.location.href);
+        const sessionId = url.searchParams.get('session_id');
+        console.log("Session ID from URL:", sessionId);
         
+        // Check if session already exists (from auto-handling)
+        const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
         if (sessionData?.session) {
           console.log("Session already established by Supabase auto-handling");
           processSuccessfulAuth(sessionData.session);
@@ -30,29 +43,44 @@ const Callback = () => {
           console.error("Session retrieval error:", sessionError);
         }
         
-        // Important: Get all possible verifier keys for debugging
+        // Debug localStorage state
+        console.log("===== LOCAL STORAGE STATE =====");
         const allKeys = Object.keys(localStorage);
         console.log("All localStorage keys:", allKeys);
-        const verifierKeys = allKeys.filter(key => key.includes('code_verifier') || key.includes('verifier'));
-        console.log("All code verifier keys:", verifierKeys);
         
-        // Check for code verifier in localStorage with expanded search
-        let codeVerifier = localStorage.getItem('supabase.auth.code_verifier');
-        console.log("Primary code verifier exists:", !!codeVerifier);
+        // Look for code verifier in multiple possible locations
+        const verifierKeys = allKeys.filter(key => 
+          key.includes('code_verifier') || 
+          key.includes('verifier') || 
+          (sessionId && key.includes(sessionId))
+        );
+        console.log("Potential verifier keys:", verifierKeys);
         
-        // Try all possible storage locations
+        // Try to get the code verifier
+        let codeVerifier = null;
+        
+        // 1. First try session-specific verifier if we have a session ID
+        if (sessionId) {
+          const sessionVerifier = localStorage.getItem(`verifier_${sessionId}`);
+          if (sessionVerifier) {
+            console.log(`Found session-specific verifier for ${sessionId}`);
+            codeVerifier = sessionVerifier;
+          }
+        }
+        
+        // 2. Try standard Supabase location
         if (!codeVerifier) {
-          console.log("Trying alternative storage keys for code verifier...");
-          // Try other possible keys if the standard one fails
-          const possibleKeys = [
-            'pkce-verifier',
-            'supabase-code-verifier',
-            'code_verifier',
-            'sb-pkce-verifier',
-            ...verifierKeys
-          ];
-          
-          for (const key of possibleKeys) {
+          const standardVerifier = localStorage.getItem('supabase.auth.code_verifier');
+          if (standardVerifier) {
+            console.log("Found verifier in standard Supabase location");
+            codeVerifier = standardVerifier;
+          }
+        }
+        
+        // 3. Try all other potential locations
+        if (!codeVerifier) {
+          console.log("Trying alternative locations for code verifier...");
+          for (const key of verifierKeys) {
             const value = localStorage.getItem(key);
             if (value) {
               console.log(`Found verifier in key: ${key}`);
@@ -62,72 +90,92 @@ const Callback = () => {
           }
         }
         
-        console.log("Final code verifier exists:", !!codeVerifier);
-        console.log("Code verifier length:", codeVerifier?.length || 0);
+        // Final status of code verifier
+        console.log("Code verifier retrieval success:", !!codeVerifier);
+        if (codeVerifier) {
+          console.log("Code verifier length:", codeVerifier.length);
+          console.log("First 5 chars:", codeVerifier.substring(0, 5));
+        }
         
-        // Get URL parameters for debugging
-        const url = new URL(window.location.href);
+        // Get URL parameters for authentication
+        console.log("===== AUTH PARAMETERS =====");
         const code = url.searchParams.get('code');
         const error_param = url.searchParams.get('error');
         const error_description = url.searchParams.get('error_description');
         const state = url.searchParams.get('state');
         
-        console.log("URL params:", { 
-          code: code ? `${code.substring(0, 5)}...` : null,
-          error: error_param,
-          state: state ? `${state.substring(0, 5)}...` : null
-        });
+        console.log("Auth code exists:", !!code);
+        if (code) console.log("Auth code prefix:", code.substring(0, 5) + "...");
+        console.log("State exists:", !!state);
         
+        // Handle any OAuth errors
         if (error_param) {
           console.error("OAuth error:", error_param, error_description);
-          throw new Error(`${error_param}: ${error_description}`);
+          throw new Error(`OAuth Error: ${error_param}: ${error_description}`);
         }
         
+        // Handle missing auth code
         if (!code) {
-          console.error("No code parameter in URL");
-          // Try to let Supabase handle this automatically
-          await new Promise(resolve => setTimeout(resolve, 1000));
+          console.error("No authentication code in URL");
+          // Try waiting briefly for Supabase auto-handling
+          console.log("Waiting for potential auto-handling...");
+          await new Promise(resolve => setTimeout(resolve, 1500));
+          
           const { data: retryData } = await supabase.auth.getSession();
           if (retryData?.session) {
             console.log("Session established after delay");
             processSuccessfulAuth(retryData.session);
             return;
           }
-          throw new Error("No authentication code provided in URL");
+          
+          throw new Error("No authentication code provided");
         }
         
+        // Handle missing code verifier
         if (!codeVerifier) {
-          console.error("No code verifier in localStorage");
-          // Force a clean restart of the auth flow
+          console.error("No code verifier found in storage");
+          // Store error info for debugging
+          localStorage.setItem('auth_error_time', Date.now().toString());
+          localStorage.setItem('auth_error_type', 'missing_verifier');
+          // Clean storage for fresh start
           Object.keys(localStorage).forEach(key => {
-            if (key.includes('supabase.auth') || key.includes('verifier') || key.includes('code')) {
+            if (key.includes('auth') || key.includes('verifier') || key.includes('code')) {
               localStorage.removeItem(key);
             }
           });
-          throw new Error("Authentication verification failed. Please try logging in again.");
+          throw new Error("Authentication verification failed - missing verifier. Please try again.");
         }
         
-        // Ensure both code and verifier are strings and not empty
+        // Validate code and verifier
         if (typeof code !== 'string' || !code.trim() || typeof codeVerifier !== 'string' || !codeVerifier.trim()) {
-          console.error("Code or code verifier is invalid:", {
+          console.error("Invalid code or verifier:", {
             codeType: typeof code,
             codeEmpty: !code?.trim(),
             verifierType: typeof codeVerifier,
             verifierEmpty: !codeVerifier?.trim()
           });
           
-          throw new Error("Invalid authentication data. Please try logging in again.");
+          throw new Error("Invalid authentication data");
         }
         
-        console.log("Exchanging code for session with code:", code.substring(0, 5) + "...");
-        console.log("Using code verifier of length:", codeVerifier.length);
+        // Exchange code for session
+        console.log("===== EXCHANGING CODE FOR SESSION =====");
+        console.log("Code prefix:", code.substring(0, 5) + "...");
+        console.log("Verifier length:", codeVerifier.length);
+        console.log("Verifier prefix:", codeVerifier.substring(0, 5) + "...");
         
-        // Use the explicit method with directly passed parameters
         const { data, error } = await supabase.auth.exchangeCodeForSession(code, codeVerifier);
         
         if (error) {
-          console.error("Exchange error:", error);
-          // Clean up all auth-related storage to ensure fresh start on next attempt
+          console.error("Code exchange error:", error);
+          console.error("Error details:", JSON.stringify(error));
+          
+          // Store error info for debugging
+          localStorage.setItem('auth_error_time', Date.now().toString());
+          localStorage.setItem('auth_error_type', 'exchange_failure');
+          localStorage.setItem('auth_error_message', error.message);
+          
+          // Clean up for fresh start
           verifierKeys.forEach(key => localStorage.removeItem(key));
           throw error;
         }
