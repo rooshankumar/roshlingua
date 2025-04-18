@@ -1,0 +1,64 @@
+04-18T13:13:38.609Z #_useSession end
+index-CL0VAH6l.js:73 GoTrueClient@0 (2.69.1) 2025-04-18T13:13:38.609Z #_acquireLock end
+index-CL0VAH6l.js:73 GoTrueClient@0 (2.69.1) 2025-04-18T13:13:38.611Z #_acquireLock lock acquired for storage key supabase.auth.token
+wqojeesjtgfcftpnzaet.supabase.co/auth/v1/token?grant_type=pkce:1 
+            
+            
+           Failed to load resource: the server responded with a status of 400 ()Understand this error
+index-CL0VAH6l.js:73 Supabase auth response: 400 
+index-CL0VAH6l.js:73 Supabase auth error: 400  Objecturl: "https://wqojeesjtgfcftpnzaet.supabase.co/auth/v1/token"[[Prototype]]: Object
+(anonymous) @ index-CL0VAH6l.js:73Understand this error
+index-CL0VAH6l.js:73 GoTrueClient@0 (2.69.1) 2025-04-18T13:13:38.739Z #_acquireLock lock released for storage key supabase.auth.token
+index-CL0VAH6l.js:73 GoTrueClient@0 (2.69.1) 2025-04-18T13:13:38.740Z #_acquireLock end
+index-CL0VAH6l.js:383 Authentication error: AuthApiError: invalid request: both auth code and code verifier should be non-empty
+    at Gg (index-CL0VAH6l.js:73:6553)
+    at async n2 (index-CL0VAH6l.js:73:7542)
+    at async de (index-CL0VAH6l.js:73:7203)
+    at async g2._exchangeCodeForSession (index-CL0VAH6l.js:73:22069)
+(anonymous) @ index-CL0VAH6l.js:383Understand this error
+index-CL0VAH6l.js:383 Authentication callback error: AuthApiError: invalid request: both auth code and code verifier should be non-empty
+    at Gg (index-CL0VAH6l.js:73:6553)
+    at async n2 (index-CL0VAH6l.js:73:7542)
+    at async de (index-CL0VAH6l.js:73:7203)
+    at async g2._exchangeCodeForSession (index-CL0VAH6l.js:73:22069)
+(anonymous) @ index-CL0VAH6l.js:383Understand this error
+index-CL0VAH6l.js:73 GoTrueClient@0 (2.69.1) 2025-04-18T13:13:38.822Z #_acquireLock begin -1
+index-CL0VAH6l.js:73 GoTrueClient@0 (2.69.1) 2025-04-18T13:13:38.865Z #_acquireLock lock acquired for storage key supabase.auth.token
+index-CL0VAH6l.js:73 GoTrueClient@0 (2.69.1) 2025-04-18T13:13:38.865Z #_useSession begin
+index-CL0VAH6l.js:73 GoTrueClient@0 (2.69.1) 2025-04-18T13:13:38.865Z #__loadSession() begin
+index-CL0VAH6l.js:73 GoTrueClient@0 (2.69.1) 2025-04-18T13:13:38.865Z #getSession() session from storage Object
+index-CL0VAH6l.js:73 GoTrueClient@0 (2.69.1) 2025-04-18T13:13:38.866Z #__loadSession() session has not expired expires_at 1744985302
+index-CL0VAH6l.js:73 GoTrueClient@0 (2.69.1) 2025-04-18T13:13:38.866Z #__loadSession() end
+index-CL0VAH6l.js:73 GoTrueClient@0 (2.69.1) 2025-04-18T13:13:38.866Z #_useSession end
+index-CL0VAH6l.js:73 GoTrueClient@0 (2.69.1) 2025-04-18T13:13:38.866Z #_acquireLock lock released for storage key supabase.auth.token
+index-CL0VAH6l.js:73 GoTrueClient@0 (2.69.1) 2025-04-18T13:13:38.867Z #_acquireLock end
+wqojeesjtgfcftpnzaet.supabase.co/rest/v1/profiles?select=onboarding_completed&id=eq.914877b7-03bb-41bc-a392-3c74713c6cb2:1 
+            
+            
+           Failed to load resource: the server responded with a status of 406 ()Understand this error
+index-CL0VAH6l.js:49 Throttling navigation to prevent the browser from hanging. See https://crbug.com/1038223. Command line switch --disable-ipc-flooding-protection can be used to bypass the protection
+y @ index-CL0VAH6l.js:49Understand this warning
+index-CL0VAH6l.js:73 GoTrueClient@0 (2.69.1) 2025-04-18T13:13:47.587Z #_onVisibilityChanged(false) visibilityState hidden
+index-CL0VAH6l.js:73 GoTrueClient@0 (2.69.1) 2025-04-18T13:13:47.588Z #_stopAutoRefresh()
+index-CL0VAH6l.js:73 GoTrueClient@0 (2.69.1) 2025-04-18T13:13:52.517Z #_onVisibilityChanged(false) visibilityState visible
+index-CL0VAH6l.js:73 GoTrueClient@0 (2.69.1) 2025-04-18T13:13:52.517Z #_stopAutoRefresh()
+index-CL0VAH6l.js:73 GoTrueClient@0 (2.69.1) 2025-04-18T13:13:52.517Z #_startAutoRefresh()
+index-CL0VAH6l.js:73 GoTrueClient@0 (2.69.1) 2025-04-18T13:13:52.517Z #_acquireLock begin -1
+index-CL0VAH6l.js:73 GoTrueClient@0 (2.69.1) 2025-04-18T13:13:52.518Z #_autoRefreshTokenTick() begin
+index-CL0VAH6l.js:73 GoTrueClient@0 (2.69.1) 2025-04-18T13:13:52.518Z #_acquireLock begin 0
+index-CL0VAH6l.js:73 GoTrueClient@0 (2.69.1) 2025-04-18T13:13:52.552Z #_acquireLock lock acquired for storage key supabase.auth.token
+index-CL0VAH6l.js:73 GoTrueClient@0 (2.69.1) 2025-04-18T13:13:52.552Z #_recoverAndRefresh() begin
+index-CL0VAH6l.js:73 GoTrueClient@0 (2.69.1) 2025-04-18T13:13:52.553Z #_recoverAndRefresh() session from storage Object
+index-CL0VAH6l.js:73 GoTrueClient@0 (2.69.1) 2025-04-18T13:13:52.553Z #_recoverAndRefresh() session has not expired with margin of 90000s
+index-CL0VAH6l.js:73 GoTrueClient@0 (2.69.1) 2025-04-18T13:13:52.553Z #_notifyAllSubscribers(SIGNED_IN) begin Object broadcast = true
+index-CL0VAH6l.js:73 Auth state changed: SIGNED_IN Session exists
+index-CL0VAH6l.js:73 User signed in, updating profile
+index-CL0VAH6l.js:73 GoTrueClient@0 (2.69.1) 2025-04-18T13:13:52.554Z #_acquireLock begin -1
+index-CL0VAH6l.js:73 GoTrueClient@0 (2.69.1) 2025-04-18T13:13:52.554Z #_acquireLock end
+index-CL0VAH6l.js:73 GoTrueClient@0 (2.69.1) 2025-04-18T13:13:52.556Z #_acquireLock begin -1
+index-CL0VAH6l.js:73 GoTrueClient@0 (2.69.1) 2025-04-18T13:13:52.556Z #_acquireLock end
+index-CL0VAH6l.js:73 GoTrueClient@0 (2.69.1) 2025-04-18T13:13:52.559Z #_acquireLock end
+index-CL0VAH6l.js:73 GoTrueClient@0 (2.69.1) 2025-04-18T13:13:52.559Z auto refresh token tick lock not available
+index-CL0VAH6l.js:73 GoTrueClient@0 (2.69.1) 2025-04-18T13:14:22.519Z #_autoRefreshTokenTick() begin
+index-CL0VAH6l.js:73 GoTrueClient@0 (2.69.1) 2025-04-18T13:14:22.519Z #_acquireLock begin 0
+index-CL0VAH6l.js:73 GoTrueClient@0 (2.69.1) 2025-04-18T13:14:22.520Z #_acquireLock end
