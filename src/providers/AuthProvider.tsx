@@ -61,7 +61,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           console.log("Setting initial session:", session ? "Session exists" : "No session");
           setSession(session);
           setUser(session?.user ?? null);
-          
+
           // If session exists, ensure profile exists
           if (session?.user) {
             console.log("Checking profile for user:", session.user.id);
@@ -70,11 +70,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               .select('id, onboarding_completed')
               .eq('id', session.user.id)
               .single();
-              
+
             if (profileCheckError && profileCheckError.code !== 'PGRST116') {
               console.error("Profile check error:", profileCheckError);
             }
-            
+
             // Create profile if it doesn't exist
             if (!profileData) {
               console.log("Creating profile for user:", session.user.id);
@@ -101,7 +101,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const { data: { subscription } } = supabase.auth.onAuthStateChange(
           async (event, currentSession) => {
             console.log("Auth state changed:", event, currentSession ? "Session exists" : "No session");
-            
+
             if (mounted) {
               setSession(currentSession);
               setUser(currentSession?.user ?? null);
@@ -331,38 +331,45 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const loginWithGoogle = async () => {
     try {
       console.log("===== INITIATING GOOGLE LOGIN =====");
-      
+
       // Clear previous verifier data and auth errors
       localStorage.removeItem('auth_error_type');
       localStorage.removeItem('auth_error_message');
-      
+
       // Handle the login using the centralized function in supabase.ts
       const result = await signInWithGoogle();
-      
+
       if (!result.data?.url) {
         throw new Error("No OAuth URL returned");
       }
-      
+
       // Additional application-specific logic before redirect
       console.log("Received OAuth URL successfully");
-      
+
       // Ensure code verifier is properly stored before redirect
       const finalVerifier = localStorage.getItem('supabase.auth.code_verifier');
       console.log("FINAL REDIRECT CHECK - code verifier exists:", !!finalVerifier);
-      
+
       if (finalVerifier) {
         console.log("Verifier length:", finalVerifier.length);
         console.log("Verifier prefix:", finalVerifier.substring(0, 5) + "...");
-        
+
         // Make 100% sure verifier is also in sessionStorage as backup
         sessionStorage.setItem('supabase.auth.code_verifier', finalVerifier);
-        
-        // Store verifier in cookie as last resort backup (expires in 5 minutes)
-        document.cookie = `pkce_verifier=${finalVerifier};max-age=300;path=/;SameSite=Lax`;
-        console.log("Stored verifier backup in sessionStorage and cookie");
+
+        // Store verifier in cookie as last resort backup (expires in 10 minutes)
+        document.cookie = `pkce_verifier=${finalVerifier};max-age=600;path=/;SameSite=Lax`;
+
+        // For debugging/monitoring
+        console.log("Stored verifier backup in multiple locations:");
+        console.log("- localStorage: OK");
+        console.log("- sessionStorage: OK");
+        console.log("- cookie: OK (expires in 10 min)");
+        console.log("Verifier value (first 5 chars):", finalVerifier.substring(0, 5) + "...");
+        console.log("Verifier length:", finalVerifier.length);
       } else {
         console.error("CRITICAL: No code verifier found before redirect!");
-        
+
         // Emergency recovery - check if our function stored it elsewhere
         const sessionId = localStorage.getItem('auth_session_id');
         if (sessionId) {
@@ -372,7 +379,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             localStorage.setItem('supabase.auth.code_verifier', backupVerifier);
             sessionStorage.setItem('supabase.auth.code_verifier', backupVerifier);
             // Also in cookie
-            document.cookie = `pkce_verifier=${backupVerifier};max-age=300;path=/;SameSite=Lax`;
+            document.cookie = `pkce_verifier=${backupVerifier};max-age=600;path=/;SameSite=Lax`;
           } else {
             // Try other backup locations
             const alternateVerifier = localStorage.getItem('sb-pkce-verifier');
@@ -380,7 +387,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               console.log("Found alternate verifier, restoring to standard location");
               localStorage.setItem('supabase.auth.code_verifier', alternateVerifier);
               sessionStorage.setItem('supabase.auth.code_verifier', alternateVerifier);
-              document.cookie = `pkce_verifier=${alternateVerifier};max-age=300;path=/;SameSite=Lax`;
+              document.cookie = `pkce_verifier=${alternateVerifier};max-age=600;path=/;SameSite=Lax`;
             } else {
               console.error("All recovery attempts failed. Authentication likely to fail.");
               // Create a new verifier as last resort
@@ -390,15 +397,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 Math.random().toString(36).substring(2);
               localStorage.setItem('supabase.auth.code_verifier', emergencyVerifier);
               sessionStorage.setItem('supabase.auth.code_verifier', emergencyVerifier);
-              document.cookie = `pkce_verifier=${emergencyVerifier};max-age=300;path=/;SameSite=Lax`;
+              document.cookie = `pkce_verifier=${emergencyVerifier};max-age=600;path=/;SameSite=Lax`;
               console.log("Created emergency verifier as last resort");
             }
           }
         }
       }
-      
+
       console.log("Redirecting to Google auth...");
-      
+
       // Perform redirect
       window.location.href = result.data.url;
     } catch (error) {
@@ -411,7 +418,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       throw error;
     }
   };
-  
+
   // We don't need this separate function anymore, it's inlined in loginWithGoogle
 
   const signOut = async () => {
