@@ -38,7 +38,8 @@ export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
   global: {
     headers: {
       'X-Device-ID': getDeviceId(),
-      'Accept': 'application/json'
+      'Accept': '*/*', // Accept any content type to avoid 406 errors
+      'Content-Type': 'application/json'
     }
   }
 });
@@ -67,17 +68,24 @@ export const signInWithGoogle = async () => {
     // Store verifier in all locations
     storePKCEVerifier(verifier);
     
-    // Add additional backup storage
+    // Add additional backup storage with multiple naming patterns for better compatibility
     localStorage.setItem('pkce_verifier_original', verifier);
     sessionStorage.setItem('pkce_verifier_original', verifier);
+    localStorage.setItem('code_verifier', verifier);
+    sessionStorage.setItem('code_verifier', verifier);
+    localStorage.setItem('pkce', verifier);
+    sessionStorage.setItem('pkce', verifier);
     
     // Store verifier directly with Supabase key
     localStorage.setItem('supabase.auth.code_verifier', verifier);
     
-    // Set a robust cookie with multiple security options
+    // Set robust cookies with longer expiration
     const secure = window.location.protocol === 'https:' ? 'Secure;' : '';
-    document.cookie = `supabase_code_verifier=${verifier};max-age=600;path=/;SameSite=Lax;${secure}`;
-    document.cookie = `pkce_verifier=${verifier};max-age=600;path=/;SameSite=Lax;${secure}`;
+    const domain = window.location.hostname.includes('localhost') ? '' : `domain=${window.location.hostname};`;
+    
+    document.cookie = `supabase_code_verifier=${verifier};max-age=3600;path=/;SameSite=Lax;${domain}${secure}`;
+    document.cookie = `pkce_verifier=${verifier};max-age=3600;path=/;SameSite=Lax;${domain}${secure}`;
+    document.cookie = `code_verifier=${verifier};max-age=3600;path=/;SameSite=Lax;${domain}${secure}`;
     
     // Verify all storage locations before continuing
     if (!localStorage.getItem('supabase.auth.code_verifier')) {
@@ -87,6 +95,14 @@ export const signInWithGoogle = async () => {
     
     console.log("PKCE Verifier stored successfully in multiple locations");
 
+    // Store in global window object as last resort backup
+    try {
+      (window as any).__PKCE_VERIFIER__ = verifier;
+      (window as any).pkce_verifier = verifier;
+    } catch (e) {
+      console.warn("Could not store verifier in window object:", e);
+    }
+
     // Start OAuth flow - ensure we use PKCE
     const result = await supabase.auth.signInWithOAuth({
       provider: 'google',
@@ -95,25 +111,42 @@ export const signInWithGoogle = async () => {
         skipBrowserRedirect: false, // Make sure we don't skip the browser redirect
         queryParams: {
           access_type: 'offline',
-          prompt: 'consent'
+          prompt: 'consent',
+          // Add extra parameters to ensure proper PKCE handling
+          code_challenge_method: 'S256'
         }
       }
     });
 
-    // Double-check verifier immediately after OAuth setup - this is critical
+    // Double-check verifier immediately after OAuth setup
     console.log("Pre-redirect verification - PKCE verifier exists:", !!localStorage.getItem('supabase.auth.code_verifier'));
     
-    // Final verification of stored verifiers
+    // Final verification and emergency backup
     const finalVerifier = localStorage.getItem('supabase.auth.code_verifier');
     if (!finalVerifier) {
       console.error("Critical: Verifier was removed during OAuth setup");
+      
+      // Create an emergency HTML5 session storage that persists across redirects
+      try {
+        sessionStorage.setItem('auth_emergency', JSON.stringify({
+          verifier: verifier,
+          timestamp: Date.now(),
+          device: deviceId
+        }));
+      } catch (e) {
+        console.error("Failed to create emergency backup:", e);
+      }
       
       // Restore from any available backup
       const backups = [
         localStorage.getItem('pkce_verifier_backup'),
         localStorage.getItem('pkce_verifier_original'),
         sessionStorage.getItem('pkce_verifier_original'),
-        sessionStorage.getItem('supabase.auth.code_verifier')
+        sessionStorage.getItem('supabase.auth.code_verifier'),
+        localStorage.getItem('code_verifier'),
+        sessionStorage.getItem('code_verifier'),
+        (window as any).__PKCE_VERIFIER__,
+        (window as any).pkce_verifier
       ];
       
       const validBackup = backups.find(v => v && v.length > 20);

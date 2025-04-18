@@ -164,25 +164,52 @@ const AuthCodeHandler = () => {
           
           // Try to check user's profile
           try {
+            // Fix headers to avoid 406 errors
             const { data: profileData, error: profileError } = await supabase
               .from('profiles')
               .select('onboarding_completed')
               .eq('id', data.session.user.id)
-              .single();
+              .single()
+              .headers({
+                'Accept': '*/*',
+                'Content-Type': 'application/json'
+              });
             
             if (profileError) {
+              console.error("Profile fetch error:", profileError);
               throw profileError;
             }
             
             // Redirect based on onboarding status
             if (profileData && profileData.onboarding_completed) {
+              console.log("User has completed onboarding, redirecting to dashboard");
               navigate('/dashboard', { replace: true });
             } else {
+              console.log("User needs to complete onboarding");
               navigate('/onboarding', { replace: true });  
             }
           } catch (profileError) {
             // If profile check fails, just go to dashboard
             console.error("Error checking profile:", profileError);
+            
+            // Try a direct check with modified headers as a fallback
+            try {
+              const { data, error } = await supabase.rpc('get_profile_status', {
+                user_id: data.session.user.id
+              }).headers({
+                'Accept': '*/*',
+                'Content-Type': 'application/json'
+              });
+              
+              if (!error && data && data.onboarding_completed) {
+                navigate('/dashboard', { replace: true });
+                return;
+              }
+            } catch (e) {
+              console.error("Fallback profile check failed:", e);
+            }
+            
+            // Default to dashboard if everything fails
             navigate('/dashboard', { replace: true });
           }
           return;

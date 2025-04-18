@@ -45,11 +45,28 @@ export const storePKCEVerifier = (verifier: string) => {
     localStorage.setItem('auth_session_id', sessionId);
     localStorage.setItem(`pkce_verifier_${sessionId}`, verifier);
     
-    // Set robust cookies as additional backup
+    // Set robust cookies with various naming patterns for maximum compatibility
     const secure = window.location.protocol === 'https:' ? 'Secure;' : '';
-    document.cookie = `pkce_verifier=${verifier};max-age=600;path=/;SameSite=Lax;${secure}`;
-    document.cookie = `supabase_code_verifier=${verifier};max-age=600;path=/;SameSite=Lax;${secure}`;
-    document.cookie = `pkce_${sessionId}=${verifier.substring(0, 20)};max-age=600;path=/;SameSite=Lax;${secure}`;
+    const domain = window.location.hostname.includes('localhost') ? '' : `domain=${window.location.hostname};`;
+    
+    // Set cookies with longer expiry and multiple options
+    document.cookie = `pkce_verifier=${verifier};max-age=3600;path=/;SameSite=Lax;${domain}${secure}`;
+    document.cookie = `supabase_code_verifier=${verifier};max-age=3600;path=/;SameSite=Lax;${domain}${secure}`;
+    document.cookie = `sb_pkce_verifier=${verifier};max-age=3600;path=/;SameSite=Lax;${domain}${secure}`;
+    document.cookie = `pkce_${sessionId}=${verifier};max-age=3600;path=/;SameSite=Lax;${domain}${secure}`;
+    
+    // Special handling for subdomains and top domains
+    if (window.location.hostname.includes('.')) {
+      const topDomain = window.location.hostname.split('.').slice(-2).join('.');
+      document.cookie = `pkce_verifier=${verifier};max-age=3600;path=/;domain=.${topDomain};SameSite=Lax;${secure}`;
+    }
+    
+    // Store in window object as last resort (will be lost on refresh but helps during redirects)
+    try {
+      (window as any).__PKCE_VERIFIER__ = verifier;
+    } catch (e) {
+      console.warn('[PKCE] Could not store in window object:', e);
+    }
     
     console.log('[PKCE] Verifier stored in multiple locations successfully');
     return true;

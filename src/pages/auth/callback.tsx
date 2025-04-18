@@ -111,23 +111,70 @@ const Callback = () => {
           console.error("No code verifier found through standard function");
           console.log("Attempting deeper storage scan...");
           
-          verifier = scanStorageForVerifier();
+          // Check window global emergency backup
+          if ((window as any).__PKCE_VERIFIER__) {
+            verifier = (window as any).__PKCE_VERIFIER__;
+            console.log("Retrieved verifier from window global backup");
+            localStorage.setItem('supabase.auth.code_verifier', verifier);
+          } else {
+            // Try scanning storage
+            verifier = scanStorageForVerifier();
+          }
+          
+          // Try emergency session storage
+          if (!verifier) {
+            try {
+              const emergencyData = sessionStorage.getItem('auth_emergency');
+              if (emergencyData) {
+                const parsed = JSON.parse(emergencyData);
+                if (parsed.verifier && typeof parsed.verifier === 'string' && parsed.verifier.length > 20) {
+                  verifier = parsed.verifier;
+                  console.log("Recovered verifier from emergency session storage");
+                  localStorage.setItem('supabase.auth.code_verifier', verifier);
+                }
+              }
+            } catch (e) {
+              console.error("Error checking emergency storage:", e);
+            }
+          }
           
           // Last-ditch direct cookie check
           if (!verifier) {
             console.error("Deep scan failed, trying direct cookie parse...");
             
-            // Try looking specifically for pkce cookies
-            for (const cookieName of ['pkce_verifier', 'supabase_code_verifier', 'sb-pkce-verifier']) {
-              const regex = new RegExp(`${cookieName}=([^;]+)`);
-              const match = document.cookie.match(regex);
-              if (match && match[1]) {
-                verifier = match[1];
-                console.log(`Extracted verifier directly from ${cookieName} cookie`);
+            // Try looking for ANY cookie with a value that looks like a verifier
+            const cookies = document.cookie.split(';');
+            for (const cookie of cookies) {
+              const [name, value] = cookie.trim().split('=');
+              if (value && value.length > 20) {
+                console.log(`Found potential verifier in cookie: ${name}`);
+                verifier = value;
                 localStorage.setItem('supabase.auth.code_verifier', verifier);
                 break;
               }
             }
+            
+            // If still no verifier, check specifically for known cookie names
+            if (!verifier) {
+              for (const cookieName of ['pkce_verifier', 'supabase_code_verifier', 'sb-pkce-verifier', 'code_verifier']) {
+                const regex = new RegExp(`${cookieName}=([^;]+)`);
+                const match = document.cookie.match(regex);
+                if (match && match[1]) {
+                  verifier = match[1];
+                  console.log(`Extracted verifier directly from ${cookieName} cookie`);
+                  localStorage.setItem('supabase.auth.code_verifier', verifier);
+                  break;
+                }
+              }
+            }
+          }
+          
+          // If still no verifier, try using the code parameter as a last resort
+          // (this is not standard PKCE but some implementations allow it)
+          if (!verifier && code && code.length > 20) {
+            console.warn("No verifier found, attempting to use code as verifier (non-standard)");
+            verifier = code;
+            localStorage.setItem('supabase.auth.code_verifier', verifier);
           }
           
           if (!verifier) {
