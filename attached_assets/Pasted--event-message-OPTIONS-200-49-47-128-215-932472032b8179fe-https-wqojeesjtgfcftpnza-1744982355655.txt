@@ -1,0 +1,124 @@
+{
+  "event_message": "OPTIONS | 200 | 49.47.128.215 | 932472032b8179fe | https://wqojeesjtgfcftpnzaet.supabase.co/rest/v1/profiles?select=onboarding_completed&id=eq.914877b7-03bb-41bc-a392-3c74713c6cb2 | Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36",
+  "id": "260ea263-94c7-412e-bb2d-2c520760b374",
+  "metadata": [
+    {
+      "load_balancer_experimental_routing": null,
+      "load_balancer_geo_aware_info": [],
+      "load_balancer_redirect_identifier": null,
+      "logflare_worker": [
+        {
+          "worker_id": "HS2NVN"
+        }
+      ],
+      "request": [
+        {
+          "cf": [
+            {
+              "asOrganization": "Jio",
+              "asn": 55836,
+              "botManagement": [
+                {
+                  "corporateProxy": false,
+                  "detectionIds": [],
+                  "ja3Hash": null,
+                  "jsDetection": [
+                    {
+                      "passed": false
+                    }
+                  ],
+                  "score": 99,
+                  "staticResource": false,
+                  "verifiedBot": false
+                }
+              ],
+              "city": "Patna",
+              "clientAcceptEncoding": "gzip, deflate, br, zstd",
+              "clientTcpRtt": null,
+              "clientTrustScore": null,
+              "colo": "PAT",
+              "continent": "AS",
+              "country": "IN",
+              "edgeRequestKeepAliveStatus": 1,
+              "httpProtocol": "HTTP/3",
+              "isEUCountry": null,
+              "latitude": "25.59430",
+              "longitude": "85.13520",
+              "metroCode": null,
+              "postalCode": "800001",
+              "region": "Bihar",
+              "regionCode": "BR",
+              "requestPriority": null,
+              "timezone": "Asia/Kolkata",
+              "tlsCipher": "AEAD-AES128-GCM-SHA256",
+              "tlsClientAuth": [
+                {
+                  "certPresented": "0",
+                  "certRevoked": "0",
+                  "certVerified": "NONE"
+                }
+              ],
+              "tlsClientExtensionsSha1": "dZhewXajoKMXTIqwsd0iveSVFig=",
+              "tlsClientHelloLength": "2019",
+              "tlsClientRandom": "uuuGYnYKS8Vfw8AIncvGCxlmXnseebeaOO6QHln7xrk=",
+              "tlsExportedAuthenticator": [
+                {
+                  "clientFinished": "f683a8b79863733417ae3227a74f5dc888dc2878017c9de727debae2a7995108",
+                  "clientHandshake": "9d84528861dc16de5ceb99545b1a9b9a51a828548ff9b8707fb1bbf3076051c7",
+                  "serverFinished": "2ced0b09e34e4c9a598d3656026ecf40ea62fcb6732742a8636322b4520ea946",
+                  "serverHandshake": "aafbb166a8b8b092ae7071bc8205cc8e03ad17d67d8a5a41bf1e5a26c6f81082"
+                }
+              ],
+              "tlsVersion": "TLSv1.3",
+              "verifiedBotCategory": null
+            }
+          ],
+          "headers": [
+            {
+              "accept": "*/*",
+              "cf_cache_status": null,
+              "cf_connecting_ip": "49.47.128.215",
+              "cf_ipcountry": "IN",
+              "cf_ray": "932472032b8179fe",
+              "content_length": null,
+              "content_location": null,
+              "content_range": null,
+              "content_type": null,
+              "date": null,
+              "host": "wqojeesjtgfcftpnzaet.supabase.co",
+              "prefer": null,
+              "range": null,
+              "referer": "https://roshlingua.vercel.app/",
+              "sb_gateway_mode": null,
+              "sb_gateway_version": null,
+              "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36",
+              "x_client_info": null,
+              "x_forwarded_host": null,
+              "x_forwarded_proto": "https",
+              "x_forwarded_user_agent": null,
+              "x_kong_proxy_latency": null,
+              "x_kong_upstream_latency": null,
+              "x_real_ip": "49.47.128.215"
+            }
+          ],
+          "host": "wqojeesjtgfcftpnzaet.supabase.co",
+          "method": "OPTIONS",
+          "path": "/rest/v1/profiles",
+          "port": null,
+          "protocol": "https:",
+          "sb": [],
+          "search": "?select=onboarding_completed&id=eq.914877b7-03bb-41bc-a392-3c74713c6cb2",
+          "url": "https://wqojeesjtgfcftpnzaet.supabase.co/rest/v1/profiles?select=onboarding_completed&id=eq.914877b7-03bb-41bc-a392-3c74713c6cb2"
+        }
+      ],
+      "response": [
+        {
+          "headers": [],
+          "origin_time": 0,
+          "status_code": 200
+        }
+      ]
+    }
+  ],
+  "timestamp": 1744982277637000
+}
