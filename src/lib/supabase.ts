@@ -27,7 +27,11 @@ export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
     // Increase timeout for auth completion
     pkceTimeout: 15 * 60, // 15 minutes to complete authentication
     pkceLeeway: 60, // 60 second leeway for clock skew
-    detectSessionInUrl: true // Ensure this is enabled
+    detectSessionInUrl: true, // Ensure this is enabled
+    // Production site URL for deployments
+    redirectTo: import.meta.env.MODE === 'production' 
+      ? 'https://roshlingua.vercel.app/auth/callback' 
+      : `${window.location.origin}/auth/callback`
   },
   // Add global error handler for debugging
   global: {

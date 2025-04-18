@@ -339,29 +339,40 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       
       // Remove any existing code verifiers to avoid conflicts
       Object.keys(localStorage).forEach(key => {
-        if (key.includes('code_verifier')) {
+        if (key.includes('code_verifier') || key.includes('verifier')) {
           localStorage.removeItem(key);
         }
       });
       
       // Generate a fresh code verifier that meets PKCE requirements
-      // Using crypto.getRandomValues for secure random generation
-      const array = new Uint8Array(64); // 64 bytes for better security
-      crypto.getRandomValues(array);
+      // Using crypto API directly for better entropy
+      const generateSecureVerifier = () => {
+        // Generate random bytes - 32 bytes gives us 256 bits of randomness
+        const randomBytes = new Uint8Array(32);
+        crypto.getRandomValues(randomBytes);
+        
+        // Convert to base64url format (RFC 7636 compliant)
+        const base64 = btoa(String.fromCharCode.apply(null, [...randomBytes]));
+        const base64url = base64
+          .replace(/\+/g, '-')
+          .replace(/\//g, '_')
+          .replace(/=+$/, '');
+        
+        // PKCE verifier must be between 43-128 chars
+        return base64url.substring(0, 96); // Safe length that's not too short or long
+      };
       
-      // Convert to base64url format (RFC 7636 compliant)
-      const codeVerifier = btoa(String.fromCharCode.apply(null, [...array]))
-        .replace(/\+/g, '-')
-        .replace(/\//g, '_')
-        .replace(/=+$/, '')
-        .substring(0, 128); // Ensure it's right length (43-128 chars)
-      
+      const codeVerifier = generateSecureVerifier();
       console.log("Generated fresh code verifier with length:", codeVerifier.length);
       
-      // Store it using multiple keys to ensure it's available
+      // Store in the primary location
       localStorage.setItem('supabase.auth.code_verifier', codeVerifier);
-      localStorage.setItem('pkce-verifier', codeVerifier); // Backup key
-      localStorage.setItem('supabase-code-verifier', codeVerifier); // Another backup
+      
+      // Also store in several backup locations to ensure it's available after redirect
+      localStorage.setItem('pkce-verifier', codeVerifier);
+      localStorage.setItem('supabase-code-verifier', codeVerifier);
+      localStorage.setItem('code_verifier', codeVerifier);
+      localStorage.setItem('sb-pkce-verifier', codeVerifier);
       
       // Verify storage for debugging
       const storedVerifier = localStorage.getItem('supabase.auth.code_verifier');
@@ -372,13 +383,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       // Log all localStorage keys for debugging
       console.log("All localStorage keys:", Object.keys(localStorage));
       
-      // Use explicit PKCE parameters with correct callback URL
-      const redirectUrl = `${window.location.origin}/auth/callback`;
-      console.log("Redirect URL:", redirectUrl);
+      // Determine correct redirect URL based on environment
+      let redirectUrl;
+      if (window.location.hostname.includes('vercel.app')) {
+        // Production deployment on Vercel
+        redirectUrl = 'https://roshlingua.vercel.app/auth/callback';
+        console.log("Using production Vercel callback URL");
+      } else {
+        // Local development or other environment
+        redirectUrl = `${window.location.origin}/auth/callback`;
+        console.log("Using dynamic callback URL for development");
+      }
       
       // Make sure our URL doesn't have trailing slashes or other issues
       const cleanRedirectUrl = redirectUrl.replace(/\/+$/, '');
-      console.log("Clean redirect URL:", cleanRedirectUrl);
+      console.log("Final redirect URL:", cleanRedirectUrl);
       
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
@@ -386,7 +405,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           redirectTo: cleanRedirectUrl,
           queryParams: {
             access_type: 'offline',
-            prompt: 'consent'
+            prompt: 'consent',
+            hd: 'domain.com' // Optional: restrict to specific domain
           },
           // Pass the same code verifier we stored
           codeVerifier: codeVerifier,
