@@ -1,0 +1,110 @@
+Initializing auth state...
+index--xLfKdal.js:73 Setting initial session: Session exists
+index--xLfKdal.js:73 Checking profile for user: 914877b7-03bb-41bc-a392-3c74713c6cb2
+wqojeesjtgfcftpnzaet.supabase.co/rest/v1/profiles?select=id%2Conboarding_completed&id=eq.914877b7-03bb-41bc-a392-3c74713c6cb2:1 
+            
+            
+           Failed to load resource: the server responded with a status of 406 ()Understand this error
+index--xLfKdal.js:73 Creating profile for user: 914877b7-03bb-41bc-a392-3c74713c6cb2
+wqojeesjtgfcftpnzaet.supabase.co/rest/v1/profiles:1 
+            
+            
+           Failed to load resource: the server responded with a status of 400 ()Understand this error
+index--xLfKdal.js:523 ===== AUTH CODE HANDLER =====
+index--xLfKdal.js:523 Auth code present: false
+index--xLfKdal.js:523 Auth error present: false
+index--xLfKdal.js:73 Auth state changed: INITIAL_SESSION Session exists
+wqojeesjtgfcftpnzaet.supabase.co/rest/v1/profiles?select=onboarding_completed&id=eq.914877b7-03bb-41bc-a392-3c74713c6cb2:1 
+            
+            
+           Failed to load resource: the server responded with a status of 406 ()Understand this error
+index--xLfKdal.js:523 ===== AUTH CODE HANDLER =====
+index--xLfKdal.js:523 Auth code present: false
+index--xLfKdal.js:523 Auth error present: false
+index--xLfKdal.js:523 ===== AUTH CODE HANDLER =====
+index--xLfKdal.js:523 Auth code present: false
+index--xLfKdal.js:523 Auth error present: false
+index--xLfKdal.js:523 ===== AUTH CODE HANDLER =====
+index--xLfKdal.js:523 Auth code present: false
+index--xLfKdal.js:523 Auth error present: false
+index--xLfKdal.js:523 ===== AUTH CODE HANDLER =====
+index--xLfKdal.js:523 Auth code present: false
+index--xLfKdal.js:523 Auth error present: false
+index--xLfKdal.js:523 ===== AUTH CODE HANDLER =====
+index--xLfKdal.js:523 Auth code present: false
+index--xLfKdal.js:523 Auth error present: false
+index--xLfKdal.js:523 ===== AUTH CODE HANDLER =====
+index--xLfKdal.js:523 Auth code present: false
+index--xLfKdal.js:523 Auth error present: false
+index--xLfKdal.js:523 ===== AUTH CODE HANDLER =====
+index--xLfKdal.js:523 Auth code present: false
+index--xLfKdal.js:523 Auth error present: false
+index--xLfKdal.js:523 ===== AUTH CODE HANDLER =====
+index--xLfKdal.js:523 Auth code present: false
+index--xLfKdal.js:523 Auth error present: false
+index--xLfKdal.js:523 ===== AUTH CODE HANDLER =====
+index--xLfKdal.js:523 Auth code present: false
+index--xLfKdal.js:523 Auth error present: false
+index--xLfKdal.js:523 ===== AUTH CODE HANDLER =====
+index--xLfKdal.js:523 Auth code present: false
+index--xLfKdal.js:523 Auth error present: false
+index--xLfKdal.js:523 ===== AUTH CODE HANDLER =====
+index--xLfKdal.js:523 Auth code present: false
+index--xLfKdal.js:523 Auth error present: false
+index--xLfKdal.js:523 ===== AUTH CODE HANDLER =====
+index--xLfKdal.js:523 Auth code present: false
+index--xLfKdal.js:523 Auth error present: false
+index--xLfKdal.js:523 ===== AUTH CODE HANDLER =====
+index--xLfKdal.js:523 Auth code present: false
+index--xLfKdal.js:523 Auth error present: false
+index--xLfKdal.js:523 ===== AUTH CODE HANDLER =====
+index--xLfKdal.js:523 Auth code present: false
+index--xLfKdal.js:523 Auth error present: false
+index--xLfKdal.js:523 ===== AUTH CODE HANDLER =====
+index--xLfKdal.js:523 Auth code present: false
+index--xLfKdal.js:523 Auth error present: false
+index--xLfKdal.js:523 ===== AUTH CODE HANDLER =====
+index--xLfKdal.js:523 Auth code present: false
+index--xLfKdal.js:523 Auth error present: false
+index--xLfKdal.js:523 ===== AUTH CODE HANDLER =====
+index--xLfKdal.js:523 Auth code present: false
+index--xLfKdal.js:523 Auth error present: false
+index--xLfKdal.js:523 ===== AUTH CODE HANDLER =====
+index--xLfKdal.js:523 Auth code present: false
+index--xLfKdal.js:523 Auth error present: false
+index--xLfKdal.js:523 ===== AUTH CODE HANDLER =====
+index--xLfKdal.js:523 Auth code present: false
+index--xLfKdal.js:523 Auth error present: false
+index--xLfKdal.js:523 ===== AUTH CODE HANDLER =====
+index--xLfKdal.js:523 Auth code present: false
+index--xLfKdal.js:523 Auth error present: false
+index--xLfKdal.js:523 ===== AUTH CODE HANDLER =====
+index--xLfKdal.js:523 Auth code present: false
+index--xLfKdal.js:523 Auth error present: false
+index--xLfKdal.js:523 ===== AUTH CODE HANDLER =====
+index--xLfKdal.js:523 Auth code present: false
+index--xLfKdal.js:523 Auth error present: false
+index--xLfKdal.js:523 ===== AUTH CODE HANDLER =====
+index--xLfKdal.js:523 Auth code present: false
+index--xLfKdal.js:523 Auth error present: false
+index--xLfKdal.js:523 ===== AUTH CODE HANDLER =====
+index--xLfKdal.js:523 Auth code present: false
+index--xLfKdal.js:523 Auth error present: false
+index--xLfKdal.js:523 ===== AUTH CODE HANDLER =====
+index--xLfKdal.js:523 Auth code present: false
+index--xLfKdal.js:523 Auth error present: false
+index--xLfKdal.js:523 ===== AUTH CODE HANDLER =====
+index--xLfKdal.js:523 Auth code present: false
+index--xLfKdal.js:523 Auth error present: false
+index--xLfKdal.js:523 ===== AUTH CODE HANDLER =====
+index--xLfKdal.js:523 Auth code present: false
+index--xLfKdal.js:523 Auth error present: false
+index--xLfKdal.js:523 ===== AUTH CODE HANDLER =====
+index--xLfKdal.js:523 Auth code present: false
+index--xLfKdal.js:523 Auth error present: false
+index--xLfKdal.js:523 ===== AUTH CODE HANDLER =====
+index--xLfKdal.js:523 Auth code present: false
+index--xLfKdal.js:523 Auth error present: false
+index--xLfKdal.js:523 ===== AUTH CODE HANDLER =====
+index--xLfKdal.js:523 Auth code present: false
+index--xLfKdal.js:523 Auth erro
