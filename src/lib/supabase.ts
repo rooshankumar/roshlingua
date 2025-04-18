@@ -14,21 +14,7 @@ export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
     persistSession: true,
     detectSessionInUrl: true,
     flowType: 'pkce',
-    debug: true,
-    cookieOptions: {
-      name: 'sb-auth-token',
-      lifetime: 60 * 60 * 8,
-      domain: window.location.hostname,
-      path: '/',
-      sameSite: 'lax'
-    },
-    storageKey: 'supabase.auth.token',
     storage: localStorage
-  },
-  global: {
-    headers: {
-      'X-Client-Info': 'supabase-js/2.x'
-    }
   }
 });
 
@@ -36,17 +22,14 @@ export const signInWithGoogle = async () => {
   try {
     console.log("===== INITIATING GOOGLE SIGN-IN =====");
 
-    // First, clear any existing auth data to start fresh
-    await supabase.auth.signOut({ scope: 'local' });
+    // Always sign out first to ensure a clean auth state
+    await supabase.auth.signOut();
 
-    // Clear any PKCE verifiers that might be lingering
+    // Clear localStorage of any previous PKCE data
     localStorage.removeItem('supabase.auth.code_verifier');
     sessionStorage.removeItem('supabase.auth.code_verifier');
 
-    // Log the start of the OAuth flow
-    console.log("Starting OAuth flow with Google...");
-
-    // Let Supabase handle the OAuth flow (it will generate a new verifier internally)
+    // Start OAuth flow
     return await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {

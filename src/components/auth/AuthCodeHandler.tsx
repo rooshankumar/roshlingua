@@ -1,7 +1,8 @@
+
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
-import { exchangeAuthCode } from '@/utils/pkceHelper';
+import { supabase } from '@/lib/supabase';
 
 const AuthCodeHandler = () => {
   const navigate = useNavigate();
@@ -40,46 +41,34 @@ const AuthCodeHandler = () => {
           return;
         }
 
-        console.log("Processing auth code callback");
+        // Let Supabase handle the code exchange with its built-in mechanisms
+        const { data, error: sessionError } = await supabase.auth.exchangeCodeForSession(code);
 
-        try {
-          // Exchange the code for a session
-          const { data, error } = await exchangeAuthCode(code);
-
-          if (error) {
-            console.error("Code exchange error in AuthCodeHandler:", error);
-            toast({
-              variant: "destructive",
-              title: "Authentication Failed",
-              description: error.message
-            });
-            navigate('/auth', { replace: true });
-            return;
-          }
-
-          if (data.session) {
-            console.log("Authentication successful!");
-            navigate('/dashboard', { replace: true });
-            return;
-          }
-
-          // No session and no error is unexpected
-          console.error("No session returned after code exchange");
+        if (sessionError) {
+          console.error("Code exchange error:", sessionError);
           toast({
             variant: "destructive",
             title: "Authentication Failed",
-            description: "Could not establish a session"
+            description: sessionError.message
           });
           navigate('/auth', { replace: true });
-        } catch (err) {
-          console.error("Error during authentication:", err);
-          toast({
-            variant: "destructive",
-            title: "Authentication Error",
-            description: "An unexpected error occurred"
-          });
-          navigate('/auth', { replace: true });
+          return;
         }
+
+        if (data.session) {
+          console.log("Authentication successful!");
+          navigate('/dashboard', { replace: true });
+          return;
+        }
+
+        // No session and no error is unexpected
+        console.error("No session returned after code exchange");
+        toast({
+          variant: "destructive",
+          title: "Authentication Failed",
+          description: "Could not establish a session"
+        });
+        navigate('/auth', { replace: true });
       } catch (err) {
         console.error("Unexpected error in auth handler:", err);
         toast({

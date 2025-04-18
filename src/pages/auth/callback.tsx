@@ -3,7 +3,6 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/lib/supabase';
 import { useToast } from '@/hooks/use-toast';
-import { exchangeAuthCode } from '@/utils/pkceHelper';
 
 const Callback = () => {
   const navigate = useNavigate();
@@ -25,9 +24,8 @@ const Callback = () => {
           throw new Error(`OAuth error: ${errorDescription || error}`);
         }
 
-        // The page URL contains the code parameter after OAuth redirect
+        // Extract code from URL
         const code = url.searchParams.get('code');
-
         if (!code) {
           console.error("No authentication code in URL");
           throw new Error("Missing authentication code");
@@ -35,12 +33,12 @@ const Callback = () => {
 
         console.log("Found auth code in URL:", code.substring(0, 5) + "...");
         
-        // Exchange the code for a session
-        const { data, error } = await exchangeAuthCode(code);
-
-        if (error) {
-          console.error("Error exchanging code for session:", error);
-          throw error;
+        // Let Supabase handle the session exchange
+        const { data, error: sessionError } = await supabase.auth.exchangeCodeForSession(code);
+        
+        if (sessionError) {
+          console.error("Error exchanging code for session:", sessionError);
+          throw sessionError;
         }
 
         if (!data.session) {
@@ -56,10 +54,11 @@ const Callback = () => {
             .from('profiles')
             .select('onboarding_completed')
             .eq('id', data.session.user.id)
-            .maybeSingle();
+            .single();
 
-          if (profileError) {
+          if (profileError && profileError.code !== 'PGRST116') {
             console.error("Error fetching profile:", profileError);
+            throw profileError;
           }
 
           // Create profile if needed
