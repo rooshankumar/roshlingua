@@ -61,10 +61,20 @@ const Callback = () => {
         
         // 1. First try session-specific verifier if we have a session ID
         if (sessionId) {
-          const sessionVerifier = localStorage.getItem(`verifier_${sessionId}`);
+          // Check for our custom session verifier
+          const sessionVerifier = localStorage.getItem(`pkce_verifier_${sessionId}`);
           if (sessionVerifier) {
             console.log(`Found session-specific verifier for ${sessionId}`);
             codeVerifier = sessionVerifier;
+          }
+          
+          // Also check legacy format
+          if (!codeVerifier) {
+            const legacySessionVerifier = localStorage.getItem(`verifier_${sessionId}`);
+            if (legacySessionVerifier) {
+              console.log(`Found legacy session-specific verifier for ${sessionId}`);
+              codeVerifier = legacySessionVerifier;
+            }
           }
         }
         
@@ -80,10 +90,31 @@ const Callback = () => {
         // 3. Try all other potential locations
         if (!codeVerifier) {
           console.log("Trying alternative locations for code verifier...");
-          for (const key of verifierKeys) {
+          // Check additional known locations
+          const alternativeKeys = [
+            'sb-pkce-verifier',
+            'pkce-verifier',
+            'supabase-pkce-verifier'
+          ];
+          
+          for (const key of [...verifierKeys, ...alternativeKeys]) {
             const value = localStorage.getItem(key);
             if (value) {
               console.log(`Found verifier in key: ${key}`);
+              codeVerifier = value;
+              break;
+            }
+          }
+        }
+        
+        // 4. Last resort - try searching all localStorage keys for anything that might be a verifier
+        if (!codeVerifier) {
+          console.log("Performing deep search for code verifier...");
+          for (const key of Object.keys(localStorage)) {
+            const value = localStorage.getItem(key);
+            if (value && value.length >= 43 && value.length <= 128) {
+              // PKCE verifiers must be 43-128 chars long
+              console.log(`Found potential verifier in key: ${key} (length: ${value.length})`);
               codeVerifier = value;
               break;
             }
@@ -164,20 +195,56 @@ const Callback = () => {
         console.log("Verifier length:", codeVerifier.length);
         console.log("Verifier prefix:", codeVerifier.substring(0, 5) + "...");
         
-        const { data, error } = await supabase.auth.exchangeCodeForSession(code, codeVerifier);
+        // Check if code and verifier meet PKCE requirements
+        if (codeVerifier.length < 43 || codeVerifier.length > 128) {
+          console.error("Code verifier length invalid:", codeVerifier.length);
+          console.error("PKCE requires 43-128 characters");
+          throw new Error("Authentication verification failed - invalid verifier length");
+        }
         
-        if (error) {
-          console.error("Code exchange error:", error);
-          console.error("Error details:", JSON.stringify(error));
+        // Check characters in verifier (should only contain [A-Z], [a-z], [0-9], "-", ".", "_", "~")
+        const validPKCEPattern = /^[A-Za-z0-9\-._~]+$/;
+        if (!validPKCEPattern.test(codeVerifier)) {
+          console.error("Code verifier contains invalid characters");
+          console.error("PKCE requires URL-safe characters only");
+          throw new Error("Authentication verification failed - invalid verifier format");
+        }
+        
+        try {
+          console.log("Calling exchangeCodeForSession with:");
+          console.log(`- Code: ${code.substring(0, 5)}... (length: ${code.length})`);
+          console.log(`- Verifier: ${codeVerifier.substring(0, 5)}... (length: ${codeVerifier.length})`);
           
-          // Store error info for debugging
+          const { data, error } = await supabase.auth.exchangeCodeForSession(code, codeVerifier);
+          
+          if (error) {
+            console.error("Code exchange error:", error);
+            console.error("Error details:", JSON.stringify(error));
+            
+            // Store error info for debugging
+            localStorage.setItem('auth_error_time', Date.now().toString());
+            localStorage.setItem('auth_error_type', 'exchange_failure');
+            localStorage.setItem('auth_error_message', error.message);
+            
+            // Store diagnostic information
+            localStorage.setItem('auth_exchange_code_length', code.length.toString());
+            localStorage.setItem('auth_exchange_verifier_length', codeVerifier.length.toString());
+            localStorage.setItem('auth_exchange_verifier_prefix', codeVerifier.substring(0, 5));
+            
+            // Clean up for fresh start
+            verifierKeys.forEach(key => localStorage.removeItem(key));
+            throw error;
+          }
+        } catch (exchangeError) {
+          console.error("Exception during code exchange:", exchangeError);
+          console.error("This could indicate a network issue or malformed request");
+          
+          // Store additional diagnostic info
           localStorage.setItem('auth_error_time', Date.now().toString());
-          localStorage.setItem('auth_error_type', 'exchange_failure');
-          localStorage.setItem('auth_error_message', error.message);
+          localStorage.setItem('auth_error_type', 'exchange_exception');
+          localStorage.setItem('auth_error_message', exchangeError.message || 'Unknown error');
           
-          // Clean up for fresh start
-          verifierKeys.forEach(key => localStorage.removeItem(key));
-          throw error;
+          throw new Error("Failed to exchange code for session: " + (exchangeError.message || 'Unknown error'));
         }
         
         if (data?.session) {

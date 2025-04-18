@@ -330,107 +330,41 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const loginWithGoogle = async () => {
     try {
-      console.log("Initiating Google login...");
+      console.log("===== INITIATING GOOGLE LOGIN =====");
       
-      // Clear any potentially conflicting auth state
-      localStorage.removeItem('supabase.auth.token');
+      // Handle the login using the centralized function in supabase.ts
+      const result = await signInWithGoogle();
       
-      // Create unique session ID to identify this specific login attempt
-      const sessionId = `auth-${Date.now()}-${Math.random().toString(36).substring(2, 10)}`;
-      localStorage.setItem('auth_session_id', sessionId);
-      console.log("Created auth session ID:", sessionId);
-      
-      // Remove potentially conflicting code verifiers
-      Object.keys(localStorage).forEach(key => {
-        if (key.includes('code_verifier') || key.includes('verifier')) {
-          console.log("Removing old verifier key:", key);
-          localStorage.removeItem(key);
-        }
-      });
-      
-      // Generate a cryptographically secure code verifier with proper length (43-128 chars)
-      const generateSecureVerifier = () => {
-        // Use the most robust method available
-        const array = new Uint8Array(64); // 64 bytes = 512 bits of randomness
-        crypto.getRandomValues(array);
-        return btoa(String.fromCharCode.apply(null, [...array]))
-          .replace(/\+/g, '-')
-          .replace(/\//g, '_')
-          .replace(/=+$/, '')
-          .substring(0, 128); // Safe maximum length
-      };
-      
-      const codeVerifier = generateSecureVerifier();
-      
-      // Store securely with multiple keys for redundancy
-      const verifierKeys = [
-        'supabase.auth.code_verifier',
-        `verifier_${sessionId}`, // Session-specific key
-        'sb-pkce-verifier',
-        'pkce-verifier'
-      ];
-      
-      verifierKeys.forEach(key => {
-        localStorage.setItem(key, codeVerifier);
-        console.log(`Stored verifier in '${key}':`, !!localStorage.getItem(key));
-      });
-      
-      // Double-check storage
-      console.log("Code verifier length:", codeVerifier.length);
-      console.log("First 5 chars:", codeVerifier.substring(0, 5));
-      console.log("Successfully stored in all keys:", verifierKeys.every(k => 
-        localStorage.getItem(k) === codeVerifier
-      ));
-      
-      // Determine correct callback URL with specific parameters to help debugging
-      const callbackBase = window.location.hostname.includes('vercel.app')
-        ? 'https://roshlingua.vercel.app'
-        : window.location.origin;
-      
-      // Add session ID as a parameter to track this specific login attempt
-      const redirectUrl = `${callbackBase}/auth/callback?session_id=${sessionId}`;
-      console.log("Using callback URL:", redirectUrl);
-      
-      // Initiate OAuth flow with explicit code verifier
-      const { data, error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          redirectTo: redirectUrl,
-          queryParams: {
-            access_type: 'offline',
-            prompt: 'consent'
-          },
-          codeVerifier: codeVerifier,
-          skipBrowserRedirect: false
-        }
-      });
-      
-      if (error) {
-        console.error("Google auth initiation error:", error);
-        toast({
-          variant: "destructive",
-          title: "Google Authentication Failed",
-          description: error.message
-        });
-        throw error;
-      }
-
-      if (!data.url) {
+      if (!result.data?.url) {
         throw new Error("No OAuth URL returned");
       }
-
-      console.log("Redirecting to OAuth URL:", data.url.substring(0, 100) + "...");
       
-      // One final check before redirect
-      const finalCheck = localStorage.getItem('supabase.auth.code_verifier');
-      console.log("Final verification - code verifier exists:", !!finalCheck);
-      console.log("Code verifier length before redirect:", finalCheck?.length);
+      // Additional application-specific logic before redirect
+      console.log("Received OAuth URL successfully");
+      console.log("Redirecting to Google auth...");
       
-      // Record timestamp to help debug timing issues
-      localStorage.setItem('auth_redirect_time', Date.now().toString());
+      // Final storage check before redirecting
+      const finalVerifier = localStorage.getItem('supabase.auth.code_verifier');
+      console.log("Final check - code verifier:", !!finalVerifier);
+      if (finalVerifier) {
+        console.log("Verifier length:", finalVerifier.length);
+        console.log("Verifier prefix:", finalVerifier.substring(0, 5) + "...");
+      } else {
+        console.warn("WARNING: No code verifier found before redirect!");
+        
+        // Emergency recovery - check if our function stored it elsewhere
+        const sessionId = localStorage.getItem('auth_session_id');
+        if (sessionId) {
+          const backupVerifier = localStorage.getItem(`pkce_verifier_${sessionId}`);
+          if (backupVerifier) {
+            console.log("Found backup verifier, restoring to standard location");
+            localStorage.setItem('supabase.auth.code_verifier', backupVerifier);
+          }
+        }
+      }
       
-      // Let browser handle redirect
-      window.location.href = data.url;
+      // Perform redirect
+      window.location.href = result.data.url;
     } catch (error) {
       console.error("Google login error:", error);
       toast({
