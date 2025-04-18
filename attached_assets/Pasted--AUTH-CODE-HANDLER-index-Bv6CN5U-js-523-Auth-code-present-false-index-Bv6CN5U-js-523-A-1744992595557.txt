@@ -1,0 +1,62 @@
+===== AUTH CODE HANDLER =====
+index-Bv6CN5U-.js:523 Auth code present: false
+index-Bv6CN5U-.js:523 Auth error present: false
+index-Bv6CN5U-.js:523 PKCE Debug Info
+index-Bv6CN5U-.js:523 Verifier in localStorage: NOT FOUND
+index-Bv6CN5U-.js:523 Verifier in sessionStorage: NOT FOUND
+index-Bv6CN5U-.js:523 Backup verifier: NOT FOUND
+index-Bv6CN5U-.js:523 Cookie verifier: NOT FOUND
+index-Bv6CN5U-.js:523 URL code param: NOT FOUND
+index-Bv6CN5U-.js:523 ===== AUTH CODE HANDLER =====
+index-Bv6CN5U-.js:523 Auth code present: false
+index-Bv6CN5U-.js:523 Auth error present: false
+index-Bv6CN5U-.js:523 PKCE Debug Info
+index-Bv6CN5U-.js:523 Verifier in localStorage: NOT FOUND
+index-Bv6CN5U-.js:523 Verifier in sessionStorage: NOT FOUND
+index-Bv6CN5U-.js:523 Backup verifier: NOT FOUND
+index-Bv6CN5U-.js:523 Cookie verifier: NOT FOUND
+index-Bv6CN5U-.js:523 URL code param: NOT FOUND
+index-Bv6CN5U-.js:523 ===== AUTH CODE HANDLER =====
+index-Bv6CN5U-.js:523 Auth code present: false
+index-Bv6CN5U-.js:523 Auth error present: false
+index-Bv6CN5U-.js:523 PKCE Debug Info
+index-Bv6CN5U-.js:523 Verifier in localStorage: NOT FOUND
+index-Bv6CN5U-.js:523 Verifier in sessionStorage: NOT FOUND
+index-Bv6CN5U-.js:523 Backup verifier: NOT FOUND
+index-Bv6CN5U-.js:523 Cookie verifier: NOT FOUND
+index-Bv6CN5U-.js:523 URL code param: NOT FOUND
+index-Bv6CN5U-.js:523 ===== AUTH CODE HANDLER =====
+index-Bv6CN5U-.js:523 Auth code present: false
+index-Bv6CN5U-.js:523 Auth error present: false
+index-Bv6CN5U-.js:523 PKCE Debug Info
+index-Bv6CN5U-.js:523 Verifier in localStorage: NOT FOUND
+index-Bv6CN5U-.js:523 Verifier in sessionStorage: NOT FOUND
+index-Bv6CN5U-.js:523 Backup verifier: NOT FOUND
+index-Bv6CN5U-.js:523 Cookie verifier: NOT FOUND
+index-Bv6CN5U-.js:523 URL code param: NOT FOUND
+index-Bv6CN5U-.js:523 ===== AUTH CODE HANDLER =====
+index-Bv6CN5U-.js:523 Auth code present: false
+index-Bv6CN5U-.js:523 Auth error present: false
+index-Bv6CN5U-.js:523 PKCE Debug Info
+index-Bv6CN5U-.js:49 Throttling navigation to prevent the browser from hanging. See https://crbug.com/1038223. Command line switch --disable-ipc-flooding-protection can be used to bypass the protection
+y @ index-Bv6CN5U-.js:49
+(anonymous) @ index-Bv6CN5U-.js:58
+(anonymous) @ index-Bv6CN5U-.js:58
+Bc @ index-Bv6CN5U-.js:40
+Po @ index-Bv6CN5U-.js:40
+(anonymous) @ index-Bv6CN5U-.js:40
+S @ index-Bv6CN5U-.js:25
+M @ index-Bv6CN5U-.js:25Understand this warning
+index-Bv6CN5U-.js:72 
+            
+            
+           GET https://wqojeesjtgfcftpnzaet.supabase.co/rest/v1/profiles?select=onboarding_completed&id=eq.914877b7-03bb-41bc-a392-3c74713c6cb2 406 (Not Acceptable)
+(anonymous) @ index-Bv6CN5U-.js:72
+(anonymous) @ index-Bv6CN5U-.js:72
+l @ index-Bv6CN5U-.js:72
+Promise.then
+u @ index-Bv6CN5U-.js:72
+(anonymous) @ index-Bv6CN5U-.js:72
+xP @ index-Bv6CN5U-.js:72
+(anonymous) @ index-Bv6CN5U-.js:72
+then @ index-Bv6CN5U-.js:67Understand this error
