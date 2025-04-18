@@ -65,9 +65,8 @@ export const signInWithGoogle = async () => {
     console.log("===== INITIATING GOOGLE SIGN-IN =====");
 
     // First, clear any existing auth data to ensure a clean login state
-    localStorage.removeItem('supabase.auth.code_verifier');
     await supabase.auth.signOut({ scope: 'local' });
-
+    
     // Generate a secure code verifier that meets PKCE requirements
     const array = new Uint8Array(64);
     crypto.getRandomValues(array);
@@ -86,18 +85,10 @@ export const signInWithGoogle = async () => {
       .replace(/=+$/, '')
       .substring(0, 64);
 
-    // Store code verifier in LOCAL storage - this is critical
-    localStorage.setItem('supabase.auth.code_verifier', codeVerifier);
-    console.log("Code verifier stored:", codeVerifier.substring(0, 5) + "...");
+    console.log("Code verifier generated:", codeVerifier.substring(0, 5) + "...");
     console.log("Code verifier length:", codeVerifier.length);
 
-    // Double-check it was stored properly
-    const storedVerifier = localStorage.getItem('supabase.auth.code_verifier');
-    if (!storedVerifier || storedVerifier !== codeVerifier) {
-      throw new Error("Failed to store code verifier - authentication will fail");
-    }
-
-    // Now initiate the OAuth flow with explicit code verifier
+    // Now initiate the OAuth flow - let Supabase handle the code verifier storage
     return await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
@@ -106,14 +97,12 @@ export const signInWithGoogle = async () => {
           access_type: 'offline',
           prompt: 'consent'
         },
-        // Explicitly pass the verifier with the request
-        codeVerifier: codeVerifier,
-        skipBrowserRedirect: false
+        // Do NOT manually set skipBrowserRedirect, let Supabase handle the flow
+        // Do NOT manually override codeVerifier, Supabase will handle this
       }
     });
   } catch (error) {
     console.error("Error in signInWithGoogle:", error);
-    localStorage.removeItem('supabase.auth.code_verifier');
     throw error;
   }
 };

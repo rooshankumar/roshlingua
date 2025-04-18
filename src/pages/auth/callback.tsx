@@ -13,7 +13,7 @@ const Callback = () => {
       try {
         console.log("===== AUTH CALLBACK PROCESSING =====");
 
-        // Get auth code from URL
+        // The page URL contains the code parameter after OAuth redirect
         const url = new URL(window.location.href);
         const code = url.searchParams.get('code');
 
@@ -24,21 +24,9 @@ const Callback = () => {
 
         console.log("Found auth code in URL:", code.substring(0, 5) + "...");
 
-        // Get code verifier from localStorage
-        const codeVerifier = localStorage.getItem('supabase.auth.code_verifier');
-        console.log("Code verifier exists:", !!codeVerifier);
-
-        if (!codeVerifier) {
-          console.error("No code verifier found in localStorage");
-          throw new Error("Missing authentication verifier");
-        }
-
-        console.log("Code verifier length:", codeVerifier.length);
-        console.log("Code verifier prefix:", codeVerifier.substring(0, 5) + "...");
-
-        // Exchange code for session
-        console.log("Exchanging code for session...");
-        const { data, error } = await supabase.auth.exchangeCodeForSession(code, codeVerifier);
+        // Let Supabase handle the exchange automatically
+        // The session setup function reads the URL and uses stored code verifier
+        const { data, error } = await supabase.auth.exchangeCodeForSession(code);
 
         if (error) {
           console.error("Error exchanging code for session:", error);
