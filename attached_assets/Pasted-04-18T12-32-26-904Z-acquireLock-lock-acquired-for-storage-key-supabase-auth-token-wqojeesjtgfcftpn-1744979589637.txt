@@ -1,0 +1,54 @@
+04-18T12:32:26.904Z #_acquireLock lock acquired for storage key supabase.auth.token
+wqojeesjtgfcftpnzaet.supabase.co/auth/v1/token?grant_type=pkce:1 
+            
+            
+           Failed to load resource: the server responded with a status of 400 ()Understand this error
+index-DVfj2XH4.js:73 Supabase API error: 400  Objecturl: "https://wqojeesjtgfcftpnzaet.supabase.co/auth/v1/token?grant_type=pkce"[[Prototype]]: Object
+(anonymous) @ index-DVfj2XH4.js:73Understand this error
+index-DVfj2XH4.js:73 GoTrueClient@0 (2.69.1) 2025-04-18T12:32:27.049Z #_acquireLock lock released for storage key supabase.auth.token
+index-DVfj2XH4.js:73 GoTrueClient@0 (2.69.1) 2025-04-18T12:32:27.050Z #_acquireLock end
+index-DVfj2XH4.js:523 Error exchanging code for session: AuthApiError: invalid request: both auth code and code verifier should be non-empty
+    at Gg (index-DVfj2XH4.js:73:6553)
+    at async n2 (index-DVfj2XH4.js:73:7542)
+    at async de (index-DVfj2XH4.js:73:7203)
+    at async g2._exchangeCodeForSession (index-DVfj2XH4.js:73:22069)
+(anonymous) @ index-DVfj2XH4.js:523Understand this error
+index-DVfj2XH4.js:73 GoTrueClient@0 (2.69.1) 2025-04-18T12:32:27.117Z #_acquireLock begin -1
+index-DVfj2XH4.js:73 GoTrueClient@0 (2.69.1) 2025-04-18T12:32:27.151Z #_acquireLock lock acquired for storage key supabase.auth.token
+index-DVfj2XH4.js:73 GoTrueClient@0 (2.69.1) 2025-04-18T12:32:27.151Z #_useSession begin
+index-DVfj2XH4.js:73 GoTrueClient@0 (2.69.1) 2025-04-18T12:32:27.151Z #__loadSession() begin
+index-DVfj2XH4.js:73 GoTrueClient@0 (2.69.1) 2025-04-18T12:32:27.152Z #getSession() session from storage Object
+index-DVfj2XH4.js:73 GoTrueClient@0 (2.69.1) 2025-04-18T12:32:27.152Z #__loadSession() session has not expired expires_at 1744981789
+index-DVfj2XH4.js:73 GoTrueClient@0 (2.69.1) 2025-04-18T12:32:27.153Z #__loadSession() end
+index-DVfj2XH4.js:73 GoTrueClient@0 (2.69.1) 2025-04-18T12:32:27.153Z #_useSession end
+index-DVfj2XH4.js:73 GoTrueClient@0 (2.69.1) 2025-04-18T12:32:27.153Z #_acquireLock lock released for storage key supabase.auth.token
+index-DVfj2XH4.js:73 GoTrueClient@0 (2.69.1) 2025-04-18T12:32:27.154Z #_acquireLock end
+wqojeesjtgfcftpnzaet.supabase.co/rest/v1/profiles?select=onboarding_completed&id=eq.914877b7-03bb-41bc-a392-3c74713c6cb2:1 
+            
+            
+           Failed to load resource: the server responded with a status of 406 ()Understand this error
+index-DVfj2XH4.js:73 Supabase API error: 406  Object
+(anonymous) @ index-DVfj2XH4.js:73Understand this error
+index-DVfj2XH4.js:49 Throttling navigation to prevent the browser from hanging. See https://crbug.com/1038223. Command line switch --disable-ipc-flooding-protection can be used to bypass the protection
+y @ index-DVfj2XH4.js:49Understand this warning
+index-DVfj2XH4.js:73 GoTrueClient@0 (2.69.1) 2025-04-18T12:32:32.248Z #_onVisibilityChanged(false) visibilityState hidden
+index-DVfj2XH4.js:73 GoTrueClient@0 (2.69.1) 2025-04-18T12:32:32.248Z #_stopAutoRefresh()
+index-DVfj2XH4.js:73 GoTrueClient@0 (2.69.1) 2025-04-18T12:32:37.394Z #_onVisibilityChanged(false) visibilityState visible
+index-DVfj2XH4.js:73 GoTrueClient@0 (2.69.1) 2025-04-18T12:32:37.394Z #_stopAutoRefresh()
+index-DVfj2XH4.js:73 GoTrueClient@0 (2.69.1) 2025-04-18T12:32:37.394Z #_startAutoRefresh()
+index-DVfj2XH4.js:73 GoTrueClient@0 (2.69.1) 2025-04-18T12:32:37.394Z #_acquireLock begin -1
+index-DVfj2XH4.js:73 GoTrueClient@0 (2.69.1) 2025-04-18T12:32:37.401Z #_autoRefreshTokenTick() begin
+index-DVfj2XH4.js:73 GoTrueClient@0 (2.69.1) 2025-04-18T12:32:37.401Z #_acquireLock begin 0
+index-DVfj2XH4.js:73 GoTrueClient@0 (2.69.1) 2025-04-18T12:32:37.416Z #_acquireLock lock acquired for storage key supabase.auth.token
+index-DVfj2XH4.js:73 GoTrueClient@0 (2.69.1) 2025-04-18T12:32:37.416Z #_recoverAndRefresh() begin
+index-DVfj2XH4.js:73 GoTrueClient@0 (2.69.1) 2025-04-18T12:32:37.416Z #_recoverAndRefresh() session from storage Object
+index-DVfj2XH4.js:73 GoTrueClient@0 (2.69.1) 2025-04-18T12:32:37.417Z #_recoverAndRefresh() session has not expired with margin of 90000s
+index-DVfj2XH4.js:73 GoTrueClient@0 (2.69.1) 2025-04-18T12:32:37.417Z #_notifyAllSubscribers(SIGNED_IN) begin Object broadcast = true
+index-DVfj2XH4.js:73 Auth state changed: SIGNED_IN Session exists
+index-DVfj2XH4.js:73 User signed in, updating profile
+index-DVfj2XH4.js:73 GoTrueClient@0 (2.69.1) 2025-04-18T12:32:37.419Z #_acquireLock begin -1
+index-DVfj2XH4.js:73 GoTrueClient@0 (2.69.1) 2025-04-18T12:32:37.419Z #_acquireLock end
+index-DVfj2XH4.js:73 GoTrueClient@0 (2.69.1) 2025-04-18T12:32:37.424Z #_acquireLock begin -1
+index-DVfj2XH4.js:73 GoTrueClient@0 (2.69.1) 2025-04-18T12:32:37.424Z #_acquireLock end
+index-DVfj2XH4.js:73 GoTrueClient@0 (2.69.1) 2025-04-18T12:32:37.425Z #_acquireLock end
+index-DVfj2XH4.js:73 GoTrueClient@0 (2.69.1) 2025-04-18T12:32:37.425Z auto refresh token tick lock not available
