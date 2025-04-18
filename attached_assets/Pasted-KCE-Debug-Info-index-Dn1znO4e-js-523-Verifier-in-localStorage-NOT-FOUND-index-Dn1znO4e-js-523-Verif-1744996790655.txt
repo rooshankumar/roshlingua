@@ -1,0 +1,73 @@
+KCE Debug Info
+index-Dn1znO4e.js:523 Verifier in localStorage: NOT FOUND
+index-Dn1znO4e.js:523 Verifier in sessionStorage: NOT FOUND
+index-Dn1znO4e.js:523 Backup verifier: NOT FOUND
+index-Dn1znO4e.js:523 Cookie verifier: 3862d0a4... (80 chars)
+index-Dn1znO4e.js:523 URL code param: NOT FOUND
+index-Dn1znO4e.js:523 PKCE diagnostics: {hasVerifier: false, hasBackupVerifier: false, hasCookieVerifier: true, hasSessionVerifier: false, hasCodeParam: false}
+index-Dn1znO4e.js:523 ===== AUTH CODE HANDLER =====
+index-Dn1znO4e.js:523 Auth code present: false
+index-Dn1znO4e.js:523 Auth error present: false
+index-Dn1znO4e.js:523 URL: https://roshlingua.vercel.app/onboarding
+index-Dn1znO4e.js:523 PKCE Debug Info
+index-Dn1znO4e.js:523 Verifier in localStorage: NOT FOUND
+index-Dn1znO4e.js:523 Verifier in sessionStorage: NOT FOUND
+index-Dn1znO4e.js:523 Backup verifier: NOT FOUND
+index-Dn1znO4e.js:523 Cookie verifier: 3862d0a4... (80 chars)
+index-Dn1znO4e.js:523 URL code param: NOT FOUND
+index-Dn1znO4e.js:523 PKCE diagnostics: {hasVerifier: false, hasBackupVerifier: false, hasCookieVerifier: true, hasSessionVerifier: false, hasCodeParam: false}
+index-Dn1znO4e.js:523 ===== AUTH CODE HANDLER =====
+index-Dn1znO4e.js:523 Auth code present: false
+index-Dn1znO4e.js:523 Auth error present: false
+index-Dn1znO4e.js:523 URL: https://roshlingua.vercel.app/dashboard
+index-Dn1znO4e.js:523 PKCE Debug Info
+index-Dn1znO4e.js:523 Verifier in localStorage: NOT FOUND
+index-Dn1znO4e.js:523 Verifier in sessionStorage: NOT FOUND
+index-Dn1znO4e.js:523 Backup verifier: NOT FOUND
+index-Dn1znO4e.js:523 Cookie verifier: 3862d0a4... (80 chars)
+index-Dn1znO4e.js:523 URL code param: NOT FOUND
+index-Dn1znO4e.js:523 PKCE diagnostics: {hasVerifier: false, hasBackupVerifier: false, hasCookieVerifier: true, hasSessionVerifier: false, hasCodeParam: false}
+index-Dn1znO4e.js:523 ===== AUTH CODE HANDLER =====
+index-Dn1znO4e.js:523 Auth code present: false
+index-Dn1znO4e.js:523 Auth error present: false
+index-Dn1znO4e.js:523 URL: https://roshlingua.vercel.app/onboarding
+index-Dn1znO4e.js:523 PKCE Debug Info
+index-Dn1znO4e.js:523 Verifier in localStorage: NOT FOUND
+index-Dn1znO4e.js:523 Verifier in sessionStorage: NOT FOUND
+index-Dn1znO4e.js:523 Backup verifier: NOT FOUND
+index-Dn1znO4e.js:523 Cookie verifier: 3862d0a4... (80 chars)
+index-Dn1znO4e.js:523 URL code param: NOT FOUND
+index-Dn1znO4e.js:523 PKCE diagnostics: {hasVerifier: false, hasBackupVerifier: false, hasCookieVerifier: true, hasSessionVerifier: false, hasCodeParam: false}
+index-Dn1znO4e.js:523 ===== AUTH CODE HANDLER =====
+index-Dn1znO4e.js:523 Auth code present: false
+index-Dn1znO4e.js:523 Auth error present: false
+index-Dn1znO4e.js:523 URL: https://roshlingua.vercel.app/dashboard
+index-Dn1znO4e.js:523 PKCE Debug Info
+index-Dn1znO4e.js:523 Verifier in localStorage: NOT FOUND
+index-Dn1znO4e.js:523 Verifier in sessionStorage: NOT FOUND
+index-Dn1znO4e.js:523 Backup verifier: NOT FOUND
+index-Dn1znO4e.js:523 Cookie verifier: 3862d0a4... (80 chars)
+index-Dn1znO4e.js:523 URL code param: NOT FOUND
+index-Dn1znO4e.js:523 PKCE diagnostics: {hasVerifier: false, hasBackupVerifier: false, hasCookieVerifier: true, hasSessionVerifier: false, hasCodeParam: false}
+index-Dn1znO4e.js:49 Throttling navigation to prevent the browser from hanging. See https://crbug.com/1038223. Command line switch --disable-ipc-flooding-protection can be used to bypass the protection
+y @ index-Dn1znO4e.js:49
+(anonymous) @ index-Dn1znO4e.js:58
+(anonymous) @ index-Dn1znO4e.js:58
+Hc @ index-Dn1znO4e.js:40
+Po @ index-Dn1znO4e.js:40
+(anonymous) @ index-Dn1znO4e.js:40
+S @ index-Dn1znO4e.js:25
+I @ index-Dn1znO4e.js:25Understand this warning
+index-Dn1znO4e.js:72 
+            
+            
+           GET https://wqojeesjtgfcftpnzaet.supabase.co/rest/v1/profiles?select=onboarding_completed&id=eq.914877b7-03bb-41bc-a392-3c74713c6cb2 406 (Not Acceptable)
+(anonymous) @ index-Dn1znO4e.js:72
+(anonymous) @ index-Dn1znO4e.js:72
+a @ index-Dn1znO4e.js:72
+Promise.then
+u @ index-Dn1znO4e.js:72
+(anonymous) @ index-Dn1znO4e.js:72
+bP @ index-Dn1znO4e.js:72
+(anonymous) @ index-Dn1znO4e.js:72
+then @ index-Dn1znO4e.js:67Understand this error
