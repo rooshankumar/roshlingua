@@ -1,0 +1,56 @@
+Understanding the problem
+The error message "Authentication callback error: AuthApiError: invalid request: both auth code and code verifier should be non-empty" indicates that the authentication process failed because either the auth code, the code verifier, or both are missing or empty when attempting to exchange them for a session. This usually occurs during the OAuth 2.0 authorization code flow with PKCE (Proof Key for Code Exchange). The error message at Kg (index-DYRM-S1q.js:73:6553) shows the error originated from a function named Kg, at line 73 of the file index-DYRM-S1q.js. The other stack trace elements represent function calls that led to the error. The other provided code is simply the code that handles the error, it is not the cause of the error.
+
+Suggested fix
+The fix requires ensuring both the auth code and code verifier are properly generated and present when the _exchangeCodeForSession function is called. This might mean the code is not properly generating a code verifier on the client side, or that it is not saving the generated verifier properly.
+
+Ensure code verifier is generated: Make sure you are generating a random code verifier before initiating the authorization flow. The code verifier is a cryptographically random string.
+Store code verifier securely: Store the generated code verifier securely (e.g., in localStorage or sessionStorage) before redirecting the user to the authorization server.
+Retrieve code verifier: After the user is redirected back to your application, retrieve the stored code verifier.
+Pass both auth code and code verifier: When making the request to exchange the auth code for a session, make sure to include both the auth code (received from the authorization server) and the code verifier.
+The exact changes will vary depending on how your application is structured. However, it might look something like this:
+
+Code
+
+// Example of handling the authorization code flow
+
+// Step 1: Generate code verifier and code challenge
+function generateCodeVerifier() {
+  // Generate code verifier
+}
+
+function generateCodeChallenge(verifier) {
+  // Generate code challenge
+}
+
+// Step 2: Store the code verifier
+const codeVerifier = generateCodeVerifier();
+localStorage.setItem('code_verifier', codeVerifier); // Store it in localStorage
+
+// Step 3: Redirect the user to the authorization server
+const codeChallenge = generateCodeChallenge(codeVerifier);
+const authUrl = `https://example.com/authorize?client_id=YOUR_CLIENT_ID&response_type=code&scope=openid&redirect_uri=YOUR_REDIRECT_URI&code_challenge=${codeChallenge}&code_challenge_method=S256`;
+window.location.href = authUrl;
+
+// Step 4: Handle the callback.
+// This code is run when the user is redirected back to the web app.
+// Example URL: https://your-web-app.com?code=AUTH_CODE&state=STATE
+const urlParams = new URLSearchParams(window.location.search);
+const authCode = urlParams.get('code');
+const codeVerifierFromStorage = localStorage.getItem('code_verifier'); // Retrieve the code verifier
+
+// Step 5: Exchange the auth code for a session.
+async function exchangeCodeForSession(authCode, codeVerifier) {
+  // Your exchange logic
+  // Make sure both authCode and codeVerifier are present
+}
+
+if(authCode && codeVerifierFromStorage) {
+  exchangeCodeForSession(authCode, codeVerifierFromStorage);
+} else {
+  // Handle case where code or code verifier is missing
+}
+Use code snippets with caution
+
+Summary
+The error "both auth code and code verifier should be non-empty" means that your application is trying to exchange an authorization code for a session without providing a valid auth code or code verifier, or both. This is common in OAuth 2.0 flows with PKCE. To fix this, ensure that you generate and store the code verifier correctly before initiating the authorization flow, and then retrieve it and use it along with the auth code when making the request to exchange for a session.
