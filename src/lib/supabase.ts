@@ -87,7 +87,10 @@ export const signInWithGoogle = async () => {
         localStorage.removeItem(key);
       }
     });
-
+    
+    // Clear any session data to ensure a clean login
+    await supabase.auth.signOut({ scope: 'local' });
+    
     // Generate a cryptographically secure code verifier (43-128 chars)
     const codeVerifier = generateCodeVerifier();
     console.log("Generated code verifier length:", codeVerifier.length);
@@ -98,50 +101,36 @@ export const signInWithGoogle = async () => {
     localStorage.setItem('auth_session_id', sessionId);
     console.log("Auth session ID:", sessionId);
 
-    // IMPORTANT: Set the PRIMARY code verifier in the official Supabase location
+    // Store the code verifier in ALL possible locations to ensure it's available
+    // The critical locations that Supabase checks
     localStorage.setItem('supabase.auth.code_verifier', codeVerifier);
-
-    // Create backup storage locations (but ensure the official one is set first)
-    const verifierKeys = [
-      'sb-pkce-verifier',             // Alternative key
-      `pkce_verifier_${sessionId}`,   // Session-specific key
-    ];
-
-    // Store backups
-    verifierKeys.forEach(key => {
-      localStorage.setItem(key, codeVerifier);
-      console.log(`Stored backup verifier in '${key}'`);
-    });
-
-    // Also store verifier in sessionStorage as a fallback
     sessionStorage.setItem('supabase.auth.code_verifier', codeVerifier);
-    console.log("Stored verifier in sessionStorage");
+    
+    // Backup locations
+    localStorage.setItem('sb-pkce-verifier', codeVerifier);
+    localStorage.setItem(`pkce_verifier_${sessionId}`, codeVerifier);
+    
+    // Set in a cookie as last resort (expires in 10 minutes)
+    document.cookie = `pkce_verifier=${encodeURIComponent(codeVerifier)};max-age=600;path=/;SameSite=Lax`;
+    
+    // Store in global window object as another fallback
+    try {
+      (window as any).__PKCE_VERIFIER__ = codeVerifier;
+    } catch (e) {
+      console.error("Could not store verifier in window object", e);
+    }
 
     // Record timestamp for debugging timing issues
     localStorage.setItem('auth_redirect_time', Date.now().toString());
 
     // Verify primary storage location is set correctly
     const storedVerifier = localStorage.getItem('supabase.auth.code_verifier');
-    console.log("PRIMARY VERIFIER CHECK:");
-    console.log(`- supabase.auth.code_verifier: length=${storedVerifier?.length || 0}, prefix=${storedVerifier?.substring(0, 5) || 'N/A'}`);
-
-    if (!storedVerifier || storedVerifier.length < 43) {
-      console.error("WARNING: Code verifier not properly stored before redirect!");
-      // Emergency recovery
-      const backupVerifier = sessionStorage.getItem('supabase.auth.code_verifier');
-      if (backupVerifier && backupVerifier.length >= 43) {
-        localStorage.setItem('supabase.auth.code_verifier', backupVerifier);
-        console.log("Recovered verifier from sessionStorage");
-      }
+    if (!storedVerifier || storedVerifier !== codeVerifier) {
+      console.error("WARNING: Code verifier not properly stored! This will cause auth to fail");
+      throw new Error("Browser storage issue - please enable cookies and local storage");
     }
-
-    // Add verification of storage event listeners
-    const storageHandler = (e) => {
-      if (e.key === 'supabase.auth.code_verifier') {
-        console.log("Storage event detected on code_verifier", e.newValue ? "set" : "removed");
-      }
-    };
-    window.addEventListener('storage', storageHandler);
+    
+    console.log("Storage verification complete - verifier stored correctly");
 
     // Initiate OAuth flow with explicit code verifier
     return await supabase.auth.signInWithOAuth({
@@ -152,12 +141,15 @@ export const signInWithGoogle = async () => {
           access_type: 'offline',
           prompt: 'consent'
         },
+        // Pass the verifier explicitly to ensure it's used
         codeVerifier: codeVerifier,
         skipBrowserRedirect: false
       }
     });
   } catch (error) {
     console.error("Error in signInWithGoogle:", error);
+    // Remove failed auth data
+    localStorage.removeItem('supabase.auth.code_verifier');
     throw error;
   }
 };

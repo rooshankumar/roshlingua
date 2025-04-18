@@ -1,4 +1,3 @@
-
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/lib/supabase';
@@ -13,7 +12,7 @@ const AuthCodeHandler = () => {
     const url = new URL(window.location.href);
     const code = url.searchParams.get('code');
     const state = url.searchParams.get('state');
-    
+
     if (code) {
       console.log("Detected code parameter, handling OAuth callback...");
       console.log("Code:", code.substring(0, 5) + "...");
@@ -21,14 +20,112 @@ const AuthCodeHandler = () => {
 
       const handleAuthWithCode = async () => {
         try {
-          // Check for code verifier in localStorage with the exact key Supabase uses
-          const codeVerifier = localStorage.getItem('supabase.auth.code_verifier');
+          // Try multiple sources for the code verifier
+          console.log("Checking for code verifier...");
+          console.log("localStorage keys:", Object.keys(localStorage));
+
+          // Get session ID if available
+          const sessionId = url.searchParams.get('session_id');
+
+          // Check multiple locations for code verifier
+          let codeVerifier = null;
+
+          // 1. Try standard Supabase location first
+          codeVerifier = localStorage.getItem('supabase.auth.code_verifier');
+
+          // 2. Try session-specific keys
+          if (!codeVerifier && sessionId) {
+            codeVerifier = localStorage.getItem(`pkce_verifier_${sessionId}`);
+            if (codeVerifier) {
+              console.log("Found verifier in session-specific key");
+              // Copy to standard location
+              localStorage.setItem('supabase.auth.code_verifier', codeVerifier);
+            }
+          }
+
+          // 3. Try alternative keys
+          if (!codeVerifier) {
+            const alternativeKeys = ['sb-pkce-verifier', 'pkce-verifier'];
+            for (const key of alternativeKeys) {
+              const value = localStorage.getItem(key);
+              if (value) {
+                console.log(`Found verifier in ${key}`);
+                codeVerifier = value;
+                localStorage.setItem('supabase.auth.code_verifier', value);
+                break;
+              }
+            }
+          }
+
+          // 4. Try sessionStorage
+          if (!codeVerifier) {
+            codeVerifier = sessionStorage.getItem('supabase.auth.code_verifier');
+            if (codeVerifier) {
+              console.log("Found verifier in sessionStorage");
+              localStorage.setItem('supabase.auth.code_verifier', codeVerifier);
+            }
+          }
+
+          // 5. Try window object
+          if (!codeVerifier) {
+            try {
+              const windowVerifier = (window as any).__PKCE_VERIFIER__;
+              if (windowVerifier) {
+                console.log("Found verifier in window object");
+                codeVerifier = windowVerifier;
+                localStorage.setItem('supabase.auth.code_verifier', codeVerifier);
+              }
+            } catch (e) {
+              console.error("Error accessing window object", e);
+            }
+          }
+
+          // 6. Try cookie as last resort
+          if (!codeVerifier) {
+            const cookies = document.cookie.split(';');
+            for (const cookie of cookies) {
+              const [name, value] = cookie.trim().split('=');
+              if (name === 'pkce_verifier') {
+                console.log("Found verifier in cookie");
+                codeVerifier = decodeURIComponent(value);
+                localStorage.setItem('supabase.auth.code_verifier', codeVerifier);
+                break;
+              }
+            }
+          }
+
           console.log("Code verifier exists:", !!codeVerifier);
           console.log("Code verifier length:", codeVerifier?.length || 0);
-          console.log("localStorage keys:", Object.keys(localStorage));
-          
+
           if (!codeVerifier) {
-            console.error("Missing code verifier in localStorage");
+            console.error("Missing code verifier in all storage locations");
+
+            // Attempt direct URL processing as fallback
+            try {
+              console.log("Attempting to process the URL directly with Supabase...");
+              const { data: urlData } = await supabase.auth.getSessionFromUrl();
+
+              if (urlData?.session) {
+                console.log("Successfully got session from URL directly");
+                // Success! Continue with this session
+                const { data: profile } = await supabase
+                  .from('profiles')
+                  .select('onboarding_completed')
+                  .eq('id', urlData.session.user.id)
+                  .maybeSingle();
+
+                // Redirect based on profile status
+                if (profile?.onboarding_completed) {
+                  window.location.href = '/dashboard';
+                } else {
+                  window.location.href = '/onboarding';
+                }
+                return;
+              }
+            } catch (urlError) {
+              console.error("URL processing failed:", urlError);
+            }
+
             toast({
               variant: "destructive",
               title: "Authentication Failed",
@@ -37,16 +134,10 @@ const AuthCodeHandler = () => {
             navigate('/auth', { replace: true });
             return;
           }
-          
-          // Ensure both code and verifier are strings and not empty
+
+          // Ensure both code and verifier are valid
           if (typeof code !== 'string' || !code.trim() || typeof codeVerifier !== 'string' || !codeVerifier.trim()) {
-            console.error("Code or code verifier is invalid:", {
-              codeType: typeof code,
-              codeEmpty: !code?.trim(),
-              verifierType: typeof codeVerifier,
-              verifierEmpty: !codeVerifier?.trim()
-            });
-            
+            console.error("Code or code verifier is invalid");
             toast({
               variant: "destructive",
               title: "Authentication Failed",
@@ -55,9 +146,11 @@ const AuthCodeHandler = () => {
             navigate('/auth', { replace: true });
             return;
           }
-          
+
           console.log("Exchanging auth code for session...");
-          
+          console.log("Code prefix:", code.substring(0, 5) + "...");
+          console.log("Verifier prefix:", codeVerifier.substring(0, 5) + "...");
+
           // Use the Supabase function to exchange the code for a session
           const { data, error } = await supabase.auth.exchangeCodeForSession(code, codeVerifier);
 
