@@ -26,7 +26,6 @@ export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
     },
     pkceTimeout: 60 * 60, // 60 minutes to complete authentication (increased further)
     pkceLeeway: 300, // 5 minutes leeway for clock skew (increased for safety)
-    detectSessionInUrl: true,
     // Ensure clean URL format for callback with correct domain
     redirectTo: window.location.hostname.includes('vercel.app')
       ? 'https://roshlingua.vercel.app/auth/callback' 
