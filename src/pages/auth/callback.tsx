@@ -13,8 +13,17 @@ const Callback = () => {
       try {
         console.log("===== AUTH CALLBACK PROCESSING =====");
 
-        // The page URL contains the code parameter after OAuth redirect
+        // Check for error parameter in URL
         const url = new URL(window.location.href);
+        const error = url.searchParams.get('error');
+        const errorDescription = url.searchParams.get('error_description');
+        
+        if (error) {
+          console.error(`Auth error: ${error} - ${errorDescription}`);
+          throw new Error(`OAuth error: ${errorDescription || error}`);
+        }
+
+        // The page URL contains the code parameter after OAuth redirect
         const code = url.searchParams.get('code');
 
         if (!code) {
@@ -23,6 +32,14 @@ const Callback = () => {
         }
 
         console.log("Found auth code in URL:", code.substring(0, 5) + "...");
+        
+        // Check if code verifier exists before attempting exchange
+        const codeVerifier = localStorage.getItem('supabase.auth.code_verifier');
+        console.log("Code verifier exists:", !!codeVerifier);
+        
+        if (!codeVerifier) {
+          console.warn("No code verifier found, auth will likely fail");
+        }
 
         // Let Supabase handle the exchange automatically
         // The session setup function reads the URL and uses stored code verifier

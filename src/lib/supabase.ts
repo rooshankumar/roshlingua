@@ -67,28 +67,7 @@ export const signInWithGoogle = async () => {
     // First, clear any existing auth data to ensure a clean login state
     await supabase.auth.signOut({ scope: 'local' });
     
-    // Generate a secure code verifier that meets PKCE requirements
-    const array = new Uint8Array(64);
-    crypto.getRandomValues(array);
-
-    // Convert to base64url encoding (RFC 4648)
-    let base64 = '';
-    for (let i = 0; i < array.length; i++) {
-      base64 += String.fromCharCode(array[i]);
-    }
-    base64 = btoa(base64);
-
-    // Make URL-safe per RFC 4648 §5
-    const codeVerifier = base64
-      .replace(/\+/g, '-')
-      .replace(/\//g, '_')
-      .replace(/=+$/, '')
-      .substring(0, 64);
-
-    console.log("Code verifier generated:", codeVerifier.substring(0, 5) + "...");
-    console.log("Code verifier length:", codeVerifier.length);
-
-    // Now initiate the OAuth flow - let Supabase handle the code verifier storage
+    // Let Supabase handle the PKCE flow completely (code verifier generation and storage)
     return await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
@@ -96,9 +75,7 @@ export const signInWithGoogle = async () => {
         queryParams: {
           access_type: 'offline',
           prompt: 'consent'
-        },
-        // Do NOT manually set skipBrowserRedirect, let Supabase handle the flow
-        // Do NOT manually override codeVerifier, Supabase will handle this
+        }
       }
     });
   } catch (error) {
