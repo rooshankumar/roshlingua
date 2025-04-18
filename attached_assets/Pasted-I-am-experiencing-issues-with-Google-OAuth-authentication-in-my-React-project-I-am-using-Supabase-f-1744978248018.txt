@@ -1,0 +1,42 @@
+I am experiencing issues with Google OAuth authentication in my React project. I am using Supabase for authentication, and my project is hosted on Vercel with the production domain https://roshlingua.vercel.app/. Email/password authentication is working correctly, but Google OAuth is not.
+
+I have already confirmed the following:
+
+The redirection URLs are correctly configured in both the Google Cloud Console for my OAuth 2.0 client ID and in the Supabase Auth settings under 'URL Configuration' (Redirect URLs).
+Here are the steps to reproduce the issue (please guide me through them in the code):
+
+Click the 'Sign in with Google' button in my application.
+I am redirected to the Google sign-in page.
+After selecting my Google account and granting permissions, I am redirected back to my application (or at least I expect to be). Please help me trace where the redirection is going and if any errors are occurring at this stage.
+To help diagnose the problem, please assist me in checking the following aspects of my code and configuration:
+
+Supabase Client Initialization:
+
+Locate where I initialize the Supabase client in my React code (likely in main.tsx or a similar entry point).
+Verify that the supabaseUrl and supabaseKey are being correctly passed, ideally using environment variables for security.
+Could there be any Vercel-specific considerations for these environment variables? For instance, how should I ensure they are correctly accessed in my deployed environment?
+Google Sign-in Function:
+
+Find the function in my React code that handles the Google sign-in action. It likely uses supabase.auth.signInWithOAuth({ provider: 'google' }).
+Check if I am passing any specific options to this function, particularly the redirectTo URL. Is it correctly pointing to my production domain https://roshlingua.vercel.app/ or the specific callback route within it?
+Redirection URL Handling:
+
+Identify the route or component in my React application that is supposed to handle the callback after successful Google authentication. This is the URL I configured in Google Cloud and Supabase (e.g., https://roshlingua.vercel.app/auth/callback or a similar route).
+Help me add logging within this callback route to see if it's being hit and if any data (like session information or error messages) is being received from Supabase.
+Are there any specific steps needed to process the authentication callback in a React application with react-router-dom deployed on Vercel when using Supabase?
+Supabase Auth Settings:
+
+Guide me on how to double-check the Google Auth Provider settings in my Supabase project dashboard.
+Ensure that the Client ID from my Google Cloud Console is correctly entered in the Supabase settings. Is there anything else I should verify in the Supabase settings for Google OAuth?
+Google Cloud Console Configuration:
+
+Remind me to verify the Authorized JavaScript origins and Authorized redirect URIs in my Google Cloud Console's OAuth 2.0 client ID settings.
+Specifically, should my Vercel production domain https://roshlingua.vercel.app/ and potentially any staging or preview URLs be included in both? What about the callback route (e.g., https://roshlingua.vercel.app/auth/callback) - where should this be added?
+Error Messages:
+
+Check the browser's developer console (Network tab and Console tab) for any error messages related to the Google sign-in or redirection process. Help me understand any errors I might be seeing.
+Check the Supabase logs in the dashboard for any authentication-related errors.
+Vercel Environment:
+
+Are there any known issues or specific configurations required when using Google OAuth with Supabase in a Vercel environment? For example, any specific environment variable handling or serverless function considerations?
+Please provide me with code snippets or guidance on how to implement these checks and add logging to help me pinpoint the issue. Let's work together step-by-step to get Google OAuth working correctly in my application on Vercel."
