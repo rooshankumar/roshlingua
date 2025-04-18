@@ -24,7 +24,6 @@ export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
       path: '/',
       sameSite: 'lax'
     },
-    // Ensure redirect URL is properly formatted
     redirectTo: `${window.location.origin}/auth/callback`,
   },
   global: {
@@ -64,34 +63,17 @@ export const signInWithGoogle = async () => {
   try {
     console.log("===== INITIATING GOOGLE SIGN-IN =====");
 
-    // First, clear any existing auth data to ensure a clean login state
+    // First, clear any existing auth data
     await supabase.auth.signOut({ scope: 'local' });
-    
-    // Import and use the PKCE helper to ensure code verifier is captured and persisted
-    const { capturePKCEVerifier, clearPKCEVerifier, generateVerifier, storePKCEVerifier } = await import('@/utils/pkceHelper');
-    
-    // Clear any existing PKCE verifiers
-    clearPKCEVerifier();
-    
-    // Generate our own verifier and store it before Supabase does
-    const customVerifier = generateVerifier();
-    console.log("Pre-generated PKCE verifier:", customVerifier.substring(0, 5) + "...");
-    storePKCEVerifier(customVerifier);
-    
-    // Force set the verifier in localStorage where Supabase expects it
-    localStorage.setItem('supabase.auth.code_verifier', customVerifier);
-    
-    // Set up to capture the PKCE verifier when Supabase generates it
-    capturePKCEVerifier();
-    
-    // Verify verifier before redirect
-    const finalVerifier = localStorage.getItem('supabase.auth.code_verifier');
-    console.log("Pre-redirect verifier check:", !!finalVerifier);
-    if (finalVerifier) {
-      console.log("Verifier length:", finalVerifier.length);
-    }
-    
-    // Let Supabase handle the PKCE flow
+
+    // Import PKCE helper
+    const { setupPKCEVerifier } = await import('@/utils/pkceHelper');
+
+    // Generate and store our own verifier BEFORE initiating OAuth flow
+    const verifier = setupPKCEVerifier();
+    console.log("Generated PKCE verifier:", verifier.substring(0, 5) + "...");
+
+    // Let Supabase handle the OAuth flow
     return await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
