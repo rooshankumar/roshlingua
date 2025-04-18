@@ -67,7 +67,16 @@ export const signInWithGoogle = async () => {
     // First, clear any existing auth data to ensure a clean login state
     await supabase.auth.signOut({ scope: 'local' });
     
-    // Let Supabase handle the PKCE flow completely (code verifier generation and storage)
+    // Import and use the PKCE helper to ensure code verifier is captured and persisted
+    const { capturePKCEVerifier, clearPKCEVerifier } = await import('@/utils/pkceHelper');
+    
+    // Clear any existing PKCE verifiers
+    clearPKCEVerifier();
+    
+    // Set up to capture the PKCE verifier when Supabase generates it
+    capturePKCEVerifier();
+    
+    // Let Supabase handle the PKCE flow
     return await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {

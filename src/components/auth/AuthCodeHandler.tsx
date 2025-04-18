@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/lib/supabase';
+import { getPKCEVerifier, storePKCEVerifier } from '@/utils/pkceHelper';
 
 const AuthCodeHandler = () => {
   const navigate = useNavigate();
@@ -17,27 +18,43 @@ const AuthCodeHandler = () => {
       const error = url.searchParams.get('error');
       
       if (hasAuthParams) {
+        console.log("===== AUTH CODE HANDLER =====");
         console.log("Detected authentication parameters");
         console.log("Auth code present:", !!code);
         console.log("Auth error present:", !!error);
         
-        // Check for code verifier and ensure it's synchronized across storage mechanisms
-        const codeVerifier = localStorage.getItem('supabase.auth.code_verifier') || 
-                             sessionStorage.getItem('supabase.auth.code_verifier');
-        
-        console.log("Code verifier exists:", !!codeVerifier);
-        
-        // If found in any storage, sync it to all storage options
-        if (codeVerifier) {
-          try {
-            localStorage.setItem('supabase.auth.code_verifier', codeVerifier);
-            sessionStorage.setItem('supabase.auth.code_verifier', codeVerifier);
-            document.cookie = `pkce_verifier=${codeVerifier};max-age=600;path=/;SameSite=Lax`;
-            console.log("Synchronized code verifier across storage mechanisms");
-          } catch (err) {
-            console.error("Failed to sync code verifier:", err);
-          }
+        if (error) {
+          console.error(`Auth error: ${error} - ${url.searchParams.get('error_description')}`);
+          toast({
+            variant: "destructive",
+            title: "Authentication Error",
+            description: url.searchParams.get('error_description') || error
+          });
+          navigate('/auth', { replace: true });
+          return;
         }
+        
+        if (!code) {
+          console.error("Auth code missing from URL");
+          return;
+        }
+        
+        // Get code verifier from all possible storage locations
+        const codeVerifier = getPKCEVerifier();
+        
+        if (!codeVerifier) {
+          console.error("PKCE code verifier not found in any storage location");
+          toast({
+            variant: "destructive",
+            title: "Authentication Failed",
+            description: "Session verification failed. Please try again."
+          });
+          navigate('/auth', { replace: true });
+          return;
+        }
+        
+        // Store code verifier in all storage mechanisms to ensure availability
+        storePKCEVerifier(codeVerifier);
         
         // If we're not already in callback page, redirect there
         if (!window.location.pathname.includes('/auth/callback')) {
