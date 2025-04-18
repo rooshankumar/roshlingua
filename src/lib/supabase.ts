@@ -13,10 +13,10 @@ export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
     autoRefreshToken: true,
     persistSession: true,
     detectSessionInUrl: true,
-    flowType: 'pkce', // Use PKCE flow for better security
+    flowType: 'pkce',
     storage: window.localStorage,
     storageKey: 'supabase.auth.token',
-    debug: true, // Enable debug logging
+    debug: true,
     cookieOptions: {
       name: 'sb-auth-token',
       lifetime: 60 * 60 * 8,
@@ -24,31 +24,20 @@ export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
       path: '/',
       sameSite: 'lax'
     },
-    pkceTimeout: 60 * 60, // 60 minutes to complete authentication (increased further)
-    pkceLeeway: 300, // 5 minutes leeway for clock skew (increased for safety)
-    // Ensure clean URL format for callback with correct domain
-    redirectTo: window.location.hostname.includes('vercel.app')
-      ? `https://${window.location.hostname}/auth/callback` 
-      : `${window.location.origin}/auth/callback`,
-    // Additional localStorage keys where Supabase might store data
-    storageOptions: {
-      pkceKey: 'supabase.auth.code_verifier', // Explicitly set PKCE verifier key
-    }
+    // Ensure redirect URL is properly formatted
+    redirectTo: `${window.location.origin}/auth/callback`,
   },
-  // Enhanced error handling and debug logging
   global: {
     headers: {
       'X-Client-Info': 'supabase-js/2.x'
     },
     fetch: (...args) => {
-      // Log the request for debugging
       const request = args[0] as Request;
       if (request && request.url && request.url.includes('auth')) {
         console.log(`Supabase auth request: ${request.method} ${request.url.split('?')[0]}`);
       }
 
       return fetch(...args).then(response => {
-        // Log detailed auth response for debugging
         if (response.url && response.url.includes('auth')) {
           console.log(`Supabase auth response: ${response.status} ${response.statusText}`);
           if (!response.ok) {
@@ -57,7 +46,6 @@ export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
             });
           }
         }
-
         return response;
       }).catch(error => {
         console.error('Supabase fetch error:', error);
@@ -73,121 +61,62 @@ export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
 });
 
 export const signInWithGoogle = async () => {
-  const redirectUrl = `${window.location.origin}/auth/callback`;
-
   try {
     console.log("===== INITIATING GOOGLE SIGN-IN =====");
-    console.log("Current hostname:", window.location.hostname);
-    console.log("Redirect URL:", redirectUrl);
 
-    // First, clear any existing code verifiers to avoid conflicts
-    Object.keys(localStorage).forEach(key => {
-      if (key.includes('code_verifier') || key.includes('verifier')) {
-        console.log(`Clearing old verifier key: ${key}`);
-        localStorage.removeItem(key);
-      }
-    });
-    
-    // Clear any session data to ensure a clean login
+    // First, clear any existing auth data to ensure a clean login state
+    localStorage.removeItem('supabase.auth.code_verifier');
     await supabase.auth.signOut({ scope: 'local' });
-    
-    // Generate a cryptographically secure code verifier (43-128 chars)
-    const codeVerifier = generateCodeVerifier();
-    console.log("Generated code verifier length:", codeVerifier.length);
-    console.log("Verifier first 5 chars:", codeVerifier.substring(0, 5));
 
-    // Create a unique session ID to identify this specific login attempt
-    const sessionId = `google-auth-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;
-    localStorage.setItem('auth_session_id', sessionId);
-    console.log("Auth session ID:", sessionId);
+    // Generate a secure code verifier that meets PKCE requirements
+    const array = new Uint8Array(64);
+    crypto.getRandomValues(array);
 
-    // Store the code verifier in ALL possible locations to ensure it's available
-    // The critical locations that Supabase checks
-    localStorage.setItem('supabase.auth.code_verifier', codeVerifier);
-    sessionStorage.setItem('supabase.auth.code_verifier', codeVerifier);
-    
-    // Backup locations
-    localStorage.setItem('sb-pkce-verifier', codeVerifier);
-    localStorage.setItem(`pkce_verifier_${sessionId}`, codeVerifier);
-    
-    // Set in a cookie as last resort (expires in 10 minutes)
-    document.cookie = `pkce_verifier=${encodeURIComponent(codeVerifier)};max-age=600;path=/;SameSite=Lax`;
-    
-    // Store in global window object as another fallback
-    try {
-      (window as any).__PKCE_VERIFIER__ = codeVerifier;
-    } catch (e) {
-      console.error("Could not store verifier in window object", e);
+    // Convert to base64url encoding (RFC 4648)
+    let base64 = '';
+    for (let i = 0; i < array.length; i++) {
+      base64 += String.fromCharCode(array[i]);
     }
+    base64 = btoa(base64);
 
-    // Record timestamp for debugging timing issues
-    localStorage.setItem('auth_redirect_time', Date.now().toString());
+    // Make URL-safe per RFC 4648 §5
+    const codeVerifier = base64
+      .replace(/\+/g, '-')
+      .replace(/\//g, '_')
+      .replace(/=+$/, '')
+      .substring(0, 64);
 
-    // Verify primary storage location is set correctly
+    // Store code verifier in LOCAL storage - this is critical
+    localStorage.setItem('supabase.auth.code_verifier', codeVerifier);
+    console.log("Code verifier stored:", codeVerifier.substring(0, 5) + "...");
+    console.log("Code verifier length:", codeVerifier.length);
+
+    // Double-check it was stored properly
     const storedVerifier = localStorage.getItem('supabase.auth.code_verifier');
     if (!storedVerifier || storedVerifier !== codeVerifier) {
-      console.error("WARNING: Code verifier not properly stored! This will cause auth to fail");
-      throw new Error("Browser storage issue - please enable cookies and local storage");
+      throw new Error("Failed to store code verifier - authentication will fail");
     }
-    
-    console.log("Storage verification complete - verifier stored correctly");
 
-    // Initiate OAuth flow with explicit code verifier
+    // Now initiate the OAuth flow with explicit code verifier
     return await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: `${redirectUrl}?session_id=${sessionId}`,
+        redirectTo: `${window.location.origin}/auth/callback`,
         queryParams: {
           access_type: 'offline',
           prompt: 'consent'
         },
-        // Pass the verifier explicitly to ensure it's used
+        // Explicitly pass the verifier with the request
         codeVerifier: codeVerifier,
         skipBrowserRedirect: false
       }
     });
   } catch (error) {
     console.error("Error in signInWithGoogle:", error);
-    // Remove failed auth data
     localStorage.removeItem('supabase.auth.code_verifier');
     throw error;
   }
 };
-
-// Helper function to generate a robust random string for the code verifier
-// Following RFC 7636 PKCE specifications
-function generateCodeVerifier() {
-  // Generate random bytes (using 64 bytes for strong security)
-  const array = new Uint8Array(64);
-  crypto.getRandomValues(array);
-
-  // Convert to base64url encoding (RFC 4648)
-  // Use a more robust approach to avoid potential issues with apply() and large arrays
-  let base64 = '';
-  for (let i = 0; i < array.length; i++) {
-    base64 += String.fromCharCode(array[i]);
-  }
-  base64 = btoa(base64);
-
-  // Make URL-safe by replacing characters per RFC 4648 §5
-  const urlSafe = base64
-    .replace(/\+/g, '-')
-    .replace(/\//g, '_')
-    .replace(/=+$/, '');
-
-  // Ensure length is between 43-128 characters per OAuth PKCE spec (RFC 7636)
-  // We'll keep it to 64 characters which is secure but not excessively long
-  const verifier = urlSafe.substring(0, 64);
-
-  // Final validation - should match ^[A-Za-z0-9-._~]{43,128}$ per RFC 7636
-  const validPKCEPattern = /^[A-Za-z0-9\-._~]{43,128}$/;
-  if (!validPKCEPattern.test(verifier)) {
-    console.error("Generated verifier doesn't match PKCE pattern! Retrying...");
-    return generateCodeVerifier(); // Recursively retry if invalid
-  }
-
-  return verifier;
-}
 
 export const signOut = async () => {
   return await supabase.auth.signOut();
