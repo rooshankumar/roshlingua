@@ -332,6 +332,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       console.log("===== INITIATING GOOGLE LOGIN =====");
       
+      // Clear previous verifier data and auth errors
+      localStorage.removeItem('auth_error_type');
+      localStorage.removeItem('auth_error_message');
+      
       // Handle the login using the centralized function in supabase.ts
       const result = await signInWithGoogle();
       
@@ -341,16 +345,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       
       // Additional application-specific logic before redirect
       console.log("Received OAuth URL successfully");
-      console.log("Redirecting to Google auth...");
       
-      // Final storage check before redirecting
+      // Ensure code verifier is properly stored before redirect
       const finalVerifier = localStorage.getItem('supabase.auth.code_verifier');
-      console.log("Final check - code verifier:", !!finalVerifier);
+      console.log("FINAL REDIRECT CHECK - code verifier exists:", !!finalVerifier);
+      
       if (finalVerifier) {
         console.log("Verifier length:", finalVerifier.length);
         console.log("Verifier prefix:", finalVerifier.substring(0, 5) + "...");
+        
+        // Make 100% sure verifier is also in sessionStorage as backup
+        sessionStorage.setItem('supabase.auth.code_verifier', finalVerifier);
+        
+        // Store verifier in cookie as last resort backup (expires in 5 minutes)
+        document.cookie = `pkce_verifier=${finalVerifier};max-age=300;path=/;SameSite=Lax`;
+        console.log("Stored verifier backup in sessionStorage and cookie");
       } else {
-        console.warn("WARNING: No code verifier found before redirect!");
+        console.error("CRITICAL: No code verifier found before redirect!");
         
         // Emergency recovery - check if our function stored it elsewhere
         const sessionId = localStorage.getItem('auth_session_id');
@@ -359,9 +370,34 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           if (backupVerifier) {
             console.log("Found backup verifier, restoring to standard location");
             localStorage.setItem('supabase.auth.code_verifier', backupVerifier);
+            sessionStorage.setItem('supabase.auth.code_verifier', backupVerifier);
+            // Also in cookie
+            document.cookie = `pkce_verifier=${backupVerifier};max-age=300;path=/;SameSite=Lax`;
+          } else {
+            // Try other backup locations
+            const alternateVerifier = localStorage.getItem('sb-pkce-verifier');
+            if (alternateVerifier) {
+              console.log("Found alternate verifier, restoring to standard location");
+              localStorage.setItem('supabase.auth.code_verifier', alternateVerifier);
+              sessionStorage.setItem('supabase.auth.code_verifier', alternateVerifier);
+              document.cookie = `pkce_verifier=${alternateVerifier};max-age=300;path=/;SameSite=Lax`;
+            } else {
+              console.error("All recovery attempts failed. Authentication likely to fail.");
+              // Create a new verifier as last resort
+              const emergencyVerifier = Math.random().toString(36).substring(2) + 
+                Math.random().toString(36).substring(2) + 
+                Math.random().toString(36).substring(2) + 
+                Math.random().toString(36).substring(2);
+              localStorage.setItem('supabase.auth.code_verifier', emergencyVerifier);
+              sessionStorage.setItem('supabase.auth.code_verifier', emergencyVerifier);
+              document.cookie = `pkce_verifier=${emergencyVerifier};max-age=300;path=/;SameSite=Lax`;
+              console.log("Created emergency verifier as last resort");
+            }
           }
         }
       }
+      
+      console.log("Redirecting to Google auth...");
       
       // Perform redirect
       window.location.href = result.data.url;

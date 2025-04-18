@@ -78,12 +78,26 @@ const Callback = () => {
           }
         }
         
-        // 2. Try standard Supabase location
+        // 2. Try standard Supabase location - this is the primary source
         if (!codeVerifier) {
           const standardVerifier = localStorage.getItem('supabase.auth.code_verifier');
           if (standardVerifier) {
             console.log("Found verifier in standard Supabase location");
             codeVerifier = standardVerifier;
+          } else {
+            console.warn("WARNING: No verifier found in primary Supabase location!");
+          }
+        }
+        
+        // Look for verifier in sessionStorage as fallback
+        if (!codeVerifier) {
+          const sessionStorageVerifier = sessionStorage.getItem('supabase.auth.code_verifier');
+          if (sessionStorageVerifier) {
+            console.log("Found verifier in sessionStorage");
+            codeVerifier = sessionStorageVerifier;
+            // Restore to localStorage for Supabase to find it
+            localStorage.setItem('supabase.auth.code_verifier', sessionStorageVerifier);
+            console.log("Restored verifier to localStorage from sessionStorage");
           }
         }
         
@@ -102,6 +116,9 @@ const Callback = () => {
             if (value) {
               console.log(`Found verifier in key: ${key}`);
               codeVerifier = value;
+              // Important: also set to the primary location for Supabase to find
+              localStorage.setItem('supabase.auth.code_verifier', value);
+              console.log("Copied verifier to primary Supabase location");
               break;
             }
           }
