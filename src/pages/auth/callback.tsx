@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/lib/supabase';
 import { useToast } from '@/hooks/use-toast';
-import { exchangeAuthCode, getPKCEVerifier, debugPKCEState } from '@/utils/pkceHelper';
+import { exchangeAuthCode, getPKCEVerifier, debugPKCEState, clearPKCEVerifier, storePKCEVerifier } from '@/utils/pkceHelper';
 
 const Callback = () => {
   const navigate = useNavigate();
@@ -12,9 +12,71 @@ const Callback = () => {
   const [errorDetails, setErrorDetails] = useState<string | null>(null);
 
   useEffect(() => {
+    const scanStorageForVerifier = () => {
+      console.log("Scanning all storage for verifier...");
+      const potentialVerifiers = new Map<string, string>();
+      
+      // Check all localStorage
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key) {
+          const value = localStorage.getItem(key);
+          if (value && value.length > 30) {
+            console.log(`Found potential localStorage verifier: ${key}`);
+            potentialVerifiers.set(key, value);
+          }
+        }
+      }
+      
+      // Check all sessionStorage
+      for (let i = 0; i < sessionStorage.length; i++) {
+        const key = sessionStorage.key(i);
+        if (key) {
+          const value = sessionStorage.getItem(key);
+          if (value && value.length > 30) {
+            console.log(`Found potential sessionStorage verifier: ${key}`);
+            potentialVerifiers.set(key, value);
+          }
+        }
+      }
+      
+      // Check all cookies
+      document.cookie.split(';').forEach(cookie => {
+        const [name, value] = cookie.trim().split('=');
+        if (value && value.length > 30) {
+          console.log(`Found potential cookie verifier: ${name}`);
+          potentialVerifiers.set(`cookie:${name}`, value);
+        }
+      });
+      
+      // Sort by key preference
+      const pkceKeys = [...potentialVerifiers.keys()].filter(k => 
+        k.includes('code_verifier') || k.includes('pkce') || k.includes('verifier')
+      );
+      
+      if (pkceKeys.length > 0) {
+        const bestKey = pkceKeys[0];
+        const verifier = potentialVerifiers.get(bestKey)!;
+        console.log(`Using verifier from ${bestKey}`);
+        localStorage.setItem('supabase.auth.code_verifier', verifier);
+        return verifier;
+      }
+      
+      // If no PKCE keys found but we have other potential values, use the first one
+      if (potentialVerifiers.size > 0) {
+        const [key, value] = potentialVerifiers.entries().next().value;
+        console.log(`Using verifier from ${key} as last resort`);
+        localStorage.setItem('supabase.auth.code_verifier', value);
+        return value;
+      }
+      
+      return null;
+    };
+
     const handleAuthCallback = async () => {
       try {
         console.log("===== AUTH CALLBACK PROCESSING =====");
+        console.log("URL:", window.location.href);
         
         // Run diagnostic checks first
         const diagnostics = debugPKCEState();
@@ -41,29 +103,50 @@ const Callback = () => {
 
         console.log("Found auth code in URL:", code.substring(0, 5) + "...", "length:", code.length);
         
-        // Verify PKCE verifier exists
+        // Try to get the verifier from our standard function first
         let verifier = getPKCEVerifier();
         
-        // Last-ditch effort if no verifier is found
+        // If no verifier found, try deeper scan
         if (!verifier) {
-          console.error("No code verifier found in any storage location");
-          console.log("Attempting emergency verifier recovery...");
+          console.error("No code verifier found through standard function");
+          console.log("Attempting deeper storage scan...");
           
-          // Try to extract from cookies directly
-          const pkceVerifierCookie = document.cookie.split(';')
-            .find(c => c.trim().startsWith('pkce_verifier='));
+          verifier = scanStorageForVerifier();
+          
+          // Last-ditch direct cookie check
+          if (!verifier) {
+            console.error("Deep scan failed, trying direct cookie parse...");
             
-          if (pkceVerifierCookie) {
-            verifier = pkceVerifierCookie.split('=')[1];
-            localStorage.setItem('supabase.auth.code_verifier', verifier);
-            console.log("Recovered verifier from direct cookie access");
-          } else {
+            // Try looking specifically for pkce cookies
+            for (const cookieName of ['pkce_verifier', 'supabase_code_verifier', 'sb-pkce-verifier']) {
+              const regex = new RegExp(`${cookieName}=([^;]+)`);
+              const match = document.cookie.match(regex);
+              if (match && match[1]) {
+                verifier = match[1];
+                console.log(`Extracted verifier directly from ${cookieName} cookie`);
+                localStorage.setItem('supabase.auth.code_verifier', verifier);
+                break;
+              }
+            }
+          }
+          
+          if (!verifier) {
             setErrorDetails("Missing security verifier");
             throw new Error("Authentication failed - missing verifier");
           }
         }
         
+        // Validate verifier
+        if (verifier.length < 20) {
+          console.error("Verifier is too short:", verifier.length);
+          setErrorDetails("Invalid security verifier");
+          throw new Error("Authentication failed - invalid verifier");
+        }
+        
         console.log("Using verifier, length:", verifier.length);
+        
+        // Make sure the verifier is stored in all locations
+        storePKCEVerifier(verifier);
         
         // Exchange code for session
         const { data, error: sessionError } = await exchangeAuthCode(code);
@@ -81,9 +164,11 @@ const Callback = () => {
         }
 
         console.log("Successfully authenticated!");
+        clearPKCEVerifier(); // Clear verifier after successful authentication
 
         // Check for existing profile
         try {
+          // Add Accept header to avoid 406 errors
           const { data: profile, error: profileError } = await supabase
             .from('profiles')
             .select('onboarding_completed')
@@ -130,6 +215,7 @@ const Callback = () => {
         }
       } catch (error: any) {
         console.error('Auth callback error:', error);
+        clearPKCEVerifier(); // Clear verifier on error
         
         toast({
           variant: "destructive", 

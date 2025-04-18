@@ -20,20 +20,38 @@ export const storePKCEVerifier = (verifier: string) => {
     return false;
   }
   
+  if (verifier.length < 20) {
+    console.error('[PKCE] Verifier is too short, must be at least 20 chars');
+    return false;
+  }
+  
   try {
     console.log('[PKCE] Storing verifier:', verifier.substring(0, 8) + '...', 'length:', verifier.length);
     
     // Store in localStorage (primary storage used by Supabase)
     localStorage.setItem('supabase.auth.code_verifier', verifier);
     
-    // Create backup storage locations
+    // Create backup storage locations with multiple naming patterns
     sessionStorage.setItem('supabase.auth.code_verifier', verifier);
     localStorage.setItem('pkce_verifier_backup', verifier);
+    localStorage.setItem('sb-pkce-verifier', verifier);
     
-    // Set a cookie as additional backup
+    // Add timestamps to help with debugging
+    const timestamp = Date.now();
+    localStorage.setItem('pkce_timestamp', timestamp.toString());
+    
+    // Create a session ID for tracking this auth attempt
+    const sessionId = Math.random().toString(36).substring(2);
+    localStorage.setItem('auth_session_id', sessionId);
+    localStorage.setItem(`pkce_verifier_${sessionId}`, verifier);
+    
+    // Set robust cookies as additional backup
     const secure = window.location.protocol === 'https:' ? 'Secure;' : '';
     document.cookie = `pkce_verifier=${verifier};max-age=600;path=/;SameSite=Lax;${secure}`;
+    document.cookie = `supabase_code_verifier=${verifier};max-age=600;path=/;SameSite=Lax;${secure}`;
+    document.cookie = `pkce_${sessionId}=${verifier.substring(0, 20)};max-age=600;path=/;SameSite=Lax;${secure}`;
     
+    console.log('[PKCE] Verifier stored in multiple locations successfully');
     return true;
   } catch (error) {
     console.error('[PKCE] Error storing verifier:', error);
@@ -43,40 +61,97 @@ export const storePKCEVerifier = (verifier: string) => {
 
 // Retrieve PKCE verifier from available storage
 export const getPKCEVerifier = () => {
+  console.log('[PKCE] Searching for PKCE verifier in all storage locations...');
+  
   // First try the primary location used by Supabase
   const verifier = localStorage.getItem('supabase.auth.code_verifier');
   
   if (verifier) {
     console.log('[PKCE] Found verifier in localStorage:', verifier.substring(0, 8) + '...', 'length:', verifier.length);
-    return verifier;
-  }
-  
-  // Try backup locations
-  const sessionVerifier = sessionStorage.getItem('supabase.auth.code_verifier');
-  const backupVerifier = localStorage.getItem('pkce_verifier_backup');
-  
-  // Get from cookie if needed
-  const cookies = document.cookie.split(';');
-  let cookieVerifier = null;
-  
-  for (const cookie of cookies) {
-    const [name, value] = cookie.trim().split('=');
-    if (name === 'pkce_verifier' && value) {
-      cookieVerifier = value;
-      break;
+    
+    // Verify it's a valid verifier (must be reasonably long)
+    if (verifier.length >= 20) {
+      // Ensure it's also stored in all backup locations
+      sessionStorage.setItem('supabase.auth.code_verifier', verifier);
+      localStorage.setItem('pkce_verifier_backup', verifier);
+      localStorage.setItem('sb-pkce-verifier', verifier);
+      
+      // Update cookies too
+      const secure = window.location.protocol === 'https:' ? 'Secure;' : '';
+      document.cookie = `pkce_verifier=${verifier};max-age=600;path=/;SameSite=Lax;${secure}`;
+      document.cookie = `supabase_code_verifier=${verifier};max-age=600;path=/;SameSite=Lax;${secure}`;
+      
+      return verifier;
+    } else {
+      console.warn('[PKCE] Found verifier is too short:', verifier.length);
     }
   }
   
-  // Use first available backup and restore to primary location
-  const recoveredVerifier = sessionVerifier || backupVerifier || cookieVerifier;
+  // Try ALL possible backup locations
+  const backups = {
+    'sessionStorage': sessionStorage.getItem('supabase.auth.code_verifier'),
+    'pkce_verifier_backup': localStorage.getItem('pkce_verifier_backup'),
+    'sb-pkce-verifier': localStorage.getItem('sb-pkce-verifier'),
+    'pkce_verifier_original': localStorage.getItem('pkce_verifier_original')
+  };
   
-  if (recoveredVerifier) {
-    console.log('[PKCE] Recovered verifier from backup:', recoveredVerifier.substring(0, 8) + '...', 'length:', recoveredVerifier.length);
-    localStorage.setItem('supabase.auth.code_verifier', recoveredVerifier);
-    return recoveredVerifier;
+  // Check session-specific backup
+  const sessionId = localStorage.getItem('auth_session_id');
+  if (sessionId) {
+    backups[`pkce_verifier_${sessionId}`] = localStorage.getItem(`pkce_verifier_${sessionId}`);
   }
   
-  console.warn('[PKCE] No verifier found in any storage location');
+  // Get from cookies
+  const cookies = document.cookie.split(';');
+  for (const cookie of cookies) {
+    const [name, value] = cookie.trim().split('=');
+    if ((name === 'pkce_verifier' || name === 'supabase_code_verifier') && value) {
+      backups[name] = value;
+    }
+    // Check session-specific cookie
+    if (sessionId && name === `pkce_${sessionId}`) {
+      backups[name] = value;
+    }
+  }
+  
+  // Log all found backups
+  console.log('[PKCE] Checking backups:', Object.keys(backups).filter(k => backups[k]).join(', '));
+  
+  // Find the first valid backup
+  for (const [source, value] of Object.entries(backups)) {
+    if (value && value.length >= 20) {
+      console.log(`[PKCE] Recovered verifier from ${source}:`, value.substring(0, 8) + '...', 'length:', value.length);
+      
+      // Restore to primary location
+      localStorage.setItem('supabase.auth.code_verifier', value);
+      
+      // Also restore to all other backup locations
+      sessionStorage.setItem('supabase.auth.code_verifier', value);
+      localStorage.setItem('pkce_verifier_backup', value);
+      localStorage.setItem('sb-pkce-verifier', value);
+      
+      // Update cookies
+      const secure = window.location.protocol === 'https:' ? 'Secure;' : '';
+      document.cookie = `pkce_verifier=${value};max-age=600;path=/;SameSite=Lax;${secure}`;
+      document.cookie = `supabase_code_verifier=${value};max-age=600;path=/;SameSite=Lax;${secure}`;
+      
+      return value;
+    }
+  }
+  
+  console.warn('[PKCE] No valid verifier found in any storage location');
+  
+  // Last resort - check localStorage for anything that looks like a verifier
+  const allLocalStorage = { ...localStorage };
+  for (const [key, value] of Object.entries(allLocalStorage)) {
+    if (typeof value === 'string' && value.length >= 40 && 
+        (key.includes('verifier') || key.includes('pkce') || key.includes('code'))) {
+      console.log('[PKCE] Found potential verifier in:', key);
+      localStorage.setItem('supabase.auth.code_verifier', value);
+      return value;
+    }
+  }
+  
   return null;
 };
 

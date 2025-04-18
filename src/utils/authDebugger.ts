@@ -1,4 +1,3 @@
-
 /**
  * Comprehensive auth debugging utility
  */
@@ -163,20 +162,62 @@ export const resetAndStartAuth = async () => {
   // 1. Sign out from Supabase
   console.log('1. Signing out...');
   await supabase.auth.signOut({ scope: 'global' });
-  
+
   // 2. Clear all stored auth data
   console.log('2. Clearing auth data...');
   clearAllAuthData();
-  
+
   // 3. Import necessary functions to re-initiate login
   console.log('3. Initiating fresh sign-in...');
   const { signInWithGoogle } = await import('@/lib/supabase');
   const result = await signInWithGoogle();
-  
+
   console.log('Sign-in initiated, URL generated:', !!result.data.url);
   console.groupEnd();
-  
+
   return result;
+};
+
+export const debugSupabaseAuth = () => {
+  console.group("Supabase Auth Debug");
+
+  // Check for session
+  const session = supabase.auth.session;
+  console.log("Has session:", !!session);
+
+  // Check local storage for auth data
+  const keys = Object.keys(localStorage);
+  const authKeys = keys.filter(key => key.includes('supabase.auth') || key.includes('sb-'));
+  console.log("Auth keys in localStorage:", authKeys);
+
+  // Log current URL
+  console.log("Current URL:", window.location.href);
+
+  // Check for auth params in URL
+  const url = new URL(window.location.href);
+  console.log("Has 'code' param:", url.searchParams.has('code'));
+  console.log("Has 'error' param:", url.searchParams.has('error'));
+
+  // Fix for 406 errors - update the accept header in global config
+  const currentHeaders = supabase.rest.headers;
+  console.log("Current API headers:", currentHeaders);
+
+  // Update the headers to ensure proper Accept header
+  supabase.rest.setHeaders({
+    ...currentHeaders,
+    'Accept': 'application/json'
+  });
+
+  console.log("Updated API headers with proper Accept: application/json");
+
+  console.groupEnd();
+
+  return {
+    hasSession: !!session,
+    authKeysCount: authKeys.length,
+    hasCodeParam: url.searchParams.has('code'),
+    hasErrorParam: url.searchParams.has('error')
+  };
 };
 
 // Export these functions to the global window object for easy debugging
@@ -186,4 +227,5 @@ if (typeof window !== 'undefined') {
   window.clearAllAuthData = clearAllAuthData;
   window.diagnoseAuthUrl = diagnoseAuthUrl;
   window.resetAndStartAuth = resetAndStartAuth;
+  window.debugSupabaseAuth = debugSupabaseAuth;
 }
