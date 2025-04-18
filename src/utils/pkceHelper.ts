@@ -1,4 +1,3 @@
-
 import { supabase } from '@/lib/supabase';
 
 // Generate a secure random string for PKCE
@@ -16,7 +15,7 @@ export const getPKCEVerifier = (): string | null => {
     console.log('[PKCE] Found verifier in localStorage:', verifier.substring(0, 5) + '...');
     return verifier;
   }
-  
+
   // Backup locations
   const sessionVerifier = sessionStorage.getItem('supabase.auth.code_verifier');
   if (sessionVerifier) {
@@ -25,7 +24,7 @@ export const getPKCEVerifier = (): string | null => {
     localStorage.setItem('supabase.auth.code_verifier', sessionVerifier);
     return sessionVerifier;
   }
-  
+
   // Check cookie as last resort
   const cookies = document.cookie.split(';');
   for (const cookie of cookies) {
@@ -37,7 +36,7 @@ export const getPKCEVerifier = (): string | null => {
       return value;
     }
   }
-  
+
   console.error('[PKCE] No verifier found in any storage location');
   return null;
 };
@@ -50,16 +49,16 @@ export const storePKCEVerifier = (verifier: string): void => {
   }
 
   console.log('[PKCE] Storing verifier in all locations:', verifier.substring(0, 5) + '...');
-  
+
   // Primary storage
   localStorage.setItem('supabase.auth.code_verifier', verifier);
-  
+
   // Backup storage
   sessionStorage.setItem('supabase.auth.code_verifier', verifier);
-  
+
   // Cookie storage (10 min expiry)
   document.cookie = `pkce_verifier=${verifier};max-age=600;path=/;SameSite=Lax`;
-  
+
   // Also store in alternate locations that Supabase might check
   localStorage.setItem('sb-pkce-verifier', verifier);
 };
@@ -77,19 +76,19 @@ export const clearPKCEVerifier = (): void => {
 export const setupPKCEVerifier = (): string => {
   // Clear any existing verifiers first
   clearPKCEVerifier();
-  
+
   // Generate a new verifier
   const verifier = generateVerifier();
   console.log('[PKCE] Generated new verifier:', verifier.substring(0, 5) + '...');
-  
+
   // Store in all locations
   storePKCEVerifier(verifier);
-  
+
   // Return for immediate use
   return verifier;
 };
 
-// Handle auth code exchange with improved error handling
+// Exchange auth code for session (used in callback route)
 export const exchangeAuthCode = async (code: string) => {
   console.log('[PKCE] Exchanging auth code for session');
 
@@ -98,23 +97,10 @@ export const exchangeAuthCode = async (code: string) => {
     return { data: { session: null }, error: new Error('Missing auth code') };
   }
 
-  const verifier = getPKCEVerifier();
-  if (!verifier) {
-    console.error('[PKCE] No code verifier found');
-    return { 
-      data: { session: null }, 
-      error: new Error('PKCE verifier not found') 
-    };
-  }
-
   try {
-    console.log('[PKCE] Code exchange with verifier:', verifier.substring(0, 5) + '...');
+    // Let Supabase handle the exchange - it should have stored the verifier internally
     console.log('[PKCE] Code length:', code.length);
-    console.log('[PKCE] Verifier length:', verifier.length);
-    
-    // Ensure the verifier is available in the expected location
-    localStorage.setItem('supabase.auth.code_verifier', verifier);
-    
+
     // Attempt the exchange
     return await supabase.auth.exchangeCodeForSession(code);
   } catch (error) {

@@ -1,8 +1,9 @@
+
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/lib/supabase';
 import { useToast } from '@/hooks/use-toast';
-import { getPKCEVerifier, storePKCEVerifier, clearPKCEVerifier, exchangeAuthCode } from '@/utils/pkceHelper';
+import { exchangeAuthCode } from '@/utils/pkceHelper';
 
 const Callback = () => {
   const navigate = useNavigate();
@@ -34,20 +35,7 @@ const Callback = () => {
 
         console.log("Found auth code in URL:", code.substring(0, 5) + "...");
         
-        // Get code verifier from all possible storage locations
-        const codeVerifier = getPKCEVerifier();
-        console.log("Code verifier found:", !!codeVerifier);
-        console.log("Code verifier length:", codeVerifier ? codeVerifier.length : 0);
-        
-        if (!codeVerifier) {
-          console.error("No code verifier found in any storage location");
-          throw new Error("Authentication failed - code verifier is missing");
-        }
-        
-        // Ensure verifier is stored in all locations before exchange
-        storePKCEVerifier(codeVerifier);
-        
-        // Exchange the code for a session using our helper
+        // Exchange the code for a session
         const { data, error } = await exchangeAuthCode(code);
 
         if (error) {
@@ -109,10 +97,7 @@ const Callback = () => {
         }
       } catch (error: any) {
         console.error('Auth callback error:', error);
-
-        // Clean up all PKCE verifier storage for next attempt
-        clearPKCEVerifier();
-
+        
         toast({
           variant: "destructive", 
           title: "Authentication Failed",
