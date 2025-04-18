@@ -1,0 +1,181 @@
+{
+  "event_message": "GET | 406 | 49.47.128.215 | 9324778cfe5a7a00 | https://wqojeesjtgfcftpnzaet.supabase.co/rest/v1/profiles?select=onboarding_completed&id=eq.914877b7-03bb-41bc-a392-3c74713c6cb2 | Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36",
+  "id": "e15e7c13-2f97-42b2-b063-da6995e1a833",
+  "metadata": [
+    {
+      "load_balancer_experimental_routing": null,
+      "load_balancer_geo_aware_info": [],
+      "load_balancer_redirect_identifier": null,
+      "logflare_worker": [
+        {
+          "worker_id": "ECRHX7"
+        }
+      ],
+      "request": [
+        {
+          "cf": [
+            {
+              "asOrganization": "Jio",
+              "asn": 55836,
+              "botManagement": [
+                {
+                  "corporateProxy": false,
+                  "detectionIds": [],
+                  "ja3Hash": null,
+                  "jsDetection": [
+                    {
+                      "passed": false
+                    }
+                  ],
+                  "score": 99,
+                  "staticResource": false,
+                  "verifiedBot": false
+                }
+              ],
+              "city": "Patna",
+              "clientAcceptEncoding": "gzip, deflate, br, zstd",
+              "clientTcpRtt": null,
+              "clientTrustScore": null,
+              "colo": "PAT",
+              "continent": "AS",
+              "country": "IN",
+              "edgeRequestKeepAliveStatus": 1,
+              "httpProtocol": "HTTP/3",
+              "isEUCountry": null,
+              "latitude": "25.59430",
+              "longitude": "85.13520",
+              "metroCode": null,
+              "postalCode": "800001",
+              "region": "Bihar",
+              "regionCode": "BR",
+              "requestPriority": null,
+              "timezone": "Asia/Kolkata",
+              "tlsCipher": "AEAD-AES128-GCM-SHA256",
+              "tlsClientAuth": [
+                {
+                  "certPresented": "0",
+                  "certRevoked": "0",
+                  "certVerified": "NONE"
+                }
+              ],
+              "tlsClientExtensionsSha1": "fBJZywgzorB6cuu3sER3ADO+4ds=",
+              "tlsClientHelloLength": "2049",
+              "tlsClientRandom": "ovCf6wjCfcItHDil+dnR5sJKRc1iA+A/egsJ3fZ6QsQ=",
+              "tlsExportedAuthenticator": [
+                {
+                  "clientFinished": "d68c3863976866a83300fe6f6f8b77b365dac0de74b668ae280e6f99915941ea",
+                  "clientHandshake": "624b75dae228b84e3f485ea96790f284241e23961ebf91bd017d089b9ced5053",
+                  "serverFinished": "930df9bc13381ae799fbd688d34257034c3192c9a3994bc266a9586c80a17328",
+                  "serverHandshake": "a5f65caac82d5fba15a7729c8ccf7cef1931fdb5a01d4e8e597bc57422bd548b"
+                }
+              ],
+              "tlsVersion": "TLSv1.3",
+              "verifiedBotCategory": null
+            }
+          ],
+          "headers": [
+            {
+              "accept": "application/vnd.pgrst.object+json",
+              "cf_cache_status": null,
+              "cf_connecting_ip": "49.47.128.215",
+              "cf_ipcountry": "IN",
+              "cf_ray": "9324778cfe5a7a00",
+              "content_length": null,
+              "content_location": null,
+              "content_range": null,
+              "content_type": null,
+              "date": null,
+              "host": "wqojeesjtgfcftpnzaet.supabase.co",
+              "prefer": null,
+              "range": null,
+              "referer": "https://roshlingua.vercel.app/",
+              "sb_gateway_mode": null,
+              "sb_gateway_version": null,
+              "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36",
+              "x_client_info": "supabase-js/2.x",
+              "x_forwarded_host": null,
+              "x_forwarded_proto": "https",
+              "x_forwarded_user_agent": null,
+              "x_kong_proxy_latency": null,
+              "x_kong_upstream_latency": null,
+              "x_real_ip": "49.47.128.215"
+            }
+          ],
+          "host": "wqojeesjtgfcftpnzaet.supabase.co",
+          "method": "GET",
+          "path": "/rest/v1/profiles",
+          "port": null,
+          "protocol": "https:",
+          "sb": [
+            {
+              "apikey": [],
+              "auth_user": "914877b7-03bb-41bc-a392-3c74713c6cb2",
+              "jwt": [
+                {
+                  "apikey": [
+                    {
+                      "invalid": null,
+                      "payload": [
+                        {
+                          "algorithm": "HS256",
+                          "expires_at": 2059318788,
+                          "issuer": "supabase",
+                          "role": "anon",
+                          "signature_prefix": "MTWWnZ",
+                          "subject": null
+                        }
+                      ]
+                    }
+                  ],
+                  "authorization": [
+                    {
+                      "invalid": null,
+                      "payload": [
+                        {
+                          "algorithm": "HS256",
+                          "expires_at": 1744985302,
+                          "issuer": "https://wqojeesjtgfcftpnzaet.supabase.co/auth/v1",
+                          "key_id": "rAVW/Q8gq7SxWeVy",
+                          "role": "authenticated",
+                          "session_id": "32f18a55-ef76-4e44-b5f2-94184ae25ad0",
+                          "signature_prefix": "NaQiN5",
+                          "subject": "914877b7-03bb-41bc-a392-3c74713c6cb2"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "search": "?select=onboarding_completed&id=eq.914877b7-03bb-41bc-a392-3c74713c6cb2",
+          "url": "https://wqojeesjtgfcftpnzaet.supabase.co/rest/v1/profiles?select=onboarding_completed&id=eq.914877b7-03bb-41bc-a392-3c74713c6cb2"
+        }
+      ],
+      "response": [
+        {
+          "headers": [
+            {
+              "cf_cache_status": "DYNAMIC",
+              "cf_ray": "9324778d157a7a00-PAT",
+              "content_length": null,
+              "content_location": null,
+              "content_range": null,
+              "content_type": "application/json; charset=utf-8",
+              "date": "Fri, 18 Apr 2025 13:21:44 GMT",
+              "sb_gateway_mode": null,
+              "sb_gateway_version": "1",
+              "transfer_encoding": "chunked",
+              "x_kong_proxy_latency": null,
+              "x_kong_upstream_latency": null,
+              "x_sb_error_code": null
+            }
+          ],
+          "origin_time": 96,
+          "status_code": 406
+        }
+      ]
+    }
+  ],
+  "timestamp": 1744982504579000
+}
