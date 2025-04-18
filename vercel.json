@@ -11,7 +11,7 @@
       "headers": [
         {
           "key": "Cache-Control",
-          "value": "no-store, max-age=0"
+          "value": "public, max-age=0, must-revalidate"
         },
         {
           "key": "Strict-Transport-Security",
@@ -46,6 +46,8 @@
     }
   ],
   "trailingSlash": false,
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
   "routes": [
     {
       "src": "/auth/callback",
