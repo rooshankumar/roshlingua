@@ -14,7 +14,33 @@ export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
     persistSession: true,
     detectSessionInUrl: true,
     flowType: 'pkce',
-    storage: window.localStorage,
+    storage: {
+      getItem: (key) => {
+        const value = localStorage.getItem(key);
+        console.log(`[Storage] GET ${key} => ${value ? 'value exists' : 'null'}`);
+        return value;
+      },
+      setItem: (key, value) => {
+        console.log(`[Storage] SET ${key} => ${value ? 'value exists' : 'null'}`);
+        localStorage.setItem(key, value);
+        // For critical PKCE values, redundantly store in multiple locations
+        if (key === 'supabase.auth.code_verifier' && value) {
+          sessionStorage.setItem(key, value);
+          document.cookie = `pkce_verifier=${value};max-age=600;path=/;SameSite=Lax`;
+          localStorage.setItem('sb-pkce-verifier', value); 
+        }
+      },
+      removeItem: (key) => {
+        console.log(`[Storage] REMOVE ${key}`);
+        localStorage.removeItem(key);
+        // Also remove from backup locations for PKCE values
+        if (key === 'supabase.auth.code_verifier') {
+          sessionStorage.removeItem(key);
+          document.cookie = 'pkce_verifier=; max-age=0; path=/;';
+          localStorage.removeItem('sb-pkce-verifier');
+        }
+      },
+    },
     storageKey: 'supabase.auth.token',
     debug: true,
     cookieOptions: {
@@ -72,15 +98,32 @@ export const signInWithGoogle = async () => {
     // Generate and store our own verifier BEFORE initiating OAuth flow
     const verifier = setupPKCEVerifier();
     console.log("Generated PKCE verifier:", verifier.substring(0, 5) + "...");
+    
+    // Create a unique session ID to track this sign-in attempt
+    const sessionId = Date.now().toString(36) + Math.random().toString(36).substring(2);
+    localStorage.setItem('auth_session_id', sessionId);
+    
+    // Store the verifier in multiple extra places with the session ID
+    localStorage.setItem(`pkce_verifier_${sessionId}`, verifier);
+    sessionStorage.setItem(`pkce_verifier_${sessionId}`, verifier);
+    
+    // Double check that it's actually stored
+    console.log("Verifier storage check before redirect:");
+    console.log("- localStorage:", !!localStorage.getItem('supabase.auth.code_verifier'));
+    console.log("- sessionStorage:", !!sessionStorage.getItem('supabase.auth.code_verifier'));
+    console.log("- backup location:", !!localStorage.getItem(`pkce_verifier_${sessionId}`));
 
     // Let Supabase handle the OAuth flow
+    console.log("Starting OAuth flow with Google...");
     return await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
+        redirectTo: `${window.location.origin}/auth/callback?sid=${sessionId}`,
         queryParams: {
           access_type: 'offline',
-          prompt: 'consent'
+          prompt: 'consent',
+          // Pass our session ID to help with tracking
+          state: sessionId
         }
       }
     });
