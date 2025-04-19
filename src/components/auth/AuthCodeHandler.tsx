@@ -312,6 +312,10 @@ const AuthCodeHandler = () => {
       }
     };
 
+    const handleAuthRedirect = async () => {
+      // Your existing async logic here
+    };
+
     handleAuthRedirect();
   }, [navigate, toast, processingAuth]);
 
