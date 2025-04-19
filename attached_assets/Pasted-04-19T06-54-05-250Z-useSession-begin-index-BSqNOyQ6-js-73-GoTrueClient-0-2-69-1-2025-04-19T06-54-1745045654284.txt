@@ -1,0 +1,43 @@
+04-19T06:54:05.250Z #_useSession begin
+index-BSqNOyQ6.js:73 GoTrueClient@0 (2.69.1) 2025-04-19T06:54:05.251Z #__loadSession() begin
+index-BSqNOyQ6.js:73 GoTrueClient@0 (2.69.1) 2025-04-19T06:54:05.252Z #getSession() session from storage {access_token: 'eyJhbGciOiJIUzI1NiIsImtpZCI6InJBVlcvUThncTdTeFdlVn…xzZX0.60eoXoYCeocMQzY9GanlnGzfKrqcfMIL9lJUuOTK9uM', token_type: 'bearer', expires_in: 3600, expires_at: 1745048531, refresh_token: 'Wb7qFhzNZd5KnVtRnEw4tA', …}
+index-BSqNOyQ6.js:73 GoTrueClient@0 (2.69.1) 2025-04-19T06:54:05.253Z #__loadSession() session has not expired expires_at 1745048531
+index-BSqNOyQ6.js:73 GoTrueClient@0 (2.69.1) 2025-04-19T06:54:05.253Z #__loadSession() end
+index-BSqNOyQ6.js:73 GoTrueClient@0 (2.69.1) 2025-04-19T06:54:05.254Z #_useSession end
+index-BSqNOyQ6.js:73 GoTrueClient@0 (2.69.1) 2025-04-19T06:54:05.254Z #_acquireLock lock released for storage key sb-auth-token
+index-BSqNOyQ6.js:73 GoTrueClient@0 (2.69.1) 2025-04-19T06:54:05.254Z #_acquireLock end
+index-BSqNOyQ6.js:72 
+            
+            
+           GET https://wqojeesjtgfcftpnzaet.supabase.co/rest/v1/profiles?select=onboarding_completed&id=eq.914877b7-03bb-41bc-a392-3c74713c6cb2 406 (Not Acceptable)
+(anonymous) @ index-BSqNOyQ6.js:72
+(anonymous) @ index-BSqNOyQ6.js:72
+a @ index-BSqNOyQ6.js:72
+Promise.then
+u @ index-BSqNOyQ6.js:72
+(anonymous) @ index-BSqNOyQ6.js:72
+_P @ index-BSqNOyQ6.js:72
+(anonymous) @ index-BSqNOyQ6.js:72
+then @ index-BSqNOyQ6.js:67Understand this error
+index-BSqNOyQ6.js:49 Throttling navigation to prevent the browser from hanging. See https://crbug.com/1038223. Command line switch --disable-ipc-flooding-protection can be used to bypass the protection
+y @ index-BSqNOyQ6.js:49
+(anonymous) @ index-BSqNOyQ6.js:58
+(anonymous) @ index-BSqNOyQ6.js:58
+Hc @ index-BSqNOyQ6.js:40
+Ro @ index-BSqNOyQ6.js:40
+(anonymous) @ index-BSqNOyQ6.js:40
+S @ index-BSqNOyQ6.js:25
+I @ index-BSqNOyQ6.js:25Understand this warning
+index-BSqNOyQ6.js:72 
+            
+            
+           GET https://wqojeesjtgfcftpnzaet.supabase.co/rest/v1/profiles?select=onboarding_completed&id=eq.914877b7-03bb-41bc-a392-3c74713c6cb2 406 (Not Acceptable)
+(anonymous) @ index-BSqNOyQ6.js:72
+(anonymous) @ index-BSqNOyQ6.js:72
+a @ index-BSqNOyQ6.js:72
+Promise.then
+u @ index-BSqNOyQ6.js:72
+(anonymous) @ index-BSqNOyQ6.js:72
+_P @ index-BSqNOyQ6.js:72
+(anonymous) @ index-BSqNOyQ6.js:72
+then @ index-BSqNOyQ6.js:67Understand this error
