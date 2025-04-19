@@ -92,7 +92,42 @@ const Dashboard = () => {
           .eq('id', user.id)
           .single();
 
-        console.log("Profile data fetch result:", error ? "Error" : "Success");
+        console.log("Profile data fetch result:", error ? `Error: ${error.message}` : "Success");
+        
+        // If profile doesn't exist yet, create it
+        if (error && error.code === 'PGRST116') {
+          console.log("Profile not found, creating one for user:", user.id);
+          // Create a new profile for the user
+          const { error: createError } = await supabase
+            .from('profiles')
+            .insert({
+              id: user.id,
+              email: user.email,
+              full_name: user.user_metadata?.full_name,
+              avatar_url: user.user_metadata?.avatar_url,
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString(),
+              onboarding_completed: false,
+              streak_count: 0,
+              xp_points: 0,
+              progress_percentage: 0
+            });
+            
+          if (createError) {
+            console.error("Error creating new profile:", createError);
+          }
+          
+          // Use default values
+          if (isMounted) {
+            setUserStats({
+              streak: 0,
+              xp: 0,
+              progress: 0,
+              level: 'Beginner'
+            });
+          }
+          return;
+        }
         
         if (error) {
           console.error("Profile data fetch error:", error);

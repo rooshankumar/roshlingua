@@ -9,6 +9,27 @@ const AuthCodeHandler = () => {
   const { toast } = useToast();
   const [isProcessing, setIsProcessing] = useState(false);
 
+  // Clear any potentially stale PKCE verifier on component mount
+  useEffect(() => {
+    const clearPKCEDataIfNeeded = () => {
+      const url = new URL(window.location.href);
+      // If we're on the callback page with a fresh code, clear any stale PKCE data
+      if (url.searchParams.has('code')) {
+        // Check if we need to clean up - only if there's a code but it's fresh (new login)
+        const authCode = url.searchParams.get('code');
+        const storedAuthCode = sessionStorage.getItem('supabase.auth.code');
+        
+        // If this is a new auth code (different from stored one), clean up PKCE data
+        if (authCode && (!storedAuthCode || authCode !== storedAuthCode)) {
+          console.log("New auth code detected, clearing old PKCE data");
+          sessionStorage.setItem('supabase.auth.code', authCode);
+        }
+      }
+    };
+    
+    clearPKCEDataIfNeeded();
+  }, []);
+
   useEffect(() => {
     let isMounted = true;
     
@@ -49,43 +70,8 @@ const AuthCodeHandler = () => {
               return;
             }
             
-            // Check if profile exists
-            if (data?.user && isMounted) {
-              const { data: profileData, error: profileError } = await supabase
-                .from('profiles')
-                .select('onboarding_completed')
-                .eq('id', data.user.id)
-                .single();
-                
-              if (profileError && profileError.code !== 'PGRST116') {
-                console.error("Error fetching profile:", profileError);
-              }
-
-              // If no profile found, create one
-              if (!profileData) {
-                const { error: insertError } = await supabase
-                  .from('profiles')
-                  .insert({
-                    id: data.user.id,
-                    email: data.user.email,
-                    created_at: new Date().toISOString(),
-                    updated_at: new Date().toISOString(),
-                    onboarding_completed: false
-                  });
-                  
-                if (insertError) {
-                  console.error("Error creating profile:", insertError);
-                }
-                
-                // Redirect to onboarding
-                if (isMounted) navigate('/onboarding', { replace: true });
-                return;
-              }
-              
-              // Redirect based on onboarding status
-              if (isMounted) navigate(profileData.onboarding_completed ? '/dashboard' : '/onboarding', { replace: true });
-              return;
-            }
+            await handleUserProfile(data?.user);
+            return;
           }
         }
 
@@ -94,41 +80,7 @@ const AuthCodeHandler = () => {
         
         if (sessionData?.session && isMounted) {
           console.log("Session already exists, checking profile");
-          
-          // Check if profile exists
-          const { data: profileData, error: profileError } = await supabase
-            .from('profiles')
-            .select('onboarding_completed')
-            .eq('id', sessionData.session.user.id)
-            .single();
-            
-          if (profileError && profileError.code !== 'PGRST116') {
-            console.error("Error fetching profile:", profileError);
-          }
-
-          // If no profile found, create one
-          if (!profileData) {
-            const { error: insertError } = await supabase
-              .from('profiles')
-              .insert({
-                id: sessionData.session.user.id,
-                email: sessionData.session.user.email,
-                created_at: new Date().toISOString(),
-                updated_at: new Date().toISOString(),
-                onboarding_completed: false
-              });
-              
-            if (insertError) {
-              console.error("Error creating profile:", insertError);
-            }
-            
-            // Redirect to onboarding
-            if (isMounted) navigate('/onboarding', { replace: true });
-            return;
-          }
-          
-          // Redirect based on onboarding status
-          if (isMounted) navigate(profileData.onboarding_completed ? '/dashboard' : '/onboarding', { replace: true });
+          await handleUserProfile(sessionData.session.user);
           return;
         }
 
@@ -159,63 +111,47 @@ const AuthCodeHandler = () => {
             return;
           }
 
-          // Exchange the code for a session
-          const { data, error: sessionError } = await supabase.auth.exchangeCodeForSession(code);
+          try {
+            // Exchange the code for a session
+            console.log("Exchanging auth code for session");
+            const { data, error: sessionError } = await supabase.auth.exchangeCodeForSession(code);
 
-          if (sessionError) {
-            console.error('Session exchange error:', sessionError);
-            toast({
-              variant: "destructive",
-              title: "Authentication Failed",
-              description: sessionError.message
-            });
-            navigate('/auth', { replace: true });
-            return;
-          }
-
-          if (!data.session) {
-            toast({
-              variant: "destructive",
-              title: "Authentication Failed",
-              description: "Could not establish a session. Please try again."
-            });
-            navigate('/auth', { replace: true });
-            return;
-          }
-
-          // Create profile if needed
-          const { data: profile, error: profileCheckError } = await supabase
-            .from('profiles')
-            .select('onboarding_completed')
-            .eq('id', data.session.user.id)
-            .single();
-
-          if (profileCheckError && profileCheckError.code !== 'PGRST116') {
-            console.error("Profile check error:", profileCheckError);
-          }
-
-          // If profile doesn't exist, create it
-          if (!profile) {
-            const { error: createError } = await supabase
-              .from('profiles')
-              .insert({
-                id: data.session.user.id,
-                email: data.session.user.email,
-                created_at: new Date().toISOString(),
-                updated_at: new Date().toISOString(),
-                onboarding_completed: false
-              });
-
-            if (createError) {
-              console.error("Error creating profile:", createError);
+            if (sessionError) {
+              throw sessionError;
             }
 
-            navigate('/onboarding', { replace: true });
-            return;
-          }
+            if (!data.session) {
+              throw new Error("Could not establish a session");
+            }
 
-          // Redirect based on onboarding status
-          navigate(profile.onboarding_completed ? '/dashboard' : '/onboarding', { replace: true });
+            await handleUserProfile(data.session.user);
+          } catch (error) {
+            console.error('Session exchange error:', error);
+            
+            // If we get a PKCE error, clear storage and redirect to auth
+            if (error.message && error.message.includes('code verifier')) {
+              console.log("PKCE error detected, clearing auth data");
+              localStorage.removeItem('supabase.auth.token');
+              localStorage.removeItem('supabase.auth.expires_at');
+              localStorage.removeItem('supabase.auth.code_verifier');
+              sessionStorage.removeItem('supabase.auth.code_verifier');
+              
+              // Redirect to auth page to restart the flow
+              toast({
+                title: "Session Expired",
+                description: "Please sign in again to continue.",
+              });
+              navigate('/auth', { replace: true });
+              return;
+            }
+            
+            toast({
+              variant: "destructive",
+              title: "Authentication Failed",
+              description: error.message || "Failed to authenticate",
+            });
+            navigate('/auth', { replace: true });
+          }
         }
       } catch (err) {
         console.error('Auth callback error:', err);
@@ -230,6 +166,63 @@ const AuthCodeHandler = () => {
       } finally {
         if (isMounted) {
           setIsProcessing(false);
+        }
+      }
+    };
+    
+    // Helper function to handle user profile creation/check
+    const handleUserProfile = async (user) => {
+      if (!user || !isMounted) return;
+      
+      try {
+        // Check with Accept header to avoid 406 errors
+        const { data: profileData, error: profileError } = await supabase
+          .from('profiles')
+          .select('onboarding_completed')
+          .eq('id', user.id)
+          .single();
+          
+        if (profileError && profileError.code !== 'PGRST116') {
+          console.error("Error fetching profile:", profileError);
+        }
+
+        // If no profile found, create one
+        if (!profileData) {
+          console.log("Creating new profile for user:", user.id);
+          const { error: insertError } = await supabase
+            .from('profiles')
+            .insert({
+              id: user.id,
+              email: user.email,
+              full_name: user.user_metadata?.full_name,
+              avatar_url: user.user_metadata?.avatar_url,
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString(),
+              onboarding_completed: false
+            });
+            
+          if (insertError) {
+            console.error("Error creating profile:", insertError);
+          }
+          
+          // Redirect to onboarding
+          if (isMounted) navigate('/onboarding', { replace: true });
+          return;
+        }
+        
+        // Redirect based on onboarding status
+        if (isMounted) {
+          console.log("Profile found, redirecting based on onboarding status");
+          navigate(profileData.onboarding_completed ? '/dashboard' : '/onboarding', { replace: true });
+        }
+      } catch (error) {
+        console.error("Error handling user profile:", error);
+        if (isMounted) {
+          toast({
+            variant: "destructive",
+            title: "Profile Error",
+            description: "Failed to retrieve or create user profile.",
+          });
         }
       }
     };
