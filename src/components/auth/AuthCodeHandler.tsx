@@ -1,8 +1,7 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/lib/supabase';
-import { checkOnboardingStatus } from '@/utils/onboardingUtils';
 
 const AuthCodeHandler = () => {
   const navigate = useNavigate();
@@ -13,27 +12,27 @@ const AuthCodeHandler = () => {
   useEffect(() => {
     const clearAuthDataIfNeeded = () => {
       const url = new URL(window.location.href);
-
+      
       // If we're on the callback page with a fresh code or hash fragment
       if (url.searchParams.has('code') || window.location.hash.includes('access_token=')) {
         // Get new auth code if present (PKCE flow)
         const authCode = url.searchParams.get('code');
         const storedAuthCode = sessionStorage.getItem('supabase.auth.code');
-
+        
         // Hash fragment indicates implicit flow
         const hasHashToken = window.location.hash.includes('access_token=');
-
+        
         // If this is a new auth code or we have hash token, clean up all auth data
         if ((authCode && (!storedAuthCode || authCode !== storedAuthCode)) || hasHashToken) {
           console.log("New authentication data detected, clearing old auth state");
-
+          
           // Clear all auth-related storage to ensure a clean state
           localStorage.removeItem('sb-auth-token');
           localStorage.removeItem('supabase.auth.token');
           sessionStorage.removeItem('supabase.auth.token');
           localStorage.removeItem('supabase.auth.expires_at');
           sessionStorage.removeItem('supabase.auth.expires_at');
-
+          
           // Keep track of the current auth code to detect changes
           if (authCode) {
             sessionStorage.setItem('supabase.auth.code', authCode);
@@ -156,31 +155,31 @@ const AuthCodeHandler = () => {
           try {
             // Exchange the code for a session with better error handling
             console.log("Exchanging auth code for session");
-
+            
             // Clear any stale verifiers to avoid conflicts
             localStorage.removeItem('supabase.auth.code_verifier');
             sessionStorage.removeItem('supabase.auth.code_verifier');
-
+            
             // Exchange code for session with retry
             let sessionError = null;
             let data = null;
             let retryCount = 0;
             const maxRetries = 2;
-
+            
             while (retryCount <= maxRetries) {
               try {
                 const result = await supabase.auth.exchangeCodeForSession(code);
                 data = result.data;
                 sessionError = result.error;
-
+                
                 if (!sessionError) break;
-
+                
                 console.log(`Session exchange attempt ${retryCount + 1} failed:`, sessionError);
-
+                
                 // Clear any stale state before retry
                 localStorage.removeItem('supabase.auth.token');
                 localStorage.removeItem('supabase.auth.expires_at');
-
+                
                 // Wait before retrying
                 await new Promise(resolve => setTimeout(resolve, 500));
                 retryCount++;
@@ -211,7 +210,7 @@ const AuthCodeHandler = () => {
                 error.message.includes('verification')
             )) {
               console.log("PKCE verification error detected, clearing all auth data");
-
+              
               // Clear all auth-related data for a clean restart
               localStorage.removeItem('sb-auth-token');
               localStorage.removeItem('supabase.auth.token');
@@ -257,84 +256,120 @@ const AuthCodeHandler = () => {
       }
     };
 
-    // Handle user profile creation/check
+    // Helper function to handle user profile creation/check
     const handleUserProfile = async (user) => {
       if (!user || !isMounted) return;
 
       try {
-        console.log("Checking profile for user:", user.id);
-
-        // Use a more reliable method to check for profile existence
-        const { data: profileData, error: profileError } = await supabase
-          .from('profiles')
-          .select('id, onboarding_completed')
-          .eq('id', user.id)
-          .maybeSingle(); // Use maybeSingle instead of single to avoid errors when not found
-
-        // If profile doesn't exist or there's an error (except not found)
-        if (!profileData || (profileError && profileError.code !== 'PGRST116')) {
-          if (profileError && profileError.code !== 'PGRST116') {
-            console.error("Error fetching profile:", profileError);
+        try {
+          // Use proper headers to avoid 406 errors
+          let profileData;
+          let profileError;
+          
+          try {
+            // Set explicit Accept header to avoid 406 errors
+            const { data, error } = await supabase
+              .from('profiles')
+              .select('onboarding_completed')
+              .eq('id', user.id)
+              .single();
+              
+            profileData = data;
+            profileError = error;
+          } catch (err) {
+            console.error("Exception fetching profile:", err);
+            profileError = err;
           }
 
-          // Create a new profile
-          console.log("No profile found, creating new profile for user:", user.id);
-          const userMetadata = user.user_metadata || {};
+          if (profileError) {
+            if (profileError.code !== 'PGRST116') {
+              console.error("Error fetching profile:", profileError);
+            }
 
-          // Use transaction to ensure profile is created
-          const { error: insertError } = await supabase
-            .from('profiles')
-            .upsert({
-              id: user.id,
-              email: user.email,
-              full_name: userMetadata.full_name || userMetadata.name || '',
-              avatar_url: userMetadata.avatar_url || userMetadata.picture || '',
-              created_at: new Date().toISOString(),
-              updated_at: new Date().toISOString(),
-              onboarding_completed: false
-            }, { 
-              onConflict: 'id',
-              returning: 'minimal'
-            });
+            // If profile not found, create one with retry logic
+            console.log("Creating new profile for user:", user.id);
+            const userMetadata = user.user_metadata || {};
+            
+            // Try profile creation with retry
+            let insertError;
+            let retryCount = 0;
+            const maxRetries = 3;
+            
+            while (retryCount < maxRetries) {
+              try {
+                const { error } = await supabase
+                  .from('profiles')
+                  .upsert({
+                    id: user.id,
+                    email: user.email,
+                    full_name: userMetadata.full_name || userMetadata.name,
+                    avatar_url: userMetadata.avatar_url || userMetadata.picture,
+                    created_at: new Date().toISOString(),
+                    updated_at: new Date().toISOString(),
+                    onboarding_completed: false
+                  }, { 
+                    onConflict: 'id',
+                    returning: 'minimal' // Reduce response size
+                  });
+                  
+                if (!error) {
+                  // Profile created successfully
+                  insertError = null;
+                  break;
+                }
+                
+                insertError = error;
+                retryCount++;
+                console.log(`Profile creation attempt ${retryCount} failed, retrying...`);
+                await new Promise(resolve => setTimeout(resolve, 500)); // Wait before retry
+              } catch (err) {
+                console.error(`Profile creation exception (attempt ${retryCount}):`, err);
+                insertError = err;
+                retryCount++;
+                await new Promise(resolve => setTimeout(resolve, 500)); // Wait before retry
+              }
+            }
 
-          if (insertError) {
-            console.error("Error creating profile:", insertError);
-            toast({
-              variant: "destructive",
-              title: "Profile Error",
-              description: "Failed to create user profile. Please try again."
-            });
-            // Even if profile creation fails, we should still try to redirect to onboarding
+            if (insertError) {
+              console.error("Error creating profile after retries:", insertError);
+              // If we can't create a profile, show an error toast but continue
+              toast({
+                variant: "destructive",
+                title: "Profile Error",
+                description: "Failed to create user profile. Some features may be limited."
+              });
+            }
+
+            // Redirect to onboarding for new users
+            if (isMounted) navigate('/onboarding', { replace: true });
+            return;
           }
 
-          console.log("Redirecting to onboarding for new user");
-          if (isMounted) {
-            // Always redirect to onboarding for new profiles
-            navigate('/onboarding', { replace: true });
+          // If profile exists, proceed with normal flow
+          if (profileData) {
+            console.log("Profile found, redirecting based on onboarding status");
+            if (isMounted) {
+              navigate(profileData.onboarding_completed ? '/dashboard' : '/onboarding', { replace: true });
+            }
+            return;
           }
-          return;
+        } catch (err) {
+          console.error("Error in profile handling:", err);
+          toast({
+            variant: "destructive",
+            title: "Error",
+            description: "Failed to process user profile."
+          });
         }
-
-        // If profile exists, check if onboarding is completed
-        console.log("Profile found, checking onboarding status:", profileData.onboarding_completed);
+      } catch (error) {
+        console.error("Error handling user profile:", error);
         if (isMounted) {
-          if (profileData.onboarding_completed) {
-            console.log("Onboarding completed, redirecting to dashboard");
-            navigate('/dashboard', { replace: true });
-          } else {
-            console.log("Onboarding not completed, redirecting to onboarding");
-            navigate('/onboarding', { replace: true });
-          }
+          toast({
+            variant: "destructive",
+            title: "Profile Error",
+            description: "Failed to retrieve or create user profile.",
+          });
         }
-      } catch (err) {
-        console.error("Error in profile handling:", err);
-        toast({
-          variant: "destructive",
-          title: "Profile Error",
-          description: "Failed to process user profile. Please try refreshing the page."
-        });
-        // Attempt to redirect to onboarding as a fallback
-        if (isMounted) navigate('/onboarding', { replace: true });
       }
     };
 
