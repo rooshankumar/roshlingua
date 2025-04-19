@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
@@ -56,6 +57,7 @@ const AuthCodeHandler = () => {
     return null;
   };
 
+  useEffect(() => {
     const handleAuthRedirect = async () => {
       // Prevent multiple processing attempts
       if (processingAuth) return;
@@ -310,10 +312,6 @@ const AuthCodeHandler = () => {
       } finally {
         setProcessingAuth(false);
       }
-    };
-
-    const handleAuthRedirect = async () => {
-      // Your existing async logic here
     };
 
     handleAuthRedirect();
