@@ -8,9 +8,14 @@ const AuthCodeHandler = () => {
   const { toast } = useToast();
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState('');
+  
+  // Track if we're actively redirecting to prevent infinite loops
+  const processingAuthRef = useRef(false);
 
   // Check for OAuth errors first
   useEffect(() => {
+    if (processingAuthRef.current) return;
+    
     const url = new URL(window.location.href);
     const error = url.searchParams.get('error');
     const errorDescription = url.searchParams.get('error_description');
@@ -26,8 +31,10 @@ const AuthCodeHandler = () => {
         clearAllAuthData();
         
         // Delay redirect slightly to allow error to be displayed
+        processingAuthRef.current = true;
         setTimeout(() => {
           navigate('/auth', { replace: true });
+          processingAuthRef.current = false;
         }, 1500);
         return;
       }
@@ -36,7 +43,7 @@ const AuthCodeHandler = () => {
 
   // Handle authentication process
   useEffect(() => {
-    if (isProcessing || error) return;
+    if (isProcessing || error || processingAuthRef.current) return;
     
     let isMounted = true;
     setIsProcessing(true);
@@ -85,8 +92,14 @@ const AuthCodeHandler = () => {
         }
         
         // No auth data found, redirect to login
-        console.log("No auth data found, redirecting to login");
-        navigate('/auth', { replace: true });
+        if (window.location.pathname.includes('/auth/callback')) {
+          console.log("No auth data found but we're on the callback page, redirecting to login");
+          processingAuthRef.current = true;
+          navigate('/auth', { replace: true });
+        } else {
+          console.log("No auth data found on non-callback page, not redirecting");
+          setIsProcessing(false);
+        }
         
       } catch (error) {
         console.error("Auth process error:", error);
@@ -112,11 +125,15 @@ const AuthCodeHandler = () => {
             clearAllAuthData();
           }
           
+          processingAuthRef.current = true;
           navigate('/auth', { replace: true });
         }
       } finally {
         if (isMounted) {
           setIsProcessing(false);
+          setTimeout(() => {
+            processingAuthRef.current = false;
+          }, 1000);
         }
       }
     };
@@ -279,17 +296,20 @@ const AuthCodeHandler = () => {
           }
           
           // Always send new users to onboarding
+          processingAuthRef.current = true;
           navigate('/onboarding', { replace: true });
           return;
         }
         
         // Profile exists, check onboarding status
         console.log("Profile found, onboarding status:", profileData.onboarding_completed);
+        processingAuthRef.current = true;
         navigate(profileData.onboarding_completed ? '/dashboard' : '/onboarding', { replace: true });
         
       } catch (error) {
         console.error("Profile handling error:", error);
         // Default to onboarding on error
+        processingAuthRef.current = true;
         navigate('/onboarding', { replace: true });
       }
     };
@@ -300,6 +320,13 @@ const AuthCodeHandler = () => {
       isMounted = false;
     };
   }, [navigate, toast, isProcessing, error]);
+  
+  // Only show loading UI if we're explicitly on the callback page or processing auth
+  const showLoadingUI = window.location.pathname.includes('/auth/callback') || isProcessing;
+  
+  if (!showLoadingUI) {
+    return null;
+  }
   
   // Display loading or error state
   return (

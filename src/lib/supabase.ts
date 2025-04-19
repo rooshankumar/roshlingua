@@ -146,7 +146,10 @@ export const clearAllAuthData = () => {
     'supabase.auth.state',
     'sb-refresh-token',
     'supabase.auth.refresh_token',
-    'supabase.auth.access_token'
+    'supabase.auth.access_token',
+    'auth_flow_started',
+    'auth_redirect_initiated',
+    'sb-previous-auth-token'
   ];
   
   // Remove from both storage types
@@ -166,6 +169,12 @@ export const clearAllAuthData = () => {
       document.cookie = `${name}=; max-age=0; path=/;`;
     }
   });
+  
+  // Flag to prevent immediate auth redirects after clearing data
+  localStorage.setItem('auth_data_recently_cleared', Date.now().toString());
+  setTimeout(() => {
+    localStorage.removeItem('auth_data_recently_cleared');
+  }, 5000);
   
   console.log('All auth data cleared');
 };

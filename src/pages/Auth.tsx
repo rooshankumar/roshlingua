@@ -124,6 +124,9 @@ const Auth = () => {
       // Call the central function to clear all auth data
       clearAllAuthData();
       
+      // Add a small delay to ensure everything is cleared
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
       // Force a completely new OAuth state by adding timestamp
       const randomState = Math.random().toString(36).substring(2, 15) + '_' + Date.now();
       
@@ -131,8 +134,8 @@ const Auth = () => {
       localStorage.setItem('supabase.auth.state', randomState);
       sessionStorage.setItem('supabase.auth.state', randomState);
       
-      // Store timestamp to track auth flow
-      localStorage.setItem('auth_flow_started', Date.now().toString());
+      // Set a flag that we're initiating auth redirect
+      localStorage.setItem('auth_redirect_initiated', 'true');
       
       // Build redirect URL with fallbacks
       const redirectUrl = window.location.hostname.includes('localhost') || 
@@ -153,7 +156,6 @@ const Auth = () => {
             prompt: 'select_account consent', // Force account selection
             include_granted_scopes: 'true',
             state: randomState, // Add random state to avoid cached data
-            hd: '*' // Allow any Google domain
           }
         }
       });
@@ -162,13 +164,17 @@ const Auth = () => {
       
       // Log the redirect URL if available (for debugging)
       if (data?.url) {
-        console.log("Redirecting to OAuth provider URL");
+        console.log("Redirecting to OAuth provider URL:", data.url.substring(0, 50) + "...");
         
-        // You could also redirect manually to ensure clean navigation
-        // window.location.href = data.url;
+        // Set a timestamp to track when this auth flow started
+        localStorage.setItem('auth_flow_started', Date.now().toString());
+        
+        // Manual redirect for more reliability
+        window.location.href = data.url;
+        return;
       }
       
-      // The redirect happens automatically via Supabase
+      // The redirect should happen automatically via Supabase if we don't manually redirect
     } catch (error: any) {
       console.error("Google login error:", error);
       toast({
@@ -177,6 +183,9 @@ const Auth = () => {
         description: "Please try again or use email login",
       });
       setIsLoading(false);
+      
+      // Clear the initiated flag if there was an error
+      localStorage.removeItem('auth_redirect_initiated');
     }
   };
 
