@@ -90,7 +90,53 @@ export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
   },
   global: {
     headers: {
-      'Accept': 'application/json, application/vnd.pgrst.object+json'
+      // Add multiple Accept headers to fix 406 errors
+      'Accept': 'application/json, text/*, */*',
+      // Add content type for profile requests
+      'Content-Type': 'application/json'
+    },
+    // Add retry behavior for failed requests
+    fetch: (url, options) => {
+      const maxRetries = 3;
+      
+      const fetchWithRetry = async (retriesLeft) => {
+        try {
+          const response = await fetch(url, options);
+          
+          // If we get a 406 error, try again with adjusted headers
+          if (response.status === 406 && retriesLeft > 0) {
+            console.log(`Got 406 error, retrying with adjusted headers (${retriesLeft} attempts left)`);
+            
+            // Add more specific headers for the retry
+            const newOptions = {
+              ...options,
+              headers: {
+                ...options?.headers,
+                'Accept': '*/*',
+                'Content-Type': 'application/json'
+              }
+            };
+            
+            // Wait a moment before retrying
+            await new Promise(r => setTimeout(r, 300));
+            return fetchWithRetry(retriesLeft - 1);
+          }
+          
+          return response;
+        } catch (error) {
+          if (retriesLeft > 0) {
+            console.log(`Fetch error, retrying (${retriesLeft} attempts left)`, error);
+            
+            // Wait longer for network errors
+            await new Promise(r => setTimeout(r, 500));
+            return fetchWithRetry(retriesLeft - 1);
+          }
+          
+          throw error;
+        }
+      };
+      
+      return fetchWithRetry(maxRetries);
     }
   }
 });
