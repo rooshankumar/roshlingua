@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { Session, User } from "@supabase/supabase-js";
-import { supabase, createUserRecord } from "@/lib/supabase"; // Assuming this now contains the single Supabase client instance
+import { supabase } from "@/lib/supabase";
 import { useToast } from "@/hooks/use-toast";
 
 interface AuthContextType {
@@ -32,13 +32,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // Password validation rules
   const PASSWORD_RULES = {
     minLength: 8
-  };
-
-  const validatePassword = (password: string): { isValid: boolean; error: string | null } => {
-    if (password.length < PASSWORD_RULES.minLength) {
-      return { isValid: false, error: `Password must be at least ${PASSWORD_RULES.minLength} characters` };
-    }
-    return { isValid: true, error: null };
   };
 
   useEffect(() => {
@@ -158,69 +151,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [toast]);
 
   const login = async (email: string, password: string) => {
-    const MAX_LOGIN_ATTEMPTS = 5;
-    const LOCKOUT_DURATION = 15 * 60 * 1000; // 15 minutes
-    const loginAttempts = new Map<string, { count: number; lastAttempt: number }>();
-
     try {
-      // Check for rate limiting
-      const attempts = loginAttempts.get(email) || { count: 0, lastAttempt: 0 };
-      const now = Date.now();
-
-      if (attempts.count >= MAX_LOGIN_ATTEMPTS && now - attempts.lastAttempt < LOCKOUT_DURATION) {
-        const remainingTime = Math.ceil((LOCKOUT_DURATION - (now - attempts.lastAttempt)) / 60000);
-        toast({
-          variant: "destructive",
-          title: "Account locked",
-          description: `Too many login attempts. Please try again in ${remainingTime} minutes.`
-        });
-        return;
-      }
-
-      // First check if the user exists
-      const { data: userExists } = await supabase
-        .from('users')
-        .select('id')
-        .eq('email', email)
-        .single();
-
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
       if (error) {
-        // Handle specific database errors
-        if (error.message.includes('Database error')) {
-          console.error('Database error during login:', error);
-          toast({
-            variant: "destructive",
-            title: "Login error",
-            description: "There was an issue accessing your account. Please try again in a few moments."
-          });
-        } else {
-          // Update login attempts for other errors
-          loginAttempts.set(email, {
-            count: attempts.count + 1,
-            lastAttempt: now
-          });
-
-          const attemptsLeft = MAX_LOGIN_ATTEMPTS - (attempts.count + 1);
-          toast({
-            variant: "destructive",
-            title: "Login failed",
-            description: `Invalid credentials${attemptsLeft > 0 ? ` (${attemptsLeft} attempts remaining)` : ''}`
-          });
-        }
+        toast({
+          variant: "destructive",
+          title: "Login failed",
+          description: error.message
+        });
         throw error;
       }
 
-      // Reset login attempts on successful login
-      loginAttempts.delete(email);
-
-      // Ensure user record exists
+      // Update last_seen for streak calculation
       if (data.user) {
-        // Update last_seen for streak calculation
         const { error: updateError } = await supabase
           .from('profiles')
           .upsert({
@@ -232,10 +179,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (updateError) {
           console.error("Error updating last_seen:", updateError);
         }
-        await handlePostAuth(data.user.id);
       }
-      await updateOnboardingStatus(data.user.id); // Call the new function after successful login
-      await updateUserActivity(data.user.id); // Add streak update after successful login
     } catch (error) {
       console.error("Login error:", error);
       throw error;
@@ -245,27 +189,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const signup = async (email: string, password: string, name: string) => {
     try {
       // Validate password
-      const passwordValidation = validatePassword(password);
-      if (!passwordValidation.isValid) {
+      if (password.length < PASSWORD_RULES.minLength) {
         toast({
           variant: "destructive",
           title: "Invalid password",
-          description: passwordValidation.error
+          description: `Password must be at least ${PASSWORD_RULES.minLength} characters`
         });
         return;
       }
 
-      // Validate email
-      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-        toast({
-          variant: "destructive",
-          title: "Invalid email",
-          description: "Please enter a valid email address"
-        });
-        return;
-      }
-
-      // First create the auth user
+      // Create the auth user
       const { data: authData, error: signUpError } = await supabase.auth.signUp({
         email,
         password,
@@ -279,39 +212,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       if (signUpError) {
         console.error("Signup error:", signUpError);
-        let errorMessage = 'Failed to create account. Please try again.';
-
-        if (signUpError.message === 'User already registered') {
-          errorMessage = 'This email is already registered. Please log in instead.';
-        } else if (signUpError.message.includes('Database error')) {
-          errorMessage = 'There was an issue creating your account. Please try again in a few moments.';
-          // Log detailed error for debugging
-          console.error('Database error during signup:', signUpError);
-        }
-
         toast({
           variant: "destructive",
           title: "Signup failed",
-          description: errorMessage
-        });
-        return;
-      }
-
-      if (!authData.user?.id) {
-        toast({
-          variant: "destructive",
-          title: "Signup failed",
-          description: "Failed to create user account"
-        });
-        return;
-      }
-
-      // User record will be created automatically via database trigger
-      if (!authData.user) {
-        toast({
-          variant: "destructive",
-          title: "Signup failed",
-          description: "There was an error creating your account. Please try again."
+          description: signUpError.message
         });
         return;
       }
@@ -320,8 +224,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         title: "Account created",
         description: "Please check your email to confirm your account.",
       });
-      await updateOnboardingStatus(authData.user.id); // Call the new function after successful signup
-      await updateUserActivity(authData.user.id); // Add streak update after successful signup
     } catch (error) {
       console.error("Signup error:", error);
       throw error;
@@ -330,7 +232,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const loginWithGoogle = async () => {
     try {
-      // Simple OAuth login with Google - let the redirect happen automatically
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
@@ -352,7 +253,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signOut = async () => {
     try {
-      // Sign out through Supabase
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
 
@@ -373,20 +273,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const updateOnboardingStatus = async (userId: string) => {
-    try {
-      const { error: onboardingError } = await supabase
-        .from('onboarding_status')
-        .update({ is_complete: true })
-        .eq('user_id', userId);
-      if (onboardingError) {
-        console.error("Error updating onboarding status:", onboardingError);
-      }
-    } catch (error) {
-      console.error("Error updating onboarding status:", error);
-    }
-  };
-
   const updateUserActivity = async (userId: string) => {
     if (!userId) return;
 
@@ -403,24 +289,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       console.error('Error updating user activity:', error);
     }
   };
-
-  const handlePostAuth = async (userId: string) => {
-    const { data: onboardingStatus, error: onboardingError } = await supabase
-      .from('onboarding_status')
-      .select('is_complete')
-      .eq('user_id', userId)
-      .single();
-
-    if (onboardingError) {
-      console.error("Error checking onboarding status:", onboardingError);
-      return;
-    }
-
-    if (onboardingStatus && onboardingStatus.is_complete) {
-      window.location.href = '/dashboard'; // Redirect to dashboard if onboarding is complete
-    }
-  };
-
 
   const value: AuthContextType = {
     user,

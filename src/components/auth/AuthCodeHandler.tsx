@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
@@ -14,7 +15,51 @@ const AuthCodeHandler = () => {
       setIsProcessing(true);
 
       try {
-        // Get the code from URL
+        // Check if we have a session already
+        const { data: sessionData } = await supabase.auth.getSession();
+        
+        if (sessionData?.session) {
+          console.log("Session already exists, checking profile");
+          
+          // Check if profile exists
+          const { data: profileData, error: profileError } = await supabase
+            .from('profiles')
+            .select('onboarding_completed')
+            .eq('id', sessionData.session.user.id)
+            .single();
+            
+          if (profileError && profileError.code !== 'PGRST116') {
+            console.error("Error fetching profile:", profileError);
+          }
+
+          // If no profile found, create one
+          if (!profileData) {
+            const { error: insertError } = await supabase
+              .from('profiles')
+              .insert({
+                id: sessionData.session.user.id,
+                email: sessionData.session.user.email,
+                created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString(),
+                onboarding_completed: false
+              });
+              
+            if (insertError) {
+              console.error("Error creating profile:", insertError);
+            }
+            
+            // Redirect to onboarding
+            navigate('/onboarding', { replace: true });
+            return;
+          }
+          
+          // Redirect based on onboarding status
+          navigate(profileData.onboarding_completed ? '/dashboard' : '/onboarding', { replace: true });
+          return;
+        }
+
+        // Otherwise we need to exchange the code from the URL
+        console.log("No session, processing auth code exchange");
         const url = new URL(window.location.href);
         const code = url.searchParams.get('code');
         const error = url.searchParams.get('error');
@@ -22,6 +67,7 @@ const AuthCodeHandler = () => {
 
         // Handle error case
         if (error) {
+          console.error("Auth error:", error, errorDescription);
           toast({
             variant: "destructive",
             title: "Authentication Error",
@@ -31,14 +77,14 @@ const AuthCodeHandler = () => {
           return;
         }
 
-        // If no code is present, return
+        // If no code is present, redirect to auth
         if (!code) {
-          setIsProcessing(false);
+          console.log("No auth code present, redirecting to auth");
+          navigate('/auth', { replace: true });
           return;
         }
 
         // Exchange the code for a session
-        // No need to manually pass a verifier - Supabase handles this internally
         const { data, error: sessionError } = await supabase.auth.exchangeCodeForSession(code);
 
         if (sessionError) {
@@ -52,7 +98,6 @@ const AuthCodeHandler = () => {
           return;
         }
 
-        // If no session was created, show error
         if (!data.session) {
           toast({
             variant: "destructive",
@@ -63,15 +108,39 @@ const AuthCodeHandler = () => {
           return;
         }
 
-        // Get user profile to check if onboarding is completed
-        const { data: profile } = await supabase
+        // Create profile if needed
+        const { data: profile, error: profileCheckError } = await supabase
           .from('profiles')
           .select('onboarding_completed')
           .eq('id', data.session.user.id)
           .single();
 
+        if (profileCheckError && profileCheckError.code !== 'PGRST116') {
+          console.error("Profile check error:", profileCheckError);
+        }
+
+        // If profile doesn't exist, create it
+        if (!profile) {
+          const { error: createError } = await supabase
+            .from('profiles')
+            .insert({
+              id: data.session.user.id,
+              email: data.session.user.email,
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString(),
+              onboarding_completed: false
+            });
+
+          if (createError) {
+            console.error("Error creating profile:", createError);
+          }
+
+          navigate('/onboarding', { replace: true });
+          return;
+        }
+
         // Redirect based on onboarding status
-        navigate(profile?.onboarding_completed ? '/dashboard' : '/onboarding', { replace: true });
+        navigate(profile.onboarding_completed ? '/dashboard' : '/onboarding', { replace: true });
       } catch (err) {
         console.error('Auth callback error:', err);
         toast({

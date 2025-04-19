@@ -1,19 +1,17 @@
+
 import { useState, useEffect } from "react";
-import { useNavigate, useSearchParams, useLocation } from "react-router-dom";
-import { useAuth } from "@/providers/AuthProvider";
-import { supabase } from "@/lib/supabase";
+import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import { Eye, EyeOff, Mail, Loader2 } from "lucide-react";
+import { Eye, EyeOff, Loader2 } from "lucide-react";
+import { supabase } from "@/lib/supabase";
 
 const Auth = () => {
-  const [searchParams] = useSearchParams();
-  const defaultTab = searchParams.get("mode") === "signup" ? "signup" : "login";
-  const [activeTab, setActiveTab] = useState(defaultTab);
+  const [activeTab, setActiveTab] = useState<string>("login");
   const [showPassword, setShowPassword] = useState(false);
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -22,26 +20,20 @@ const Auth = () => {
 
   const { toast } = useToast();
   const navigate = useNavigate();
-  const location = useLocation();
-  const { login, signup, loginWithGoogle, user } = useAuth();
-
-  const from = (location.state as any)?.from || "/dashboard";
 
   useEffect(() => {
+    // Check if user is already authenticated
     const checkSession = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (session?.user) {
+        // Check if profile exists and onboarding is completed
         const { data: profile } = await supabase
           .from('profiles')
           .select('onboarding_completed')
           .eq('id', session.user.id)
           .single();
 
-        if (profile?.onboarding_completed) {
-          navigate('/dashboard', { replace: true });
-        } else {
-          navigate('/onboarding', { replace: true });
-        }
+        navigate(profile?.onboarding_completed ? '/dashboard' : '/onboarding', { replace: true });
       }
     };
 
@@ -66,11 +58,7 @@ const Auth = () => {
         .eq('id', data.user.id)
         .single();
 
-      if (profile?.onboarding_completed) {
-        navigate('/dashboard', { replace: true });
-      } else {
-        navigate('/onboarding', { replace: true });
-      }
+      navigate(profile?.onboarding_completed ? '/dashboard' : '/onboarding', { replace: true });
     } catch (error: any) {
       toast({
         variant: "destructive",
@@ -101,29 +89,12 @@ const Auth = () => {
         email,
         password,
         options: {
-          emailRedirectTo: `${window.location.origin}/auth/callback`,
-          data: {
-            email: email,
-            created_at: new Date().toISOString()
-          }
+          emailRedirectTo: `${window.location.origin}/auth/callback`
         }
       });
 
       if (signUpError) throw signUpError;
       if (!data?.user) throw new Error("Signup failed - no user returned");
-
-      // Create profile record
-      const { error: profileError } = await supabase
-        .from('profiles')
-        .insert([{
-          id: data.user.id,
-          email: email,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
-        }])
-        .single();
-
-      if (profileError) throw profileError;
 
       toast({
         title: "Success",
@@ -147,7 +118,6 @@ const Auth = () => {
     try {
       setIsLoading(true);
       
-      // Simple OAuth login with Google
       const { error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
@@ -291,7 +261,7 @@ const Auth = () => {
                   <Input
                     id="password"
                     type={showPassword ? "text" : "password"}
-                  placeholder="********"
+                    placeholder="********"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     disabled={isLoading}

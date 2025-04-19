@@ -1,5 +1,6 @@
+
 import { createClient } from '@supabase/supabase-js';
-import type { Database } from '@/integrations/supabase/types';
+import type { Database } from '@/types/supabase';
 
 // Get environment variables
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
@@ -12,10 +13,14 @@ if (!supabaseUrl || !supabaseAnonKey) {
 // Create a single supabase client for the entire app
 export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
   auth: {
-    flowType: 'pkce',
     autoRefreshToken: true,
     persistSession: true,
     detectSessionInUrl: true
+  },
+  global: {
+    headers: {
+      'Accept': 'application/json'
+    }
   }
 });
 
@@ -40,22 +45,11 @@ export const getCurrentSession = async () => {
   return data?.session || null;
 };
 
-export const createUserRecord = async (userId: string, email: string, fullName: string) => {
-  try {
-    const { data, error } = await supabase.rpc('create_user_with_onboarding', {
-      p_user_id: userId,
-      p_email: email,
-      p_full_name: fullName
-    });
-
-    if (error) {
-      console.error("Failed to create user record:", error);
-      return { success: false, error };
+export const signInWithGoogle = async () => {
+  return supabase.auth.signInWithOAuth({
+    provider: 'google',
+    options: {
+      redirectTo: `${window.location.origin}/auth/callback`,
     }
-
-    return { success: true, data };
-  } catch (err) {
-    console.error("Exception creating user record:", err);
-    return { success: false, error: err };
-  }
+  });
 };
