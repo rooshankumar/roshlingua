@@ -118,74 +118,48 @@ const Auth = () => {
     try {
       setIsLoading(true);
       
-      // Import the clearAllAuthData function to ensure clean auth state
-      const { clearAllAuthData } = await import('@/lib/supabase');
+      // Clear any previous auth data to ensure clean login
+      localStorage.removeItem('sb-auth-token');
+      localStorage.removeItem('supabase.auth.token');
+      sessionStorage.removeItem('supabase.auth.token');
+      localStorage.removeItem('supabase.auth.expires_at');
+      sessionStorage.removeItem('supabase.auth.expires_at');
+      localStorage.removeItem('supabase.auth.code_verifier');
+      sessionStorage.removeItem('supabase.auth.code_verifier');
+      localStorage.removeItem('supabase.auth.code');
+      sessionStorage.removeItem('supabase.auth.code');
       
-      // Call the central function to clear all auth data
-      clearAllAuthData();
-      
-      // Add a small delay to ensure everything is cleared
-      await new Promise(resolve => setTimeout(resolve, 100));
-      
-      // Force a completely new OAuth state by adding timestamp
-      const randomState = Math.random().toString(36).substring(2, 15) + '_' + Date.now();
-      
-      // Store the state in both localStorage and sessionStorage for redundancy
-      localStorage.setItem('supabase.auth.state', randomState);
-      sessionStorage.setItem('supabase.auth.state', randomState);
-      
-      // Set a flag that we're initiating auth redirect
-      localStorage.setItem('auth_redirect_initiated', 'true');
-      
-      // Build redirect URL with fallbacks
-      const redirectUrl = window.location.hostname.includes('localhost') || 
-                         window.location.hostname.includes('replit')
+      // Use production URL for redirects
+      const redirectUrl = window.location.hostname.includes('localhost') || window.location.hostname.includes('replit')
         ? `${window.location.origin}/auth/callback`
         : `${window.location.origin.replace(/\/$/, '')}/auth/callback`;
         
-      console.log(`Google login initiated: ${new Date().toISOString()}`);
-      console.log(`Using redirect URL: ${redirectUrl}`);
+      console.log("Redirect URL:", redirectUrl);
       
-      const { data, error } = await supabase.auth.signInWithOAuth({
+      const { error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
           redirectTo: redirectUrl,
           skipBrowserRedirect: false,
           queryParams: {
             access_type: 'offline',
-            prompt: 'select_account consent', // Force account selection
-            include_granted_scopes: 'true',
-            state: randomState, // Add random state to avoid cached data
+            prompt: 'select_account consent', // Force account selection dialog
+            include_granted_scopes: 'true'
           }
         }
       });
 
       if (error) throw error;
       
-      // Log the redirect URL if available (for debugging)
-      if (data?.url) {
-        console.log("Redirecting to OAuth provider URL:", data.url.substring(0, 50) + "...");
-        
-        // Set a timestamp to track when this auth flow started
-        localStorage.setItem('auth_flow_started', Date.now().toString());
-        
-        // Manual redirect for more reliability
-        window.location.href = data.url;
-        return;
-      }
-      
-      // The redirect should happen automatically via Supabase if we don't manually redirect
+      // The redirect happens automatically
     } catch (error: any) {
       console.error("Google login error:", error);
       toast({
         variant: "destructive",
         title: "Google login failed",
-        description: "Please try again or use email login",
+        description: error.message || "Failed to authenticate with Google",
       });
       setIsLoading(false);
-      
-      // Clear the initiated flag if there was an error
-      localStorage.removeItem('auth_redirect_initiated');
     }
   };
 
