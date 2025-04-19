@@ -15,7 +15,7 @@ export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
   auth: {
     autoRefreshToken: true,
     persistSession: true,
-    detectSessionInUrl: true,
+    detectSessionInUrl: false, // Disable automatic detection - we'll handle it manually
     flowType: 'pkce', // Use PKCE flow for more reliable token exchange
     storageKey: 'sb-auth-token',
     storage: {
@@ -35,28 +35,26 @@ export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
       },
       setItem: (key, value) => {
         try {
-          // For login with different Google accounts, we need to clear all previous auth data
-          if (key === 'sb-auth-token' || key.includes('supabase.auth.token')) {
-            // Clear all known auth token storage locations
-            localStorage.removeItem('sb-auth-token');
-            localStorage.removeItem('supabase.auth.token');
-            sessionStorage.removeItem('supabase.auth.token');
-            localStorage.removeItem('supabase.auth.expires_at');
-            sessionStorage.removeItem('supabase.auth.expires_at');
-            
-            // Also clear any PKCE verifiers to ensure clean authentication
-            localStorage.removeItem('supabase.auth.code_verifier');
-            sessionStorage.removeItem('supabase.auth.code_verifier');
-            localStorage.removeItem('supabase.auth.code');
-            sessionStorage.removeItem('supabase.auth.code');
-          }
-          
           // Store PKCE verifiers in both localStorage and sessionStorage for redundancy
           if (key.includes('code_verifier')) {
             localStorage.setItem(key, value);
             sessionStorage.setItem(key, value);
+            
+            // Store PKCE state keys in both storages too
+            if (key === 'supabase.auth.code_verifier') {
+              const randomState = Math.random().toString(36).substring(2, 15);
+              localStorage.setItem('supabase.auth.state', randomState);
+              sessionStorage.setItem('supabase.auth.state', randomState);
+            }
           } else {
+            // Store normal items in localStorage
             localStorage.setItem(key, value);
+            
+            // For tokens, ensure we clear old values first
+            if (key === 'sb-auth-token' || key.includes('supabase.auth.token')) {
+              localStorage.removeItem('sb-previous-auth-token');
+              localStorage.setItem('sb-previous-auth-token', value);
+            }
           }
           return;
         } catch (error) {
@@ -68,18 +66,13 @@ export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
           localStorage.removeItem(key);
           sessionStorage.removeItem(key);
           
-          // If clearing main token, clear all related auth data
+          // If clearing main token, don't clear PKCE data yet
           if (key === 'sb-auth-token' || key === 'supabase.auth.token') {
-            // Clear all known auth token locations
             localStorage.removeItem('sb-auth-token');
             localStorage.removeItem('supabase.auth.token');
             sessionStorage.removeItem('supabase.auth.token');
             localStorage.removeItem('supabase.auth.expires_at');
             sessionStorage.removeItem('supabase.auth.expires_at');
-            localStorage.removeItem('supabase.auth.code_verifier');
-            sessionStorage.removeItem('supabase.auth.code_verifier');
-            localStorage.removeItem('supabase.auth.code');
-            sessionStorage.removeItem('supabase.auth.code');
           }
           return;
         } catch (error) {
@@ -140,6 +133,42 @@ export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
     }
   }
 });
+
+// Function to clear all auth-related data - helps fix OAuth state issues
+export const clearAllAuthData = () => {
+  // List of all auth-related keys to clear
+  const authKeys = [
+    'sb-auth-token',
+    'supabase.auth.token',
+    'supabase.auth.expires_at',
+    'supabase.auth.code_verifier',
+    'supabase.auth.code',
+    'supabase.auth.state',
+    'sb-refresh-token',
+    'supabase.auth.refresh_token',
+    'supabase.auth.access_token'
+  ];
+  
+  // Remove from both storage types
+  authKeys.forEach(key => {
+    try {
+      localStorage.removeItem(key);
+      sessionStorage.removeItem(key);
+    } catch (e) {
+      console.warn(`Failed to clear ${key}:`, e);
+    }
+  });
+  
+  // Clear any cookies with auth data
+  document.cookie.split(';').forEach(cookie => {
+    const name = cookie.trim().split('=')[0];
+    if (name.includes('supabase') || name.includes('auth') || name.includes('sb-')) {
+      document.cookie = `${name}=; max-age=0; path=/;`;
+    }
+  });
+  
+  console.log('All auth data cleared');
+};
 
 // Simple auth helpers
 export const signOut = async () => {

@@ -118,31 +118,21 @@ const Auth = () => {
     try {
       setIsLoading(true);
       
-      // Create a clean authentication state by clearing all storage
-      // This helps prevent issues with multiple Google accounts
-      const authKeys = [
-        'sb-auth-token',
-        'supabase.auth.token',
-        'supabase.auth.expires_at',
-        'supabase.auth.code_verifier',
-        'supabase.auth.code',
-        'sb-refresh-token',
-        'supabase.auth.refresh_token',
-        'supabase.auth.access_token'
-      ];
+      // Import the clearAllAuthData function to ensure clean auth state
+      const { clearAllAuthData } = await import('@/lib/supabase');
       
-      // Clear in both storage types
-      authKeys.forEach(key => {
-        try {
-          localStorage.removeItem(key);
-          sessionStorage.removeItem(key);
-        } catch (e) {
-          console.warn(`Failed to clear ${key}:`, e);
-        }
-      });
+      // Call the central function to clear all auth data
+      clearAllAuthData();
       
-      // Force a random state parameter to prevent stale authentication states
-      const randomState = Math.random().toString(36).substring(2, 15);
+      // Force a completely new OAuth state by adding timestamp
+      const randomState = Math.random().toString(36).substring(2, 15) + '_' + Date.now();
+      
+      // Store the state in both localStorage and sessionStorage for redundancy
+      localStorage.setItem('supabase.auth.state', randomState);
+      sessionStorage.setItem('supabase.auth.state', randomState);
+      
+      // Store timestamp to track auth flow
+      localStorage.setItem('auth_flow_started', Date.now().toString());
       
       // Build redirect URL with fallbacks
       const redirectUrl = window.location.hostname.includes('localhost') || 
@@ -162,7 +152,8 @@ const Auth = () => {
             access_type: 'offline',
             prompt: 'select_account consent', // Force account selection
             include_granted_scopes: 'true',
-            state: randomState // Add random state to avoid cached data
+            state: randomState, // Add random state to avoid cached data
+            hd: '*' // Allow any Google domain
           }
         }
       });
@@ -172,9 +163,12 @@ const Auth = () => {
       // Log the redirect URL if available (for debugging)
       if (data?.url) {
         console.log("Redirecting to OAuth provider URL");
+        
+        // You could also redirect manually to ensure clean navigation
+        // window.location.href = data.url;
       }
       
-      // The redirect happens automatically
+      // The redirect happens automatically via Supabase
     } catch (error: any) {
       console.error("Google login error:", error);
       toast({
