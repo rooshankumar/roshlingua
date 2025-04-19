@@ -1,0 +1,50 @@
+TrueClient@0 (2.69.1) 2025-04-19T06:48:13.985Z #getSession() session from storage {access_token: 'eyJhbGciOiJIUzI1NiIsImtpZCI6InJBVlcvUThncTdTeFdlVn…xzZX0.60eoXoYCeocMQzY9GanlnGzfKrqcfMIL9lJUuOTK9uM', token_type: 'bearer', expires_in: 3600, expires_at: 1745048531, refresh_token: 'Wb7qFhzNZd5KnVtRnEw4tA', …}
+index-CjQZ5wGA.js:73 GoTrueClient@0 (2.69.1) 2025-04-19T06:48:13.986Z #__loadSession() session has not expired expires_at 1745048531
+index-CjQZ5wGA.js:73 GoTrueClient@0 (2.69.1) 2025-04-19T06:48:13.986Z #__loadSession() end
+index-CjQZ5wGA.js:73 GoTrueClient@0 (2.69.1) 2025-04-19T06:48:13.986Z #_useSession end
+index-CjQZ5wGA.js:73 GoTrueClient@0 (2.69.1) 2025-04-19T06:48:13.987Z #_acquireLock lock released for storage key sb-auth-token
+index-CjQZ5wGA.js:73 GoTrueClient@0 (2.69.1) 2025-04-19T06:48:13.987Z #_acquireLock end
+index-CjQZ5wGA.js:73 GoTrueClient@0 (2.69.1) 2025-04-19T06:48:13.989Z #_acquireLock lock acquired for storage key sb-auth-token
+index-CjQZ5wGA.js:73 GoTrueClient@0 (2.69.1) 2025-04-19T06:48:13.989Z #_useSession begin
+index-CjQZ5wGA.js:73 GoTrueClient@0 (2.69.1) 2025-04-19T06:48:13.990Z #__loadSession() begin
+index-CjQZ5wGA.js:73 GoTrueClient@0 (2.69.1) 2025-04-19T06:48:13.990Z #getSession() session from storage {access_token: 'eyJhbGciOiJIUzI1NiIsImtpZCI6InJBVlcvUThncTdTeFdlVn…xzZX0.60eoXoYCeocMQzY9GanlnGzfKrqcfMIL9lJUuOTK9uM', token_type: 'bearer', expires_in: 3600, expires_at: 1745048531, refresh_token: 'Wb7qFhzNZd5KnVtRnEw4tA', …}
+index-CjQZ5wGA.js:73 GoTrueClient@0 (2.69.1) 2025-04-19T06:48:13.991Z #__loadSession() session has not expired expires_at 1745048531
+index-CjQZ5wGA.js:73 GoTrueClient@0 (2.69.1) 2025-04-19T06:48:13.991Z #__loadSession() end
+index-CjQZ5wGA.js:73 GoTrueClient@0 (2.69.1) 2025-04-19T06:48:13.992Z #_useSession end
+index-CjQZ5wGA.js:73 GoTrueClient@0 (2.69.1) 2025-04-19T06:48:13.994Z #_acquireLock lock released for storage key sb-auth-token
+index-CjQZ5wGA.js:73 GoTrueClient@0 (2.69.1) 2025-04-19T06:48:13.996Z #_acquireLock end
+index-CjQZ5wGA.js:72 
+            
+            
+           GET https://wqojeesjtgfcftpnzaet.supabase.co/rest/v1/profiles?select=onboarding_completed&id=eq.914877b7-03bb-41bc-a392-3c74713c6cb2 406 (Not Acceptable)
+(anonymous) @ index-CjQZ5wGA.js:72
+(anonymous) @ index-CjQZ5wGA.js:72
+a @ index-CjQZ5wGA.js:72
+Promise.then
+u @ index-CjQZ5wGA.js:72
+(anonymous) @ index-CjQZ5wGA.js:72
+_P @ index-CjQZ5wGA.js:72
+(anonymous) @ index-CjQZ5wGA.js:72
+then @ index-CjQZ5wGA.js:67Understand this error
+index-CjQZ5wGA.js:49 Throttling navigation to prevent the browser from hanging. See https://crbug.com/1038223. Command line switch --disable-ipc-flooding-protection can be used to bypass the protection
+y @ index-CjQZ5wGA.js:49
+(anonymous) @ index-CjQZ5wGA.js:58
+(anonymous) @ index-CjQZ5wGA.js:58
+Hc @ index-CjQZ5wGA.js:40
+Ro @ index-CjQZ5wGA.js:40
+(anonymous) @ index-CjQZ5wGA.js:40
+S @ index-CjQZ5wGA.js:25
+I @ index-CjQZ5wGA.js:25Understand this warning
+index-CjQZ5wGA.js:72 
+            
+            
+           GET https://wqojeesjtgfcftpnzaet.supabase.co/rest/v1/profiles?select=onboarding_completed&id=eq.914877b7-03bb-41bc-a392-3c74713c6cb2 406 (Not Acceptable)
+(anonymous) @ index-CjQZ5wGA.js:72
+(anonymous) @ index-CjQZ5wGA.js:72
+a @ index-CjQZ5wGA.js:72
+Promise.then
+u @ index-CjQZ5wGA.js:72
+(anonymous) @ index-CjQZ5wGA.js:72
+_P @ index-CjQZ5wGA.js:72
+(anonymous) @ index-CjQZ5wGA.js:72
+then @ index-CjQZ5wGA.js:67Understand this error
