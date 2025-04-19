@@ -37,18 +37,19 @@ const AuthCodeHandler = () => {
         }
 
         const verifier = getPKCEVerifier();
-        
+
         if (!verifier) {
           toast({
             variant: "destructive",
             title: "Authentication Failed",
-            description: "Missing security code verifier. Please try signing in again."
+            description: "Missing code verifier. Please try signing in again."
           });
           navigate('/auth', { replace: true });
           return;
         }
 
-        const { data, error: sessionError } = await supabase.auth.exchangeCodeForSession(code);
+        // Exchange auth code for session
+        const { data, error: sessionError } = await supabase.auth.exchangeCodeForSession(code, verifier);
 
         if (sessionError) {
           console.error('Session exchange error:', sessionError);
@@ -64,7 +65,7 @@ const AuthCodeHandler = () => {
 
         if (!data.session) {
           toast({
-            variant: "destructive", 
+            variant: "destructive",
             title: "Authentication Failed",
             description: "Could not establish a session. Please try again."
           });
@@ -75,18 +76,12 @@ const AuthCodeHandler = () => {
 
         clearPKCEVerifier();
 
-        // Check if user has completed onboarding
+        // Check profile after successful auth
         const { data: profile, error: profileError } = await supabase
           .from('profiles')
           .select('onboarding_completed')
           .eq('id', data.session.user.id)
           .single();
-        
-        if (profileError) {
-          // If profile doesn't exist, send to onboarding
-          navigate('/onboarding', { replace: true });
-          return;
-        }
 
         navigate(profile?.onboarding_completed ? '/dashboard' : '/onboarding', { replace: true });
 
