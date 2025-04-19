@@ -10,8 +10,10 @@ const AuthCodeHandler = () => {
   const [isProcessing, setIsProcessing] = useState(false);
 
   useEffect(() => {
+    let isMounted = true;
+    
     const handleAuthCallback = async () => {
-      if (isProcessing) return;
+      if (isProcessing || !isMounted) return;
       setIsProcessing(true);
 
       try {
@@ -48,7 +50,7 @@ const AuthCodeHandler = () => {
             }
             
             // Check if profile exists
-            if (data?.user) {
+            if (data?.user && isMounted) {
               const { data: profileData, error: profileError } = await supabase
                 .from('profiles')
                 .select('onboarding_completed')
@@ -76,12 +78,12 @@ const AuthCodeHandler = () => {
                 }
                 
                 // Redirect to onboarding
-                navigate('/onboarding', { replace: true });
+                if (isMounted) navigate('/onboarding', { replace: true });
                 return;
               }
               
               // Redirect based on onboarding status
-              navigate(profileData.onboarding_completed ? '/dashboard' : '/onboarding', { replace: true });
+              if (isMounted) navigate(profileData.onboarding_completed ? '/dashboard' : '/onboarding', { replace: true });
               return;
             }
           }
@@ -90,7 +92,7 @@ const AuthCodeHandler = () => {
         // Check if we have a session already
         const { data: sessionData } = await supabase.auth.getSession();
         
-        if (sessionData?.session) {
+        if (sessionData?.session && isMounted) {
           console.log("Session already exists, checking profile");
           
           // Check if profile exists
@@ -121,112 +123,123 @@ const AuthCodeHandler = () => {
             }
             
             // Redirect to onboarding
-            navigate('/onboarding', { replace: true });
+            if (isMounted) navigate('/onboarding', { replace: true });
             return;
           }
           
           // Redirect based on onboarding status
-          navigate(profileData.onboarding_completed ? '/dashboard' : '/onboarding', { replace: true });
+          if (isMounted) navigate(profileData.onboarding_completed ? '/dashboard' : '/onboarding', { replace: true });
           return;
         }
 
         // Otherwise we need to exchange the code from the URL
-        console.log("No session, processing auth code exchange");
-        const url = new URL(window.location.href);
-        const code = url.searchParams.get('code');
-        const error = url.searchParams.get('error');
-        const errorDescription = url.searchParams.get('error_description');
+        if (isMounted) {
+          console.log("No session, processing auth code exchange");
+          const url = new URL(window.location.href);
+          const code = url.searchParams.get('code');
+          const error = url.searchParams.get('error');
+          const errorDescription = url.searchParams.get('error_description');
 
-        // Handle error case
-        if (error) {
-          console.error("Auth error:", error, errorDescription);
-          toast({
-            variant: "destructive",
-            title: "Authentication Error",
-            description: errorDescription || error
-          });
-          navigate('/auth', { replace: true });
-          return;
-        }
-
-        // If no code is present, redirect to auth
-        if (!code) {
-          console.log("No auth code present, redirecting to auth");
-          navigate('/auth', { replace: true });
-          return;
-        }
-
-        // Exchange the code for a session
-        const { data, error: sessionError } = await supabase.auth.exchangeCodeForSession(code);
-
-        if (sessionError) {
-          console.error('Session exchange error:', sessionError);
-          toast({
-            variant: "destructive",
-            title: "Authentication Failed",
-            description: sessionError.message
-          });
-          navigate('/auth', { replace: true });
-          return;
-        }
-
-        if (!data.session) {
-          toast({
-            variant: "destructive",
-            title: "Authentication Failed",
-            description: "Could not establish a session. Please try again."
-          });
-          navigate('/auth', { replace: true });
-          return;
-        }
-
-        // Create profile if needed
-        const { data: profile, error: profileCheckError } = await supabase
-          .from('profiles')
-          .select('onboarding_completed')
-          .eq('id', data.session.user.id)
-          .single();
-
-        if (profileCheckError && profileCheckError.code !== 'PGRST116') {
-          console.error("Profile check error:", profileCheckError);
-        }
-
-        // If profile doesn't exist, create it
-        if (!profile) {
-          const { error: createError } = await supabase
-            .from('profiles')
-            .insert({
-              id: data.session.user.id,
-              email: data.session.user.email,
-              created_at: new Date().toISOString(),
-              updated_at: new Date().toISOString(),
-              onboarding_completed: false
+          // Handle error case
+          if (error) {
+            console.error("Auth error:", error, errorDescription);
+            toast({
+              variant: "destructive",
+              title: "Authentication Error",
+              description: errorDescription || error
             });
-
-          if (createError) {
-            console.error("Error creating profile:", createError);
+            navigate('/auth', { replace: true });
+            return;
           }
 
-          navigate('/onboarding', { replace: true });
-          return;
-        }
+          // If no code is present, redirect to auth
+          if (!code) {
+            console.log("No auth code present, redirecting to auth");
+            navigate('/auth', { replace: true });
+            return;
+          }
 
-        // Redirect based on onboarding status
-        navigate(profile.onboarding_completed ? '/dashboard' : '/onboarding', { replace: true });
+          // Exchange the code for a session
+          const { data, error: sessionError } = await supabase.auth.exchangeCodeForSession(code);
+
+          if (sessionError) {
+            console.error('Session exchange error:', sessionError);
+            toast({
+              variant: "destructive",
+              title: "Authentication Failed",
+              description: sessionError.message
+            });
+            navigate('/auth', { replace: true });
+            return;
+          }
+
+          if (!data.session) {
+            toast({
+              variant: "destructive",
+              title: "Authentication Failed",
+              description: "Could not establish a session. Please try again."
+            });
+            navigate('/auth', { replace: true });
+            return;
+          }
+
+          // Create profile if needed
+          const { data: profile, error: profileCheckError } = await supabase
+            .from('profiles')
+            .select('onboarding_completed')
+            .eq('id', data.session.user.id)
+            .single();
+
+          if (profileCheckError && profileCheckError.code !== 'PGRST116') {
+            console.error("Profile check error:", profileCheckError);
+          }
+
+          // If profile doesn't exist, create it
+          if (!profile) {
+            const { error: createError } = await supabase
+              .from('profiles')
+              .insert({
+                id: data.session.user.id,
+                email: data.session.user.email,
+                created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString(),
+                onboarding_completed: false
+              });
+
+            if (createError) {
+              console.error("Error creating profile:", createError);
+            }
+
+            navigate('/onboarding', { replace: true });
+            return;
+          }
+
+          // Redirect based on onboarding status
+          navigate(profile.onboarding_completed ? '/dashboard' : '/onboarding', { replace: true });
+        }
       } catch (err) {
         console.error('Auth callback error:', err);
-        toast({
-          variant: "destructive",
-          title: "Error",
-          description: "An unexpected error occurred. Please try again."
-        });
-        navigate('/auth', { replace: true });
+        if (isMounted) {
+          toast({
+            variant: "destructive",
+            title: "Error",
+            description: "An unexpected error occurred. Please try again."
+          });
+          navigate('/auth', { replace: true });
+        }
       } finally {
-        setIsProcessing(false);
+        if (isMounted) {
+          setIsProcessing(false);
+        }
       }
     };
 
     handleAuthCallback();
+
+    // Cleanup function to prevent state updates after unmounting
+    return () => {
+      isMounted = false;
+    };
   }, [navigate, toast, isProcessing]);
 
   return null;

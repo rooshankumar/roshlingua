@@ -76,8 +76,12 @@ const Dashboard = () => {
 
 
   useEffect(() => {
+    let isMounted = true;
+    let profileSubscription;
+    let dashboardChannel;
+    
     const fetchUserData = async () => {
-      if (!user) return;
+      if (!user || !isMounted) return;
 
       try {
         console.log("Fetching user data for dashboard...");
@@ -93,24 +97,26 @@ const Dashboard = () => {
         if (error) {
           console.error("Profile data fetch error:", error);
           // Don't throw, just use defaults
-          setUserStats({
-            streak: 0,
-            xp: 0,
-            progress: 0,
-            level: 'Beginner'
-          });
+          if (isMounted) {
+            setUserStats({
+              streak: 0,
+              xp: 0,
+              progress: 0,
+              level: 'Beginner'
+            });
+          }
           return;
         }
 
-        if (profileData) {
+        if (profileData && isMounted) {
           console.log("Setting user stats with profile data");
           setUserStats({
-            streak: profileData.streak_count ?? 0, // Use nullish coalescing to only default to 0 if null/undefined
+            streak: profileData.streak_count ?? 0, 
             xp: profileData.xp_points || 0,
             progress: profileData.progress_percentage || 0,
             level: getLevel(profileData.xp_points || 0)
           });
-        } else {
+        } else if (isMounted) {
           console.log("No profile data found, using defaults");
           setUserStats({
             streak: 0,
@@ -121,7 +127,7 @@ const Dashboard = () => {
         }
 
         // Set up realtime subscription for profile updates
-        const profileSubscription = supabase
+        profileSubscription = supabase
           .channel(`profile_updates_${user.id}`)
           .on('postgres_changes', {
             event: '*',
@@ -129,7 +135,7 @@ const Dashboard = () => {
             table: 'profiles',
             filter: `id=eq.${user.id}`
           }, (payload) => {
-            if (payload.new) {
+            if (payload.new && isMounted) {
               setUserStats(prev => ({
                 ...prev,
                 streak: payload.new.streak_count ?? 0,
@@ -147,19 +153,12 @@ const Dashboard = () => {
           .select('*', { count: 'exact' })
           .eq('user_id', user.id);
 
-        return () => {
-          profileSubscription.unsubscribe();
-        };
-
-        return () => {
-          profileSubscription.unsubscribe();
-        };
-
-        setStats({
-          conversations: conversationsCount || 0,
-          xp: xpData || 0,
-          proficiency_level: getLevel(xpData) || 'beginner'
-        });
+        if (isMounted) {
+          setStats(prev => ({
+            ...prev,
+            conversations: conversationsCount || 0
+          }));
+        }
 
         // Get active users
         const { data: activeUsersData } = await supabase
@@ -177,7 +176,9 @@ const Dashboard = () => {
           .order('last_seen', { ascending: false })
           .limit(4);
 
-        setActiveUsers(activeUsersData || []);
+        if (isMounted) {
+          setActiveUsers(activeUsersData || []);
+        }
       } catch (error) {
         console.error('Error in fetchUserData:', error);
       }
@@ -186,21 +187,42 @@ const Dashboard = () => {
     fetchUserData();
 
     // Subscribe to realtime updates
-    const channel = supabase
+    dashboardChannel = supabase
       .channel('dashboard_changes')
       .on('postgres_changes', {
         event: '*',
         schema: 'public',
         table: 'profiles',
       }, () => {
-        fetchUserData();
+        // Don't call fetchUserData directly to avoid loops
+        if (isMounted && user) {
+          console.log("Received profile change, updating stats for user:", user.id);
+          // Instead of calling fetchUserData, update specific data
+          supabase
+            .from('profiles')
+            .select('streak_count, xp_points, progress_percentage')
+            .eq('id', user.id)
+            .single()
+            .then(({ data, error }) => {
+              if (!error && data && isMounted) {
+                setUserStats({
+                  streak: data.streak_count ?? 0,
+                  xp: data.xp_points || 0,
+                  progress: data.progress_percentage || 0,
+                  level: getLevel(data.xp_points || 0)
+                });
+              }
+            });
+        }
       })
       .subscribe();
 
     return () => {
-      channel.unsubscribe();
+      isMounted = false;
+      if (profileSubscription) profileSubscription.unsubscribe();
+      if (dashboardChannel) dashboardChannel.unsubscribe();
     };
-  }, [user]);
+  }, [user?.id]); // Only re-run when user ID changes
 
   return (
     <div className="container pb-8 animate-fade-up">
