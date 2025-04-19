@@ -146,6 +146,12 @@ const Auth = () => {
   const handleGoogleLogin = async () => {
     try {
       setIsLoading(true);
+      const { generateVerifier, storePKCEVerifier } = await import('@/utils/pkceHelper');
+      
+      // Generate and store a new PKCE verifier
+      const verifier = generateVerifier();
+      storePKCEVerifier(verifier);
+
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
@@ -154,6 +160,7 @@ const Auth = () => {
             access_type: "offline",
             prompt: "consent",
           },
+          skipBrowserRedirect: true,
         },
       });
 
