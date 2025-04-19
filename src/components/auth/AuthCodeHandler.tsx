@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
@@ -35,22 +36,22 @@ const AuthCodeHandler = () => {
           return;
         }
 
-        // Get the verifier that was stored during the initial auth request
         const verifier = getPKCEVerifier();
-
+        
         if (!verifier) {
           toast({
             variant: "destructive",
             title: "Authentication Failed",
-            description: "Missing security code verifier. Please try again."
+            description: "Missing security code verifier. Please try signing in again."
           });
           navigate('/auth', { replace: true });
           return;
         }
 
-        const { data, error: sessionError } = await supabase.auth.exchangeCodeForSession(code, { code_verifier: verifier });
+        const { data, error: sessionError } = await supabase.auth.exchangeCodeForSession(code);
 
         if (sessionError) {
+          console.error('Session exchange error:', sessionError);
           toast({
             variant: "destructive",
             title: "Authentication Failed",
@@ -61,31 +62,34 @@ const AuthCodeHandler = () => {
           return;
         }
 
-        if (data.session) {
+        if (!data.session) {
+          toast({
+            variant: "destructive", 
+            title: "Authentication Failed",
+            description: "Could not establish a session. Please try again."
+          });
           clearPKCEVerifier();
-          try {
-            const { data: profileData, error: profileError } = await supabase
-              .from('profiles')
-              .select('onboarding_completed')
-              .eq('id', data.session.user.id)
-              .single();
-
-            if (profileError) throw profileError;
-
-            navigate(profileData?.onboarding_completed ? '/dashboard' : '/onboarding', { replace: true });
-          } catch (error) {
-            navigate('/dashboard', { replace: true });
-          }
+          navigate('/auth', { replace: true });
           return;
         }
 
-        toast({
-          variant: "destructive",
-          title: "Authentication Failed",
-          description: "Could not establish a session. Please try again."
-        });
         clearPKCEVerifier();
-        navigate('/auth', { replace: true });
+
+        // Check if user has completed onboarding
+        const { data: profile, error: profileError } = await supabase
+          .from('profiles')
+          .select('onboarding_completed')
+          .eq('id', data.session.user.id)
+          .single();
+        
+        if (profileError) {
+          // If profile doesn't exist, send to onboarding
+          navigate('/onboarding', { replace: true });
+          return;
+        }
+
+        navigate(profile?.onboarding_completed ? '/dashboard' : '/onboarding', { replace: true });
+
       } catch (err) {
         console.error('Auth callback error:', err);
         toast({
