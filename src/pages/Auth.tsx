@@ -146,32 +146,18 @@ const Auth = () => {
   const handleGoogleLogin = async () => {
     try {
       setIsLoading(true);
-      const { generateVerifier, storePKCEVerifier } = await import('@/utils/pkceHelper');
       
-      // Generate and store a new PKCE verifier
-      const verifier = generateVerifier();
-      storePKCEVerifier(verifier);
-
-      const { data, error } = await supabase.auth.signInWithOAuth({
+      // Simple OAuth login with Google
+      const { error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
           redirectTo: `${window.location.origin}/auth/callback`,
-          queryParams: {
-            access_type: "offline",
-            prompt: "consent",
-          },
-          skipBrowserRedirect: true,
-        },
+        }
       });
 
       if (error) throw error;
       
-      if (!data.url) {
-        throw new Error("No OAuth URL returned");
-      }
-
-      // Redirect to Google OAuth
-      window.location.href = data.url;
+      // The redirect happens automatically
     } catch (error: any) {
       console.error("Google login error:", error);
       toast({

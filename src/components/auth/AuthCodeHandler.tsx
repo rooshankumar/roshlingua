@@ -1,26 +1,26 @@
-
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/lib/supabase';
-import { getPKCEVerifier, clearPKCEVerifier } from '@/utils/pkceHelper';
 
 const AuthCodeHandler = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [processingAuth, setProcessingAuth] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
 
   useEffect(() => {
-    const handleAuthRedirect = async () => {
-      if (processingAuth) return;
-      setProcessingAuth(true);
+    const handleAuthCallback = async () => {
+      if (isProcessing) return;
+      setIsProcessing(true);
 
       try {
+        // Get the code from URL
         const url = new URL(window.location.href);
         const code = url.searchParams.get('code');
         const error = url.searchParams.get('error');
         const errorDescription = url.searchParams.get('error_description');
 
+        // Handle error case
         if (error) {
           toast({
             variant: "destructive",
@@ -31,25 +31,15 @@ const AuthCodeHandler = () => {
           return;
         }
 
+        // If no code is present, return
         if (!code) {
-          setProcessingAuth(false);
+          setIsProcessing(false);
           return;
         }
 
-        const verifier = getPKCEVerifier();
-
-        if (!verifier) {
-          toast({
-            variant: "destructive",
-            title: "Authentication Failed",
-            description: "Missing code verifier. Please try signing in again."
-          });
-          navigate('/auth', { replace: true });
-          return;
-        }
-
-        // Exchange auth code for session
-        const { data, error: sessionError } = await supabase.auth.exchangeCodeForSession(code, verifier);
+        // Exchange the code for a session
+        // No need to manually pass a verifier - Supabase handles this internally
+        const { data, error: sessionError } = await supabase.auth.exchangeCodeForSession(code);
 
         if (sessionError) {
           console.error('Session exchange error:', sessionError);
@@ -58,33 +48,30 @@ const AuthCodeHandler = () => {
             title: "Authentication Failed",
             description: sessionError.message
           });
-          clearPKCEVerifier();
           navigate('/auth', { replace: true });
           return;
         }
 
+        // If no session was created, show error
         if (!data.session) {
           toast({
             variant: "destructive",
             title: "Authentication Failed",
             description: "Could not establish a session. Please try again."
           });
-          clearPKCEVerifier();
           navigate('/auth', { replace: true });
           return;
         }
 
-        clearPKCEVerifier();
-
-        // Check profile after successful auth
-        const { data: profile, error: profileError } = await supabase
+        // Get user profile to check if onboarding is completed
+        const { data: profile } = await supabase
           .from('profiles')
           .select('onboarding_completed')
           .eq('id', data.session.user.id)
           .single();
 
+        // Redirect based on onboarding status
         navigate(profile?.onboarding_completed ? '/dashboard' : '/onboarding', { replace: true });
-
       } catch (err) {
         console.error('Auth callback error:', err);
         toast({
@@ -92,15 +79,14 @@ const AuthCodeHandler = () => {
           title: "Error",
           description: "An unexpected error occurred. Please try again."
         });
-        clearPKCEVerifier();
         navigate('/auth', { replace: true });
       } finally {
-        setProcessingAuth(false);
+        setIsProcessing(false);
       }
     };
 
-    handleAuthRedirect();
-  }, [navigate, toast, processingAuth]);
+    handleAuthCallback();
+  }, [navigate, toast, isProcessing]);
 
   return null;
 };

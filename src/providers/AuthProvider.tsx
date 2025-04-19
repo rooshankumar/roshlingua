@@ -330,84 +330,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const loginWithGoogle = async () => {
     try {
-      console.log("===== INITIATING GOOGLE LOGIN =====");
-
-      // Clear previous verifier data and auth errors
-      localStorage.removeItem('auth_error_type');
-      localStorage.removeItem('auth_error_message');
-
-      // Handle the login using the centralized function in supabase.ts
-      const result = await signInWithGoogle();
-
-      if (!result.data?.url) {
-        throw new Error("No OAuth URL returned");
-      }
-
-      // Additional application-specific logic before redirect
-      console.log("Received OAuth URL successfully");
-
-      // Ensure code verifier is properly stored before redirect
-      const finalVerifier = localStorage.getItem('supabase.auth.code_verifier');
-      console.log("FINAL REDIRECT CHECK - code verifier exists:", !!finalVerifier);
-
-      if (finalVerifier) {
-        console.log("Verifier length:", finalVerifier.length);
-        console.log("Verifier prefix:", finalVerifier.substring(0, 5) + "...");
-
-        // Make 100% sure verifier is also in sessionStorage as backup
-        sessionStorage.setItem('supabase.auth.code_verifier', finalVerifier);
-
-        // Store verifier in cookie as last resort backup (expires in 10 minutes)
-        document.cookie = `pkce_verifier=${finalVerifier};max-age=600;path=/;SameSite=Lax`;
-
-        // For debugging/monitoring
-        console.log("Stored verifier backup in multiple locations:");
-        console.log("- localStorage: OK");
-        console.log("- sessionStorage: OK");
-        console.log("- cookie: OK (expires in 10 min)");
-        console.log("Verifier value (first 5 chars):", finalVerifier.substring(0, 5) + "...");
-        console.log("Verifier length:", finalVerifier.length);
-      } else {
-        console.error("CRITICAL: No code verifier found before redirect!");
-
-        // Emergency recovery - check if our function stored it elsewhere
-        const sessionId = localStorage.getItem('auth_session_id');
-        if (sessionId) {
-          const backupVerifier = localStorage.getItem(`pkce_verifier_${sessionId}`);
-          if (backupVerifier) {
-            console.log("Found backup verifier, restoring to standard location");
-            localStorage.setItem('supabase.auth.code_verifier', backupVerifier);
-            sessionStorage.setItem('supabase.auth.code_verifier', backupVerifier);
-            // Also in cookie
-            document.cookie = `pkce_verifier=${backupVerifier};max-age=600;path=/;SameSite=Lax`;
-          } else {
-            // Try other backup locations
-            const alternateVerifier = localStorage.getItem('sb-pkce-verifier');
-            if (alternateVerifier) {
-              console.log("Found alternate verifier, restoring to standard location");
-              localStorage.setItem('supabase.auth.code_verifier', alternateVerifier);
-              sessionStorage.setItem('supabase.auth.code_verifier', alternateVerifier);
-              document.cookie = `pkce_verifier=${alternateVerifier};max-age=600;path=/;SameSite=Lax`;
-            } else {
-              console.error("All recovery attempts failed. Authentication likely to fail.");
-              // Create a new verifier as last resort
-              const emergencyVerifier = Math.random().toString(36).substring(2) + 
-                Math.random().toString(36).substring(2) + 
-                Math.random().toString(36).substring(2) + 
-                Math.random().toString(36).substring(2);
-              localStorage.setItem('supabase.auth.code_verifier', emergencyVerifier);
-              sessionStorage.setItem('supabase.auth.code_verifier', emergencyVerifier);
-              document.cookie = `pkce_verifier=${emergencyVerifier};max-age=600;path=/;SameSite=Lax`;
-              console.log("Created emergency verifier as last resort");
-            }
-          }
+      // Simple OAuth login with Google - let the redirect happen automatically
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`
         }
-      }
+      });
 
-      console.log("Redirecting to Google auth...");
-
-      // Perform redirect
-      window.location.href = result.data.url;
+      if (error) throw error;
     } catch (error) {
       console.error("Google login error:", error);
       toast({
@@ -419,41 +350,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  // We don't need this separate function anymore, it's inlined in loginWithGoogle
-
   const signOut = async () => {
     try {
-      console.log("Starting sign out process...");
-      
-      // Import clearPKCEVerifier function to ensure all verifiers are cleared
-      const { clearPKCEVerifier } = await import('@/utils/pkceHelper');
-      
-      // First clear all PKCE verifiers to ensure clean state
-      clearPKCEVerifier();
-      
-      // Then sign out through Supabase (our enhanced version)
-      const { error } = await supabase.auth.signOut({ scope: 'global' });
+      // Sign out through Supabase
+      const { error } = await supabase.auth.signOut();
       if (error) throw error;
 
-      // Clear any local state
+      // Clear local state
       setUser(null);
       setSession(null);
-      
-      // Clear all possible auth data
-      localStorage.removeItem('supabase.auth.token');
-      sessionStorage.removeItem('supabase.auth.token');
-      localStorage.removeItem('sb-auth-token');
-      sessionStorage.removeItem('sb-auth-token');
-      
-      console.log("Sign out complete, redirecting to auth page");
 
-      // Force navigation to auth page
+      // Redirect to auth page
       window.location.href = '/auth';
-
-      toast({
-        title: "Logged out",
-        description: "You have been successfully logged out.",
-      });
     } catch (error) {
       console.error("Signout error:", error);
       toast({
