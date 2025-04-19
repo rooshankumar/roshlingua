@@ -118,6 +118,17 @@ const Auth = () => {
     try {
       setIsLoading(true);
       
+      // Clear any previous auth data to ensure clean login
+      localStorage.removeItem('sb-auth-token');
+      localStorage.removeItem('supabase.auth.token');
+      sessionStorage.removeItem('supabase.auth.token');
+      localStorage.removeItem('supabase.auth.expires_at');
+      sessionStorage.removeItem('supabase.auth.expires_at');
+      localStorage.removeItem('supabase.auth.code_verifier');
+      sessionStorage.removeItem('supabase.auth.code_verifier');
+      localStorage.removeItem('supabase.auth.code');
+      sessionStorage.removeItem('supabase.auth.code');
+      
       // Use production URL for redirects
       const redirectUrl = window.location.hostname.includes('localhost') || window.location.hostname.includes('replit')
         ? `${window.location.origin}/auth/callback`
@@ -129,11 +140,11 @@ const Auth = () => {
         provider: "google",
         options: {
           redirectTo: redirectUrl,
-          // Skip PKCE when having issues
           skipBrowserRedirect: false,
           queryParams: {
             access_type: 'offline',
-            prompt: 'consent'
+            prompt: 'select_account consent', // Force account selection dialog
+            include_granted_scopes: 'true'
           }
         }
       });

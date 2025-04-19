@@ -16,12 +16,17 @@ export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
     autoRefreshToken: true,
     persistSession: true,
     detectSessionInUrl: true,
-    flowType: 'implicit', // Use implicit flow to help with hash fragment tokens
+    flowType: 'pkce', // Use PKCE flow for more reliable token exchange
     storageKey: 'sb-auth-token',
     storage: {
       getItem: (key) => {
         try {
-          const value = localStorage.getItem(key);
+          // Try localStorage first, then sessionStorage as fallback
+          let value = localStorage.getItem(key);
+          if (!value && key.includes('code_verifier')) {
+            // For PKCE verifiers, also check sessionStorage
+            value = sessionStorage.getItem(key);
+          }
           return value;
         } catch (error) {
           console.error('Error getting auth storage item:', error);
@@ -30,13 +35,29 @@ export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
       },
       setItem: (key, value) => {
         try {
-          // Clear any existing auth tokens first to avoid conflicts
-          if (key === 'sb-auth-token' || key.includes('supabase.auth')) {
+          // For login with different Google accounts, we need to clear all previous auth data
+          if (key === 'sb-auth-token' || key.includes('supabase.auth.token')) {
+            // Clear all known auth token storage locations
             localStorage.removeItem('sb-auth-token');
             localStorage.removeItem('supabase.auth.token');
             sessionStorage.removeItem('supabase.auth.token');
+            localStorage.removeItem('supabase.auth.expires_at');
+            sessionStorage.removeItem('supabase.auth.expires_at');
+            
+            // Also clear any PKCE verifiers to ensure clean authentication
+            localStorage.removeItem('supabase.auth.code_verifier');
+            sessionStorage.removeItem('supabase.auth.code_verifier');
+            localStorage.removeItem('supabase.auth.code');
+            sessionStorage.removeItem('supabase.auth.code');
           }
-          localStorage.setItem(key, value);
+          
+          // Store PKCE verifiers in both localStorage and sessionStorage for redundancy
+          if (key.includes('code_verifier')) {
+            localStorage.setItem(key, value);
+            sessionStorage.setItem(key, value);
+          } else {
+            localStorage.setItem(key, value);
+          }
           return;
         } catch (error) {
           console.error('Error setting auth storage item:', error);
@@ -45,10 +66,20 @@ export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
       removeItem: (key) => {
         try {
           localStorage.removeItem(key);
-          if (key === 'sb-auth-token') {
-            // Also clear related items
+          sessionStorage.removeItem(key);
+          
+          // If clearing main token, clear all related auth data
+          if (key === 'sb-auth-token' || key === 'supabase.auth.token') {
+            // Clear all known auth token locations
+            localStorage.removeItem('sb-auth-token');
             localStorage.removeItem('supabase.auth.token');
             sessionStorage.removeItem('supabase.auth.token');
+            localStorage.removeItem('supabase.auth.expires_at');
+            sessionStorage.removeItem('supabase.auth.expires_at');
+            localStorage.removeItem('supabase.auth.code_verifier');
+            sessionStorage.removeItem('supabase.auth.code_verifier');
+            localStorage.removeItem('supabase.auth.code');
+            sessionStorage.removeItem('supabase.auth.code');
           }
           return;
         } catch (error) {
@@ -59,7 +90,7 @@ export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
   },
   global: {
     headers: {
-      'Accept': 'application/json'
+      'Accept': 'application/json, application/vnd.pgrst.object+json'
     }
   }
 });
