@@ -15,6 +15,78 @@ const AuthCodeHandler = () => {
       setIsProcessing(true);
 
       try {
+        // Check if there's a hash fragment with access_token (happens with implicit grant)
+        const hash = window.location.hash;
+        if (hash && hash.includes('access_token=')) {
+          console.log("Found access token in URL hash, setting session");
+          
+          // Extract the access token from the hash
+          const hashParams = new URLSearchParams(hash.substring(1));
+          const accessToken = hashParams.get('access_token');
+          const refreshToken = hashParams.get('refresh_token');
+          const expiresIn = hashParams.get('expires_in');
+          const tokenType = hashParams.get('token_type');
+          
+          if (accessToken) {
+            // Set the session manually using the token from the hash
+            const { data, error } = await supabase.auth.setSession({
+              access_token: accessToken,
+              refresh_token: refreshToken || '',
+              expires_in: parseInt(expiresIn || '3600'),
+              token_type: tokenType || 'bearer',
+            });
+
+            if (error) {
+              console.error("Error setting session:", error);
+              toast({
+                variant: "destructive",
+                title: "Authentication Failed",
+                description: error.message
+              });
+              navigate('/auth', { replace: true });
+              return;
+            }
+            
+            // Check if profile exists
+            if (data?.user) {
+              const { data: profileData, error: profileError } = await supabase
+                .from('profiles')
+                .select('onboarding_completed')
+                .eq('id', data.user.id)
+                .single();
+                
+              if (profileError && profileError.code !== 'PGRST116') {
+                console.error("Error fetching profile:", profileError);
+              }
+
+              // If no profile found, create one
+              if (!profileData) {
+                const { error: insertError } = await supabase
+                  .from('profiles')
+                  .insert({
+                    id: data.user.id,
+                    email: data.user.email,
+                    created_at: new Date().toISOString(),
+                    updated_at: new Date().toISOString(),
+                    onboarding_completed: false
+                  });
+                  
+                if (insertError) {
+                  console.error("Error creating profile:", insertError);
+                }
+                
+                // Redirect to onboarding
+                navigate('/onboarding', { replace: true });
+                return;
+              }
+              
+              // Redirect based on onboarding status
+              navigate(profileData.onboarding_completed ? '/dashboard' : '/onboarding', { replace: true });
+              return;
+            }
+          }
+        }
+
         // Check if we have a session already
         const { data: sessionData } = await supabase.auth.getSession();
         

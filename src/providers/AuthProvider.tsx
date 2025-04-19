@@ -232,10 +232,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const loginWithGoogle = async () => {
     try {
+      // Use production URL for redirects
+      const redirectUrl = window.location.hostname.includes('localhost') || window.location.hostname.includes('replit')
+        ? `${window.location.origin}/auth/callback`
+        : `${window.location.origin.replace(/\/$/, '')}/auth/callback`;
+        
+      console.log("Redirect URL for Google auth:", redirectUrl);
+      
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}/auth/callback`
+          redirectTo: redirectUrl,
+          // Skip PKCE when having issues
+          skipBrowserRedirect: false,
+          queryParams: {
+            access_type: 'offline',
+            prompt: 'consent'
+          }
         }
       });
 
