@@ -16,6 +16,11 @@ const AuthCodeHandler = () => {
       if (isProcessing || !mounted) return;
       setIsProcessing(true);
 
+      // Add debug logging
+      console.log("Starting auth callback processing");
+      const verifier = localStorage.getItem('supabase.auth.code_verifier');
+      console.log("Found verifier:", verifier ? "Yes" : "No");
+
       try {
         console.log("Processing auth callback...");
 
@@ -39,7 +44,7 @@ const AuthCodeHandler = () => {
         }
 
         // Get the stored PKCE verifier
-        const verifier = getPKCEVerifier();
+
         console.log("Retrieved verifier:", verifier ? "Present" : "Missing");
 
         if (!verifier) {
@@ -49,7 +54,7 @@ const AuthCodeHandler = () => {
 
         // Exchange code for session
         console.log("Exchanging auth code for session...");
-        const { data, error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
+        const { data, error: exchangeError } = await supabase.auth.exchangeCodeForSession(code, { code_verifier: verifier });
 
         if (exchangeError) {
           console.error("Session exchange error:", exchangeError);
