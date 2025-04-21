@@ -245,18 +245,31 @@ const AuthCodeHandler = () => {
                     };
 
                     // Remove undefined or null values
-                    Object.keys(profileData).forEach(key => profileData[key] === undefined && delete profileData[key]);
-                    const { error: insertError } = await supabase
-                        .from('profiles')
-                        .insert([profileData]);
+                    Object.keys(profileData).forEach(key => {
+                        if (profileData[key] === undefined || profileData[key] === null) {
+                            delete profileData[key];
+                        }
+                    });
 
+                    try {
+                        const { error: insertError } = await supabase
+                            .from('profiles')
+                            .insert([profileData]);
 
-                    if (insertError) {
-                        console.error("Error creating profile:", insertError);
+                        if (insertError) {
+                            console.error("Error creating profile:", insertError);
+                            toast({
+                                variant: "destructive",
+                                title: "Profile Error",
+                                description: "Failed to create user profile. Some features may be limited."
+                            });
+                        }
+                    } catch (insertErr) {
+                        console.error("Exception during profile insertion:", insertErr);
                         toast({
                             variant: "destructive",
                             title: "Profile Error",
-                            description: "Failed to create user profile. Some features may be limited."
+                            description: "An unexpected error occurred while creating your profile."
                         });
                     }
 
