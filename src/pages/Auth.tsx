@@ -125,9 +125,17 @@ const Auth = () => {
       localStorage.removeItem('supabase.auth.expires_at');
       sessionStorage.removeItem('supabase.auth.expires_at');
 
+      // Clear any existing verifiers first
+      localStorage.removeItem('supabase.auth.code_verifier');
+      sessionStorage.removeItem('supabase.auth.code_verifier');
+      
       // Generate new PKCE verifier
       const verifier = generateVerifier();
-      // The verifier will be automatically stored in multiple locations by generateVerifier()
+      
+      // Store verifier in multiple locations
+      localStorage.setItem('supabase.auth.code_verifier', verifier);
+      sessionStorage.setItem('supabase.auth.code_verifier', verifier);
+      
       console.log("Generated PKCE verifier, length:", verifier.length);
 
       // Use production URL for redirects

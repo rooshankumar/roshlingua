@@ -38,18 +38,30 @@ const AuthCodeHandler = () => {
           return;
         }
 
-        // Get code verifier using the helper function
+        // Get all stored verifiers
         const verifier = getPKCEVerifier();
         
         console.log("Retrieved verifier:", verifier ? `Present (${verifier.length} chars)` : "Missing");
+        console.log("Code from URL:", code);
 
-        if (!verifier) {
+        if (!verifier || !code) {
+          console.error("Missing auth parameters:", {
+            hasVerifier: !!verifier,
+            hasCode: !!code
+          });
+          
           toast({
             variant: "destructive",
             title: "Authentication Error",
-            description: "Failed to retrieve security verifier. Please try logging in again."
+            description: "Authentication failed - missing required parameters. Please try logging in again."
           });
-          throw new Error("Authentication failed - missing code verifier");
+          
+          // Clear any stale auth state
+          await supabase.auth.signOut();
+          localStorage.removeItem('supabase.auth.code_verifier');
+          sessionStorage.removeItem('supabase.auth.code_verifier');
+          
+          throw new Error("Authentication failed - missing required parameters");
         }
 
         // Exchange code for session
