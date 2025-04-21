@@ -1,3 +1,4 @@
+
 import { createContext, useContext, useEffect, useState } from "react";
 import { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/lib/supabase";
@@ -28,6 +29,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+    return () => setMounted(false);
+  }, []);
 
   // Password validation rules
   const PASSWORD_RULES = {
@@ -95,22 +102,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             }
             return;
           } else {
-              // Update last_seen
-              console.log("Updating last_seen for user:", session.user.id);
-              await supabase
-                .from('profiles')
-                .update({ last_seen: new Date().toISOString() })
-                .eq('id', session.user.id);
-              // Check if onboarding is needed
-              if (!profileData.onboarding_completed) {
-                window.location.href = '/onboarding';
-                return;
-              }
+            // Update last_seen
+            console.log("Updating last_seen for user:", session.user.id);
+            await supabase
+              .from('profiles')
+              .update({ last_seen: new Date().toISOString() })
+              .eq('id', session.user.id);
+            // Check if onboarding is needed
+            if (!profileData.onboarding_completed) {
+              window.location.href = '/onboarding';
+              return;
             }
           }
         }
 
-        // Listen for auth changes
+        // Set up auth state change listener
         const { data: { subscription } } = supabase.auth.onAuthStateChange(
           async (event, currentSession) => {
             console.log("Auth state changed:", event, currentSession ? "Session exists" : "No session");
@@ -143,7 +149,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           }
         );
 
-        subscription.unsubscribe;
+        return () => {
+          if (subscription) subscription.unsubscribe();
+          mounted = false;
+        };
+
       } catch (error) {
         console.error("Auth initialization error:", error);
         if (mounted) {
@@ -260,7 +270,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         provider: 'google',
         options: {
           redirectTo: redirectUrl,
-          // Skip PKCE when having issues
           skipBrowserRedirect: false,
           queryParams: {
             access_type: 'offline',
