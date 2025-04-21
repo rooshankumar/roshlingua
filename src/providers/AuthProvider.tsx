@@ -71,15 +71,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             // Create profile if it doesn't exist
             if (!profileData) {
               console.log("Creating profile for user:", session.user.id);
-              const {error: insertError} = await supabase.from('profiles').insert([{
+              const {error: insertError} = await supabase.from('profiles').upsert({
                 id: session.user.id,
+                user_id: session.user.id,
                 email: session.user.email,
                 created_at: new Date().toISOString(),
                 updated_at: new Date().toISOString(),
                 last_seen: new Date().toISOString(),
                 onboarding_completed: false
-              }]);
-              if (insertError) throw insertError;
+              }, {
+                onConflict: 'id',
+                ignoreDuplicates: false
+              });
+              
+              if (insertError) {
+                console.error("Profile creation error:", insertError);
+                throw insertError;
+              }
               window.location.href = '/onboarding';
               return;
             } else {
