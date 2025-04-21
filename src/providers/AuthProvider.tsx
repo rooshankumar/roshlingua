@@ -1,4 +1,3 @@
-
 import { createContext, useContext, useEffect, useState } from "react";
 import { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/lib/supabase";
@@ -29,12 +28,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-    return () => setMounted(false);
-  }, []);
 
   // Password validation rules
   const PASSWORD_RULES = {
@@ -46,7 +39,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     async function initializeAuth() {
       try {
-        if (!mounted) return;
         setIsLoading(true);
         console.log("Initializing auth state...");
 
@@ -58,65 +50,47 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           throw error;
         }
 
-        if (!mounted) return;
-        console.log("Setting initial session:", session ? "Session exists" : "No session");
-        setSession(session);
-        setUser(session?.user ?? null);
+        if (mounted) {
+          console.log("Setting initial session:", session ? "Session exists" : "No session");
+          setSession(session);
+          setUser(session?.user ?? null);
 
-        // Only proceed with profile check if we have a session
-        if (session?.user && mounted) {
-          console.log("Checking profile for user:", session.user.id);
-          const { data: profileData, error: profileCheckError } = await supabase
-            .from('profiles')
-            .select('id, onboarding_completed')
-            .eq('id', session.user.id)
-            .single();
-
-          if (profileCheckError && profileCheckError.code !== 'PGRST116') {
-            console.error("Profile check error:", profileCheckError);
-            return;
-          }
-
-          // Create profile if it doesn't exist
-          if (!profileData && mounted) {
-            console.log("Creating profile for user:", session.user.id);
-            const {error: insertError} = await supabase.from('profiles').upsert({
-              id: session.user.id,
-              user_id: session.user.id,
-              email: session.user.email,
-              created_at: new Date().toISOString(),
-              updated_at: new Date().toISOString(),
-              last_seen: new Date().toISOString(),
-              onboarding_completed: false
-            }, {
-              onConflict: 'id',
-              ignoreDuplicates: false
-            });
-            
-            if (insertError) {
-              console.error("Profile creation error:", insertError);
-              return;
-            }
-            if (mounted) {
-              window.location.href = '/onboarding';
-            }
-            return;
-          } else {
-            // Update last_seen
-            console.log("Updating last_seen for user:", session.user.id);
-            await supabase
+          // If session exists, ensure profile exists
+          if (session?.user) {
+            console.log("Checking profile for user:", session.user.id);
+            const { data: profileData, error: profileCheckError } = await supabase
               .from('profiles')
-              .update({ last_seen: new Date().toISOString() })
-              .eq('id', session.user.id);
-            // Check if onboarding is needed
-            if (!profileData.onboarding_completed) {
-              window.location.href = '/onboarding';
-              return;
+              .select('id, onboarding_completed')
+              .eq('id', session.user.id)
+              .single();
+
+            if (profileCheckError && profileCheckError.code !== 'PGRST116') {
+              console.error("Profile check error:", profileCheckError);
+            }
+
+            // Create profile if it doesn't exist
+            if (!profileData) {
+              console.log("Creating profile for user:", session.user.id);
+              await supabase.from('profiles').insert({
+                id: session.user.id,
+                email: session.user.email,
+                created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString(),
+                last_seen: new Date().toISOString(),
+                onboarding_completed: false
+              });
+            } else {
+              // Update last_seen
+              console.log("Updating last_seen for user:", session.user.id);
+              await supabase
+                .from('profiles')
+                .update({ last_seen: new Date().toISOString() })
+                .eq('id', session.user.id);
             }
           }
         }
 
-        // Set up auth state change listener
+        // Listen for auth changes
         const { data: { subscription } } = supabase.auth.onAuthStateChange(
           async (event, currentSession) => {
             console.log("Auth state changed:", event, currentSession ? "Session exists" : "No session");
@@ -150,10 +124,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         );
 
         return () => {
-          if (subscription) subscription.unsubscribe();
           mounted = false;
+          subscription.unsubscribe();
         };
-
       } catch (error) {
         console.error("Auth initialization error:", error);
         if (mounted) {
@@ -263,13 +236,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const redirectUrl = window.location.hostname.includes('localhost') || window.location.hostname.includes('replit')
         ? `${window.location.origin}/auth/callback`
         : `${window.location.origin.replace(/\/$/, '')}/auth/callback`;
-
+        
       console.log("Redirect URL for Google auth:", redirectUrl);
-
+      
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
           redirectTo: redirectUrl,
+          // Skip PKCE when having issues
           skipBrowserRedirect: false,
           queryParams: {
             access_type: 'offline',
@@ -340,26 +314,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   useEffect(() => {
-    let interval: NodeJS.Timeout | undefined;
-    
-    if (user?.id && mounted) {
+    if (user?.id) {
       // Update last_seen on mount
       updateUserActivity(user.id);
 
       // Update last_seen every 5 minutes while user is active
-      interval = setInterval(() => {
-        if (mounted) {
-          updateUserActivity(user.id);
-        }
+      const interval = setInterval(() => {
+        updateUserActivity(user.id);
       }, 5 * 60 * 1000);
-    }
 
-    return () => {
-      if (interval) {
-        clearInterval(interval);
-      }
-    };
-  }, [user?.id, mounted]);
+      return () => clearInterval(interval);
+    }
+  }, [user?.id]);
 
   return (
     <AuthContext.Provider value={value}>
