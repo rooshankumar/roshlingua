@@ -16,9 +16,11 @@ const AuthCodeHandler = () => {
       if (isProcessing || !mounted) return;
       setIsProcessing(true);
 
-      // Add debug logging
-      console.log("Starting auth callback processing");
+      // Clear any stale auth state except verifier
       const verifier = localStorage.getItem('supabase.auth.code_verifier');
+      await supabase.auth.signOut({ scope: 'local' });
+
+      console.log("Starting auth callback processing");
       console.log("Found verifier:", verifier ? "Yes" : "No");
 
       try {
@@ -55,12 +57,21 @@ const AuthCodeHandler = () => {
           throw new Error("Authentication failed - missing code verifier");
         }
 
-        // Exchange code for session
+        // Exchange code for session with additional headers
         console.log("Exchanging auth code for session...");
-        const { data, error: exchangeError } = await supabase.auth.exchangeCodeForSession(code, { code_verifier: verifier });
+        const { data, error: exchangeError } = await supabase.auth.exchangeCodeForSession(code, { 
+          code_verifier: verifier,
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+          }
+        });
 
         if (exchangeError) {
           console.error("Session exchange error:", exchangeError);
+          // Clear verifier on error
+          localStorage.removeItem('supabase.auth.code_verifier');
+          sessionStorage.removeItem('supabase.auth.code_verifier');
           throw exchangeError;
         }
 
@@ -75,13 +86,11 @@ const AuthCodeHandler = () => {
           .eq('id', data.user.id)
           .single();
 
-        if (profileError && profileError.code !== 'PGRST116') {
-          console.error("Error fetching profile:", profileError);
-          throw profileError;
-        }
+        const isNewUser = profileError?.code === 'PGRST116' || !profile;
+        console.log("Profile check:", { isNewUser, profileError, profile });
 
         // Create profile if it doesn't exist
-        if (!profile) {
+        if (isNewUser) {
           const { error: createError } = await supabase
             .from('profiles')
             .insert({

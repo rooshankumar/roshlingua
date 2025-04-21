@@ -118,12 +118,17 @@ const Auth = () => {
     try {
       setIsLoading(true);
       
-      // Do not clear PKCE verifier before login as it's needed for the callback
+      // Clear all auth data first
       localStorage.removeItem('sb-auth-token');
       localStorage.removeItem('supabase.auth.token');
       sessionStorage.removeItem('supabase.auth.token');
       localStorage.removeItem('supabase.auth.expires_at');
       sessionStorage.removeItem('supabase.auth.expires_at');
+      
+      // Generate new PKCE verifier
+      const verifier = generateVerifier();
+      localStorage.setItem('supabase.auth.code_verifier', verifier);
+      sessionStorage.setItem('supabase.auth.code_verifier', verifier);
       
       // Use production URL for redirects
       const redirectUrl = window.location.hostname.includes('localhost') || window.location.hostname.includes('replit')
