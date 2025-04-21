@@ -16,49 +16,8 @@ export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
     autoRefreshToken: true,
     persistSession: true,
     detectSessionInUrl: true,
-    flowType: 'pkce',
-    debug: true,
+    flowType: 'pkce', // Use PKCE flow for more reliable token exchange
     storageKey: 'sb-auth-token',
-    storage: {
-      getItem: (key) => {
-        try {
-          // Try multiple storage locations
-          let value = localStorage.getItem(key);
-          if (!value && key.includes('code_verifier')) {
-            value = sessionStorage.getItem(key);
-          }
-          return value;
-        } catch (error) {
-          console.error('Error getting auth storage item:', error);
-          return null;
-        }
-      },
-      setItem: (key, value) => {
-        try {
-          if (key.includes('code_verifier')) {
-            // Store PKCE values in multiple locations
-            localStorage.setItem(key, value);
-            sessionStorage.setItem(key, value);
-            localStorage.setItem('pkce_verifier_backup', value);
-          } else {
-            localStorage.setItem(key, value);
-          }
-        } catch (error) {
-          console.error('Error setting auth storage item:', error);
-        }
-      },
-      removeItem: (key) => {
-        try {
-          localStorage.removeItem(key);
-          if (key.includes('code_verifier')) {
-            sessionStorage.removeItem(key);
-            localStorage.removeItem('pkce_verifier_backup');
-          }
-        } catch (error) {
-          console.error('Error removing auth storage item:', error);
-        }
-      }
-    },
     storage: {
       getItem: (key) => {
         try {
@@ -131,8 +90,7 @@ export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
   },
   global: {
     headers: {
-      'Accept': 'application/json, application/vnd.pgrst.object+json',
-      'Content-Type': 'application/json'
+      'Accept': 'application/json, application/vnd.pgrst.object+json'
     }
   }
 });
