@@ -39,6 +39,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     async function initializeAuth() {
       try {
+        if (!mounted) return;
         setIsLoading(true);
         console.log("Initializing auth state...");
 
@@ -50,47 +51,50 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           throw error;
         }
 
-        if (mounted) {
-          console.log("Setting initial session:", session ? "Session exists" : "No session");
-          setSession(session);
-          setUser(session?.user ?? null);
+        if (!mounted) return;
+        console.log("Setting initial session:", session ? "Session exists" : "No session");
+        setSession(session);
+        setUser(session?.user ?? null);
 
-          // If session exists, ensure profile exists
-          if (session?.user) {
-            console.log("Checking profile for user:", session.user.id);
-            const { data: profileData, error: profileCheckError } = await supabase
-              .from('profiles')
-              .select('id, onboarding_completed')
-              .eq('id', session.user.id)
-              .single();
+        // Only proceed with profile check if we have a session
+        if (session?.user && mounted) {
+          console.log("Checking profile for user:", session.user.id);
+          const { data: profileData, error: profileCheckError } = await supabase
+            .from('profiles')
+            .select('id, onboarding_completed')
+            .eq('id', session.user.id)
+            .single();
 
-            if (profileCheckError && profileCheckError.code !== 'PGRST116') {
-              console.error("Profile check error:", profileCheckError);
-            }
+          if (profileCheckError && profileCheckError.code !== 'PGRST116') {
+            console.error("Profile check error:", profileCheckError);
+            return;
+          }
 
-            // Create profile if it doesn't exist
-            if (!profileData) {
-              console.log("Creating profile for user:", session.user.id);
-              const {error: insertError} = await supabase.from('profiles').upsert({
-                id: session.user.id,
-                user_id: session.user.id,
-                email: session.user.email,
-                created_at: new Date().toISOString(),
-                updated_at: new Date().toISOString(),
-                last_seen: new Date().toISOString(),
-                onboarding_completed: false
-              }, {
-                onConflict: 'id',
-                ignoreDuplicates: false
-              });
-              
-              if (insertError) {
-                console.error("Profile creation error:", insertError);
-                throw insertError;
-              }
-              window.location.href = '/onboarding';
+          // Create profile if it doesn't exist
+          if (!profileData && mounted) {
+            console.log("Creating profile for user:", session.user.id);
+            const {error: insertError} = await supabase.from('profiles').upsert({
+              id: session.user.id,
+              user_id: session.user.id,
+              email: session.user.email,
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString(),
+              last_seen: new Date().toISOString(),
+              onboarding_completed: false
+            }, {
+              onConflict: 'id',
+              ignoreDuplicates: false
+            });
+            
+            if (insertError) {
+              console.error("Profile creation error:", insertError);
               return;
-            } else {
+            }
+            if (mounted) {
+              window.location.href = '/onboarding';
+            }
+            return;
+          } else {
               // Update last_seen
               console.log("Updating last_seen for user:", session.user.id);
               await supabase
@@ -330,18 +334,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   useEffect(() => {
-    if (user?.id) {
+    let interval: NodeJS.Timeout | undefined;
+    
+    if (user?.id && mounted) {
       // Update last_seen on mount
       updateUserActivity(user.id);
 
       // Update last_seen every 5 minutes while user is active
-      const interval = setInterval(() => {
-        updateUserActivity(user.id);
+      interval = setInterval(() => {
+        if (mounted) {
+          updateUserActivity(user.id);
+        }
       }, 5 * 60 * 1000);
-
-      return () => clearInterval(interval);
     }
-  }, [user?.id]);
+
+    return () => {
+      if (interval) {
+        clearInterval(interval);
+      }
+    };
+  }, [user?.id, mounted]);
 
   return (
     <AuthContext.Provider value={value}>
