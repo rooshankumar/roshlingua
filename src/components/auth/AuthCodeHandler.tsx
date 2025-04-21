@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/lib/supabase';
-import { getPKCEVerifier, clearPKCEVerifier } from '@/utils/pkceHelper';
 
 const AuthCodeHandler = () => {
   const navigate = useNavigate();
@@ -16,15 +15,8 @@ const AuthCodeHandler = () => {
       if (isProcessing || !mounted) return;
       setIsProcessing(true);
 
-      // Clear any stale auth state except verifier
-      const verifier = localStorage.getItem('supabase.auth.code_verifier');
-      await supabase.auth.signOut({ scope: 'local' });
-
-      console.log("Starting auth callback processing");
-      console.log("Found verifier:", verifier ? "Yes" : "No");
-
       try {
-        console.log("Processing auth callback...");
+        console.log("Starting auth callback processing");
 
         // Get the code from URL
         const url = new URL(window.location.href);
@@ -38,40 +30,29 @@ const AuthCodeHandler = () => {
           throw new Error(errorDescription || error);
         }
 
-        // Validate we have a code
+        // If no code present, redirect to auth
         if (!code) {
           console.log("No auth code present, redirecting to auth");
           navigate('/auth', { replace: true });
           return;
         }
 
-        // Check all storage locations for PKCE verifier
+        // Get code verifier from storage
         const verifier = localStorage.getItem('supabase.auth.code_verifier') || 
-                        sessionStorage.getItem('supabase.auth.code_verifier') ||
-                        localStorage.getItem('pkce_verifier_backup');
+                        sessionStorage.getItem('supabase.auth.code_verifier');
 
         console.log("Retrieved verifier:", verifier ? "Present" : "Missing");
 
         if (!verifier) {
-          console.error("No code verifier found for PKCE exchange");
           throw new Error("Authentication failed - missing code verifier");
         }
 
-        // Exchange code for session with additional headers
+        // Exchange code for session
         console.log("Exchanging auth code for session...");
-        const { data, error: exchangeError } = await supabase.auth.exchangeCodeForSession(code, { 
-          code_verifier: verifier,
-          headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-          }
-        });
+        const { data, error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
 
         if (exchangeError) {
           console.error("Session exchange error:", exchangeError);
-          // Clear verifier on error
-          localStorage.removeItem('supabase.auth.code_verifier');
-          sessionStorage.removeItem('supabase.auth.code_verifier');
           throw exchangeError;
         }
 
@@ -87,9 +68,8 @@ const AuthCodeHandler = () => {
           .single();
 
         const isNewUser = profileError?.code === 'PGRST116' || !profile;
-        console.log("Profile check:", { isNewUser, profileError, profile });
 
-        // Create profile if it doesn't exist
+        // Create profile if new user
         if (isNewUser) {
           const { error: createError } = await supabase
             .from('profiles')
@@ -106,7 +86,6 @@ const AuthCodeHandler = () => {
             throw createError;
           }
 
-          // Redirect new users to onboarding
           navigate('/onboarding', { replace: true });
           return;
         }
@@ -125,7 +104,8 @@ const AuthCodeHandler = () => {
 
         // Clear any stale auth state
         await supabase.auth.signOut();
-        clearPKCEVerifier();
+        localStorage.removeItem('supabase.auth.code_verifier');
+        sessionStorage.removeItem('supabase.auth.code_verifier');
 
         navigate('/auth', { replace: true });
       } finally {
