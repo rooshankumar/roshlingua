@@ -71,14 +71,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             // Create profile if it doesn't exist
             if (!profileData) {
               console.log("Creating profile for user:", session.user.id);
-              await supabase.from('profiles').insert({
+              const {error: insertError} = await supabase.from('profiles').insert([{
                 id: session.user.id,
                 email: session.user.email,
                 created_at: new Date().toISOString(),
                 updated_at: new Date().toISOString(),
                 last_seen: new Date().toISOString(),
                 onboarding_completed: false
-              });
+              }]);
+              if (insertError) throw insertError;
+              window.location.href = '/onboarding';
+              return;
             } else {
               // Update last_seen
               console.log("Updating last_seen for user:", session.user.id);
@@ -86,6 +89,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 .from('profiles')
                 .update({ last_seen: new Date().toISOString() })
                 .eq('id', session.user.id);
+              // Check if onboarding is needed
+              if (!profileData.onboarding_completed) {
+                window.location.href = '/onboarding';
+                return;
+              }
             }
           }
         }
@@ -236,9 +244,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const redirectUrl = window.location.hostname.includes('localhost') || window.location.hostname.includes('replit')
         ? `${window.location.origin}/auth/callback`
         : `${window.location.origin.replace(/\/$/, '')}/auth/callback`;
-        
+
       console.log("Redirect URL for Google auth:", redirectUrl);
-      
+
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
