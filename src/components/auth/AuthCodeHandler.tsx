@@ -233,17 +233,23 @@ const AuthCodeHandler = () => {
 
                     const userMetadata = user.user_metadata || {};
 
+                    // Data validation before creating profile
+                    const profileData = {
+                        id: user.id,
+                        email: user.email,
+                        full_name: userMetadata.full_name || userMetadata.name || '',
+                        avatar_url: userMetadata.avatar_url || userMetadata.picture || '',
+                        created_at: new Date().toISOString(),
+                        updated_at: new Date().toISOString(),
+                        onboarding_completed: false
+                    };
+
+                    // Remove undefined or null values
+                    Object.keys(profileData).forEach(key => profileData[key] === undefined && delete profileData[key]);
                     const { error: insertError } = await supabase
                         .from('profiles')
-                        .insert({
-                            id: user.id,
-                            email: user.email,
-                            full_name: userMetadata.full_name || userMetadata.name || '',
-                            avatar_url: userMetadata.avatar_url || userMetadata.picture || '',
-                            created_at: new Date().toISOString(),
-                            updated_at: new Date().toISOString(),
-                            onboarding_completed: false
-                        });
+                        .insert([profileData]);
+
 
                     if (insertError) {
                         console.error("Error creating profile:", insertError);

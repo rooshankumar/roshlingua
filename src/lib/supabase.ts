@@ -5,31 +5,30 @@ const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
 if (!supabaseUrl || !supabaseAnonKey) {
-  throw new Error('Missing Supabase environment variables');
+    throw new Error('Missing Supabase environment variables');
 }
 
 export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
-  auth: {
-    flowType: 'pkce',
-    autoRefreshToken: true,
-    persistSession: true,
-    detectSessionInUrl: true
-  }
+    auth: {
+        flowType: 'pkce',
+        autoRefreshToken: true,
+        persistSession: true,
+        detectSessionInUrl: true
+    },
+    global: {
+        headers: {
+            'Accept': 'application/json',
+        }
+    }
 });
 
-// Auth helpers
 export const signOut = () => supabase.auth.signOut();
 export const getCurrentUser = () => supabase.auth.getUser();
 export const getCurrentSession = () => supabase.auth.getSession();
-
-export const signInWithGoogle = () => 
-  supabase.auth.signInWithOAuth({
-    provider: 'google',
-    options: {
-      redirectTo: `${window.location.origin}/auth/callback`,
-      queryParams: {
-        access_type: 'offline',
-        prompt: 'consent'
-      }
-    }
-  });
+export const signInWithGoogle = () =>
+    supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+            redirectTo: `${window.location.origin}/auth/callback`,
+        }
+    });
