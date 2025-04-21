@@ -127,8 +127,8 @@ const Auth = () => {
 
       // Generate new PKCE verifier
       const verifier = generateVerifier();
-      localStorage.setItem('supabase.auth.code_verifier', verifier);
-      sessionStorage.setItem('supabase.auth.code_verifier', verifier);
+      // The verifier will be automatically stored in multiple locations by generateVerifier()
+      console.log("Generated PKCE verifier, length:", verifier.length);
 
       // Use production URL for redirects
       const redirectUrl = window.location.hostname.includes('localhost') || window.location.hostname.includes('replit')

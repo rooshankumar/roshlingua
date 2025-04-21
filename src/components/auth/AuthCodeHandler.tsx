@@ -37,13 +37,17 @@ const AuthCodeHandler = () => {
           return;
         }
 
-        // Get code verifier from storage
-        const verifier = localStorage.getItem('supabase.auth.code_verifier') || 
-                        sessionStorage.getItem('supabase.auth.code_verifier');
-
-        console.log("Retrieved verifier:", verifier ? "Present" : "Missing");
+        // Get code verifier using the helper function
+        const verifier = getPKCEVerifier();
+        
+        console.log("Retrieved verifier:", verifier ? `Present (${verifier.length} chars)` : "Missing");
 
         if (!verifier) {
+          toast({
+            variant: "destructive",
+            title: "Authentication Error",
+            description: "Failed to retrieve security verifier. Please try logging in again."
+          });
           throw new Error("Authentication failed - missing code verifier");
         }
 
