@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/lib/supabase';
+import { getPKCEVerifier } from '@/utils/pkceHelper';
 
 const AuthCodeHandler = () => {
   const navigate = useNavigate();
