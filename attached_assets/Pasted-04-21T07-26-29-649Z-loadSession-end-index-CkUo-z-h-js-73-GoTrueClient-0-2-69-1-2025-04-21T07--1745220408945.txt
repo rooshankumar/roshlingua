@@ -1,0 +1,64 @@
+04-21T07:26:29.649Z #__loadSession() end
+index-CkUo_z-h.js:73 GoTrueClient@0 (2.69.1) 2025-04-21T07:26:29.650Z #_useSession end
+index-CkUo_z-h.js:73 GoTrueClient@0 (2.69.1) 2025-04-21T07:26:29.650Z #_acquireLock lock released for storage key sb-auth-token
+index-CkUo_z-h.js:73 GoTrueClient@0 (2.69.1) 2025-04-21T07:26:29.651Z #_acquireLock end
+index-CkUo_z-h.js:73 GoTrueClient@0 (2.69.1) 2025-04-21T07:26:29.654Z #_acquireLock lock acquired for storage key sb-auth-token
+index-CkUo_z-h.js:73 
+            
+            
+           POST https://wqojeesjtgfcftpnzaet.supabase.co/auth/v1/token?grant_type=pkce 400 (Bad Request)
+(anonymous) @ index-CkUo_z-h.js:73
+e2 @ index-CkUo_z-h.js:73
+de @ index-CkUo_z-h.js:73
+_exchangeCodeForSession @ index-CkUo_z-h.js:73
+await in _exchangeCodeForSession
+(anonymous) @ index-CkUo_z-h.js:73
+(anonymous) @ index-CkUo_z-h.js:73
+(anonymous) @ index-CkUo_z-h.js:73Understand this error
+index-CkUo_z-h.js:73 GoTrueClient@0 (2.69.1) 2025-04-21T07:26:29.880Z #_acquireLock lock released for storage key sb-auth-token
+index-CkUo_z-h.js:73 GoTrueClient@0 (2.69.1) 2025-04-21T07:26:29.880Z #_acquireLock end
+index-CkUo_z-h.js:383 Authentication error: AuthApiError: invalid request: both auth code and code verifier should be non-empty
+    at qg (index-CkUo_z-h.js:73:6553)
+    at async e2 (index-CkUo_z-h.js:73:7542)
+    at async de (index-CkUo_z-h.js:73:7203)
+    at async h2._exchangeCodeForSession (index-CkUo_z-h.js:73:22069)
+(anonymous) @ index-CkUo_z-h.js:383
+await in (anonymous)
+(anonymous) @ index-CkUo_z-h.js:383
+Vc @ index-CkUo_z-h.js:40
+Po @ index-CkUo_z-h.js:40
+(anonymous) @ index-CkUo_z-h.js:40
+S @ index-CkUo_z-h.js:25
+I @ index-CkUo_z-h.js:25Understand this error
+index-CkUo_z-h.js:383 Authentication callback error: AuthApiError: invalid request: both auth code and code verifier should be non-empty
+    at qg (index-CkUo_z-h.js:73:6553)
+    at async e2 (index-CkUo_z-h.js:73:7542)
+    at async de (index-CkUo_z-h.js:73:7203)
+    at async h2._exchangeCodeForSession (index-CkUo_z-h.js:73:22069)
+(anonymous) @ index-CkUo_z-h.js:383
+await in (anonymous)
+(anonymous) @ index-CkUo_z-h.js:383
+Vc @ index-CkUo_z-h.js:40
+Po @ index-CkUo_z-h.js:40
+(anonymous) @ index-CkUo_z-h.js:40
+S @ index-CkUo_z-h.js:25
+I @ index-CkUo_z-h.js:25Understand this error
+index-CkUo_z-h.js:73 GoTrueClient@0 (2.69.1) 2025-04-21T07:26:29.961Z #_acquireLock begin -1
+index-CkUo_z-h.js:73 GoTrueClient@0 (2.69.1) 2025-04-21T07:26:29.987Z #_acquireLock lock acquired for storage key sb-auth-token
+index-CkUo_z-h.js:73 GoTrueClient@0 (2.69.1) 2025-04-21T07:26:29.987Z #_useSession begin
+index-CkUo_z-h.js:73 GoTrueClient@0 (2.69.1) 2025-04-21T07:26:29.988Z #__loadSession() begin
+index-CkUo_z-h.js:73 GoTrueClient@0 (2.69.1) 2025-04-21T07:26:29.988Z #getSession() session from storage {access_token: 'eyJhbGciOiJIUzI1NiIsImtpZCI6InJBVlcvUThncTdTeFdlVn…xzZX0.bcuUt6H35QaMzx_VfqYqHGPl7Tfwdyk24n5x9E8lfQg', token_type: 'bearer', expires_in: 3600, expires_at: 1745223989, refresh_token: 'Nqodv5Loey19kd9KSBMmvg', …}
+index-CkUo_z-h.js:73 GoTrueClient@0 (2.69.1) 2025-04-21T07:26:29.989Z #__loadSession() session has not expired expires_at 1745223989
+index-CkUo_z-h.js:73 GoTrueClient@0 (2.69.1) 2025-04-21T07:26:29.989Z #__loadSession() end
+index-CkUo_z-h.js:73 GoTrueClient@0 (2.69.1) 2025-04-21T07:26:29.989Z #_useSession end
+index-CkUo_z-h.js:73 GoTrueClient@0 (2.69.1) 2025-04-21T07:26:29.990Z #_acquireLock lock released for storage key sb-auth-token
+index-CkUo_z-h.js:73 GoTrueClient@0 (2.69.1) 2025-04-21T07:26:29.990Z #_acquireLock end
+index-CkUo_z-h.js:49 Throttling navigation to prevent the browser from hanging. See https://crbug.com/1038223. Command line switch --disable-ipc-flooding-protection can be used to bypass the protection
+y @ index-CkUo_z-h.js:49
+(anonymous) @ index-CkUo_z-h.js:58
+(anonymous) @ index-CkUo_z-h.js:58
+Vc @ index-CkUo_z-h.js:40
+Po @ index-CkUo_z-h.js:40
+(anonymous) @ index-CkUo_z-h.js:40
+S @ index-CkUo_z-h.js:25
+I @ index-CkUo_z-h.js:25Understand this warning
