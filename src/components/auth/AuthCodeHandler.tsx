@@ -43,7 +43,10 @@ const AuthCodeHandler = () => {
           return;
         }
 
-        // Get the stored PKCE verifier
+        // Check all storage locations for PKCE verifier
+        const verifier = localStorage.getItem('supabase.auth.code_verifier') || 
+                        sessionStorage.getItem('supabase.auth.code_verifier') ||
+                        localStorage.getItem('pkce_verifier_backup');
 
         console.log("Retrieved verifier:", verifier ? "Present" : "Missing");
 
