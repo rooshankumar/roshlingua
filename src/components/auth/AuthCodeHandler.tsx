@@ -241,7 +241,8 @@ const AuthCodeHandler = () => {
                         avatar_url: userMetadata.avatar_url || userMetadata.picture || '',
                         created_at: new Date().toISOString(),
                         updated_at: new Date().toISOString(),
-                        onboarding_completed: false
+                        onboarding_completed: false,
+                        user_id: user.id
                     };
 
                     // Remove undefined or null values
