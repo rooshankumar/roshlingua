@@ -11,277 +11,60 @@ const AuthCodeHandler = () => {
     useEffect(() => {
         let isMounted = true;
 
-        const handleAuthCallback = async () => {
-            if (isProcessing || !isMounted) return;
-            setIsProcessing(true);
-
-            try {
-                // Check if there's a hash fragment with access_token (happens with implicit grant)
-                const hash = window.location.hash;
-                if (hash && hash.includes('access_token=')) {
-                    console.log("Found access token in URL hash, setting session");
-
-                    try {
-                        // Extract the access token from the hash
-                        const hashParams = new URLSearchParams(hash.substring(1));
-                        const accessToken = hashParams.get('access_token');
-                        const refreshToken = hashParams.get('refresh_token');
-                        const expiresIn = hashParams.get('expires_in');
-                        const tokenType = hashParams.get('token_type');
-
-                        if (accessToken) {
-                            console.log("Extracted access token from URL hash");
-
-                            // Clear any existing auth data that might be stale
-                            localStorage.removeItem('supabase.auth.token');
-                            sessionStorage.removeItem('supabase.auth.token');
-                            localStorage.removeItem('sb-auth-token');
-
-                            // Set the session manually using the token from the hash
-                            const { data, error } = await supabase.auth.setSession({
-                                access_token: accessToken,
-                                refresh_token: refreshToken || '',
-                            });
-
-                            if (error) {
-                                console.error("Error setting session:", error);
-                                toast({
-                                    variant: "destructive",
-                                    title: "Authentication Failed",
-                                    description: error.message || "Failed to establish session"
-                                });
-                                navigate('/auth', { replace: true });
-                                return;
-                            }
-
-                            console.log("Session set successfully from hash params");
-
-                            // Remove the hash from the URL to prevent stale token issues on refresh
-                            if (window.history && window.history.replaceState) {
-                                window.history.replaceState({}, document.title, window.location.pathname + window.location.search);
-                            }
-
-                            if (data?.user) {
-                                await handleUserProfile(data.user);
-                                return;
-                            }
-                        }
-                    } catch (hashError) {
-                        console.error("Error processing hash fragment:", hashError);
-                        toast({
-                            variant: "destructive",
-                            title: "Authentication Error",
-                            description: "Failed to process authentication data"
-                        });
-                    } finally {
-                        setIsProcessing(false);
-                    }
-                } else {
-                    // Check if we have a session already
-                    const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
-
-                    if (sessionError) {
-                        console.error("Error getting session:", sessionError);
-                        toast({
-                            variant: "destructive",
-                            title: "Authentication Error",
-                            description: sessionError.message || "Failed to retrieve session"
-                        });
-                        navigate('/auth', { replace: true });
-                        return;
-                    }
-
-                    if (sessionData?.session && isMounted) {
-                        console.log("Session already exists, checking profile");
-                        await handleUserProfile(sessionData.session.user);
-                        return;
-                    }
-
-                    // Otherwise we need to exchange the code from the URL
-                    if (isMounted) {
-                        console.log("No session, processing auth code exchange");
-                        const url = new URL(window.location.href);
-                        const code = url.searchParams.get('code');
-                        const error = url.searchParams.get('error');
-                        const errorDescription = url.searchParams.get('error_description');
-
-                        // Handle error case
-                        if (error) {
-                            console.error("Auth error:", error, errorDescription);
-                            toast({
-                                variant: "destructive",
-                                title: "Authentication Error",
-                                description: errorDescription || error
-                            });
-                            navigate('/auth', { replace: true });
-                            return;
-                        }
-
-                        // If no code is present, redirect to auth
-                        if (!code) {
-                            console.log("No auth code present, redirecting to auth");
-                            navigate('/auth', { replace: true });
-                            return;
-                        }
-
-                        try {
-                            // Exchange the code for a session with better error handling
-                            console.log("Exchanging auth code for session");
-
-                            // Clear any stale verifiers to avoid conflicts
-                            localStorage.removeItem('supabase.auth.code_verifier');
-                            sessionStorage.removeItem('supabase.auth.code_verifier');
-
-                            const { data, error } = await supabase.auth.exchangeCodeForSession(code)
-
-                            if (error) {
-                                console.error('Session exchange error:', error);
-
-                                if (error.message.includes('code verifier') || error.message.includes('PKCE')) {
-                                    console.log("PKCE verification error detected, clearing all auth data");
-
-                                    localStorage.removeItem('sb-auth-token');
-                                    localStorage.removeItem('supabase.auth.token');
-                                    sessionStorage.removeItem('supabase.auth.token');
-                                    localStorage.removeItem('supabase.auth.expires_at');
-                                    sessionStorage.removeItem('supabase.auth.expires_at');
-                                    localStorage.removeItem('supabase.auth.code_verifier');
-                                    sessionStorage.removeItem('supabase.auth.code_verifier');
-                                    localStorage.removeItem('supabase.auth.code');
-                                    sessionStorage.removeItem('supabase.auth.code');
-
-                                    toast({
-                                        title: "Authentication Error",
-                                        description: "Please sign in again to continue.",
-                                    });
-                                    navigate('/auth', { replace: true });
-                                    return;
-                                }
-
-                                toast({
-                                    variant: "destructive",
-                                    title: "Authentication Failed",
-                                    description: error.message || "Failed to authenticate",
-                                });
-                                navigate('/auth', { replace: true });
-                                return;
-                            }
-
-                            if (data?.session) {
-                                await handleUserProfile(data.session.user);
-                            } else {
-                                toast({
-                                    variant: "destructive",
-                                    title: "Authentication Failed",
-                                    description: "Could not establish a session",
-                                });
-                                navigate('/auth', { replace: true });
-                            }
-                        } catch (err) {
-                            console.error('Auth callback error:', err);
-                            toast({
-                                variant: "destructive",
-                                title: "Error",
-                                description: "An unexpected error occurred. Please try again."
-                            });
-                            navigate('/auth', { replace: true });
-                        } finally {
-                            setIsProcessing(false);
-                        }
-                    }
-                }
-            } catch (err) {
-                console.error('Auth callback error:', err);
-                if (isMounted) {
-                    toast({
-                        variant: "destructive",
-                        title: "Error",
-                        description: "An unexpected error occurred. Please try again."
-                    });
-                    navigate('/auth', { replace: true });
-                }
-            } finally {
-                if (isMounted) {
-                    setIsProcessing(false);
-                }
-            }
-        };
-
         const handleUserProfile = async (user) => {
             if (!user || !isMounted) return;
 
             try {
+                // Set proper headers for all requests
+                supabase.rest.headers({
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                });
+
                 const { data: profileData, error: profileError } = await supabase
                     .from('profiles')
                     .select('onboarding_completed')
                     .eq('id', user.id)
-                    .single();
+                    .maybeSingle();
 
-                if (profileError) {
-                    if (profileError.code !== 'PGRST116') {
-                        console.error("Error fetching profile:", profileError);
-                        toast({
-                            variant: "destructive",
-                            title: "Profile Error",
-                            description: "Failed to retrieve user profile."
-                        });
-                    } else {
-                        console.log("Creating new profile for user:", user.id);
-                    }
+                if (profileError && profileError.code !== 'PGRST116') {
+                    console.error("Error fetching profile:", profileError);
+                    throw profileError;
+                }
 
+                if (!profileData) {
                     const userMetadata = user.user_metadata || {};
 
-                    // Data validation before creating profile
-                    const profileData = {
+                    // Prepare profile data with all required fields
+                    const newProfileData = {
                         id: user.id,
+                        user_id: user.id, // Ensure user_id is set
                         email: user.email,
                         full_name: userMetadata.full_name || userMetadata.name || '',
                         avatar_url: userMetadata.avatar_url || userMetadata.picture || '',
-                        created_at: new Date().toISOString(),
-                        updated_at: new Date().toISOString(),
                         onboarding_completed: false,
-                        user_id: user.id
+                        created_at: new Date().toISOString(),
+                        updated_at: new Date().toISOString()
                     };
 
-                    // Remove undefined or null values
-                    Object.keys(profileData).forEach(key => {
-                        if (profileData[key] === undefined || profileData[key] === null) {
-                            delete profileData[key];
-                        }
-                    });
+                    const { error: insertError } = await supabase
+                        .from('profiles')
+                        .insert([newProfileData]);
 
-                    try {
-                        const { error: insertError } = await supabase
-                            .from('profiles')
-                            .insert([profileData]);
-
-                        if (insertError) {
-                            console.error("Error creating profile:", insertError);
-                            toast({
-                                variant: "destructive",
-                                title: "Profile Error",
-                                description: "Failed to create user profile. Some features may be limited."
-                            });
-                        }
-                    } catch (insertErr) {
-                        console.error("Exception during profile insertion:", insertErr);
-                        toast({
-                            variant: "destructive",
-                            title: "Profile Error",
-                            description: "An unexpected error occurred while creating your profile."
-                        });
+                    if (insertError) {
+                        console.error("Error creating profile:", insertError);
+                        throw insertError;
                     }
 
-                    if (isMounted) navigate('/onboarding', { replace: true });
+                    if (isMounted) {
+                        navigate('/onboarding', { replace: true });
+                    }
                     return;
                 }
 
-                if (profileData) {
-                    console.log("Profile found, redirecting based on onboarding status");
-                    if (isMounted) {
-                        navigate(profileData.onboarding_completed ? '/dashboard' : '/onboarding', { replace: true });
-                    }
-                    return;
+                // Redirect based on onboarding status
+                if (isMounted) {
+                    navigate(profileData.onboarding_completed ? '/dashboard' : '/onboarding', { replace: true });
                 }
             } catch (error) {
                 console.error("Error handling user profile:", error);
@@ -289,8 +72,42 @@ const AuthCodeHandler = () => {
                     toast({
                         variant: "destructive",
                         title: "Profile Error",
-                        description: "Failed to retrieve or create user profile.",
+                        description: "Failed to setup user profile. Please try again.",
                     });
+                    navigate('/auth', { replace: true });
+                }
+            }
+        };
+
+        const handleAuthCallback = async () => {
+            if (isProcessing || !isMounted) return;
+            setIsProcessing(true);
+
+            try {
+                const { data, error } = await supabase.auth.exchangeCodeForSession(window.location.href);
+
+                if (error) {
+                    throw error;
+                }
+
+                if (data?.session) {
+                    await handleUserProfile(data.session.user);
+                } else {
+                    throw new Error("No session established");
+                }
+            } catch (err) {
+                console.error('Auth callback error:', err);
+                if (isMounted) {
+                    toast({
+                        variant: "destructive",
+                        title: "Authentication Error",
+                        description: err.message || "Failed to authenticate. Please try again.",
+                    });
+                    navigate('/auth', { replace: true });
+                }
+            } finally {
+                if (isMounted) {
+                    setIsProcessing(false);
                 }
             }
         };
