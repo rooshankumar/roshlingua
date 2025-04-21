@@ -91,7 +91,8 @@ export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
   },
   global: {
     headers: {
-      'Accept': 'application/json, application/vnd.pgrst.object+json'
+      'Accept': 'application/json, application/vnd.pgrst.object+json',
+      'Content-Type': 'application/json'
     }
   }
 });
