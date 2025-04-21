@@ -1,0 +1,94 @@
+orage key sb-auth-token
+index-BLvYWgYC.js:73 GoTrueClient@0 (2.69.1) 2025-04-21T07:37:28.336Z #_useSession begin
+index-BLvYWgYC.js:73 GoTrueClient@0 (2.69.1) 2025-04-21T07:37:28.337Z #__loadSession() begin
+index-BLvYWgYC.js:73 GoTrueClient@0 (2.69.1) 2025-04-21T07:37:28.337Z #getSession() session from storage {access_token: 'eyJhbGciOiJIUzI1NiIsImtpZCI6InJBVlcvUThncTdTeFdlVn…sc2V9.ui3De8exjcE2TCuU5SG92-NEC3ejTfK8lERcVEmcfgs', token_type: 'bearer', expires_in: 3600, expires_at: 1745224615, refresh_token: 'USzle99IKcymGoSRk8kxgQ', …}
+index-BLvYWgYC.js:73 GoTrueClient@0 (2.69.1) 2025-04-21T07:37:28.338Z #__loadSession() session has not expired expires_at 1745224615
+index-BLvYWgYC.js:73 GoTrueClient@0 (2.69.1) 2025-04-21T07:37:28.338Z #__loadSession() end
+index-BLvYWgYC.js:73 GoTrueClient@0 (2.69.1) 2025-04-21T07:37:28.338Z #_useSession end
+index-BLvYWgYC.js:73 GoTrueClient@0 (2.69.1) 2025-04-21T07:37:28.338Z #_acquireLock lock released for storage key sb-auth-token
+index-BLvYWgYC.js:73 GoTrueClient@0 (2.69.1) 2025-04-21T07:37:28.339Z #_acquireLock end
+index-BLvYWgYC.js:531 Starting auth callback processing
+index-BLvYWgYC.js:531 Found verifier: No
+index-BLvYWgYC.js:531 Processing auth callback...
+index-BLvYWgYC.js:531 No auth code present, redirecting to auth
+index-BLvYWgYC.js:531 Starting auth callback processing
+index-BLvYWgYC.js:531 Found verifier: No
+index-BLvYWgYC.js:531 Processing auth callback...
+index-BLvYWgYC.js:531 No auth code present, redirecting to auth
+index-BLvYWgYC.js:531 Starting auth callback processing
+index-BLvYWgYC.js:531 Found verifier: No
+index-BLvYWgYC.js:531 Processing auth callback...
+index-BLvYWgYC.js:531 No auth code present, redirecting to auth
+index-BLvYWgYC.js:73 GoTrueClient@0 (2.69.1) 2025-04-21T07:37:28.890Z #_acquireLock begin -1
+index-BLvYWgYC.js:531 Starting auth callback processing
+index-BLvYWgYC.js:531 Found verifier: No
+index-BLvYWgYC.js:531 Processing auth callback...
+index-BLvYWgYC.js:531 No auth code present, redirecting to auth
+index-BLvYWgYC.js:531 Starting auth callback processing
+index-BLvYWgYC.js:531 Found verifier: No
+index-BLvYWgYC.js:531 Processing auth callback...
+index-BLvYWgYC.js:531 No auth code present, redirecting to auth
+index-BLvYWgYC.js:73 GoTrueClient@0 (2.69.1) 2025-04-21T07:37:29.170Z #_acquireLock begin -1
+index-BLvYWgYC.js:73 GoTrueClient@0 (2.69.1) 2025-04-21T07:37:29.171Z #_acquireLock lock acquired for storage key sb-auth-token
+index-BLvYWgYC.js:73 GoTrueClient@0 (2.69.1) 2025-04-21T07:37:29.171Z #_useSession begin
+index-BLvYWgYC.js:73 GoTrueClient@0 (2.69.1) 2025-04-21T07:37:29.171Z #__loadSession() begin
+index-BLvYWgYC.js:73 GoTrueClient@0 (2.69.1) 2025-04-21T07:37:29.172Z #getSession() session from storage {access_token: 'eyJhbGciOiJIUzI1NiIsImtpZCI6InJBVlcvUThncTdTeFdlVn…sc2V9.ui3De8exjcE2TCuU5SG92-NEC3ejTfK8lERcVEmcfgs', token_type: 'bearer', expires_in: 3600, expires_at: 1745224615, refresh_token: 'USzle99IKcymGoSRk8kxgQ', …}
+index-BLvYWgYC.js:73 GoTrueClient@0 (2.69.1) 2025-04-21T07:37:29.172Z #__loadSession() session has not expired expires_at 1745224615
+index-BLvYWgYC.js:73 GoTrueClient@0 (2.69.1) 2025-04-21T07:37:29.172Z #__loadSession() end
+index-BLvYWgYC.js:73 GoTrueClient@0 (2.69.1) 2025-04-21T07:37:29.172Z #_useSession end
+index-BLvYWgYC.js:73 GoTrueClient@0 (2.69.1) 2025-04-21T07:37:29.172Z #_acquireLock lock released for storage key sb-auth-token
+index-BLvYWgYC.js:73 GoTrueClient@0 (2.69.1) 2025-04-21T07:37:29.173Z #_acquireLock end
+index-BLvYWgYC.js:531 Starting auth callback processing
+index-BLvYWgYC.js:531 Found verifier: No
+index-BLvYWgYC.js:531 Processing auth callback...
+index-BLvYWgYC.js:531 No auth code present, redirecting to auth
+index-BLvYWgYC.js:531 Starting auth callback processing
+index-BLvYWgYC.js:531 Found verifier: No
+index-BLvYWgYC.js:531 Processing auth callback...
+index-BLvYWgYC.js:531 No auth code present, redirecting to auth
+index-BLvYWgYC.js:73 GoTrueClient@0 (2.69.1) 2025-04-21T07:37:29.582Z #_acquireLock begin -1
+index-BLvYWgYC.js:531 Starting auth callback processing
+index-BLvYWgYC.js:531 Found verifier: No
+index-BLvYWgYC.js:531 Processing auth callback...
+index-BLvYWgYC.js:531 No auth code present, redirecting to auth
+index-BLvYWgYC.js:531 Starting auth callback processing
+index-BLvYWgYC.js:531 Found verifier: No
+index-BLvYWgYC.js:531 Processing auth callback...
+index-BLvYWgYC.js:531 No auth code present, redirecting to auth
+index-BLvYWgYC.js:73 GoTrueClient@0 (2.69.1) 2025-04-21T07:37:29.958Z #_acquireLock begin -1
+index-BLvYWgYC.js:531 Starting auth callback processing
+index-BLvYWgYC.js:531 Found verifier: No
+index-BLvYWgYC.js:531 Processing auth callback...
+index-BLvYWgYC.js:531 No auth code present, redirecting to auth
+index-BLvYWgYC.js:531 Starting auth callback processing
+index-BLvYWgYC.js:531 Found verifier: No
+index-BLvYWgYC.js:531 Processing auth callback...
+index-BLvYWgYC.js:531 No auth code present, redirecting to auth
+index-BLvYWgYC.js:73 GoTrueClient@0 (2.69.1) 2025-04-21T07:37:30.329Z #_acquireLock begin -1
+index-BLvYWgYC.js:73 GoTrueClient@0 (2.69.1) 2025-04-21T07:37:30.331Z #_acquireLock lock acquired for storage key sb-auth-token
+index-BLvYWgYC.js:73 GoTrueClient@0 (2.69.1) 2025-04-21T07:37:30.331Z #_useSession begin
+index-BLvYWgYC.js:73 GoTrueClient@0 (2.69.1) 2025-04-21T07:37:30.331Z #__loadSession() begin
+index-BLvYWgYC.js:73 GoTrueClient@0 (2.69.1) 2025-04-21T07:37:30.331Z #getSession() session from storage {access_token: 'eyJhbGciOiJIUzI1NiIsImtpZCI6InJBVlcvUThncTdTeFdlVn…sc2V9.ui3De8exjcE2TCuU5SG92-NEC3ejTfK8lERcVEmcfgs', token_type: 'bearer', expires_in: 3600, expires_at: 1745224615, refresh_token: 'USzle99IKcymGoSRk8kxgQ', …}
+index-BLvYWgYC.js:73 GoTrueClient@0 (2.69.1) 2025-04-21T07:37:30.332Z #__loadSession() session has not expired expires_at 1745224615
+index-BLvYWgYC.js:73 GoTrueClient@0 (2.69.1) 2025-04-21T07:37:30.332Z #__loadSession() end
+index-BLvYWgYC.js:73 GoTrueClient@0 (2.69.1) 2025-04-21T07:37:30.332Z #_useSession end
+index-BLvYWgYC.js:73 GoTrueClient@0 (2.69.1) 2025-04-21T07:37:30.332Z #_acquireLock lock released for storage key sb-auth-token
+index-BLvYWgYC.js:73 GoTrueClient@0 (2.69.1) 2025-04-21T07:37:30.333Z #_acquireLock end
+index-BLvYWgYC.js:531 Starting auth callback processing
+index-BLvYWgYC.js:531 Found verifier: No
+index-BLvYWgYC.js:531 Processing auth callback...
+index-BLvYWgYC.js:531 No auth code present, redirecting to auth
+index-BLvYWgYC.js:531 Starting auth callback processing
+index-BLvYWgYC.js:531 Found verifier: No
+index-BLvYWgYC.js:531 Processing auth callback...
+index-BLvYWgYC.js:531 No auth code present, redirecting to auth
+index-BLvYWgYC.js:73 GoTrueClient@0 (2.69.1) 2025-04-21T07:37:30.672Z #_acquireLock begin -1
+index-BLvYWgYC.js:531 Starting auth callback processing
+index-BLvYWgYC.js:531 Found verifier: No
+index-BLvYWgYC.js:531 Processing auth callback...
+index-BLvYWgYC.js:531 No auth code present, redirecting to auth
+index-BLvYWgYC.js:531 Starting auth callback processing
+index-BLvYWgYC.js:531 Found verifier: No
+index-BLvYWgYC.js:531 Processing auth callback...
+index-BLvYWgYC.js:531 No auth code present, redirecting to auth
+index-BLvYWgYC.js:73 GoTrueClien
