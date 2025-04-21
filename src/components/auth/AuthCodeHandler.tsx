@@ -156,13 +156,11 @@ const AuthCodeHandler = () => {
             // Exchange the code for a session with better error handling
             console.log("Exchanging auth code for session");
             
-            // Clear any stale verifiers to avoid conflicts
-            localStorage.removeItem('supabase.auth.code_verifier');
-            sessionStorage.removeItem('supabase.auth.code_verifier');
-            
-            // Get the code verifier before exchange
+            // Get the code verifier from storage
             const verifier = localStorage.getItem('supabase.auth.code_verifier') || 
                            sessionStorage.getItem('supabase.auth.code_verifier');
+
+            console.log("Processing auth code with verifier:", verifier ? "Present" : "Missing");
 
             if (!verifier) {
               console.error("No code verifier found for PKCE exchange");
