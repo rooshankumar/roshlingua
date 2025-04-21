@@ -160,7 +160,18 @@ const AuthCodeHandler = () => {
             localStorage.removeItem('supabase.auth.code_verifier');
             sessionStorage.removeItem('supabase.auth.code_verifier');
             
-            // Exchange code for session with retry
+            // Get the code verifier before exchange
+            const verifier = localStorage.getItem('supabase.auth.code_verifier') || 
+                           sessionStorage.getItem('supabase.auth.code_verifier');
+
+            if (!verifier) {
+              console.error("No code verifier found for PKCE exchange");
+              throw new Error("Authentication failed - missing code verifier");
+            }
+
+            console.log("Found code verifier for exchange, length:", verifier.length);
+
+            // Attempt code exchange with verifier
             let sessionError = null;
             let data = null;
             let retryCount = 0;
@@ -172,7 +183,10 @@ const AuthCodeHandler = () => {
                 data = result.data;
                 sessionError = result.error;
                 
-                if (!sessionError) break;
+                if (!sessionError) {
+                  console.log("Session exchange successful");
+                  break;
+                }
                 
                 console.log(`Session exchange attempt ${retryCount + 1} failed:`, sessionError);
                 
