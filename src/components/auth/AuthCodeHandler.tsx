@@ -41,8 +41,6 @@ const AuthCodeHandler = () => {
                             const { data, error } = await supabase.auth.setSession({
                                 access_token: accessToken,
                                 refresh_token: refreshToken || '',
-                                expires_in: expiresIn ? parseInt(expiresIn) : 3600,
-                                token_type: tokenType || 'bearer',
                             });
 
                             if (error) {
