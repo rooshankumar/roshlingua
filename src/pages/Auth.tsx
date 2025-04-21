@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,6 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
+import { generateVerifier } from '@/utils/pkceHelper';
 
 const Auth = () => {
   const [activeTab, setActiveTab] = useState<string>("login");
@@ -117,26 +117,26 @@ const Auth = () => {
   const handleGoogleLogin = async () => {
     try {
       setIsLoading(true);
-      
+
       // Clear all auth data first
       localStorage.removeItem('sb-auth-token');
       localStorage.removeItem('supabase.auth.token');
       sessionStorage.removeItem('supabase.auth.token');
       localStorage.removeItem('supabase.auth.expires_at');
       sessionStorage.removeItem('supabase.auth.expires_at');
-      
+
       // Generate new PKCE verifier
       const verifier = generateVerifier();
       localStorage.setItem('supabase.auth.code_verifier', verifier);
       sessionStorage.setItem('supabase.auth.code_verifier', verifier);
-      
+
       // Use production URL for redirects
       const redirectUrl = window.location.hostname.includes('localhost') || window.location.hostname.includes('replit')
         ? `${window.location.origin}/auth/callback`
         : `${window.location.origin.replace(/\/$/, '')}/auth/callback`;
-        
+
       console.log("Redirect URL:", redirectUrl);
-      
+
       const { error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
@@ -151,7 +151,7 @@ const Auth = () => {
       });
 
       if (error) throw error;
-      
+
       // The redirect happens automatically
     } catch (error: any) {
       console.error("Google login error:", error);
