@@ -1,0 +1,146 @@
+[plugin:vite:react-swc] × cannot reassign to a variable declared with `const`
+    ╭─[/home/runner/workspace/src/pages/AuthCallback.tsx:19:1]
+ 16 │ 
+ 17 │         const url = new URL(window.location.href);
+ 18 │         const code = url.searchParams.get('code');
+ 19 │         const error = url.searchParams.get('error');
+    ·               ──┬──
+    ·                 ╰── const variable was declared here
+ 20 │         const errorDescription = url.searchParams.get('error_description');
+ 21 │ 
+ 22 │         // Handle error from auth provider
+ 23 │         if (error) {
+ 24 │           console.error("Auth provider error:", error, errorDescription);
+ 25 │           toast({
+ 26 │             variant: "destructive",
+ 27 │             title: "Authentication Error",
+ 28 │             description: errorDescription || error
+ 29 │           });
+ 30 │           navigate('/auth', { replace: true });
+ 31 │           return;
+ 32 │         }
+ 33 │ 
+ 34 │         // If no code, redirect to auth
+ 35 │         if (!code) {
+ 36 │           console.log("No auth code present, redirecting to auth");
+ 37 │           navigate('/auth', { replace: true });
+ 38 │           return;
+ 39 │         }
+ 40 │ 
+ 41 │         // Clear any stale auth state
+ 42 │         localStorage.removeItem('supabase.auth.token');
+ 43 │         sessionStorage.removeItem('supabase.auth.token');
+ 44 │ 
+ 45 │         // Exchange the code for a session with retry
+ 46 │         let retries = 2;
+ 47 │         let error = null;
+ 48 │         let data = null;
+ 49 │ 
+ 50 │         while (retries > 0) {
+ 51 │           try {
+ 52 │             const result = await supabase.auth.exchangeCodeForSession(code);
+ 53 │             data = result.data;
+ 54 │             error = result.error;
+    ·             ──┬──
+    ·               ╰── cannot reassign
+ 55 │             if (!error) break;
+ 56 │             retries--;
+ 57 │             await new Promise(r => setTimeout(r, 500)); // Wait before retry
+    ╰────
+  × cannot reassign to a variable declared with `const`
+    ╭─[/home/runner/workspace/src/pages/AuthCallback.tsx:19:1]
+ 16 │ 
+ 17 │         const url = new URL(window.location.href);
+ 18 │         const code = url.searchParams.get('code');
+ 19 │         const error = url.searchParams.get('error');
+    ·               ──┬──
+    ·                 ╰── const variable was declared here
+ 20 │         const errorDescription = url.searchParams.get('error_description');
+ 21 │ 
+ 22 │         // Handle error from auth provider
+ 23 │         if (error) {
+ 24 │           console.error("Auth provider error:", error, errorDescription);
+ 25 │           toast({
+ 26 │             variant: "destructive",
+ 27 │             title: "Authentication Error",
+ 28 │             description: errorDescription || error
+ 29 │           });
+ 30 │           navigate('/auth', { replace: true });
+ 31 │           return;
+ 32 │         }
+ 33 │ 
+ 34 │         // If no code, redirect to auth
+ 35 │         if (!code) {
+ 36 │           console.log("No auth code present, redirecting to auth");
+ 37 │           navigate('/auth', { replace: true });
+ 38 │           return;
+ 39 │         }
+ 40 │ 
+ 41 │         // Clear any stale auth state
+ 42 │         localStorage.removeItem('supabase.auth.token');
+ 43 │         sessionStorage.removeItem('supabase.auth.token');
+ 44 │ 
+ 45 │         // Exchange the code for a session with retry
+ 46 │         let retries = 2;
+ 47 │         let error = null;
+ 48 │         let data = null;
+ 49 │ 
+ 50 │         while (retries > 0) {
+ 51 │           try {
+ 52 │             const result = await supabase.auth.exchangeCodeForSession(code);
+ 53 │             data = result.data;
+ 54 │             error = result.error;
+ 55 │             if (!error) break;
+ 56 │             retries--;
+ 57 │             await new Promise(r => setTimeout(r, 500)); // Wait before retry
+ 58 │           } catch (e) {
+ 59 │             error = e;
+    ·             ──┬──
+    ·               ╰── cannot reassign
+ 60 │             retries--;
+ 61 │             await new Promise(r => setTimeout(r, 500));
+ 62 │           }
+    ╰────
+  × the name `error` is defined multiple times
+    ╭─[/home/runner/workspace/src/pages/AuthCallback.tsx:19:1]
+ 16 │ 
+ 17 │         const url = new URL(window.location.href);
+ 18 │         const code = url.searchParams.get('code');
+ 19 │         const error = url.searchParams.get('error');
+    ·               ──┬──
+    ·                 ╰── previous definition of `error` here
+ 20 │         const errorDescription = url.searchParams.get('error_description');
+ 21 │ 
+ 22 │         // Handle error from auth provider
+ 23 │         if (error) {
+ 24 │           console.error("Auth provider error:", error, errorDescription);
+ 25 │           toast({
+ 26 │             variant: "destructive",
+ 27 │             title: "Authentication Error",
+ 28 │             description: errorDescription || error
+ 29 │           });
+ 30 │           navigate('/auth', { replace: true });
+ 31 │           return;
+ 32 │         }
+ 33 │ 
+ 34 │         // If no code, redirect to auth
+ 35 │         if (!code) {
+ 36 │           console.log("No auth code present, redirecting to auth");
+ 37 │           navigate('/auth', { replace: true });
+ 38 │           return;
+ 39 │         }
+ 40 │ 
+ 41 │         // Clear any stale auth state
+ 42 │         localStorage.removeItem('supabase.auth.token');
+ 43 │         sessionStorage.removeItem('supabase.auth.token');
+ 44 │ 
+ 45 │         // Exchange the code for a session with retry
+ 46 │         let retries = 2;
+ 47 │         let error = null;
+    ·             ──┬──
+    ·               ╰── `error` redefined here
+ 48 │         let data = null;
+ 49 │ 
+ 50 │         while (retries > 0) {
+    ╰────
+/home/runner/workspace/src/pages/AuthCallback.tsx:19:1
