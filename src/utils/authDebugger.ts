@@ -8,13 +8,25 @@ export const clearAllAuthData = () => {
   console.log('Clearing all auth data...');
 
   // Clear localStorage
-  localStorage.removeItem('supabase.auth.token');
-  localStorage.removeItem('supabase.auth.code_verifier');
-  localStorage.removeItem('code_verifier');
-  localStorage.removeItem('sb-pkce-verifier');
-  localStorage.removeItem('auth_session_id');
-  localStorage.removeItem('supabase_device_id');
-  localStorage.removeItem('pkce_verifier_backup');
+  // Clear all auth-related storage
+  const authKeys = Object.keys(localStorage).filter(key => 
+    key.includes('auth') || 
+    key.includes('supabase') || 
+    key.includes('pkce') ||
+    key.includes('verifier')
+  );
+  
+  authKeys.forEach(key => localStorage.removeItem(key));
+  
+  // Clear session storage
+  const sessionKeys = Object.keys(sessionStorage).filter(key =>
+    key.includes('auth') ||
+    key.includes('supabase') ||
+    key.includes('pkce') ||
+    key.includes('verifier')
+  );
+  
+  sessionKeys.forEach(key => sessionStorage.removeItem(key));
 
   // Clear sessionStorage
   sessionStorage.removeItem('supabase.auth.token');

@@ -204,12 +204,30 @@ const AuthCodeHandler = () => {
             console.error('Session exchange error:', error);
 
             // Handle various error types
-            if (error.message && (
-                error.message.includes('code verifier') || 
-                error.message.includes('PKCE') ||
-                error.message.includes('verification')
-            )) {
-              console.log("PKCE verification error detected, clearing all auth data");
+            const errorType = error.message?.toLowerCase() || '';
+            if (errorType.includes('code verifier') || errorType.includes('pkce')) {
+              console.error("PKCE verification failed:", error);
+              toast({
+                variant: "destructive",
+                title: "Authentication Error",
+                description: "Session verification failed. Please try signing in again."
+              });
+            } else if (errorType.includes('expired')) {
+              console.error("Token expired:", error);
+              toast({
+                variant: "destructive",
+                title: "Session Expired",
+                description: "Your session has expired. Please sign in again."
+              });
+            } else if (errorType.includes('invalid')) {
+              console.error("Invalid auth state:", error);
+              toast({
+                variant: "destructive",
+                title: "Authentication Error",
+                description: "Invalid authentication state. Please try again."
+              });
+            } else {
+              console.error("Unhandled auth error:", error);
               
               // Clear all auth-related data for a clean restart
               localStorage.removeItem('sb-auth-token');

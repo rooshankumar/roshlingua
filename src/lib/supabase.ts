@@ -1,4 +1,3 @@
-
 import { createClient } from '@supabase/supabase-js';
 import type { Database } from '@/types/supabase';
 
@@ -43,14 +42,14 @@ export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
             sessionStorage.removeItem('supabase.auth.token');
             localStorage.removeItem('supabase.auth.expires_at');
             sessionStorage.removeItem('supabase.auth.expires_at');
-            
+
             // Also clear any PKCE verifiers to ensure clean authentication
             localStorage.removeItem('supabase.auth.code_verifier');
             sessionStorage.removeItem('supabase.auth.code_verifier');
             localStorage.removeItem('supabase.auth.code');
             sessionStorage.removeItem('supabase.auth.code');
           }
-          
+
           // Store PKCE verifiers in both localStorage and sessionStorage for redundancy
           if (key.includes('code_verifier')) {
             localStorage.setItem(key, value);
@@ -67,7 +66,7 @@ export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
         try {
           localStorage.removeItem(key);
           sessionStorage.removeItem(key);
-          
+
           // If clearing main token, clear all related auth data
           if (key === 'sb-auth-token' || key === 'supabase.auth.token') {
             // Clear all known auth token locations
