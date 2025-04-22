@@ -1,0 +1,96 @@
+onboarding completed
+ProtectedRoute.tsx:65 Redirecting to onboarding - not completed
+ProtectedRoute.tsx:72 Redirecting to dashboard - onboarding completed
+chunk-W6L2VRDA.js?v=ae83a17f:521 Warning: Maximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render.
+    at Navigate (https://47f470bf-bc8a-4c4a-b111-931a59aed597-00-3a8o4es1taqvp.sisko.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=ae83a17f:4411:5)
+    at ProtectedRoute (https://47f470bf-bc8a-4c4a-b111-931a59aed597-00-3a8o4es1taqvp.sisko.replit.dev/src/components/auth/ProtectedRoute.tsx?t=1745335990099:15:27)
+    at RenderedRoute (https://47f470bf-bc8a-4c4a-b111-931a59aed597-00-3a8o4es1taqvp.sisko.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=ae83a17f:4069:5)
+    at Routes (https://47f470bf-bc8a-4c4a-b111-931a59aed597-00-3a8o4es1taqvp.sisko.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=ae83a17f:4508:5)
+    at AppRoutes (https://47f470bf-bc8a-4c4a-b111-931a59aed597-00-3a8o4es1taqvp.sisko.replit.dev/src/App.tsx?t=1745335990099:39:33)
+    at AuthProvider (https://47f470bf-bc8a-4c4a-b111-931a59aed597-00-3a8o4es1taqvp.sisko.replit.dev/src/providers/AuthProvider.tsx:23:32)
+    at Router (https://47f470bf-bc8a-4c4a-b111-931a59aed597-00-3a8o4es1taqvp.sisko.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=ae83a17f:4451:15)
+    at BrowserRouter (https://47f470bf-bc8a-4c4a-b111-931a59aed597-00-3a8o4es1taqvp.sisko.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=ae83a17f:5196:5)
+    at ThemeProvider (https://47f470bf-bc8a-4c4a-b111-931a59aed597-00-3a8o4es1taqvp.sisko.replit.dev/src/components/theme-provider.tsx:17:33)
+    at QueryClientProvider (https://47f470bf-bc8a-4c4a-b111-931a59aed597-00-3a8o4es1taqvp.sisko.replit.dev/node_modules/.vite/deps/@tanstack_react-query.js?v=ae83a17f:2794:3)
+    at App
+printWarning @ chunk-W6L2VRDA.js?v=ae83a17f:521
+error @ chunk-W6L2VRDA.js?v=ae83a17f:505
+checkForNestedUpdates @ chunk-W6L2VRDA.js?v=ae83a17f:19665
+scheduleUpdateOnFiber @ chunk-W6L2VRDA.js?v=ae83a17f:18533
+dispatchSetState @ chunk-W6L2VRDA.js?v=ae83a17f:12403
+(anonymous) @ react-router-dom.js?v=ae83a17f:5217
+replace2 @ react-router-dom.js?v=ae83a17f:347
+(anonymous) @ react-router-dom.js?v=ae83a17f:3876
+(anonymous) @ react-router-dom.js?v=ae83a17f:4436
+commitHookEffectListMount @ chunk-W6L2VRDA.js?v=ae83a17f:16915
+commitPassiveMountOnFiber @ chunk-W6L2VRDA.js?v=ae83a17f:18156
+commitPassiveMountEffects_complete @ chunk-W6L2VRDA.js?v=ae83a17f:18129
+commitPassiveMountEffects_begin @ chunk-W6L2VRDA.js?v=ae83a17f:18119
+commitPassiveMountEffects @ chunk-W6L2VRDA.js?v=ae83a17f:18109
+flushPassiveEffectsImpl @ chunk-W6L2VRDA.js?v=ae83a17f:19490
+flushPassiveEffects @ chunk-W6L2VRDA.js?v=ae83a17f:19447
+(anonymous) @ chunk-W6L2VRDA.js?v=ae83a17f:19328
+workLoop @ chunk-W6L2VRDA.js?v=ae83a17f:197
+flushWork @ chunk-W6L2VRDA.js?v=ae83a17f:176
+performWorkUntilDeadline @ chunk-W6L2VRDA.js?v=ae83a17f:384Understand this error
+ProtectedRoute.tsx:65 Redirecting to onboarding - not completed
+ProtectedRoute.tsx:72 Redirecting to dashboard - onboarding completed
+ProtectedRoute.tsx:65 Redirecting to onboarding - not completed
+ProtectedRoute.tsx:72 Redirecting to dashboard - onboarding completed
+ProtectedRoute.tsx:65 Redirecting to onboarding - not completed
+ProtectedRoute.tsx:72 Redirecting to dashboard - onboarding completed
+ProtectedRoute.tsx:65 Redirecting to onboarding - not completed
+ProtectedRoute.tsx:72 Redirecting to dashboard - onboarding completed
+ProtectedRoute.tsx:65 Redirecting to onboarding - not completed
+ProtectedRoute.tsx:72 Redirecting to dashboard - onboarding completed
+ProtectedRoute.tsx:65 Redirecting to onboarding - not completed
+ProtectedRoute.tsx:72 Redirecting to dashboard - onboarding completed
+ProtectedRoute.tsx:65 Redirecting to onboarding - not completed
+ProtectedRoute.tsx:72 Redirecting to dashboard - onboarding completed
+ProtectedRoute.tsx:65 Redirecting to onboarding - not completed
+ProtectedRoute.tsx:72 Redirecting to dashboard - onboarding completed
+ProtectedRoute.tsx:65 Redirecting to onboarding - not completed
+ProtectedRoute.tsx:72 Redirecting to dashboard - onboarding completed
+ProtectedRoute.tsx:65 Redirecting to onboarding - not completed
+ProtectedRoute.tsx:72 Redirecting to dashboard - onboarding completed
+ProtectedRoute.tsx:65 Redirecting to onboarding - not completed
+ProtectedRoute.tsx:72 Redirecting to dashboard - onboarding completed
+ProtectedRoute.tsx:65 Redirecting to onboarding - not completed
+ProtectedRoute.tsx:72 Redirecting to dashboard - onboarding completed
+ProtectedRoute.tsx:65 Redirecting to onboarding - not completed
+ProtectedRoute.tsx:72 Redirecting to dashboard - onboarding completed
+ProtectedRoute.tsx:65 Redirecting to onboarding - not completed
+ProtectedRoute.tsx:72 Redirecting to dashboard - onboarding completed
+ProtectedRoute.tsx:65 Redirecting to onboarding - not completed
+ProtectedRoute.tsx:72 Redirecting to dashboard - onboarding completed
+ProtectedRoute.tsx:65 Redirecting to onboarding - not completed
+ProtectedRoute.tsx:72 Redirecting to dashboard - onboarding completed
+ProtectedRoute.tsx:65 Redirecting to onboarding - not completed
+ProtectedRoute.tsx:72 Redirecting to dashboard - onboarding completed
+ProtectedRoute.tsx:65 Redirecting to onboarding - not completed
+ProtectedRoute.tsx:72 Redirecting to dashboard - onboarding completed
+ProtectedRoute.tsx:65 Redirecting to onboarding - not completed
+ProtectedRoute.tsx:72 Redirecting to dashboard - onboarding completed
+ProtectedRoute.tsx:65 Redirecting to onboarding - not completed
+ProtectedRoute.tsx:72 Redirecting to dashboard - onboarding completed
+ProtectedRoute.tsx:65 Redirecting to onboarding - not completed
+ProtectedRoute.tsx:72 Redirecting to dashboard - onboarding completed
+ProtectedRoute.tsx:65 Redirecting to onboarding - not completed
+ProtectedRoute.tsx:72 Redirecting to dashboard - onboarding completed
+ProtectedRoute.tsx:65 Redirecting to onboarding - not completed
+react-router-dom.js?v=ae83a17f:345 Throttling navigation to prevent the browser from hanging. See https://crbug.com/1038223. Command line switch --disable-ipc-flooding-protection can be used to bypass the protection
+replace2 @ react-router-dom.js?v=ae83a17f:345
+(anonymous) @ react-router-dom.js?v=ae83a17f:3876
+(anonymous) @ react-router-dom.js?v=ae83a17f:4436
+commitHookEffectListMount @ chunk-W6L2VRDA.js?v=ae83a17f:16915
+commitPassiveMountOnFiber @ chunk-W6L2VRDA.js?v=ae83a17f:18156
+commitPassiveMountEffects_complete @ chunk-W6L2VRDA.js?v=ae83a17f:18129
+commitPassiveMountEffects_begin @ chunk-W6L2VRDA.js?v=ae83a17f:18119
+commitPassiveMountEffects @ chunk-W6L2VRDA.js?v=ae83a17f:18109
+flushPassiveEffectsImpl @ chunk-W6L2VRDA.js?v=ae83a17f:19490
+flushPassiveEffects @ chunk-W6L2VRDA.js?v=ae83a17f:19447
+(anonymous) @ chunk-W6L2VRDA.js?v=ae83a17f:19328
+workLoop @ chunk-W6L2VRDA.js?v=ae83a17f:197
+flushWork @ chunk-W6L2VRDA.js?v=ae83a17f:176
+performWorkUntilDeadline @ chunk-W6L2VRDA.js?v=ae83a17f:384Understand this warning
+ProtectedRoute.tsx:65 Redirecting to onboarding - not completed
