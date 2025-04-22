@@ -7,31 +7,37 @@ DROP FUNCTION IF EXISTS public.handle_new_user();
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS TRIGGER AS $$
 BEGIN
-  -- Create profile with user_id reference
-  INSERT INTO public.profiles (
-    user_id,
-    email,
-    created_at,
-    updated_at
-  ) VALUES (
-    NEW.id,
-    NEW.email,
-    NOW(),
-    NOW()
-  );
+  BEGIN
+    -- Create profile with user_id reference
+    INSERT INTO public.profiles (
+      id,
+      email,
+      created_at,
+      updated_at
+    ) VALUES (
+      NEW.id,
+      NEW.email,
+      NOW(),
+      NOW()
+    );
 
-  -- Create onboarding status
-  INSERT INTO public.onboarding_status (
-    user_id,
-    is_complete,
-    created_at
-  ) VALUES (
-    NEW.id,
-    false,
-    NOW()
-  );
+    -- Create onboarding status
+    INSERT INTO public.onboarding_status (
+      user_id,
+      is_complete,
+      created_at
+    ) VALUES (
+      NEW.id,
+      false,
+      NOW()
+    );
 
-  RETURN NEW;
+    RETURN NEW;
+  EXCEPTION WHEN OTHERS THEN
+    -- Log the error and rollback this transaction
+    RAISE NOTICE 'Error in handle_new_user: %', SQLERRM;
+    RETURN NULL;
+  END;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
