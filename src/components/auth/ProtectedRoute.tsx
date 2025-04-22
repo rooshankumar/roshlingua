@@ -32,8 +32,8 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
           console.error("Error checking onboarding status:", profileError);
         }
 
-        // Set the completion status even if profile doesn't exist (false)
-        setHasCompletedOnboarding(profileData?.onboarding_completed || false);
+        const isCompleted = profileData?.onboarding_completed || false;
+        setHasCompletedOnboarding(isCompleted);
       } catch (error) {
         console.error("Error in onboarding check:", error);
       } finally {
@@ -41,7 +41,9 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
       }
     };
 
-    checkOnboardingStatus();
+    if (user) {
+      checkOnboardingStatus();
+    }
   }, [user]);
 
   if (isLoading || isCheckingOnboarding) {
@@ -59,17 +61,15 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
     return <Navigate to="/auth" state={{ from: location.pathname }} replace />;
   }
 
+  // Only handle redirects when not checking onboarding status
   if (!isCheckingOnboarding) {
-    // Only redirect when we're done checking
-    if (!hasCompletedOnboarding && location.pathname !== "/onboarding") {
-      console.log("Redirecting to onboarding - not completed");
+    const isOnOnboardingPage = location.pathname === "/onboarding";
+    
+    if (!hasCompletedOnboarding && !isOnOnboardingPage) {
       return <Navigate to="/onboarding" replace />;
     }
 
-    // If onboarding is completed and user is on onboarding page
-    if ((hasCompletedOnboarding || localStorage.getItem("onboarding_completed") === "true") 
-        && location.pathname === "/onboarding") {
-      console.log("Redirecting to dashboard - onboarding completed");
+    if (hasCompletedOnboarding && isOnOnboardingPage) {
       return <Navigate to="/dashboard" replace />;
     }
   }
