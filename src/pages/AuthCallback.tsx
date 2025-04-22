@@ -14,16 +14,33 @@ const AuthCallback = () => {
         console.log("Processing authentication callback...");
         setIsLoading(true);
 
+        const url = new URL(window.location.href);
+        const code = url.searchParams.get('code');
+        const error = url.searchParams.get('error');
+        const errorDescription = url.searchParams.get('error_description');
+
+        // Handle error from auth provider
+        if (error) {
+          console.error("Auth provider error:", error, errorDescription);
+          toast({
+            variant: "destructive",
+            title: "Authentication Error",
+            description: errorDescription || error
+          });
+          navigate('/auth', { replace: true });
+          return;
+        }
+
+        // If no code, redirect to auth
+        if (!code) {
+          console.log("No auth code present, redirecting to auth");
+          navigate('/auth', { replace: true });
+          return;
+        }
+
         // Clear any stale auth state
         localStorage.removeItem('supabase.auth.token');
         sessionStorage.removeItem('supabase.auth.token');
-
-        const url = new URL(window.location.href);
-        const code = url.searchParams.get('code');
-
-        if (!code) {
-          throw new Error('No auth code found in URL');
-        }
 
         // Exchange the code for a session with retry
         let retries = 2;

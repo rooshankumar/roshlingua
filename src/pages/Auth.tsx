@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -117,7 +116,7 @@ const Auth = () => {
   const handleGoogleLogin = async () => {
     try {
       setIsLoading(true);
-      
+
       // Clear any previous auth data to ensure clean login
       localStorage.removeItem('sb-auth-token');
       localStorage.removeItem('supabase.auth.token');
@@ -128,14 +127,14 @@ const Auth = () => {
       sessionStorage.removeItem('supabase.auth.code_verifier');
       localStorage.removeItem('supabase.auth.code');
       sessionStorage.removeItem('supabase.auth.code');
-      
+
       // Use production URL for redirects
       const redirectUrl = window.location.hostname.includes('localhost') || window.location.hostname.includes('replit')
         ? `${window.location.origin}/auth/callback`
         : `${window.location.origin.replace(/\/$/, '')}/auth/callback`;
-        
+
       console.log("Redirect URL:", redirectUrl);
-      
+
       const { error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
@@ -150,7 +149,7 @@ const Auth = () => {
       });
 
       if (error) throw error;
-      
+
       // The redirect happens automatically
     } catch (error: any) {
       console.error("Google login error:", error);
@@ -199,6 +198,7 @@ const Auth = () => {
                     id="password"
                     type={showPassword ? "text" : "password"}
                     placeholder="*********"
+                    autoComplete="current-password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     disabled={isLoading}
@@ -286,6 +286,7 @@ const Auth = () => {
                     id="password"
                     type={showPassword ? "text" : "password"}
                     placeholder="********"
+                    autoComplete="new-password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     disabled={isLoading}
@@ -308,6 +309,7 @@ const Auth = () => {
                   id="confirm-password"
                   type={showPassword ? "text" : "password"}
                   placeholder="********"
+                  autoComplete="new-password"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   disabled={isLoading}
