@@ -98,9 +98,33 @@ const AuthCallback = () => {
             }
           }
 
-          // Update last seen  -  Modified to use a stored procedure for better transaction management.
+          // Update last seen  -  Modified to ensure ID is properly set
           try {
-            console.log("User signed in, updating profile");
+            if (!data?.session?.user?.id) {
+              throw new Error("No user ID available in session");
+            }
+
+            console.log("User signed in, updating profile with ID:", data.session.user.id);
+            
+            // First ensure profile exists
+            const { error: insertError } = await supabase
+              .from('profiles')
+              .upsert({
+                id: data.session.user.id,
+                email: data.session.user.email,
+                created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString(),
+                last_seen: new Date().toISOString()
+              }, {
+                onConflict: 'id'
+              });
+
+            if (insertError) {
+              console.error("Error ensuring profile exists:", insertError);
+              throw insertError;
+            }
+
+            // Now update via RPC
             const { error: profileError } = await supabase.rpc('handle_user_profile_upsert', {
               user_id: data.session.user.id,
               user_email: data.session.user.email,
@@ -113,8 +137,7 @@ const AuthCallback = () => {
             }
           } catch (error) {
             console.error("Error updating profile in transaction:", error);
-            // Handle the transaction error appropriately, e.g., retry or display a user-friendly message.
-            throw error; // Re-throw to be caught by the outer try-catch.
+            throw error;
           }
 
 
