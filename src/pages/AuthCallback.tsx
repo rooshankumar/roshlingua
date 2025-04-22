@@ -50,25 +50,15 @@ const AuthCallback = () => {
         while (retries > 0) {
           try {
             const result = await supabase.auth.exchangeCodeForSession(code);
-            if (result.error) {
-              console.error("Session exchange error:", result.error);
-              sessionError = result.error;
-              retries--;
-              if (retries > 0) {
-                await new Promise(r => setTimeout(r, 1000)); // Longer wait between retries
-                continue;
-              }
-              break;
-            }
             data = result.data;
-            break;
+            sessionError = result.error;
+            if (!sessionError) break;
+            retries--;
+            await new Promise(r => setTimeout(r, 500)); // Wait before retry
           } catch (e) {
-            console.error("Auth callback error:", e);
             sessionError = e;
             retries--;
-            if (retries > 0) {
-              await new Promise(r => setTimeout(r, 1000));
-            }
+            await new Promise(r => setTimeout(r, 500));
           }
         }
 
