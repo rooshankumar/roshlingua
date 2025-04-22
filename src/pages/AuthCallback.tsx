@@ -16,16 +16,16 @@ const AuthCallback = () => {
 
         const url = new URL(window.location.href);
         const code = url.searchParams.get('code');
-        const error = url.searchParams.get('error');
+        const urlError = url.searchParams.get('error');
         const errorDescription = url.searchParams.get('error_description');
 
         // Handle error from auth provider
-        if (error) {
-          console.error("Auth provider error:", error, errorDescription);
+        if (urlError) {
+          console.error("Auth provider error:", urlError, errorDescription);
           toast({
             variant: "destructive",
             title: "Authentication Error",
-            description: errorDescription || error
+            description: errorDescription || urlError
           });
           navigate('/auth', { replace: true });
           return;
@@ -44,19 +44,19 @@ const AuthCallback = () => {
 
         // Exchange the code for a session with retry
         let retries = 2;
-        let error = null;
+        let sessionError = null;
         let data = null;
 
         while (retries > 0) {
           try {
             const result = await supabase.auth.exchangeCodeForSession(code);
             data = result.data;
-            error = result.error;
-            if (!error) break;
+            sessionError = result.error;
+            if (!sessionError) break;
             retries--;
             await new Promise(r => setTimeout(r, 500)); // Wait before retry
           } catch (e) {
-            error = e;
+            sessionError = e;
             retries--;
             await new Promise(r => setTimeout(r, 500));
           }
