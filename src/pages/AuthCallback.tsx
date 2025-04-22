@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
@@ -14,17 +13,45 @@ const AuthCallback = () => {
       try {
         console.log("Processing authentication callback...");
         setIsLoading(true);
-        
-        // Exchange the code in the URL for a session
-        const { data, error } = await supabase.auth.exchangeCodeForSession(window.location.href);
-        
+
+        // Clear any stale auth state
+        localStorage.removeItem('supabase.auth.token');
+        sessionStorage.removeItem('supabase.auth.token');
+
+        const url = new URL(window.location.href);
+        const code = url.searchParams.get('code');
+
+        if (!code) {
+          throw new Error('No auth code found in URL');
+        }
+
+        // Exchange the code for a session with retry
+        let retries = 2;
+        let error = null;
+        let data = null;
+
+        while (retries > 0) {
+          try {
+            const result = await supabase.auth.exchangeCodeForSession(code);
+            data = result.data;
+            error = result.error;
+            if (!error) break;
+            retries--;
+            await new Promise(r => setTimeout(r, 500)); // Wait before retry
+          } catch (e) {
+            error = e;
+            retries--;
+            await new Promise(r => setTimeout(r, 500));
+          }
+        }
+
         if (error) {
           console.error("Authentication error:", error);
           throw error;
         }
-        
+
         console.log("Session check result:", data.session ? "Session exists" : "No session");
-        
+
         if (data?.session) {
           // Session exists, check if profile exists and if onboarding was completed
           const { data: profile, error: profileError } = await supabase
@@ -32,11 +59,11 @@ const AuthCallback = () => {
             .select('onboarding_completed')
             .eq('id', data.session.user.id)
             .single();
-            
+
           if (profileError && profileError.code !== 'PGRST116') {
             console.error("Error fetching profile:", profileError);
           }
-          
+
           // Create profile if it doesn't exist
           if (!profile) {
             console.log("Creating new profile for user:", data.session.user.id);
@@ -48,18 +75,18 @@ const AuthCallback = () => {
               last_seen: new Date().toISOString(),
               onboarding_completed: false
             });
-            
+
             if (insertError) {
               console.error("Error creating profile:", insertError);
             }
           }
-          
+
           // Update last seen
           await supabase
             .from('profiles')
             .update({ last_seen: new Date().toISOString() })
             .eq('id', data.session.user.id);
-          
+
           // Redirect based on onboarding status
           setTimeout(() => {
             if (profile?.onboarding_completed) {
@@ -90,10 +117,10 @@ const AuthCallback = () => {
         setIsLoading(false);
       }
     };
-    
+
     handleCallback();
   }, [navigate, toast]);
-  
+
   return (
     <div className="h-screen w-full flex items-center justify-center">
       <div className="animate-pulse flex flex-col items-center gap-4">
