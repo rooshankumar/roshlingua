@@ -50,21 +50,31 @@ const AuthCallback = () => {
         while (retries > 0) {
           try {
             const result = await supabase.auth.exchangeCodeForSession(code);
+            if (result.error) {
+              console.error("Session exchange error:", result.error);
+              sessionError = result.error;
+              retries--;
+              if (retries > 0) {
+                await new Promise(r => setTimeout(r, 1000)); // Longer wait between retries
+                continue;
+              }
+              break;
+            }
             data = result.data;
-            sessionError = result.error;
-            if (!sessionError) break;
-            retries--;
-            await new Promise(r => setTimeout(r, 500)); // Wait before retry
+            break;
           } catch (e) {
+            console.error("Auth callback error:", e);
             sessionError = e;
             retries--;
-            await new Promise(r => setTimeout(r, 500));
+            if (retries > 0) {
+              await new Promise(r => setTimeout(r, 1000));
+            }
           }
         }
 
-        if (error) {
-          console.error("Authentication error:", error);
-          throw error;
+        if (sessionError) {
+          console.error("Authentication error:", sessionError);
+          throw sessionError;
         }
 
         console.log("Session check result:", data.session ? "Session exists" : "No session");
