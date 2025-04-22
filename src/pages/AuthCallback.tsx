@@ -108,11 +108,25 @@ const AuthCallback = () => {
             }
           }
 
-          // Update last seen
-          await supabase
-            .from('profiles')
-            .update({ last_seen: new Date().toISOString() })
-            .eq('id', data.session.user.id);
+          // Update last seen  -  Modified to use a stored procedure for better transaction management.
+          try {
+            console.log("User signed in, updating profile");
+            const { error: profileError } = await supabase.rpc('handle_user_profile_upsert', {
+              user_id: data.session.user.id,
+              user_email: data.session.user.email,
+              current_timestamp: new Date().toISOString()
+            });
+
+            if (profileError) {
+              console.error("Error updating profile on sign in:", profileError);
+              throw profileError;
+            }
+          } catch (error) {
+            console.error("Error updating profile in transaction:", error);
+            // Handle the transaction error appropriately, e.g., retry or display a user-friendly message.
+            throw error; // Re-throw to be caught by the outer try-catch.
+          }
+
 
           // Redirect based on onboarding status
           setTimeout(() => {
