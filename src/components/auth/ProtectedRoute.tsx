@@ -16,20 +16,29 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
 
   useEffect(() => {
     const checkOnboardingStatus = async () => {
-      if (!user) return;
-
-      // Check both profile existence and completion
-      const { data: profileData, error: profileError } = await supabase
-        .from('profiles')
-        .select('onboarding_completed')
-        .eq('id', user.id)
-        .single();
-
-      if (!profileError && profileData) {
-        setHasCompletedOnboarding(profileData.onboarding_completed || false);
+      if (!user) {
+        setIsCheckingOnboarding(false);
+        return;
       }
 
-      setIsCheckingOnboarding(false);
+      try {
+        const { data: profileData, error: profileError } = await supabase
+          .from('profiles')
+          .select('onboarding_completed')
+          .eq('id', user.id)
+          .single();
+
+        if (profileError && profileError.code !== 'PGRST116') {
+          console.error("Error checking onboarding status:", profileError);
+        }
+
+        // Set the completion status even if profile doesn't exist (false)
+        setHasCompletedOnboarding(profileData?.onboarding_completed || false);
+      } catch (error) {
+        console.error("Error in onboarding check:", error);
+      } finally {
+        setIsCheckingOnboarding(false);
+      }
     };
 
     checkOnboardingStatus();
@@ -50,19 +59,19 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
     return <Navigate to="/auth" state={{ from: location.pathname }} replace />;
   }
 
-  // Redirect to onboarding if not completed, except if already on onboarding page
-  if (!hasCompletedOnboarding && location.pathname !== "/onboarding") {
-    return <Navigate to="/onboarding" replace />;
-  }
+  if (!isCheckingOnboarding) {
+    // Only redirect when we're done checking
+    if (!hasCompletedOnboarding && location.pathname !== "/onboarding") {
+      console.log("Redirecting to onboarding - not completed");
+      return <Navigate to="/onboarding" replace />;
+    }
 
-  // If on onboarding page but has completed it, redirect to dashboard
-  if (hasCompletedOnboarding && location.pathname === "/onboarding") {
-    return <Navigate to="/dashboard" replace />;
-  }
-
-  // If onboarding was just completed via localStorage flag, redirect to dashboard
-  if (localStorage.getItem("onboarding_completed") === "true" && location.pathname === "/onboarding") {
-    return <Navigate to="/dashboard" replace />;
+    // If onboarding is completed and user is on onboarding page
+    if ((hasCompletedOnboarding || localStorage.getItem("onboarding_completed") === "true") 
+        && location.pathname === "/onboarding") {
+      console.log("Redirecting to dashboard - onboarding completed");
+      return <Navigate to="/dashboard" replace />;
+    }
   }
 
   return <>{children}</>;
