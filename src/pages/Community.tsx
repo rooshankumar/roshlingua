@@ -176,7 +176,7 @@ const Community = () => {
       }
 
       // Use LikeButton component instead of direct DB operations
-      const likeButton = document.querySelector(`button[data-user-id="${userId}"]`);
+      const likeButton = document.querySelector(`button[data-user-id="${userId}"]`) as HTMLButtonElement;
       if (likeButton) {
         likeButton.click();
         // Update the user's likes_count after liking
