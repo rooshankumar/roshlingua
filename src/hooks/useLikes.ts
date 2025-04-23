@@ -10,40 +10,56 @@ export function useLikes(targetUserId: string, currentUserId: string) {
   const { toast } = useToast();
 
   useEffect(() => {
-    if (targetUserId) {
-      fetchLikeStatus();
-    }
+    if (!targetUserId) return;
+
+    fetchLikeStatus();
+    setupRealtimeSubscription();
+
+    return () => {
+      supabase.removeChannel('likes');
+    };
   }, [targetUserId, currentUserId]);
+
+  const setupRealtimeSubscription = () => {
+    const channel = supabase
+      .channel('likes')
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'user_likes',
+        filter: `liked_id=eq.${targetUserId}`,
+      }, () => {
+        fetchLikeStatus();
+      })
+      .subscribe();
+
+    return () => {
+      channel.unsubscribe();
+    };
+  };
 
   const fetchLikeStatus = async () => {
     try {
-      // Get like count first
-      const { data: likes, error: likesError } = await supabase
+      // Get total like count
+      const { data: likeData, error: countError } = await supabase
         .from('user_likes')
         .select('*', { count: 'exact' })
         .eq('liked_id', targetUserId);
 
-      if (likesError) throw likesError;
+      if (countError) throw countError;
+      setLikeCount(likeData?.length || 0);
 
-      const actualLikeCount = likes?.length || 0;
-      setLikeCount(actualLikeCount);
-
-      // Only check user's like status if they're logged in
-      if (currentUserId && currentUserId !== targetUserId) {
-        const { data: userLike, error: userLikeError } = await supabase
+      // Check if current user has liked
+      if (currentUserId) {
+        const { data: userLike, error: likeError } = await supabase
           .from('user_likes')
           .select('*')
           .eq('liker_id', currentUserId)
           .eq('liked_id', targetUserId)
           .maybeSingle();
 
-        if (userLikeError) throw userLikeError;
-        
-        // Explicitly set isLiked based on whether userLike exists
+        if (likeError) throw likeError;
         setIsLiked(!!userLike);
-      } else {
-        // Reset like status if no current user or if viewing own profile
-        setIsLiked(false);
       }
     } catch (error) {
       console.error('Error fetching like status:', error);
@@ -52,20 +68,17 @@ export function useLikes(targetUserId: string, currentUserId: string) {
         description: "Failed to fetch like status",
         variant: "destructive",
       });
-      setIsLiked(false);
     }
   };
 
   const toggleLike = async () => {
-    if (isLoading || !currentUserId || currentUserId === targetUserId) {
-      return;
-    }
+    if (!currentUserId || currentUserId === targetUserId || isLoading) return;
 
     setIsLoading(true);
 
     try {
       if (isLiked) {
-        // Remove like if already liked
+        // Remove like
         const { error: deleteError } = await supabase
           .from('user_likes')
           .delete()
@@ -73,6 +86,9 @@ export function useLikes(targetUserId: string, currentUserId: string) {
           .eq('liked_id', targetUserId);
 
         if (deleteError) throw deleteError;
+
+        // Update profiles table
+        await supabase.rpc('decrement_likes_count', { target_user_id: targetUserId });
 
         setLikeCount(prev => Math.max(0, prev - 1));
         setIsLiked(false);
@@ -82,29 +98,19 @@ export function useLikes(targetUserId: string, currentUserId: string) {
           description: "Like removed successfully",
         });
       } else {
-        // Start a transaction by adding the like and updating the profile count
-        const { data: newLike, error: insertError } = await supabase
+        // Add like
+        const { error: insertError } = await supabase
           .from('user_likes')
           .insert([{ 
             liker_id: currentUserId, 
             liked_id: targetUserId,
             created_at: new Date().toISOString()
-          }])
-          .select()
-          .single();
+          }]);
 
         if (insertError) throw insertError;
 
-        // Update the profile's like count
-        const { error: updateError } = await supabase
-          .from('profiles')
-          .update({ 
-            likes_count: likeCount + 1,
-            updated_at: new Date().toISOString()
-          })
-          .eq('id', targetUserId);
-
-        if (updateError) throw updateError;
+        // Update profiles table
+        await supabase.rpc('increment_likes_count', { target_user_id: targetUserId });
 
         setLikeCount(prev => prev + 1);
         setIsLiked(true);
@@ -121,7 +127,7 @@ export function useLikes(targetUserId: string, currentUserId: string) {
         description: "Failed to update like status",
         variant: "destructive",
       });
-      // Reset state in case of error
+      // Refresh like status on error
       await fetchLikeStatus();
     } finally {
       setIsLoading(false);

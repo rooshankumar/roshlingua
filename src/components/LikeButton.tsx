@@ -1,4 +1,3 @@
-
 import { Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useLikes } from "@/hooks/useLikes";
