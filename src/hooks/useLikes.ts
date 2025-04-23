@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useToast } from '@/hooks/use-toast';
@@ -90,7 +91,6 @@ export function useLikes(targetUserId: string, currentUserId: string) {
         return;
       }
 
-    try {
       const { error: insertError } = await supabase
         .from('user_likes')
         .insert([{ 
