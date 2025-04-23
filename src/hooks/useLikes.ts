@@ -10,14 +10,14 @@ export function useLikes(targetUserId: string, currentUserId: string) {
   const { toast } = useToast();
 
   useEffect(() => {
-    if (targetUserId && currentUserId) {
+    if (targetUserId) {
       fetchLikeStatus();
     }
   }, [targetUserId, currentUserId]);
 
   const fetchLikeStatus = async () => {
     try {
-      // Get like count
+      // Get like count first
       const { data: likes, error: likesError } = await supabase
         .from('user_likes')
         .select('*', { count: 'exact' })
@@ -28,8 +28,8 @@ export function useLikes(targetUserId: string, currentUserId: string) {
       const actualLikeCount = likes?.length || 0;
       setLikeCount(actualLikeCount);
 
-      // Check if current user has already liked
-      if (currentUserId) {
+      // Only check user's like status if they're logged in
+      if (currentUserId && currentUserId !== targetUserId) {
         const { data: userLike, error: userLikeError } = await supabase
           .from('user_likes')
           .select('*')
@@ -38,21 +38,33 @@ export function useLikes(targetUserId: string, currentUserId: string) {
           .maybeSingle();
 
         if (userLikeError) throw userLikeError;
+        
+        // Explicitly set isLiked based on whether userLike exists
         setIsLiked(!!userLike);
+      } else {
+        // Reset like status if no current user or if viewing own profile
+        setIsLiked(false);
       }
     } catch (error) {
       console.error('Error fetching like status:', error);
+      toast({
+        title: "Error",
+        description: "Failed to fetch like status",
+        variant: "destructive",
+      });
       setIsLiked(false);
     }
   };
 
   const toggleLike = async () => {
-    if (isLoading || !currentUserId) return;
+    if (isLoading || !currentUserId || currentUserId === targetUserId) {
+      return;
+    }
 
     setIsLoading(true);
 
     try {
-      // Check for existing like
+      // Check for existing like with proper error handling
       const { data: existingLike, error: checkError } = await supabase
         .from('user_likes')
         .select('*')
