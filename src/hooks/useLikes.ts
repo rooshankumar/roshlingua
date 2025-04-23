@@ -11,23 +11,23 @@ export function useLikes(targetUserId?: string, currentUserId?: string | null) {
 
   useEffect(() => {
     if (!targetUserId) return;
-    
+
     const fetchLikeStatus = async () => {
       try {
         // Get total likes count
-        const { data: likeData, error: countError } = await supabase
+        const { data: likes, error: countError } = await supabase
           .from('user_likes')
-          .select('*', { count: 'exact' })
+          .select('*')
           .eq('liked_id', targetUserId);
 
         if (countError) throw countError;
-        setLikeCount(likeData?.length || 0);
+        setLikeCount(likes?.length || 0);
 
         // Check if current user has liked
         if (currentUserId) {
           const { data: userLike, error: likeError } = await supabase
             .from('user_likes')
-            .select('*')
+            .select()
             .eq('liker_id', currentUserId)
             .eq('liked_id', targetUserId)
             .maybeSingle();
@@ -49,7 +49,7 @@ export function useLikes(targetUserId?: string, currentUserId?: string | null) {
   }, [targetUserId, currentUserId]);
 
   const toggleLike = async () => {
-    if (!currentUserId || currentUserId === targetUserId || isLoading) return;
+    if (!currentUserId || !targetUserId || currentUserId === targetUserId || isLoading) return;
 
     setIsLoading(true);
     const previousIsLiked = isLiked;
@@ -69,11 +69,11 @@ export function useLikes(targetUserId?: string, currentUserId?: string | null) {
       } else {
         const { error: insertError } = await supabase
           .from('user_likes')
-          .insert([{ 
-            liker_id: currentUserId, 
+          .insert({
+            liker_id: currentUserId,
             liked_id: targetUserId,
             created_at: new Date().toISOString()
-          }]);
+          });
 
         if (insertError) throw insertError;
         setLikeCount(prev => prev + 1);
