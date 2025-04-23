@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useToast } from '@/hooks/use-toast';
@@ -9,42 +8,32 @@ export function useLikes(targetUserId?: string, currentUserId?: string | null) {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
-  useEffect(() => {
+  const fetchLikeStatus = async () => {
     if (!targetUserId) return;
 
-    const fetchLikeStatus = async () => {
-      try {
-        // Get total likes count
-        const { data: likes, error: countError } = await supabase
-          .from('user_likes')
-          .select('*')
-          .eq('liked_id', targetUserId);
+    try {
+      const { data: likes, error } = await supabase
+        .from('user_likes')
+        .select('liker_id')
+        .eq('liked_id', targetUserId);
 
-        if (countError) throw countError;
-        setLikeCount(likes?.length || 0);
+      if (error) throw error;
+      setLikeCount(likes?.length || 0);
 
-        // Check if current user has liked
-        if (currentUserId) {
-          const { data: userLike, error: likeError } = await supabase
-            .from('user_likes')
-            .select()
-            .eq('liker_id', currentUserId)
-            .eq('liked_id', targetUserId)
-            .maybeSingle();
-
-          if (likeError) throw likeError;
-          setIsLiked(!!userLike);
-        }
-      } catch (error) {
-        console.error('Error fetching like status:', error);
-        toast({
-          title: "Error",
-          description: "Failed to fetch like status",
-          variant: "destructive",
-        });
+      if (currentUserId) {
+        setIsLiked(likes?.some(like => like.liker_id === currentUserId) || false);
       }
-    };
+    } catch (error) {
+      console.error('Error fetching likes:', error);
+      toast({
+        title: "Error",
+        description: "Failed to fetch likes",
+        variant: "destructive",
+      });
+    }
+  };
 
+  useEffect(() => {
     fetchLikeStatus();
   }, [targetUserId, currentUserId]);
 
@@ -52,22 +41,22 @@ export function useLikes(targetUserId?: string, currentUserId?: string | null) {
     if (!currentUserId || !targetUserId || currentUserId === targetUserId || isLoading) return;
 
     setIsLoading(true);
-    const previousIsLiked = isLiked;
     const previousLikeCount = likeCount;
+    const previousIsLiked = isLiked;
 
     try {
       if (isLiked) {
-        const { error: deleteError } = await supabase
+        const { error } = await supabase
           .from('user_likes')
           .delete()
           .eq('liker_id', currentUserId)
           .eq('liked_id', targetUserId);
 
-        if (deleteError) throw deleteError;
-        setLikeCount(prev => Math.max(0, prev - 1));
+        if (error) throw error;
+        setLikeCount(prev => prev - 1);
         setIsLiked(false);
       } else {
-        const { error: insertError } = await supabase
+        const { error } = await supabase
           .from('user_likes')
           .insert({
             liker_id: currentUserId,
@@ -75,14 +64,14 @@ export function useLikes(targetUserId?: string, currentUserId?: string | null) {
             created_at: new Date().toISOString()
           });
 
-        if (insertError) throw insertError;
+        if (error) throw error;
         setLikeCount(prev => prev + 1);
         setIsLiked(true);
       }
     } catch (error) {
       console.error('Error toggling like:', error);
-      setIsLiked(previousIsLiked);
       setLikeCount(previousLikeCount);
+      setIsLiked(previousIsLiked);
       toast({
         title: "Error",
         description: "Failed to update like status",
