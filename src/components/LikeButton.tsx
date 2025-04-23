@@ -17,7 +17,7 @@ export function LikeButton({ targetUserId, currentUserId, className }: LikeButto
     <Button
       variant="ghost"
       size="sm"
-      disabled={isLoading || isLiked}
+      disabled={isLoading}
       onClick={toggleLike}
       data-user-id={targetUserId}
       className={cn(

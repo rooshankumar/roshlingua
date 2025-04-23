@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useToast } from '@/hooks/use-toast';
@@ -10,13 +9,14 @@ export function useLikes(targetUserId: string, currentUserId: string) {
   const { toast } = useToast();
 
   useEffect(() => {
-    fetchLikeStatus();
-    subscribeToLikes();
+    if (targetUserId && currentUserId) {
+      fetchLikeStatus();
+    }
   }, [targetUserId, currentUserId]);
 
   const fetchLikeStatus = async () => {
     try {
-      // Get actual like count
+      // Get like count
       const { data: likes, error: likesError } = await supabase
         .from('user_likes')
         .select('*', { count: 'exact' })
@@ -25,69 +25,47 @@ export function useLikes(targetUserId: string, currentUserId: string) {
       if (likesError) throw likesError;
 
       const actualLikeCount = likes?.length || 0;
-
-      // Sync likes count with profiles table
-      await supabase
-        .from('profiles')
-        .update({ likes_count: actualLikeCount })
-        .eq('id', targetUserId);
-
       setLikeCount(actualLikeCount);
 
       // Check if current user has already liked
       if (currentUserId) {
-        const { data: userLike } = await supabase
+        const { data: userLike, error: userLikeError } = await supabase
           .from('user_likes')
           .select('*')
           .eq('liker_id', currentUserId)
           .eq('liked_id', targetUserId)
           .maybeSingle();
 
+        if (userLikeError) throw userLikeError;
         setIsLiked(!!userLike);
       }
     } catch (error) {
       console.error('Error fetching like status:', error);
+      setIsLiked(false);
     }
-  };
-
-  const subscribeToLikes = () => {
-    const channel = supabase
-      .channel(`profile-likes:${targetUserId}`)
-      .on('postgres_changes', {
-        event: '*',
-        schema: 'public',
-        table: 'user_likes',
-        filter: `liked_id=eq.${targetUserId}`,
-      }, () => {
-        fetchLikeStatus();
-      })
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
   };
 
   const toggleLike = async () => {
     if (isLoading || !currentUserId) return;
-    
+
     setIsLoading(true);
 
     try {
-      // Check if current user has already liked this profile
-      const { data: existingLike } = await supabase
+      const { data: existingLike, error: checkError } = await supabase
         .from('user_likes')
         .select()
         .eq('liker_id', currentUserId)
         .eq('liked_id', targetUserId)
         .maybeSingle();
 
+      if (checkError) throw checkError;
+
       if (existingLike) {
-        setIsLoading(false);
         toast({
           title: "Already liked",
           description: "You can only like a profile once",
         });
+        setIsLiked(true);
         return;
       }
 
@@ -101,21 +79,7 @@ export function useLikes(targetUserId: string, currentUserId: string) {
 
       if (insertError) throw insertError;
 
-      // Get updated count
-      const { data: likes } = await supabase
-        .from('user_likes')
-        .select('*', { count: 'exact' })
-        .eq('liked_id', targetUserId);
-
-      const newCount = (likes?.length || 0);
-
-      // Update profile with new count
-      await supabase
-        .from('profiles')
-        .update({ likes_count: newCount })
-        .eq('id', targetUserId);
-
-      setLikeCount(newCount);
+      setLikeCount(prev => prev + 1);
       setIsLiked(true);
 
       toast({
