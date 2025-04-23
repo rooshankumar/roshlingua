@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useToast } from '@/hooks/use-toast';
@@ -8,33 +9,38 @@ export function useLikes(targetUserId?: string, currentUserId?: string | null) {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
-  const fetchLikeStatus = async () => {
+  useEffect(() => {
     if (!targetUserId) return;
 
-    try {
-      const { data: likes, error } = await supabase
-        .from('user_likes')
-        .select('liker_id')
-        .eq('liked_id', targetUserId);
+    const fetchLikes = async () => {
+      try {
+        // Get all likes for target user
+        const { data: likes, error } = await supabase
+          .from('user_likes')
+          .select('*')
+          .eq('liked_id', targetUserId);
 
-      if (error) throw error;
-      setLikeCount(likes?.length || 0);
+        if (error) throw error;
 
-      if (currentUserId) {
-        setIsLiked(likes?.some(like => like.liker_id === currentUserId) || false);
+        // Update like count
+        setLikeCount(likes?.length || 0);
+
+        // Check if current user has liked
+        if (currentUserId) {
+          const hasLiked = likes?.some(like => like.liker_id === currentUserId);
+          setIsLiked(hasLiked);
+        }
+      } catch (error) {
+        console.error('Error fetching likes:', error);
+        toast({
+          title: "Error",
+          description: "Failed to fetch likes",
+          variant: "destructive",
+        });
       }
-    } catch (error) {
-      console.error('Error fetching likes:', error);
-      toast({
-        title: "Error",
-        description: "Failed to fetch likes",
-        variant: "destructive",
-      });
-    }
-  };
+    };
 
-  useEffect(() => {
-    fetchLikeStatus();
+    fetchLikes();
   }, [targetUserId, currentUserId]);
 
   const toggleLike = async () => {
@@ -46,16 +52,17 @@ export function useLikes(targetUserId?: string, currentUserId?: string | null) {
 
     try {
       if (isLiked) {
+        // Remove like
         const { error } = await supabase
           .from('user_likes')
           .delete()
-          .eq('liker_id', currentUserId)
-          .eq('liked_id', targetUserId);
+          .match({ liker_id: currentUserId, liked_id: targetUserId });
 
         if (error) throw error;
         setLikeCount(prev => prev - 1);
         setIsLiked(false);
       } else {
+        // Add like
         const { error } = await supabase
           .from('user_likes')
           .insert({

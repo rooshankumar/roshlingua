@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 
 interface LikeButtonProps {
   targetUserId: string;
-  currentUserId: string;
+  currentUserId?: string | null;
   className?: string;
 }
 
