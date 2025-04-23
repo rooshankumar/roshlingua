@@ -40,16 +40,16 @@ export function useLikes(targetUserId: string, currentUserId: string) {
 
   const fetchLikeStatus = async () => {
     try {
-      // Get total like count
-      const { data: likeData, error: countError } = await supabase
+      // Get total likes for the target profile
+      const { count: totalLikes, error: countError } = await supabase
         .from('user_likes')
         .select('*', { count: 'exact' })
         .eq('liked_id', targetUserId);
 
       if (countError) throw countError;
-      setLikeCount(likeData?.length || 0);
+      setLikeCount(totalLikes || 0);
 
-      // Check if current user has liked
+      // Check if current user has liked this profile
       if (currentUserId) {
         const { data: userLike, error: likeError } = await supabase
           .from('user_likes')
@@ -95,34 +95,27 @@ export function useLikes(targetUserId: string, currentUserId: string) {
           description: "Like removed successfully",
         });
       } else {
-        // Check if already liked
-        const { data: existingLike, error: checkError } = await supabase
-          .from('user_likes')
-          .select('*')
-          .eq('liker_id', currentUserId)
-          .eq('liked_id', targetUserId)
-          .maybeSingle();
-
-        if (checkError) throw checkError;
-
-        if (existingLike) {
-          toast({
-            title: "Info",
-            description: "You've already liked this profile",
-          });
-          return;
-        }
-
-        // Add like
+        // Add like if not already liked
         const { error: insertError } = await supabase
           .from('user_likes')
           .insert([{ 
             liker_id: currentUserId, 
             liked_id: targetUserId,
             created_at: new Date().toISOString()
-          }]);
+          }])
+          .select()
+          .single();
 
-        if (insertError) throw insertError;
+        if (insertError) {
+          if (insertError.code === '23505') { // Unique constraint violation
+            toast({
+              title: "Info",
+              description: "You've already liked this profile",
+            });
+            return;
+          }
+          throw insertError;
+        }
 
         setLikeCount(prev => prev + 1);
         setIsLiked(true);
@@ -139,7 +132,6 @@ export function useLikes(targetUserId: string, currentUserId: string) {
         description: "Failed to update like status",
         variant: "destructive",
       });
-      // Refresh like status on error
       await fetchLikeStatus();
     } finally {
       setIsLoading(false);
