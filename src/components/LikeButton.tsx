@@ -1,3 +1,4 @@
+
 import { Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useLikes } from "@/hooks/useLikes";
@@ -12,23 +13,33 @@ interface LikeButtonProps {
 export function LikeButton({ targetUserId, currentUserId, className }: LikeButtonProps) {
   const { likeCount, isLiked, isLoading, toggleLike } = useLikes(targetUserId, currentUserId);
 
+  const disabled = isLoading || !currentUserId || currentUserId === targetUserId;
+
   return (
     <Button
       variant="ghost"
       size="sm"
-      disabled={isLoading}
-      onClick={toggleLike}
-      data-user-id={targetUserId}
+      disabled={disabled}
+      onClick={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        toggleLike();
+      }}
       className={cn(
-        "gap-2",
-        isLiked && "cursor-not-allowed opacity-80",
+        "gap-2 transition-colors",
+        isLiked && "text-red-500 hover:text-red-600",
+        disabled && "cursor-not-allowed opacity-50",
         className
       )}
-      title={isLiked ? "Already liked" : "Like profile"}
+      title={
+        !currentUserId ? "Please login to like" :
+        currentUserId === targetUserId ? "You cannot like your own profile" :
+        isLiked ? "Unlike profile" : "Like profile"
+      }
     >
       <Heart className={cn(
-        "h-5 w-5",
-        isLiked && "fill-current heart-liked"
+        "h-5 w-5 transition-all",
+        isLiked && "fill-current animate-like"
       )} />
       <span>{likeCount}</span>
     </Button>

@@ -13,16 +13,16 @@ export function useLikes(targetUserId: string, currentUserId: string) {
     if (!targetUserId) return;
 
     fetchLikeStatus();
-    setupRealtimeSubscription();
+    const channel = setupRealtimeSubscription();
 
     return () => {
-      supabase.removeChannel('likes');
+      channel.unsubscribe();
     };
   }, [targetUserId, currentUserId]);
 
   const setupRealtimeSubscription = () => {
     const channel = supabase
-      .channel('likes')
+      .channel(`likes:${targetUserId}`)
       .on('postgres_changes', {
         event: '*',
         schema: 'public',
@@ -33,9 +33,7 @@ export function useLikes(targetUserId: string, currentUserId: string) {
       })
       .subscribe();
 
-    return () => {
-      channel.unsubscribe();
-    };
+    return channel;
   };
 
   const fetchLikeStatus = async () => {
@@ -88,15 +86,15 @@ export function useLikes(targetUserId: string, currentUserId: string) {
         if (deleteError) throw deleteError;
 
         // Update profiles table
-        await supabase.rpc('decrement_likes_count', { target_user_id: targetUserId });
+        const { error: updateError } = await supabase
+          .from('profiles')
+          .update({ likes_count: likeCount - 1 })
+          .eq('id', targetUserId);
+
+        if (updateError) throw updateError;
 
         setLikeCount(prev => Math.max(0, prev - 1));
         setIsLiked(false);
-        
-        toast({
-          title: "Success",
-          description: "Like removed successfully",
-        });
       } else {
         // Add like
         const { error: insertError } = await supabase
@@ -110,16 +108,21 @@ export function useLikes(targetUserId: string, currentUserId: string) {
         if (insertError) throw insertError;
 
         // Update profiles table
-        await supabase.rpc('increment_likes_count', { target_user_id: targetUserId });
+        const { error: updateError } = await supabase
+          .from('profiles')
+          .update({ likes_count: likeCount + 1 })
+          .eq('id', targetUserId);
+
+        if (updateError) throw updateError;
 
         setLikeCount(prev => prev + 1);
         setIsLiked(true);
-
-        toast({
-          title: "Success",
-          description: "Profile liked successfully",
-        });
       }
+
+      toast({
+        title: "Success",
+        description: isLiked ? "Like removed" : "Profile liked",
+      });
     } catch (error) {
       console.error('Error toggling like:', error);
       toast({

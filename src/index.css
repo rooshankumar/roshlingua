@@ -1,3 +1,14 @@
+
+@keyframes like {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+  100% { transform: scale(1); }
+}
+
+.animate-like {
+  animation: like 0.3s ease-in-out;
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
