@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useToast } from '@/hooks/use-toast';
@@ -9,35 +8,6 @@ export function useLikes(targetUserId: string, currentUserId: string | undefined
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
-  useEffect(() => {
-    if (!targetUserId) return;
-
-    fetchLikeStatus();
-    setupRealtimeSubscription();
-
-    return () => {
-      supabase.removeChannel('likes');
-    };
-  }, [targetUserId, currentUserId]);
-
-  const setupRealtimeSubscription = () => {
-    const channel = supabase
-      .channel('likes')
-      .on('postgres_changes', {
-        event: '*',
-        schema: 'public',
-        table: 'user_likes',
-        filter: `liked_id=eq.${targetUserId}`,
-      }, () => {
-        fetchLikeStatus();
-      })
-      .subscribe();
-
-    return () => {
-      channel.unsubscribe();
-    };
-  };
-
   const fetchLikeStatus = async () => {
     try {
       const { data: likes, error: countError } = await supabase
@@ -46,13 +16,10 @@ export function useLikes(targetUserId: string, currentUserId: string | undefined
         .eq('liked_id', targetUserId);
 
       if (countError) throw countError;
-      setLikeCount(likes?.length || 0);
 
-      if (currentUserId) {
-        setIsLiked(likes?.some(like => like.liker_id === currentUserId) || false);
-      } else {
-        setIsLiked(false);
-      }
+      setLikeCount(likes?.length || 0);
+      setIsLiked(currentUserId ? likes?.some(like => like.liker_id === currentUserId) || false : false);
+
     } catch (error) {
       console.error('Error fetching like status:', error);
       toast({
@@ -80,7 +47,7 @@ export function useLikes(targetUserId: string, currentUserId: string | undefined
 
         setLikeCount(prev => Math.max(0, prev - 1));
         setIsLiked(false);
-        
+
         toast({
           title: "Success",
           description: "Like removed successfully",
@@ -127,6 +94,11 @@ export function useLikes(targetUserId: string, currentUserId: string | undefined
       setIsLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (!targetUserId) return;
+    fetchLikeStatus();
+  }, [targetUserId, currentUserId]);
 
   return { likeCount, isLiked, isLoading, toggleLike };
 }
