@@ -35,14 +35,14 @@ export function useLikes(targetUserId: string, currentUserId: string) {
 
       // Check if current user has already liked
       if (currentUserId) {
-        const { data: existingLike } = await supabase
+        const { data: userLike } = await supabase
           .from('user_likes')
-          .select()
+          .select('*')
           .eq('liker_id', currentUserId)
           .eq('liked_id', targetUserId)
           .maybeSingle();
 
-        setIsLiked(!!existingLike);
+        setIsLiked(!!userLike);
       }
     } catch (error) {
       console.error('Error fetching like status:', error);
@@ -69,24 +69,26 @@ export function useLikes(targetUserId: string, currentUserId: string) {
 
   const toggleLike = async () => {
     if (isLoading || !currentUserId) return;
-
-    // Check if current user has already liked this profile
-    const { data: existingLike } = await supabase
-      .from('user_likes')
-      .select()
-      .eq('liker_id', currentUserId)
-      .eq('liked_id', targetUserId)
-      .maybeSingle();
-
-    if (existingLike) {
-      toast({
-        title: "Already liked",
-        description: "You can only like a profile once",
-      });
-      return;
-    }
-
+    
     setIsLoading(true);
+
+    try {
+      // Check if current user has already liked this profile
+      const { data: existingLike } = await supabase
+        .from('user_likes')
+        .select()
+        .eq('liker_id', currentUserId)
+        .eq('liked_id', targetUserId)
+        .maybeSingle();
+
+      if (existingLike) {
+        setIsLoading(false);
+        toast({
+          title: "Already liked",
+          description: "You can only like a profile once",
+        });
+        return;
+      }
 
     try {
       const { error: insertError } = await supabase
