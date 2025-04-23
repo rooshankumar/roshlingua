@@ -23,13 +23,14 @@ export function LikeButton({ targetUserId, currentUserId, className }: LikeButto
       className={cn(
         "gap-2",
         isLiked && "bg-red-500 hover:bg-red-600 text-white",
+        !isLiked && "hover:bg-red-100 hover:text-red-500",
         className
       )}
       title={!currentUserId ? "Login to like" : currentUserId === targetUserId ? "Cannot like own profile" : isLiked ? "Unlike profile" : "Like profile"}
     >
       <Heart className={cn(
         "h-5 w-5",
-        isLiked && "fill-current"
+        isLiked ? "fill-current" : "stroke-current"
       )} />
       <span>{likeCount}</span>
     </Button>
