@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useToast } from '@/hooks/use-toast';
@@ -51,9 +52,10 @@ export function useLikes(targetUserId: string, currentUserId: string) {
     setIsLoading(true);
 
     try {
+      // Check for existing like
       const { data: existingLike, error: checkError } = await supabase
         .from('user_likes')
-        .select()
+        .select('*')
         .eq('liker_id', currentUserId)
         .eq('liked_id', targetUserId)
         .maybeSingle();
@@ -65,10 +67,10 @@ export function useLikes(targetUserId: string, currentUserId: string) {
           title: "Already liked",
           description: "You can only like a profile once",
         });
-        setIsLiked(true);
         return;
       }
 
+      // Insert new like
       const { error: insertError } = await supabase
         .from('user_likes')
         .insert([{ 
