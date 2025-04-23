@@ -48,6 +48,7 @@ const Community = () => {
   const [onlineOnly, setOnlineOnly] = useState(false);
   const [showMoreFilters, setShowMoreFilters] = useState(false); // Added state for more filters
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -103,12 +104,12 @@ const Community = () => {
 
     const channel = supabase
       .channel('public:profiles')
-      .on('postgres_changes', 
+      .on('postgres_changes',
         {
           event: '*',
           schema: 'public',
           table: 'profiles'
-        }, 
+        },
         payload => {
           console.log('Real-time update:', payload);
           fetchUsers();
@@ -178,6 +179,21 @@ const Community = () => {
       const likeButton = document.querySelector(`button[data-user-id="${userId}"]`);
       if (likeButton) {
         likeButton.click();
+        // Update the user's likes_count after liking
+        const { data: updatedProfile, error: updateError } = await supabase
+          .from('profiles')
+          .update({ likes_count: profile.likes_count + 1 })
+          .eq('id', userId);
+
+        if (updateError) {
+          console.error('Error updating likes count:', updateError);
+          toast({
+            title: "Error",
+            description: "Failed to update likes count",
+            variant: "destructive",
+          });
+          return;
+        }
       }
     } catch (error) {
       console.error('Error handling like:', error);
@@ -188,8 +204,6 @@ const Community = () => {
       });
     }
   };
-
-  const { user } = useAuth();
 
   const handleStartChat = async (otherUserId: string) => {
     try {
@@ -262,7 +276,7 @@ const Community = () => {
 
   const availableLanguages = Array.from(
     new Set(
-      users.flatMap(user => 
+      users.flatMap(user =>
         [user.native_language, user.learning_language]
       ).filter(Boolean)
     )
@@ -380,7 +394,7 @@ const Community = () => {
                     <div className="flex items-center gap-4">
                       <LikeButton
                         targetUserId={user.id}
-                        currentUserId={user?.id || ''}
+                        currentUserId={user?.id}
                         className="hover:text-red-500"
                       />
                       <div className="flex items-center text-orange-500">
@@ -389,9 +403,9 @@ const Community = () => {
                       </div>
                     </div>
 
-                    <Button 
-                      onClick={() => handleStartChat(user.id)} 
-                      variant="default" 
+                    <Button
+                      onClick={() => handleStartChat(user.id)}
+                      variant="default"
                       size="sm"
                       className="transition-all duration-300 hover:scale-105"
                     >
