@@ -50,9 +50,30 @@ export async function deleteAvatar(userId: string, avatarUrl: string | null) {
       return true;
     }
 
-    // Extract filename from URL
-    const fileName = avatarUrl.split('avatars/')[1];
-    if (!fileName) throw new Error('Invalid avatar URL format');
+    // Only attempt deletion if it's a Supabase storage URL
+    if (avatarUrl.includes('storage.googleapis.com') || avatarUrl.includes('lh3.googleusercontent.com')) {
+      // Skip deletion for external URLs (Google avatar)
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .update({ avatar_url: null })
+        .eq('id', userId);
+
+      if (updateError) throw updateError;
+      return true;
+    }
+
+    // Extract filename from Supabase storage URL
+    const fileName = avatarUrl.includes('avatars/') ? avatarUrl.split('avatars/')[1] : null;
+    if (!fileName) {
+      // If we can't extract the filename, just update the profile
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .update({ avatar_url: null })
+        .eq('id', userId);
+
+      if (updateError) throw updateError;
+      return true;
+    }
 
     // Delete file from storage
     const { error: deleteError } = await supabase.storage
