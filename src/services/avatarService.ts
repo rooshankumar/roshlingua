@@ -37,11 +37,22 @@ export async function uploadAvatar(file: File, userId: string) {
   }
 }
 
-export async function deleteAvatar(userId: string, avatarUrl: string) {
+export async function deleteAvatar(userId: string, avatarUrl: string | null) {
   try {
+    if (!avatarUrl) {
+      // If no avatar URL exists, just update the profile
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .update({ avatar_url: null })
+        .eq('id', userId);
+
+      if (updateError) throw updateError;
+      return true;
+    }
+
     // Extract filename from URL
     const fileName = avatarUrl.split('avatars/')[1];
-    if (!fileName) throw new Error('Invalid avatar URL');
+    if (!fileName) throw new Error('Invalid avatar URL format');
 
     // Delete file from storage
     const { error: deleteError } = await supabase.storage
