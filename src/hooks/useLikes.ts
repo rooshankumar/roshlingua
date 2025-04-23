@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useToast } from '@/hooks/use-toast';
 
-export function useLikes(targetUserId: string, currentUserId: string) {
+export function useLikes(targetUserId: string, currentUserId: string | undefined) {
   const [likeCount, setLikeCount] = useState(0);
   const [isLiked, setIsLiked] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -41,16 +41,20 @@ export function useLikes(targetUserId: string, currentUserId: string) {
   const fetchLikeStatus = async () => {
     try {
       // Get total likes for the target profile
-      const { count: totalLikes, error: countError } = await supabase
+      const { data: likes, error: countError } = await supabase
         .from('user_likes')
-        .select('*', { count: 'exact' })
+        .select('*')
         .eq('liked_id', targetUserId);
 
       if (countError) throw countError;
-      setLikeCount(totalLikes || 0);
+      setLikeCount(likes?.length || 0);
 
       // Check if current user has liked this profile
       if (currentUserId) {
+        setIsLiked(likes?.some(like => like.liker_id === currentUserId) || false);
+      } else {
+        setIsLiked(false);
+      }
         const { data: userLike, error: likeError } = await supabase
           .from('user_likes')
           .select('*')

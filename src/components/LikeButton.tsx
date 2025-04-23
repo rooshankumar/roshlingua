@@ -11,7 +11,7 @@ interface LikeButtonProps {
 }
 
 export function LikeButton({ targetUserId, currentUserId, className }: LikeButtonProps) {
-  const { likeCount, isLiked, isLoading, toggleLike } = useLikes(targetUserId, currentUserId || '');
+  const { likeCount, isLiked, isLoading, toggleLike } = useLikes(targetUserId, currentUserId);
 
   return (
     <Button
