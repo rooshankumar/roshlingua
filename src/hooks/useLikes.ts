@@ -64,49 +64,52 @@ export function useLikes(targetUserId: string, currentUserId: string) {
     setIsLoading(true);
 
     try {
-      // Check for existing like with proper error handling
-      const { data: existingLike, error: checkError } = await supabase
-        .from('user_likes')
-        .select('*')
-        .eq('liker_id', currentUserId)
-        .eq('liked_id', targetUserId)
-        .maybeSingle();
+      if (isLiked) {
+        // Remove like if already liked
+        const { error: deleteError } = await supabase
+          .from('user_likes')
+          .delete()
+          .eq('liker_id', currentUserId)
+          .eq('liked_id', targetUserId);
 
-      if (checkError) throw checkError;
+        if (deleteError) throw deleteError;
 
-      if (existingLike) {
+        setLikeCount(prev => Math.max(0, prev - 1));
+        setIsLiked(false);
+        
         toast({
-          title: "Already liked",
-          description: "You can only like a profile once",
+          title: "Success",
+          description: "Like removed successfully",
         });
-        return;
+      } else {
+        // Add new like
+        const { error: insertError } = await supabase
+          .from('user_likes')
+          .insert([{ 
+            liker_id: currentUserId, 
+            liked_id: targetUserId,
+            created_at: new Date().toISOString()
+          }]);
+
+        if (insertError) throw insertError;
+
+        setLikeCount(prev => prev + 1);
+        setIsLiked(true);
+
+        toast({
+          title: "Success",
+          description: "Profile liked successfully",
+        });
       }
-
-      // Insert new like
-      const { error: insertError } = await supabase
-        .from('user_likes')
-        .insert([{ 
-          liker_id: currentUserId, 
-          liked_id: targetUserId,
-          created_at: new Date().toISOString()
-        }]);
-
-      if (insertError) throw insertError;
-
-      setLikeCount(prev => prev + 1);
-      setIsLiked(true);
-
-      toast({
-        title: "Success",
-        description: "Profile liked successfully",
-      });
     } catch (error) {
       console.error('Error toggling like:', error);
       toast({
         title: "Error",
-        description: "Failed to like profile",
+        description: "Failed to update like status",
         variant: "destructive",
       });
+      // Reset state in case of error
+      await fetchLikeStatus();
     } finally {
       setIsLoading(false);
     }
