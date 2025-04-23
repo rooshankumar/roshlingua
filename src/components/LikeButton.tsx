@@ -11,26 +11,25 @@ interface LikeButtonProps {
 }
 
 export function LikeButton({ targetUserId, currentUserId, className }: LikeButtonProps) {
-  const { likeCount, isLiked, isLoading, toggleLike } = useLikes(targetUserId, currentUserId);
+  const { likeCount, isLiked, isLoading, toggleLike } = useLikes(targetUserId, currentUserId || '');
 
   return (
     <Button
-      variant={isLiked ? "default" : "outline"}
+      variant="ghost"
       size="sm"
       disabled={isLoading || !currentUserId || currentUserId === targetUserId}
       onClick={toggleLike}
       data-user-id={targetUserId}
       className={cn(
         "gap-2",
-        isLiked && "bg-red-500 hover:bg-red-600 text-white",
-        !isLiked && "hover:bg-red-100 hover:text-red-500",
+        isLiked && "text-red-500",
         className
       )}
-      title={!currentUserId ? "Login to like" : currentUserId === targetUserId ? "Cannot like own profile" : isLiked ? "Unlike profile" : "Like profile"}
+      title={!currentUserId ? "Login to like" : isLiked ? "Unlike profile" : "Like profile"}
     >
       <Heart className={cn(
         "h-5 w-5",
-        isLiked ? "fill-current" : "stroke-current"
+        isLiked && "fill-current text-red-500"
       )} />
       <span>{likeCount}</span>
     </Button>
