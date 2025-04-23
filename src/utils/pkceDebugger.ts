@@ -10,13 +10,11 @@ export const logPKCEState = () => {
   
   // Check localStorage
   const localVerifier = localStorage.getItem('supabase.auth.code_verifier');
-  console.log('localStorage verifier:', localVerifier ? 
-    `${localVerifier.substring(0, 5)}... (${localVerifier.length} chars)` : 'NOT FOUND');
+  console.log('localStorage verifier:', localVerifier ? 'PRESENT' : 'NOT FOUND');
   
   // Check sessionStorage
   const sessionVerifier = sessionStorage.getItem('supabase.auth.code_verifier');
-  console.log('sessionStorage verifier:', sessionVerifier ? 
-    `${sessionVerifier.substring(0, 5)}... (${sessionVerifier.length} chars)` : 'NOT FOUND');
+  console.log('sessionStorage verifier:', sessionVerifier ? 'PRESENT' : 'NOT FOUND');
   
   // Check cookies
   const cookies = document.cookie.split(';');

@@ -9,7 +9,7 @@ export async function debugSupabaseSchema() {
       .select('*')
       .limit(1);
     
-    console.log("Conversations schema test:", { data, error });
+    console.log("Conversations schema test:", error ? "Error occurred" : "Success");
     
     // Try specific column query
     const { data: creatorTest, error: creatorError } = await supabase
@@ -17,7 +17,7 @@ export async function debugSupabaseSchema() {
       .select('creator_id')
       .limit(1);
     
-    console.log("Creator ID test:", { creatorTest, creatorError });
+    console.log("Creator ID test:", creatorError ? "Error occurred" : "Success");
     
     // Test conversation participants query
     const { data: participantTest, error: participantError } = await supabase

@@ -7,15 +7,15 @@ export async function debugConversations(conversationId?: string) {
     
     // Check authentication status
     const { data: { user } } = await supabase.auth.getUser();
-    console.log("Current user:", user?.id);
+    console.log("Auth status:", user ? "Authenticated" : "Not authenticated");
     
     // 1. Check table structures
     const { data: tableInfo, error: tableError } = await supabase
       .rpc('get_table_info');
     
-    console.log("Table info error:", tableError);
+    console.log("Table info status:", tableError ? "Error" : "Success");
     if (tableInfo) {
-      console.log("Tables in database:", tableInfo.map(t => t.table_name));
+      console.log("Tables count:", tableInfo.length);
     }
     
     // 2. Check if conversations table has data
