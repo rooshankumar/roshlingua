@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useToast } from '@/hooks/use-toast';
@@ -10,16 +11,22 @@ export function useLikes(targetUserId: string, currentUserId: string | undefined
 
   const fetchLikeStatus = async () => {
     try {
-      const { data: likes, error: countError } = await supabase
+      // Get all likes for the target profile
+      const { data: likes, error: likesError } = await supabase
         .from('user_likes')
         .select('*')
         .eq('liked_id', targetUserId);
 
-      if (countError) throw countError;
+      if (likesError) throw likesError;
 
+      // Set total like count
       setLikeCount(likes?.length || 0);
-      setIsLiked(currentUserId ? likes?.some(like => like.liker_id === currentUserId) || false : false);
 
+      // Check if current user has liked the profile
+      if (currentUserId) {
+        const hasLiked = likes?.some(like => like.liker_id === currentUserId) || false;
+        setIsLiked(hasLiked);
+      }
     } catch (error) {
       console.error('Error fetching like status:', error);
       toast({
@@ -37,6 +44,7 @@ export function useLikes(targetUserId: string, currentUserId: string | undefined
 
     try {
       if (isLiked) {
+        // Remove like
         const { error: deleteError } = await supabase
           .from('user_likes')
           .delete()
@@ -47,21 +55,20 @@ export function useLikes(targetUserId: string, currentUserId: string | undefined
 
         setLikeCount(prev => Math.max(0, prev - 1));
         setIsLiked(false);
-
+        
         toast({
           title: "Success",
           description: "Like removed successfully",
         });
       } else {
+        // Add like
         const { error: insertError } = await supabase
           .from('user_likes')
           .insert([{ 
             liker_id: currentUserId, 
             liked_id: targetUserId,
             created_at: new Date().toISOString()
-          }])
-          .select()
-          .single();
+          }]);
 
         if (insertError) {
           if (insertError.code === '23505') {
@@ -76,7 +83,7 @@ export function useLikes(targetUserId: string, currentUserId: string | undefined
 
         setLikeCount(prev => prev + 1);
         setIsLiked(true);
-
+        
         toast({
           title: "Success",
           description: "Profile liked successfully",
@@ -89,12 +96,14 @@ export function useLikes(targetUserId: string, currentUserId: string | undefined
         description: "Failed to update like status",
         variant: "destructive",
       });
+      // Refresh like status on error
       await fetchLikeStatus();
     } finally {
       setIsLoading(false);
     }
   };
 
+  // Fetch initial like status
   useEffect(() => {
     if (!targetUserId) return;
     fetchLikeStatus();
