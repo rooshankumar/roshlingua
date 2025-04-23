@@ -1,0 +1,13 @@
+Replit AI, the like feature in my Roshlingua app is currently not working as expected. When a user clicks the like button on a profile in the community section or on the profile page, the like count is not increasing in the user interface, and it's not being recorded in the Supabase database.
+
+The expected behavior is that when a user clicks the like button on a profile they haven't liked before, the like should be recorded, the like count should increment in real time for all users, and the button should visually indicate that the profile has been liked by the current user.
+
+Could you please perform a comprehensive review of the logic involved in the like feature, starting from how the LikeButton component interacts with the useLikes hook (src/hooks/useLikes.ts) and how this hook communicates with the Supabase backend? Please consider all aspects of the implementation, including:
+
+Initial like status: How is the initial "liked" state determined when a user views a profile?
+toggleLike function: Examine the logic within this function to ensure it correctly handles both liking and unliking actions, including inserting/deleting data in the user_likes table and updating the likes_count in the profiles table.
+Supabase database interactions: Review the Supabase queries for inserting, deleting, and selecting like data for any potential errors or inconsistencies.
+Real-time updates: Check the implementation of the Supabase real-time subscription to ensure that like count changes are being broadcast and received correctly by all clients.
+Passing of User IDs: Verify that the targetUserId (the profile being liked) and currentUserId (the user performing the like) are being passed correctly and used appropriately throughout the code.
+Error Handling: Look for any potential errors that might be occurring and preventing the like action from completing successfully, and suggest improvements to error handling if needed.
+Please provide suggestions for code modifications in any of the relevant files (useLikes.ts, LikeButton.tsx, Community.tsx, and potentially any other relevant files) to ensure the like feature works correctly from the ground up.

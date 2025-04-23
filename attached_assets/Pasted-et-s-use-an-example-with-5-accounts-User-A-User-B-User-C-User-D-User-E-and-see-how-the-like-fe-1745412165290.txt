@@ -1,0 +1,14 @@
+et's use an example with 5 accounts (User A, User B, User C, User D, User E) and see how the like feature works for a specific profile, say User C's profile:
+
+Scenario: User A, User B, and User E visit User C's profile and decide they like it. User D visits User C's profile but doesn't like it.
+
+What happens in the database:
+
+When User A clicks the like button on User C's profile: A new record is inserted into the user_likes table with liker_id as User A's ID and liked_id as User C's ID. User C's likes_count in the profiles table is increased by 1 (if you are using the RPC calls you mentioned, it would be incremented by one).
+When User B clicks the like button on User C's profile: A new record is inserted into the user_likes table with liker_id as User B's ID and liked_id as User C's ID. User C's likes_count in the profiles table is increased by another 1.
+When User E clicks the like button on User C's profile: A new record is inserted into the user_likes table with liker_id as User E's ID and liked_id as User C's ID. User C's likes_count in the profiles table is increased by one more time.
+When User A tries to like User C's profile again: The useLikes hook will detect that a like already exists from User A to User C in the user_likes table, and it will prevent the insertion of a duplicate record. The likes_count for User C will not increase again from User A's action.
+User D visits User C's profile and does not click the like button: No record is added to the user_likes table, and User C's likes_count remains unaffected by User D.
+Result: User C's profile will have a likes_count of 3 in the profiles table, reflecting the likes from User A, User B, and User E. The user_likes table will contain three entries indicating these individual like relationships. User D has not liked User C, and User A cannot like User C multiple times.
+
+This example illustrates that while multiple accounts can like a single profile, each individual account can only like that specific profile once, and the likes_count reflects the total number of unique likes received.
