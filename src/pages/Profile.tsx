@@ -51,7 +51,16 @@ const Profile = () => {
   const { id } = useParams<{ id: string }>();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
+  const [currentUser, setCurrentUser] = useState<any>(null);
   const { toast } = useToast();
+
+  useEffect(() => {
+    const getUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      setCurrentUser(user);
+    };
+    getUser();
+  }, []);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -220,14 +229,11 @@ const Profile = () => {
         </div>
 
         <div className="flex space-x-2">
-          <Button 
-            variant={false ? "default" : "outline"} 
-            size="sm" 
-            className={`button-hover ${false ? "bg-red-500 hover:bg-red-600 text-white" : ""}`}
-            onClick={handleLike}
-          >
-            <Heart className={`h-4 w-4 mr-2 ${false ? "fill-white" : ""}`} /> {profile.likes_count}
-          </Button>
+          <LikeButton
+            targetUserId={profile.id}
+            currentUserId={currentUser?.id}
+            className="button-hover"
+          />
 
           <Button variant="outline" size="sm" className="button-hover" onClick={handleShare}>
             <Share2 className="h-4 w-4 mr-2" />
