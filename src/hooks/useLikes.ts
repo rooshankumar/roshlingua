@@ -87,9 +87,6 @@ export function useLikes(targetUserId: string, currentUserId: string) {
 
         if (deleteError) throw deleteError;
 
-        // Update profiles table
-        await supabase.rpc('decrement_likes_count', { target_user_id: targetUserId });
-
         setLikeCount(prev => Math.max(0, prev - 1));
         setIsLiked(false);
         
@@ -98,6 +95,24 @@ export function useLikes(targetUserId: string, currentUserId: string) {
           description: "Like removed successfully",
         });
       } else {
+        // Check if already liked
+        const { data: existingLike, error: checkError } = await supabase
+          .from('user_likes')
+          .select('*')
+          .eq('liker_id', currentUserId)
+          .eq('liked_id', targetUserId)
+          .maybeSingle();
+
+        if (checkError) throw checkError;
+
+        if (existingLike) {
+          toast({
+            title: "Info",
+            description: "You've already liked this profile",
+          });
+          return;
+        }
+
         // Add like
         const { error: insertError } = await supabase
           .from('user_likes')
@@ -108,9 +123,6 @@ export function useLikes(targetUserId: string, currentUserId: string) {
           }]);
 
         if (insertError) throw insertError;
-
-        // Update profiles table
-        await supabase.rpc('increment_likes_count', { target_user_id: targetUserId });
 
         setLikeCount(prev => prev + 1);
         setIsLiked(true);
