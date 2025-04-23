@@ -82,16 +82,29 @@ export function useLikes(targetUserId: string, currentUserId: string) {
           description: "Like removed successfully",
         });
       } else {
-        // Add new like
-        const { error: insertError } = await supabase
+        // Start a transaction by adding the like and updating the profile count
+        const { data: newLike, error: insertError } = await supabase
           .from('user_likes')
           .insert([{ 
             liker_id: currentUserId, 
             liked_id: targetUserId,
             created_at: new Date().toISOString()
-          }]);
+          }])
+          .select()
+          .single();
 
         if (insertError) throw insertError;
+
+        // Update the profile's like count
+        const { error: updateError } = await supabase
+          .from('profiles')
+          .update({ 
+            likes_count: likeCount + 1,
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', targetUserId);
+
+        if (updateError) throw updateError;
 
         setLikeCount(prev => prev + 1);
         setIsLiked(true);
