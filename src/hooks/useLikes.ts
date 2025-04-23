@@ -40,7 +40,6 @@ export function useLikes(targetUserId: string, currentUserId: string | undefined
 
   const fetchLikeStatus = async () => {
     try {
-      // Get total likes for the target profile
       const { data: likes, error: countError } = await supabase
         .from('user_likes')
         .select('*')
@@ -49,21 +48,10 @@ export function useLikes(targetUserId: string, currentUserId: string | undefined
       if (countError) throw countError;
       setLikeCount(likes?.length || 0);
 
-      // Check if current user has liked this profile
       if (currentUserId) {
         setIsLiked(likes?.some(like => like.liker_id === currentUserId) || false);
       } else {
         setIsLiked(false);
-      }
-        const { data: userLike, error: likeError } = await supabase
-          .from('user_likes')
-          .select('*')
-          .eq('liker_id', currentUserId)
-          .eq('liked_id', targetUserId)
-          .maybeSingle();
-
-        if (likeError) throw likeError;
-        setIsLiked(!!userLike);
       }
     } catch (error) {
       console.error('Error fetching like status:', error);
@@ -82,7 +70,6 @@ export function useLikes(targetUserId: string, currentUserId: string | undefined
 
     try {
       if (isLiked) {
-        // Remove like
         const { error: deleteError } = await supabase
           .from('user_likes')
           .delete()
@@ -99,7 +86,6 @@ export function useLikes(targetUserId: string, currentUserId: string | undefined
           description: "Like removed successfully",
         });
       } else {
-        // Add like if not already liked
         const { error: insertError } = await supabase
           .from('user_likes')
           .insert([{ 
@@ -111,7 +97,7 @@ export function useLikes(targetUserId: string, currentUserId: string | undefined
           .single();
 
         if (insertError) {
-          if (insertError.code === '23505') { // Unique constraint violation
+          if (insertError.code === '23505') {
             toast({
               title: "Info",
               description: "You've already liked this profile",
