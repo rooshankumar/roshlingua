@@ -10,7 +10,8 @@ export const getXP = async (userId: string): Promise<number> => {
   return data?.xp_points || 0;
 };
 
-export const addXP = async (userId: string, actionType: string): Promise<{ xp: number, gained: number }> => {
+export const addXP = async (userId: string, actionType: string, achievementPoints: number = 0): Promise<{ xp: number, gained: number }> => {
+  // First add XP from the action
   const { data: result } = await supabase
     .rpc('increment_xp', { 
       user_id: userId,
@@ -22,7 +23,15 @@ export const addXP = async (userId: string, actionType: string): Promise<{ xp: n
     return { xp: 0, gained: 0 };
   }
 
-  // Update profile XP to ensure consistency
+  // If there are achievement points, add them directly to profile
+  if (achievementPoints > 0) {
+    await supabase
+      .from('profiles')
+      .update({ xp_points: (result.xp_points || 0) + achievementPoints })
+      .eq('id', userId);
+  }
+
+  // Get final XP value
   const { data: profileData } = await supabase
     .from('profiles')
     .select('xp_points')
@@ -31,7 +40,7 @@ export const addXP = async (userId: string, actionType: string): Promise<{ xp: n
 
   return { 
     xp: profileData?.xp_points || 0,
-    gained: result.xp_gained || 0
+    gained: (result.xp_gained || 0) + achievementPoints
   };
 };
 

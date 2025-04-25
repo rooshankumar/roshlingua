@@ -181,6 +181,9 @@ export function useAchievements(userId: string) {
   };
 
   const unlockAchievement = async (achievementId: string) => {
+    const achievement = ACHIEVEMENTS.find(a => a.id === achievementId);
+    if (!achievement) return;
+
     const { error } = await supabase
       .from('user_achievements')
       .insert({
@@ -190,7 +193,10 @@ export function useAchievements(userId: string) {
       });
 
     if (!error) {
+      // Add achievement points directly through progressUtils
+      await addXP(userId, 'achievement_unlock', achievement.points);
       loadUserAchievements();
+      loadUserXP();
     }
   };
 

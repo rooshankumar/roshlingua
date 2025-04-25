@@ -17,12 +17,13 @@ RETURNS TABLE (
 ) AS $$
     SELECT * FROM (
         VALUES
-            ('lesson_complete', 50, 1.2),      -- Base XP for completing a lesson
+            ('first_lesson', 10, 1.0),         -- First lesson (matches achievement)
+            ('lesson_complete', 30, 1.2),      -- Regular lesson completion
             ('conversation_started', 30, 1.1),  -- Starting a conversation
             ('message_sent', 5, 1.0),          -- Sending a message
             ('daily_login', 20, 1.3),          -- Daily login bonus
             ('profile_complete', 100, 1.0),    -- One-time profile completion
-            ('achievement_unlock', 75, 1.0)     -- Achievement unlocking
+            ('achievement_unlock', 0, 1.0)      -- Achievement points handled separately
     ) AS rewards(action_type, base_points, streak_multiplier);
 $$ LANGUAGE SQL IMMUTABLE;
 
