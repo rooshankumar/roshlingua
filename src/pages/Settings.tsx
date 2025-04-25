@@ -19,6 +19,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { Shield, Bell, Key, User, Lock, Mail, Save, LogOut, Moon, Sun, Globe, Wallet, Camera, AlertTriangle } from "lucide-react";
+import LanguageSwitcher from "@/components/LanguageSwitcher"; // Assuming this component exists
 
 const Settings = () => {
   const { theme, setTheme } = useTheme();
@@ -421,10 +422,7 @@ const Settings = () => {
               <div className="space-y-6">
                 <h3 className="text-xl font-semibold">Language Settings</h3>
                 <div className="grid gap-6 sm:grid-cols-2">
-                  <div className="space-y-4">
-                    <Label className="text-base">Interface Language</Label>
-                    <LanguageSwitcher />
-                  </div>
+
                   <div className="space-y-2">
                     <Label htmlFor="nativeLanguage" className="text-base">Native Language</Label>
                     <Select
@@ -662,6 +660,10 @@ const Settings = () => {
                     <Mail className="h-4 w-4 mr-2" />
                     Update Email
                   </Button>
+                </div>
+                <div className="space-y-4">
+                  <Label className="text-base">Interface Language</Label>
+                  <LanguageSwitcher />
                 </div>
               </div>
 
