@@ -309,21 +309,27 @@
   }
   
   /* Responsive typography */
-  @screen xs {
+  /* Base styles for smallest screens */
+  html { font-size: 14px; }
+  h1 { @apply text-2xl; }
+  h2 { @apply text-xl; }
+  h3 { @apply text-lg; }
+  
+  @media (min-width: 480px) {
     html { font-size: 14px; }
     h1 { @apply text-2xl; }
     h2 { @apply text-xl; }
     h3 { @apply text-lg; }
   }
   
-  @screen sm {
+  @media (min-width: 640px) {
     html { font-size: 15px; }
     h1 { @apply text-3xl; }
     h2 { @apply text-2xl; }
     h3 { @apply text-xl; }
   }
   
-  @screen md {
+  @media (min-width: 768px) {
     html { font-size: 16px; }
     h1 { @apply text-4xl; }
     h2 { @apply text-2xl; }

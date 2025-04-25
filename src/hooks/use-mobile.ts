@@ -52,6 +52,93 @@ export const useResponsive = (mobileBreakpoint = 768): ResponsiveInfo => {
       large: 24
     }
   });
+  
+  const updateResponsiveInfo = () => {
+    // Get screen width
+    const width = window.innerWidth;
+    
+    // Determine device size based on width
+    let deviceSize: DeviceSize = 'md';
+    if (width < 480) deviceSize = 'xs';
+    else if (width < 640) deviceSize = 'sm';
+    else if (width < 768) deviceSize = 'md';
+    else if (width < 1024) deviceSize = 'lg';
+    else deviceSize = 'xl';
+    
+    // Check for mobile and touch
+    const isMobile = width < mobileBreakpoint;
+    const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+    const isPortrait = window.innerHeight > window.innerWidth;
+    
+    // Detect iOS or Android
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || 
+                 (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+    const isAndroid = /Android/.test(navigator.userAgent);
+    
+    // Responsive font sizes based on device size
+    let fontSize = {
+      base: '16px',
+      small: '14px',
+      large: '18px',
+      heading: '24px'
+    };
+    
+    let iconSize = {
+      small: 16,
+      base: 20,
+      large: 24
+    };
+    
+    // Adjust sizes based on device size
+    if (deviceSize === 'xs') {
+      fontSize = {
+        base: '14px',
+        small: '12px',
+        large: '16px',
+        heading: '20px'
+      };
+      iconSize = {
+        small: 16,
+        base: 20,
+        large: 24
+      };
+    } else if (deviceSize === 'sm') {
+      fontSize = {
+        base: '15px',
+        small: '13px',
+        large: '17px',
+        heading: '22px'
+      };
+      iconSize = {
+        small: 16,
+        base: 22,
+        large: 26
+      };
+    } else {
+      fontSize = {
+        base: '16px',
+        small: '14px',
+        large: '18px',
+        heading: '24px'
+      };
+      iconSize = {
+        small: 18,
+        base: 24,
+        large: 28
+      };
+    }
+    
+    setState({
+      isMobile,
+      isTouch,
+      isPortrait,
+      isIOS,
+      isAndroid,
+      deviceSize,
+      fontSize,
+      iconSize
+    });
+  };
 
   useEffect(() => {
     const updateResponsiveInfo = () => {
