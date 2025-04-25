@@ -130,19 +130,8 @@ export function useAchievements(userId: string) {
         const achievement = ACHIEVEMENTS.find(a => a.id === payload.new.achievement_id);
         if (achievement) {
           toast({
-            title: (
-              <div className="flex items-center gap-2">
-                <span className="text-xl">{achievement.icon}</span>
-                <span>Achievement Unlocked!</span>
-              </div>
-            ),
-            description: (
-              <div className="space-y-2">
-                <p className="font-medium">{achievement.title}</p>
-                <p className="text-sm text-muted-foreground">{achievement.description}</p>
-                <p className="text-sm font-medium text-primary">+{achievement.points} points</p>
-              </div>
-            ),
+            title: `${achievement.icon} Achievement Unlocked!`,
+            description: `${achievement.title}\n${achievement.description}\n+${achievement.points} points`,
             duration: 6000,
           });
           loadUserAchievements();
