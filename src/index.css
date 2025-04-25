@@ -263,12 +263,69 @@
   }
 
   .message-actions {
-    @apply opacity-0 group-hover:opacity-100 transition-opacity duration-200;
+    @apply opacity-0 md:group-hover:opacity-100 transition-opacity duration-200;
+    /* On mobile, make tap show actions */
+    @apply touch-device:active:opacity-100;
   }
 
   .chat-input-container {
     @apply backdrop-blur-xl bg-background/90 border-t border-border/50;
   }
+  
+  /* Mobile optimizations */
+  .mobile-safe-bottom {
+    padding-bottom: env(safe-area-inset-bottom, 0);
+  }
+  
+  .mobile-safe-top {
+    padding-top: env(safe-area-inset-top, 0);
+  }
+  
+  .mobile-touch-target {
+    @apply min-h-[44px] min-w-[44px]; /* Apple HIG recommends 44x44 minimum touch targets */
+  }
+  
+  .mobile-card {
+    @apply rounded-xl px-3 py-4 md:p-6;
+  }
+  
+  .mobile-nav-fixed {
+    @apply fixed top-0 left-0 right-0 z-50;
+  }
+  
+  .mobile-content-area {
+    @apply pt-[60px] pb-[80px] md:pt-0 md:pb-0;
+  }
+  
+  /* Optimize inputs for mobile */
+  input, textarea, select, button {
+    @apply touch-device:text-base; /* iOS auto-zooms on inputs smaller than 16px */
+  }
+  
+  /* Better scrolling on mobile */
+  .mobile-scroll {
+    @apply overflow-auto overscroll-contain -webkit-overflow-scrolling-touch;
+  }
+  
+  /* Optimized for touch devices */
+  .touch-device {
+    -webkit-tap-highlight-color: transparent;
+  }
+  
+  /* Mobile-first grid layouts */
+  .mobile-grid {
+    @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4;
+  }
+  
+  /* Responsive typography */
+  .mobile-title {
+    @apply text-xl md:text-2xl font-bold;
+  }
+  
+  .mobile-subtitle {
+    @apply text-base md:text-lg font-medium;
+  }
+}
 
   @keyframes message-pop {
     0% {
