@@ -19,6 +19,66 @@ import { useAuth } from "@/hooks/useAuth";
 import { useUserPresence } from "@/hooks/useUserPresence";
 import { cn } from "@/lib/utils";
 
+// Achievement types
+export type Achievement = {
+  id: string;
+  title: string;
+  description: string;
+  imageUrl?: string;
+  isCompleted: boolean;
+};
+
+// Achievement hook
+const useAchievements = () => {
+  const [achievements, setAchievements] = useState<Achievement[]>([]);
+
+  useEffect(() => {
+    // Fetch achievements from Supabase or other data source
+    const fetchAchievements = async () => {
+      try {
+        // Replace with your actual achievement fetching logic
+        const fetchedAchievements: Achievement[] = [
+          { id: '1', title: 'First Conversation', description: 'Had your first conversation!', isCompleted: true },
+          { id: '2', title: '10 Conversations', description: 'Had 10 conversations!', isCompleted: false },
+          { id: '3', title: '50 XP', description: 'Earned 50 XP points!', isCompleted: true },
+          // Add more achievements here
+        ];
+        setAchievements(fetchedAchievements);
+      } catch (error) {
+        console.error('Error fetching achievements:', error);
+      }
+    };
+
+    fetchAchievements();
+  }, []);
+
+  return achievements;
+};
+
+
+// AchievementsList component
+const AchievementsList = () => {
+  const achievements = useAchievements();
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      {achievements.map((achievement) => (
+        <Card key={achievement.id} className="bg-gradient-to-br from-card to-card/95 hover:shadow-lg transition-all duration-200">
+          <CardHeader>
+            <CardTitle>{achievement.title}</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p>{achievement.description}</p>
+            {achievement.imageUrl && <img src={achievement.imageUrl} alt={achievement.title} />}
+            <Badge variant={achievement.isCompleted ? 'default' : 'outline'}>
+              {achievement.isCompleted ? 'Completed' : 'In Progress'}
+            </Badge>
+          </CardContent>
+        </Card>
+      ))}
+    </div>
+  );
+};
+
 const Dashboard = () => {
   const { user } = useAuth();
   const { onlineUsers } = useUserPresence();
@@ -79,7 +139,7 @@ const Dashboard = () => {
     let isMounted = true;
     let profileSubscription;
     let dashboardChannel;
-    
+
     const fetchUserData = async () => {
       if (!user || !isMounted) return;
 
@@ -93,7 +153,7 @@ const Dashboard = () => {
           .single();
 
         console.log("Profile data fetch result:", error ? `Error: ${error.message}` : "Success");
-        
+
         // If profile doesn't exist yet, create it
         if (error && error.code === 'PGRST116') {
           console.log("Profile not found, creating one for user:", user.id);
@@ -112,11 +172,11 @@ const Dashboard = () => {
               xp_points: 0,
               progress_percentage: 0
             });
-            
+
           if (createError) {
             console.error("Error creating new profile:", createError);
           }
-          
+
           // Use default values
           if (isMounted) {
             setUserStats({
@@ -128,7 +188,7 @@ const Dashboard = () => {
           }
           return;
         }
-        
+
         if (error) {
           console.error("Profile data fetch error:", error);
           // Don't throw, just use defaults
@@ -390,6 +450,11 @@ const Dashboard = () => {
           </div>
         </CardContent>
       </Card>
+
+      <div className="space-y-4 mt-8">
+        <h2 className="text-2xl font-bold">Achievements</h2>
+        <AchievementsList />
+      </div>
 
       <NotificationCard />
     </div>
