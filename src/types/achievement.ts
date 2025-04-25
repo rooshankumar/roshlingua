@@ -1,9 +1,14 @@
 
+export type AchievementCategory = 'learning' | 'social' | 'milestone' | 'special';
+export type AchievementLevel = 'bronze' | 'silver' | 'gold';
+
 export interface Achievement {
   id: string;
   title: string;
   description: string;
   icon: string;
+  category: AchievementCategory;
+  level: AchievementLevel;
   condition: AchievementCondition;
   points: number;
   unlockedAt?: string;

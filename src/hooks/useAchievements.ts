@@ -1,9 +1,7 @@
-
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import { Achievement, UserAchievement } from '@/types/achievement';
 import { useToast } from '@/components/ui/use-toast';
-import { Award } from 'lucide-react';
 
 const ACHIEVEMENTS: Achievement[] = [
   {
@@ -11,6 +9,8 @@ const ACHIEVEMENTS: Achievement[] = [
     title: 'First Steps',
     description: 'Complete your first lesson',
     icon: '🎯',
+    category: 'learning',
+    level: 'bronze',
     condition: { type: 'lessons', threshold: 1 },
     points: 50
   },
@@ -19,6 +19,8 @@ const ACHIEVEMENTS: Achievement[] = [
     title: 'Consistent Learner',
     description: 'Maintain a 3-day streak',
     icon: '🔥',
+    category: 'milestone',
+    level: 'bronze',
     condition: { type: 'streak', threshold: 3 },
     points: 100
   },
@@ -27,6 +29,8 @@ const ACHIEVEMENTS: Achievement[] = [
     title: 'Rising Star',
     description: 'Earn 500 XP',
     icon: '⭐',
+    category: 'milestone',
+    level: 'silver',
     condition: { type: 'xp', threshold: 500 },
     points: 200
   },
@@ -35,6 +39,8 @@ const ACHIEVEMENTS: Achievement[] = [
     title: 'Weekly Warrior',
     description: 'Maintain a 7-day streak',
     icon: '🗓️',
+    category: 'milestone',
+    level: 'silver',
     condition: { type: 'streak', threshold: 7 },
     points: 300
   },
@@ -43,6 +49,8 @@ const ACHIEVEMENTS: Achievement[] = [
     title: 'Language Master',
     description: 'Earn 1000 XP',
     icon: '👑',
+    category: 'milestone',
+    level: 'gold',
     condition: { type: 'xp', threshold: 1000 },
     points: 400
   },
@@ -51,6 +59,8 @@ const ACHIEVEMENTS: Achievement[] = [
     title: 'Social Butterfly',
     description: 'Have 5 conversations',
     icon: '🦋',
+    category: 'social',
+    level: 'silver',
     condition: { type: 'conversations', threshold: 5 },
     points: 250
   },
@@ -59,8 +69,20 @@ const ACHIEVEMENTS: Achievement[] = [
     title: 'Dedicated Student',
     description: 'Complete 10 lessons',
     icon: '📚',
+    category: 'learning',
+    level: 'gold',
     condition: { type: 'lessons', threshold: 10 },
     points: 300
+  },
+  {
+    id: 'winter-2024',
+    title: 'Winter Champion',
+    description: 'Complete a lesson during winter 2024',
+    icon: '❄️',
+    category: 'special',
+    level: 'silver',
+    condition: { type: 'lessons', threshold: 1 },
+    points: 150
   }
 ];
 
@@ -78,7 +100,7 @@ export function useAchievements(userId: string) {
       .from('user_achievements')
       .select('*')
       .eq('user_id', userId);
-    
+
     if (data) {
       setUnlockedAchievements(data);
     }
@@ -130,7 +152,7 @@ export function useAchievements(userId: string) {
         achievement_id: achievementId,
         unlocked_at: new Date().toISOString()
       });
-    
+
     if (!error) {
       loadUserAchievements();
     }
