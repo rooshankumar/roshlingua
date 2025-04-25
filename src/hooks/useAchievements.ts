@@ -29,6 +29,38 @@ const ACHIEVEMENTS: Achievement[] = [
     icon: '⭐',
     condition: { type: 'xp', threshold: 500 },
     points: 200
+  },
+  {
+    id: 'streak-7',
+    title: 'Weekly Warrior',
+    description: 'Maintain a 7-day streak',
+    icon: '🗓️',
+    condition: { type: 'streak', threshold: 7 },
+    points: 300
+  },
+  {
+    id: 'xp-1000',
+    title: 'Language Master',
+    description: 'Earn 1000 XP',
+    icon: '👑',
+    condition: { type: 'xp', threshold: 1000 },
+    points: 400
+  },
+  {
+    id: 'conversations-5',
+    title: 'Social Butterfly',
+    description: 'Have 5 conversations',
+    icon: '🦋',
+    condition: { type: 'conversations', threshold: 5 },
+    points: 250
+  },
+  {
+    id: 'lessons-10',
+    title: 'Dedicated Student',
+    description: 'Complete 10 lessons',
+    icon: '📚',
+    condition: { type: 'lessons', threshold: 10 },
+    points: 300
   }
 ];
 
