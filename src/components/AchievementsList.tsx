@@ -31,12 +31,39 @@ export function AchievementsList() {
     }, 0);
   };
 
+  const getRank = (points: number) => {
+    if (points >= 1000) return { title: 'Master', icon: '👑' };
+    if (points >= 500) return { title: 'Expert', icon: '⭐' };
+    if (points >= 200) return { title: 'Intermediate', icon: '🌟' };
+    return { title: 'Beginner', icon: '🌱' };
+  };
+
+  const currentRank = getRank(getTotalPoints());
+
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between bg-gradient-to-r from-primary/10 to-primary/5 p-6 rounded-lg border border-primary/20">
         <div>
-          <h2 className="text-2xl font-bold">Achievements</h2>
-          <p className="text-muted-foreground">Total Points: {getTotalPoints()}</p>
+          <h2 className="text-3xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+            Achievements
+          </h2>
+          <div className="flex items-center gap-2 mt-2">
+            <span className="text-2xl">{currentRank.icon}</span>
+            <div>
+              <p className="font-medium">{currentRank.title} Level</p>
+              <p className="text-muted-foreground">
+                {getTotalPoints()} Points Total
+              </p>
+            </div>
+          </div>
+        </div>
+        <div className="hidden md:block">
+          <div className="text-center">
+            <p className="text-4xl font-bold text-primary">
+              {((unlockedAchievements.length / achievements.length) * 100).toFixed(0)}%
+            </p>
+            <p className="text-sm text-muted-foreground">Completed</p>
+          </div>
         </div>
       </div>
       
@@ -54,16 +81,31 @@ export function AchievementsList() {
               animate={isUnlocked ? { opacity: 1 } : { opacity: 0.7 }}
             >
               <Card className={cn(
-                "transition-all duration-200 border-2",
-                isUnlocked ? LEVEL_COLORS[achievement.level] : "border-dashed"
+                "transition-all duration-300 border-2 overflow-hidden",
+                isUnlocked 
+                  ? `${LEVEL_COLORS[achievement.level]} shadow-lg shadow-primary/5` 
+                  : "border-dashed hover:border-primary/30"
               )}>
-                <CardHeader>
+                <CardHeader className="relative">
+                  {isUnlocked && (
+                    <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-transparent to-primary/5 animate-shimmer"/>
+                  )}
                   <div className="flex items-start gap-4">
                     <div className={cn(
-                      "w-12 h-12 rounded-lg flex items-center justify-center text-2xl",
-                      isUnlocked ? "bg-primary/10" : "bg-muted"
+                      "w-14 h-14 rounded-xl flex items-center justify-center text-3xl relative",
+                      isUnlocked 
+                        ? "bg-gradient-to-br from-primary/20 to-primary/5" 
+                        : "bg-muted"
                     )}>
-                      {achievement.icon}
+                      {isUnlocked && (
+                        <motion.div
+                          initial={{ scale: 0 }}
+                          animate={{ scale: 1 }}
+                          transition={{ type: "spring", stiffness: 260, damping: 20 }}
+                          className="absolute inset-0 bg-primary/10 rounded-xl"
+                        />
+                      )}
+                      <span className="relative z-10">{achievement.icon}</span>
                     </div>
                     <div className="flex-1">
                       <div className="flex items-center gap-2">
