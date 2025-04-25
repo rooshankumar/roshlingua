@@ -391,7 +391,7 @@ const Dashboard = () => {
             <Award className="h-4 w-4 text-primary" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{userStats.xp + userStats.achievementPoints} XP</div>
+            <div className="text-2xl font-bold">{(userStats.xp || 0) + (userStats.achievementPoints || 0)} XP</div>
             <div className="inline-flex items-center mt-2 text-xs text-muted-foreground">
               <Book className="h-3 w-3 mr-1" />
               Learning rewards
