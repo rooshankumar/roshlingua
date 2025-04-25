@@ -451,8 +451,9 @@ const Dashboard = () => {
         </CardContent>
       </Card>
 
-      <div className="mt-8">
+      <div className="mt-8 space-y-8">
         <AchievementsList />
+        <AchievementStats />
       </div>
 
       <NotificationCard />

@@ -80,11 +80,28 @@ export function AchievementsList() {
               animate={isUnlocked ? { opacity: 1 } : { opacity: 0.7 }}
             >
               <Card className={cn(
-                "transition-all duration-300 border-2 overflow-hidden",
+                "transition-all duration-300 border-2 overflow-hidden group",
                 isUnlocked 
                   ? `${LEVEL_COLORS[achievement.level]} shadow-lg shadow-primary/5` 
                   : "border-dashed hover:border-primary/30"
               )}>
+                {isUnlocked && (
+                  <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => {
+                        navigator.share({
+                          title: `I unlocked ${achievement.title}!`,
+                          text: `I just earned the ${achievement.title} achievement on Roshlingua!`,
+                          url: window.location.href
+                        }).catch(console.error);
+                      }}
+                    >
+                      Share 🎉
+                    </Button>
+                  </div>
+                )}
                 <CardHeader className="relative">
                   {isUnlocked && (
                     <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-transparent to-primary/5 animate-shimmer"/>
