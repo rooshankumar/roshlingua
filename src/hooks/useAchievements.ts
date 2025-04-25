@@ -157,15 +157,22 @@ export function useAchievements(userId: string) {
   };
 
   const checkAchievements = async (stats: { xp: number; streak: number; lessons: number }) => {
+    // Get latest XP from profile
+    const { data: profileData } = await supabase
+      .from('profiles')
+      .select('xp_points')
+      .eq('id', userId)
+      .single();
+    
+    const currentXP = profileData?.xp_points || 0;
+
     for (const achievement of ACHIEVEMENTS) {
       const isUnlocked = unlockedAchievements.some(ua => ua.achievement_id === achievement.id);
       if (!isUnlocked) {
-        let statValue;
-        if (achievement.condition.type === 'xp') {
-          statValue = userXP; // Use fetched XP for XP achievements
-        } else {
-          statValue = stats[achievement.condition.type];
-        }
+        const statValue = achievement.condition.type === 'xp' 
+          ? currentXP 
+          : stats[achievement.condition.type];
+          
         if (statValue >= achievement.condition.threshold) {
           await unlockAchievement(achievement.id);
         }

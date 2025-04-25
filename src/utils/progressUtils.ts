@@ -11,20 +11,27 @@ export const getXP = async (userId: string): Promise<number> => {
 };
 
 export const addXP = async (userId: string, actionType: string): Promise<{ xp: number, gained: number }> => {
-  const { data, error } = await supabase
+  const { data: result } = await supabase
     .rpc('increment_xp', { 
       user_id: userId,
       action_type: actionType
     });
 
-  if (error) {
-    console.error('Error adding XP:', error);
+  if (!result) {
+    console.error('Error adding XP');
     return { xp: 0, gained: 0 };
   }
 
+  // Update profile XP to ensure consistency
+  const { data: profileData } = await supabase
+    .from('profiles')
+    .select('xp_points')
+    .eq('id', userId)
+    .single();
+
   return { 
-    xp: data?.[0]?.xp_points || 0,
-    gained: data?.[0]?.xp_gained || 0
+    xp: profileData?.xp_points || 0,
+    gained: result.xp_gained || 0
   };
 };
 
