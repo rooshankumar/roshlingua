@@ -5,13 +5,13 @@ import { useToast } from '@/components/ui/use-toast';
 
 export const ACHIEVEMENTS: Achievement[] = [
   {
-    id: 'first-lesson',
+    id: 'first-chat',
     title: 'First Steps',
-    description: 'Complete your first lesson',
+    description: 'Start your first conversation',
     icon: '🎯',
-    category: 'learning',
+    category: 'social',
     level: 'bronze',
-    condition: { type: 'lessons', threshold: 1 },
+    condition: { type: 'conversations', threshold: 1 },
     points: 10
   },
   {
@@ -65,23 +65,23 @@ export const ACHIEVEMENTS: Achievement[] = [
     points: 250
   },
   {
-    id: 'lessons-10',
-    title: 'Dedicated Student',
-    description: 'Complete 10 lessons',
-    icon: '📚',
-    category: 'learning',
+    id: 'messages-50',
+    title: 'Active Chatter',
+    description: 'Send 50 messages',
+    icon: '💬',
+    category: 'social',
     level: 'gold',
-    condition: { type: 'lessons', threshold: 10 },
+    condition: { type: 'messages', threshold: 50 },
     points: 300
   },
   {
     id: 'winter-2024',
     title: 'Winter Champion',
-    description: 'Complete a lesson during winter 2024',
+    description: 'Stay active during winter 2024',
     icon: '❄️',
     category: 'special',
     level: 'silver',
-    condition: { type: 'lessons', threshold: 1 },
+    condition: { type: 'streak', threshold: 1 },
     points: 150
   }
 ];

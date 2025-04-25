@@ -15,7 +15,7 @@ export interface Achievement {
 }
 
 export type AchievementCondition = {
-  type: 'xp' | 'streak' | 'conversations' | 'lessons';
+  type: 'xp' | 'streak' | 'conversations' | 'messages';
   threshold: number;
 }
 
