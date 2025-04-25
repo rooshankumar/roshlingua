@@ -6,16 +6,16 @@ RETURNS TABLE (
     base_points INTEGER,
     streak_multiplier DECIMAL
 ) AS $$
-BEGIN
-    RETURN QUERY VALUES
-        ('lesson_complete', 50, 1.2),      -- Base XP for completing a lesson
-        ('conversation_started', 30, 1.1),  -- Starting a conversation
-        ('message_sent', 5, 1.0),          -- Sending a message
-        ('daily_login', 20, 1.3),          -- Daily login bonus
-        ('profile_complete', 100, 1.0),    -- One-time profile completion
-        ('achievement_unlock', 75, 1.0);    -- Achievement unlocking
-END;
-$$ LANGUAGE plpgsql IMMUTABLE;
+    SELECT * FROM (
+        VALUES
+            ('lesson_complete', 50, 1.2),      -- Base XP for completing a lesson
+            ('conversation_started', 30, 1.1),  -- Starting a conversation
+            ('message_sent', 5, 1.0),          -- Sending a message
+            ('daily_login', 20, 1.3),          -- Daily login bonus
+            ('profile_complete', 100, 1.0),    -- One-time profile completion
+            ('achievement_unlock', 75, 1.0)     -- Achievement unlocking
+    ) AS rewards(action_type, base_points, streak_multiplier);
+$$ LANGUAGE SQL IMMUTABLE;
 
 -- Function to calculate streak bonus
 CREATE OR REPLACE FUNCTION calculate_streak_bonus(
