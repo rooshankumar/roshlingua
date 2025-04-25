@@ -89,10 +89,12 @@ const ACHIEVEMENTS: Achievement[] = [
 export function useAchievements(userId: string) {
   const [unlockedAchievements, setUnlockedAchievements] = useState<UserAchievement[]>([]);
   const { toast } = useToast();
+  const [userXP, setUserXP] = useState(0); // Added state for user XP
 
   useEffect(() => {
     loadUserAchievements();
     subscribeToAchievements();
+    loadUserXP(); // Load user XP on mount
   }, [userId]);
 
   const loadUserAchievements = async () => {
@@ -105,6 +107,16 @@ export function useAchievements(userId: string) {
       setUnlockedAchievements(data);
     }
   };
+
+  const loadUserXP = async () => {
+    const { data: profileData } = await supabase
+      .from('profiles')
+      .select('xp_points')
+      .eq('id', userId)
+      .single();
+    setUserXP(profileData?.xp_points || 0);
+  };
+
 
   const subscribeToAchievements = () => {
     const subscription = supabase
@@ -134,6 +146,7 @@ export function useAchievements(userId: string) {
             duration: 6000,
           });
           loadUserAchievements();
+          loadUserXP(); //update XP after achievement unlock
         }
       })
       .subscribe();
@@ -147,7 +160,12 @@ export function useAchievements(userId: string) {
     for (const achievement of ACHIEVEMENTS) {
       const isUnlocked = unlockedAchievements.some(ua => ua.achievement_id === achievement.id);
       if (!isUnlocked) {
-        const statValue = stats[achievement.condition.type];
+        let statValue;
+        if (achievement.condition.type === 'xp') {
+          statValue = userXP; // Use fetched XP for XP achievements
+        } else {
+          statValue = stats[achievement.condition.type];
+        }
         if (statValue >= achievement.condition.threshold) {
           await unlockAchievement(achievement.id);
         }
