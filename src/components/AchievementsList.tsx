@@ -4,6 +4,7 @@ import { Progress } from '@/components/ui/progress';
 import { useAchievements } from '@/hooks/useAchievements';
 import { useAuth } from '@/hooks/useAuth';
 import { cn } from '@/lib/utils';
+import type { Variants } from 'framer-motion';
 import { motion } from 'framer-motion';
 
 const LEVEL_COLORS = {
