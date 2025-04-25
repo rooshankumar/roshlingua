@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/lib/supabase";
 import { uploadAvatar, deleteAvatar } from "@/services/avatarService";
@@ -22,6 +23,7 @@ import { Shield, Bell, Key, User, Lock, Mail, Save, LogOut, Moon, Sun, Globe, Wa
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 
 const Settings = () => {
+  const { t } = useTranslation();
   const { theme, setTheme } = useTheme();
   const { toast } = useToast();
   const { user } = useAuth();
@@ -291,9 +293,11 @@ const Settings = () => {
   return (
     <div className="container max-w-6xl pb-12 animate-fade-in">
       <div className="space-y-2 mb-8">
-        <h1 className="text-4xl font-bold tracking-tight bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">Settings</h1>
+        <h1 className="text-4xl font-bold tracking-tight bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+          {t('settings.title')}
+        </h1>
         <p className="text-muted-foreground text-lg">
-          Customize your experience and manage your account
+          {t('settings.subtitle')}
         </p>
       </div>
 

@@ -13,14 +13,45 @@
     "signOut": "Abmelden",
     "getStarted": "Loslegen"
   },
-  "profile": {
-    "nativeLanguage": "Muttersprache",
-    "learningLanguage": "Lernsprache",
-    "proficiencyLevel": "Kenntnisniveau"
-  },
-  "chat": {
-    "startChat": "Chat starten",
-    "sendMessage": "Nachricht senden",
-    "typeMessage": "Nachricht eingeben..."
+  "settings": {
+    "title": "Einstellungen",
+    "subtitle": "Passen Sie Ihre Erfahrung an und verwalten Sie Ihr Konto",
+    "tabs": {
+      "profile": "Profil",
+      "privacy": "Privatsphäre",
+      "notifications": "Benachrichtigungen",
+      "account": "Konto"
+    },
+    "profile": {
+      "title": "Profilinformationen",
+      "description": "Aktualisieren Sie Ihre persönlichen Informationen und Spracheinstellungen",
+      "fullName": "Vollständiger Name",
+      "email": "E-Mail",
+      "gender": "Geschlecht",
+      "dateOfBirth": "Geburtsdatum",
+      "bio": "Biografie",
+      "bioPlaceholder": "Erzählen Sie uns von sich..."
+    },
+    "language": {
+      "title": "Spracheinstellungen",
+      "interface": "Oberflächensprache",
+      "native": "Muttersprache",
+      "learning": "Lernsprache",
+      "proficiency": "Kenntnisniveau"
+    },
+    "buttons": {
+      "save": "Änderungen speichern",
+      "saving": "Wird gespeichert...",
+      "delete": "Konto löschen",
+      "logout": "Abmelden",
+      "password": "Passwort ändern",
+      "email": "E-Mail aktualisieren"
+    },
+    "theme": {
+      "title": "Design",
+      "light": "Hell",
+      "dark": "Dunkel",
+      "system": "System"
+    }
   }
 }

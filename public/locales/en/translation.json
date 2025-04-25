@@ -3,22 +3,55 @@
   "navigation": {
     "home": "Home",
     "chat": "Chat",
-    "community": "Community",
-    "settings": "Settings"
+    "community": "Community", 
+    "settings": "Settings",
+    "menu": "Menu",
+    "online": "Online"
   },
   "auth": {
     "signIn": "Sign In",
     "signOut": "Sign Out",
     "getStarted": "Get Started"
   },
-  "profile": {
-    "nativeLanguage": "Native Language",
-    "learningLanguage": "Learning Language",
-    "proficiencyLevel": "Proficiency Level"
-  },
-  "chat": {
-    "startChat": "Start Chat",
-    "sendMessage": "Send Message",
-    "typeMessage": "Type your message..."
+  "settings": {
+    "title": "Settings",
+    "subtitle": "Customize your experience and manage your account",
+    "tabs": {
+      "profile": "Profile",
+      "privacy": "Privacy",
+      "notifications": "Notifications",
+      "account": "Account"
+    },
+    "profile": {
+      "title": "Profile Information",
+      "description": "Update your personal information and language preferences",
+      "fullName": "Full Name",
+      "email": "Email",
+      "gender": "Gender",
+      "dateOfBirth": "Date of Birth",
+      "bio": "Bio",
+      "bioPlaceholder": "Tell us about yourself..."
+    },
+    "language": {
+      "title": "Language Settings",
+      "interface": "Interface Language",
+      "native": "Native Language",
+      "learning": "Learning Language",
+      "proficiency": "Proficiency Level"
+    },
+    "buttons": {
+      "save": "Save Changes",
+      "saving": "Saving...",
+      "delete": "Delete Account",
+      "logout": "Logout",
+      "password": "Change Password",
+      "email": "Update Email"
+    },
+    "theme": {
+      "title": "Theme",
+      "light": "Light",
+      "dark": "Dark",
+      "system": "System"
+    }
   }
 }
