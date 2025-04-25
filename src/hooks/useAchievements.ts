@@ -12,7 +12,7 @@ const ACHIEVEMENTS: Achievement[] = [
     category: 'learning',
     level: 'bronze',
     condition: { type: 'lessons', threshold: 1 },
-    points: 50
+    points: 10
   },
   {
     id: 'streak-3',
@@ -22,7 +22,7 @@ const ACHIEVEMENTS: Achievement[] = [
     category: 'milestone',
     level: 'bronze',
     condition: { type: 'streak', threshold: 3 },
-    points: 100
+    points: 30
   },
   {
     id: 'xp-500',
