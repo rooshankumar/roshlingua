@@ -299,7 +299,35 @@
   
   /* Optimize inputs for mobile */
   input, textarea, select, button {
-    @apply text-base; /* iOS auto-zooms on inputs smaller than 16px */
+    @apply text-base touch:text-lg; /* iOS auto-zooms on inputs smaller than 16px */
+    min-height: 44px; /* Minimum touch target size */
+  }
+  
+  /* Better touch targets for mobile */
+  .touch-target {
+    @apply min-h-[44px] min-w-[44px] flex items-center justify-center;
+  }
+  
+  /* Responsive typography */
+  @screen xs {
+    html { font-size: 14px; }
+    h1 { @apply text-2xl; }
+    h2 { @apply text-xl; }
+    h3 { @apply text-lg; }
+  }
+  
+  @screen sm {
+    html { font-size: 15px; }
+    h1 { @apply text-3xl; }
+    h2 { @apply text-2xl; }
+    h3 { @apply text-xl; }
+  }
+  
+  @screen md {
+    html { font-size: 16px; }
+    h1 { @apply text-4xl; }
+    h2 { @apply text-2xl; }
+    h3 { @apply text-xl; }
   }
   
   /* Better scrolling on mobile */

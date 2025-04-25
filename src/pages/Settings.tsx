@@ -302,22 +302,28 @@ const Settings = () => {
       </div>
 
       <Tabs defaultValue="profile" className="space-y-8">
-        <TabsList className="grid w-full grid-cols-4 h-12 items-stretch gap-4 bg-transparent p-1">
+        <TabsList className="grid w-full grid-cols-4 h-12 items-stretch gap-2 sm:gap-4 bg-transparent p-1">
           {[
             { id: "profile", icon: User, label: "Profile" },
             { id: "privacy", icon: Shield, label: "Privacy" },
             { id: "notifications", icon: Bell, label: "Notifications" },
             { id: "account", icon: Key, label: "Account" }
-          ].map(tab => (
-            <TabsTrigger
-              key={tab.id}
-              value={tab.id}
-              className="flex items-center justify-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-lg transition-all"
-            >
-              <tab.icon className="h-4 w-4" />
-              <span className="hidden sm:inline">{tab.label}</span>
-            </TabsTrigger>
-          ))}
+          ].map(tab => {
+            // Use the responsive hook for dynamic sizing
+            const { deviceSize } = useResponsive();
+            const iconSize = deviceSize === 'xs' ? 16 : deviceSize === 'sm' ? 18 : 20;
+            
+            return (
+              <TabsTrigger
+                key={tab.id}
+                value={tab.id}
+                className="flex items-center justify-center gap-1 sm:gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-lg transition-all touch-target"
+              >
+                <tab.icon size={iconSize} />
+                <span className="hidden sm:inline text-sm md:text-base">{tab.label}</span>
+              </TabsTrigger>
+            );
+          })}
         </TabsList>
 
         <TabsContent value="profile">
@@ -673,31 +679,39 @@ const Settings = () => {
 
               <div className="space-y-4">
                 <h3 className="text-xl font-semibold">Theme</h3>
-                <div className="flex flex-wrap gap-4">
-                  <Button
-                    variant={theme === "light" ? "default" : "outline"}
-                    className="flex-1"
-                    onClick={() => setTheme("light")}
-                  >
-                    <Sun className="h-5 w-5 mr-2" />
-                    Light
-                  </Button>
-                  <Button
-                    variant={theme === "dark" ? "default" : "outline"}
-                    className="flex-1"
-                    onClick={() => setTheme("dark")}
-                  >
-                    <Moon className="h-5 w-5 mr-2" />
-                    Dark
-                  </Button>
-                  <Button
-                    variant={theme === "system" ? "default" : "outline"}
-                    className="flex-1"
-                    onClick={() => setTheme("system")}
-                  >
-                    <Globe className="h-5 w-5 mr-2" />
-                    System
-                  </Button>
+                <div className="flex flex-wrap gap-2 sm:gap-4">
+                  {/* Use responsive hook for icon sizing */}
+                  {(() => {
+                    const { iconSize } = useResponsive();
+                    return (
+                      <>
+                        <Button
+                          variant={theme === "light" ? "default" : "outline"}
+                          className="flex-1 h-auto py-2 sm:py-4"
+                          onClick={() => setTheme("light")}
+                        >
+                          <Sun size={iconSize.small} className="mr-1 sm:mr-2" />
+                          <span className="text-sm sm:text-base">Light</span>
+                        </Button>
+                        <Button
+                          variant={theme === "dark" ? "default" : "outline"}
+                          className="flex-1 h-auto py-2 sm:py-4"
+                          onClick={() => setTheme("dark")}
+                        >
+                          <Moon size={iconSize.small} className="mr-1 sm:mr-2" />
+                          <span className="text-sm sm:text-base">Dark</span>
+                        </Button>
+                        <Button
+                          variant={theme === "system" ? "default" : "outline"}
+                          className="flex-1 h-auto py-2 sm:py-4"
+                          onClick={() => setTheme("system")}
+                        >
+                          <Globe size={iconSize.small} className="mr-1 sm:mr-2" />
+                          <span className="text-sm sm:text-base">System</span>
+                        </Button>
+                      </>
+                    );
+                  })()}
                 </div>
               </div>
 

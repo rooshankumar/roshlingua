@@ -5,7 +5,8 @@ import { useAuth } from "@/hooks/useAuth";
 import { useUnreadMessages } from "@/hooks/useUnreadMessages";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { useTranslation } from 'react-i18next'; // Added import
+import { useTranslation } from 'react-i18next';
+import { useResponsive } from "@/hooks/use-mobile";
 
 
 const routes = [
@@ -39,7 +40,7 @@ export function MainNav() {
   const { unreadCounts } = useUnreadMessages(user?.id);
   const totalUnread = unreadCounts ? Object.values(unreadCounts).reduce((sum, count) => sum + count, 0) : 0;
   const { t } = useTranslation();
-  const isMobile = window.innerWidth < 768;
+  const responsive = useResponsive();
 
   const isActive = (path: string) => {
     return location.pathname === path;
@@ -61,18 +62,25 @@ export function MainNav() {
           }`}
         >
           <div className="relative">
-            <route.icon className={`h-5 w-5 transition-transform duration-200 ${
-              isActive(route.path) 
-                ? "scale-110" 
-                : "group-hover:scale-105"
-            }`} />
+            <route.icon 
+              className={`transition-transform duration-200 ${
+                isActive(route.path) 
+                  ? "scale-110" 
+                  : "group-hover:scale-105"
+              }`} 
+              size={mobile ? responsive.iconSize.base : responsive.iconSize.small}
+            />
             {route.notificationCount && route.path === '/chat' && totalUnread > 0 && (
               <span className="absolute -top-2 -right-2 bg-destructive text-destructive-foreground text-xs rounded-full h-5 w-5 flex items-center justify-center animate-pulse">
                 {totalUnread}
               </span>
             )}
           </div>
-          <span className={mobile ? "text-base" : ""}>{t(`navigation.${route.label.toLowerCase()}`)}</span>
+          <span 
+            style={{ fontSize: mobile ? responsive.fontSize.base : responsive.fontSize.small }}
+          >
+            {t(`navigation.${route.label.toLowerCase()}`)}
+          </span>
         </NavLink>
       ))}
     </>
@@ -85,13 +93,19 @@ export function MainNav() {
         <div className="flex items-center justify-between p-3 border-b bg-background/90 backdrop-blur-lg">
           <Sheet open={open} onOpenChange={setOpen}>
             <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="lg:hidden">
-                {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+              <Button variant="ghost" size="icon" className="lg:hidden mobile-touch-target">
+                {open ? 
+                  <X size={responsive.iconSize.base} /> : 
+                  <Menu size={responsive.iconSize.base} />
+                }
               </Button>
             </SheetTrigger>
             <SheetContent side="left" className="w-[270px] p-4">
               <div className="mb-6 mt-2">
-                <h2 className="text-xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+                <h2 
+                  className="font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent"
+                  style={{ fontSize: responsive.fontSize.large }}
+                >
                   {t('navigation.menu')}
                 </h2>
               </div>
@@ -101,12 +115,22 @@ export function MainNav() {
               <div className="mt-auto pt-4 border-t absolute bottom-6 left-4 right-4">
                 <div className="flex items-center space-x-2 px-3 py-2 rounded-md bg-muted/50">
                   <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"/>
-                  <span className="text-sm text-muted-foreground">{t('navigation.online')}</span>
+                  <span 
+                    className="text-muted-foreground"
+                    style={{ fontSize: responsive.fontSize.small }}
+                  >
+                    {t('navigation.online')}
+                  </span>
                 </div>
               </div>
             </SheetContent>
           </Sheet>
-          <h2 className="text-lg font-medium">{routes.find(route => isActive(route.path))?.label || "Dashboard"}</h2>
+          <h2 
+            className="font-medium"
+            style={{ fontSize: responsive.fontSize.large }}
+          >
+            {routes.find(route => isActive(route.path))?.label || "Dashboard"}
+          </h2>
           <div className="w-10"></div> {/* Spacer for balance */}
         </div>
       </div>
@@ -114,7 +138,10 @@ export function MainNav() {
       {/* Desktop Navigation */}
       <nav className="hidden lg:flex sticky top-0 flex-col space-y-2 p-4 min-h-screen bg-background/80 backdrop-blur-lg border-r">
         <div className="mb-8">
-          <h2 className="text-2xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+          <h2 
+            className="font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent"
+            style={{ fontSize: responsive.fontSize.heading }}
+          >
             {t('navigation.menu')}
           </h2>
         </div>
@@ -122,7 +149,12 @@ export function MainNav() {
         <div className="mt-auto pt-4 border-t">
           <div className="flex items-center space-x-2 px-3 py-2 rounded-md bg-muted/50">
             <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"/>
-            <span className="text-sm text-muted-foreground">{t('navigation.online')}</span>
+            <span 
+              className="text-muted-foreground"
+              style={{ fontSize: responsive.fontSize.small }}
+            >
+              {t('navigation.online')}
+            </span>
           </div>
         </div>
       </nav>
