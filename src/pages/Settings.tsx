@@ -21,6 +21,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Separator } from "@/components/ui/separator";
 import { Shield, Bell, Key, User, Lock, Mail, Save, LogOut, Moon, Sun, Globe, Wallet, Camera, AlertTriangle } from "lucide-react";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { useResponsive } from "@/hooks/use-mobile"; // Added import
 
 const Settings = () => {
   const { t } = useTranslation();
@@ -312,7 +313,7 @@ const Settings = () => {
             // Use the responsive hook for dynamic sizing
             const { deviceSize } = useResponsive();
             const iconSize = deviceSize === 'xs' ? 16 : deviceSize === 'sm' ? 18 : 20;
-            
+
             return (
               <TabsTrigger
                 key={tab.id}
