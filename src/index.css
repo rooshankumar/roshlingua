@@ -299,7 +299,7 @@
   
   /* Optimize inputs for mobile */
   input, textarea, select, button {
-    @apply touch-device:text-base; /* iOS auto-zooms on inputs smaller than 16px */
+    @apply text-base; /* iOS auto-zooms on inputs smaller than 16px */
   }
   
   /* Better scrolling on mobile */

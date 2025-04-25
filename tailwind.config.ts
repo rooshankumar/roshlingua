@@ -157,5 +157,11 @@ export default {
 			},
 		}
 	},
-	plugins: [require("tailwindcss-animate")],
+	plugins: [
+		require("tailwindcss-animate"),
+		function({ addVariant }) {
+			// Add a touch-device variant
+			addVariant('touch', '@media (hover: none) { &:not(html) }');
+		}
+	],
 } satisfies Config;
