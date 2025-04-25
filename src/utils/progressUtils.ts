@@ -43,9 +43,9 @@ export const addXP = async (userId: string, points: number): Promise<void> => {
 };
 
 export const getLevel = (xp: number): string => {
-  if (xp > 1000) return 'Advanced';
-  if (xp > 500) return 'Intermediate';
-  return 'Beginner';
+  if (xp >= 1000) return 'Advanced';      // Advanced: 1000+ XP
+  if (xp >= 100) return 'Intermediate';   // Intermediate: 100-999 XP
+  return 'Beginner';                      // Beginner: 0-99 XP
 };
 
 export const getProgress = async (userId: string): Promise<number> => {
