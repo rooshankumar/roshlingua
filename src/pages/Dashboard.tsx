@@ -20,9 +20,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useUserPresence } from "@/hooks/useUserPresence";
 import { cn } from "@/lib/utils";
 
-import { useAchievements } from '@/hooks/useAchievements';
-
-
+import { useAchievements, ACHIEVEMENTS } from '@/hooks/useAchievements';
 import { AchievementsList } from '@/components/AchievementsList';
 
 const Dashboard = () => {
@@ -33,7 +31,8 @@ const Dashboard = () => {
     xp: 0,
     progress: 0,
     level: 'Beginner',
-    achievementPoints: 0
+    achievementPoints: 0,
+    totalXP: 0
   });
   const [activeUsers, setActiveUsers] = useState([]);
   const [stats, setStats] = useState({
@@ -85,20 +84,38 @@ const Dashboard = () => {
     let isMounted = true;
     let profileSubscription;
     let dashboardChannel;
+    let achievementsSubscription;
 
     const fetchUserData = async () => {
       if (!user || !isMounted) return;
 
       try {
         console.log("Fetching user data for dashboard...");
-        // Get initial profile data including streak
+        
+        // Get initial profile data including streak and achievements
         const { data: profileData, error } = await supabase
           .from('profiles')
           .select('streak_count, xp_points, progress_percentage')
           .eq('id', user.id)
           .single();
 
+        // Fetch achievement points in parallel
+        const { data: achievementsData } = await supabase
+          .from('user_achievements')
+          .select('achievement_id')
+          .eq('user_id', user.id);
+          
         console.log("Profile data fetch result:", error ? `Error: ${error.message}` : "Success");
+
+        // Calculate achievement points
+        let achievementPoints = 0;
+        if (achievementsData && achievementsData.length > 0) {
+          // Get points from unlocked achievements
+          const unlocked = achievementsData.map(a => a.achievement_id);
+          achievementPoints = ACHIEVEMENTS
+            .filter(a => unlocked.includes(a.id))
+            .reduce((sum, a) => sum + a.points, 0);
+        }
 
         // If profile doesn't exist yet, create it
         if (error && error.code === 'PGRST116') {
@@ -129,7 +146,9 @@ const Dashboard = () => {
               streak: 0,
               xp: 0,
               progress: 0,
-              level: 'Beginner'
+              level: 'Beginner',
+              achievementPoints: 0,
+              totalXP: 0
             });
           }
           return;
@@ -143,7 +162,9 @@ const Dashboard = () => {
               streak: 0,
               xp: 0,
               progress: 0,
-              level: 'Beginner'
+              level: 'Beginner',
+              achievementPoints: 0,
+              totalXP: 0
             });
           }
           return;
@@ -151,11 +172,16 @@ const Dashboard = () => {
 
         if (profileData && isMounted) {
           console.log("Setting user stats with profile data");
+          const xpPoints = profileData.xp_points || 0;
+          const totalXP = xpPoints + achievementPoints;
+          
           setUserStats({
             streak: profileData.streak_count ?? 0, 
-            xp: profileData.xp_points || 0,
+            xp: xpPoints,
             progress: profileData.progress_percentage || 0,
-            level: getLevel(profileData.xp_points || 0)
+            level: getLevel(totalXP),
+            achievementPoints: achievementPoints,
+            totalXP: totalXP
           });
         } else if (isMounted) {
           console.log("No profile data found, using defaults");
@@ -163,7 +189,9 @@ const Dashboard = () => {
             streak: 0,
             xp: 0,
             progress: 0,
-            level: 'Beginner'
+            level: 'Beginner',
+            achievementPoints: 0,
+            totalXP: 0
           });
         }
 
@@ -177,12 +205,45 @@ const Dashboard = () => {
             filter: `id=eq.${user.id}`
           }, (payload) => {
             if (payload.new && isMounted) {
+              const newXp = payload.new.xp_points ?? 0;
               setUserStats(prev => ({
                 ...prev,
                 streak: payload.new.streak_count ?? 0,
-                xp: payload.new.xp_points ?? 0,
+                xp: newXp,
+                totalXP: newXp + prev.achievementPoints,
                 progress: payload.new.progress_percentage ?? 0,
-                level: getLevel(payload.new.xp_points ?? 0)
+                level: getLevel(newXp + prev.achievementPoints)
+              }));
+            }
+          })
+          .subscribe();
+          
+        // Subscribe to achievements updates
+        achievementsSubscription = supabase
+          .channel(`user_achievements_${user.id}`)
+          .on('postgres_changes', {
+            event: 'INSERT',
+            schema: 'public',
+            table: 'user_achievements',
+            filter: `user_id=eq.${user.id}`
+          }, async () => {
+            // Refetch achievement points when new achievements are unlocked
+            const { data: newAchievementsData } = await supabase
+              .from('user_achievements')
+              .select('achievement_id')
+              .eq('user_id', user.id);
+              
+            if (newAchievementsData && isMounted) {
+              const unlocked = newAchievementsData.map(a => a.achievement_id);
+              const newAchievementPoints = ACHIEVEMENTS
+                .filter(a => unlocked.includes(a.id))
+                .reduce((sum, a) => sum + a.points, 0);
+                
+              setUserStats(prev => ({
+                ...prev,
+                achievementPoints: newAchievementPoints,
+                totalXP: prev.xp + newAchievementPoints,
+                level: getLevel(prev.xp + newAchievementPoints)
               }));
             }
           })
@@ -227,7 +288,7 @@ const Dashboard = () => {
 
     fetchUserData();
 
-    // Subscribe to realtime updates
+    // Subscribe to realtime updates for profiles
     dashboardChannel = supabase
       .channel('dashboard_changes')
       .on('postgres_changes', {
@@ -235,25 +296,9 @@ const Dashboard = () => {
         schema: 'public',
         table: 'profiles',
       }, () => {
-        // Don't call fetchUserData directly to avoid loops
         if (isMounted && user) {
           console.log("Received profile change, updating stats for user:", user.id);
-          // Instead of calling fetchUserData, update specific data
-          supabase
-            .from('profiles')
-            .select('streak_count, xp_points, progress_percentage')
-            .eq('id', user.id)
-            .single()
-            .then(({ data, error }) => {
-              if (!error && data && isMounted) {
-                setUserStats({
-                  streak: data.streak_count ?? 0,
-                  xp: data.xp_points || 0,
-                  progress: data.progress_percentage || 0,
-                  level: getLevel(data.xp_points || 0)
-                });
-              }
-            });
+          fetchUserData(); // It's safer to refetch all data
         }
       })
       .subscribe();
@@ -262,6 +307,7 @@ const Dashboard = () => {
       isMounted = false;
       if (profileSubscription) profileSubscription.unsubscribe();
       if (dashboardChannel) dashboardChannel.unsubscribe();
+      if (achievementsSubscription) achievementsSubscription.unsubscribe();
     };
   }, [user?.id]); // Only re-run when user ID changes
 
@@ -336,7 +382,7 @@ const Dashboard = () => {
             <Award className="h-4 w-4 text-primary" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{(userStats.xp || 0) + (userStats.achievementPoints || 0)} XP</div>
+            <div className="text-2xl font-bold">{userStats.totalXP || userStats.xp || 0} XP</div>
             <div className="inline-flex items-center mt-2 text-xs text-muted-foreground">
               <Book className="h-3 w-3 mr-1" />
               Learning rewards
