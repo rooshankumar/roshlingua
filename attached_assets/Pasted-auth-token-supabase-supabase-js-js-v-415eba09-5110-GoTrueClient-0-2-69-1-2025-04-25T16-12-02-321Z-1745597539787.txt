@@ -1,0 +1,44 @@
+auth-token
+@supabase_supabase-js.js?v=415eba09:5110 GoTrueClient@0 (2.69.1) 2025-04-25T16:12:02.321Z #_acquireLock end
+2Dashboard.tsx:456 Uncaught ReferenceError: AchievementStats is not defined
+    at Dashboard (Dashboard.tsx:456:10)
+    at renderWithHooks (chunk-W6L2VRDA.js?v=415eba09:11548:26)
+    at mountIndeterminateComponent (chunk-W6L2VRDA.js?v=415eba09:14926:21)
+    at beginWork (chunk-W6L2VRDA.js?v=415eba09:15914:22)
+    at HTMLUnknownElement.callCallback2 (chunk-W6L2VRDA.js?v=415eba09:3674:22)
+    at Object.invokeGuardedCallbackDev (chunk-W6L2VRDA.js?v=415eba09:3699:24)
+    at invokeGuardedCallback (chunk-W6L2VRDA.js?v=415eba09:3733:39)
+    at beginWork$1 (chunk-W6L2VRDA.js?v=415eba09:19765:15)
+    at performUnitOfWork (chunk-W6L2VRDA.js?v=415eba09:19198:20)
+    at workLoopSync (chunk-W6L2VRDA.js?v=415eba09:19137:13)Understand this error
+chunk-W6L2VRDA.js?v=415eba09:14032 The above error occurred in the <Dashboard> component:
+
+    at Dashboard (https://bad4fc84-ed2a-4f7e-bfdb-c6dc1afb9ebd-00-mlb980c67grq.pike.replit.dev/src/pages/Dashboard.tsx?t=1745597513907:192:22)
+    at main
+    at div
+    at AppLayout (https://bad4fc84-ed2a-4f7e-bfdb-c6dc1afb9ebd-00-mlb980c67grq.pike.replit.dev/src/components/layouts/AppLayout.tsx?t=1745596347168:36:22)
+    at ProtectedRoute (https://bad4fc84-ed2a-4f7e-bfdb-c6dc1afb9ebd-00-mlb980c67grq.pike.replit.dev/src/components/auth/ProtectedRoute.tsx:15:27)
+    at RenderedRoute (https://bad4fc84-ed2a-4f7e-bfdb-c6dc1afb9ebd-00-mlb980c67grq.pike.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=415eba09:4069:5)
+    at Routes (https://bad4fc84-ed2a-4f7e-bfdb-c6dc1afb9ebd-00-mlb980c67grq.pike.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=415eba09:4508:5)
+    at AppRoutes (https://bad4fc84-ed2a-4f7e-bfdb-c6dc1afb9ebd-00-mlb980c67grq.pike.replit.dev/src/App.tsx?t=1745597513907:39:33)
+    at AuthProvider (https://bad4fc84-ed2a-4f7e-bfdb-c6dc1afb9ebd-00-mlb980c67grq.pike.replit.dev/src/providers/AuthProvider.tsx:23:32)
+    at Router (https://bad4fc84-ed2a-4f7e-bfdb-c6dc1afb9ebd-00-mlb980c67grq.pike.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=415eba09:4451:15)
+    at BrowserRouter (https://bad4fc84-ed2a-4f7e-bfdb-c6dc1afb9ebd-00-mlb980c67grq.pike.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=415eba09:5196:5)
+    at ThemeProvider (https://bad4fc84-ed2a-4f7e-bfdb-c6dc1afb9ebd-00-mlb980c67grq.pike.replit.dev/src/components/theme-provider.tsx:17:33)
+    at QueryClientProvider (https://bad4fc84-ed2a-4f7e-bfdb-c6dc1afb9ebd-00-mlb980c67grq.pike.replit.dev/node_modules/.vite/deps/@tanstack_react-query.js?v=415eba09:2794:3)
+    at App
+
+Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://reactjs.org/link/error-boundaries to learn more about error boundaries.
+logCapturedError @ chunk-W6L2VRDA.js?v=415eba09:14032Understand this error
+chunk-W6L2VRDA.js?v=415eba09:19413 Uncaught ReferenceError: AchievementStats is not defined
+    at Dashboard (Dashboard.tsx:456:10)
+    at renderWithHooks (chunk-W6L2VRDA.js?v=415eba09:11548:26)
+    at mountIndeterminateComponent (chunk-W6L2VRDA.js?v=415eba09:14926:21)
+    at beginWork (chunk-W6L2VRDA.js?v=415eba09:15914:22)
+    at beginWork$1 (chunk-W6L2VRDA.js?v=415eba09:19753:22)
+    at performUnitOfWork (chunk-W6L2VRDA.js?v=415eba09:19198:20)
+    at workLoopSync (chunk-W6L2VRDA.js?v=415eba09:19137:13)
+    at renderRootSync (chunk-W6L2VRDA.js?v=415eba09:19116:15)
+    at recoverFromConcurrentError (chunk-W6L2VRDA.js?v=415eba09:18736:28)
+    at performConcurrentWorkOnRoot (chunk-W6L2VRDA.js?v=415eba09:18684:30)Understand this error
