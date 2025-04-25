@@ -10,19 +10,22 @@ export const getXP = async (userId: string): Promise<number> => {
   return data?.xp || 0;
 };
 
-export const addXP = async (userId: string, points: number): Promise<void> => {
-  const { data: user } = await supabase
-    .from('profiles')
-    .select('xp, streak_count')
-    .eq('id', userId)
-    .single();
+export const addXP = async (userId: string, actionType: string): Promise<{ xp: number, gained: number }> => {
+  const { data, error } = await supabase
+    .rpc('increment_xp', { 
+      user_id: userId,
+      action_type: actionType
+    });
 
-  const newXP = (user?.xp || 0) + points;
+  if (error) {
+    console.error('Error adding XP:', error);
+    return { xp: 0, gained: 0 };
+  }
 
-  await supabase
-    .from('profiles')
-    .update({ xp: newXP })
-    .eq('id', userId);
+  return { 
+    xp: data?.[0]?.xp_points || 0,
+    gained: data?.[0]?.xp_gained || 0
+  };
 
   // Check achievements after XP update
   const { data: lessonCount } = await supabase
