@@ -1,4 +1,3 @@
-
 import * as React from "react"
 import { NavLink, useLocation } from "react-router-dom";
 import { Home, Users, MessageSquare, Settings, Menu, X } from "lucide-react";
@@ -6,6 +5,8 @@ import { useAuth } from "@/hooks/useAuth";
 import { useUnreadMessages } from "@/hooks/useUnreadMessages";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { useTranslation } from 'react-i18next'; // Added import
+
 
 const routes = [
   {
@@ -37,7 +38,8 @@ export function MainNav() {
   const { user } = useAuth();
   const { unreadCounts } = useUnreadMessages(user?.id);
   const totalUnread = unreadCounts ? Object.values(unreadCounts).reduce((sum, count) => sum + count, 0) : 0;
-  
+  const { t } = useTranslation(); // Added useTranslation hook
+
   const isActive = (path: string) => {
     return location.pathname === path;
   };
@@ -67,7 +69,7 @@ export function MainNav() {
               </span>
             )}
           </div>
-          <span>{route.label}</span>
+          <span>{t(`navigation.${route.label.toLowerCase()}`)}</span> {/* Use t() for translation */}
         </NavLink>
       ))}
     </>
@@ -95,14 +97,14 @@ export function MainNav() {
       <nav className="hidden lg:flex sticky top-0 flex-col space-y-2 p-4 min-h-screen bg-background/80 backdrop-blur-lg border-r">
         <div className="mb-8">
           <h2 className="text-2xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
-            Menu
+            {t('navigation.menu')} {/* Translate the menu title */}
           </h2>
         </div>
         <NavigationItems />
         <div className="mt-auto pt-4 border-t">
           <div className="flex items-center space-x-2 px-3 py-2 rounded-md bg-muted/50">
             <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"/>
-            <span className="text-sm text-muted-foreground">Online</span>
+            <span className="text-sm text-muted-foreground">{t('navigation.online')}</span> {/* Translate online status */}
           </div>
         </div>
       </nav>

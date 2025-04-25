@@ -421,6 +421,10 @@ const Settings = () => {
               <div className="space-y-6">
                 <h3 className="text-xl font-semibold">Language Settings</h3>
                 <div className="grid gap-6 sm:grid-cols-2">
+                  <div className="space-y-4">
+                    <Label className="text-base">Interface Language</Label>
+                    <LanguageSwitcher />
+                  </div>
                   <div className="space-y-2">
                     <Label htmlFor="nativeLanguage" className="text-base">Native Language</Label>
                     <Select

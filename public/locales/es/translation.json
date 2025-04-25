@@ -1,0 +1,24 @@
+
+{
+  "navigation": {
+    "home": "Inicio",
+    "chat": "Chat",
+    "community": "Comunidad",
+    "settings": "Ajustes"
+  },
+  "auth": {
+    "signIn": "Iniciar Sesión",
+    "signOut": "Cerrar Sesión",
+    "getStarted": "Comenzar"
+  },
+  "profile": {
+    "nativeLanguage": "Idioma Nativo",
+    "learningLanguage": "Idioma de Aprendizaje",
+    "proficiencyLevel": "Nivel de Competencia"
+  },
+  "chat": {
+    "startChat": "Iniciar Chat",
+    "sendMessage": "Enviar Mensaje",
+    "typeMessage": "Escribe tu mensaje..."
+  }
+}
