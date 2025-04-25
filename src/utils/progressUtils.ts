@@ -13,7 +13,7 @@ export const getXP = async (userId: string): Promise<number> => {
 export const addXP = async (userId: string, points: number): Promise<void> => {
   const { data: user } = await supabase
     .from('profiles')
-    .select('xp')
+    .select('xp, streak_count')
     .eq('id', userId)
     .single();
 
@@ -23,6 +23,23 @@ export const addXP = async (userId: string, points: number): Promise<void> => {
     .from('profiles')
     .update({ xp: newXP })
     .eq('id', userId);
+
+  // Check achievements after XP update
+  const { data: lessonCount } = await supabase
+    .from('learning_activities')
+    .select('*', { count: 'exact' })
+    .eq('user_id', userId)
+    .eq('type', 'lesson_completed');
+
+  const stats = {
+    xp: newXP,
+    streak: user?.streak_count || 0,
+    lessons: lessonCount || 0
+  };
+
+  // Use the achievements hook to check and update
+  const { checkAchievements } = useAchievements(userId);
+  await checkAchievements(stats);
 };
 
 export const getLevel = (xp: number): string => {
