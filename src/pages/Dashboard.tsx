@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { NotificationCard } from "@/components/notifications/NotificationCard";
+import { AchievementStats } from "@/components/AchievementStats";
 import { 
   Activity, Award, Calendar, Flame, 
   Languages, MessageSquare, Users,
