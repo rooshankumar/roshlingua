@@ -372,7 +372,6 @@
   .section-transition {
     @apply transition-all duration-500 ease-in-out;
   }
-}
 
 /* Elegant scrollbar */
 ::-webkit-scrollbar {
