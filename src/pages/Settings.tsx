@@ -294,10 +294,10 @@ const Settings = () => {
     <div className="container max-w-6xl pb-12 animate-fade-in">
       <div className="space-y-2 mb-8">
         <h1 className="text-4xl font-bold tracking-tight bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
-          {t('settings.title')}
+          <TranslatedText text="settings.title" />
         </h1>
         <p className="text-muted-foreground text-lg">
-          {t('settings.subtitle')}
+          <TranslatedText text="settings.subtitle" />
         </p>
       </div>
 
@@ -315,7 +315,7 @@ const Settings = () => {
               className="flex items-center justify-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-lg transition-all"
             >
               <tab.icon className="h-4 w-4" />
-              <span className="hidden sm:inline">{tab.label}</span>
+              <span className="hidden sm:inline"><TranslatedText text={tab.label}/></span>
             </TabsTrigger>
           ))}
         </TabsList>
