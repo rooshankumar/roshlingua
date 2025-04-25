@@ -3,7 +3,7 @@ import { supabase } from '@/lib/supabase';
 import { Achievement, UserAchievement } from '@/types/achievement';
 import { useToast } from '@/components/ui/use-toast';
 
-const ACHIEVEMENTS: Achievement[] = [
+export const ACHIEVEMENTS: Achievement[] = [
   {
     id: 'first-lesson',
     title: 'First Steps',

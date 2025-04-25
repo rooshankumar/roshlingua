@@ -87,7 +87,8 @@ const Dashboard = () => {
     streak: 0,
     xp: 0,
     progress: 0,
-    level: 'Beginner'
+    level: 'Beginner',
+    achievementPoints: 0
   });
   const [activeUsers, setActiveUsers] = useState([]);
   const [stats, setStats] = useState({
@@ -390,7 +391,7 @@ const Dashboard = () => {
             <Award className="h-4 w-4 text-primary" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{userStats.xp} XP</div>
+            <div className="text-2xl font-bold">{userStats.xp + userStats.achievementPoints} XP</div>
             <div className="inline-flex items-center mt-2 text-xs text-muted-foreground">
               <Book className="h-3 w-3 mr-1" />
               Learning rewards
