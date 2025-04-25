@@ -20,65 +20,10 @@ import { useAuth } from "@/hooks/useAuth";
 import { useUserPresence } from "@/hooks/useUserPresence";
 import { cn } from "@/lib/utils";
 
-// Achievement types
-export type Achievement = {
-  id: string;
-  title: string;
-  description: string;
-  imageUrl?: string;
-  isCompleted: boolean;
-};
-
-// Achievement hook
-const useAchievements = () => {
-  const [achievements, setAchievements] = useState<Achievement[]>([]);
-
-  useEffect(() => {
-    // Fetch achievements from Supabase or other data source
-    const fetchAchievements = async () => {
-      try {
-        // Replace with your actual achievement fetching logic
-        const fetchedAchievements: Achievement[] = [
-          { id: '1', title: 'First Conversation', description: 'Had your first conversation!', isCompleted: true },
-          { id: '2', title: '10 Conversations', description: 'Had 10 conversations!', isCompleted: false },
-          { id: '3', title: '50 XP', description: 'Earned 50 XP points!', isCompleted: true },
-          // Add more achievements here
-        ];
-        setAchievements(fetchedAchievements);
-      } catch (error) {
-        console.error('Error fetching achievements:', error);
-      }
-    };
-
-    fetchAchievements();
-  }, []);
-
-  return achievements;
-};
+import { useAchievements } from '@/hooks/useAchievements';
 
 
-// AchievementsList component
-const AchievementsList = () => {
-  const achievements = useAchievements();
-  return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-      {achievements.map((achievement) => (
-        <Card key={achievement.id} className="bg-gradient-to-br from-card to-card/95 hover:shadow-lg transition-all duration-200">
-          <CardHeader>
-            <CardTitle>{achievement.title}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p>{achievement.description}</p>
-            {achievement.imageUrl && <img src={achievement.imageUrl} alt={achievement.title} />}
-            <Badge variant={achievement.isCompleted ? 'default' : 'outline'}>
-              {achievement.isCompleted ? 'Completed' : 'In Progress'}
-            </Badge>
-          </CardContent>
-        </Card>
-      ))}
-    </div>
-  );
-};
+import { AchievementsList } from '@/components/AchievementsList';
 
 const Dashboard = () => {
   const { user } = useAuth();
