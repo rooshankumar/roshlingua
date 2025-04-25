@@ -1,9 +1,8 @@
-
 {
   "navigation": {
-    "home": "Home",
+    "dashboard": "Dashboard",
     "chat": "Chat",
-    "community": "Community", 
+    "community": "Community",
     "settings": "Settings",
     "menu": "Menu",
     "online": "Online"

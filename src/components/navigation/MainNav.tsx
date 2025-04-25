@@ -10,8 +10,8 @@ import { useTranslation } from 'react-i18next'; // Added import
 
 const routes = [
   {
-    path: "/Dashboard",
-    label: "Dashboard",
+    path: "/dashboard",
+    label: "dashboard",
     icon: Home
   },
   {
