@@ -1,4 +1,3 @@
-
 import { Achievement, UserAchievement } from '@/types/achievement';
 import { Card, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
@@ -66,13 +65,13 @@ export function AchievementsList() {
           </div>
         </div>
       </div>
-      
+
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {achievements.map((achievement) => {
           const isUnlocked = unlockedAchievements.some(
             ua => ua.achievement_id === achievement.id
           );
-          
+
           return (
             <motion.div
               key={achievement.id}
