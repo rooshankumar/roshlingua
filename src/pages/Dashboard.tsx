@@ -97,18 +97,17 @@ const Dashboard = () => {
   });
 
   const getXP = async (userId) => {
-    //Implementation for fetching XP from Supabase based on userId
-    try{
-        const { data, error } = await supabase
-          .from('profiles')
-          .select('xp_points')
-          .eq('id', userId)
-          .single();
-        if (error) throw error;
-        return data.xp_points || 0;
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('xp_points')
+        .eq('id', userId)
+        .single();
+      if (error) throw error;
+      return data?.xp_points || 0;
     } catch (error) {
-        console.error("Error fetching XP:", error);
-        return 0;
+      console.error("Error fetching XP:", error);
+      return 0;
     }
   };
 

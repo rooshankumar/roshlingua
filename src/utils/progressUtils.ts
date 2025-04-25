@@ -3,11 +3,11 @@ import { supabase } from '@/lib/supabase';
 export const getXP = async (userId: string): Promise<number> => {
   const { data } = await supabase
     .from('profiles')
-    .select('xp')
+    .select('xp_points')
     .eq('id', userId)
     .single();
 
-  return data?.xp || 0;
+  return data?.xp_points || 0;
 };
 
 export const addXP = async (userId: string, actionType: string): Promise<{ xp: number, gained: number }> => {
@@ -22,50 +22,21 @@ export const addXP = async (userId: string, actionType: string): Promise<{ xp: n
     return { xp: 0, gained: 0 };
   }
 
-  // Get the updated XP values
-  const newXP = data?.[0]?.xp_points || 0;
-  const gained = data?.[0]?.xp_gained || 0;
-
-  // Update user's level if needed
-  const newLevel = getLevel(newXP);
-  await supabase
-    .from('profiles')
-    .update({ level: newLevel })
-    .eq('id', userId);
-
-  return { xp: newXP, gained };
-
-  // Check achievements after XP update
-  const { data: lessonCount } = await supabase
-    .from('learning_activities')
-    .select('*', { count: 'exact' })
-    .eq('user_id', userId)
-    .eq('type', 'lesson_completed');
-
-  const stats = {
-    xp: newXP,
-    streak: user?.streak_count || 0,
-    lessons: lessonCount || 0
+  return { 
+    xp: data?.[0]?.xp_points || 0,
+    gained: data?.[0]?.xp_gained || 0
   };
-
-  // Use the achievements hook to check and update
-  const { checkAchievements } = useAchievements(userId);
-  await checkAchievements(stats);
 };
 
 export const getLevel = (xp: number): string => {
   if (xp >= 1000) return 'Advanced';      // Advanced: 1000+ XP
-  if (xp >= 100) return 'Intermediate';   // Intermediate: 100-999 XP
-  return 'Beginner';                      // Beginner: 0-99 XP
+  if (xp >= 500) return 'Intermediate';   // Intermediate: 500-999 XP
+  return 'Beginner';                      // Beginner: 0-499 XP
 };
 
 export const getProgress = async (userId: string): Promise<number> => {
-  const { count } = await supabase
-    .from('learning_activities')
-    .select('*', { count: 'exact' })
-    .eq('user_id', userId)
-    .eq('type', 'lesson_completed');
-
-  const totalLessons = 20; // Total number of lessons
-  return Math.min(100, Math.round(((count || 0) / totalLessons) * 100));
+  const xp = await getXP(userId);
+  const nextLevel = xp >= 1000 ? 2000 : xp >= 500 ? 1000 : 500;
+  const currentLevelBase = xp >= 1000 ? 1000 : xp >= 500 ? 500 : 0;
+  return Math.min(100, Math.round(((xp - currentLevelBase) / (nextLevel - currentLevelBase)) * 100));
 };
