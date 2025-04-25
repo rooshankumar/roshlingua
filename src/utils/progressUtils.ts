@@ -22,10 +22,18 @@ export const addXP = async (userId: string, actionType: string): Promise<{ xp: n
     return { xp: 0, gained: 0 };
   }
 
-  return { 
-    xp: data?.[0]?.xp_points || 0,
-    gained: data?.[0]?.xp_gained || 0
-  };
+  // Get the updated XP values
+  const newXP = data?.[0]?.xp_points || 0;
+  const gained = data?.[0]?.xp_gained || 0;
+
+  // Update user's level if needed
+  const newLevel = getLevel(newXP);
+  await supabase
+    .from('profiles')
+    .update({ level: newLevel })
+    .eq('id', userId);
+
+  return { xp: newXP, gained };
 
   // Check achievements after XP update
   const { data: lessonCount } = await supabase

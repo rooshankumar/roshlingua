@@ -1,4 +1,13 @@
 
+-- XP History Table
+CREATE TABLE IF NOT EXISTS xp_history (
+    id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+    user_id UUID REFERENCES profiles(id),
+    action_type TEXT NOT NULL,
+    points_earned INTEGER NOT NULL,
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
 -- Constants for XP rewards
 CREATE OR REPLACE FUNCTION get_xp_rewards()
 RETURNS TABLE (
