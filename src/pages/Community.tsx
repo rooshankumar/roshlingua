@@ -24,7 +24,7 @@ import { toast } from '@/hooks/use-toast';
 import classNames from 'classnames';
 import { cn } from "@/lib/utils";
 
-// Helper function to get flag emoji for language
+// Helper function to get flag emoji for language - improved to ensure visibility
 const getLanguageFlag = (language?: string) => {
   if (!language) return "🌐";
   
@@ -59,7 +59,12 @@ const getLanguageFlag = (language?: string) => {
     // Add more languages as needed
   };
   
-  return languageToFlag[language] || '🌐';
+  // If flag emoji isn't found, show language code or first two letters
+  const flag = languageToFlag[language];
+  if (flag) return flag;
+  
+  // Fallback option for custom languages - get first two letters
+  return language.slice(0, 2).toUpperCase();
 };
 
 interface User {
@@ -386,7 +391,7 @@ const Community = () => {
               <Card className="h-auto overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
                 <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-primary to-primary/50" />
                 <CardContent className="p-3 flex flex-col">
-                  {/* User Info Section */}
+                  {/* User Info Section - Simplified */}
                   <div className="flex items-center space-x-3 mb-3">
                     <div className="relative cursor-pointer" onClick={() => navigate(`/profile/${user.id}`)}>
                       <Avatar className="h-14 w-14 ring-2 ring-background shadow-sm">
@@ -420,20 +425,20 @@ const Community = () => {
                     </div>
                   </div>
                   
-                  {/* Language Flags Section */}
-                  <div className="flex items-center justify-center gap-2 mb-3 text-sm">
+                  {/* Language Flags Section - Fixed display */}
+                  <div className="flex items-center justify-center gap-2 mb-3">
                     <div className="inline-flex items-center px-2 py-1 rounded-md bg-muted/50">
-                      <span className="text-lg mr-2" title={user.native_language}>
+                      <span className="text-xl mr-1" title={user.native_language}>
                         {getLanguageFlag(user.native_language)}
                       </span>
                       <span className="text-muted-foreground mx-1">→</span>
-                      <span className="text-lg ml-2" title={user.learning_language}>
+                      <span className="text-xl ml-1" title={user.learning_language}>
                         {getLanguageFlag(user.learning_language)}
                       </span>
                     </div>
                   </div>
 
-                  {/* Actions Section */}
+                  {/* Actions Section - Only Profile button */}
                   <div className="flex items-center justify-between mt-2">
                     <LikeButton
                       targetUserId={user.id}
@@ -441,27 +446,15 @@ const Community = () => {
                       className="hover:text-red-500"
                     />
                     
-                    <div className="flex gap-2">
-                      <Button
-                        onClick={() => navigate(`/profile/${user.id}`)}
-                        variant="outline"
-                        size="sm"
-                        className="h-8 px-3"
-                      >
-                        <User className="h-3.5 w-3.5 mr-1" />
-                        Profile
-                      </Button>
-                      
-                      <Button
-                        onClick={() => handleStartChat(user.id)}
-                        variant="default"
-                        size="sm"
-                        className="h-8 px-3"
-                      >
-                        <MessageSquare className="h-3.5 w-3.5 mr-1" />
-                        Chat
-                      </Button>
-                    </div>
+                    <Button
+                      onClick={() => navigate(`/profile/${user.id}`)}
+                      variant="outline"
+                      size="sm"
+                      className="h-8 px-3"
+                    >
+                      <User className="h-3.5 w-3.5 mr-1" />
+                      Profile
+                    </Button>
                   </div>
                 </CardContent>
               </Card>
