@@ -16,7 +16,7 @@ export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
     persistSession: true,
     detectSessionInUrl: true,
     flowType: 'pkce',
-    debug: true,
+    debug: false, // Disable debug logs
     storage: window?.localStorage, // Use PKCE flow for more reliable token exchange
     storageKey: 'sb-auth-token',
     storage: {
