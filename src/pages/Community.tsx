@@ -24,7 +24,7 @@ import { toast } from '@/hooks/use-toast';
 import classNames from 'classnames';
 import { cn } from "@/lib/utils";
 
-// Helper function to get flag emoji for language - improved to ensure visibility
+// Helper function to get flag emoji for language
 const getLanguageFlag = (language?: string) => {
   if (!language) return "🌐";
   
@@ -59,12 +59,8 @@ const getLanguageFlag = (language?: string) => {
     // Add more languages as needed
   };
   
-  // If flag emoji isn't found, show language code or first two letters
-  const flag = languageToFlag[language];
-  if (flag) return flag;
-  
-  // Fallback option for custom languages - get first two letters
-  return language.slice(0, 2).toUpperCase();
+  // Return the flag if found
+  return languageToFlag[language] || '🌐';
 };
 
 interface User {
@@ -411,30 +407,30 @@ const Community = () => {
                       >
                         {user.full_name}
                       </h3>
-                      <div className="flex items-center space-x-2 mt-1">
+                      <div className="flex items-center gap-2 mt-1">
                         {user.age && (
                           <Badge variant="outline" className="text-xs py-0 h-5">
                             {user.age} yrs
                           </Badge>
                         )}
-                        <div className="flex items-center text-amber-500">
-                          <Flame className="h-3 w-3 mr-1" />
-                          <span className="text-xs">{user.streak_count || 0}</span>
-                        </div>
+                        <Badge variant="outline" className="text-xs py-0 h-5 bg-amber-500/10 text-amber-600 flex items-center gap-1">
+                          <Flame className="h-3 w-3" />
+                          <span>{user.streak_count || 0}</span>
+                        </Badge>
                       </div>
                     </div>
                   </div>
                   
-                  {/* Language Flags Section - Fixed display */}
-                  <div className="flex items-center justify-center gap-2 mb-3">
-                    <div className="inline-flex items-center px-2 py-1 rounded-md bg-muted/50">
-                      <span className="text-xl mr-1" title={user.native_language}>
+                  {/* Language Flags Section - Enhanced display */}
+                  <div className="flex items-center justify-center mb-3">
+                    <div className="inline-flex items-center px-3 py-1.5 rounded-md bg-muted/50">
+                      <div className="text-2xl" title={user.native_language}>
                         {getLanguageFlag(user.native_language)}
-                      </span>
-                      <span className="text-muted-foreground mx-1">→</span>
-                      <span className="text-xl ml-1" title={user.learning_language}>
+                      </div>
+                      <span className="text-muted-foreground mx-2">→</span>
+                      <div className="text-2xl" title={user.learning_language}>
                         {getLanguageFlag(user.learning_language)}
-                      </span>
+                      </div>
                     </div>
                   </div>
 
