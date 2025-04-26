@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { Heart, MessageSquare, Search, Filter, Flame, User } from 'lucide-react';
+import { Heart, Search, Filter, Flame, User } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from "@/components/ui/badge";
@@ -313,73 +313,7 @@ const Community = () => {
     }
   };
 
-  const handleStartChat = async (otherUserId: string) => {
-    try {
-      const { data: { user: authUser }, error: authError } = await supabase.auth.getUser();
-      if (authError) throw authError;
-      if (!authUser) {
-        toast({
-          title: "Error",
-          description: "You must be logged in to start a chat",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      // First check for existing conversation
-      const { data: participants, error: participantsError } = await supabase
-        .from('conversation_participants')
-        .select('conversation_id')
-        .eq('user_id', authUser.id); // Use authUser.id
-
-      if (participantsError) throw participantsError;
-
-      if (participants && participants.length > 0) {
-        const { data: existingChat } = await supabase
-          .from('conversation_participants')
-          .select('conversation_id')
-          .in('conversation_id', participants.map(p => p.conversation_id))
-          .eq('user_id', otherUserId)
-          .maybeSingle();
-
-        if (existingChat) {
-          navigate(`/chat/${existingChat.conversation_id}`);
-          return;
-        }
-      }
-
-      // Create new conversation if none exists
-      const { data: newConversation, error: conversationError } = await supabase
-        .from('conversations')
-        .insert([{
-          created_by: authUser.id, // Use authUser.id
-          last_message_at: new Date().toISOString()
-        }])
-        .select()
-        .single();
-
-      if (conversationError) throw conversationError;
-
-      // Add both participants in one operation
-      const { error: participantsInsertError } = await supabase
-        .from('conversation_participants')
-        .insert([
-          { conversation_id: newConversation.id, user_id: authUser.id },
-          { conversation_id: newConversation.id, user_id: otherUserId }
-        ]);
-
-      if (participantsInsertError) throw participantsInsertError;
-
-      navigate(`/chat/${newConversation.id}`);
-    } catch (error) {
-      console.error('Error starting chat:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to start chat',
-        variant: 'destructive',
-      });
-    }
-  };
+  // Chat functionality removed - users can only chat from full profile view
 
 
   const availableLanguages = Array.from(
@@ -499,24 +433,12 @@ const Community = () => {
                       <span>Profile</span>
                     </Button>
                   </div>
-                  <div className="flex items-center gap-2" onClick={e => e.stopPropagation()}>
+                  <div className="flex items-center" onClick={e => e.stopPropagation()}>
                     <LikeButton
                       targetUserId={user.id}
                       currentUserId={user?.id}
                       className="hover:text-red-500"
                     />
-                    <Button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleStartChat(user.id);
-                      }}
-                      variant="ghost"
-                      size="icon"
-                      className="h-8 w-8"
-                      title="Start chat"
-                    >
-                      <MessageSquare className="h-4 w-4" />
-                    </Button>
                   </div>
                 </div>
               </CardContent>
