@@ -1,3 +1,4 @@
+
 import * as React from "react"
 import { NavLink, useLocation } from "react-router-dom";
 import { Home, Users, MessageSquare, Settings, Menu, X } from "lucide-react";
@@ -107,40 +108,41 @@ export function MainNav() {
                   }
                 </Button>
               </SheetTrigger>
-            <SheetContent side="left" className="w-[270px] p-4">
-              <div className="mb-6 mt-2">
-                <h2 
-                  className="font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent"
-                  style={{ fontSize: responsive.fontSize.large }}
-                >
-                  {t('navigation.menu')}
-                </h2>
-              </div>
-              <nav className="flex flex-col space-y-3">
-                <NavigationItems mobile={true} />
-              </nav>
-              <div className="mt-auto pt-4 border-t absolute bottom-6 left-4 right-4">
-                <div className="flex items-center space-x-2 px-3 py-2 rounded-md bg-muted/50">
-                  <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"/>
-                  <span 
-                    className="text-muted-foreground"
-                    style={{ fontSize: responsive.fontSize.small }}
+              <SheetContent side="left" className="w-[270px] p-4">
+                <div className="mb-6 mt-2">
+                  <h2 
+                    className="font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent"
+                    style={{ fontSize: responsive.fontSize.large }}
                   >
-                    {t('navigation.online')}
-                  </span>
+                    {t('navigation.menu')}
+                  </h2>
                 </div>
-              </div>
-            </SheetContent>
-          </Sheet>
-          <h2 
-            className="font-medium"
-            style={{ fontSize: responsive.fontSize.large }}
-          >
-            {routes.find(route => isActive(route.path))?.label || "Dashboard"}
-          </h2>
-          <NotificationDropdown />
+                <nav className="flex flex-col space-y-3">
+                  <NavigationItems mobile={true} />
+                </nav>
+                <div className="mt-auto pt-4 border-t absolute bottom-6 left-4 right-4">
+                  <div className="flex items-center space-x-2 px-3 py-2 rounded-md bg-muted/50">
+                    <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"/>
+                    <span 
+                      className="text-muted-foreground"
+                      style={{ fontSize: responsive.fontSize.small }}
+                    >
+                      {t('navigation.online')}
+                    </span>
+                  </div>
+                </div>
+              </SheetContent>
+            </Sheet>
+            <h2 
+              className="font-medium"
+              style={{ fontSize: responsive.fontSize.large }}
+            >
+              {routes.find(route => isActive(route.path))?.label || "Dashboard"}
+            </h2>
+            <NotificationDropdown />
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Desktop Navigation */}
       <nav className="hidden lg:flex sticky top-0 flex-col space-y-2 p-4 min-h-screen bg-background/80 backdrop-blur-lg border-r">
