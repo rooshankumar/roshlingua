@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useTranslation } from 'react-i18next';
 import { useResponsive } from "@/hooks/use-mobile";
+import { NotificationDropdown } from "@/components/notifications/NotificationDropdown";
 
 
 const routes = [
@@ -148,7 +149,7 @@ export function MainNav() {
           >
             {routes.find(route => isActive(route.path))?.label || "Dashboard"}
           </h2>
-          <div className="w-10"></div> {/* Spacer for balance */}
+          <NotificationDropdown />
         </div>
       </div>
 
