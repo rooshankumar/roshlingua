@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import { 
   Calendar, 
   Flame, 
@@ -46,6 +46,7 @@ const Profile = () => {
   const { user } = useAuth();
   const { toast } = useToast();
   const [isCurrentUser, setIsCurrentUser] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     setIsCurrentUser(user?.id === id);
@@ -95,6 +96,71 @@ const Profile = () => {
       title: "Link copied to clipboard",
       description: "You can now share this profile with others",
     });
+  };
+
+  const handleStartChat = async (userId) => {
+    try {
+      if (!user) return;
+
+      // First check if a conversation already exists between the users
+      const { data: existingConversations, error: convError } = await supabase
+        .from('conversation_participants')
+        .select(`
+          conversation_id,
+          conversations!inner(id)
+        `)
+        .eq('user_id', user.id);
+
+      if (convError) throw convError;
+
+      // Get all conversations where both users are participants
+      const conversationIds = existingConversations.map(c => c.conversation_id);
+      
+      if (conversationIds.length > 0) {
+        const { data: sharedConversations, error: sharedError } = await supabase
+          .from('conversation_participants')
+          .select('conversation_id')
+          .in('conversation_id', conversationIds)
+          .eq('user_id', userId)
+          .limit(1);
+
+        if (sharedError) throw sharedError;
+
+        if (sharedConversations && sharedConversations.length > 0) {
+          // Conversation exists, navigate to it
+          navigate(`/chat/${sharedConversations[0].conversation_id}`);
+          return;
+        }
+      }
+      
+      // Create new conversation if none exists
+      const { data: newConversation, error: createError } = await supabase
+        .from('conversations')
+        .insert([{ created_by: user.id }])
+        .select()
+        .single();
+
+      if (createError) throw createError;
+
+      // Add participants to the conversation
+      const { error: participantsInsertError } = await supabase
+        .from('conversation_participants')
+        .insert([
+          { conversation_id: newConversation.id, user_id: user.id },
+          { conversation_id: newConversation.id, user_id: userId }
+        ]);
+
+      if (participantsInsertError) throw participantsInsertError;
+
+      navigate(`/chat/${newConversation.id}`);
+    } catch (error) {
+      console.error('Error starting chat:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to start chat',
+        variant: 'destructive',
+      });
+    }
   };
 
   const calculateJoinDate = (dateString: string) => {
@@ -155,11 +221,13 @@ const Profile = () => {
   const userLevel = calculateLevel(totalXp);
 
   return (
-    <div className="container pb-12 animate-fade-in max-w-5xl mx-auto">
+    <div className="container pb-12 pt-6 animate-fade-in max-w-5xl mx-auto">
       {/* Profile Header */}
-      <div className="relative mb-8 overflow-hidden rounded-xl">
-        <div className="h-48 bg-gradient-to-r from-primary/20 to-primary/5"></div>
-        <div className="absolute -bottom-16 left-8">
+      <div className="relative mb-24 md:mb-16 overflow-hidden rounded-xl shadow-md">
+        <div className="h-40 bg-gradient-to-r from-primary/20 to-primary/5"></div>
+        
+        {/* Avatar Section - Repositioned */}
+        <div className="absolute left-1/2 transform -translate-x-1/2 -bottom-16 md:-bottom-12">
           <Dialog>
             <DialogTrigger asChild>
               <Button variant="ghost" className="p-0 h-auto hover:bg-transparent">
@@ -185,58 +253,64 @@ const Profile = () => {
           </Dialog>
         </div>
         
-        <div className="flex justify-end p-4">
-          <div className="flex space-x-2">
-            {!isCurrentUser && (
-              <>
-                <LikeButton
-                  targetUserId={profile.id}
-                  currentUserId={user?.id}
-                  className="button-hover"
-                />
+        {/* Action Buttons */}
+        <div className="flex justify-end p-4 gap-2">
+          {!isCurrentUser && (
+            <>
+              <LikeButton
+                targetUserId={profile.id}
+                currentUserId={user?.id}
+                className="button-hover"
+              />
 
-                <Button variant="outline" size="sm" className="button-hover" onClick={handleShare}>
-                  <Share2 className="h-4 w-4 mr-2" />
-                  Share
-                </Button>
-
-                <Button asChild size="sm" className="button-hover">
-                  <Link to={`/chat/${profile.id}`}>
-                    <MessageCircle className="h-4 w-4 mr-2" />
-                    Message
-                  </Link>
-                </Button>
-              </>
-            )}
-            {isCurrentUser && (
-              <Button asChild size="sm" className="button-hover">
-                <Link to="/settings">
-                  <FileText className="h-4 w-4 mr-2" />
-                  Edit Profile
-                </Link>
+              <Button variant="outline" size="sm" className="button-hover" onClick={handleShare}>
+                <Share2 className="h-4 w-4 mr-2" />
+                Share
               </Button>
-            )}
-          </div>
+
+              <Button 
+                size="sm" 
+                className="button-hover"
+                onClick={() => handleStartChat(profile.id)}
+              >
+                <MessageCircle className="h-4 w-4 mr-2" />
+                Message
+              </Button>
+            </>
+          )}
+          {isCurrentUser && (
+            <Button asChild size="sm" className="button-hover">
+              <Link to="/settings">
+                <FileText className="h-4 w-4 mr-2" />
+                Edit Profile
+              </Link>
+            </Button>
+          )}
+        </div>
+      </div>
+
+      {/* Profile Name and Username - Centered */}
+      <div className="text-center mb-8 mt-4">
+        <h1 className="text-2xl font-bold">{profile.full_name}</h1>
+        <div className="flex justify-center gap-2 mt-1">
+          <Badge variant="secondary" className="px-2 py-1">
+            @{profile.username || "username"}
+          </Badge>
+          {profile.date_of_birth && (
+            <Badge variant="outline" className="px-2 py-1">
+              {getAgeFromDateOfBirth(profile.date_of_birth)} years old
+            </Badge>
+          )}
         </div>
       </div>
 
       {/* Profile Info */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-20">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Left Column - Personal Info */}
         <div className="space-y-6">
-          <Card className="glass-card overflow-visible">
+          <Card className="glass-card">
             <CardHeader className="pb-2">
-              <CardTitle className="text-2xl font-bold">{profile.full_name}</CardTitle>
-              <div className="flex flex-wrap gap-2 mt-1">
-                <Badge variant="secondary" className="px-2 py-1">
-                  @{profile.username || "username"}
-                </Badge>
-                {profile.date_of_birth && (
-                  <Badge variant="outline" className="px-2 py-1">
-                    {getAgeFromDateOfBirth(profile.date_of_birth)} years old
-                  </Badge>
-                )}
-              </div>
+              <CardTitle className="text-md font-semibold">About</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center space-x-2">
@@ -247,7 +321,7 @@ const Profile = () => {
               </div>
               {profile.bio && (
                 <div className="pt-2 border-t border-border">
-                  <h3 className="text-sm font-medium text-muted-foreground mb-2">About</h3>
+                  <h3 className="text-sm font-medium text-muted-foreground mb-2">Bio</h3>
                   <p className="text-sm">{profile.bio}</p>
                 </div>
               )}
@@ -449,11 +523,12 @@ const Profile = () => {
           </Link>
         </Button>
         {!isCurrentUser && (
-          <Button asChild className="button-hover">
-            <Link to={`/chat/${profile.id}`}>
-              <MessageCircle className="h-4 w-4 mr-2" />
-              Start Conversation
-            </Link>
+          <Button 
+            className="button-hover"
+            onClick={() => handleStartChat(profile.id)}
+          >
+            <MessageCircle className="h-4 w-4 mr-2" />
+            Start Conversation
           </Button>
         )}
       </div>
