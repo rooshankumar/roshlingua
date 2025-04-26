@@ -38,10 +38,12 @@ const AppLayout = ({ children }: AppLayoutProps) => {
 
   return (
     <div className="min-h-screen flex flex-col md:flex-row">
-      {/* Notification icon in top right corner */}
-      <div className="absolute top-2 right-3 z-40 md:hidden">
-        <NotificationDropdown className="mobile-touch-target" />
-      </div>
+      {/* Notification icon in top right corner - hidden on chat and settings pages */}
+      {!location.pathname.includes('/chat') && !location.pathname.includes('/settings') && (
+        <div className="absolute top-2 right-3 z-40 md:hidden">
+          <NotificationDropdown className="mobile-touch-target" />
+        </div>
+      )}
       
       <div className="md:block">
         <MainNav />

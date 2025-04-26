@@ -114,7 +114,9 @@ export function MainNav() {
               {t('navigation.online')}
             </span>
           </div>
-          <NotificationDropdown />
+          {!location.pathname.includes('/chat') && !location.pathname.includes('/settings') && (
+            <NotificationDropdown />
+          )}
         </div>
       </div>
     </nav>
