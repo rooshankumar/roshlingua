@@ -326,14 +326,14 @@ export const ChatScreen = ({ conversation }: Props) => {
                 onChange={(e) => setNewMessage(e.target.value)}
                 onKeyDown={handleKeyPress}
                 placeholder="Type a message..."
-                className="flex-1 min-h-[60px] max-h-[120px] rounded-2xl bg-muted/50 backdrop-blur-sm focus:bg-background transition-colors duration-200"
+                className="flex-1 min-h-[45px] max-h-[90px] rounded-2xl bg-muted/50 backdrop-blur-sm focus:bg-background transition-colors duration-200"
                 rows={1}
               />
               <Button
                 onClick={() => handleSend(newMessage)}
                 disabled={!newMessage.trim() || isSending || !user}
                 size="icon"
-                className="h-[60px] w-[60px] rounded-2xl bg-primary hover:bg-primary/90 transition-all duration-200 hover:scale-105 active:scale-95"
+                className="h-[45px] w-[45px] rounded-2xl bg-primary hover:bg-primary/90 transition-all duration-200 hover:scale-105 active:scale-95"
               >
                 {isSending ? (
                   <Loader2 className="h-5 w-5 animate-spin" />
