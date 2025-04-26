@@ -1,0 +1,74 @@
+Failed to load resource: net::ERR_BLOCKED_BY_CLIENTUnderstand this error
+2@radix-ui_react-select.js?v=04765a11:870 Uncaught Error: A <Select.Item /> must have a value prop that is not an empty string. This is because the Select value can be set to an empty string to clear the selection and show the placeholder.
+    at @radix-ui_react-select.js?v=04765a11:870:13
+    at renderWithHooks (chunk-W6L2VRDA.js?v=1ec971da:11548:26)
+    at updateForwardRef (chunk-W6L2VRDA.js?v=1ec971da:14325:28)
+    at beginWork (chunk-W6L2VRDA.js?v=1ec971da:15946:22)
+    at HTMLUnknownElement.callCallback2 (chunk-W6L2VRDA.js?v=1ec971da:3674:22)
+    at Object.invokeGuardedCallbackDev (chunk-W6L2VRDA.js?v=1ec971da:3699:24)
+    at invokeGuardedCallback (chunk-W6L2VRDA.js?v=1ec971da:3733:39)
+    at beginWork$1 (chunk-W6L2VRDA.js?v=1ec971da:19765:15)
+    at performUnitOfWork (chunk-W6L2VRDA.js?v=1ec971da:19198:20)
+    at workLoopSync (chunk-W6L2VRDA.js?v=1ec971da:19137:13)Understand this error
+chunk-W6L2VRDA.js?v=1ec971da:14032 The above error occurred in the <SelectItem> component:
+
+    at https://bad4fc84-ed2a-4f7e-bfdb-c6dc1afb9ebd-00-mlb980c67grq.pike.replit.dev/node_modules/.vite/deps/@radix-ui_react-select.js?v=04765a11:843:7
+    at _c8 (https://bad4fc84-ed2a-4f7e-bfdb-c6dc1afb9ebd-00-mlb980c67grq.pike.replit.dev/src/components/ui/select.tsx:130:60)
+    at div
+    at https://bad4fc84-ed2a-4f7e-bfdb-c6dc1afb9ebd-00-mlb980c67grq.pike.replit.dev/node_modules/.vite/deps/chunk-LTXT6CEX.js?v=1ec971da:41:13
+    at https://bad4fc84-ed2a-4f7e-bfdb-c6dc1afb9ebd-00-mlb980c67grq.pike.replit.dev/node_modules/.vite/deps/chunk-D3CTYCI6.js?v=1ec971da:52:11
+    at https://bad4fc84-ed2a-4f7e-bfdb-c6dc1afb9ebd-00-mlb980c67grq.pike.replit.dev/node_modules/.vite/deps/chunk-D3CTYCI6.js?v=1ec971da:33:11
+    at https://bad4fc84-ed2a-4f7e-bfdb-c6dc1afb9ebd-00-mlb980c67grq.pike.replit.dev/node_modules/.vite/deps/chunk-LP3SNE3I.js?v=1ec971da:98:15
+    at https://bad4fc84-ed2a-4f7e-bfdb-c6dc1afb9ebd-00-mlb980c67grq.pike.replit.dev/node_modules/.vite/deps/@radix-ui_react-select.js?v=04765a11:754:13
+    at div
+    at https://bad4fc84-ed2a-4f7e-bfdb-c6dc1afb9ebd-00-mlb980c67grq.pike.replit.dev/node_modules/.vite/deps/chunk-D3CTYCI6.js?v=1ec971da:52:11
+    at https://bad4fc84-ed2a-4f7e-bfdb-c6dc1afb9ebd-00-mlb980c67grq.pike.replit.dev/node_modules/.vite/deps/chunk-D3CTYCI6.js?v=1ec971da:33:11
+    at https://bad4fc84-ed2a-4f7e-bfdb-c6dc1afb9ebd-00-mlb980c67grq.pike.replit.dev/node_modules/.vite/deps/chunk-LP3SNE3I.js?v=1ec971da:98:15
+    at Provider (https://bad4fc84-ed2a-4f7e-bfdb-c6dc1afb9ebd-00-mlb980c67grq.pike.replit.dev/node_modules/.vite/deps/chunk-ICA7ZJMY.js?v=1ec971da:38:15)
+    at https://bad4fc84-ed2a-4f7e-bfdb-c6dc1afb9ebd-00-mlb980c67grq.pike.replit.dev/node_modules/.vite/deps/@radix-ui_react-select.js?v=04765a11:298:58
+    at https://bad4fc84-ed2a-4f7e-bfdb-c6dc1afb9ebd-00-mlb980c67grq.pike.replit.dev/node_modules/.vite/deps/chunk-D3CTYCI6.js?v=1ec971da:52:11
+    at https://bad4fc84-ed2a-4f7e-bfdb-c6dc1afb9ebd-00-mlb980c67grq.pike.replit.dev/node_modules/.vite/deps/chunk-D3CTYCI6.js?v=1ec971da:33:11
+    at https://bad4fc84-ed2a-4f7e-bfdb-c6dc1afb9ebd-00-mlb980c67grq.pike.replit.dev/node_modules/.vite/deps/chunk-LTXT6CEX.js?v=1ec971da:41:13
+    at https://bad4fc84-ed2a-4f7e-bfdb-c6dc1afb9ebd-00-mlb980c67grq.pike.replit.dev/node_modules/.vite/deps/chunk-LUZMXLRO.js?v=1ec971da:260:22
+    at SelectPortal
+    at _c4 (https://bad4fc84-ed2a-4f7e-bfdb-c6dc1afb9ebd-00-mlb980c67grq.pike.replit.dev/src/components/ui/select.tsx:81:63)
+    at Provider (https://bad4fc84-ed2a-4f7e-bfdb-c6dc1afb9ebd-00-mlb980c67grq.pike.replit.dev/node_modules/.vite/deps/chunk-ICA7ZJMY.js?v=1ec971da:38:15)
+    at Provider (https://bad4fc84-ed2a-4f7e-bfdb-c6dc1afb9ebd-00-mlb980c67grq.pike.replit.dev/node_modules/.vite/deps/chunk-LP3SNE3I.js?v=1ec971da:28:15)
+    at CollectionProvider (https://bad4fc84-ed2a-4f7e-bfdb-c6dc1afb9ebd-00-mlb980c67grq.pike.replit.dev/node_modules/.vite/deps/chunk-LP3SNE3I.js?v=1ec971da:89:13)
+    at Provider (https://bad4fc84-ed2a-4f7e-bfdb-c6dc1afb9ebd-00-mlb980c67grq.pike.replit.dev/node_modules/.vite/deps/chunk-ICA7ZJMY.js?v=1ec971da:38:15)
+    at Provider (https://bad4fc84-ed2a-4f7e-bfdb-c6dc1afb9ebd-00-mlb980c67grq.pike.replit.dev/node_modules/.vite/deps/chunk-WNUSBTM2.js?v=1ec971da:1905:15)
+    at Popper (https://bad4fc84-ed2a-4f7e-bfdb-c6dc1afb9ebd-00-mlb980c67grq.pike.replit.dev/node_modules/.vite/deps/chunk-WNUSBTM2.js?v=1ec971da:1962:11)
+    at Select (https://bad4fc84-ed2a-4f7e-bfdb-c6dc1afb9ebd-00-mlb980c67grq.pike.replit.dev/node_modules/.vite/deps/@radix-ui_react-select.js?v=04765a11:86:5)
+    at div
+    at div
+    at div
+    at div
+    at Community (https://bad4fc84-ed2a-4f7e-bfdb-c6dc1afb9ebd-00-mlb980c67grq.pike.replit.dev/src/pages/Community.tsx?t=1745667912659:64:31)
+    at main
+    at div
+    at AppLayout (https://bad4fc84-ed2a-4f7e-bfdb-c6dc1afb9ebd-00-mlb980c67grq.pike.replit.dev/src/components/layouts/AppLayout.tsx?t=1745666844992:37:22)
+    at ProtectedRoute (https://bad4fc84-ed2a-4f7e-bfdb-c6dc1afb9ebd-00-mlb980c67grq.pike.replit.dev/src/components/auth/ProtectedRoute.tsx?t=1745664346592:15:27)
+    at RenderedRoute (https://bad4fc84-ed2a-4f7e-bfdb-c6dc1afb9ebd-00-mlb980c67grq.pike.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=67a39f9e:4069:5)
+    at Routes (https://bad4fc84-ed2a-4f7e-bfdb-c6dc1afb9ebd-00-mlb980c67grq.pike.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=67a39f9e:4508:5)
+    at AppRoutes (https://bad4fc84-ed2a-4f7e-bfdb-c6dc1afb9ebd-00-mlb980c67grq.pike.replit.dev/src/App.tsx?t=1745667912659:39:33)
+    at AuthProvider (https://bad4fc84-ed2a-4f7e-bfdb-c6dc1afb9ebd-00-mlb980c67grq.pike.replit.dev/src/providers/AuthProvider.tsx?t=1745664346592:23:32)
+    at Router (https://bad4fc84-ed2a-4f7e-bfdb-c6dc1afb9ebd-00-mlb980c67grq.pike.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=67a39f9e:4451:15)
+    at BrowserRouter (https://bad4fc84-ed2a-4f7e-bfdb-c6dc1afb9ebd-00-mlb980c67grq.pike.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=67a39f9e:5196:5)
+    at ThemeProvider (https://bad4fc84-ed2a-4f7e-bfdb-c6dc1afb9ebd-00-mlb980c67grq.pike.replit.dev/src/components/theme-provider.tsx:17:33)
+    at QueryClientProvider (https://bad4fc84-ed2a-4f7e-bfdb-c6dc1afb9ebd-00-mlb980c67grq.pike.replit.dev/node_modules/.vite/deps/@tanstack_react-query.js?v=4c542ea1:2794:3)
+    at App
+
+Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://reactjs.org/link/error-boundaries to learn more about error boundaries.
+logCapturedError @ chunk-W6L2VRDA.js?v=1ec971da:14032Understand this error
+chunk-W6L2VRDA.js?v=1ec971da:9129 Uncaught Error: A <Select.Item /> must have a value prop that is not an empty string. This is because the Select value can be set to an empty string to clear the selection and show the placeholder.
+    at @radix-ui_react-select.js?v=04765a11:870:13
+    at renderWithHooks (chunk-W6L2VRDA.js?v=1ec971da:11548:26)
+    at updateForwardRef (chunk-W6L2VRDA.js?v=1ec971da:14325:28)
+    at beginWork (chunk-W6L2VRDA.js?v=1ec971da:15946:22)
+    at beginWork$1 (chunk-W6L2VRDA.js?v=1ec971da:19753:22)
+    at performUnitOfWork (chunk-W6L2VRDA.js?v=1ec971da:19198:20)
+    at workLoopSync (chunk-W6L2VRDA.js?v=1ec971da:19137:13)
+    at renderRootSync (chunk-W6L2VRDA.js?v=1ec971da:19116:15)
+    at recoverFromConcurrentError (chunk-W6L2VRDA.js?v=1ec971da:18736:28)
+    at performSyncWorkOnRoot (chunk-W6L2VRDA.js?v=1ec971da:18879:28)Understand this error
