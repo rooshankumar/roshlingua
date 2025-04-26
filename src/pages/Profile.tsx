@@ -15,7 +15,8 @@ import {
   Sparkles,
   GraduationCap,
   FileText,
-  Mail
+  Mail,
+  ArrowLeft
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -222,6 +223,16 @@ const Profile = () => {
 
   return (
     <div className="container pb-12 pt-6 animate-fade-in max-w-5xl mx-auto">
+      {/* Back Button */}
+      <div className="mb-4">
+        <Button variant="outline" size="sm" className="button-hover" asChild>
+          <Link to="/community">
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back to Community
+          </Link>
+        </Button>
+      </div>
+      
       {/* Profile Header */}
       <div className="relative mb-24 md:mb-16 overflow-hidden rounded-xl shadow-md">
         <div className="h-40 bg-gradient-to-r from-primary/20 to-primary/5"></div>
@@ -523,23 +534,6 @@ const Profile = () => {
             </TabsContent>
           </Tabs>
         </div>
-      </div>
-
-      <div className="flex justify-center space-x-4 mt-8">
-        <Button asChild variant="outline" className="button-hover">
-          <Link to="/community">
-            Back to Community
-          </Link>
-        </Button>
-        {!isCurrentUser && (
-          <Button 
-            className="button-hover"
-            onClick={() => handleStartChat(profile.id)}
-          >
-            <MessageCircle className="h-4 w-4 mr-2" />
-            Start Conversation
-          </Button>
-        )}
       </div>
     </div>
   );
