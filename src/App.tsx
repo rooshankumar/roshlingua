@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from '@vercel/speed-insights/react';
+import HMRHandler from '@/components/HMRHandler';
 
 
 // Pages
@@ -138,6 +139,7 @@ const App = () => {
           <AuthProvider>
             <AppRoutes />
             <Toaster />
+            <HMRHandler />
             <Analytics debug={false} />
             <SpeedInsights debug={false} />
           </AuthProvider>
