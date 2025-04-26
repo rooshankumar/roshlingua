@@ -1,0 +1,106 @@
+status: CLOSED
+@supabase_supabase-js.js?v=eca65b80:5110 GoTrueClient@0 (2.69.1) 2025-04-26T10:40:22.871Z #_acquireLock begin -1
+@supabase_supabase-js.js?v=eca65b80:5110 GoTrueClient@0 (2.69.1) 2025-04-26T10:40:22.877Z #_acquireLock lock acquired for storage key sb-auth-token
+@supabase_supabase-js.js?v=eca65b80:5110 GoTrueClient@0 (2.69.1) 2025-04-26T10:40:22.877Z #_useSession begin
+@supabase_supabase-js.js?v=eca65b80:5110 GoTrueClient@0 (2.69.1) 2025-04-26T10:40:22.878Z #__loadSession() begin
+@supabase_supabase-js.js?v=eca65b80:5110 GoTrueClient@0 (2.69.1) 2025-04-26T10:40:22.879Z #getSession() session from storage {access_token: 'eyJhbGciOiJIUzI1NiIsImtpZCI6InJBVlcvUThncTdTeFdlVn…sc2V9.hpjYFC4VEb86r91dOkujcVErIykVEWD_bo-iCrx0CnI', token_type: 'bearer', expires_in: 3600, expires_at: 1745666250, refresh_token: 'o2duZ_ldZ1teIehi_DhlNA', …}
+@supabase_supabase-js.js?v=eca65b80:5110 GoTrueClient@0 (2.69.1) 2025-04-26T10:40:22.880Z #__loadSession() session has not expired expires_at 1745666250
+@supabase_supabase-js.js?v=eca65b80:5110 GoTrueClient@0 (2.69.1) 2025-04-26T10:40:22.880Z #__loadSession() end
+@supabase_supabase-js.js?v=eca65b80:5110 GoTrueClient@0 (2.69.1) 2025-04-26T10:40:22.880Z #_useSession end
+@supabase_supabase-js.js?v=eca65b80:5110 GoTrueClient@0 (2.69.1) 2025-04-26T10:40:22.881Z #_acquireLock lock released for storage key sb-auth-token
+@supabase_supabase-js.js?v=eca65b80:5110 GoTrueClient@0 (2.69.1) 2025-04-26T10:40:22.883Z #_acquireLock end
+useNotifications.ts:75 Notification subscription status: CHANNEL_ERROR
+useNotifications.ts:75 Notification subscription status: CLOSED
+useNotifications.ts:75 Notification subscription status: CHANNEL_ERROR
+3useNotifications.ts:75 Notification subscription status: CLOSED
+useNotifications.ts:75 Notification subscription status: CLOSED
+useNotifications.ts:75 Notification subscription status: CHANNEL_ERROR
+2useNotifications.ts:75 Notification subscription status: CLOSED
+useNotifications.ts:75 Notification subscription status: CLOSED
+useNotifications.ts:75 Notification subscription status: CHANNEL_ERROR
+useNotifications.ts:75 Notification subscription status: CLOSED
+useNotifications.ts:75 Notification subscription status: CLOSED
+useNotifications.ts:75 Notification subscription status: CLOSED
+useNotifications.ts:75 Notification subscription status: CLOSED
+useNotifications.ts:75 Notification subscription status: CLOSED
+useNotifications.ts:75 Notification subscription status: CLOSED
+useNotifications.ts:75 Notification subscription status: CLOSED
+useNotifications.ts:75 Notification subscription status: CHANNEL_ERROR
+useNotifications.ts:75 Notification subscription status: CLOSED
+useNotifications.ts:75 Notification subscription status: CLOSED
+useNotifications.ts:75 Notification subscription status: CLOSED
+useNotifications.ts:75 Notification subscription status: CLOSED
+useNotifications.ts:75 Notification subscription status: CHANNEL_ERROR
+useNotifications.ts:75 Notification subscription status: CLOSED
+useNotifications.ts:75 Notification subscription status: CLOSED
+useNotifications.ts:75 Notification subscription status: CHANNEL_ERROR
+useNotifications.ts:75 Notification subscription status: CLOSED
+useNotifications.ts:75 Notification subscription status: CLOSED
+useNotifications.ts:75 Notification subscription status: CLOSED
+useNotifications.ts:75 Notification subscription status: CLOSED
+2useNotifications.ts:75 Notification subscription status: CLOSED
+useNotifications.ts:75 Notification subscription status: CLOSED
+2useNotifications.ts:75 Notification subscription status: CLOSED
+useNotifications.ts:75 Notification subscription status: CLOSED
+useNotifications.ts:75 Notification subscription status: CLOSED
+useNotifications.ts:75 Notification subscription status: CLOSED
+2useNotifications.ts:75 Notification subscription status: CLOSED
+useNotifications.ts:75 Notification subscription status: CLOSED
+useNotifications.ts:75 Notification subscription status: CLOSED
+useNotifications.ts:75 Notification subscription status: CLOSED
+2useNotifications.ts:75 Notification subscription status: CLOSED
+useNotifications.ts:75 Notification subscription status: CLOSED
+useNotifications.ts:75 Notification subscription status: CLOSED
+useNotifications.ts:75 Notification subscription status: CLOSED
+useNotifications.ts:75 Notification subscription status: CLOSED
+useNotifications.ts:75 Notification subscription status: CLOSED
+useNotifications.ts:75 Notification subscription status: CLOSED
+useNotifications.ts:75 Notification subscription status: CLOSED
+useNotifications.ts:75 Notification subscription status: CLOSED
+useNotifications.ts:75 Notification subscription status: CLOSED
+useNotifications.ts:75 Notification subscription status: CHANNEL_ERROR
+useNotifications.ts:75 Notification subscription status: CLOSED
+useNotifications.ts:75 Notification subscription status: CLOSED
+useNotifications.ts:75 Notification subscription status: CLOSED
+useNotifications.ts:75 Notification subscription status: CLOSED
+2useNotifications.ts:75 Notification subscription status: CLOSED
+useNotifications.ts:75 Notification subscription status: CLOSED
+useNotifications.ts:75 Notification subscription status: CLOSED
+useNotifications.ts:75 Notification subscription status: CLOSED
+useNotifications.ts:75 Notification subscription status: CLOSED
+useNotifications.ts:75 Notification subscription status: CLOSED
+useNotifications.ts:75 Notification subscription status: CLOSED
+useNotifications.ts:75 Notification subscription status: CLOSED
+useNotifications.ts:75 Notification subscription status: CLOSED
+useNotifications.ts:75 Notification subscription status: CLOSED
+useNotifications.ts:75 Notification subscription status: CLOSED
+useNotifications.ts:75 Notification subscription status: CLOSED
+useNotifications.ts:75 Notification subscription status: CLOSED
+useNotifications.ts:75 Notification subscription status: CLOSED
+2useNotifications.ts:75 Notification subscription status: CLOSED
+useNotifications.ts:75 Notification subscription status: CLOSED
+useNotifications.ts:75 Notification subscription status: CLOSED
+useNotifications.ts:75 Notification subscription status: CLOSED
+useNotifications.ts:75 Notification subscription status: CLOSED
+useNotifications.ts:75 Notification subscription status: CLOSED
+useNotifications.ts:75 Notification subscription status: CLOSED
+useNotifications.ts:75 Notification subscription status: CLOSED
+2useNotifications.ts:75 Notification subscription status: CLOSED
+useNotifications.ts:75 Notification subscription status: CLOSED
+useNotifications.ts:75 Notification subscription status: CLOSED
+useNotifications.ts:75 Notification subscription status: CLOSED
+useNotifications.ts:75 Notification subscription status: CLOSED
+useNotifications.ts:75 Notification subscription status: CLOSED
+useNotifications.ts:75 Notification subscription status: CLOSED
+useNotifications.ts:75 Notification subscription status: CLOSED
+2useNotifications.ts:75 Notification subscription status: CLOSED
+useNotifications.ts:75 Notification subscription status: CLOSED
+2useNotifications.ts:75 Notification subscription status: CLOSED
+useNotifications.ts:75 Notification subscription status: CLOSED
+2useNotifications.ts:75 Notification subscription status: CLOSED
+useNotifications.ts:75 Notification subscription status: CLOSED
+2useNotifications.ts:75 Notification subscription status: CLOSED
+useNotifications.ts:75 Notification subscription status: CLOSED
+useNotifications.ts:75 Notification subscription status: CLOSED
+useNotifications.ts:75 Notification subscription status: CLOSED
+useNotifications.ts:75 Notification subscription status: CHANNEL_ERROR
