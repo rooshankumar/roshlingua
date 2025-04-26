@@ -1,19 +1,26 @@
+
 import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { 
   Calendar, 
   Flame, 
-  Heart, 
   Languages, 
   MapPin, 
   MessageCircle, 
   Share2, 
-  User 
+  User,
+  Award,
+  BookOpen,
+  Heart,
+  Sparkles,
+  GraduationCap,
+  FileText,
+  Mail
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { 
   Dialog, 
   DialogContent, 
@@ -23,136 +30,101 @@ import {
   DialogTrigger 
 } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/components/ui/use-toast";
-import { supabase } from "@/lib/supabaseClient";
-
-interface UserProfile {
-  id: number;
-  full_name: string;
-  username: string;
-  bio: string;
-  nativeLanguage: string;
-  learningLanguage: string;
-  proficiency_level: string;
-  streak_count: number;
-  joinDate: string;
-  learning_goal: string;
-  avatar_url: string;
-  likes_count: number;
-  achievements: {
-    title: string;
-    description: string;
-    date: string;
-    icon: string;
-  }[];
-}
+import { supabase } from "@/lib/supabase";
+import { useAuth } from "@/hooks/useAuth";
+import { LikeButton } from "@/components/LikeButton";
+import { useProfile } from "@/hooks/useProfile";
+import { ACHIEVEMENTS } from "@/hooks/useAchievements";
 
 const Profile = () => {
   const { id } = useParams<{ id: string }>();
-  const [profile, setProfile] = useState<UserProfile | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [currentUser, setCurrentUser] = useState<any>(null);
+  const { profile, loading, error } = useProfile(id || '');
+  const [userAchievements, setUserAchievements] = useState([]);
+  const [totalXp, setTotalXp] = useState(0);
+  const { user } = useAuth();
   const { toast } = useToast();
+  const [isCurrentUser, setIsCurrentUser] = useState(false);
 
   useEffect(() => {
-    const getUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      setCurrentUser(user);
-    };
-    getUser();
-  }, []);
+    setIsCurrentUser(user?.id === id);
+  }, [user, id]);
 
   useEffect(() => {
-    const fetchProfile = async () => {
-      if (!id) return;
+    if (id) {
+      fetchUserAchievements();
+    }
+  }, [id]);
 
-      setLoading(true);
-      try {
-        const { data, error } = await supabase
-          .from('profiles')
-          .select(`
-            id,
-            full_name,
-            username,
-            bio,
-            native_language,
-            learning_language,
-            proficiency_level,
-            streak_count,
-            created_at as joinDate,
-            learning_goal,
-            avatar_url,
-            likes_count,
-            achievements (
-              title,
-              description,
-              date,
-              icon
-            )
-          `)
-          .eq('id', id)
-          .single();
+  const fetchUserAchievements = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('user_achievements')
+        .select('*')
+        .eq('user_id', id);
 
-        if (error) throw error;
-
-        setProfile(data);
-
-      } catch (err) {
-        console.error("Error fetching profile:", err);
-        toast({
-          title: "Error",
-          description: "Failed to load profile data",
-          variant: "destructive"
-        });
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchProfile();
-  }, [id, toast]);
-
-  const handleLike = () => {
-    if (!profile) return;
-
-    //This function needs to be rewritten to handle liking in the new schema. For now it's left as-is to avoid introducing new errors.
-    const newLiked = !false; // Placeholder -  liked field is removed
-    setProfile({
-      ...profile,
-      liked: newLiked, // Placeholder - liked field is removed
-      likes: newLiked ? profile.likes_count + 1 : profile.likes_count -1 // Placeholder - likes field is removed
-    });
-
-    toast({
-      title: newLiked ? "Profile liked" : "Like removed",
-      description: newLiked 
-        ? `You've liked ${profile.full_name}'s profile` 
-        : `You've removed your like from ${profile.full_name}'s profile`,
-    });
-  };
-
-  const calculateJoinedTime = (dateString: string) => {
-    const joinDate = new Date(dateString);
-    const now = new Date();
-
-    const diffTime = Math.abs(now.getTime() - joinDate.getTime());
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-    if (diffDays < 30) {
-      return `${diffDays} days ago`;
-    } else {
-      const diffMonths = Math.floor(diffDays / 30);
-      return diffMonths === 1 ? "1 month ago" : `${diffMonths} months ago`;
+      if (error) throw error;
+      
+      // Map DB achievements to full achievement data from constant
+      const enrichedAchievements = data?.map(ua => {
+        const achievementDetails = ACHIEVEMENTS.find(a => a.id === ua.achievement_id);
+        return {
+          ...ua,
+          ...achievementDetails,
+          unlocked_at: new Date(ua.unlocked_at).toLocaleDateString()
+        };
+      }) || [];
+      
+      setUserAchievements(enrichedAchievements);
+      
+    } catch (err) {
+      console.error("Error fetching achievements:", err);
     }
   };
 
+  useEffect(() => {
+    if (profile?.xp_points) {
+      setTotalXp(profile.xp_points);
+    }
+  }, [profile]);
+
   const handleShare = () => {
     navigator.clipboard.writeText(window.location.href);
-
     toast({
       title: "Link copied to clipboard",
       description: "You can now share this profile with others",
     });
+  };
+
+  const calculateJoinDate = (dateString: string) => {
+    if (!dateString) return "Unknown";
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', { 
+      year: 'numeric', 
+      month: 'long', 
+      day: 'numeric' 
+    });
+  };
+  
+  const getAgeFromDateOfBirth = (dateString: string) => {
+    if (!dateString) return null;
+    const birthDate = new Date(dateString);
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+    return age;
+  };
+
+  const calculateLevel = (xp: number) => {
+    if (xp >= 1000) return { name: "Master", progress: 100 };
+    if (xp >= 750) return { name: "Advanced", progress: 75 };
+    if (xp >= 500) return { name: "Intermediate", progress: 50 };
+    if (xp >= 250) return { name: "Beginner Plus", progress: 25 };
+    return { name: "Beginner", progress: 10 };
   };
 
   if (loading) {
@@ -180,16 +152,20 @@ const Profile = () => {
     );
   }
 
+  const userLevel = calculateLevel(totalXp);
+
   return (
-    <div className="container pb-12 animate-fade-in">
-      <div className="flex justify-between items-start mb-8">
-        <div className="flex items-center space-x-4">
+    <div className="container pb-12 animate-fade-in max-w-5xl mx-auto">
+      {/* Profile Header */}
+      <div className="relative mb-8 overflow-hidden rounded-xl">
+        <div className="h-48 bg-gradient-to-r from-primary/20 to-primary/5"></div>
+        <div className="absolute -bottom-16 left-8">
           <Dialog>
             <DialogTrigger asChild>
               <Button variant="ghost" className="p-0 h-auto hover:bg-transparent">
-                <Avatar className="h-24 w-24 cursor-pointer hover:ring-2 hover:ring-primary/50 transition-all">
+                <Avatar className="h-32 w-32 ring-4 ring-background shadow-md cursor-pointer hover:ring-primary/50 transition-all">
                   <AvatarImage src={profile.avatar_url} alt={profile.full_name} />
-                  <AvatarFallback className="text-2xl">{profile.full_name.charAt(0)}</AvatarFallback>
+                  <AvatarFallback className="text-3xl">{profile.full_name?.charAt(0)}</AvatarFallback>
                 </Avatar>
               </Button>
             </DialogTrigger>
@@ -207,238 +183,279 @@ const Profile = () => {
               </div>
             </DialogContent>
           </Dialog>
-
-          <div>
-            <h1 className="text-3xl font-bold">{profile.full_name}</h1>
-            <div className="flex items-center space-x-2 mt-1">
-              <User className="h-4 w-4 text-muted-foreground" />
-              <span className="text-muted-foreground"></span>
-
-              <span className="text-muted-foreground">•</span>
-
-              <MapPin className="h-4 w-4 text-muted-foreground" />
-              <span className="text-muted-foreground"></span>
-            </div>
-            <div className="flex items-center space-x-2 mt-1">
-              <Calendar className="h-4 w-4 text-muted-foreground" />
-              <span className="text-muted-foreground">
-                Joined {calculateJoinedTime(profile.joinDate)}
-              </span>
-            </div>
-          </div>
         </div>
+        
+        <div className="flex justify-end p-4">
+          <div className="flex space-x-2">
+            {!isCurrentUser && (
+              <>
+                <LikeButton
+                  targetUserId={profile.id}
+                  currentUserId={user?.id}
+                  className="button-hover"
+                />
 
-        <div className="flex space-x-2">
-          <LikeButton
-            targetUserId={profile.id}
-            currentUserId={currentUser?.id}
-            className="button-hover"
-          />
+                <Button variant="outline" size="sm" className="button-hover" onClick={handleShare}>
+                  <Share2 className="h-4 w-4 mr-2" />
+                  Share
+                </Button>
 
-          <Button variant="outline" size="sm" className="button-hover" onClick={handleShare}>
-            <Share2 className="h-4 w-4 mr-2" />
-            Share
-          </Button>
-
-          <Button asChild size="sm" className="button-hover">
-            <Link to={`/chat/${profile.id}`}>
-              <MessageCircle className="h-4 w-4 mr-2" />
-              Message
-            </Link>
-          </Button>
+                <Button asChild size="sm" className="button-hover">
+                  <Link to={`/chat/${profile.id}`}>
+                    <MessageCircle className="h-4 w-4 mr-2" />
+                    Message
+                  </Link>
+                </Button>
+              </>
+            )}
+            {isCurrentUser && (
+              <Button asChild size="sm" className="button-hover">
+                <Link to="/settings">
+                  <FileText className="h-4 w-4 mr-2" />
+                  Edit Profile
+                </Link>
+              </Button>
+            )}
+          </div>
         </div>
       </div>
 
-      <Card className="mb-8 glass-card">
-        <CardContent className="p-6">
-          <div className="flex flex-col md:flex-row md:justify-between">
-            <div className="mb-4 md:mb-0">
-              <h3 className="text-lg font-semibold">Language Skills</h3>
-              <div className="flex flex-col space-y-2 mt-2">
-                <div className="flex items-center space-x-2">
-                  <Languages className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-muted-foreground">Native language:</span>
-                  <Badge variant="secondary">{profile.nativeLanguage}</Badge>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Languages className="h-4 w-4 text-primary" />
-                  <span className="text-muted-foreground">Learning:</span>
-                  <Badge>{profile.learningLanguage}</Badge>
-                  <span className="text-xs text-muted-foreground">({profile.proficiency_level})</span>
-                </div>
+      {/* Profile Info */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-20">
+        {/* Left Column - Personal Info */}
+        <div className="space-y-6">
+          <Card className="glass-card overflow-visible">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-2xl font-bold">{profile.full_name}</CardTitle>
+              <div className="flex flex-wrap gap-2 mt-1">
+                <Badge variant="secondary" className="px-2 py-1">
+                  @{profile.username || "username"}
+                </Badge>
+                {profile.date_of_birth && (
+                  <Badge variant="outline" className="px-2 py-1">
+                    {getAgeFromDateOfBirth(profile.date_of_birth)} years old
+                  </Badge>
+                )}
               </div>
-            </div>
-
-            <div className="flex items-center space-x-4">
-              <div className="flex flex-col items-center">
-                <div className="flex items-center space-x-1">
-                  <Flame className="h-5 w-5 text-primary" />
-                  <span className="text-2xl font-bold">{profile.streak_count}</span>
-                </div>
-                <span className="text-xs text-muted-foreground">day streak</span>
-              </div>
-
-              <div className="h-12 w-px bg-border"></div>
-
-              <div>
-                <h4 className="text-sm font-medium mb-1">Study Progress</h4>
-                <div className="grid grid-cols-4 gap-2">
-                  <div className="flex flex-col items-center">
-                    <div className="relative w-10 h-10">
-                      <svg className="w-10 h-10" viewBox="0 0 36 36">
-                        <circle cx="18" cy="18" r="16" fill="none" className="stroke-muted stroke-2" />
-                        <circle 
-                          cx="18" cy="18" r="16" fill="none" 
-                          className="stroke-primary stroke-2" 
-                          strokeDasharray="100" 
-                          strokeDashoffset={100 - 0} 
-                          transform="rotate(-90 18 18)" 
-                        />
-                      </svg>
-                      <div className="absolute inset-0 flex items-center justify-center text-xs font-medium">
-                        0% 
-                      </div>
-                    </div>
-                    <span className="text-xs text-muted-foreground mt-1">Vocab</span>
-                  </div>
-
-                  <div className="flex flex-col items-center">
-                    <div className="relative w-10 h-10">
-                      <svg className="w-10 h-10" viewBox="0 0 36 36">
-                        <circle cx="18" cy="18" r="16" fill="none" className="stroke-muted stroke-2" />
-                        <circle 
-                          cx="18" cy="18" r="16" fill="none" 
-                          className="stroke-primary stroke-2" 
-                          strokeDasharray="100" 
-                          strokeDashoffset={100 - 0} 
-                          transform="rotate(-90 18 18)" 
-                        />
-                      </svg>
-                      <div className="absolute inset-0 flex items-center justify-center text-xs font-medium">
-                        0% 
-                      </div>
-                    </div>
-                    <span className="text-xs text-muted-foreground mt-1">Grammar</span>
-                  </div>
-
-                  <div className="flex flex-col items-center">
-                    <div className="relative w-10 h-10">
-                      <svg className="w-10 h-10" viewBox="0 0 36 36">
-                        <circle cx="18" cy="18" r="16" fill="none" className="stroke-muted stroke-2" />
-                        <circle 
-                          cx="18" cy="18" r="16" fill="none" 
-                          className="stroke-primary stroke-2" 
-                          strokeDasharray="100" 
-                          strokeDashoffset={100 - 0} 
-                          transform="rotate(-90 18 18)" 
-                        />
-                      </svg>
-                      <div className="absolute inset-0 flex items-center justify-center text-xs font-medium">
-                        0% 
-                      </div>
-                    </div>
-                    <span className="text-xs text-muted-foreground mt-1">Speaking</span>
-                  </div>
-
-                  <div className="flex flex-col items-center">
-                    <div className="relative w-10 h-10">
-                      <svg className="w-10 h-10" viewBox="0 0 36 36">
-                        <circle cx="18" cy="18" r="16" fill="none" className="stroke-muted stroke-2" />
-                        <circle 
-                          cx="18" cy="18" r="16" fill="none" 
-                          className="stroke-primary stroke-2" 
-                          strokeDasharray="100" 
-                          strokeDashoffset={100 - 0} 
-                          transform="rotate(-90 18 18)" 
-                        />
-                      </svg>
-                      <div className="absolute inset-0 flex items-center justify-center text-xs font-medium">
-                        0% 
-                      </div>
-                    </div>
-                    <span className="text-xs text-muted-foreground mt-1">Listening</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      <Tabs defaultValue="about" className="mb-8">
-        <TabsList className="grid grid-cols-3 mb-6">
-          <TabsTrigger value="about">About</TabsTrigger>
-          <TabsTrigger value="achievements">Achievements</TabsTrigger>
-          <TabsTrigger value="interests">Interests</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="about" className="mt-0">
-          <Card>
-            <CardHeader>
-              <CardTitle>About {profile.full_name}</CardTitle>
             </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground">{profile.bio}</p>
+            <CardContent className="space-y-4">
+              <div className="flex items-center space-x-2">
+                <Calendar className="h-4 w-4 text-muted-foreground" />
+                <span className="text-muted-foreground">
+                  Joined {calculateJoinDate(profile.created_at)}
+                </span>
+              </div>
+              {profile.bio && (
+                <div className="pt-2 border-t border-border">
+                  <h3 className="text-sm font-medium text-muted-foreground mb-2">About</h3>
+                  <p className="text-sm">{profile.bio}</p>
+                </div>
+              )}
+              <div className="pt-2 border-t border-border">
+                <h3 className="text-sm font-medium text-muted-foreground mb-2">Learning Goal</h3>
+                <p className="text-sm">{profile.learning_goal || "No learning goal set"}</p>
+              </div>
             </CardContent>
           </Card>
-        </TabsContent>
 
-        <TabsContent value="achievements" className="mt-0">
-          <Card>
-            <CardHeader>
-              <CardTitle>Achievements</CardTitle>
+          <Card className="glass-card">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-md font-semibold">Language Skills</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-2">
+                  <Languages className="h-4 w-4 text-muted-foreground" />
+                  <span className="text-sm">Native language:</span>
+                </div>
+                <Badge variant="secondary">{profile.native_language || "Not specified"}</Badge>
+              </div>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-2">
+                  <Languages className="h-4 w-4 text-primary" />
+                  <span className="text-sm">Learning:</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Badge>{profile.learning_language || "Not specified"}</Badge>
+                  <Badge variant="outline" className="bg-muted">
+                    {profile.proficiency_level || "beginner"}
+                  </Badge>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="glass-card">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-md font-semibold">Stats</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-2">
+                  <Flame className="h-4 w-4 text-orange-500" />
+                  <span className="text-sm">Streak:</span>
+                </div>
+                <Badge variant="outline" className="bg-orange-500/10 text-orange-600">
+                  {profile.streak_count || 0} days
+                </Badge>
+              </div>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-2">
+                  <Heart className="h-4 w-4 text-red-500" />
+                  <span className="text-sm">Likes received:</span>
+                </div>
+                <Badge variant="outline" className="bg-red-500/10 text-red-600">
+                  {profile.likes_count || 0}
+                </Badge>
+              </div>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-2">
+                  <Award className="h-4 w-4 text-primary" />
+                  <span className="text-sm">Achievements:</span>
+                </div>
+                <Badge variant="outline" className="bg-primary/10 text-primary">
+                  {userAchievements.length}
+                </Badge>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Right Column - Achievements & Progress */}
+        <div className="lg:col-span-2 space-y-6">
+          <Card className="glass-card">
+            <CardHeader className="pb-4">
+              <div className="flex justify-between items-center">
+                <CardTitle>Level & XP</CardTitle>
+                <Badge className="text-sm py-1">
+                  {userLevel.name} Level
+                </Badge>
+              </div>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {profile.achievements.map((achievement, index) => (
-                  <div key={index} className="flex items-start space-x-4 p-4 rounded-lg border border-border">
-                    <div className="w-10 h-10 flex items-center justify-center bg-primary/10 rounded-full text-xl">
-                      {achievement.icon}
+                <div className="flex justify-between items-center text-sm mb-2">
+                  <span className="text-muted-foreground">Progress to next level</span>
+                  <span className="font-medium">{totalXp} XP</span>
+                </div>
+                <Progress value={userLevel.progress} className="h-2" />
+                
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-4">
+                  <div className="flex flex-col items-center bg-muted/50 p-3 rounded-lg">
+                    <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center mb-2">
+                      <BookOpen className="h-4 w-4 text-primary" />
                     </div>
-                    <div>
-                      <h4 className="font-medium">{achievement.title}</h4>
-                      <p className="text-sm text-muted-foreground">{achievement.description}</p>
-                      <p className="text-xs text-muted-foreground mt-1">
-                        Achieved on {new Date(achievement.date).toLocaleDateString()}
-                      </p>
-                    </div>
+                    <span className="text-sm font-medium">Vocabulary</span>
+                    <span className="text-xs text-muted-foreground">Coming Soon</span>
                   </div>
-                ))}
+                  
+                  <div className="flex flex-col items-center bg-muted/50 p-3 rounded-lg">
+                    <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center mb-2">
+                      <FileText className="h-4 w-4 text-primary" />
+                    </div>
+                    <span className="text-sm font-medium">Grammar</span>
+                    <span className="text-xs text-muted-foreground">Coming Soon</span>
+                  </div>
+                  
+                  <div className="flex flex-col items-center bg-muted/50 p-3 rounded-lg">
+                    <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center mb-2">
+                      <MessageCircle className="h-4 w-4 text-primary" />
+                    </div>
+                    <span className="text-sm font-medium">Speaking</span>
+                    <span className="text-xs text-muted-foreground">Coming Soon</span>
+                  </div>
+                  
+                  <div className="flex flex-col items-center bg-muted/50 p-3 rounded-lg">
+                    <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center mb-2">
+                      <Mail className="h-4 w-4 text-primary" />
+                    </div>
+                    <span className="text-sm font-medium">Listening</span>
+                    <span className="text-xs text-muted-foreground">Coming Soon</span>
+                  </div>
+                </div>
               </div>
             </CardContent>
           </Card>
-        </TabsContent>
 
-        <TabsContent value="interests" className="mt-0">
-          <Card>
-            <CardHeader>
-              <CardTitle>Interests</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex flex-wrap gap-2">
-                {profile.achievements.map((interest, index) => (
-                  <Badge key={index} variant="secondary" className="py-1.5">
-                    {interest}
-                  </Badge>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
+          <Tabs defaultValue="achievements">
+            <TabsList className="grid grid-cols-2 w-full mb-4">
+              <TabsTrigger value="achievements">Achievements</TabsTrigger>
+              <TabsTrigger value="activity">Recent Activity</TabsTrigger>
+            </TabsList>
 
-      <div className="flex justify-center space-x-4">
+            <TabsContent value="achievements" className="space-y-4">
+              {userAchievements.length > 0 ? (
+                <div className="grid gap-4 grid-cols-1 sm:grid-cols-2">
+                  {userAchievements.map((achievement) => (
+                    <Card key={achievement.id} className="overflow-hidden transition-all duration-200 hover:shadow-md hover:-translate-y-1">
+                      <CardContent className="p-0">
+                        <div className="flex items-start space-x-3 p-4">
+                          <div className="flex-shrink-0 w-10 h-10 flex items-center justify-center bg-primary/10 rounded-full text-xl">
+                            {achievement.icon}
+                          </div>
+                          <div className="flex-1">
+                            <h4 className="font-medium">{achievement.title}</h4>
+                            <p className="text-sm text-muted-foreground">{achievement.description}</p>
+                            <div className="flex items-center justify-between mt-2">
+                              <span className="text-xs text-muted-foreground">
+                                Achieved on {achievement.unlocked_at}
+                              </span>
+                              <Badge variant="secondary" className="bg-primary/10 text-primary border-primary/20">
+                                +{achievement.points} XP
+                              </Badge>
+                            </div>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              ) : (
+                <Card className="bg-muted/20">
+                  <CardContent className="flex flex-col items-center justify-center text-center p-8">
+                    <div className="w-12 h-12 rounded-full bg-muted/80 flex items-center justify-center mb-4">
+                      <Award className="h-6 w-6 text-muted-foreground" />
+                    </div>
+                    <h3 className="text-lg font-medium mb-2">No achievements yet</h3>
+                    <p className="text-muted-foreground max-w-md">
+                      This user hasn't unlocked any achievements yet. Achievements are earned by using the app and completing various activities.
+                    </p>
+                  </CardContent>
+                </Card>
+              )}
+            </TabsContent>
+            
+            <TabsContent value="activity">
+              <Card className="bg-muted/20">
+                <CardContent className="flex flex-col items-center justify-center text-center p-8">
+                  <div className="w-12 h-12 rounded-full bg-muted/80 flex items-center justify-center mb-4">
+                    <Sparkles className="h-6 w-6 text-muted-foreground" />
+                  </div>
+                  <h3 className="text-lg font-medium mb-2">Activity tracking coming soon</h3>
+                  <p className="text-muted-foreground max-w-md">
+                    We're working on a feature to show each user's recent activity and learning progress.
+                  </p>
+                </CardContent>
+              </Card>
+            </TabsContent>
+          </Tabs>
+        </div>
+      </div>
+
+      <div className="flex justify-center space-x-4 mt-8">
         <Button asChild variant="outline" className="button-hover">
           <Link to="/community">
             Back to Community
           </Link>
         </Button>
-        <Button asChild className="button-hover">
-          <Link to={`/chat/${profile.id}`}>
-            <MessageCircle className="h-4 w-4 mr-2" />
-            Start Conversation
-          </Link>
-        </Button>
+        {!isCurrentUser && (
+          <Button asChild className="button-hover">
+            <Link to={`/chat/${profile.id}`}>
+              <MessageCircle className="h-4 w-4 mr-2" />
+              Start Conversation
+            </Link>
+          </Button>
+        )}
       </div>
     </div>
   );
