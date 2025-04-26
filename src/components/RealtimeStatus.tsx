@@ -1,54 +1,71 @@
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { supabase } from '@/lib/supabase';
 import { RealtimeChannel } from '@supabase/supabase-js';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
-import { Loader2 } from 'lucide-react';
+import { Loader2, RefreshCw } from 'lucide-react';
 
 const RealtimeStatus = () => {
   const [status, setStatus] = useState<'connecting' | 'connected' | 'disconnected'>('connecting');
   const [lastMessage, setLastMessage] = useState<string | null>(null);
+  const [reconnectAttempt, setReconnectAttempt] = useState(0);
   
-  useEffect(() => {
+  const setupChannel = useCallback(() => {
     let channel: RealtimeChannel;
     
-    const setupChannel = () => {
-      channel = supabase.channel('realtime-status', {
-        config: {
-          broadcast: {
-            self: true
-          }
+    channel = supabase.channel('realtime-status', {
+      config: {
+        broadcast: {
+          self: true
+        }
+      }
+    });
+
+    channel
+      .on('broadcast', { event: 'test' }, (payload) => {
+        setLastMessage(JSON.stringify(payload));
+      })
+      .on('presence', { event: 'sync' }, () => {
+        setStatus('connected');
+      })
+      .subscribe((status) => {
+        console.log('Realtime subscription status:', status);
+        if (status === 'SUBSCRIBED') {
+          setStatus('connected');
+        } else if (status === 'CLOSED' || status === 'CHANNEL_ERROR') {
+          setStatus('disconnected');
+          // Auto-reconnect after a delay
+          setTimeout(() => {
+            setReconnectAttempt(prev => prev + 1);
+          }, 5000);
+        } else {
+          setStatus('connecting');
         }
       });
+      
+    return channel;
+  }, []);
 
-      channel
-        .on('broadcast', { event: 'test' }, (payload) => {
-          setLastMessage(JSON.stringify(payload));
-        })
-        .on('presence', { event: 'sync' }, () => {
-          setStatus('connected');
-        })
-        .subscribe((status) => {
-          console.log('Realtime subscription status:', status);
-          if (status === 'SUBSCRIBED') {
-            setStatus('connected');
-          } else if (status === 'CLOSED' || status === 'CHANNEL_ERROR') {
-            setStatus('disconnected');
-          } else {
-            setStatus('connecting');
-          }
-        });
-    };
+  useEffect(() => {
+    let channel = setupChannel();
 
-    setupChannel();
+    // Reconnect every 5 minutes to ensure connection stays fresh
+    const intervalId = setInterval(() => {
+      console.log('Refreshing realtime connection');
+      if (channel) {
+        channel.unsubscribe();
+      }
+      channel = setupChannel();
+    }, 5 * 60 * 1000);
 
     return () => {
       if (channel) {
         channel.unsubscribe();
       }
+      clearInterval(intervalId);
     };
-  }, []);
+  }, [setupChannel, reconnectAttempt]);
 
   const testConnection = () => {
     const channel = supabase.channel('realtime-status');
@@ -57,6 +74,11 @@ const RealtimeStatus = () => {
       event: 'test',
       payload: { message: 'Testing realtime connection', timestamp: new Date().toISOString() }
     });
+  };
+  
+  const forceReconnect = () => {
+    setStatus('connecting');
+    setReconnectAttempt(prev => prev + 1);
   };
 
   return (
@@ -72,27 +94,43 @@ const RealtimeStatus = () => {
           <Badge variant="outline" className="bg-green-100 text-green-800">Connected</Badge>
         )}
         {status === 'disconnected' && (
-          <Badge variant="outline" className="bg-red-100 text-red-800">Disconnected</Badge>
+          <Badge variant="outline" className="bg-red-100 text-red-800">
+            Disconnected
+          </Badge>
         )}
       </div>
       
-      <Button 
-        size="sm" 
-        variant="outline" 
-        onClick={testConnection}
-        disabled={status !== 'connected'}
-      >
-        Test Connection
-      </Button>
+      <div className="flex gap-2">
+        <Button 
+          size="sm" 
+          variant="outline" 
+          onClick={testConnection}
+          disabled={status !== 'connected'}
+        >
+          Test Connection
+        </Button>
+        
+        <Button 
+          size="sm" 
+          variant="outline" 
+          onClick={forceReconnect}
+        >
+          <RefreshCw className="h-3 w-3 mr-1" /> Reconnect
+        </Button>
+      </div>
       
       {lastMessage && (
         <div className="mt-2">
           <p className="text-xs text-gray-500">Last Message:</p>
-          <pre className="text-xs bg-gray-50 p-2 rounded overflow-x-auto">
+          <pre className="text-xs bg-gray-50 p-2 rounded overflow-x-auto dark:bg-gray-800">
             {lastMessage}
           </pre>
         </div>
       )}
+      
+      <div className="text-xs text-muted-foreground">
+        Reconnect attempts: {reconnectAttempt}
+      </div>
     </div>
   );
 };
