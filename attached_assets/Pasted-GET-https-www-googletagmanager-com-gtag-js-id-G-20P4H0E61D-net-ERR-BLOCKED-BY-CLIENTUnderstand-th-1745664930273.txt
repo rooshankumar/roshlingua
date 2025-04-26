@@ -1,0 +1,109 @@
+GET https://www.googletagmanager.com/gtag/js?id=G-20P4H0E61D net::ERR_BLOCKED_BY_CLIENTUnderstand this error
+AppLayout.tsx:69 Uncaught ReferenceError: NotificationDropdown is not defined
+    at AppLayout (AppLayout.tsx:69:14)
+    at renderWithHooks (chunk-W6L2VRDA.js?v=1ec971da:11548:26)
+    at mountIndeterminateComponent (chunk-W6L2VRDA.js?v=1ec971da:14926:21)
+    at beginWork (chunk-W6L2VRDA.js?v=1ec971da:15914:22)
+    at HTMLUnknownElement.callCallback2 (chunk-W6L2VRDA.js?v=1ec971da:3674:22)
+    at Object.invokeGuardedCallbackDev (chunk-W6L2VRDA.js?v=1ec971da:3699:24)
+    at invokeGuardedCallback (chunk-W6L2VRDA.js?v=1ec971da:3733:39)
+    at beginWork$1 (chunk-W6L2VRDA.js?v=1ec971da:19765:15)
+    at performUnitOfWork (chunk-W6L2VRDA.js?v=1ec971da:19198:20)
+    at workLoopSync (chunk-W6L2VRDA.js?v=1ec971da:19137:13)
+AppLayout @ AppLayout.tsx:69
+renderWithHooks @ chunk-W6L2VRDA.js?v=1ec971da:11548
+mountIndeterminateComponent @ chunk-W6L2VRDA.js?v=1ec971da:14926
+beginWork @ chunk-W6L2VRDA.js?v=1ec971da:15914
+callCallback2 @ chunk-W6L2VRDA.js?v=1ec971da:3674
+invokeGuardedCallbackDev @ chunk-W6L2VRDA.js?v=1ec971da:3699
+invokeGuardedCallback @ chunk-W6L2VRDA.js?v=1ec971da:3733
+beginWork$1 @ chunk-W6L2VRDA.js?v=1ec971da:19765
+performUnitOfWork @ chunk-W6L2VRDA.js?v=1ec971da:19198
+workLoopSync @ chunk-W6L2VRDA.js?v=1ec971da:19137
+renderRootSync @ chunk-W6L2VRDA.js?v=1ec971da:19116
+performConcurrentWorkOnRoot @ chunk-W6L2VRDA.js?v=1ec971da:18678
+workLoop @ chunk-W6L2VRDA.js?v=1ec971da:197
+flushWork @ chunk-W6L2VRDA.js?v=1ec971da:176
+performWorkUntilDeadline @ chunk-W6L2VRDA.js?v=1ec971da:384Understand this error
+AppLayout.tsx:69 Uncaught ReferenceError: NotificationDropdown is not defined
+    at AppLayout (AppLayout.tsx:69:14)
+    at renderWithHooks (chunk-W6L2VRDA.js?v=1ec971da:11548:26)
+    at mountIndeterminateComponent (chunk-W6L2VRDA.js?v=1ec971da:14926:21)
+    at beginWork (chunk-W6L2VRDA.js?v=1ec971da:15914:22)
+    at HTMLUnknownElement.callCallback2 (chunk-W6L2VRDA.js?v=1ec971da:3674:22)
+    at Object.invokeGuardedCallbackDev (chunk-W6L2VRDA.js?v=1ec971da:3699:24)
+    at invokeGuardedCallback (chunk-W6L2VRDA.js?v=1ec971da:3733:39)
+    at beginWork$1 (chunk-W6L2VRDA.js?v=1ec971da:19765:15)
+    at performUnitOfWork (chunk-W6L2VRDA.js?v=1ec971da:19198:20)
+    at workLoopSync (chunk-W6L2VRDA.js?v=1ec971da:19137:13)
+AppLayout @ AppLayout.tsx:69
+renderWithHooks @ chunk-W6L2VRDA.js?v=1ec971da:11548
+mountIndeterminateComponent @ chunk-W6L2VRDA.js?v=1ec971da:14926
+beginWork @ chunk-W6L2VRDA.js?v=1ec971da:15914
+callCallback2 @ chunk-W6L2VRDA.js?v=1ec971da:3674
+invokeGuardedCallbackDev @ chunk-W6L2VRDA.js?v=1ec971da:3699
+invokeGuardedCallback @ chunk-W6L2VRDA.js?v=1ec971da:3733
+beginWork$1 @ chunk-W6L2VRDA.js?v=1ec971da:19765
+performUnitOfWork @ chunk-W6L2VRDA.js?v=1ec971da:19198
+workLoopSync @ chunk-W6L2VRDA.js?v=1ec971da:19137
+renderRootSync @ chunk-W6L2VRDA.js?v=1ec971da:19116
+recoverFromConcurrentError @ chunk-W6L2VRDA.js?v=1ec971da:18736
+performConcurrentWorkOnRoot @ chunk-W6L2VRDA.js?v=1ec971da:18684
+workLoop @ chunk-W6L2VRDA.js?v=1ec971da:197
+flushWork @ chunk-W6L2VRDA.js?v=1ec971da:176
+performWorkUntilDeadline @ chunk-W6L2VRDA.js?v=1ec971da:384Understand this error
+chunk-W6L2VRDA.js?v=1ec971da:14032 The above error occurred in the <AppLayout> component:
+
+    at AppLayout (https://bad4fc84-ed2a-4f7e-bfdb-c6dc1afb9ebd-00-mlb980c67grq.pike.replit.dev/src/components/layouts/AppLayout.tsx?t=1745664896802:36:22)
+    at ProtectedRoute (https://bad4fc84-ed2a-4f7e-bfdb-c6dc1afb9ebd-00-mlb980c67grq.pike.replit.dev/src/components/auth/ProtectedRoute.tsx?t=1745664346592:15:27)
+    at RenderedRoute (https://bad4fc84-ed2a-4f7e-bfdb-c6dc1afb9ebd-00-mlb980c67grq.pike.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=67a39f9e:4069:5)
+    at Routes (https://bad4fc84-ed2a-4f7e-bfdb-c6dc1afb9ebd-00-mlb980c67grq.pike.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=67a39f9e:4508:5)
+    at AppRoutes (https://bad4fc84-ed2a-4f7e-bfdb-c6dc1afb9ebd-00-mlb980c67grq.pike.replit.dev/src/App.tsx?t=1745664896802:39:33)
+    at AuthProvider (https://bad4fc84-ed2a-4f7e-bfdb-c6dc1afb9ebd-00-mlb980c67grq.pike.replit.dev/src/providers/AuthProvider.tsx?t=1745664346592:23:32)
+    at Router (https://bad4fc84-ed2a-4f7e-bfdb-c6dc1afb9ebd-00-mlb980c67grq.pike.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=67a39f9e:4451:15)
+    at BrowserRouter (https://bad4fc84-ed2a-4f7e-bfdb-c6dc1afb9ebd-00-mlb980c67grq.pike.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=67a39f9e:5196:5)
+    at ThemeProvider (https://bad4fc84-ed2a-4f7e-bfdb-c6dc1afb9ebd-00-mlb980c67grq.pike.replit.dev/src/components/theme-provider.tsx:17:33)
+    at QueryClientProvider (https://bad4fc84-ed2a-4f7e-bfdb-c6dc1afb9ebd-00-mlb980c67grq.pike.replit.dev/node_modules/.vite/deps/@tanstack_react-query.js?v=4c542ea1:2794:3)
+    at App
+
+Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://reactjs.org/link/error-boundaries to learn more about error boundaries.
+logCapturedError @ chunk-W6L2VRDA.js?v=1ec971da:14032
+update.callback @ chunk-W6L2VRDA.js?v=1ec971da:14052
+callCallback @ chunk-W6L2VRDA.js?v=1ec971da:11248
+commitUpdateQueue @ chunk-W6L2VRDA.js?v=1ec971da:11265
+commitLayoutEffectOnFiber @ chunk-W6L2VRDA.js?v=1ec971da:17093
+commitLayoutMountEffects_complete @ chunk-W6L2VRDA.js?v=1ec971da:17980
+commitLayoutEffects_begin @ chunk-W6L2VRDA.js?v=1ec971da:17969
+commitLayoutEffects @ chunk-W6L2VRDA.js?v=1ec971da:17920
+commitRootImpl @ chunk-W6L2VRDA.js?v=1ec971da:19353
+commitRoot @ chunk-W6L2VRDA.js?v=1ec971da:19277
+finishConcurrentRender @ chunk-W6L2VRDA.js?v=1ec971da:18760
+performConcurrentWorkOnRoot @ chunk-W6L2VRDA.js?v=1ec971da:18718
+workLoop @ chunk-W6L2VRDA.js?v=1ec971da:197
+flushWork @ chunk-W6L2VRDA.js?v=1ec971da:176
+performWorkUntilDeadline @ chunk-W6L2VRDA.js?v=1ec971da:384Understand this error
+chunk-W6L2VRDA.js?v=1ec971da:19413 Uncaught ReferenceError: NotificationDropdown is not defined
+    at AppLayout (AppLayout.tsx:69:14)
+    at renderWithHooks (chunk-W6L2VRDA.js?v=1ec971da:11548:26)
+    at mountIndeterminateComponent (chunk-W6L2VRDA.js?v=1ec971da:14926:21)
+    at beginWork (chunk-W6L2VRDA.js?v=1ec971da:15914:22)
+    at beginWork$1 (chunk-W6L2VRDA.js?v=1ec971da:19753:22)
+    at performUnitOfWork (chunk-W6L2VRDA.js?v=1ec971da:19198:20)
+    at workLoopSync (chunk-W6L2VRDA.js?v=1ec971da:19137:13)
+    at renderRootSync (chunk-W6L2VRDA.js?v=1ec971da:19116:15)
+    at recoverFromConcurrentError (chunk-W6L2VRDA.js?v=1ec971da:18736:28)
+    at performConcurrentWorkOnRoot (chunk-W6L2VRDA.js?v=1ec971da:18684:30)
+AppLayout @ AppLayout.tsx:69
+renderWithHooks @ chunk-W6L2VRDA.js?v=1ec971da:11548
+mountIndeterminateComponent @ chunk-W6L2VRDA.js?v=1ec971da:14926
+beginWork @ chunk-W6L2VRDA.js?v=1ec971da:15914
+beginWork$1 @ chunk-W6L2VRDA.js?v=1ec971da:19753
+performUnitOfWork @ chunk-W6L2VRDA.js?v=1ec971da:19198
+workLoopSync @ chunk-W6L2VRDA.js?v=1ec971da:19137
+renderRootSync @ chunk-W6L2VRDA.js?v=1ec971da:19116
+recoverFromConcurrentError @ chunk-W6L2VRDA.js?v=1ec971da:18736
+performConcurrentWorkOnRoot @ chunk-W6L2VRDA.js?v=1ec971da:18684
+workLoop @ chunk-W6L2VRDA.js?v=1ec971da:197
+flushWork @ chunk-W6L2VRDA.js?v=1ec971da:176
+performWorkUntilDeadline @ chunk-W6L2VRDA.js?v=1ec971da:384Understand this error
