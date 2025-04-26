@@ -226,8 +226,8 @@ const Profile = () => {
       <div className="relative mb-24 md:mb-16 overflow-hidden rounded-xl shadow-md">
         <div className="h-40 bg-gradient-to-r from-primary/20 to-primary/5"></div>
         
-        {/* Avatar Section - Repositioned */}
-        <div className="absolute left-1/2 transform -translate-x-1/2 -bottom-16 md:-bottom-12">
+        {/* Avatar Section - Repositioned higher */}
+        <div className="absolute left-1/2 transform -translate-x-1/2 -bottom-16 md:-bottom-16 translate-y-[-20px]">
           <Dialog>
             <DialogTrigger asChild>
               <Button variant="ghost" className="p-0 h-auto hover:bg-transparent">
