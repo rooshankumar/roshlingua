@@ -2,6 +2,7 @@ import { ReactNode } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import { Home, Users, MessageSquare, Settings } from "lucide-react";
 import MainNav from "../navigation/MainNav";
+import { NotificationDropdown } from "../notifications/NotificationDropdown";
 
 interface AppLayoutProps {
   children: ReactNode;
