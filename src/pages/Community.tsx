@@ -348,10 +348,19 @@ const Community = () => {
               <Card className="h-[420px] overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
                 <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-primary to-primary/50" />
                 <CardContent className="p-0 flex flex-col h-full">
-                  <div className="relative h-32 bg-gradient-to-b from-primary/10 to-background/5">
+                  <div 
+                    className="relative h-32 bg-gradient-to-b from-primary/10 to-background/5 cursor-pointer" 
+                    onClick={() => navigate(`/profile/${user.id}`)}
+                  >
                     <div className="absolute -bottom-10 left-1/2 -translate-x-1/2">
                       <div className="relative">
-                        <Avatar className="h-20 w-20 ring-4 ring-background">
+                        <Avatar 
+                          className="h-20 w-20 ring-4 ring-background cursor-pointer"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            navigate(`/profile/${user.id}`);
+                          }}
+                        >
                           <AvatarImage src={user.avatar_url} className="object-cover" />
                           <AvatarFallback className="text-xl">{user.username?.charAt(0)}</AvatarFallback>
                         </Avatar>
@@ -363,7 +372,10 @@ const Community = () => {
                     </div>
                   </div>
 
-                  <div className="flex-1 pt-12 px-4 text-center">
+                  <div 
+                    className="flex-1 pt-12 px-4 text-center cursor-pointer"
+                    onClick={() => navigate(`/profile/${user.id}`)}
+                  >
                     <h3 className="font-semibold text-lg mb-3 truncate">{user.full_name}</h3>
                     <div className="flex flex-wrap items-center justify-center gap-2 mb-3">
                       <Badge variant="outline" className="bg-green-500/10 text-green-700 border-green-500/30">
@@ -402,16 +414,28 @@ const Community = () => {
                         <span className="text-sm font-medium">{user.streak_count || 0}</span>
                       </div>
                     </div>
-
-                    <Button
-                      onClick={() => handleStartChat(user.id)}
-                      variant="default"
-                      size="sm"
-                      className="transition-all duration-300 hover:scale-105"
-                    >
-                      <MessageSquare className="h-4 w-4 mr-2" />
-                      Chat
-                    </Button>
+                    
+                    <div className="flex gap-2">
+                      <Button
+                        onClick={() => navigate(`/profile/${user.id}`)}
+                        variant="outline"
+                        size="sm"
+                        className="transition-all duration-300 hover:scale-105"
+                      >
+                        <User className="h-4 w-4 mr-2" />
+                        Profile
+                      </Button>
+                      
+                      <Button
+                        onClick={() => handleStartChat(user.id)}
+                        variant="default"
+                        size="sm"
+                        className="transition-all duration-300 hover:scale-105"
+                      >
+                        <MessageSquare className="h-4 w-4 mr-2" />
+                        Chat
+                      </Button>
+                    </div>
                   </div>
                 </CardContent>
               </Card>

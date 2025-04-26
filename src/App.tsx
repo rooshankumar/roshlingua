@@ -86,6 +86,13 @@ const AppRoutes = () => {
             </AppLayout>
           </ProtectedRoute>
         } />
+        <Route path="/profile/:id" element={
+          <ProtectedRoute>
+            <AppLayout>
+              <Profile />
+            </AppLayout>
+          </ProtectedRoute>
+        } />
         <Route path="/community" element={
           <ProtectedRoute>
             <AppLayout>
