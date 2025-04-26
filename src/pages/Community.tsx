@@ -242,7 +242,7 @@ const Community = () => {
       );
     }
 
-    if (languageFilter) {
+    if (languageFilter && languageFilter !== 'all') {
       result = result.filter(user =>
         user.native_language === languageFilter ||
         user.learning_language === languageFilter
@@ -417,10 +417,10 @@ const Community = () => {
                 <SelectValue placeholder="Language" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All Languages</SelectItem>
+                <SelectItem value="all">All Languages</SelectItem>
                 {availableLanguages.map((language) => (
-                  <SelectItem key={language} value={language}>
-                    {language}
+                  <SelectItem key={language} value={language || "unknown"}>
+                    {language || "Unknown"}
                   </SelectItem>
                 ))}
               </SelectContent>
