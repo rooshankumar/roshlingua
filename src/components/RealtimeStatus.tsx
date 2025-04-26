@@ -60,7 +60,7 @@ const RealtimeStatus = () => {
       subscriptionRef.current = setupChannel();
     }
 
-    // Periodic health check, but less frequent
+    // Periodic health check with more frequent checks
     const intervalId = setInterval(() => {
       if (!isActive) return;
       
@@ -77,10 +77,11 @@ const RealtimeStatus = () => {
           if (isActive) {
             setReconnectAttempt(prev => prev + 1);
             subscriptionRef.current = setupChannel();
+            console.log('Attempting to reconnect real-time subscription, attempt:', reconnectAttempt + 1);
           }
-        }, 5000);
+        }, 3000); // Reduced wait time to 3 seconds
       }
-    }, 10 * 60 * 1000); // Reduced frequency to 10 minutes
+    }, 60 * 1000); // Check every minute instead of 10 minutes
 
     return () => {
       isActive = false;

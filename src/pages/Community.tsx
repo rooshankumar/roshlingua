@@ -141,8 +141,9 @@ const Community = () => {
 
     fetchUsers();
 
+    // Create a more robust real-time subscription
     const channel = supabase
-      .channel('public:profiles')
+      .channel('public:profiles:changes')
       .on('postgres_changes',
         {
           event: '*',
@@ -150,13 +151,81 @@ const Community = () => {
           table: 'profiles'
         },
         payload => {
-          console.log('Real-time update:', payload);
-          fetchUsers();
+          console.log('Real-time profile update received:', payload);
+          
+          // Update the specific user in the state rather than re-fetching all users
+          if (payload.new && payload.eventType) {
+            setUsers(prevUsers => {
+              // For INSERT event, add the new user if they're not already in the list
+              if (payload.eventType === 'INSERT' && !prevUsers.some(u => u.id === payload.new.id)) {
+                // Don't add the current user to the list
+                const isCurrentUser = payload.new.id === user?.id;
+                if (!isCurrentUser) {
+                  return [...prevUsers, payload.new as User];
+                }
+              }
+              
+              // For UPDATE event, update the existing user
+              else if (payload.eventType === 'UPDATE') {
+                return prevUsers.map(u => 
+                  u.id === payload.new.id ? { ...u, ...payload.new } : u
+                );
+              }
+              
+              // For DELETE event, remove the user
+              else if (payload.eventType === 'DELETE' && payload.old) {
+                return prevUsers.filter(u => u.id !== payload.old.id);
+              }
+              
+              return prevUsers;
+            });
+            
+            // Also update filtered users to reflect changes immediately
+            setFilteredUsers(prevFiltered => {
+              // Apply the same filtering logic as in the useEffect
+              let updatedUsers = [...users];
+              
+              if (searchQuery) {
+                updatedUsers = updatedUsers.filter(user =>
+                  user.full_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                  user.native_language?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                  user.learning_language?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                  user.bio?.toLowerCase().includes(searchQuery.toLowerCase())
+                );
+              }
+              
+              if (languageFilter) {
+                updatedUsers = updatedUsers.filter(user =>
+                  user.native_language === languageFilter ||
+                  user.learning_language === languageFilter
+                );
+              }
+              
+              if (onlineOnly) {
+                updatedUsers = updatedUsers.filter(user => user.is_online);
+              }
+              
+              return updatedUsers;
+            });
+          }
         }
       )
-      .subscribe();
+      .subscribe((status) => {
+        console.log('Community real-time subscription status:', status);
+        if (status === 'SUBSCRIBED') {
+          console.log('Successfully subscribed to real-time updates');
+        } else if (status !== 'SUBSCRIBED') {
+          console.warn('Real-time subscription issue:', status);
+          // Try to reconnect if needed
+          setTimeout(() => fetchUsers(), 3000);
+        }
+      });
+
+    // Fetch users initially
+    fetchUsers();
 
     return () => {
+      console.log('Unsubscribing from real-time updates');
       channel.unsubscribe();
     };
   }, []);
