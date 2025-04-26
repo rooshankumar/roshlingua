@@ -446,7 +446,7 @@ const Community = () => {
           {filteredUsers.map((user) => (
             <Card 
               key={user.id} 
-              className="overflow-hidden cursor-pointer hover:shadow-md transition-all"
+              className="overflow-hidden cursor-pointer hover:shadow-md transition-all card-hover"
               onClick={() => navigate(`/profile/${user.id}`)}
             >
               <CardContent className="p-4">
