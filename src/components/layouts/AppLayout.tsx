@@ -38,6 +38,11 @@ const AppLayout = ({ children }: AppLayoutProps) => {
 
   return (
     <div className="min-h-screen flex flex-col md:flex-row">
+      {/* Notification icon in top right corner */}
+      <div className="fixed top-2 right-3 z-50 md:hidden">
+        <NotificationDropdown className="mobile-touch-target" />
+      </div>
+      
       <div className="md:block">
         <MainNav />
       </div>
@@ -66,10 +71,6 @@ const AppLayout = ({ children }: AppLayoutProps) => {
               </NavLink>
             );
           })}
-          <div className="flex flex-col items-center p-2">
-            <NotificationDropdown className="mobile-touch-target" />
-            <span className="text-xs mt-1 font-medium">Alerts</span>
-          </div>
         </nav>
       )}
       
