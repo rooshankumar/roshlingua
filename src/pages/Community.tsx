@@ -489,9 +489,15 @@ const Community = () => {
                 {/* Simple actions row */}
                 <div className="flex justify-between items-center mt-3 pt-3 border-t">
                   <div className="flex items-center text-xs text-muted-foreground">
-                    <Badge variant="secondary" className="mr-2 px-2 py-0 h-5">
-                      {user.proficiency_level || "beginner"}
-                    </Badge>
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className="flex items-center gap-1 text-muted-foreground hover:text-primary"
+                      title="View full profile"
+                    >
+                      <User className="h-3.5 w-3.5" />
+                      <span>Profile</span>
+                    </Button>
                   </div>
                   <div className="flex items-center gap-2" onClick={e => e.stopPropagation()}>
                     <LikeButton
@@ -507,6 +513,7 @@ const Community = () => {
                       variant="ghost"
                       size="icon"
                       className="h-8 w-8"
+                      title="Start chat"
                     >
                       <MessageSquare className="h-4 w-4" />
                     </Button>
