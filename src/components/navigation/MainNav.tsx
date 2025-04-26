@@ -89,20 +89,24 @@ export function MainNav() {
     </>
   );
 
+  // Check if we're in a chat detail route
+  const isChatDetailRoute = location.pathname.match(/^\/chat\/[0-9a-f-]+$/);
+
   return (
     <>
-      {/* Mobile Navigation */}
-      <div className="lg:hidden sticky top-0 z-50">
-        <div className="flex items-center justify-between p-3 border-b bg-background/90 backdrop-blur-lg">
-          <Sheet open={open} onOpenChange={setOpen}>
-            <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="lg:hidden mobile-touch-target">
-                {open ? 
-                  <X size={responsive.iconSize.base} /> : 
-                  <Menu size={responsive.iconSize.base} />
-                }
-              </Button>
-            </SheetTrigger>
+      {/* Mobile Navigation - Hidden on chat detail pages */}
+      {!isChatDetailRoute && (
+        <div className="lg:hidden fixed top-0 left-0 right-0 z-50">
+          <div className="flex items-center justify-between p-3 border-b bg-background/90 backdrop-blur-lg">
+            <Sheet open={open} onOpenChange={setOpen}>
+              <SheetTrigger asChild>
+                <Button variant="ghost" size="icon" className="lg:hidden mobile-touch-target">
+                  {open ? 
+                    <X size={responsive.iconSize.base} /> : 
+                    <Menu size={responsive.iconSize.base} />
+                  }
+                </Button>
+              </SheetTrigger>
             <SheetContent side="left" className="w-[270px] p-4">
               <div className="mb-6 mt-2">
                 <h2 

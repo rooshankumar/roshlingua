@@ -95,6 +95,35 @@
   animation: bounce 1s infinite;
 }
 
+
+/* Better mobile navigation */
+.mobile-chat-view {
+  height: calc(100vh - var(--header-height, 60px) - var(--footer-height, 60px));
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Improved safe areas */
+.mobile-safe-top {
+  padding-top: max(env(safe-area-inset-top, 0px), 0px);
+}
+
+.mobile-safe-bottom {
+  padding-bottom: max(env(safe-area-inset-bottom, 0px), 0px);
+}
+
+/* Prevent header overlap with content */
+@media (max-width: 768px) {
+  .content-with-fixed-header {
+    padding-top: 60px;
+  }
+  
+  .chat-detail-view {
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+}
+
 @keyframes bounce {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-2px); }
