@@ -69,7 +69,7 @@ const AppLayout = ({ children }: AppLayoutProps) => {
       )}
       
       {/* Safe area for bottom padding in mobile browsers */}
-      <style jsx global>{`
+      <style jsx="true" global="true">{`
         @supports (padding-bottom: env(safe-area-inset-bottom)) {
           .safe-area-bottom {
             padding-bottom: calc(0.5rem + env(safe-area-inset-bottom));

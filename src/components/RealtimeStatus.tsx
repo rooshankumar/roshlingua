@@ -1,5 +1,4 @@
-
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { supabase } from '@/lib/supabase';
 import { RealtimeChannel } from '@supabase/supabase-js';
 import { Button } from './ui/button';
@@ -10,11 +9,10 @@ const RealtimeStatus = () => {
   const [status, setStatus] = useState<'connecting' | 'connected' | 'disconnected'>('connecting');
   const [lastMessage, setLastMessage] = useState<string | null>(null);
   const [reconnectAttempt, setReconnectAttempt] = useState(0);
-  
+  const subscriptionRef = useRef<RealtimeChannel | null>(null);
+
   const setupChannel = useCallback(() => {
-    let channel: RealtimeChannel;
-    
-    channel = supabase.channel('realtime-status', {
+    const channel = supabase.channel('realtime-status', {
       config: {
         broadcast: {
           self: true
@@ -43,25 +41,33 @@ const RealtimeStatus = () => {
           setStatus('connecting');
         }
       });
-      
+
     return channel;
   }, []);
 
   useEffect(() => {
-    let channel = setupChannel();
+    // Clean up any existing subscription
+    if (subscriptionRef.current) {
+      subscriptionRef.current.unsubscribe();
+      subscriptionRef.current = null;
+    }
+
+    // Create new subscription
+    subscriptionRef.current = setupChannel();
 
     // Reconnect every 5 minutes to ensure connection stays fresh
     const intervalId = setInterval(() => {
       console.log('Refreshing realtime connection');
-      if (channel) {
-        channel.unsubscribe();
+      if (subscriptionRef.current) {
+        subscriptionRef.current.unsubscribe();
+        subscriptionRef.current = setupChannel();
       }
-      channel = setupChannel();
     }, 5 * 60 * 1000);
 
     return () => {
-      if (channel) {
-        channel.unsubscribe();
+      if (subscriptionRef.current) {
+        subscriptionRef.current.unsubscribe();
+        subscriptionRef.current = null;
       }
       clearInterval(intervalId);
     };
@@ -75,7 +81,7 @@ const RealtimeStatus = () => {
       payload: { message: 'Testing realtime connection', timestamp: new Date().toISOString() }
     });
   };
-  
+
   const forceReconnect = () => {
     setStatus('connecting');
     setReconnectAttempt(prev => prev + 1);
@@ -99,26 +105,26 @@ const RealtimeStatus = () => {
           </Badge>
         )}
       </div>
-      
+
       <div className="flex gap-2">
-        <Button 
-          size="sm" 
-          variant="outline" 
+        <Button
+          size="sm"
+          variant="outline"
           onClick={testConnection}
           disabled={status !== 'connected'}
         >
           Test Connection
         </Button>
-        
-        <Button 
-          size="sm" 
-          variant="outline" 
+
+        <Button
+          size="sm"
+          variant="outline"
           onClick={forceReconnect}
         >
           <RefreshCw className="h-3 w-3 mr-1" /> Reconnect
         </Button>
       </div>
-      
+
       {lastMessage && (
         <div className="mt-2">
           <p className="text-xs text-gray-500">Last Message:</p>
@@ -127,7 +133,7 @@ const RealtimeStatus = () => {
           </pre>
         </div>
       )}
-      
+
       <div className="text-xs text-muted-foreground">
         Reconnect attempts: {reconnectAttempt}
       </div>

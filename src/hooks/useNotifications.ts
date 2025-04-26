@@ -51,9 +51,12 @@ export function useNotifications() {
   useEffect(() => {
     if (!user?.id) return;
 
-    let channel: RealtimeChannel;
+    let channel: RealtimeChannel | null = null;
+    let isSubscribed = true;
 
     const setupRealtimeSubscription = () => {
+      if (!isSubscribed || channel) return; // Prevent multiple subscriptions
+
       channel = supabase
         .channel(`notifications:${user.id}`)
         .on('postgres_changes', {
@@ -77,6 +80,7 @@ export function useNotifications() {
             setTimeout(() => {
               if (channel) {
                 channel.unsubscribe();
+                channel = null; //Reset channel after unsubscribe
               }
               setupRealtimeSubscription();
             }, 3000);
@@ -85,7 +89,9 @@ export function useNotifications() {
     };
 
     fetchNotifications();
-    setupRealtimeSubscription();
+    
+    const subscriptionTimeout = setTimeout(setupRealtimeSubscription, 500); //Small delay
+
 
     const intervalId = setInterval(() => {
       if (channelStatus !== 'connected') {
@@ -95,10 +101,12 @@ export function useNotifications() {
     }, 30000);
 
     return () => {
+      isSubscribed = false;
+      clearTimeout(subscriptionTimeout);
+      clearInterval(intervalId);
       if (channel) {
         channel.unsubscribe();
       }
-      clearInterval(intervalId);
     };
   }, [user, fetchNotifications, channelStatus]);
 
@@ -111,7 +119,7 @@ export function useNotifications() {
 
       if (error) throw error;
 
-      setNotifications(notifications.map(n => 
+      setNotifications(notifications.map(n =>
         n.id === notificationId ? { ...n, is_read: true } : n
       ));
       setUnreadCount(prev => Math.max(0, prev - 1));
@@ -139,11 +147,11 @@ export function useNotifications() {
     }
   };
 
-  return { 
-    notifications, 
-    loading, 
-    unreadCount, 
-    markAsRead, 
+  return {
+    notifications,
+    loading,
+    unreadCount,
+    markAsRead,
     markAllAsRead,
     isConnected: channelStatus === 'connected'
   };
