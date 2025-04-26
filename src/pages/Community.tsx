@@ -392,138 +392,128 @@ const Community = () => {
 
   return (
     <div className="container mx-auto py-6 space-y-4">
-      <div className="flex flex-col space-y-4">
+      <div className="flex flex-col space-y-1 mb-6">
         <h1 className="text-2xl font-bold">Community</h1>
         <p className="text-muted-foreground">
-          Discover language partners from around the world
+          Find language partners who match your learning goals
         </p>
       </div>
 
-      <div className="bg-card rounded-lg p-4 mb-6">
-        <div className="flex flex-col md:flex-row gap-4 items-center">
-          <div className="flex-1 relative">
+      <div className="bg-card/50 border rounded-lg p-4 mb-6 shadow-sm">
+        <div className="flex flex-col md:flex-row gap-3 items-start md:items-center">
+          <div className="flex-1 relative w-full">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder="Search by name, language, or interests..."
+              placeholder="Search by name or language..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full pl-9"
             />
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
             <Select value={languageFilter} onValueChange={setLanguageFilter}>
-              <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="Filter by language" />
+              <SelectTrigger className="w-full md:w-[150px]">
+                <SelectValue placeholder="Language" />
               </SelectTrigger>
               <SelectContent>
-                <SelectGroup>
-                  <SelectLabel>Languages</SelectLabel>
-                  <SelectItem value="all">All Languages</SelectItem>
-                  {availableLanguages.map((language) => (
-                    <SelectItem key={language} value={language}>
-                      {language}
-                    </SelectItem>
-                  ))}
-                </SelectGroup>
+                <SelectItem value="">All Languages</SelectItem>
+                {availableLanguages.map((language) => (
+                  <SelectItem key={language} value={language}>
+                    {language}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
 
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={() => setShowMoreFilters(!showMoreFilters)}
-            >
-              <Filter className="h-4 w-4" />
-            </Button>
-
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center gap-2 bg-background rounded-md px-3 py-1.5 border">
               <Switch
                 id="online-mode"
                 checked={onlineOnly}
                 onCheckedChange={setOnlineOnly}
+                className="data-[state=checked]:bg-green-500"
               />
-              <Label htmlFor="online-mode">Online only</Label>
+              <Label htmlFor="online-mode" className="text-sm cursor-pointer">
+                Online only
+              </Label>
             </div>
           </div>
         </div>
       </div>
 
       {filteredUsers.length > 0 ? (
-        <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+        <div className="grid gap-5 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
           {filteredUsers.map((user) => (
-            <div key={user.id} className="relative">
-              <Card className="h-auto overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
-                <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-primary to-primary/50" />
-                <CardContent className="p-3 flex flex-col">
-                  {/* User Info Section - Simplified */}
-                  <div className="flex items-center space-x-3 mb-3">
-                    <div className="relative cursor-pointer" onClick={() => navigate(`/profile/${user.id}`)}>
-                      <Avatar className="h-14 w-14 ring-2 ring-background shadow-sm">
-                        <AvatarImage src={user.avatar_url} className="object-cover" />
-                        <AvatarFallback className="text-lg">{user.username?.charAt(0)}</AvatarFallback>
-                      </Avatar>
-                      <span className={cn(
-                        "absolute bottom-0 right-0 block h-3 w-3 rounded-full ring-1 ring-background",
-                        user.is_online ? "bg-green-500" : "bg-gray-400"
-                      )} />
-                    </div>
-                    
-                    <div className="flex-1 min-w-0">
-                      <h3 
-                        className="font-semibold text-base truncate cursor-pointer" 
-                        onClick={() => navigate(`/profile/${user.id}`)}
-                      >
-                        {user.full_name}
-                      </h3>
-                      <div className="flex items-center gap-2 mt-1">
-                        {user.age && (
-                          <Badge variant="outline" className="text-xs py-0 h-5">
-                            {user.age} yrs
-                          </Badge>
-                        )}
-                        <Badge variant="outline" className="text-xs py-0 h-5 bg-amber-500/10 text-amber-600 flex items-center gap-1">
-                          <Flame className="h-3 w-3" />
-                          <span>{user.streak_count || 0}</span>
-                        </Badge>
-                      </div>
+            <Card 
+              key={user.id} 
+              className="overflow-hidden cursor-pointer hover:shadow-md transition-all"
+              onClick={() => navigate(`/profile/${user.id}`)}
+            >
+              <CardContent className="p-4">
+                <div className="flex items-center gap-3">
+                  {/* Avatar with online indicator */}
+                  <div className="relative flex-shrink-0">
+                    <Avatar className="h-12 w-12 border-2 border-background">
+                      <AvatarImage src={user.avatar_url} className="object-cover" />
+                      <AvatarFallback>{user.full_name?.charAt(0)}</AvatarFallback>
+                    </Avatar>
+                    <span className={cn(
+                      "absolute bottom-0 right-0 block h-2.5 w-2.5 rounded-full border border-background",
+                      user.is_online ? "bg-green-500" : "bg-gray-300"
+                    )} />
+                  </div>
+                  
+                  {/* User info */}
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-medium text-base truncate">{user.full_name}</h3>
+                    <div className="flex items-center gap-1 text-muted-foreground text-xs">
+                      <span>{user.native_language}</span>
+                      <span>→</span>
+                      <span>{user.learning_language}</span>
+                      {user.age && (
+                        <>
+                          <span className="mx-1">•</span>
+                          <span>{user.age} yrs</span>
+                        </>
+                      )}
                     </div>
                   </div>
                   
-                  {/* Language Flags Section - Enhanced display */}
-                  <div className="flex items-center justify-center mb-3">
-                    <div className="inline-flex items-center px-3 py-1.5 rounded-md bg-muted/50">
-                      <div className="text-2xl" title={user.native_language}>
-                        {getLanguageFlag(user.native_language)}
-                      </div>
-                      <span className="text-muted-foreground mx-2">→</span>
-                      <div className="text-2xl" title={user.learning_language}>
-                        {getLanguageFlag(user.learning_language)}
-                      </div>
-                    </div>
+                  {/* Streak badge */}
+                  <Badge variant="outline" className="flex items-center h-6 bg-amber-500/5 text-amber-600 font-normal">
+                    <Flame className="h-3 w-3 mr-1" />
+                    {user.streak_count || 0}
+                  </Badge>
+                </div>
+                
+                {/* Simple actions row */}
+                <div className="flex justify-between items-center mt-3 pt-3 border-t">
+                  <div className="flex items-center text-xs text-muted-foreground">
+                    <Badge variant="secondary" className="mr-2 px-2 py-0 h-5">
+                      {user.proficiency_level || "beginner"}
+                    </Badge>
                   </div>
-
-                  {/* Actions Section - Only Profile button */}
-                  <div className="flex items-center justify-between mt-2">
+                  <div className="flex items-center gap-2" onClick={e => e.stopPropagation()}>
                     <LikeButton
                       targetUserId={user.id}
                       currentUserId={user?.id}
                       className="hover:text-red-500"
                     />
-                    
                     <Button
-                      onClick={() => navigate(`/profile/${user.id}`)}
-                      variant="outline"
-                      size="sm"
-                      className="h-8 px-3"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleStartChat(user.id);
+                      }}
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8"
                     >
-                      <User className="h-3.5 w-3.5 mr-1" />
-                      Profile
+                      <MessageSquare className="h-4 w-4" />
                     </Button>
                   </div>
-                </CardContent>
-              </Card>
-            </div>
+                </div>
+              </CardContent>
+            </Card>
           ))}
         </div>
       ) : (
