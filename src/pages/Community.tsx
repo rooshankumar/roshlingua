@@ -24,6 +24,44 @@ import { toast } from '@/hooks/use-toast';
 import classNames from 'classnames';
 import { cn } from "@/lib/utils";
 
+// Helper function to get flag emoji for language
+const getLanguageFlag = (language?: string) => {
+  if (!language) return "🌐";
+  
+  const languageToFlag: Record<string, string> = {
+    'English': '🇬🇧',
+    'Spanish': '🇪🇸',
+    'French': '🇫🇷',
+    'German': '🇩🇪',
+    'Italian': '🇮🇹',
+    'Portuguese': '🇵🇹',
+    'Russian': '🇷🇺',
+    'Japanese': '🇯🇵',
+    'Korean': '🇰🇷',
+    'Chinese': '🇨🇳',
+    'Arabic': '🇸🇦',
+    'Hindi': '🇮🇳',
+    'Turkish': '🇹🇷',
+    'Dutch': '🇳🇱',
+    'Swedish': '🇸🇪',
+    'Polish': '🇵🇱',
+    'Norwegian': '🇳🇴',
+    'Danish': '🇩🇰',
+    'Finnish': '🇫🇮',
+    'Czech': '🇨🇿',
+    'Greek': '🇬🇷',
+    'Hungarian': '🇭🇺',
+    'Romanian': '🇷🇴',
+    'Thai': '🇹🇭',
+    'Vietnamese': '🇻🇳',
+    'Indonesian': '🇮🇩',
+    'Hebrew': '🇮🇱',
+    // Add more languages as needed
+  };
+  
+  return languageToFlag[language] || '🌐';
+};
+
 interface User {
   id: string;
   full_name: string;
@@ -342,87 +380,75 @@ const Community = () => {
       </div>
 
       {filteredUsers.length > 0 ? (
-        <div className="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
           {filteredUsers.map((user) => (
             <div key={user.id} className="relative">
-              <Card className="h-[420px] overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
+              <Card className="h-auto overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
                 <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-primary to-primary/50" />
-                <CardContent className="p-0 flex flex-col h-full">
-                  <div 
-                    className="relative h-32 bg-gradient-to-b from-primary/10 to-background/5 cursor-pointer" 
-                    onClick={() => navigate(`/profile/${user.id}`)}
-                  >
-                    <div className="absolute -bottom-10 left-1/2 -translate-x-1/2">
-                      <div className="relative">
-                        <Avatar 
-                          className="h-20 w-20 ring-4 ring-background cursor-pointer"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            navigate(`/profile/${user.id}`);
-                          }}
-                        >
-                          <AvatarImage src={user.avatar_url} className="object-cover" />
-                          <AvatarFallback className="text-xl">{user.username?.charAt(0)}</AvatarFallback>
-                        </Avatar>
-                        <span className={cn(
-                          "absolute bottom-0 right-0 block h-4 w-4 rounded-full ring-2 ring-background",
-                          user.is_online ? "bg-green-500" : "bg-gray-400"
-                        )} />
+                <CardContent className="p-3 flex flex-col">
+                  {/* User Info Section */}
+                  <div className="flex items-center space-x-3 mb-3">
+                    <div className="relative cursor-pointer" onClick={() => navigate(`/profile/${user.id}`)}>
+                      <Avatar className="h-14 w-14 ring-2 ring-background shadow-sm">
+                        <AvatarImage src={user.avatar_url} className="object-cover" />
+                        <AvatarFallback className="text-lg">{user.username?.charAt(0)}</AvatarFallback>
+                      </Avatar>
+                      <span className={cn(
+                        "absolute bottom-0 right-0 block h-3 w-3 rounded-full ring-1 ring-background",
+                        user.is_online ? "bg-green-500" : "bg-gray-400"
+                      )} />
+                    </div>
+                    
+                    <div className="flex-1 min-w-0">
+                      <h3 
+                        className="font-semibold text-base truncate cursor-pointer" 
+                        onClick={() => navigate(`/profile/${user.id}`)}
+                      >
+                        {user.full_name}
+                      </h3>
+                      <div className="flex items-center space-x-2 mt-1">
+                        {user.age && (
+                          <Badge variant="outline" className="text-xs py-0 h-5">
+                            {user.age} yrs
+                          </Badge>
+                        )}
+                        <div className="flex items-center text-amber-500">
+                          <Flame className="h-3 w-3 mr-1" />
+                          <span className="text-xs">{user.streak_count || 0}</span>
+                        </div>
                       </div>
                     </div>
                   </div>
-
-                  <div 
-                    className="flex-1 pt-12 px-4 text-center cursor-pointer"
-                    onClick={() => navigate(`/profile/${user.id}`)}
-                  >
-                    <h3 className="font-semibold text-lg mb-3 truncate">{user.full_name}</h3>
-                    <div className="flex flex-wrap items-center justify-center gap-2 mb-3">
-                      <Badge variant="outline" className="bg-green-500/10 text-green-700 border-green-500/30">
-                        {user.native_language}
-                      </Badge>
-                      <span className="text-muted-foreground">→</span>
-                      <Badge variant="outline" className="bg-blue-500/10 text-blue-700 border-blue-500/30">
-                        {user.learning_language}
-                      </Badge>
+                  
+                  {/* Language Flags Section */}
+                  <div className="flex items-center justify-center gap-2 mb-3 text-sm">
+                    <div className="inline-flex items-center px-2 py-1 rounded-md bg-muted/50">
+                      <span className="text-lg mr-2" title={user.native_language}>
+                        {getLanguageFlag(user.native_language)}
+                      </span>
+                      <span className="text-muted-foreground mx-1">→</span>
+                      <span className="text-lg ml-2" title={user.learning_language}>
+                        {getLanguageFlag(user.learning_language)}
+                      </span>
                     </div>
-                    <div className="flex items-center justify-center gap-2 mb-3">
-                      {user.age && (
-                        <Badge variant="outline">
-                          {user.age} years old
-                        </Badge>
-                      )}
-                      <Badge variant="secondary">
-                        {user.proficiency_level || 'Beginner'}
-                      </Badge>
-                    </div>
-
-                    <p className="text-sm text-muted-foreground mb-4 line-clamp-3 px-2">
-                      {user.bio || 'No bio available.'}
-                    </p>
                   </div>
 
-                  <div className="mt-auto flex items-center justify-between p-4 bg-muted/50">
-                    <div className="flex items-center gap-4">
-                      <LikeButton
-                        targetUserId={user.id}
-                        currentUserId={user?.id}
-                        className="hover:text-red-500"
-                      />
-                      <div className="flex items-center text-orange-500">
-                        <Flame className="h-4 w-4 mr-1" />
-                        <span className="text-sm font-medium">{user.streak_count || 0}</span>
-                      </div>
-                    </div>
+                  {/* Actions Section */}
+                  <div className="flex items-center justify-between mt-2">
+                    <LikeButton
+                      targetUserId={user.id}
+                      currentUserId={user?.id}
+                      className="hover:text-red-500"
+                    />
                     
                     <div className="flex gap-2">
                       <Button
                         onClick={() => navigate(`/profile/${user.id}`)}
                         variant="outline"
                         size="sm"
-                        className="transition-all duration-300 hover:scale-105"
+                        className="h-8 px-3"
                       >
-                        <User className="h-4 w-4 mr-2" />
+                        <User className="h-3.5 w-3.5 mr-1" />
                         Profile
                       </Button>
                       
@@ -430,9 +456,9 @@ const Community = () => {
                         onClick={() => handleStartChat(user.id)}
                         variant="default"
                         size="sm"
-                        className="transition-all duration-300 hover:scale-105"
+                        className="h-8 px-3"
                       >
-                        <MessageSquare className="h-4 w-4 mr-2" />
+                        <MessageSquare className="h-3.5 w-3.5 mr-1" />
                         Chat
                       </Button>
                     </div>
