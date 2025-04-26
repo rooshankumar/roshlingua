@@ -32,7 +32,11 @@ export function NotificationDropdown({ className = "" }) {
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <Button variant="ghost" size="icon" className={`relative ${className}`}>
+        <Button 
+          variant="ghost" 
+          size="icon" 
+          className={`relative hover:bg-muted/80 transition-colors ${className}`}
+        >
           <Bell className="h-5 w-5" />
           {unreadCount > 0 && (
             <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-destructive text-[10px] text-destructive-foreground animate-pulse">
@@ -41,7 +45,7 @@ export function NotificationDropdown({ className = "" }) {
           )}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-80" align="end">
+      <PopoverContent className="w-[90vw] max-w-[320px] sm:w-80" align="end" sideOffset={8}>
         <div className="flex items-center justify-between py-2">
           <div className="flex items-center gap-2">
             <h4 className="font-medium">Notifications</h4>
@@ -58,7 +62,7 @@ export function NotificationDropdown({ className = "" }) {
           )}
         </div>
         <Separator />
-        <ScrollArea className="h-[300px]">
+        <ScrollArea className="h-[min(calc(100vh-120px),300px)]">
           {loading ? (
             <div className="flex h-full items-center justify-center p-4">
               <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />

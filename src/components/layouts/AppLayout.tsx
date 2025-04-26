@@ -39,7 +39,7 @@ const AppLayout = ({ children }: AppLayoutProps) => {
   return (
     <div className="min-h-screen flex flex-col md:flex-row">
       {/* Notification icon in top right corner */}
-      <div className="fixed top-2 right-3 z-50 md:hidden">
+      <div className="absolute top-2 right-3 z-40 md:hidden">
         <NotificationDropdown className="mobile-touch-target" />
       </div>
       

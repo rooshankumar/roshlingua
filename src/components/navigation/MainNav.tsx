@@ -1,4 +1,3 @@
-
 import * as React from "react"
 import { NavLink, useLocation } from "react-router-dom";
 import { Home, Users, MessageSquare, Settings, Menu, X } from "lucide-react";
@@ -94,36 +93,31 @@ export function MainNav() {
   const isChatDetailRoute = location.pathname.match(/^\/chat\/[0-9a-f-]+$/);
 
   return (
-    <>
-      {/* We've removed the title bar completely since bottom navigation is sufficient */}
-
-      {/* Desktop Navigation */}
-      <nav className="hidden lg:flex sticky top-0 flex-col space-y-2 p-4 min-h-screen bg-background/80 backdrop-blur-lg border-r">
-        <div className="mb-8">
-          <h2 
-            className="font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent"
-            style={{ fontSize: responsive.fontSize.heading }}
-          >
-            {t('navigation.menu')}
-          </h2>
-        </div>
-        <NavigationItems />
-        <div className="mt-auto pt-4 border-t">
-          <div className="flex items-center justify-between px-3 py-2">
-            <div className="flex items-center space-x-2">
-              <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"/>
-              <span 
-                className="text-muted-foreground"
-                style={{ fontSize: responsive.fontSize.small }}
-              >
-                {t('navigation.online')}
-              </span>
-            </div>
-            <NotificationDropdown />
+    <nav className="hidden lg:flex sticky top-0 flex-col space-y-2 p-4 min-h-screen bg-background/80 backdrop-blur-lg border-r">
+      <div className="mb-8">
+        <h2 
+          className="font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent"
+          style={{ fontSize: responsive.fontSize.heading }}
+        >
+          {t('navigation.menu')}
+        </h2>
+      </div>
+      <NavigationItems />
+      <div className="mt-auto pt-4 border-t">
+        <div className="flex items-center justify-between px-3 py-2">
+          <div className="flex items-center space-x-2">
+            <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"/>
+            <span 
+              className="text-muted-foreground"
+              style={{ fontSize: responsive.fontSize.small }}
+            >
+              {t('navigation.online')}
+            </span>
           </div>
+          <NotificationDropdown />
         </div>
-      </nav>
-    </>
+      </div>
+    </nav>
   );
 }
 
