@@ -40,7 +40,7 @@ const AppLayout = ({ children }: AppLayoutProps) => {
       <div className="md:block">
         <MainNav />
       </div>
-      <main className={`flex-1 pb-24 md:pb-4 ${isChatDetailRoute ? 'pt-0' : 'pt-14 md:pt-4'} px-3 md:px-6`}>{children}</main>
+      <main className={`flex-1 pb-24 md:pb-4 pt-4 px-3 md:px-6`}>{children}</main>
 
       {/* Mobile Bottom Navigation */}
       {!isChatDetailRoute && (
@@ -65,6 +65,10 @@ const AppLayout = ({ children }: AppLayoutProps) => {
               </NavLink>
             );
           })}
+          <div className="flex flex-col items-center p-2">
+            <NotificationDropdown className="mobile-touch-target" />
+            <span className="text-xs mt-1 font-medium">Alerts</span>
+          </div>
         </nav>
       )}
       

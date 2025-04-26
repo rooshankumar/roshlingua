@@ -9,7 +9,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { NotificationCard } from './NotificationCard';
 import { Badge } from '@/components/ui/badge';
 
-export function NotificationDropdown() {
+export function NotificationDropdown({ className = "" }) {
   const [open, setOpen] = useState(false);
   const { user } = useAuth();
   const { 
@@ -32,7 +32,7 @@ export function NotificationDropdown() {
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <Button variant="ghost" size="icon" className="relative">
+        <Button variant="ghost" size="icon" className={`relative ${className}`}>
           <Bell className="h-5 w-5" />
           {unreadCount > 0 && (
             <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-destructive text-[10px] text-destructive-foreground animate-pulse">

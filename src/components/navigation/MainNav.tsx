@@ -95,20 +95,7 @@ export function MainNav() {
 
   return (
     <>
-      {/* Mobile title bar - keeps notifications dropdown but removes hamburger menu */}
-      {!isChatDetailRoute && (
-        <div className="lg:hidden fixed top-0 left-0 right-0 z-50">
-          <div className="flex items-center justify-between p-3 border-b bg-background/90 backdrop-blur-lg">
-            <h2 
-              className="font-medium"
-              style={{ fontSize: responsive.fontSize.large }}
-            >
-              {routes.find(route => isActive(route.path))?.label || "Dashboard"}
-            </h2>
-            <NotificationDropdown />
-          </div>
-        </div>
-      )}
+      {/* We've removed the title bar completely since bottom navigation is sufficient */}
 
       {/* Desktop Navigation */}
       <nav className="hidden lg:flex sticky top-0 flex-col space-y-2 p-4 min-h-screen bg-background/80 backdrop-blur-lg border-r">
