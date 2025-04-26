@@ -99,6 +99,4 @@ The UI follows a consistent design system using:
 - Accessible UI elements
 - Glass-morphism effects for modern aesthetics
 
-## Contributors
 
-This is an educational project developed by the Replit community.
