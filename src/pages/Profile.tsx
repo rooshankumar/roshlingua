@@ -231,10 +231,19 @@ const Profile = () => {
           <Dialog>
             <DialogTrigger asChild>
               <Button variant="ghost" className="p-0 h-auto hover:bg-transparent">
-                <Avatar className="h-32 w-32 ring-4 ring-background shadow-md cursor-pointer hover:ring-primary/50 transition-all">
-                  <AvatarImage src={profile.avatar_url} alt={profile.full_name} />
-                  <AvatarFallback className="text-3xl">{profile.full_name?.charAt(0)}</AvatarFallback>
-                </Avatar>
+                <div className="h-32 w-32 rounded-full ring-4 ring-background shadow-md cursor-pointer hover:ring-primary/50 transition-all overflow-hidden">
+                  {profile.avatar_url ? (
+                    <img 
+                      src={profile.avatar_url} 
+                      alt={profile.full_name} 
+                      className="h-full w-full object-cover"
+                    />
+                  ) : (
+                    <div className="h-full w-full bg-muted flex items-center justify-center">
+                      <span className="text-3xl">{profile.full_name?.charAt(0)}</span>
+                    </div>
+                  )}
+                </div>
               </Button>
             </DialogTrigger>
             <DialogContent className="max-w-md">
