@@ -33,6 +33,23 @@ const routes = [
   }
 ];
 
+const NotificationDropdown = () => {
+  // Placeholder for notification dropdown implementation.  Replace with actual component.
+  return (
+    <div className="relative">
+      <Button variant="ghost" size="icon">
+        <span className="relative">
+          {/* Add notification icon here */}
+          <span className="absolute -top-2 -right-2 bg-destructive text-destructive-foreground text-xs rounded-full h-5 w-5 flex items-center justify-center">
+            {/* Add notification count here */}
+          </span>
+        </span>
+      </Button>
+       {/* Add dropdown content here.  This will likely need additional state management */}
+    </div>
+  );
+};
+
 export function MainNav() {
   const location = useLocation();
   const [open, setOpen] = React.useState(false);
@@ -147,14 +164,17 @@ export function MainNav() {
         </div>
         <NavigationItems />
         <div className="mt-auto pt-4 border-t">
-          <div className="flex items-center space-x-2 px-3 py-2 rounded-md bg-muted/50">
-            <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"/>
-            <span 
-              className="text-muted-foreground"
-              style={{ fontSize: responsive.fontSize.small }}
-            >
-              {t('navigation.online')}
-            </span>
+          <div className="flex items-center justify-between px-3 py-2">
+            <div className="flex items-center space-x-2">
+              <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"/>
+              <span 
+                className="text-muted-foreground"
+                style={{ fontSize: responsive.fontSize.small }}
+              >
+                {t('navigation.online')}
+              </span>
+            </div>
+            <NotificationDropdown />
           </div>
         </div>
       </nav>
