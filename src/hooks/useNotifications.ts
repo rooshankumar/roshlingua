@@ -53,9 +53,19 @@ export function useNotifications() {
 
     let channel: RealtimeChannel | null = null;
     let isSubscribed = true;
+    let reconnectTimer: NodeJS.Timeout | null = null;
+    let reconnectAttempts = 0;
+    const MAX_RECONNECT_ATTEMPTS = 5;
+    const RECONNECT_DELAY = 5000; // 5 seconds between reconnection attempts
 
     const setupRealtimeSubscription = () => {
       if (!isSubscribed || channel) return; // Prevent multiple subscriptions
+
+      // Clear any existing reconnect timer
+      if (reconnectTimer) {
+        clearTimeout(reconnectTimer);
+        reconnectTimer = null;
+      }
 
       channel = supabase
         .channel(`notifications:${user.id}`)
@@ -70,20 +80,33 @@ export function useNotifications() {
         })
         .on('presence', { event: 'sync' }, () => {
           setChannelStatus('connected');
+          reconnectAttempts = 0; // Reset reconnect attempts on successful connection
         })
         .subscribe((status) => {
           console.log('Notification subscription status:', status);
           if (status === 'SUBSCRIBED') {
             setChannelStatus('connected');
+            reconnectAttempts = 0; // Reset reconnect attempts on successful connection
           } else if (status === 'CLOSED' || status === 'CHANNEL_ERROR') {
             setChannelStatus('disconnected');
-            setTimeout(() => {
+            
+            // Only attempt to reconnect if we haven't exceeded maximum attempts
+            if (reconnectAttempts < MAX_RECONNECT_ATTEMPTS && isSubscribed) {
+              reconnectAttempts++;
+              console.log(`Realtime reconnect attempt ${reconnectAttempts}/${MAX_RECONNECT_ATTEMPTS}`);
+              
+              // Clean up existing channel
               if (channel) {
                 channel.unsubscribe();
-                channel = null; //Reset channel after unsubscribe
+                channel = null;
               }
-              setupRealtimeSubscription();
-            }, 3000);
+              
+              // Schedule reconnection with exponential backoff
+              const delay = RECONNECT_DELAY * Math.pow(1.5, reconnectAttempts - 1);
+              reconnectTimer = setTimeout(() => {
+                setupRealtimeSubscription();
+              }, delay);
+            }
           }
         });
     };
@@ -92,23 +115,24 @@ export function useNotifications() {
     
     const subscriptionTimeout = setTimeout(setupRealtimeSubscription, 500); //Small delay
 
-
+    // Periodic refresh as fallback (reduced frequency)
     const intervalId = setInterval(() => {
       if (channelStatus !== 'connected') {
         console.log('Fallback notifications refresh');
         fetchNotifications();
       }
-    }, 30000);
+    }, 60000); // Reduced from 30s to 60s to reduce load
 
     return () => {
       isSubscribed = false;
+      if (reconnectTimer) clearTimeout(reconnectTimer);
       clearTimeout(subscriptionTimeout);
       clearInterval(intervalId);
       if (channel) {
         channel.unsubscribe();
       }
     };
-  }, [user, fetchNotifications, channelStatus]);
+  }, [user, fetchNotifications]);
 
   const markAsRead = async (notificationId: string) => {
     try {

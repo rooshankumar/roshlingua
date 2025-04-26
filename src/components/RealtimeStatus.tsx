@@ -46,6 +46,9 @@ const RealtimeStatus = () => {
   }, []);
 
   useEffect(() => {
+    let isActive = true;
+    let reconnectTimer: NodeJS.Timeout | null = null;
+    
     // Clean up any existing subscription
     if (subscriptionRef.current) {
       subscriptionRef.current.unsubscribe();
@@ -53,25 +56,42 @@ const RealtimeStatus = () => {
     }
 
     // Create new subscription
-    subscriptionRef.current = setupChannel();
+    if (isActive) {
+      subscriptionRef.current = setupChannel();
+    }
 
-    // Reconnect every 5 minutes to ensure connection stays fresh
+    // Periodic health check, but less frequent
     const intervalId = setInterval(() => {
-      console.log('Refreshing realtime connection');
-      if (subscriptionRef.current) {
-        subscriptionRef.current.unsubscribe();
-        subscriptionRef.current = setupChannel();
+      if (!isActive) return;
+      
+      console.log('Checking realtime connection health');
+      if (status === 'disconnected' && reconnectAttempt < 5) {
+        if (subscriptionRef.current) {
+          subscriptionRef.current.unsubscribe();
+          subscriptionRef.current = null;
+        }
+        
+        // Use a delay before reconnecting to prevent rapid cycling
+        if (reconnectTimer) clearTimeout(reconnectTimer);
+        reconnectTimer = setTimeout(() => {
+          if (isActive) {
+            setReconnectAttempt(prev => prev + 1);
+            subscriptionRef.current = setupChannel();
+          }
+        }, 5000);
       }
-    }, 5 * 60 * 1000);
+    }, 10 * 60 * 1000); // Reduced frequency to 10 minutes
 
     return () => {
+      isActive = false;
+      if (reconnectTimer) clearTimeout(reconnectTimer);
+      clearInterval(intervalId);
       if (subscriptionRef.current) {
         subscriptionRef.current.unsubscribe();
         subscriptionRef.current = null;
       }
-      clearInterval(intervalId);
     };
-  }, [setupChannel, reconnectAttempt]);
+  }, [setupChannel, reconnectAttempt, status]);
 
   const testConnection = () => {
     const channel = supabase.channel('realtime-status');
