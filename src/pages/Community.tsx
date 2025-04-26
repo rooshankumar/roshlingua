@@ -404,20 +404,8 @@ const Community = () => {
                       <span>{user.native_language}</span>
                       <span>→</span>
                       <span>{user.learning_language}</span>
-                      {user.age && (
-                        <>
-                          <span className="mx-1">•</span>
-                          <span>{user.age} yrs</span>
-                        </>
-                      )}
                     </div>
                   </div>
-                  
-                  {/* Streak badge */}
-                  <Badge variant="outline" className="flex items-center h-6 bg-amber-500/5 text-amber-600 font-normal">
-                    <Flame className="h-3 w-3 mr-1" />
-                    {user.streak_count || 0}
-                  </Badge>
                 </div>
                 
                 {/* Simple actions row */}
