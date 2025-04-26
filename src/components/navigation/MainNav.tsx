@@ -95,44 +95,10 @@ export function MainNav() {
 
   return (
     <>
-      {/* Mobile Navigation - Hidden on chat detail pages */}
+      {/* Mobile title bar - keeps notifications dropdown but removes hamburger menu */}
       {!isChatDetailRoute && (
         <div className="lg:hidden fixed top-0 left-0 right-0 z-50">
           <div className="flex items-center justify-between p-3 border-b bg-background/90 backdrop-blur-lg">
-            <Sheet open={open} onOpenChange={setOpen}>
-              <SheetTrigger asChild>
-                <Button variant="ghost" size="icon" className="lg:hidden mobile-touch-target">
-                  {open ? 
-                    <X size={responsive.iconSize.base} /> : 
-                    <Menu size={responsive.iconSize.base} />
-                  }
-                </Button>
-              </SheetTrigger>
-              <SheetContent side="left" className="w-[270px] p-4">
-                <div className="mb-6 mt-2">
-                  <h2 
-                    className="font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent"
-                    style={{ fontSize: responsive.fontSize.large }}
-                  >
-                    {t('navigation.menu')}
-                  </h2>
-                </div>
-                <nav className="flex flex-col space-y-3">
-                  <NavigationItems mobile={true} />
-                </nav>
-                <div className="mt-auto pt-4 border-t absolute bottom-6 left-4 right-4">
-                  <div className="flex items-center space-x-2 px-3 py-2 rounded-md bg-muted/50">
-                    <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"/>
-                    <span 
-                      className="text-muted-foreground"
-                      style={{ fontSize: responsive.fontSize.small }}
-                    >
-                      {t('navigation.online')}
-                    </span>
-                  </div>
-                </div>
-              </SheetContent>
-            </Sheet>
             <h2 
               className="font-medium"
               style={{ fontSize: responsive.fontSize.large }}
