@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import { User } from '@/types/user';
@@ -10,6 +9,10 @@ export function useProfile(userId: string) {
 
   useEffect(() => {
     const fetchProfile = async () => {
+      if (!userId) {
+        setLoading(false); //Set loading to false if no userId is provided
+        return;
+      }
       try {
         const { data, error } = await supabase
           .from('profiles')
@@ -24,7 +27,8 @@ export function useProfile(userId: string) {
             streak_count,
             avatar_url,
             likes_count,
-            date_of_birth::text
+            date_of_birth::text,
+            xp_points // Added xp_points selection as suggested in changes
           `)
           .eq('id', userId)
           .single();
@@ -39,9 +43,8 @@ export function useProfile(userId: string) {
       }
     };
 
-    if (userId) {
-      fetchProfile();
-    }
+    fetchProfile(); //Removed the userId conditional, the null check is now inside fetchProfile
+
   }, [userId]);
 
   return { profile, loading, error };

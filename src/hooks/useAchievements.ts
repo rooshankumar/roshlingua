@@ -92,12 +92,14 @@ export function useAchievements(userId: string) {
   const [userXP, setUserXP] = useState(0); // Added state for user XP
 
   useEffect(() => {
+    if (!userId) return; // Added null check for userId
     loadUserAchievements();
     subscribeToAchievements();
     loadUserXP(); // Load user XP on mount
   }, [userId]);
 
   const loadUserAchievements = async () => {
+    if (!userId) return; // Added null check for userId
     const { data } = await supabase
       .from('user_achievements')
       .select('*')
@@ -109,6 +111,7 @@ export function useAchievements(userId: string) {
   };
 
   const loadUserXP = async () => {
+    if (!userId) return; // Added null check for userId
     const { data: profileData } = await supabase
       .from('profiles')
       .select('xp_points')
@@ -119,6 +122,7 @@ export function useAchievements(userId: string) {
 
 
   const subscribeToAchievements = () => {
+    if (!userId) return; // Added null check for userId
     const subscription = supabase
       .channel('user_achievements')
       .on('postgres_changes', {
@@ -146,22 +150,24 @@ export function useAchievements(userId: string) {
   };
 
   const checkAchievements = async (stats: { xp: number; streak: number; lessons: number }) => {
+    if (!userId) return; // Added null check for userId
+
     // Get latest XP from profile
     const { data: profileData } = await supabase
       .from('profiles')
       .select('xp_points')
       .eq('id', userId)
       .single();
-    
+
     const currentXP = profileData?.xp_points || 0;
 
     for (const achievement of ACHIEVEMENTS) {
       const isUnlocked = unlockedAchievements.some(ua => ua.achievement_id === achievement.id);
       if (!isUnlocked) {
-        const statValue = achievement.condition.type === 'xp' 
-          ? currentXP 
+        const statValue = achievement.condition.type === 'xp'
+          ? currentXP
           : stats[achievement.condition.type];
-          
+
         if (statValue >= achievement.condition.threshold) {
           await unlockAchievement(achievement.id);
         }
@@ -170,6 +176,7 @@ export function useAchievements(userId: string) {
   };
 
   const unlockAchievement = async (achievementId: string) => {
+    if (!userId) return; // Added null check for userId
     const achievement = ACHIEVEMENTS.find(a => a.id === achievementId);
     if (!achievement) return;
 
@@ -187,6 +194,11 @@ export function useAchievements(userId: string) {
       loadUserAchievements();
       loadUserXP();
     }
+  };
+
+  // Placeholder function - needs to be implemented elsewhere
+  const addXP = async (userId: string, source: string, amount: number) => {
+      //Implement your logic to add XP here.  This is a placeholder.
   };
 
   return {

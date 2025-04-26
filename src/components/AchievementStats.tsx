@@ -1,18 +1,17 @@
-
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 
 export function AchievementStats() {
   const [stats, setStats] = useState<{[key: string]: number}>({});
-  
+
   useEffect(() => {
     const fetchStats = async () => {
       const { data } = await supabase
         .from('user_achievements')
-        .select('achievement_id, count(*)')
-        .group_by('achievement_id');
-      
+        .select('achievement_id, count(*)', { count: 'exact' })
+        .order('achievement_id');
+
       if (data) {
         const statsMap = data.reduce((acc, curr) => ({
           ...acc,
@@ -21,7 +20,7 @@ export function AchievementStats() {
         setStats(statsMap);
       }
     };
-    
+
     fetchStats();
   }, []);
 

@@ -372,3 +372,21 @@ export const fetchChats = async (limit = 50): Promise<any[]> => {
 
   return data;
 };
+
+export const getLastMessage = async (conversationId: string) => {
+  if (!conversationId) return null;
+
+  const { data, error } = await supabase
+    .from('messages')
+    .select('id, content, created_at')
+    .eq('conversation_id', conversationId)
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .single();
+
+  if (error) {
+    console.error("Error getting last message:", error);
+    return null;
+  }
+  return data;
+};
