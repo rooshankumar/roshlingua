@@ -144,12 +144,13 @@ const Community = () => {
       badges.push(
         <Badge 
           key="native" 
-          variant="outline" 
-          className="flex items-center gap-1 bg-secondary/20"
+          variant="secondary" 
+          className="flex items-center gap-1 pl-2 pr-1 py-1 shadow-sm hover:bg-secondary/30 transition-colors cursor-pointer group"
           onClick={() => setNativeLanguageFilter("any")}
         >
-          Native: {nativeLanguageFilter}
-          <X className="h-3 w-3 cursor-pointer" />
+          <span className="mr-1">{getLanguageFlag(nativeLanguageFilter)}</span>
+          <span>Native: {nativeLanguageFilter}</span>
+          <X className="h-3 w-3 ml-1 group-hover:scale-110 transition-transform" />
         </Badge>
       );
     }
@@ -158,12 +159,13 @@ const Community = () => {
       badges.push(
         <Badge 
           key="learning" 
-          variant="outline" 
-          className="flex items-center gap-1 bg-secondary/20"
+          variant="secondary" 
+          className="flex items-center gap-1 pl-2 pr-1 py-1 shadow-sm hover:bg-secondary/30 transition-colors cursor-pointer group"
           onClick={() => setLearningLanguageFilter("any")}
         >
-          Learning: {learningLanguageFilter}
-          <X className="h-3 w-3 cursor-pointer" />
+          <span className="mr-1">{getLanguageFlag(learningLanguageFilter)}</span>
+          <span>Learning: {learningLanguageFilter}</span>
+          <X className="h-3 w-3 ml-1 group-hover:scale-110 transition-transform" />
         </Badge>
       );
     }
@@ -172,15 +174,16 @@ const Community = () => {
       badges.push(
         <Badge 
           key="age" 
-          variant="outline" 
-          className="flex items-center gap-1 bg-secondary/20"
+          variant="secondary" 
+          className="flex items-center gap-1 pl-2 pr-1 py-1 shadow-sm hover:bg-secondary/30 transition-colors cursor-pointer group"
           onClick={() => {
             setMinAgeFilter(null);
             setMaxAgeFilter(null);
           }}
         >
-          Age: {minAgeFilter || '18'}—{maxAgeFilter || '100'}
-          <X className="h-3 w-3 cursor-pointer" />
+          <User className="h-3 w-3 mr-1" />
+          <span>Age: {minAgeFilter || '18'}—{maxAgeFilter || '100'}</span>
+          <X className="h-3 w-3 ml-1 group-hover:scale-110 transition-transform" />
         </Badge>
       );
     }
@@ -190,11 +193,12 @@ const Community = () => {
         <Badge 
           key="online" 
           variant="outline" 
-          className="flex items-center gap-1 bg-green-500/20"
+          className="flex items-center gap-1 pl-2 pr-1 py-1 border-green-500/30 bg-green-500/10 text-green-700 dark:text-green-400 shadow-sm hover:bg-green-500/20 transition-colors cursor-pointer group"
           onClick={() => setOnlineOnly(false)}
         >
-          Online only
-          <X className="h-3 w-3 cursor-pointer" />
+          <span className="h-2 w-2 rounded-full bg-green-500 inline-block mr-1"></span>
+          <span>Online only</span>
+          <X className="h-3 w-3 ml-1 group-hover:scale-110 transition-transform" />
         </Badge>
       );
     }
@@ -443,75 +447,96 @@ const Community = () => {
         </p>
       </div>
 
-      <div className="bg-card/50 border rounded-lg p-4 mb-6 shadow-sm">
-        <div className="flex flex-col md:flex-row gap-3 items-start md:items-center">
-          <div className="flex-1 relative w-full">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+      <div className="bg-gradient-to-r from-primary/5 to-secondary/5 backdrop-blur-sm border rounded-xl p-6 mb-8 shadow-md">
+        <div className="flex flex-col md:flex-row gap-4 items-start md:items-center">
+          <div className="flex-1 relative w-full group">
+            <div className="absolute inset-0 bg-primary/5 rounded-md -z-10 opacity-0 group-focus-within:opacity-100 transition-opacity"></div>
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-primary/50 group-focus-within:text-primary transition-colors" />
             <Input
               placeholder="Search by name or language..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-9"
+              className="w-full pl-10 bg-background/50 backdrop-blur-sm border-primary/20 focus:border-primary/50 transition-all"
             />
+            {searchQuery && (
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                className="absolute right-2 top-1/2 transform -translate-y-1/2 h-6 w-6 text-muted-foreground hover:text-foreground"
+                onClick={() => setSearchQuery("")}
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            )}
           </div>
 
           <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
             <Dialog>
               <DialogTrigger asChild>
-                <Button variant="outline" className="gap-2">
-                  <Filter className="h-4 w-4" />
+                <Button variant="outline" className="gap-2 border-primary/20 hover:border-primary/50 bg-background/50 backdrop-blur-sm hover:bg-background/80">
+                  <Filter className="h-4 w-4 text-primary" />
                   <span>Filters</span>
-                  {(onlineOnly || languageFilter !== "" || languageFilter !== "all") && (
-                    <Badge variant="secondary" className="h-5 px-1 ml-1 bg-primary/10">
+                  {getFilterCount() && (
+                    <Badge variant="secondary" className="h-5 w-5 p-0 ml-1 flex items-center justify-center rounded-full bg-primary text-primary-foreground">
                       {getFilterCount()}
                     </Badge>
                   )}
                 </Button>
               </DialogTrigger>
-              <DialogContent className="sm:max-w-[425px]">
-                <DialogHeader>
-                  <DialogTitle>Filter Community</DialogTitle>
-                  <DialogDescription>
-                    Find language partners that match your specific criteria.
-                  </DialogDescription>
-                </DialogHeader>
-                <div className="grid gap-4 py-4">
-                  <div className="space-y-2">
-                    <h3 className="text-sm font-medium">Languages</h3>
-                    <div className="grid grid-cols-2 gap-3">
+              <DialogContent className="sm:max-w-[500px] p-0 overflow-hidden rounded-xl">
+                <div className="bg-gradient-to-r from-primary/10 to-secondary/10 p-4">
+                  <DialogHeader>
+                    <DialogTitle className="text-xl">Find Your Perfect Language Partners</DialogTitle>
+                    <DialogDescription>
+                      Customize your search to connect with the right people
+                    </DialogDescription>
+                  </DialogHeader>
+                </div>
+                
+                <div className="grid gap-6 p-6">
+                  <div className="space-y-3">
+                    <div className="flex items-center">
+                      <Globe className="mr-2 h-5 w-5 text-primary" />
+                      <h3 className="text-base font-medium">Languages</h3>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-2">
-                        <Label htmlFor="native-language">Native Language</Label>
+                        <Label htmlFor="native-language" className="text-sm flex items-center gap-1">
+                          Native Language
+                        </Label>
                         <Select 
                           value={nativeLanguageFilter} 
                           onValueChange={setNativeLanguageFilter}
                         >
-                          <SelectTrigger id="native-language">
+                          <SelectTrigger id="native-language" className="bg-background/50">
                             <SelectValue placeholder="Any" />
                           </SelectTrigger>
                           <SelectContent>
                             <SelectItem value="any">Any</SelectItem>
                             {availableLanguages.filter(Boolean).map((language) => (
                               <SelectItem key={`native-${language}`} value={language}>
-                                {getLanguageFlag(language)} {language}
+                                <span className="mr-2">{getLanguageFlag(language)}</span> {language}
                               </SelectItem>
                             ))}
                           </SelectContent>
                         </Select>
                       </div>
                       <div className="space-y-2">
-                        <Label htmlFor="learning-language">Learning Language</Label>
+                        <Label htmlFor="learning-language" className="text-sm flex items-center gap-1">
+                          Learning Language
+                        </Label>
                         <Select 
                           value={learningLanguageFilter} 
                           onValueChange={setLearningLanguageFilter}
                         >
-                          <SelectTrigger id="learning-language">
+                          <SelectTrigger id="learning-language" className="bg-background/50">
                             <SelectValue placeholder="Any" />
                           </SelectTrigger>
                           <SelectContent>
                             <SelectItem value="any">Any</SelectItem>
                             {availableLanguages.filter(Boolean).map((language) => (
                               <SelectItem key={`learning-${language}`} value={language}>
-                                {getLanguageFlag(language)} {language}
+                                <span className="mr-2">{getLanguageFlag(language)}</span> {language}
                               </SelectItem>
                             ))}
                           </SelectContent>
@@ -520,65 +545,101 @@ const Community = () => {
                     </div>
                   </div>
                   
-                  <div className="space-y-2">
-                    <h3 className="text-sm font-medium">Age Range</h3>
-                    <div className="flex items-center gap-4">
-                      <div className="grid flex-1 gap-2">
-                        <Label htmlFor="min-age">Min Age</Label>
+                  <div className="space-y-3">
+                    <div className="flex items-center">
+                      <User className="mr-2 h-5 w-5 text-primary" />
+                      <h3 className="text-base font-medium">Age Range</h3>
+                    </div>
+                    <div className="bg-background/50 p-4 rounded-lg border border-border/50">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-sm">{minAgeFilter || 18}</span>
+                        <span className="text-sm">{maxAgeFilter || 100}</span>
+                      </div>
+                      <div className="flex items-center gap-4 mb-4">
                         <Input
-                          id="min-age"
-                          type="number"
+                          type="range"
                           min="18"
+                          max={(maxAgeFilter || 100) - 1}
+                          value={minAgeFilter || 18}
+                          onChange={(e) => setMinAgeFilter(Number(e.target.value))}
+                          className="flex-1 h-2 accent-primary"
+                        />
+                        <Input
+                          type="range" 
+                          min={(minAgeFilter || 18) + 1}
                           max="100"
-                          value={minAgeFilter !== null ? minAgeFilter : ''}
-                          onChange={(e) => setMinAgeFilter(e.target.value ? Number(e.target.value) : null)}
-                          placeholder="18"
+                          value={maxAgeFilter || 100}
+                          onChange={(e) => setMaxAgeFilter(Number(e.target.value))}
+                          className="flex-1 h-2 accent-primary"
                         />
                       </div>
-                      <div className="grid flex-1 gap-2">
-                        <Label htmlFor="max-age">Max Age</Label>
-                        <Input
-                          id="max-age"
-                          type="number"
-                          min="18"
-                          max="100"
-                          value={maxAgeFilter !== null ? maxAgeFilter : ''}
-                          onChange={(e) => setMaxAgeFilter(e.target.value ? Number(e.target.value) : null)}
-                          placeholder="100"
-                        />
+                      <div className="flex items-center gap-4">
+                        <div className="grid flex-1 gap-1">
+                          <Label htmlFor="min-age" className="text-xs text-muted-foreground">Min Age</Label>
+                          <Input
+                            id="min-age"
+                            type="number"
+                            min="18"
+                            max={(maxAgeFilter || 100) - 1}
+                            value={minAgeFilter !== null ? minAgeFilter : ''}
+                            onChange={(e) => setMinAgeFilter(e.target.value ? Number(e.target.value) : null)}
+                            placeholder="18"
+                            className="h-8 text-sm"
+                          />
+                        </div>
+                        <div className="grid flex-1 gap-1">
+                          <Label htmlFor="max-age" className="text-xs text-muted-foreground">Max Age</Label>
+                          <Input
+                            id="max-age"
+                            type="number"
+                            min={(minAgeFilter || 18) + 1}
+                            max="100"
+                            value={maxAgeFilter !== null ? maxAgeFilter : ''}
+                            onChange={(e) => setMaxAgeFilter(e.target.value ? Number(e.target.value) : null)}
+                            placeholder="100"
+                            className="h-8 text-sm"
+                          />
+                        </div>
                       </div>
                     </div>
                   </div>
                   
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-3 p-4 rounded-lg bg-green-500/10 border border-green-500/20">
                     <Switch
                       id="online-mode"
                       checked={onlineOnly}
                       onCheckedChange={setOnlineOnly}
                       className="data-[state=checked]:bg-green-500"
                     />
-                    <Label htmlFor="online-mode" className="cursor-pointer">
-                      Show online users only
-                    </Label>
+                    <div>
+                      <Label htmlFor="online-mode" className="cursor-pointer font-medium flex items-center">
+                        <span className="mr-2 h-2 w-2 rounded-full bg-green-500 inline-block"></span>
+                        Online users only
+                      </Label>
+                      <p className="text-xs text-muted-foreground mt-1">Only show users who are currently active</p>
+                    </div>
                   </div>
                 </div>
-                <DialogFooter className="flex justify-between items-center">
-                  <Button 
-                    variant="outline" 
-                    onClick={resetFilters}
-                    className="w-auto"
-                  >
-                    Reset Filters
-                  </Button>
-                  <DialogClose asChild>
-                    <Button>Apply Filters</Button>
-                  </DialogClose>
-                </DialogFooter>
+                
+                <div className="border-t">
+                  <div className="p-4 flex justify-between items-center">
+                    <Button 
+                      variant="ghost" 
+                      onClick={resetFilters}
+                      className="text-muted-foreground hover:text-foreground"
+                    >
+                      Reset Filters
+                    </Button>
+                    <DialogClose asChild>
+                      <Button className="px-6">Apply Filters</Button>
+                    </DialogClose>
+                  </div>
+                </div>
               </DialogContent>
             </Dialog>
             
-            {/* Show active filters as badges */}
-            <div className="flex flex-wrap gap-2">
+            {/* Active filters */}
+            <div className="flex flex-wrap gap-2 animate-in fade-in">
               {renderActiveFilterBadges()}
             </div>
           </div>
