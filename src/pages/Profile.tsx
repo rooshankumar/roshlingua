@@ -216,26 +216,26 @@ const Profile = () => {
 
   return (
     <div className="container pb-12 pt-6 animate-fade-in max-w-5xl mx-auto">
-      {/* Back Button */}
-      <div className="mb-4">
-        <Button variant="outline" size="sm" className="button-hover" asChild>
-          <Link to="/community">
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Community
-          </Link>
-        </Button>
+      <div className="flex flex-col md:flex-row items-start gap-6 mb-8">
+        {/* Back Button and Title */}
+        <div className="w-full md:w-auto">
+          <Button variant="outline" size="sm" className="mb-4" asChild>
+            <Link to="/community">
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Back to Community
+            </Link>
+          </Button>
+        </div>
       </div>
-      
-      {/* Profile Header */}
-      <div className="relative mb-24 md:mb-16 overflow-hidden rounded-xl shadow-md">
-        <div className="h-40 bg-gradient-to-r from-primary/20 to-primary/5"></div>
-        
-        {/* Avatar Section - Repositioned higher */}
-        <div className="absolute left-1/2 transform -translate-x-1/2 -bottom-16 md:-bottom-16 translate-y-[-20px]">
+
+      {/* Profile Card with Avatar, Name and Actions */}
+      <Card className="p-6 mb-8 border-0 shadow-md bg-gradient-to-r from-background to-muted/20">
+        <div className="flex flex-col md:flex-row gap-6 items-center md:items-start">
+          {/* Avatar Section */}
           <Dialog>
             <DialogTrigger asChild>
               <Button variant="ghost" className="p-0 h-auto hover:bg-transparent">
-                <div className="h-32 w-32 rounded-full ring-4 ring-background shadow-md cursor-pointer hover:ring-primary/50 transition-all overflow-hidden">
+                <div className="h-32 w-32 rounded-full ring-4 ring-primary/10 shadow-xl cursor-pointer hover:ring-primary/30 transition-all overflow-hidden">
                   {profile.avatar_url ? (
                     <img 
                       src={profile.avatar_url} 
@@ -264,55 +264,64 @@ const Profile = () => {
               </div>
             </DialogContent>
           </Dialog>
-        </div>
-        
-        {/* Action Buttons */}
-        <div className="flex justify-end p-4 gap-2">
-          {!isCurrentUser && (
-            <>
-              <LikeButton
-                targetUserId={profile.id}
-                currentUserId={user?.id}
-                className="button-hover"
-              />
 
-              
-
-              <Button 
-                size="sm" 
-                className="button-hover"
-                onClick={() => handleStartChat(profile.id)}
-              >
-                <MessageCircle className="h-4 w-4 mr-2" />
-                Message
-              </Button>
-            </>
-          )}
-          {isCurrentUser && (
-            <Button asChild size="sm" className="button-hover">
-              <Link to="/settings">
-                <FileText className="h-4 w-4 mr-2" />
-                Edit Profile
-              </Link>
-            </Button>
-          )}
+          {/* Profile Info and Action Buttons */}
+          <div className="flex-1 flex flex-col items-center md:items-start">
+            <h1 className="text-3xl font-bold mb-2">{profile.full_name}</h1>
+            
+            {profile.date_of_birth && (
+              <div className="mb-3">
+                <Badge variant="outline" className="px-2 py-1">
+                  {getAgeFromDateOfBirth(profile.date_of_birth)} years old
+                </Badge>
+              </div>
+            )}
+            
+            {/* About Section Directly Integrated */}
+            {profile.bio && (
+              <p className="text-muted-foreground text-sm mb-4 text-center md:text-left max-w-md">
+                {profile.bio}
+              </p>
+            )}
+            
+            {/* Joined Date */}
+            <div className="flex items-center mb-4 text-sm text-muted-foreground">
+              <Calendar className="h-4 w-4 mr-2" />
+              Joined {calculateJoinDate(profile.created_at)}
+            </div>
+            
+            {/* Action Buttons */}
+            <div className="flex flex-wrap gap-2 mt-2">
+              {!isCurrentUser && (
+                <>
+                  <LikeButton
+                    targetUserId={profile.id}
+                    currentUserId={user?.id}
+                    className="button-hover"
+                  />
+                  
+                  <Button 
+                    size="sm" 
+                    className="button-hover"
+                    onClick={() => handleStartChat(profile.id)}
+                  >
+                    <MessageCircle className="h-4 w-4 mr-2" />
+                    Message
+                  </Button>
+                </>
+              )}
+              {isCurrentUser && (
+                <Button asChild size="sm" className="button-hover">
+                  <Link to="/settings">
+                    <FileText className="h-4 w-4 mr-2" />
+                    Edit Profile
+                  </Link>
+                </Button>
+              )}
+            </div>
+          </div>
         </div>
-      </div>
-
-      {/* Profile Name and Username - Centered */}
-      <div className="text-center mb-8 mt-4">
-        <h1 className="text-2xl font-bold">{profile.full_name}</h1>
-        <div className="flex justify-center gap-2 mt-1">
-          <Badge variant="secondary" className="px-2 py-1">
-            @{profile.username || "username"}
-          </Badge>
-          {profile.date_of_birth && (
-            <Badge variant="outline" className="px-2 py-1">
-              {getAgeFromDateOfBirth(profile.date_of_birth)} years old
-            </Badge>
-          )}
-        </div>
-      </div>
+      </Card>
 
       {/* Profile Info */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -320,24 +329,15 @@ const Profile = () => {
         <div className="space-y-6">
           <Card className="glass-card">
             <CardHeader className="pb-2">
-              <CardTitle className="text-md font-semibold">About</CardTitle>
+              <CardTitle className="text-md font-semibold">Learning Goals</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="flex items-center space-x-2">
-                <Calendar className="h-4 w-4 text-muted-foreground" />
-                <span className="text-muted-foreground">
-                  Joined {calculateJoinDate(profile.created_at)}
-                </span>
-              </div>
-              {profile.bio && (
-                <div className="pt-2 border-t border-border">
-                  <h3 className="text-sm font-medium text-muted-foreground mb-2">Bio</h3>
-                  <p className="text-sm">{profile.bio}</p>
+              <div className="flex flex-col space-y-3">
+                <div className="inline-flex items-center">
+                  <GraduationCap className="h-4 w-4 text-primary mr-2" />
+                  <h3 className="text-sm font-medium">Goal</h3>
                 </div>
-              )}
-              <div className="pt-2 border-t border-border">
-                <h3 className="text-sm font-medium text-muted-foreground mb-2">Learning Goal</h3>
-                <p className="text-sm">{profile.learning_goal || "No learning goal set"}</p>
+                <p className="text-sm pl-6">{profile.learning_goal || "No learning goal set"}</p>
               </div>
             </CardContent>
           </Card>
