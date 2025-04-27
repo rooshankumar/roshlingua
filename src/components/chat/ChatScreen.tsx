@@ -44,6 +44,9 @@ export const ChatScreen = ({ conversation }: Props) => {
 
   useEffect(() => {
     if (!conversation?.id) return;
+    
+    let isActive = true;
+    console.log('Setting up realtime chat for conversation:', conversation.id);
 
     const fetchMessages = async (loadMore = false) => {
       try {
@@ -92,6 +95,8 @@ export const ChatScreen = ({ conversation }: Props) => {
         table: 'messages',
         filter: `conversation_id=eq.${conversation.id}`,
       }, async (payload) => {
+        console.log('New message received:', payload);
+        
         // Fetch the complete message with sender info
         const { data: newMessage } = await supabase
           .from('messages')
@@ -109,19 +114,58 @@ export const ChatScreen = ({ conversation }: Props) => {
           .single();
 
         if (newMessage) {
+          console.log('Fetched new message with sender:', newMessage);
           setMessages(prev => {
             const exists = prev.some(msg => msg.id === newMessage.id);
-            return exists ? prev : [...prev, newMessage];
+            const updatedMessages = exists ? prev : [...prev, newMessage];
+            // Force a render after a small delay to ensure state update
+            setTimeout(() => scrollToLatestMessage(), 100);
+            return updatedMessages;
           });
-          scrollToBottom();
         }
       })
       .subscribe();
 
     return () => {
+      isActive = false;
+      console.log('Cleaning up chat subscription');
       supabase.removeChannel(channel);
     };
   }, [conversation?.id, page]);
+  
+  // Add a connection status checker and reconnect mechanism
+  useEffect(() => {
+    if (!conversation?.id) return;
+    
+    let reconnectInterval: NodeJS.Timeout | null = null;
+    
+    const checkConnection = () => {
+      const channel = supabase.channel(`heartbeat:${conversation.id}`);
+      
+      channel
+        .subscribe((status) => {
+          console.log('Chat connection status:', status);
+          if (status === 'SUBSCRIBED') {
+            console.log('Chat connection is healthy');
+          } else if (status === 'CLOSED' || status === 'CHANNEL_ERROR') {
+            console.log('Chat connection lost, will reconnect shortly');
+            // Force reload on connection loss
+            setTimeout(() => {
+              window.location.reload();
+            }, 5000);
+          }
+        });
+        
+      // Check connection every minute
+      reconnectInterval = setInterval(checkConnection, 60000);
+    };
+    
+    checkConnection();
+    
+    return () => {
+      if (reconnectInterval) clearInterval(reconnectInterval);
+    };
+  }, [conversation?.id]);
 
   // Auto-scroll when messages change
   useEffect(() => {
