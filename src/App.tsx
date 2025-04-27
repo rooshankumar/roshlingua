@@ -6,7 +6,6 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from '@vercel/speed-insights/react';
 import HMRHandler from '@/components/HMRHandler';
-import { RealtimeManager } from "@/components/RealtimeManager"; // Added
 
 
 // Pages
@@ -138,7 +137,6 @@ const App = () => {
       <ThemeProvider defaultTheme="dark" storageKey="ui-theme">
         <BrowserRouter>
           <AuthProvider>
-            <RealtimeManager /> {/* Added */}
             <AppRoutes />
             <Toaster />
             <HMRHandler />
