@@ -380,54 +380,98 @@ const Community = () => {
           {filteredUsers.map((user) => (
             <Card 
               key={user.id} 
-              className="overflow-hidden cursor-pointer hover:shadow-md transition-all card-hover"
+              className="overflow-hidden cursor-pointer hover:shadow-lg transition-all group relative border border-border/50 hover:border-primary/20"
               onClick={() => navigate(`/profile/${user.id}`)}
             >
-              <CardContent className="p-4">
-                <div className="flex items-center gap-3">
+              {/* Card top background with decorative pattern */}
+              <div className="absolute inset-0 bg-gradient-to-b from-primary/5 to-transparent h-24 w-full" />
+              
+              {/* Like button positioned on top right */}
+              <div 
+                className="absolute top-3 right-3 z-10" 
+                onClick={e => e.stopPropagation()}
+              >
+                <LikeButton
+                  targetUserId={user.id}
+                  currentUserId={user?.id}
+                  className="hover:text-red-500 bg-background/80 backdrop-blur-sm p-1.5 rounded-full shadow-sm"
+                />
+              </div>
+              
+              <CardContent className="p-0">
+                {/* Profile section */}
+                <div className="pt-6 px-5 pb-3 relative z-[1]">
                   {/* Avatar with online indicator */}
-                  <div className="relative flex-shrink-0">
-                    <Avatar className="h-12 w-12 border-2 border-background">
-                      <AvatarImage src={user.avatar_url} className="object-cover" />
-                      <AvatarFallback>{user.full_name?.charAt(0)}</AvatarFallback>
-                    </Avatar>
-                    <span className={cn(
-                      "absolute bottom-0 right-0 block h-2.5 w-2.5 rounded-full border border-background",
-                      user.is_online ? "bg-green-500" : "bg-gray-300"
-                    )} />
+                  <div className="flex items-center gap-3">
+                    <div className="relative">
+                      <Avatar className="h-16 w-16 border-4 border-background shadow-md">
+                        <AvatarImage src={user.avatar_url} className="object-cover" />
+                        <AvatarFallback className="text-lg">{user.full_name?.charAt(0)}</AvatarFallback>
+                      </Avatar>
+                      <span className={cn(
+                        "absolute bottom-1 right-1 block h-3 w-3 rounded-full border-2 border-background",
+                        user.is_online ? "bg-green-500" : "bg-gray-300"
+                      )} />
+                    </div>
+                    
+                    {/* User name and languages */}
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-semibold text-base truncate group-hover:text-primary transition-colors">{user.full_name}</h3>
+                      <div className="flex items-center gap-1 text-muted-foreground text-xs mt-0.5">
+                        <span>{getLanguageFlag(user.native_language)}</span>
+                        <span className="font-medium">{user.native_language}</span>
+                        <span className="mx-1 text-primary/60">→</span>
+                        <span>{getLanguageFlag(user.learning_language)}</span>
+                        <span className="font-medium">{user.learning_language}</span>
+                      </div>
+                      
+                      {/* Level badge */}
+                      <Badge variant="outline" className="mt-1.5 text-xs bg-primary/5 border-primary/10">
+                        {user.proficiency_level?.charAt(0).toUpperCase() + user.proficiency_level?.slice(1) || 'Beginner'}
+                      </Badge>
+                    </div>
                   </div>
                   
-                  {/* User info */}
-                  <div className="flex-1 min-w-0">
-                    <h3 className="font-medium text-base truncate">{user.full_name}</h3>
-                    <div className="flex items-center gap-1 text-muted-foreground text-xs">
-                      <span>{user.native_language}</span>
-                      <span>→</span>
-                      <span>{user.learning_language}</span>
+                  {/* Bio snippet */}
+                  {user.bio && (
+                    <div className="mt-3 text-xs text-muted-foreground line-clamp-2 h-9 overflow-hidden">
+                      {user.bio}
                     </div>
+                  )}
+                </div>
+                
+                {/* Stats section */}
+                <div className="grid grid-cols-3 border-t mt-1">
+                  <div className="flex flex-col items-center py-2 border-r">
+                    <span className="text-xs text-muted-foreground">Streak</span>
+                    <div className="flex items-center gap-1 mt-0.5">
+                      <Flame className="h-3 w-3 text-orange-500" />
+                      <span className="font-medium text-sm">{user.streak_count || 0}</span>
+                    </div>
+                  </div>
+                  <div className="flex flex-col items-center py-2 border-r">
+                    <span className="text-xs text-muted-foreground">Likes</span>
+                    <div className="flex items-center gap-1 mt-0.5">
+                      <Heart className="h-3 w-3 text-red-500" />
+                      <span className="font-medium text-sm">{user.likes_count || 0}</span>
+                    </div>
+                  </div>
+                  <div className="flex flex-col items-center py-2">
+                    <span className="text-xs text-muted-foreground">Age</span>
+                    <span className="font-medium text-sm">{user.age || '–'}</span>
                   </div>
                 </div>
                 
-                {/* Simple actions row */}
-                <div className="flex justify-between items-center mt-3 pt-3 border-t">
-                  <div className="flex items-center text-xs text-muted-foreground">
-                    <Button 
-                      variant="ghost" 
-                      size="sm" 
-                      className="flex items-center gap-1 text-muted-foreground hover:text-primary"
-                      title="View full profile"
-                    >
-                      <User className="h-3.5 w-3.5" />
-                      <span>Profile</span>
-                    </Button>
-                  </div>
-                  <div className="flex items-center" onClick={e => e.stopPropagation()}>
-                    <LikeButton
-                      targetUserId={user.id}
-                      currentUserId={user?.id}
-                      className="hover:text-red-500"
-                    />
-                  </div>
+                {/* View profile button */}
+                <div className="px-3 pb-3 pt-1">
+                  <Button 
+                    variant="ghost" 
+                    size="sm"
+                    className="w-full text-xs justify-center gap-1 py-1 h-8 hover:bg-primary hover:text-primary-foreground group-hover:bg-primary/10 transition-colors"
+                  >
+                    <User className="h-3.5 w-3.5" />
+                    <span>View Profile</span>
+                  </Button>
                 </div>
               </CardContent>
             </Card>
