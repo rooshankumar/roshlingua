@@ -1,0 +1,46 @@
+Realtime reconnect attempt 5/5
+main.tsx:23 Notification subscription status: CLOSED
+wqojeesjtgfcftpnzaet.supabase.co/rest/v1/user_achievements?select=achievement_id%2Ccount%28*%29&order=achievement_id.asc:1 
+            
+            
+           Failed to load resource: the server responded with a status of 400 ()Understand this error
+main.tsx:23 Notification subscription status: SUBSCRIBED
+main.tsx:23 Profile data fetch result: Success
+main.tsx:23 Setting user stats with profile data
+main.tsx:23 Notification subscription status: CLOSED
+10main.tsx:23 Realtime subscription status: CLOSED
+wqojeesjtgfcftpnzaet.supabase.co/rest/v1/conversation_participants?select=user%3Aprofiles%21conversation_participants_user_id_fkey%28id%2Cuser_id%2Cfull_name%2Cavatar_url%2Clast_seen%29&conversation_id=eq.f74683b7-55ef-41c5-92c8-c827d0e30fd4&user_id=neq.ed1c374e-3823-4ea2-aa28-3999c21d1140:1 
+            
+            
+           Failed to load resource: the server responded with a status of 406 ()Understand this error
+8main.tsx:23 Realtime subscription status: CLOSED
+wqojeesjtgfcftpnzaet.supabase.co/rest/v1/messages?select=content%2Ccreated_at&conversation_id=eq.f74683b7-55ef-41c5-92c8-c827d0e30fd4&order=created_at.desc&limit=1:1 
+            
+            
+           Failed to load resource: the server responded with a status of 406 ()Understand this error
+wqojeesjtgfcftpnzaet.supabase.co/rest/v1/messages?select=content%2Ccreated_at&conversation_id=eq.f29b194a-7004-4a50-8d87-c8a31c03a20d&order=created_at.desc&limit=1:1 
+            
+            
+           Failed to load resource: the server responded with a status of 406 ()Understand this error
+13main.tsx:23 Realtime subscription status: CLOSED
+main.tsx:23 Realtime subscription status: SUBSCRIBED
+23main.tsx:23 Realtime subscription status: CLOSED
+3main.tsx:23 Realtime subscription status: CLOSED
+main.tsx:23 Realtime subscription status: SUBSCRIBED
+2main.tsx:23 Realtime subscription status: CLOSED
+main.tsx:23 Realtime subscription status: SUBSCRIBED
+2main.tsx:23 Realtime subscription status: CLOSED
+main.tsx:23 Realtime subscription status: SUBSCRIBED
+2main.tsx:23 Realtime subscription status: CLOSED
+main.tsx:23 Realtime subscription status: SUBSCRIBED
+7main.tsx:23 Realtime subscription status: CLOSED
+main.tsx:23 Realtime subscription status: SUBSCRIBED
+52main.tsx:23 Realtime subscription status: CLOSED
+main.tsx:23 Realtime subscription status: SUBSCRIBED
+19main.tsx:23 Realtime subscription status: CLOSED
+main.tsx:23 Realtime subscription status: SUBSCRIBED
+20main.tsx:23 Realtime subscription status: CLOSED
+main.tsx:23 Realtime subscription status: SUBSCRIBED
+56main.tsx:23 Realtime subscription status: CLOSED
+main.tsx:23 Realtime subscription status: SUBSCRIBED
+3main.tsx:23 Realtime subscription status: CLOSED
