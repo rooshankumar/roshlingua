@@ -31,7 +31,9 @@ const handleReconnection = () => {
   const reconnectInterval = 3000; // 3 seconds
 
   // Listen for WebSocket status changes
-  const { data: { subscription } } = supabase.channel('system').subscribe(status => {
+  const channel = supabase.channel('system');
+  
+  channel.subscribe(status => {
     if (status === 'CLOSED' || status === 'CHANNEL_ERROR') {
       console.log(`Real-time connection lost (${status}), attempt ${reconnectAttempts + 1}/${maxReconnectAttempts}`);
 
