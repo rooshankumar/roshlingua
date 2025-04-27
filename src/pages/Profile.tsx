@@ -92,7 +92,12 @@ const Profile = () => {
   }, [profile]);
 
   const handleShare = () => {
-    navigator.clipboard.writeText(window.location.href);
+    // Use the base URL and append the current path for sharing
+    const baseUrl = "https://roshlingua.vercel.app";
+    const profilePath = `/profile/${id}`;
+    const shareUrl = baseUrl + profilePath;
+    
+    navigator.clipboard.writeText(shareUrl);
     toast({
       title: "Link copied to clipboard",
       description: "You can now share this profile with others",
