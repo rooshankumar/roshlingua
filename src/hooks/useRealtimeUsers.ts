@@ -31,50 +31,91 @@ export function useRealtimeUsers() {
     };
 
     const setupRealtimeSubscription = () => {
-      // Enable realtime for the users table
-      channel = supabase
-        .channel('public:users')
-        .on('postgres_changes', 
-          {
+      let retryTimeout: number | null = null;
+      const maxRetries = 5;
+      let retryCount = 0;
+
+      const subscribe = () => {
+        // Enable realtime for the users table
+        channel = supabase
+          .channel('public:users')
+          .on('postgres_changes', {
             event: '*',
             schema: 'public',
             table: 'users'
-          }, 
-          payload => {
-            console.log('Realtime users update:', payload);
-            // Refetch the entire list to ensure we have the latest data
-            fetchUsers();
-          }
-        )
-        .subscribe((status) => {
-          console.log('Realtime subscription status:', status);
-        });
+          },
+            payload => {
+              console.log('Realtime users update:', payload);
+              // Refetch the entire list to ensure we have the latest data
+              fetchUsers();
+            }
+          )
+          .subscribe((status) => {
+            console.log('Realtime subscription status:', status);
+            if (status === 'SUBSCRIBED') {
+              retryCount = 0;
+            } else if (status === 'CLOSED' || status === 'CHANNEL_ERROR') {
+              if (retryCount < maxRetries) {
+                const delay = Math.min(1000 * Math.pow(2, retryCount), 10000);
+                console.log(`Connection closed, retrying in ${delay}ms (${retryCount + 1}/${maxRetries})`);
+                if (retryTimeout) window.clearTimeout(retryTimeout);
+                retryTimeout = window.setTimeout(() => {
+                  retryCount++;
+                  channel.unsubscribe();
+                  subscribe();
+                }, delay);
+              }
+            }
+          });
+      };
+      subscribe();
     };
 
-    const setupSubscription = () => {
-      channel = supabase
-        .channel('online-users')
-        .on('presence', { event: 'sync' }, () => {
-          // Handle presence sync
-          const presenceState = channel.presenceState();
-          const onlineUserIds = Object.keys(presenceState);
 
-          setUsers(prevUsers => 
-            prevUsers.map(user => ({
-              ...user,
-              is_online: onlineUserIds.includes(user.id)
-            }))
-          );
-        })
-        .subscribe(async (status) => {
-          if (status === 'SUBSCRIBED') {
-            // Track user's presence
-            await channel.track({
-              user_id: supabase.auth.user()?.id,
-              online_at: new Date().toISOString(),
+    const setupSubscription = () => {
+      let retryTimeout: number | null = null;
+      const maxRetries = 5;
+      let retryCount = 0;
+      const subscribe = () => {
+          channel = supabase
+            .channel('online-users')
+            .on('presence', { event: 'sync' }, () => {
+              // Handle presence sync
+              const presenceState = channel.presenceState();
+              const onlineUserIds = Object.keys(presenceState);
+
+              setUsers(prevUsers =>
+                prevUsers.map(user => ({
+                  ...user,
+                  is_online: onlineUserIds.includes(user.id)
+                }))
+              );
+            })
+            .subscribe(async (status) => {
+              console.log('Realtime subscription status:', status);
+              if (status === 'SUBSCRIBED') {
+                retryCount = 0;
+                // Track user's presence
+                await channel.track({
+                  user_id: supabase.auth.user()?.id,
+                  online_at: new Date().toISOString(),
+                });
+              } else if (status === 'CLOSED' || status === 'CHANNEL_ERROR') {
+                // Attempt to reconnect with exponential backoff
+                if (retryCount < maxRetries) {
+                  const delay = Math.min(1000 * Math.pow(2, retryCount), 10000);
+                  console.log(`Connection closed, retrying in ${delay}ms (${retryCount + 1}/${maxRetries})`);
+                  if (retryTimeout) window.clearTimeout(retryTimeout);
+                  retryTimeout = window.setTimeout(() => {
+                    retryCount++;
+                    channel.unsubscribe();
+                    subscribe();
+                  }, delay);
+                }
+              }
             });
-          }
-        });
+      };
+      subscribe();
     };
 
     // Initial fetch and subscription setup
