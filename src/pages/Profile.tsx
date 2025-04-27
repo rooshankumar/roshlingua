@@ -255,11 +255,6 @@ const Profile = () => {
             </DialogTrigger>
             <DialogContent className="max-w-3xl p-0 overflow-hidden">
               <div className="relative w-full">
-                <DialogClose className="absolute right-4 top-4 z-10 rounded-full bg-background/80 p-2 opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none">
-                  <X className="h-5 w-5" />
-                  <span className="sr-only">Close</span>
-                </DialogClose>
-                
                 <div className="w-full flex items-center justify-center bg-black/5 p-6">
                   <img 
                     src={profile.avatar_url} 
