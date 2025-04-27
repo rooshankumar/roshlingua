@@ -216,16 +216,14 @@ const Profile = () => {
 
   return (
     <div className="container pb-12 pt-6 animate-fade-in max-w-5xl mx-auto">
-      <div className="flex flex-col md:flex-row items-start gap-6 mb-8">
-        {/* Back Button and Title */}
-        <div className="w-full md:w-auto">
-          <Button variant="outline" size="sm" className="mb-4" asChild>
-            <Link to="/community">
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to Community
-            </Link>
-          </Button>
-        </div>
+      {/* Back Button */}
+      <div className="w-full flex items-center mb-6">
+        <Button variant="ghost" size="sm" asChild className="group flex items-center gap-2 hover:bg-primary/10">
+          <Link to="/community">
+            <ArrowLeft className="h-5 w-5 transition-transform group-hover:-translate-x-1" />
+            <span>Back to Community</span>
+          </Link>
+        </Button>
       </div>
 
       {/* Profile Card with Avatar, Name and Actions */}
@@ -234,8 +232,8 @@ const Profile = () => {
           {/* Avatar Section */}
           <Dialog>
             <DialogTrigger asChild>
-              <Button variant="ghost" className="p-0 h-auto hover:bg-transparent">
-                <div className="h-32 w-32 rounded-full ring-4 ring-primary/10 shadow-xl cursor-pointer hover:ring-primary/30 transition-all overflow-hidden">
+              <Button variant="ghost" className="p-0 h-auto hover:bg-transparent relative group">
+                <div className="h-32 w-32 rounded-full ring-4 ring-primary/10 shadow-xl cursor-pointer hover:ring-primary/30 transition-all overflow-hidden group-hover:brightness-90">
                   {profile.avatar_url ? (
                     <img 
                       src={profile.avatar_url} 
@@ -247,20 +245,31 @@ const Profile = () => {
                       <span className="text-3xl">{profile.full_name?.charAt(0)}</span>
                     </div>
                   )}
+                  <div className="absolute inset-0 flex items-center justify-center bg-black/40 text-white opacity-0 group-hover:opacity-100 transition-opacity rounded-full">
+                    <span className="text-xs font-medium">View full size</span>
+                  </div>
                 </div>
               </Button>
             </DialogTrigger>
-            <DialogContent className="max-w-md">
-              <DialogHeader>
-                <DialogTitle>{profile.full_name}</DialogTitle>
-                <DialogDescription>Profile picture</DialogDescription>
-              </DialogHeader>
-              <div className="flex flex-col items-center gap-4 p-4">
-                <img 
-                  src={profile.avatar_url} 
-                  alt={profile.full_name} 
-                  className="max-w-full max-h-[60vh] object-contain rounded-md"
-                />
+            <DialogContent className="max-w-3xl p-0 overflow-hidden">
+              <div className="relative w-full">
+                <DialogClose className="absolute right-4 top-4 z-10 rounded-full bg-background/80 p-2 opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none">
+                  <X className="h-5 w-5" />
+                  <span className="sr-only">Close</span>
+                </DialogClose>
+                
+                <div className="w-full flex items-center justify-center bg-black/5 p-6">
+                  <img 
+                    src={profile.avatar_url} 
+                    alt={profile.full_name} 
+                    className="max-w-full max-h-[75vh] object-contain rounded-md"
+                  />
+                </div>
+                
+                <div className="p-4 bg-background">
+                  <h3 className="text-lg font-semibold">{profile.full_name}</h3>
+                  <p className="text-sm text-muted-foreground">Profile picture</p>
+                </div>
               </div>
             </DialogContent>
           </Dialog>
