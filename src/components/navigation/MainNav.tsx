@@ -8,7 +8,7 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useTranslation } from 'react-i18next';
 import { useResponsive } from "@/hooks/use-mobile";
 import { NotificationDropdown } from "@/components/notifications/NotificationDropdown";
-import RealtimeStatus from "@/components/RealtimeStatus"; // Fixed import
+import { RealtimeStatus } from "@/components/RealtimeStatus";
 
 
 const routes = [
