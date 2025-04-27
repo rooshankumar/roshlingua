@@ -49,9 +49,11 @@ export function RealtimeManager() {
       reconnectAttemptRef.current = 0; // Reset counter on successful connection
     };
     
-    // Track connection state changes
-    const subscription = realtimeClient.onPresenceStateChange(() => {});
+    // Create a channel instead of using the deprecated onPresenceStateChange
+    const channel = supabase.channel('system');
+    const subscription = channel.subscribe();
     
+    // Track connection state changes
     realtimeClient.on('DISCONNECT', handleDisconnect);
     realtimeClient.on('RECONNECT', handleConnect);
     
@@ -64,7 +66,9 @@ export function RealtimeManager() {
       }
       realtimeClient.off('DISCONNECT', handleDisconnect);
       realtimeClient.off('RECONNECT', handleConnect);
-      subscription.unsubscribe();
+      if (subscription) {
+        channel.unsubscribe();
+      }
     };
   }, [toast]);
   
