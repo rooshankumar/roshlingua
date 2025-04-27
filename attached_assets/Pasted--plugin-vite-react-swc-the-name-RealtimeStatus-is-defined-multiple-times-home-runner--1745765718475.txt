@@ -1,0 +1,133 @@
+[plugin:vite:react-swc] × the name `RealtimeStatus` is defined multiple times
+     ╭─[/home/runner/workspace/src/components/navigation/MainNav.tsx:11:1]
+   8 │ import { useTranslation } from 'react-i18next';
+   9 │ import { useResponsive } from "@/hooks/use-mobile";
+  10 │ import { NotificationDropdown } from "@/components/notifications/NotificationDropdown";
+  11 │ import { RealtimeStatus } from "@/components/RealtimeStatus"; // Added import
+     ·          ───────┬──────
+     ·                 ╰── previous definition of `RealtimeStatus` here
+  12 │ 
+  13 │ 
+  14 │ const routes = [
+  15 │   {
+  16 │     path: "/dashboard",
+  17 │     label: "dashboard",
+  18 │     icon: Home
+  19 │   },
+  20 │   {
+  21 │     path: "/community",
+  22 │     label: "Community",
+  23 │     icon: Users
+  24 │   },
+  25 │   {
+  26 │     path: "/chat",
+  27 │     label: "Chat",
+  28 │     icon: MessageSquare,
+  29 │     notificationCount: (notifications) => notifications?.unreadMessages || 0
+  30 │   },
+  31 │   {
+  32 │     path: "/settings",
+  33 │     label: "Settings",
+  34 │     icon: Settings
+  35 │   }
+  36 │ ];
+  37 │ 
+  38 │ export function MainNav() {
+  39 │   const location = useLocation();
+  40 │   const [open, setOpen] = React.useState(false);
+  41 │   const { user } = useAuth();
+  42 │   const { unreadCounts } = useUnreadMessages(user?.id);
+  43 │   const totalUnread = unreadCounts ? Object.values(unreadCounts).reduce((sum, count) => sum + count, 0) : 0;
+  44 │   const { t } = useTranslation();
+  45 │   const responsive = useResponsive();
+  46 │ 
+  47 │   const isActive = (path: string) => {
+  48 │     return location.pathname === path;
+  49 │   };
+  50 │ 
+  51 │   const NavigationItems = ({ mobile = false }) => (
+  52 │     <>
+  53 │       {routes.map((route) => (
+  54 │         <NavLink
+  55 │           key={route.path}
+  56 │           to={route.path}
+  57 │           onClick={() => setOpen(false)}
+  58 │           className={`flex items-center space-x-2 px-3 py-2 rounded-md transition-all duration-200 group ${
+  59 │             mobile ? 'py-3' : ''
+  60 │           } ${
+  61 │             isActive(route.path) 
+  62 │               ? "bg-primary/10 text-primary translate-x-2" 
+  63 │               : "hover:bg-secondary hover:translate-x-1"
+  64 │           }`}
+  65 │         >
+  66 │           <div className="relative">
+  67 │             <route.icon 
+  68 │               className={`transition-transform duration-200 ${
+  69 │                 isActive(route.path) 
+  70 │                   ? "scale-110" 
+  71 │                   : "group-hover:scale-105"
+  72 │               }`} 
+  73 │               size={mobile ? responsive.iconSize.base : responsive.iconSize.small}
+  74 │             />
+  75 │             {route.notificationCount && route.path === '/chat' && totalUnread > 0 && (
+  76 │               <span className="absolute -top-2 -right-2 bg-destructive text-destructive-foreground text-xs rounded-full h-5 w-5 flex items-center justify-center animate-pulse">
+  77 │                 {totalUnread}
+  78 │               </span>
+  79 │             )}
+  80 │           </div>
+  81 │           <span 
+  82 │             style={{ fontSize: mobile ? responsive.fontSize.base : responsive.fontSize.small }}
+  83 │           >
+  84 │             {t(`navigation.${route.label.toLowerCase()}`)}
+  85 │           </span>
+  86 │         </NavLink>
+  87 │       ))}
+  88 │     </>
+  89 │   );
+  90 │ 
+  91 │   // Check if we're in a chat detail route
+  92 │   const isChatDetailRoute = location.pathname.match(/^\/chat\/[0-9a-f-]+$/);
+  93 │ 
+  94 │   return (
+  95 │     <nav className="hidden lg:flex sticky top-0 flex-col space-y-2 p-4 min-h-screen bg-background/80 backdrop-blur-lg border-r">
+  96 │       <div className="mb-8">
+  97 │         <h2 
+  98 │           className="font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent"
+  99 │           style={{ fontSize: responsive.fontSize.heading }}
+ 100 │         >
+ 101 │           {t('navigation.menu')}
+ 102 │         </h2>
+ 103 │       </div>
+ 104 │       <NavigationItems />
+ 105 │       <div className="mt-auto pt-4 border-t">
+ 106 │         <div className="flex items-center justify-between px-3 py-2">
+ 107 │           <div className="flex items-center space-x-2">
+ 108 │             <RealtimeStatus /> {/* Added RealtimeStatus component */}
+ 109 │             <span 
+ 110 │               className="text-muted-foreground"
+ 111 │               style={{ fontSize: responsive.fontSize.small }}
+ 112 │             >
+ 113 │               {t('navigation.online')}
+ 114 │             </span>
+ 115 │           </div>
+ 116 │           {!location.pathname.includes('/chat') && !location.pathname.includes('/settings') && (
+ 117 │             <NotificationDropdown />
+ 118 │           )}
+ 119 │         </div>
+ 120 │       </div>
+ 121 │     </nav>
+ 122 │   );
+ 123 │ }
+ 124 │ 
+ 125 │ export default MainNav;
+ 126 │ 
+ 127 │ 
+ 128 │ // Placeholder RealtimeStatus component
+ 129 │ export const RealtimeStatus = () => {
+     ·              ───────┬──────
+     ·                     ╰── `RealtimeStatus` redefined here
+ 130 │   return (
+ 131 │     <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"/>
+ 132 │   );
+     ╰────
+/home/runner/workspace/src/components/navigation/MainNav.tsx:11:1
