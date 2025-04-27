@@ -33,22 +33,23 @@ import {
 import { toast } from '@/hooks/use-toast';
 import classNames from 'classnames';
 import { cn } from "@/lib/utils";
+import { ChevronUp } from 'lucide-react'; // Added import for ChevronUp icon
 
 import { SUPPORTED_LANGUAGES } from '@/utils/languageUtils';
 
 // Helper function to get flag emoji for language
 const getLanguageFlag = (language?: string) => {
   if (!language) return "🌐";
-  
+
   // First try to find language in our supported languages array
   const supportedLang = SUPPORTED_LANGUAGES.find(
     lang => lang.name.toLowerCase() === language.toLowerCase()
   );
-  
+
   if (supportedLang) {
     return supportedLang.flag;
   }
-  
+
   // Fallback to a simple map for languages not in SUPPORTED_LANGUAGES
   const languageToFlag: Record<string, string> = {
     'English': '🇬🇧',
@@ -79,7 +80,7 @@ const getLanguageFlag = (language?: string) => {
     'Indonesian': '🇮🇩',
     'Hebrew': '🇮🇱',
   };
-  
+
   return languageToFlag[language] || '🌐';
 };
 
@@ -103,7 +104,7 @@ const Community = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
-  
+
   // Filter states
   const [languageFilter, setLanguageFilter] = useState("any");
   const [nativeLanguageFilter, setNativeLanguageFilter] = useState("any");
@@ -111,10 +112,11 @@ const Community = () => {
   const [minAgeFilter, setMinAgeFilter] = useState<number | null>(null);
   const [maxAgeFilter, setMaxAgeFilter] = useState<number | null>(null);
   const [onlineOnly, setOnlineOnly] = useState(false);
-  
+  const [showScrollTop, setShowScrollTop] = useState(false); // Added state for scroll button
+
   const navigate = useNavigate();
   const { user } = useAuth();
-  
+
   // Get the count of active filters for the badge
   const getFilterCount = () => {
     let count = 0;
@@ -124,7 +126,7 @@ const Community = () => {
     if (onlineOnly) count++;
     return count > 0 ? count : '';
   };
-  
+
   // Reset all filters to default values
   const resetFilters = () => {
     setSearchQuery("");
@@ -135,11 +137,11 @@ const Community = () => {
     setMaxAgeFilter(null);
     setOnlineOnly(false);
   };
-  
+
   // Render badges for active filters
   const renderActiveFilterBadges = () => {
     const badges = [];
-    
+
     if (nativeLanguageFilter && nativeLanguageFilter !== "any") {
       badges.push(
         <Badge 
@@ -154,7 +156,7 @@ const Community = () => {
         </Badge>
       );
     }
-    
+
     if (learningLanguageFilter && learningLanguageFilter !== "any") {
       badges.push(
         <Badge 
@@ -169,7 +171,7 @@ const Community = () => {
         </Badge>
       );
     }
-    
+
     if (minAgeFilter !== null || maxAgeFilter !== null) {
       badges.push(
         <Badge 
@@ -187,7 +189,7 @@ const Community = () => {
         </Badge>
       );
     }
-    
+
     if (onlineOnly) {
       badges.push(
         <Badge 
@@ -202,7 +204,7 @@ const Community = () => {
         </Badge>
       );
     }
-    
+
     return badges;
   };
 
@@ -269,7 +271,7 @@ const Community = () => {
         },
         payload => {
           console.log('Real-time profile update received:', payload);
-          
+
           // Update the specific user in the state rather than re-fetching all users
           if (payload.new && payload.eventType) {
             setUsers(prevUsers => {
@@ -281,22 +283,22 @@ const Community = () => {
                   return [...prevUsers, payload.new as User];
                 }
               }
-              
+
               // For UPDATE event, update the existing user
               else if (payload.eventType === 'UPDATE') {
                 return prevUsers.map(u => 
                   u.id === payload.new.id ? { ...u, ...payload.new } : u
                 );
               }
-              
+
               // For DELETE event, remove the user
               else if (payload.eventType === 'DELETE' && payload.old) {
                 return prevUsers.filter(u => u.id !== payload.old.id);
               }
-              
+
               return prevUsers;
             });
-            
+
             // We'll rely on the useEffect dependency array to update filtered users
             // This ensures consistent filtering logic in one place
           }
@@ -438,6 +440,15 @@ const Community = () => {
     )
   ).sort();
 
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowScrollTop(window.pageYOffset > 300);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+
   return (
     <div className="container mx-auto py-6 space-y-4">
       <div className="flex flex-col space-y-1 mb-6">
@@ -492,7 +503,7 @@ const Community = () => {
                     </DialogDescription>
                   </DialogHeader>
                 </div>
-                
+
                 <div className="grid gap-6 p-6">
                   <div className="space-y-3">
                     <div className="flex items-center">
@@ -544,7 +555,7 @@ const Community = () => {
                       </div>
                     </div>
                   </div>
-                  
+
                   <div className="space-y-3">
                     <div className="flex items-center">
                       <User className="mr-2 h-5 w-5 text-primary" />
@@ -603,7 +614,7 @@ const Community = () => {
                       </div>
                     </div>
                   </div>
-                  
+
                   <div className="flex items-center gap-3 p-4 rounded-lg bg-green-500/10 border border-green-500/20">
                     <Switch
                       id="online-mode"
@@ -620,7 +631,7 @@ const Community = () => {
                     </div>
                   </div>
                 </div>
-                
+
                 <div className="border-t">
                   <div className="p-4 flex justify-between items-center">
                     <Button 
@@ -637,7 +648,7 @@ const Community = () => {
                 </div>
               </DialogContent>
             </Dialog>
-            
+
             {/* Active filters */}
             <div className="flex flex-wrap gap-2 animate-in fade-in">
               {renderActiveFilterBadges()}
@@ -667,14 +678,14 @@ const Community = () => {
                       user.is_online ? "bg-green-500" : "bg-gray-300"
                     )} />
                   </div>
-                  
+
                   {/* Name and age */}
                   <div className="flex-1">
                     <div className="flex items-center justify-between">
                       <h3 className="font-medium text-base group-hover:text-primary transition-colors">{user.full_name}</h3>
                       <span className="text-sm text-muted-foreground">{user.age || '–'}</span>
                     </div>
-                    
+
                     {/* Languages */}
                     <div className="flex items-center gap-2 mt-1">
                       <Badge variant="secondary" className="text-xs py-0 px-1.5 h-5">
@@ -705,6 +716,18 @@ const Community = () => {
             </p>
           </CardContent>
         </Card>
+      )}
+
+      {/* Scroll to top button */}
+      {showScrollTop && (
+        <Button
+          variant="secondary"
+          size="icon"
+          className="fixed bottom-20 right-6 z-50 rounded-full shadow-lg animate-fade-up hover:shadow-xl transition-all"
+          onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+        >
+          <ChevronUp className="h-5 w-5" />
+        </Button>
       )}
     </div>
   );
