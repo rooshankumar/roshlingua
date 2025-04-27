@@ -105,9 +105,9 @@ const Community = () => {
   const [searchQuery, setSearchQuery] = useState("");
   
   // Filter states
-  const [languageFilter, setLanguageFilter] = useState("");
-  const [nativeLanguageFilter, setNativeLanguageFilter] = useState("");
-  const [learningLanguageFilter, setLearningLanguageFilter] = useState("");
+  const [languageFilter, setLanguageFilter] = useState("any");
+  const [nativeLanguageFilter, setNativeLanguageFilter] = useState("any");
+  const [learningLanguageFilter, setLearningLanguageFilter] = useState("any");
   const [minAgeFilter, setMinAgeFilter] = useState<number | null>(null);
   const [maxAgeFilter, setMaxAgeFilter] = useState<number | null>(null);
   const [onlineOnly, setOnlineOnly] = useState(false);
@@ -118,8 +118,8 @@ const Community = () => {
   // Get the count of active filters for the badge
   const getFilterCount = () => {
     let count = 0;
-    if (nativeLanguageFilter) count++;
-    if (learningLanguageFilter) count++;
+    if (nativeLanguageFilter && nativeLanguageFilter !== "any") count++;
+    if (learningLanguageFilter && learningLanguageFilter !== "any") count++;
     if (minAgeFilter !== null || maxAgeFilter !== null) count++;
     if (onlineOnly) count++;
     return count > 0 ? count : '';
@@ -128,9 +128,9 @@ const Community = () => {
   // Reset all filters to default values
   const resetFilters = () => {
     setSearchQuery("");
-    setLanguageFilter("");
-    setNativeLanguageFilter("");
-    setLearningLanguageFilter("");
+    setLanguageFilter("any");
+    setNativeLanguageFilter("any");
+    setLearningLanguageFilter("any");
     setMinAgeFilter(null);
     setMaxAgeFilter(null);
     setOnlineOnly(false);
@@ -140,13 +140,13 @@ const Community = () => {
   const renderActiveFilterBadges = () => {
     const badges = [];
     
-    if (nativeLanguageFilter) {
+    if (nativeLanguageFilter && nativeLanguageFilter !== "any") {
       badges.push(
         <Badge 
           key="native" 
           variant="outline" 
           className="flex items-center gap-1 bg-secondary/20"
-          onClick={() => setNativeLanguageFilter("")}
+          onClick={() => setNativeLanguageFilter("any")}
         >
           Native: {nativeLanguageFilter}
           <X className="h-3 w-3 cursor-pointer" />
@@ -154,13 +154,13 @@ const Community = () => {
       );
     }
     
-    if (learningLanguageFilter) {
+    if (learningLanguageFilter && learningLanguageFilter !== "any") {
       badges.push(
         <Badge 
           key="learning" 
           variant="outline" 
           className="flex items-center gap-1 bg-secondary/20"
-          onClick={() => setLearningLanguageFilter("")}
+          onClick={() => setLearningLanguageFilter("any")}
         >
           Learning: {learningLanguageFilter}
           <X className="h-3 w-3 cursor-pointer" />
@@ -332,14 +332,14 @@ const Community = () => {
     }
 
     // Apply native language filter (with null check)
-    if (nativeLanguageFilter) {
+    if (nativeLanguageFilter && nativeLanguageFilter !== "any") {
       result = result.filter(user => 
         user.native_language && user.native_language.toLowerCase() === nativeLanguageFilter.toLowerCase()
       );
     }
 
     // Apply learning language filter (with null check)
-    if (learningLanguageFilter) {
+    if (learningLanguageFilter && learningLanguageFilter !== "any") {
       result = result.filter(user => 
         user.learning_language && user.learning_language.toLowerCase() === learningLanguageFilter.toLowerCase()
       );
@@ -489,10 +489,10 @@ const Community = () => {
                             <SelectValue placeholder="Any" />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="">Any</SelectItem>
-                            {availableLanguages.map((language) => (
-                              <SelectItem key={`native-${language}`} value={language || "unknown"}>
-                                {getLanguageFlag(language)} {language || "Unknown"}
+                            <SelectItem value="any">Any</SelectItem>
+                            {availableLanguages.filter(Boolean).map((language) => (
+                              <SelectItem key={`native-${language}`} value={language}>
+                                {getLanguageFlag(language)} {language}
                               </SelectItem>
                             ))}
                           </SelectContent>
@@ -508,10 +508,10 @@ const Community = () => {
                             <SelectValue placeholder="Any" />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="">Any</SelectItem>
-                            {availableLanguages.map((language) => (
-                              <SelectItem key={`learning-${language}`} value={language || "unknown"}>
-                                {getLanguageFlag(language)} {language || "Unknown"}
+                            <SelectItem value="any">Any</SelectItem>
+                            {availableLanguages.filter(Boolean).map((language) => (
+                              <SelectItem key={`learning-${language}`} value={language}>
+                                {getLanguageFlag(language)} {language}
                               </SelectItem>
                             ))}
                           </SelectContent>
