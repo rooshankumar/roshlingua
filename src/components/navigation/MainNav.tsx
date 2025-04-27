@@ -8,7 +8,7 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useTranslation } from 'react-i18next';
 import { useResponsive } from "@/hooks/use-mobile";
 import { NotificationDropdown } from "@/components/notifications/NotificationDropdown";
-import { RealtimeStatus } from "@/components/RealtimeStatus"; // Added import
+import RealtimeStatus from "@/components/RealtimeStatus"; // Fixed import
 
 
 const routes = [
@@ -123,11 +123,3 @@ export function MainNav() {
 }
 
 export default MainNav;
-
-
-// Placeholder RealtimeStatus component
-export const RealtimeStatus = () => {
-  return (
-    <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"/>
-  );
-};
