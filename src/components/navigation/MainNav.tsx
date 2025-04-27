@@ -8,6 +8,7 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useTranslation } from 'react-i18next';
 import { useResponsive } from "@/hooks/use-mobile";
 import { NotificationDropdown } from "@/components/notifications/NotificationDropdown";
+import { RealtimeStatus } from "@/components/RealtimeStatus"; // Added import
 
 
 const routes = [
@@ -33,8 +34,6 @@ const routes = [
     icon: Settings
   }
 ];
-
-// The NotificationDropdown component is now imported from @/components/notifications/NotificationDropdown
 
 export function MainNav() {
   const location = useLocation();
@@ -106,7 +105,7 @@ export function MainNav() {
       <div className="mt-auto pt-4 border-t">
         <div className="flex items-center justify-between px-3 py-2">
           <div className="flex items-center space-x-2">
-            <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"/>
+            <RealtimeStatus /> {/* Added RealtimeStatus component */}
             <span 
               className="text-muted-foreground"
               style={{ fontSize: responsive.fontSize.small }}
@@ -124,3 +123,11 @@ export function MainNav() {
 }
 
 export default MainNav;
+
+
+// Placeholder RealtimeStatus component
+export const RealtimeStatus = () => {
+  return (
+    <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"/>
+  );
+};

@@ -1,9 +1,12 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import { supabase } from '@/lib/supabase';
 import { RealtimeChannel } from '@supabase/supabase-js';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
-import { Loader2, RefreshCw } from 'lucide-react';
+import { Loader2, RefreshCw, Wifi, WifiOff } from 'lucide-react';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip';
+import { toast } from '@/hooks/use-toast';
+
 
 const RealtimeStatus = () => {
   const [status, setStatus] = useState<'connecting' | 'connected' | 'disconnected'>('connecting');
@@ -48,7 +51,7 @@ const RealtimeStatus = () => {
   useEffect(() => {
     let isActive = true;
     let reconnectTimer: NodeJS.Timeout | null = null;
-    
+
     // Clean up any existing subscription
     if (subscriptionRef.current) {
       subscriptionRef.current.unsubscribe();
@@ -63,14 +66,14 @@ const RealtimeStatus = () => {
     // Periodic health check with more frequent checks
     const intervalId = setInterval(() => {
       if (!isActive) return;
-      
+
       console.log('Checking realtime connection health');
       if (status === 'disconnected' && reconnectAttempt < 5) {
         if (subscriptionRef.current) {
           subscriptionRef.current.unsubscribe();
           subscriptionRef.current = null;
         }
-        
+
         // Use a delay before reconnecting to prevent rapid cycling
         if (reconnectTimer) clearTimeout(reconnectTimer);
         reconnectTimer = setTimeout(() => {
@@ -106,28 +109,57 @@ const RealtimeStatus = () => {
   const forceReconnect = () => {
     setStatus('connecting');
     setReconnectAttempt(prev => prev + 1);
+    toast({
+      title: "Reconnecting...",
+      description: "Attempting to reconnect to real-time service",
+    });
+    // Force disconnect and reconnect (added for robustness)
+    supabase.realtime.disconnect();
+    setTimeout(() => {
+      supabase.realtime.connect();
+    }, 500);
   };
 
   return (
     <div className="flex flex-col gap-2 p-4 border rounded-md">
-      <div className="flex items-center gap-2">
-        <span>Realtime Status:</span>
-        {status === 'connecting' && (
-          <Badge variant="outline" className="bg-yellow-100 text-yellow-800">
-            <Loader2 className="h-3 w-3 animate-spin mr-1" /> Connecting...
-          </Badge>
-        )}
-        {status === 'connected' && (
-          <Badge variant="outline" className="bg-green-100 text-green-800">Connected</Badge>
-        )}
-        {status === 'disconnected' && (
-          <Badge variant="outline" className="bg-red-100 text-red-800">
-            Disconnected
-          </Badge>
-        )}
-      </div>
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant={status === 'disconnected' ? "destructive" : "ghost"}
+              size="sm"
+              className="h-8 px-2 gap-1.5"
+              onClick={status === 'disconnected' ? forceReconnect : undefined}
+            >
+              {status === 'connected' && (
+                <Wifi className="h-3.5 w-3.5 text-green-500" />
+              )}
+              {status === 'connecting' && (
+                <Loader2 className="h-3.5 w-3.5 animate-spin text-yellow-500" />
+              )}
+              {status === 'disconnected' && (
+                <WifiOff className="h-3.5 w-3.5 text-destructive" />
+              )}
+              <span className="text-xs">
+                {status === 'connected' && "Real-time"}
+                {status === 'connecting' && "Connecting..."}
+                {status === 'disconnected' && "Reconnect"}
+              </span>
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent side="bottom">
+            <p>
+              {status === 'connected' && "Connected to real-time updates"}
+              {status === 'connecting' && "Establishing connection..."}
+              {status === 'disconnected' && "Connection lost - click to reconnect"}
+            </p>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
 
-      <div className="flex gap-2">
+
+      {/* Remaining UI elements */}
+      <div className="flex gap-2 mt-2">
         <Button
           size="sm"
           variant="outline"
@@ -136,14 +168,7 @@ const RealtimeStatus = () => {
         >
           Test Connection
         </Button>
-
-        <Button
-          size="sm"
-          variant="outline"
-          onClick={forceReconnect}
-        >
-          <RefreshCw className="h-3 w-3 mr-1" /> Reconnect
-        </Button>
+        {/* Removed redundant Reconnect button */}
       </div>
 
       {lastMessage && (
