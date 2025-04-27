@@ -24,10 +24,22 @@ import { toast } from '@/hooks/use-toast';
 import classNames from 'classnames';
 import { cn } from "@/lib/utils";
 
+import { SUPPORTED_LANGUAGES } from '@/utils/languageUtils';
+
 // Helper function to get flag emoji for language
 const getLanguageFlag = (language?: string) => {
   if (!language) return "🌐";
   
+  // First try to find language in our supported languages array
+  const supportedLang = SUPPORTED_LANGUAGES.find(
+    lang => lang.name.toLowerCase() === language.toLowerCase()
+  );
+  
+  if (supportedLang) {
+    return supportedLang.flag;
+  }
+  
+  // Fallback to a simple map for languages not in SUPPORTED_LANGUAGES
   const languageToFlag: Record<string, string> = {
     'English': '🇬🇧',
     'Spanish': '🇪🇸',
@@ -56,10 +68,8 @@ const getLanguageFlag = (language?: string) => {
     'Vietnamese': '🇻🇳',
     'Indonesian': '🇮🇩',
     'Hebrew': '🇮🇱',
-    // Add more languages as needed
   };
   
-  // Return the flag if found
   return languageToFlag[language] || '🌐';
 };
 
@@ -407,11 +417,13 @@ const Community = () => {
                     {/* Languages */}
                     <div className="flex items-center gap-2 mt-1">
                       <Badge variant="secondary" className="text-xs py-0 px-1.5 h-5">
-                        {getLanguageFlag(user.native_language)} {user.native_language}
+                        <span className="mr-1" aria-label={`Flag for ${user.native_language}`}>{getLanguageFlag(user.native_language)}</span> 
+                        <span>{user.native_language}</span>
                       </Badge>
                       <span className="text-primary">→</span>
                       <Badge variant="outline" className="text-xs py-0 px-1.5 h-5 bg-primary/5">
-                        {getLanguageFlag(user.learning_language)} {user.learning_language}
+                        <span className="mr-1" aria-label={`Flag for ${user.learning_language}`}>{getLanguageFlag(user.learning_language)}</span>
+                        <span>{user.learning_language}</span>
                       </Badge>
                     </div>
                   </div>
