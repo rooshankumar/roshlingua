@@ -7,7 +7,6 @@ import {
   Languages, 
   MapPin, 
   MessageCircle, 
-  Share2, 
   User,
   Award,
   BookOpen,
@@ -91,18 +90,7 @@ const Profile = () => {
     }
   }, [profile]);
 
-  const handleShare = () => {
-    // Use the base URL and append the current path for sharing
-    const baseUrl = "https://roshlingua.vercel.app";
-    const profilePath = `/profile/${id}`;
-    const shareUrl = baseUrl + profilePath;
-    
-    navigator.clipboard.writeText(shareUrl);
-    toast({
-      title: "Link copied to clipboard",
-      description: "You can now share this profile with others",
-    });
-  };
+  
 
   const handleStartChat = async (userId) => {
     try {
@@ -288,10 +276,7 @@ const Profile = () => {
                 className="button-hover"
               />
 
-              <Button variant="outline" size="sm" className="button-hover" onClick={handleShare}>
-                <Share2 className="h-4 w-4 mr-2" />
-                Share
-              </Button>
+              
 
               <Button 
                 size="sm" 
