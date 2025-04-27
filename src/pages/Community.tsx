@@ -127,6 +127,7 @@ const Community = () => {
   
   // Reset all filters to default values
   const resetFilters = () => {
+    setSearchQuery("");
     setLanguageFilter("");
     setNativeLanguageFilter("");
     setLearningLanguageFilter("");
@@ -292,33 +293,8 @@ const Community = () => {
               return prevUsers;
             });
             
-            // Also update filtered users to reflect changes immediately
-            setFilteredUsers(prevFiltered => {
-              // Apply the same filtering logic as in the useEffect
-              let updatedUsers = [...users];
-              
-              if (searchQuery) {
-                updatedUsers = updatedUsers.filter(user =>
-                  user.full_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                  user.native_language?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                  user.learning_language?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                  user.bio?.toLowerCase().includes(searchQuery.toLowerCase())
-                );
-              }
-              
-              if (languageFilter) {
-                updatedUsers = updatedUsers.filter(user =>
-                  user.native_language === languageFilter ||
-                  user.learning_language === languageFilter
-                );
-              }
-              
-              if (onlineOnly) {
-                updatedUsers = updatedUsers.filter(user => user.is_online);
-              }
-              
-              return updatedUsers;
-            });
+            // We'll rely on the useEffect dependency array to update filtered users
+            // This ensures consistent filtering logic in one place
           }
         }
       )
@@ -348,47 +324,47 @@ const Community = () => {
     // Apply search query filter
     if (searchQuery) {
       result = result.filter(user =>
-        user.full_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        user.native_language?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        user.learning_language?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        user.bio?.toLowerCase().includes(searchQuery.toLowerCase())
+        (user.full_name?.toLowerCase().includes(searchQuery.toLowerCase())) ||
+        (user.native_language?.toLowerCase().includes(searchQuery.toLowerCase())) ||
+        (user.learning_language?.toLowerCase().includes(searchQuery.toLowerCase())) ||
+        (user.bio?.toLowerCase().includes(searchQuery.toLowerCase()))
       );
     }
 
-    // For backward compatibility
-    if (languageFilter && languageFilter !== '' && languageFilter !== 'all') {
-      result = result.filter(user =>
-        user.native_language === languageFilter ||
-        user.learning_language === languageFilter
-      );
-    }
-
-    // Apply native language filter
+    // Apply native language filter (with null check)
     if (nativeLanguageFilter) {
-      result = result.filter(user => user.native_language === nativeLanguageFilter);
+      result = result.filter(user => 
+        user.native_language && user.native_language.toLowerCase() === nativeLanguageFilter.toLowerCase()
+      );
     }
 
-    // Apply learning language filter
+    // Apply learning language filter (with null check)
     if (learningLanguageFilter) {
-      result = result.filter(user => user.learning_language === learningLanguageFilter);
+      result = result.filter(user => 
+        user.learning_language && user.learning_language.toLowerCase() === learningLanguageFilter.toLowerCase()
+      );
     }
 
-    // Apply age range filters
+    // Apply age range filters with proper null checks
     if (minAgeFilter !== null) {
-      result = result.filter(user => user.age !== null && user.age >= minAgeFilter);
+      result = result.filter(user => 
+        user.age !== null && user.age !== undefined && user.age >= minAgeFilter
+      );
     }
 
     if (maxAgeFilter !== null) {
-      result = result.filter(user => user.age !== null && user.age <= maxAgeFilter);
+      result = result.filter(user => 
+        user.age !== null && user.age !== undefined && user.age <= maxAgeFilter
+      );
     }
 
     // Apply online status filter
     if (onlineOnly) {
-      result = result.filter(user => user.is_online);
+      result = result.filter(user => Boolean(user.is_online));
     }
 
     setFilteredUsers(result);
-  }, [users, searchQuery, languageFilter, nativeLanguageFilter, learningLanguageFilter, minAgeFilter, maxAgeFilter, onlineOnly]);
+  }, [users, searchQuery, nativeLanguageFilter, learningLanguageFilter, minAgeFilter, maxAgeFilter, onlineOnly]);
 
   const handleLike = async (userId: string) => {
     try {
@@ -595,7 +571,7 @@ const Community = () => {
                     Reset Filters
                   </Button>
                   <DialogClose asChild>
-                    <Button type="submit">Apply Filters</Button>
+                    <Button>Apply Filters</Button>
                   </DialogClose>
                 </DialogFooter>
               </DialogContent>
