@@ -254,6 +254,10 @@ const Profile = () => {
               </Button>
             </DialogTrigger>
             <DialogContent className="max-w-3xl p-0 overflow-hidden">
+              <DialogHeader className="sr-only">
+                <DialogTitle>{profile.full_name}'s Profile Picture</DialogTitle>
+                <DialogDescription>Full size view of profile picture</DialogDescription>
+              </DialogHeader>
               <div className="relative w-full">
                 <div className="w-full flex items-center justify-center bg-black/5 p-6">
                   <img 
