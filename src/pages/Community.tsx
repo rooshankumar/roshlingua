@@ -16,10 +16,20 @@ import {
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { Heart, Search, Filter, Flame, User } from 'lucide-react';
+import { Heart, Search, Filter, Flame, User, X } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from "@/components/ui/badge";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogClose,
+} from "@/components/ui/dialog";
 import { toast } from '@/hooks/use-toast';
 import classNames from 'classnames';
 import { cn } from "@/lib/utils";
@@ -93,11 +103,103 @@ const Community = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
+  
+  // Filter states
   const [languageFilter, setLanguageFilter] = useState("");
+  const [nativeLanguageFilter, setNativeLanguageFilter] = useState("");
+  const [learningLanguageFilter, setLearningLanguageFilter] = useState("");
+  const [minAgeFilter, setMinAgeFilter] = useState<number | null>(null);
+  const [maxAgeFilter, setMaxAgeFilter] = useState<number | null>(null);
   const [onlineOnly, setOnlineOnly] = useState(false);
-  const [showMoreFilters, setShowMoreFilters] = useState(false); // Added state for more filters
+  
   const navigate = useNavigate();
   const { user } = useAuth();
+  
+  // Get the count of active filters for the badge
+  const getFilterCount = () => {
+    let count = 0;
+    if (nativeLanguageFilter) count++;
+    if (learningLanguageFilter) count++;
+    if (minAgeFilter !== null || maxAgeFilter !== null) count++;
+    if (onlineOnly) count++;
+    return count > 0 ? count : '';
+  };
+  
+  // Reset all filters to default values
+  const resetFilters = () => {
+    setLanguageFilter("");
+    setNativeLanguageFilter("");
+    setLearningLanguageFilter("");
+    setMinAgeFilter(null);
+    setMaxAgeFilter(null);
+    setOnlineOnly(false);
+  };
+  
+  // Render badges for active filters
+  const renderActiveFilterBadges = () => {
+    const badges = [];
+    
+    if (nativeLanguageFilter) {
+      badges.push(
+        <Badge 
+          key="native" 
+          variant="outline" 
+          className="flex items-center gap-1 bg-secondary/20"
+          onClick={() => setNativeLanguageFilter("")}
+        >
+          Native: {nativeLanguageFilter}
+          <X className="h-3 w-3 cursor-pointer" />
+        </Badge>
+      );
+    }
+    
+    if (learningLanguageFilter) {
+      badges.push(
+        <Badge 
+          key="learning" 
+          variant="outline" 
+          className="flex items-center gap-1 bg-secondary/20"
+          onClick={() => setLearningLanguageFilter("")}
+        >
+          Learning: {learningLanguageFilter}
+          <X className="h-3 w-3 cursor-pointer" />
+        </Badge>
+      );
+    }
+    
+    if (minAgeFilter !== null || maxAgeFilter !== null) {
+      badges.push(
+        <Badge 
+          key="age" 
+          variant="outline" 
+          className="flex items-center gap-1 bg-secondary/20"
+          onClick={() => {
+            setMinAgeFilter(null);
+            setMaxAgeFilter(null);
+          }}
+        >
+          Age: {minAgeFilter || '18'}—{maxAgeFilter || '100'}
+          <X className="h-3 w-3 cursor-pointer" />
+        </Badge>
+      );
+    }
+    
+    if (onlineOnly) {
+      badges.push(
+        <Badge 
+          key="online" 
+          variant="outline" 
+          className="flex items-center gap-1 bg-green-500/20"
+          onClick={() => setOnlineOnly(false)}
+        >
+          Online only
+          <X className="h-3 w-3 cursor-pointer" />
+        </Badge>
+      );
+    }
+    
+    return badges;
+  };
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -243,6 +345,7 @@ const Community = () => {
   useEffect(() => {
     let result = [...users];
 
+    // Apply search query filter
     if (searchQuery) {
       result = result.filter(user =>
         user.full_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -252,19 +355,40 @@ const Community = () => {
       );
     }
 
-    if (languageFilter && languageFilter !== 'all') {
+    // For backward compatibility
+    if (languageFilter && languageFilter !== '' && languageFilter !== 'all') {
       result = result.filter(user =>
         user.native_language === languageFilter ||
         user.learning_language === languageFilter
       );
     }
 
+    // Apply native language filter
+    if (nativeLanguageFilter) {
+      result = result.filter(user => user.native_language === nativeLanguageFilter);
+    }
+
+    // Apply learning language filter
+    if (learningLanguageFilter) {
+      result = result.filter(user => user.learning_language === learningLanguageFilter);
+    }
+
+    // Apply age range filters
+    if (minAgeFilter !== null) {
+      result = result.filter(user => user.age !== null && user.age >= minAgeFilter);
+    }
+
+    if (maxAgeFilter !== null) {
+      result = result.filter(user => user.age !== null && user.age <= maxAgeFilter);
+    }
+
+    // Apply online status filter
     if (onlineOnly) {
       result = result.filter(user => user.is_online);
     }
 
     setFilteredUsers(result);
-  }, [users, searchQuery, languageFilter, onlineOnly]);
+  }, [users, searchQuery, languageFilter, nativeLanguageFilter, learningLanguageFilter, minAgeFilter, maxAgeFilter, onlineOnly]);
 
   const handleLike = async (userId: string) => {
     try {
@@ -356,30 +480,130 @@ const Community = () => {
           </div>
 
           <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
-            <Select value={languageFilter} onValueChange={setLanguageFilter}>
-              <SelectTrigger className="w-full md:w-[150px]">
-                <SelectValue placeholder="Language" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Languages</SelectItem>
-                {availableLanguages.map((language) => (
-                  <SelectItem key={language} value={language || "unknown"}>
-                    {language || "Unknown"}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-
-            <div className="flex items-center gap-2 bg-background rounded-md px-3 py-1.5 border">
-              <Switch
-                id="online-mode"
-                checked={onlineOnly}
-                onCheckedChange={setOnlineOnly}
-                className="data-[state=checked]:bg-green-500"
-              />
-              <Label htmlFor="online-mode" className="text-sm cursor-pointer">
-                Online only
-              </Label>
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button variant="outline" className="gap-2">
+                  <Filter className="h-4 w-4" />
+                  <span>Filters</span>
+                  {(onlineOnly || languageFilter !== "" || languageFilter !== "all") && (
+                    <Badge variant="secondary" className="h-5 px-1 ml-1 bg-primary/10">
+                      {getFilterCount()}
+                    </Badge>
+                  )}
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[425px]">
+                <DialogHeader>
+                  <DialogTitle>Filter Community</DialogTitle>
+                  <DialogDescription>
+                    Find language partners that match your specific criteria.
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="grid gap-4 py-4">
+                  <div className="space-y-2">
+                    <h3 className="text-sm font-medium">Languages</h3>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="space-y-2">
+                        <Label htmlFor="native-language">Native Language</Label>
+                        <Select 
+                          value={nativeLanguageFilter} 
+                          onValueChange={setNativeLanguageFilter}
+                        >
+                          <SelectTrigger id="native-language">
+                            <SelectValue placeholder="Any" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="">Any</SelectItem>
+                            {availableLanguages.map((language) => (
+                              <SelectItem key={`native-${language}`} value={language || "unknown"}>
+                                {getLanguageFlag(language)} {language || "Unknown"}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="learning-language">Learning Language</Label>
+                        <Select 
+                          value={learningLanguageFilter} 
+                          onValueChange={setLearningLanguageFilter}
+                        >
+                          <SelectTrigger id="learning-language">
+                            <SelectValue placeholder="Any" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="">Any</SelectItem>
+                            {availableLanguages.map((language) => (
+                              <SelectItem key={`learning-${language}`} value={language || "unknown"}>
+                                {getLanguageFlag(language)} {language || "Unknown"}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <h3 className="text-sm font-medium">Age Range</h3>
+                    <div className="flex items-center gap-4">
+                      <div className="grid flex-1 gap-2">
+                        <Label htmlFor="min-age">Min Age</Label>
+                        <Input
+                          id="min-age"
+                          type="number"
+                          min="18"
+                          max="100"
+                          value={minAgeFilter !== null ? minAgeFilter : ''}
+                          onChange={(e) => setMinAgeFilter(e.target.value ? Number(e.target.value) : null)}
+                          placeholder="18"
+                        />
+                      </div>
+                      <div className="grid flex-1 gap-2">
+                        <Label htmlFor="max-age">Max Age</Label>
+                        <Input
+                          id="max-age"
+                          type="number"
+                          min="18"
+                          max="100"
+                          value={maxAgeFilter !== null ? maxAgeFilter : ''}
+                          onChange={(e) => setMaxAgeFilter(e.target.value ? Number(e.target.value) : null)}
+                          placeholder="100"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center gap-2">
+                    <Switch
+                      id="online-mode"
+                      checked={onlineOnly}
+                      onCheckedChange={setOnlineOnly}
+                      className="data-[state=checked]:bg-green-500"
+                    />
+                    <Label htmlFor="online-mode" className="cursor-pointer">
+                      Show online users only
+                    </Label>
+                  </div>
+                </div>
+                <DialogFooter className="flex justify-between items-center">
+                  <Button 
+                    variant="outline" 
+                    onClick={resetFilters}
+                    className="w-auto"
+                  >
+                    Reset Filters
+                  </Button>
+                  <DialogClose asChild>
+                    <Button type="submit">Apply Filters</Button>
+                  </DialogClose>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+            
+            {/* Show active filters as badges */}
+            <div className="flex flex-wrap gap-2">
+              {renderActiveFilterBadges()}
             </div>
           </div>
         </div>
