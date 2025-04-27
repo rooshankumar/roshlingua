@@ -1,0 +1,102 @@
+Download the React DevTools for a better development experience: https://reactjs.org/link/react-devtools
+supabaseClient.ts:11 Multiple GoTrueClient instances detected in the same browser context. It is not an error, but this should be avoided as it may produce undefined behavior when used concurrently under the same storage key.
+_GoTrueClient @ @supabase_supabase-js.js?v=1feae103:5040
+SupabaseAuthClient @ @supabase_supabase-js.js?v=1feae103:6906
+_initSupabaseAuthClient @ @supabase_supabase-js.js?v=1feae103:7102
+SupabaseClient @ @supabase_supabase-js.js?v=1feae103:6975
+createClient @ @supabase_supabase-js.js?v=1feae103:7142
+(anonymous) @ supabaseClient.ts:11Understand this warning
+chunk-W6L2VRDA.js?v=b33fc264:16670 Uncaught TypeError: realtimeClient.onPresenceStateChange is not a function
+    at RealtimeManager.tsx:53:41
+    at commitHookEffectListMount (chunk-W6L2VRDA.js?v=b33fc264:16915:34)
+    at commitPassiveMountOnFiber (chunk-W6L2VRDA.js?v=b33fc264:18156:19)
+    at commitPassiveMountEffects_complete (chunk-W6L2VRDA.js?v=b33fc264:18129:17)
+    at commitPassiveMountEffects_begin (chunk-W6L2VRDA.js?v=b33fc264:18119:15)
+    at commitPassiveMountEffects (chunk-W6L2VRDA.js?v=b33fc264:18109:11)
+    at flushPassiveEffectsImpl (chunk-W6L2VRDA.js?v=b33fc264:19490:11)
+    at flushPassiveEffects (chunk-W6L2VRDA.js?v=b33fc264:19447:22)
+    at performSyncWorkOnRoot (chunk-W6L2VRDA.js?v=b33fc264:18868:11)
+    at flushSyncCallbacks (chunk-W6L2VRDA.js?v=b33fc264:9119:30)
+(anonymous) @ RealtimeManager.tsx:53
+commitHookEffectListMount @ chunk-W6L2VRDA.js?v=b33fc264:16915
+commitPassiveMountOnFiber @ chunk-W6L2VRDA.js?v=b33fc264:18156
+commitPassiveMountEffects_complete @ chunk-W6L2VRDA.js?v=b33fc264:18129
+commitPassiveMountEffects_begin @ chunk-W6L2VRDA.js?v=b33fc264:18119
+commitPassiveMountEffects @ chunk-W6L2VRDA.js?v=b33fc264:18109
+flushPassiveEffectsImpl @ chunk-W6L2VRDA.js?v=b33fc264:19490
+flushPassiveEffects @ chunk-W6L2VRDA.js?v=b33fc264:19447
+performSyncWorkOnRoot @ chunk-W6L2VRDA.js?v=b33fc264:18868
+flushSyncCallbacks @ chunk-W6L2VRDA.js?v=b33fc264:9119
+commitRootImpl @ chunk-W6L2VRDA.js?v=b33fc264:19432
+commitRoot @ chunk-W6L2VRDA.js?v=b33fc264:19277
+finishConcurrentRender @ chunk-W6L2VRDA.js?v=b33fc264:18805
+performConcurrentWorkOnRoot @ chunk-W6L2VRDA.js?v=b33fc264:18718
+workLoop @ chunk-W6L2VRDA.js?v=b33fc264:197
+flushWork @ chunk-W6L2VRDA.js?v=b33fc264:176
+performWorkUntilDeadline @ chunk-W6L2VRDA.js?v=b33fc264:384Understand this error
+main.tsx:23 Initializing auth state...
+chunk-W6L2VRDA.js?v=b33fc264:14032 The above error occurred in the <RealtimeManager> component:
+
+    at RealtimeManager (https://78f04d97-2eca-45b9-a10e-1f792df6074f-00-2793cxcm5objb.pike.replit.dev/src/components/RealtimeManager.tsx:15:23)
+    at AuthProvider (https://78f04d97-2eca-45b9-a10e-1f792df6074f-00-2793cxcm5objb.pike.replit.dev/src/providers/AuthProvider.tsx:23:32)
+    at Router (https://78f04d97-2eca-45b9-a10e-1f792df6074f-00-2793cxcm5objb.pike.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=e0d4374f:4451:15)
+    at BrowserRouter (https://78f04d97-2eca-45b9-a10e-1f792df6074f-00-2793cxcm5objb.pike.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=e0d4374f:5196:5)
+    at ThemeProvider (https://78f04d97-2eca-45b9-a10e-1f792df6074f-00-2793cxcm5objb.pike.replit.dev/src/components/theme-provider.tsx:17:33)
+    at QueryClientProvider (https://78f04d97-2eca-45b9-a10e-1f792df6074f-00-2793cxcm5objb.pike.replit.dev/node_modules/.vite/deps/@tanstack_react-query.js?v=459cc63a:2794:3)
+    at App
+
+Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://reactjs.org/link/error-boundaries to learn more about error boundaries.
+logCapturedError @ chunk-W6L2VRDA.js?v=b33fc264:14032
+update.callback @ chunk-W6L2VRDA.js?v=b33fc264:14052
+callCallback @ chunk-W6L2VRDA.js?v=b33fc264:11248
+commitUpdateQueue @ chunk-W6L2VRDA.js?v=b33fc264:11265
+commitLayoutEffectOnFiber @ chunk-W6L2VRDA.js?v=b33fc264:17093
+commitLayoutMountEffects_complete @ chunk-W6L2VRDA.js?v=b33fc264:17980
+commitLayoutEffects_begin @ chunk-W6L2VRDA.js?v=b33fc264:17969
+commitLayoutEffects @ chunk-W6L2VRDA.js?v=b33fc264:17920
+commitRootImpl @ chunk-W6L2VRDA.js?v=b33fc264:19353
+commitRoot @ chunk-W6L2VRDA.js?v=b33fc264:19277
+performSyncWorkOnRoot @ chunk-W6L2VRDA.js?v=b33fc264:18895
+flushSyncCallbacks @ chunk-W6L2VRDA.js?v=b33fc264:9119
+commitRootImpl @ chunk-W6L2VRDA.js?v=b33fc264:19432
+commitRoot @ chunk-W6L2VRDA.js?v=b33fc264:19277
+finishConcurrentRender @ chunk-W6L2VRDA.js?v=b33fc264:18805
+performConcurrentWorkOnRoot @ chunk-W6L2VRDA.js?v=b33fc264:18718
+workLoop @ chunk-W6L2VRDA.js?v=b33fc264:197
+flushWork @ chunk-W6L2VRDA.js?v=b33fc264:176
+performWorkUntilDeadline @ chunk-W6L2VRDA.js?v=b33fc264:384Understand this error
+chunk-W6L2VRDA.js?v=b33fc264:9129 Uncaught TypeError: realtimeClient.onPresenceStateChange is not a function
+    at RealtimeManager.tsx:53:41
+    at commitHookEffectListMount (chunk-W6L2VRDA.js?v=b33fc264:16915:34)
+    at commitPassiveMountOnFiber (chunk-W6L2VRDA.js?v=b33fc264:18156:19)
+    at commitPassiveMountEffects_complete (chunk-W6L2VRDA.js?v=b33fc264:18129:17)
+    at commitPassiveMountEffects_begin (chunk-W6L2VRDA.js?v=b33fc264:18119:15)
+    at commitPassiveMountEffects (chunk-W6L2VRDA.js?v=b33fc264:18109:11)
+    at flushPassiveEffectsImpl (chunk-W6L2VRDA.js?v=b33fc264:19490:11)
+    at flushPassiveEffects (chunk-W6L2VRDA.js?v=b33fc264:19447:22)
+    at performSyncWorkOnRoot (chunk-W6L2VRDA.js?v=b33fc264:18868:11)
+    at flushSyncCallbacks (chunk-W6L2VRDA.js?v=b33fc264:9119:30)
+(anonymous) @ RealtimeManager.tsx:53
+commitHookEffectListMount @ chunk-W6L2VRDA.js?v=b33fc264:16915
+commitPassiveMountOnFiber @ chunk-W6L2VRDA.js?v=b33fc264:18156
+commitPassiveMountEffects_complete @ chunk-W6L2VRDA.js?v=b33fc264:18129
+commitPassiveMountEffects_begin @ chunk-W6L2VRDA.js?v=b33fc264:18119
+commitPassiveMountEffects @ chunk-W6L2VRDA.js?v=b33fc264:18109
+flushPassiveEffectsImpl @ chunk-W6L2VRDA.js?v=b33fc264:19490
+flushPassiveEffects @ chunk-W6L2VRDA.js?v=b33fc264:19447
+performSyncWorkOnRoot @ chunk-W6L2VRDA.js?v=b33fc264:18868
+flushSyncCallbacks @ chunk-W6L2VRDA.js?v=b33fc264:9119
+commitRootImpl @ chunk-W6L2VRDA.js?v=b33fc264:19432
+commitRoot @ chunk-W6L2VRDA.js?v=b33fc264:19277
+finishConcurrentRender @ chunk-W6L2VRDA.js?v=b33fc264:18805
+performConcurrentWorkOnRoot @ chunk-W6L2VRDA.js?v=b33fc264:18718
+workLoop @ chunk-W6L2VRDA.js?v=b33fc264:197
+flushWork @ chunk-W6L2VRDA.js?v=b33fc264:176
+performWorkUntilDeadline @ chunk-W6L2VRDA.js?v=b33fc264:384Understand this error
+chat:1 <meta name="apple-mobile-web-app-capable" content="yes"> is deprecated. Please include <meta name="mobile-web-app-capable" content="yes">Understand this warning
+main.tsx:23 i18next::backendConnector: loaded namespace translation for language en {navigation: {…}, auth: {…}, settings: {…}}
+main.tsx:23 i18next: languageChanged en
+main.tsx:23 i18next: initialized {debug: true, initAsync: true, ns: Array(1), defaultNS: Array(1), fallbackLng: Array(1), …}
+main.tsx:23 Auth state changed: INITIAL_SESSION Session exists
+main.tsx:23 Successfully connected to Supabase real-time
