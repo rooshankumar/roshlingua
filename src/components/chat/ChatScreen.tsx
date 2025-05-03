@@ -349,27 +349,17 @@ export const ChatScreen = ({ conversation }: Props) => {
                             <div className="relative">
                               <img 
                                 src={message.attachment_url} 
-                                alt={message.attachment_name || "Image"} 
-                                className="max-w-[300px] max-h-[300px] object-cover rounded-lg cursor-pointer"
+                                alt={message.attachment_name || "Image"}
+                                className="max-w-[300px] max-h-[300px] object-cover rounded-lg hover:scale-105 transition-transform duration-200 cursor-pointer"
                                 onClick={() => window.open(message.attachment_url, '_blank')}
-                                onError={(e) => {
-                                  (e.target as HTMLImageElement).style.display = 'none';
-                                  const parent = (e.target as HTMLImageElement).parentElement;
-                                  if (parent) {
-                                    parent.innerHTML = `
-                                      <div class="flex flex-col items-center justify-center p-4 bg-muted/30 border border-border rounded-lg w-[200px] h-[150px]">
-                                        <span class="text-sm text-muted-foreground">Image could not be loaded</span>
-                                        <a href="${message.attachment_url}" target="_blank" class="text-primary hover:underline mt-2">Open image in new tab</a>
-                                      </div>
-                                    `;
-                                  }
-                                }}
+                                onError={(e) => handleImageLoadError(e, message.attachment_url as string)}
+                                loading="lazy"
                               />
-                              {/* Simple download button */}
+                              {/* Download button */}
                               <a 
                                 href={message.attachment_url}
                                 download={message.attachment_name}
-                                className="absolute top-2 right-2 bg-black/60 text-white p-1 rounded-full"
+                                className="absolute top-2 right-2 bg-black/60 text-white p-1 rounded-full hover:bg-black/80 transition-colors"
                                 onClick={(e) => e.stopPropagation()}
                               >
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

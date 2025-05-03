@@ -62,14 +62,26 @@ export const ChatAttachment = ({ onAttach }: ChatAttachmentProps) => {
         throw uploadError;
       }
 
+      // Get file's public URL
       const { data } = await supabase.storage
         .from('attachments')
         .getPublicUrl(filePath);
+
+      if (!data || !data.publicUrl) {
+        throw new Error("Failed to get public URL for uploaded file");
+      }
 
       // Append a timestamp to the URL to prevent caching issues
       const publicUrl = `${data.publicUrl}?t=${timestamp}`;
 
       console.log("File uploaded successfully:", publicUrl);
+      
+      // Show success message
+      toast({
+        title: "File uploaded",
+        description: "Your file was uploaded successfully",
+        variant: "default"
+      });
 
       // Pass the thumbnail along with the URL and filename
       onAttach(publicUrl, file.name, thumbnailDataUrl);

@@ -101,13 +101,29 @@ export const base64ToBlob = (base64: string): string => {
   }
 };
 
-export const handleImageLoadError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
-  console.error("Image load error:", e);
-  const imageElement = e.target as HTMLImageElement;
-  const fallbackElement = imageElement.parentElement?.querySelector('.image-fallback');
+/**
+ * Checks if a URL is likely being blocked by browser extensions or client settings
+ */
+export const isLikelyBlockedUrl = (url: string): boolean => {
+  // Check if URL contains common patterns that might be blocked
+  return url.includes('supabase.co/storage');
+};
 
-  if (fallbackElement) {
-    imageElement.style.display = 'none';
-    fallbackElement.classList.remove('hidden');
+export const handleImageLoadError = (e: React.SyntheticEvent<HTMLImageElement, Event>, url: string) => {
+  console.error("Image load error:", e, "URL:", url);
+  const imageElement = e.target as HTMLImageElement;
+  
+  // Hide the failed image
+  imageElement.style.display = 'none';
+  
+  // Add fallback directly to parent element
+  const parent = imageElement.parentElement;
+  if (parent) {
+    parent.innerHTML = `
+      <div class="flex flex-col items-center justify-center p-4 bg-muted/30 border border-border rounded-lg">
+        <span class="text-sm text-muted-foreground">Image could not be loaded</span>
+        <a href="${url}" target="_blank" class="text-primary hover:underline mt-2">Open image in new tab</a>
+      </div>
+    `;
   }
 };
