@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/lib/supabase";
 import { uploadAvatar, deleteAvatar } from "@/services/avatarService";
 import { useTheme } from "@/components/theme-provider";
-import { Switch } from "@/components/ui/switch";
+import { CustomToggle } from "@/components/ui/custom-toggle";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/providers/AuthProvider";
 import { useRealtimeProfile } from "@/hooks/useRealtimeProfile";
@@ -549,7 +549,7 @@ const Settings = () => {
                         <Label htmlFor={setting.id} className="text-base">{setting.label}</Label>
                         <p className="text-sm text-muted-foreground">{setting.description}</p>
                       </div>
-                      <Switch
+                      <CustomToggle
                         id={setting.id}
                         checked={setting.value}
                         onCheckedChange={(value) => handlePrivacyChange(setting.id, value)}
@@ -617,7 +617,7 @@ const Settings = () => {
                         <Label htmlFor={setting.id} className="text-base">{setting.label}</Label>
                         <p className="text-sm text-muted-foreground">{setting.description}</p>
                       </div>
-                      <Switch
+                      <CustomToggle
                         id={setting.id}
                         checked={setting.value}
                         onCheckedChange={(value) => handleNotificationChange(setting.id, value)}

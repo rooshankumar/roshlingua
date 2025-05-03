@@ -22,6 +22,38 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Custom toggle animation */
+@keyframes toggleSlide {
+  from { transform: translateX(0); }
+  to { transform: translateX(28px); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes fadeOut {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+.custom-toggle-animation [data-state="checked"] {
+  animation: toggleSlide 0.25s ease-out forwards;
+}
+
+.custom-toggle-animation [data-state="unchecked"] {
+  animation: toggleSlide 0.25s ease-out reverse;
+}
+
+.custom-toggle-icon[data-state="checked"] {
+  animation: fadeIn 0.15s ease-in forwards;
+}
+
+.custom-toggle-icon[data-state="unchecked"] {
+  animation: fadeOut 0.15s ease-out forwards;
+}
+
 @keyframes shimmer {
   0% { transform: translateX(-100%); }
   100% { transform: translateX(100%); }
