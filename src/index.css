@@ -440,6 +440,10 @@
     @apply border-x-0 sm:border-x border-t-0 first:border-t border-b sm:rounded-lg p-4 sm:p-6 transition-all hover:border-primary/30 hover:shadow-lg bg-card/50 backdrop-blur-sm overflow-hidden;
   }
   
+  .responsive-card .truncate {
+    @apply max-w-[180px] sm:max-w-[220px] md:max-w-full;
+  }
+  
   .responsive-grid {
     @apply grid gap-2 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4;
   }
