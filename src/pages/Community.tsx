@@ -710,38 +710,42 @@ const Community = () => {
               onClick={() => navigate(`/profile/${user.id}`)}
             >              
               <CardContent className="p-4 sm:p-6">
-                <div className="flex items-center gap-3 sm:gap-4">
-                  <div className="relative shrink-0">
-                    <Avatar className="h-14 w-14 sm:h-16 sm:w-16">
-                      <AvatarImage src={user.avatar_url} alt={user.full_name} className="object-cover" />
-                      <AvatarFallback>{user.full_name?.charAt(0)}</AvatarFallback>
-                    </Avatar>
-                    <span 
-                      className={cn(
-                        "absolute bottom-0 right-0 block h-3 w-3 rounded-full ring-2 ring-background",
-                        user.is_online ? "bg-green-500" : "bg-gray-400"
-                      )} 
-                    />
+                <div className="flex flex-col space-y-3">
+                  {/* Avatar and name in one row */}
+                  <div className="flex items-center space-x-3">
+                    <div className="relative shrink-0">
+                      <Avatar className="h-12 w-12 sm:h-14 sm:w-14">
+                        <AvatarImage src={user.avatar_url} alt={user.full_name} className="object-cover" />
+                        <AvatarFallback>{user.full_name?.charAt(0)}</AvatarFallback>
+                      </Avatar>
+                      <span 
+                        className={cn(
+                          "absolute bottom-0 right-0 block h-2.5 w-2.5 rounded-full ring-2 ring-background",
+                          user.is_online ? "bg-green-500" : "bg-gray-400"
+                        )} 
+                      />
+                    </div>
+                    
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-semibold text-base sm:text-lg leading-tight truncate">{user.full_name}</h3>
+                      <p className="text-sm text-muted-foreground">{user.age || '–'} years</p>
+                    </div>
                   </div>
                   
-                  <div className="flex-1 min-w-0 overflow-hidden">
-                    <h3 className="font-semibold text-base sm:text-lg mb-1 break-words line-clamp-2 sm:line-clamp-1 md:line-clamp-none">{user.full_name}</h3>
-                    <p className="text-sm text-muted-foreground mb-2">{user.age || '–'} years</p>
-                    
-                    <div className="flex items-center gap-2 sm:gap-3">
-                      <div className="flex items-center gap-1 sm:gap-2" title={`Native: ${user.native_language}`}>
-                        <span className="text-lg sm:text-xl" aria-label={`Native language: ${user.native_language}`}>
-                          {getLanguageFlag(user.native_language)}
-                        </span>
-                        <span className="hidden md:inline-block text-xs sm:text-sm text-muted-foreground">{user.native_language}</span>
-                      </div>
-                      <ArrowRight className="h-3 w-3 sm:h-4 sm:w-4 text-primary shrink-0" />
-                      <div className="flex items-center gap-1 sm:gap-2" title={`Learning: ${user.learning_language}`}>
-                        <span className="text-lg sm:text-xl" aria-label={`Learning language: ${user.learning_language}`}>
-                          {getLanguageFlag(user.learning_language)}
-                        </span>
-                        <span className="hidden md:inline-block text-xs sm:text-sm text-muted-foreground">{user.learning_language}</span>
-                      </div>
+                  {/* Language info in second row */}
+                  <div className="flex items-center gap-2 sm:gap-3">
+                    <div className="flex items-center gap-1 sm:gap-2" title={`Native: ${user.native_language}`}>
+                      <span className="text-lg sm:text-xl" aria-label={`Native language: ${user.native_language}`}>
+                        {getLanguageFlag(user.native_language)}
+                      </span>
+                      <span className="hidden md:inline-block text-xs sm:text-sm text-muted-foreground">{user.native_language}</span>
+                    </div>
+                    <ArrowRight className="h-3 w-3 sm:h-4 sm:w-4 text-primary shrink-0" />
+                    <div className="flex items-center gap-1 sm:gap-2" title={`Learning: ${user.learning_language}`}>
+                      <span className="text-lg sm:text-xl" aria-label={`Learning language: ${user.learning_language}`}>
+                        {getLanguageFlag(user.learning_language)}
+                      </span>
+                      <span className="hidden md:inline-block text-xs sm:text-sm text-muted-foreground">{user.learning_language}</span>
                     </div>
                   </div>
                 </div>

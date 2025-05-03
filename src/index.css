@@ -441,7 +441,7 @@
   }
   
   .responsive-card h3 {
-    @apply overflow-hidden text-ellipsis;
+    @apply overflow-hidden text-ellipsis max-w-full;
     display: -webkit-box;
     -webkit-box-orient: vertical;
   }
