@@ -48,7 +48,7 @@ const AppLayout = ({ children }: AppLayoutProps) => {
       <div className="md:block">
         <MainNav />
       </div>
-      <main className={`flex-1 pb-24 md:pb-4 pt-4 px-3 md:px-6`}>{children}</main>
+      <main className={`flex-1 pb-24 md:pb-4 pt-2 sm:pt-4 px-0 sm:px-3 md:px-6 overflow-x-hidden`}>{children}</main>
 
       {/* Mobile Bottom Navigation */}
       {!isChatDetailRoute && (

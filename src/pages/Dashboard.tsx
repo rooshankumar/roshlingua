@@ -89,7 +89,7 @@ const Dashboard = () => {
 
       try {
         console.log("Fetching user data for dashboard...");
-        
+
         // Get initial profile data including streak and achievements
         const { data: profileData, error } = await supabase
           .from('profiles')
@@ -102,7 +102,7 @@ const Dashboard = () => {
           .from('user_achievements')
           .select('achievement_id')
           .eq('user_id', user.id);
-          
+
         console.log("Profile data fetch result:", error ? `Error: ${error.message}` : "Success");
 
         // Calculate achievement points
@@ -172,7 +172,7 @@ const Dashboard = () => {
           console.log("Setting user stats with profile data");
           const xpPoints = profileData.xp_points || 0;
           const totalXP = xpPoints + achievementPoints;
-          
+
           setUserStats({
             streak: profileData.streak_count ?? 0, 
             xp: xpPoints,
@@ -215,7 +215,7 @@ const Dashboard = () => {
             }
           })
           .subscribe();
-          
+
         // Subscribe to achievements updates
         achievementsSubscription = supabase
           .channel(`user_achievements_${user.id}`)
@@ -230,13 +230,13 @@ const Dashboard = () => {
               .from('user_achievements')
               .select('achievement_id')
               .eq('user_id', user.id);
-              
+
             if (newAchievementsData && isMounted) {
               const unlocked = newAchievementsData.map(a => a.achievement_id);
               const newAchievementPoints = ACHIEVEMENTS
                 .filter(a => unlocked.includes(a.id))
                 .reduce((sum, a) => sum + a.points, 0);
-                
+
               setUserStats(prev => ({
                 ...prev,
                 achievementPoints: newAchievementPoints,
@@ -260,7 +260,7 @@ const Dashboard = () => {
           }));
         }
 
-        
+
       } catch (error) {
         console.error('Error in fetchUserData:', error);
       }
@@ -292,18 +292,18 @@ const Dashboard = () => {
   }, [user?.id]); // Only re-run when user ID changes
 
   return (
-    <div className="container pb-8 animate-fade-up">
-      <div className="relative space-y-2 mb-8 p-8 rounded-xl bg-gradient-to-r from-primary/10 via-primary/5 to-background">
+    <div className="mobile-container pb-8 animate-fade-up"> {/* Added mobile-container class */}
+      <div className="relative space-y-2 mb-8 p-4 rounded-xl bg-gradient-to-r from-primary/10 via-primary/5 to-background"> {/* Reduced p-8 to p-4 */}
         <div className="absolute inset-0 bg-grid-white/5 [mask-image:linear-gradient(0deg,white,rgba(255,255,255,0.5))] rounded-xl" />
-        <h1 className="text-4xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/60">
+        <h1 className="text-3xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/60"> {/* Reduced text-4xl to text-3xl */}
           Welcome Back!
         </h1>
-        <p className="text-muted-foreground text-lg">
+        <p className="text-muted-foreground text-base"> {/* Reduced text-lg to text-base */}
           Track your progress and connect with language partners
         </p>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-8">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-8"> {/* This grid needs adjustments for better responsiveness */}
         <Card className="group hover:shadow-lg transition-all duration-200 hover:scale-[1.02] bg-gradient-to-br from-card to-card/95">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium group-hover:text-primary transition-colors">
@@ -371,7 +371,7 @@ const Dashboard = () => {
         </Card>
       </div>
 
-      
+
 
       <div className="mt-8 space-y-8">
         <AchievementsList />

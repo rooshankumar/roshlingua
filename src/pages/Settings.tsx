@@ -292,7 +292,7 @@ const Settings = () => {
   const formattedDate = localProfile?.date_of_birth ? new Date(localProfile.date_of_birth).toISOString().split('T')[0] : null;
 
   return (
-    <div className="container max-w-6xl pb-12 animate-fade-in">
+    <div className="mobile-container max-w-6xl pb-12 animate-fade-in">
       <div className="space-y-2 mb-8">
         <h1 className="text-4xl font-bold tracking-tight bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
           {t('settings.title')}
@@ -328,7 +328,7 @@ const Settings = () => {
         </TabsList>
 
         <TabsContent value="profile">
-          <Card className="border-2 shadow-lg">
+          <Card className="border-0 sm:border-2 shadow-lg sm:rounded-lg">
             <CardHeader>
               <CardTitle className="text-2xl">Profile Information</CardTitle>
               <CardDescription className="text-base">
@@ -508,7 +508,7 @@ const Settings = () => {
         </TabsContent>
 
         <TabsContent value="privacy">
-          <Card className="border-2 shadow-lg">
+          <Card className="border-0 sm:border-2 shadow-lg sm:rounded-lg">
             <CardHeader>
               <CardTitle className="text-2xl">Privacy Preferences</CardTitle>
               <CardDescription className="text-base">
@@ -570,7 +570,7 @@ const Settings = () => {
         </TabsContent>
 
         <TabsContent value="notifications">
-          <Card className="border-2 shadow-lg">
+          <Card className="border-0 sm:border-2 shadow-lg sm:rounded-lg">
             <CardHeader>
               <CardTitle className="text-2xl">Notification Preferences</CardTitle>
               <CardDescription className="text-base">
@@ -638,7 +638,7 @@ const Settings = () => {
         </TabsContent>
 
         <TabsContent value="account">
-          <Card className="border-2 shadow-lg">
+          <Card className="border-0 sm:border-2 shadow-lg sm:rounded-lg">
             <CardHeader>
               <CardTitle className="text-2xl">Account Settings</CardTitle>
               <CardDescription className="text-base">
