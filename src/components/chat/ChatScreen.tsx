@@ -137,11 +137,20 @@ export const ChatScreen = ({ conversation }: Props) => {
 
           if (newMessage) {
             console.log('Fetched new message with sender:', newMessage);
+            console.log('Message has attachment:', newMessage.attachment_url);
+            
             setMessages(prev => {
               const exists = prev.some(msg => msg.id === newMessage.id);
               if (exists) return prev;
               
-              const updatedMessages = [...prev, newMessage];
+              // Ensure attachment properties are properly included
+              const messageWithAttachment = {
+                ...newMessage,
+                attachment_url: newMessage.attachment_url || null,
+                attachment_name: newMessage.attachment_name || null
+              };
+              
+              const updatedMessages = [...prev, messageWithAttachment];
               // Force a scroll after a small delay to ensure state update
               setTimeout(() => scrollToLatestMessage(), 100);
               return updatedMessages;
@@ -319,31 +328,33 @@ export const ChatScreen = ({ conversation }: Props) => {
                       <p className="leading-relaxed mb-2">{message.content}</p>
                       {message.attachment_url && (
                         <div className="mt-1 rounded-lg overflow-hidden">
-                          {message.attachment_url.match(/\.(jpg|jpeg|png|gif|webp|avif)$/i) ? (
+                          {message.attachment_url?.match(/\.(jpg|jpeg|png|gif|webp|avif)$/i) ? (
                             <img 
                               src={message.attachment_url} 
                               alt="Image" 
+                              loading="lazy"
+                              onError={(e) => console.error("Image load error:", e)}
                               className="max-w-[300px] max-h-[300px] object-cover rounded-lg hover:scale-105 transition-transform duration-300 cursor-pointer"
                               onClick={() => window.open(message.attachment_url, '_blank')}
                             />
-                          ) : message.attachment_url.match(/\.(mp4|webm|ogg)$/i) ? (
+                          ) : message.attachment_url?.match(/\.(mp4|webm|ogg)$/i) ? (
                             <video 
                               src={message.attachment_url}
                               controls
                               className="max-w-[300px] rounded-lg"
                             />
-                          ) : message.attachment_url.match(/\.(mp3|wav|aac)$/i) ? (
+                          ) : message.attachment_url?.match(/\.(mp3|wav|aac)$/i) ? (
                             <audio 
                               src={message.attachment_url}
                               controls
                               className="max-w-[300px]"
                             />
-                          ) : message.attachment_url.match(/\.(pdf)$/i) ? (
+                          ) : message.attachment_url?.match(/\.(pdf)$/i) ? (
                             <iframe
                               src={message.attachment_url}
                               className="w-[300px] h-[400px] rounded-lg border border-border"
                             />
-                          ) : (
+                          ) : message.attachment_url ? (
                             <div className="flex items-center gap-3 p-3 bg-background/10 rounded-lg hover:bg-background/20 transition-colors duration-200">
                               <FileText className="h-5 w-5" />
                               <a 
@@ -355,7 +366,7 @@ export const ChatScreen = ({ conversation }: Props) => {
                                 {message.attachment_name || 'Download attachment'}
                               </a>
                             </div>
-                          )}
+                          ) : null}
                         </div>
                       )}
                     </div>
