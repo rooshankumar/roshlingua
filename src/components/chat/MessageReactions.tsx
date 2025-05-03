@@ -91,37 +91,7 @@ export const MessageReactions = ({ messageId, existingReactions = {} }: MessageR
         </Button>
       ))}
 
-      {/* Only show emoji button when there are no reactions or on desktop */}
-      <Popover>
-        <PopoverTrigger asChild>
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            className="h-7 w-7 p-0 rounded-full hover:bg-muted/30 hidden md:flex" 
-          >
-            <Smile className="h-4 w-4" />
-          </Button>
-        </PopoverTrigger>
-        <PopoverContent className="w-auto p-2">
-          <div className="flex flex-wrap gap-2 max-w-[200px]">
-            {commonEmojis.map(emoji => (
-              <button
-                key={emoji}
-                className="text-xl hover:scale-125 transition-transform p-2 mobile-touch-target"
-                onClick={() => {
-                  handleReact(emoji);
-                  // Add haptic feedback for mobile
-                  if ('vibrate' in navigator) {
-                    navigator.vibrate(25); 
-                  }
-                }}
-              >
-                {emoji}
-              </button>
-            ))}
-          </div>
-        </PopoverContent>
-      </Popover>
+      {/* Removed the permanent smile icon - reactions now only available via long press */}
     </div>
   );
 };

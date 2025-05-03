@@ -648,4 +648,19 @@ html {
   transform: scale(0.97);
   transition: transform 0.2s ease-out;
   background-color: rgba(0, 0, 0, 0.05);
+  border-radius: 9999px;
+}
+
+/* Fix for mobile emoji handling */
+@media (hover: none) {
+  .message-actions-menu {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease-out;
+  }
+  
+  .message-actions-menu.active {
+    opacity: 1;
+    pointer-events: auto;
+  }
 }

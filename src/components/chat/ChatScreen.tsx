@@ -401,9 +401,14 @@ export const ChatScreen = ({ conversation }: Props) => {
                 onTouchStart={(e) => {
                   // Set up long press handler
                   const element = e.currentTarget;
+                  const messageId = message.id;
+                  
+                  // Add visual feedback
+                  element.classList.add('message-long-press');
+                  
                   const longPressTimer = setTimeout(() => {
                     // Show message actions on long press
-                    const messageActions = document.getElementById(`message-actions-${message.id}`);
+                    const messageActions = document.getElementById(`message-actions-${messageId}`);
                     if (messageActions) {
                       // Add haptic feedback if supported
                       if ('vibrate' in navigator) {
@@ -411,8 +416,9 @@ export const ChatScreen = ({ conversation }: Props) => {
                       }
                       messageActions.classList.remove('opacity-0');
                       messageActions.classList.remove('pointer-events-none');
+                      messageActions.classList.add('active');
                     }
-                  }, 500); // 500ms for long press
+                  }, 400); // 400ms for long press - slightly faster for better responsiveness
                   
                   // Store the timer ID to clear it on touchend
                   element.setAttribute('data-long-press-timer', longPressTimer.toString());
@@ -425,6 +431,9 @@ export const ChatScreen = ({ conversation }: Props) => {
                     clearTimeout(parseInt(timerId));
                     element.removeAttribute('data-long-press-timer');
                   }
+                  
+                  // Remove visual feedback
+                  element.classList.remove('message-long-press');
                 }}
                 onTouchMove={(e) => {
                   // Clear the long press timer on touch move (user is scrolling)
@@ -440,7 +449,7 @@ export const ChatScreen = ({ conversation }: Props) => {
                   {/* Message actions */}
                   <div 
                     id={`message-actions-${message.id}`}
-                    className="absolute -top-14 left-0 right-0 opacity-0 pointer-events-none transition-opacity duration-200 flex justify-center gap-2 z-10 touch:z-50"
+                    className="message-actions-menu absolute -top-14 left-0 right-0 opacity-0 pointer-events-none transition-opacity duration-200 flex justify-center gap-2 z-10 touch:z-50"
                     onClick={(e) => e.stopPropagation()}
                   >
                     <div className="bg-muted/90 backdrop-blur-sm rounded-full p-1.5 shadow-md flex items-center gap-2 border border-border/30">
