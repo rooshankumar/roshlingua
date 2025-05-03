@@ -38,53 +38,6 @@ import subscriptionManager from '@/utils/subscriptionManager';
 
 import { SUPPORTED_LANGUAGES, getLanguageFlag } from '@/utils/languageUtils';
 
-// Helper function to get flag emoji for language
-const getLanguageFlag = (language?: string) => {
-  if (!language) return "🌐";
-
-  // First try to find language in our supported languages array
-  const supportedLang = SUPPORTED_LANGUAGES.find(
-    lang => lang.name.toLowerCase() === language.toLowerCase()
-  );
-
-  if (supportedLang) {
-    return supportedLang.flag;
-  }
-
-  // Fallback to a simple map for languages not in SUPPORTED_LANGUAGES
-  const languageToFlag: Record<string, string> = {
-    'English': '🇬🇧',
-    'Spanish': '🇪🇸',
-    'French': '🇫🇷',
-    'German': '🇩🇪',
-    'Italian': '🇮🇹',
-    'Portuguese': '🇵🇹',
-    'Russian': '🇷🇺',
-    'Japanese': '🇯🇵',
-    'Korean': '🇰🇷',
-    'Chinese': '🇨🇳',
-    'Arabic': '🇸🇦',
-    'Hindi': '🇮🇳',
-    'Turkish': '🇹🇷',
-    'Dutch': '🇳🇱',
-    'Swedish': '🇸🇪',
-    'Polish': '🇵🇱',
-    'Norwegian': '🇳🇴',
-    'Danish': '🇩🇰',
-    'Finnish': '🇫🇮',
-    'Czech': '🇨🇿',
-    'Greek': '🇬🇷',
-    'Hungarian': '🇭🇺',
-    'Romanian': '🇷🇴',
-    'Thai': '🇹🇭',
-    'Vietnamese': '🇻🇳',
-    'Indonesian': '🇮🇩',
-    'Hebrew': '🇮🇱',
-  };
-
-  return languageToFlag[language] || '🌐';
-};
-
 interface User {
   id: string;
   full_name: string;
