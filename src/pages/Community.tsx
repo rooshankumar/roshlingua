@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Input } from "@/components/ui/input";
 import { LikeButton } from "@/components/LikeButton";
 import { Button } from "@/components/ui/button";
@@ -70,6 +70,7 @@ const Community = () => {
   const [showScrollTop, setShowScrollTop] = useState(false); // Added state for scroll button
 
   const navigate = useNavigate();
+  const location = useLocation();
   const { user } = useAuth();
 
   // Get the count of active filters for the badge
@@ -214,7 +215,7 @@ const Community = () => {
           // First by online status
           if (a.is_online && !b.is_online) return -1;
           if (!a.is_online && b.is_online) return 1;
-          
+
           // Then by last_seen (most recent first)
           const aLastSeen = a.last_seen ? new Date(a.last_seen).getTime() : 0;
           const bLastSeen = b.last_seen ? new Date(b.last_seen).getTime() : 0;
@@ -223,7 +224,7 @@ const Community = () => {
 
         // Log the fetched users for debugging
         console.log("Fetched users:", sortedUsers.length);
-        
+
         setUsers(sortedUsers);
         setFilteredUsers(sortedUsers);
       } catch (error) {
@@ -233,7 +234,7 @@ const Community = () => {
 
     // Create a more robust real-time subscription
     const subscriptionKey = 'community_profiles';
-    
+
     const setupRealtimeSubscription = () => {
       return subscriptionManager.subscribe(subscriptionKey, () => {
         console.log('Setting up community profiles subscription');
@@ -252,7 +253,7 @@ const Community = () => {
               if (payload.new && payload.eventType) {
                 setUsers(prevUsers => {
                   let updatedUsers = [...prevUsers];
-                  
+
                   // For INSERT event, add the new user if they're not already in the list
                   if (payload.eventType === 'INSERT' && !prevUsers.some(u => u.id === payload.new.id)) {
                     // Don't add the current user to the list
@@ -312,10 +313,10 @@ const Community = () => {
 
     // Initial data fetch
     fetchUsers();
-    
+
     // Setup realtime subscription
     const subscription = setupRealtimeSubscription();
-    
+
     // Set up a refresh interval for page visibility changes
     // This helps when user comes back to the app after it was in background
     const handleVisibilityChange = () => {
@@ -324,9 +325,9 @@ const Community = () => {
         fetchUsers();
       }
     };
-    
+
     document.addEventListener('visibilitychange', handleVisibilityChange);
-    
+
     // Set up a regular refresh interval (every 30 seconds)
     const refreshInterval = setInterval(() => {
       console.log('Refreshing community data on interval');
@@ -341,6 +342,87 @@ const Community = () => {
       clearInterval(refreshInterval);
     };
   }, [user?.id]); // Add user?.id as dependency to re-initialize when user changes
+
+  useEffect(() => {
+    console.log("Community page mounted or navigated to");
+    //Refresh users when this page is navigated to
+    const fetchUsers = async () => {
+      try {
+        const currentUser = (await supabase.auth.getUser()).data.user;
+
+        const { data, error } = await supabase
+          .from('profiles')
+          .select(`
+            id,
+            full_name,
+            native_language,
+            learning_language,
+            proficiency_level,
+            bio,
+            avatar_url,
+            streak_count,
+            likes_count,
+            date_of_birth,
+            age,
+            is_online,
+            username,
+            last_seen
+          `)
+          .neq('id', currentUser?.id);
+
+        if (error) {
+          console.error("Error fetching users:", error);
+          return;
+        }
+
+        // Use data directly from users table with defaults
+        const usersWithDefaults = (data || []).map(user => ({
+          ...user,
+          username: user.username || user.full_name,
+          full_name: user.full_name || 'Anonymous User',
+          avatar_url: user.avatar_url || '/placeholder.svg',
+          bio: user.bio || 'No bio available',
+          native_language: user.native_language || 'English',
+          learning_language: user.learning_language || 'Spanish',
+          proficiency_level: user.proficiency_level || 'beginner',
+          is_online: user.is_online || false,
+          streak_count: user.streak_count || 1,
+          likes_count: user.likes_count || 0,
+          age: user.date_of_birth ? Math.floor((new Date().getTime() - new Date(user.date_of_birth).getTime()) / (365.25 * 24 * 60 * 60 * 1000)) : null,
+        }));
+
+        // Sort users: online first, then by last seen (most recent first)
+        const sortedUsers = usersWithDefaults.sort((a, b) => {
+          // First by online status
+          if (a.is_online && !b.is_online) return -1;
+          if (!a.is_online && b.is_online) return 1;
+
+          // Then by last_seen (most recent first)
+          const aLastSeen = a.last_seen ? new Date(a.last_seen).getTime() : 0;
+          const bLastSeen = b.last_seen ? new Date(b.last_seen).getTime() : 0;
+          return bLastSeen - aLastSeen;
+        });
+
+        // Log the fetched users for debugging
+        console.log("Fetched users:", sortedUsers.length);
+
+        setUsers(sortedUsers);
+        setFilteredUsers(sortedUsers);
+      } catch (error) {
+        console.error("Error fetching users:", error);
+      }
+    };
+    fetchUsers();
+    // Set up an interval to refresh users every 30 seconds while on this page
+    const refreshInterval = setInterval(() => {
+      console.log("Auto-refreshing community users");
+      fetchUsers();
+    }, 30000);
+
+    return () => {
+      clearInterval(refreshInterval);
+    };
+  }, [location.pathname]);
 
   useEffect(() => {
     let result = [...users];
@@ -761,7 +843,7 @@ const Community = () => {
                         )} 
                       />
                     </div>
-                    
+
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-1.5">
                         <h3 
@@ -791,7 +873,7 @@ const Community = () => {
                       </p>
                     </div>
                   </div>
-                  
+
                   {/* Language info in second row */}
                   <div className="flex items-center gap-2 sm:gap-3">
                     <div className="flex items-center gap-1 sm:gap-2" title={`Native: ${user.native_language}`}>

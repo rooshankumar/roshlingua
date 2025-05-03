@@ -39,7 +39,7 @@ const AppLayout = ({ children }: AppLayoutProps) => {
   const location = useLocation();
   const isChatDetailRoute = location.pathname.match(/^\/chat\/[0-9a-f-]+$/);
   const isMobile = window.innerWidth < 768;
-  const { user } = useAuth(); // Added to access user authentication status
+  const { user, refreshSubscriptions } = useAuth(); // Added to access user authentication status and refreshSubscriptions
 
 
   // Monitor connection status app-wide
@@ -78,17 +78,16 @@ const AppLayout = ({ children }: AppLayoutProps) => {
     if (user?.id) {
       console.log('Route changed to:', location.pathname);
 
-      // Special handling for key subscriptions we want to maintain
-      const subscriptionKeys = ['community_profiles', 'user_notifications']; //Example keys, adjust as needed
-
-      subscriptionKeys.forEach(key => {
-        if (subscriptionManager.hasSubscription(key)) {
-          console.log(`Refreshing ${key} subscription after navigation`);
-          subscriptionManager.refresh(key);
-        }
-      });
+      // Call the AuthProvider's refreshSubscriptions method to refresh data
+      if (location.pathname) {
+        setTimeout(() => {
+          console.log('Refreshing subscriptions after page change');
+          // This will trigger a refresh of data in the current page
+          refreshSubscriptions();
+        }, 100);
+      }
     }
-  }, [location.pathname, user?.id]);
+  }, [location.pathname, user?.id, refreshSubscriptions]);
 
   return (
     <div className="min-h-screen flex flex-col md:flex-row">
