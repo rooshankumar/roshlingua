@@ -347,56 +347,37 @@ export const ChatScreen = ({ conversation }: Props) => {
                         <div className="mt-1 rounded-lg overflow-hidden">
                           {message.attachment_url?.match(/\.(jpg|jpeg|png|gif|webp|avif)$/i) ? (
                             <div className="relative">
-                              {/* Simplified image display */}
-                              <div className="relative group">
-                                {/* If thumbnail available, use it, otherwise use direct URL */}
-                                <img 
-                                  src={message.attachment_thumbnail || message.attachment_url} 
-                                  alt={message.attachment_name || "Image"} 
-                                  className="max-w-[300px] max-h-[300px] object-cover rounded-lg hover:scale-105 transition-transform duration-300 cursor-pointer"
-                                  onClick={() => window.open(message.attachment_url, '_blank')}
-                                  onError={(e) => {
-                                    // Simple fallback without complex logic
-                                    (e.target as HTMLElement).classList.add('hidden');
-                                    const fallback = (e.target as HTMLElement).parentElement?.querySelector('.image-fallback');
-                                    if (fallback) fallback.classList.remove('hidden');
-                                  }}
-                                />
-                                
-                                {/* Simple fallback that's initially hidden */}
-                                <div className="image-fallback hidden flex flex-col items-center justify-center p-4 bg-muted/30 border border-border rounded-lg w-[200px] h-[150px]">
-                                  <Image className="h-6 w-6 mb-2 text-muted-foreground" />
-                                  <span className="text-sm text-muted-foreground">
-                                    {message.attachment_name || "Image"}
-                                  </span>
-                                  <Button 
-                                    variant="outline" 
-                                    size="sm"
-                                    className="mt-2"
-                                    onClick={() => window.open(message.attachment_url, '_blank')}
-                                  >
-                                    Open Image
-                                  </Button>
-                                </div>
-                                
-                                {/* Download button */}
-                                <div className="absolute top-2 right-2 bg-black/40 backdrop-blur-sm rounded-full p-1 opacity-70 hover:opacity-100 transition-opacity">
-                                  <a 
-                                    href={message.attachment_url}
-                                    download={message.attachment_name}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    onClick={(e) => e.stopPropagation()}
-                                    className="text-white"
-                                  >
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                                      <polyline points="7 10 12 15 17 10"></polyline>
-                                      <line x1="12" y1="15" x2="12" y2="3"></line>
-                                    </svg>
-                                  </a>
-                                </div>
-                              </div>
+                              <img 
+                                src={message.attachment_url} 
+                                alt={message.attachment_name || "Image"} 
+                                className="max-w-[300px] max-h-[300px] object-cover rounded-lg cursor-pointer"
+                                onClick={() => window.open(message.attachment_url, '_blank')}
+                                onError={(e) => {
+                                  (e.target as HTMLImageElement).style.display = 'none';
+                                  const parent = (e.target as HTMLImageElement).parentElement;
+                                  if (parent) {
+                                    parent.innerHTML = `
+                                      <div class="flex flex-col items-center justify-center p-4 bg-muted/30 border border-border rounded-lg w-[200px] h-[150px]">
+                                        <span class="text-sm text-muted-foreground">Image could not be loaded</span>
+                                        <a href="${message.attachment_url}" target="_blank" class="text-primary hover:underline mt-2">Open image in new tab</a>
+                                      </div>
+                                    `;
+                                  }
+                                }}
+                              />
+                              {/* Simple download button */}
+                              <a 
+                                href={message.attachment_url}
+                                download={message.attachment_name}
+                                className="absolute top-2 right-2 bg-black/60 text-white p-1 rounded-full"
+                                onClick={(e) => e.stopPropagation()}
+                              >
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                  <polyline points="7 10 12 15 17 10"></polyline>
+                                  <line x1="12" y1="15" x2="12" y2="3"></line>
+                                </svg>
+                              </a>
                             </div>
                           ) : message.attachment_url?.match(/\.(mp4|webm|ogg)$/i) ? (
                             <video 

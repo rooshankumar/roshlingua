@@ -100,3 +100,14 @@ export const base64ToBlob = (base64: string): string => {
     return '';
   }
 };
+
+export const handleImageLoadError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
+  console.error("Image load error:", e);
+  const imageElement = e.target as HTMLImageElement;
+  const fallbackElement = imageElement.parentElement?.querySelector('.image-fallback');
+
+  if (fallbackElement) {
+    imageElement.style.display = 'none';
+    fallbackElement.classList.remove('hidden');
+  }
+};

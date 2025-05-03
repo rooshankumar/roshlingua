@@ -54,7 +54,8 @@ export const ChatAttachment = ({ onAttach }: ChatAttachmentProps) => {
         .from('attachments')
         .upload(filePath, file, {
           contentType: file.type, // Specify the correct MIME type
-          cacheControl: '3600' // 1 hour cache
+          cacheControl: '3600', // 1 hour cache
+          upsert: true // Overwrite if exists
         });
 
       if (uploadError) {
