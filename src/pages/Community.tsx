@@ -684,24 +684,18 @@ const Community = () => {
                     <h3 className="font-semibold text-lg mb-1">{user.full_name}</h3>
                     <p className="text-sm text-muted-foreground mb-2">{user.age || '–'} years</p>
                     
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <Badge variant="secondary" className="text-xs px-3 py-1.5 whitespace-nowrap bg-secondary/90 hover:bg-secondary/95">
-                        <span className="mr-2 text-base" aria-label={`Flag for ${user.native_language}`}>
+                    <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-2" title={`Native: ${user.native_language}`}>
+                        <span className="text-xl" aria-label={`Native language: ${user.native_language}`}>
                           {getLanguageFlag(user.native_language)}
                         </span>
-                        <span className="truncate max-w-[100px] inline-block align-bottom">
-                          {user.native_language}
-                        </span>
-                      </Badge>
+                      </div>
                       <ArrowRight className="h-4 w-4 text-primary shrink-0" />
-                      <Badge variant="outline" className="text-xs px-3 py-1.5 whitespace-nowrap bg-primary/10 hover:bg-primary/15 border-primary/20">
-                        <span className="mr-2 text-base" aria-label={`Flag for ${user.learning_language}`}>
+                      <div className="flex items-center gap-2" title={`Learning: ${user.learning_language}`}>
+                        <span className="text-xl" aria-label={`Learning language: ${user.learning_language}`}>
                           {getLanguageFlag(user.learning_language)}
                         </span>
-                        <span className="truncate max-w-[100px] inline-block align-bottom">
-                          {user.learning_language}
-                        </span>
-                      </Badge>
+                      </div>
                     </div>
                   </div>
                 </div>
