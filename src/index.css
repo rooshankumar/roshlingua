@@ -441,7 +441,7 @@
   }
   
   .responsive-card .truncate {
-    @apply max-w-[180px] sm:max-w-[220px] md:max-w-full;
+    @apply max-w-[180px] sm:max-w-[220px] md:max-w-[250px] lg:max-w-[300px] xl:max-w-none;
   }
   
   .responsive-grid {
