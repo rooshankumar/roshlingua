@@ -727,11 +727,22 @@ const Community = () => {
                     </div>
                     
                     <div className="flex-1 min-w-0">
-                      <h3 className={`font-semibold leading-tight truncate ${
-                        user.full_name?.length > 12 
-                          ? 'text-sm sm:text-base' 
-                          : 'text-base sm:text-lg'
-                      }`}>
+                      <h3 
+                        className={`font-semibold leading-tight truncate ${
+                          user.full_name?.length > 20
+                            ? 'text-xs sm:text-sm'
+                            : user.full_name?.length > 15
+                              ? 'text-sm sm:text-base'
+                              : 'text-base sm:text-lg'
+                        }`}
+                        data-length={
+                          user.full_name?.length > 20 
+                            ? 'very-long' 
+                            : user.full_name?.length > 15 
+                              ? 'long' 
+                              : 'normal'
+                        }
+                      >
                         {user.full_name}
                       </h3>
                       <p className="text-sm text-muted-foreground">{user.age || '–'} years</p>

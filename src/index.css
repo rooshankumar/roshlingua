@@ -442,7 +442,24 @@
   
   .responsive-card h3 {
     @apply overflow-hidden text-ellipsis max-w-full whitespace-nowrap;
-    transition: font-size 0.2s ease;
+    transition: font-size 0.2s ease, transform 0.2s ease;
+    transform-origin: left;
+  }
+  
+  @media (max-width: 640px) {
+    .responsive-card h3 {
+      /* Further scaling for extremely long names on small screens */
+      transform: scale(var(--name-scale, 1));
+      --name-scale: 1;
+    }
+    
+    .responsive-card h3[data-length="long"] {
+      --name-scale: 0.95;
+    }
+    
+    .responsive-card h3[data-length="very-long"] {
+      --name-scale: 0.9;
+    }
   }
   
   @media (min-width: 640px) {
