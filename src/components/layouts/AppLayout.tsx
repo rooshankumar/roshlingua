@@ -5,6 +5,8 @@ import MainNav from "../navigation/MainNav";
 import { NotificationDropdown } from "../notifications/NotificationDropdown";
 import { supabase } from "@/lib/supabase";
 import subscriptionManager from "@/utils/subscriptionManager";
+import { useAuth } from '@/providers/AuthProvider'; // Added import for useAuth
+
 
 interface AppLayoutProps {
   children: ReactNode;
@@ -37,12 +39,14 @@ const AppLayout = ({ children }: AppLayoutProps) => {
   const location = useLocation();
   const isChatDetailRoute = location.pathname.match(/^\/chat\/[0-9a-f-]+$/);
   const isMobile = window.innerWidth < 768;
+  const { user } = useAuth(); // Added to access user authentication status
+
 
   // Monitor connection status app-wide
   useEffect(() => {
     // Setup a global connection monitor
     const connectionKey = "app_connection_monitor";
-    
+
     const channel = subscriptionManager.subscribe(connectionKey, () =>
       supabase.channel("global")
         .on("system", { event: "disconnect" }, (payload) => {
@@ -65,6 +69,27 @@ const AppLayout = ({ children }: AppLayoutProps) => {
     };
   }, []);
 
+  // Track scrolling positions and handle route changes
+  useEffect(() => {
+    window.scrollTo(0, 0);
+
+    // When route changes, refresh any active subscriptions
+    // This helps ensure data is fresh when switching between pages
+    if (user?.id) {
+      console.log('Route changed to:', location.pathname);
+
+      // Special handling for key subscriptions we want to maintain
+      const subscriptionKeys = ['community_profiles', 'user_notifications']; //Example keys, adjust as needed
+
+      subscriptionKeys.forEach(key => {
+        if (subscriptionManager.hasSubscription(key)) {
+          console.log(`Refreshing ${key} subscription after navigation`);
+          subscriptionManager.refresh(key);
+        }
+      });
+    }
+  }, [location.pathname, user?.id]);
+
   return (
     <div className="min-h-screen flex flex-col md:flex-row">
       {/* Notification icon in top right corner - hidden on chat and settings pages */}
@@ -73,7 +98,7 @@ const AppLayout = ({ children }: AppLayoutProps) => {
           <NotificationDropdown className="mobile-touch-target" />
         </div>
       )}
-      
+
       <div className="md:block">
         <MainNav />
       </div>
@@ -84,7 +109,7 @@ const AppLayout = ({ children }: AppLayoutProps) => {
         <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-background/90 backdrop-blur-xl border-t flex justify-around p-2 z-50 shadow-lg safe-area-bottom">
           {routes.map((route) => {
             const isActive = location.pathname === route.path;
-            
+
             return (
               <NavLink
                 key={route.path}
@@ -104,7 +129,7 @@ const AppLayout = ({ children }: AppLayoutProps) => {
           })}
         </nav>
       )}
-      
+
       {/* Safe area for bottom padding in mobile browsers */}
       <style jsx="true" global="true">{`
         @supports (padding-bottom: env(safe-area-inset-bottom)) {

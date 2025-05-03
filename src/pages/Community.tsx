@@ -227,7 +227,9 @@ const Community = () => {
             streak_count,
             likes_count,
             date_of_birth,
-            age
+            age,
+            is_online,
+            username
           `)
           .neq('id', currentUser?.id);
 
@@ -252,6 +254,9 @@ const Community = () => {
           age: user.date_of_birth ? Math.floor((new Date().getTime() - new Date(user.date_of_birth).getTime()) / (365.25 * 24 * 60 * 60 * 1000)) : null,
         }));
 
+        // Log the fetched users for debugging
+        console.log("Fetched users:", usersWithDefaults.length);
+        
         setUsers(usersWithDefaults);
         setFilteredUsers(usersWithDefaults);
       } catch (error) {
@@ -259,75 +264,109 @@ const Community = () => {
       }
     };
 
-    fetchUsers();
-
     // Create a more robust real-time subscription
     const subscriptionKey = 'community_profiles';
     
-    const channel = subscriptionManager.subscribe(subscriptionKey, () => {
-      return supabase
-        .channel('public:profiles:changes')
-        .on('postgres_changes',
-          {
-            event: '*',
-            schema: 'public',
-            table: 'profiles'
-          },
-          payload => {
-            console.log('Real-time profile update received:', payload);
+    const setupRealtimeSubscription = () => {
+      return subscriptionManager.subscribe(subscriptionKey, () => {
+        console.log('Setting up community profiles subscription');
+        return supabase
+          .channel('public:profiles:changes')
+          .on('postgres_changes',
+            {
+              event: '*',
+              schema: 'public',
+              table: 'profiles'
+            },
+            payload => {
+              console.log('Real-time profile update received:', payload);
 
-            // Update the specific user in the state rather than re-fetching all users
-            if (payload.new && payload.eventType) {
-              setUsers(prevUsers => {
-                // For INSERT event, add the new user if they're not already in the list
-                if (payload.eventType === 'INSERT' && !prevUsers.some(u => u.id === payload.new.id)) {
-                  // Don't add the current user to the list
-                  const isCurrentUser = payload.new.id === user?.id;
-                  if (!isCurrentUser) {
-                    return [...prevUsers, payload.new as User];
+              // Update the specific user in the state rather than re-fetching all users
+              if (payload.new && payload.eventType) {
+                setUsers(prevUsers => {
+                  let updatedUsers = [...prevUsers];
+                  
+                  // For INSERT event, add the new user if they're not already in the list
+                  if (payload.eventType === 'INSERT' && !prevUsers.some(u => u.id === payload.new.id)) {
+                    // Don't add the current user to the list
+                    const isCurrentUser = payload.new.id === user?.id;
+                    if (!isCurrentUser) {
+                      // Add defaults for new user
+                      const newUser = {
+                        ...payload.new,
+                        username: payload.new.username || payload.new.full_name || 'Anonymous User',
+                        full_name: payload.new.full_name || 'Anonymous User',
+                        avatar_url: payload.new.avatar_url || '/placeholder.svg',
+                        bio: payload.new.bio || 'No bio available',
+                        native_language: payload.new.native_language || 'English',
+                        learning_language: payload.new.learning_language || 'Spanish',
+                        proficiency_level: payload.new.proficiency_level || 'beginner',
+                        is_online: payload.new.is_online || false,
+                        streak_count: payload.new.streak_count || 1,
+                        likes_count: payload.new.likes_count || 0,
+                      };
+                      updatedUsers = [...updatedUsers, newUser as User];
+                    }
                   }
-                }
 
-                // For UPDATE event, update the existing user
-                else if (payload.eventType === 'UPDATE') {
-                  return prevUsers.map(u => 
-                    u.id === payload.new.id ? { ...u, ...payload.new } : u
-                  );
-                }
+                  // For UPDATE event, update the existing user
+                  else if (payload.eventType === 'UPDATE') {
+                    updatedUsers = prevUsers.map(u => {
+                      if (u.id === payload.new.id) {
+                        console.log('Updating user:', u.full_name, '→', payload.new.full_name);
+                        return { ...u, ...payload.new };
+                      }
+                      return u;
+                    });
+                  }
 
-                // For DELETE event, remove the user
-                else if (payload.eventType === 'DELETE' && payload.old) {
-                  return prevUsers.filter(u => u.id !== payload.old.id);
-                }
+                  // For DELETE event, remove the user
+                  else if (payload.eventType === 'DELETE' && payload.old) {
+                    updatedUsers = prevUsers.filter(u => u.id !== payload.old.id);
+                  }
 
-                return prevUsers;
-              });
-
-              // We'll rely on the useEffect dependency array to update filtered users
-              // This ensures consistent filtering logic in one place
+                  return updatedUsers;
+                });
+              }
             }
-          }
-        )
-        .subscribe((status) => {
-          console.log('Community real-time subscription status:', status);
-          if (status === 'SUBSCRIBED') {
-            console.log('Successfully subscribed to real-time updates');
-          } else if (status !== 'SUBSCRIBED') {
-            console.warn('Real-time subscription issue:', status);
-            // Try to reconnect if needed
-            setTimeout(() => fetchUsers(), 3000);
-          }
-        });
-    });
+          )
+          .subscribe((status) => {
+            console.log('Community real-time subscription status:', status);
+            if (status === 'SUBSCRIBED') {
+              console.log('Successfully subscribed to real-time updates');
+            } else if (status !== 'SUBSCRIBED') {
+              console.warn('Real-time subscription issue:', status);
+              // Try to reconnect if needed
+              setTimeout(() => fetchUsers(), 3000);
+            }
+          });
+      });
+    };
 
-    // Fetch users initially
+    // Initial data fetch
     fetchUsers();
+    
+    // Setup realtime subscription
+    const subscription = setupRealtimeSubscription();
+    
+    // Set up a refresh interval for page visibility changes
+    // This helps when user comes back to the app after it was in background
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        console.log('Page became visible, refreshing community data');
+        fetchUsers();
+      }
+    };
+    
+    document.addEventListener('visibilitychange', handleVisibilityChange);
 
+    // Cleanup function
     return () => {
       console.log('Unsubscribing from real-time updates');
       subscriptionManager.unsubscribe(subscriptionKey);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
-  }, []);
+  }, [user?.id]); // Add user?.id as dependency to re-initialize when user changes
 
   useEffect(() => {
     let result = [...users];

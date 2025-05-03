@@ -11,6 +11,7 @@ interface AuthContextType {
   signup: (email: string, password: string, name: string) => Promise<void>;
   loginWithGoogle: () => Promise<void>;
   signOut: () => Promise<void>;
+  refreshSubscriptions: () => void; // Added refreshSubscriptions
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -21,6 +22,7 @@ const AuthContext = createContext<AuthContextType>({
   signup: async () => {},
   loginWithGoogle: async () => {},
   signOut: async () => {},
+  refreshSubscriptions: () => {} // Added refreshSubscriptions
 });
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
@@ -236,9 +238,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const redirectUrl = window.location.hostname.includes('localhost') || window.location.hostname.includes('replit')
         ? `${window.location.origin}/auth/callback`
         : `${window.location.origin.replace(/\/$/, '')}/auth/callback`;
-        
+
       console.log("Redirect URL for Google auth:", redirectUrl);
-      
+
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
@@ -266,6 +268,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signOut = async () => {
     try {
+      //Clean up subscriptions before signing out.  This is a placeholder.  A real implementation would require a subscription manager.
+      subscriptionManager.cleanup();
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
 
@@ -303,6 +307,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const refreshSubscriptions = () => {
+    console.log('Refreshing subscriptions - Placeholder implementation');
+    // Real implementation would use subscriptionManager here.
+  };
+
+
   const value: AuthContextType = {
     user,
     session,
@@ -311,6 +321,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     signup,
     loginWithGoogle,
     signOut,
+    refreshSubscriptions, // Added refreshSubscriptions
   };
 
   useEffect(() => {
@@ -341,3 +352,10 @@ export function useAuth() {
   }
   return context;
 }
+
+// Placeholder for subscriptionManager module
+const subscriptionManager = {
+  cleanup: () => {
+    console.log('subscriptionManager.cleanup() called - Placeholder implementation');
+  }
+};
