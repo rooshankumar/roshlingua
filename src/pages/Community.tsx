@@ -658,11 +658,11 @@ const Community = () => {
       </div>
 
       {filteredUsers.length > 0 ? (
-        <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 container mx-auto px-4">
+        <div className="grid gap-2 sm:gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 container mx-auto px-0 sm:px-4">
           {filteredUsers.map((user) => (
             <Card 
               key={user.id} 
-              className="overflow-hidden cursor-pointer group border hover:border-primary/30 hover:shadow-lg transition-all bg-card/50 backdrop-blur-sm"
+              className="overflow-hidden cursor-pointer group border-x-0 sm:border-x border-t-0 first:border-t border-b hover:border-primary/30 hover:shadow-lg transition-all bg-card/50 backdrop-blur-sm sm:rounded-lg"
               onClick={() => navigate(`/profile/${user.id}`)}
             >              
               <CardContent className="p-6">
