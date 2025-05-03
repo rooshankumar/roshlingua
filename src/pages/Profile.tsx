@@ -280,24 +280,18 @@ const Profile = () => {
           <div className="flex-1 flex flex-col items-center md:items-start">
             <h1 className="text-3xl font-bold mb-2">{profile.full_name}</h1>
             
-            <div className="flex flex-wrap gap-2 mb-3">
-              {profile.date_of_birth && (
+            {/* Age Display */}
+            {profile.date_of_birth && (
+              <div className="mb-2">
                 <Badge variant="outline" className="px-2 py-1">
                   {getAgeFromDateOfBirth(profile.date_of_birth)} years old
                 </Badge>
-              )}
-              
-              {/* Language Badges */}
-              {profile.proficiency_level && (
-                <Badge variant="outline" className="bg-primary/10 text-primary px-2 py-1">
-                  {profile.proficiency_level?.charAt(0).toUpperCase() + profile.proficiency_level?.slice(1) || "Beginner"} Level
-                </Badge>
-              )}
-            </div>
+              </div>
+            )}
             
             {/* Languages Display */}
             {(profile.native_language || profile.learning_language) && (
-              <div className="flex items-center gap-3 mb-4">
+              <div className="flex items-center gap-3 mb-3">
                 {profile.native_language && (
                   <Badge variant="secondary" className="px-3 py-1.5">
                     {getLanguageFlag(profile.native_language)}
@@ -315,6 +309,15 @@ const Profile = () => {
                     <span className="ml-2">{profile.learning_language}</span>
                   </Badge>
                 )}
+              </div>
+            )}
+            
+            {/* Proficiency Level */}
+            {profile.proficiency_level && (
+              <div className="mb-4">
+                <Badge variant="outline" className="bg-primary/10 text-primary px-2 py-1">
+                  {profile.proficiency_level?.charAt(0).toUpperCase() + profile.proficiency_level?.slice(1) || "Beginner"} Level
+                </Badge>
               </div>
             )}
             
@@ -361,12 +364,12 @@ const Profile = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
         {/* Left Column - Personal Info */}
         <div className="space-y-6">
-          <Card className="glass-card">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-md font-semibold">About & Learning Goals</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {profile.bio && (
+          {profile.bio && (
+            <Card className="glass-card">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-md font-semibold">About</CardTitle>
+              </CardHeader>
+              <CardContent>
                 <div className="flex flex-col space-y-3">
                   <div className="inline-flex items-center">
                     <User className="h-4 w-4 text-primary mr-2" />
@@ -374,19 +377,9 @@ const Profile = () => {
                   </div>
                   <p className="text-sm pl-6">{profile.bio}</p>
                 </div>
-              )}
-              
-              <div className="flex flex-col space-y-3">
-                <div className="inline-flex items-center">
-                  <GraduationCap className="h-4 w-4 text-primary mr-2" />
-                  <h3 className="text-sm font-medium">Learning Goal</h3>
-                </div>
-                <p className="text-sm pl-6">{profile.learning_goal || "No learning goal set"}</p>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Language card has been removed and integrated into main profile card */}
+              </CardContent>
+            </Card>
+          )}
 
           <Card className="glass-card">
             <CardHeader className="pb-2">
