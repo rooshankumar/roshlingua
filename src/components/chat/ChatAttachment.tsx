@@ -48,26 +48,30 @@ export const ChatAttachment = ({ onAttach }: ChatAttachmentProps) => {
   };
 
   return (
-    <div className="relative">
+    <div>
       <input
         type="file"
+        id="fileUpload"
+        style={{ display: 'none' }}
         onChange={handleFileChange}
-        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-        disabled={uploading}
-        accept="image/*,video/*,audio/*,.pdf,.doc,.docx,.txt"
+        accept="image/*,video/*,audio/*,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-powerpoint,application/vnd.openxmlformats-officedocument.presentationml.presentation,text/plain"
       />
-      <Button
-        variant="ghost"
-        size="icon"
-        className="h-[60px] w-[60px] rounded-2xl hover:bg-muted/50"
-        disabled={uploading}
-      >
-        {uploading ? (
-          <Loader2 className="h-5 w-5 animate-spin" />
-        ) : (
-          <Paperclip className="h-5 w-5" />
-        )}
-      </Button>
+      <label htmlFor="fileUpload">
+        <Button
+          variant="outline"
+          size="icon"
+          className="h-[45px] w-[45px] rounded-2xl border-muted-foreground/20"
+          disabled={uploading}
+          type="button"
+          onClick={() => document.getElementById('fileUpload')?.click()}
+        >
+          {uploading ? (
+            <Loader2 className="h-5 w-5 animate-spin" />
+          ) : (
+            <Paperclip className="h-5 w-5" />
+          )}
+        </Button>
+      </label>
     </div>
   );
 };

@@ -143,7 +143,12 @@ export const ChatScreen = ({ conversation }: Props) => {
               const exists = prev.some(msg => msg.id === newMessage.id);
               if (exists) return prev;
               
-              // Ensure attachment properties are properly included
+              // Ensure attachment properties are properly included and log them
+              console.log('Processing message with attachment:', 
+                newMessage.id, 
+                'URL:', newMessage.attachment_url,
+                'Name:', newMessage.attachment_name);
+              
               const messageWithAttachment = {
                 ...newMessage,
                 attachment_url: newMessage.attachment_url || null,
@@ -225,6 +230,14 @@ export const ChatScreen = ({ conversation }: Props) => {
     setIsSending(true);
     const tempId = crypto.randomUUID();
     const timestamp = new Date().toISOString();
+    
+    // Log attachment information for debugging
+    if (attachment) {
+      console.log('Sending message with attachment:', {
+        url: attachment.url,
+        filename: attachment.filename
+      });
+    }
 
     // Add optimistic message
     const optimisticMessage = {
@@ -331,9 +344,17 @@ export const ChatScreen = ({ conversation }: Props) => {
                           {message.attachment_url?.match(/\.(jpg|jpeg|png|gif|webp|avif)$/i) ? (
                             <img 
                               src={message.attachment_url} 
-                              alt="Image" 
+                              alt={message.attachment_name || "Image"} 
                               loading="lazy"
-                              onError={(e) => console.error("Image load error:", e)}
+                              onLoad={() => console.log("Image loaded successfully:", message.attachment_url)}
+                              onError={(e) => {
+                                console.error("Image load error:", e, "URL:", message.attachment_url);
+                                // Try to reload image with cache busting
+                                const target = e.target as HTMLImageElement;
+                                if (!target.src.includes('?')) {
+                                  target.src = `${message.attachment_url}?t=${new Date().getTime()}`;
+                                }
+                              }}
                               className="max-w-[300px] max-h-[300px] object-cover rounded-lg hover:scale-105 transition-transform duration-300 cursor-pointer"
                               onClick={() => window.open(message.attachment_url, '_blank')}
                             />
