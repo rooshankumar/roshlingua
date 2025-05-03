@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Send, Loader2, FileText, Check } from 'lucide-react';
+import { Send, Loader2, FileText, Check, Image } from 'lucide-react';
 import { ChatAttachment } from './ChatAttachment';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
@@ -11,6 +11,8 @@ import { ChatHeader } from './ChatHeader';
 import { Textarea } from '../ui/textarea';
 import { ScrollArea } from '../ui/scroll-area';
 import { Card, CardContent } from '../ui/card';
+import { toast } from '@/components/ui/use-toast';
+import { handleImageLoadError, isLikelyBlockedUrl } from '@/utils/imageUtils';
 
 // Simple subscription manager (replace with a more robust solution)
 const subscriptionManager = {
@@ -342,22 +344,58 @@ export const ChatScreen = ({ conversation }: Props) => {
                       {message.attachment_url && (
                         <div className="mt-1 rounded-lg overflow-hidden">
                           {message.attachment_url?.match(/\.(jpg|jpeg|png|gif|webp|avif)$/i) ? (
-                            <img 
-                              src={message.attachment_url} 
-                              alt={message.attachment_name || "Image"} 
-                              loading="lazy"
-                              onLoad={() => console.log("Image loaded successfully:", message.attachment_url)}
-                              onError={(e) => {
-                                console.error("Image load error:", e, "URL:", message.attachment_url);
-                                // Try to reload image with cache busting
-                                const target = e.target as HTMLImageElement;
-                                if (!target.src.includes('?')) {
-                                  target.src = `${message.attachment_url}?t=${new Date().getTime()}`;
-                                }
-                              }}
-                              className="max-w-[300px] max-h-[300px] object-cover rounded-lg hover:scale-105 transition-transform duration-300 cursor-pointer"
-                              onClick={() => window.open(message.attachment_url, '_blank')}
-                            />
+                            <div className="relative">
+                              <img 
+                                src={message.attachment_url} 
+                                alt={message.attachment_name || "Image"} 
+                                loading="lazy"
+                                onLoad={(e) => {
+                                  console.log("Image loaded successfully:", message.attachment_url);
+                                  // Show image and hide fallback
+                                  const target = e.target as HTMLImageElement;
+                                  target.style.display = 'block';
+                                  const fallback = target.parentElement?.querySelector('.image-fallback');
+                                  if (fallback) {
+                                    fallback.classList.add('hidden');
+                                  }
+                                }}
+                                onError={(e) => {
+                                  console.error("Image load error:", e, "URL:", message.attachment_url);
+                                  // Try to reload image with cache busting
+                                  const target = e.target as HTMLImageElement;
+                                  target.style.display = 'none'; // Hide the image element
+                                  
+                                  // Show the fallback
+                                  const fallback = target.parentElement?.querySelector('.image-fallback');
+                                  if (fallback) {
+                                    fallback.classList.remove('hidden');
+                                  }
+                                  
+                                  // Try a cross-origin proxy as a last resort
+                                  if (!target.src.includes('?')) {
+                                    setTimeout(() => {
+                                      target.src = `${message.attachment_url}?t=${new Date().getTime()}`;
+                                    }, 1000);
+                                  }
+                                }}
+                                className="max-w-[300px] max-h-[300px] object-cover rounded-lg hover:scale-105 transition-transform duration-300 cursor-pointer"
+                                onClick={() => window.open(message.attachment_url, '_blank')}
+                              />
+                              <div className="image-fallback hidden flex flex-col items-center justify-center p-4 bg-muted/30 border border-border rounded-lg w-[200px] h-[150px]">
+                                <FileText className="h-6 w-6 mb-2 text-muted-foreground" />
+                                <span className="text-sm text-muted-foreground">
+                                  {message.attachment_name || "Image"}
+                                </span>
+                                <Button 
+                                  variant="outline" 
+                                  size="sm" 
+                                  className="mt-2"
+                                  onClick={() => window.open(message.attachment_url, '_blank')}
+                                >
+                                  Open Image
+                                </Button>
+                              </div>
+                            </div>
                           ) : message.attachment_url?.match(/\.(mp4|webm|ogg)$/i) ? (
                             <video 
                               src={message.attachment_url}
