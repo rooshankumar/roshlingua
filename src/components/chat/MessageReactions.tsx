@@ -91,12 +91,13 @@ export const MessageReactions = ({ messageId, existingReactions = {} }: MessageR
         </Button>
       ))}
 
+      {/* Only show emoji button when there are no reactions or on desktop */}
       <Popover>
         <PopoverTrigger asChild>
           <Button 
             variant="ghost" 
             size="sm" 
-            className="h-7 w-7 p-0 rounded-full hover:bg-muted/30"
+            className="h-7 w-7 p-0 rounded-full hover:bg-muted/30 hidden md:flex" 
           >
             <Smile className="h-4 w-4" />
           </Button>

@@ -123,6 +123,17 @@
     background-color: rgba(0, 0, 0, 0.05);
     border-radius: 9999px;
   }
+  
+  /* On touch devices, we'll handle emoji via the long-press menu */
+  .message-reactions .emoji-button {
+    display: none;
+  }
+}
+
+/* Make touch targets larger for mobile */
+.touch-device .mobile-touch-target {
+  min-height: 44px;
+  min-width: 44px;
 }
 
   0% {

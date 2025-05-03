@@ -440,7 +440,8 @@ export const ChatScreen = ({ conversation }: Props) => {
                   {/* Message actions */}
                   <div 
                     id={`message-actions-${message.id}`}
-                    className="absolute -top-14 left-0 right-0 opacity-0 pointer-events-none transition-opacity duration-200 flex justify-center gap-2 z-10"
+                    className="absolute -top-14 left-0 right-0 opacity-0 pointer-events-none transition-opacity duration-200 flex justify-center gap-2 z-10 touch:z-50"
+                    onClick={(e) => e.stopPropagation()}
                   >
                     <div className="bg-muted/90 backdrop-blur-sm rounded-full p-1.5 shadow-md flex items-center gap-2 border border-border/30">
                       <button 
