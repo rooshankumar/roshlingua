@@ -22,12 +22,12 @@ export const ChatAttachment = ({ onAttach }: ChatAttachmentProps) => {
       }
 
       const file = event.target.files[0];
-      
+
       // Validate file size (10MB max)
       if (file.size > 10 * 1024 * 1024) {
         throw new Error("File size exceeds 10MB limit.");
       }
-      
+
       // Generate a thumbnail if it's an image (for preview)
       let thumbnailDataUrl: string | undefined;
       if (file.type.startsWith('image/')) {
@@ -39,7 +39,7 @@ export const ChatAttachment = ({ onAttach }: ChatAttachmentProps) => {
           // Continue without thumbnail
         }
       }
-      
+
       // Create a more unique filename with timestamp
       const timestamp = new Date().getTime();
       const randomStr = Math.random().toString().substring(2, 8);
@@ -64,12 +64,12 @@ export const ChatAttachment = ({ onAttach }: ChatAttachmentProps) => {
       const { data } = await supabase.storage
         .from('attachments')
         .getPublicUrl(filePath);
-        
+
       // Append a timestamp to the URL to prevent caching issues
       const publicUrl = `${data.publicUrl}?t=${timestamp}`;
-      
+
       console.log("File uploaded successfully:", publicUrl);
-      
+
       // Pass the thumbnail along with the URL and filename
       onAttach(publicUrl, file.name, thumbnailDataUrl);
 
