@@ -34,6 +34,7 @@ import { toast } from '@/hooks/use-toast';
 import classNames from 'classnames';
 import { cn } from "@/lib/utils";
 import { ChevronUp } from 'lucide-react'; // Added import for ChevronUp icon
+import subscriptionManager from '@/utils/subscriptionManager';
 
 import { SUPPORTED_LANGUAGES } from '@/utils/languageUtils';
 
@@ -261,8 +262,6 @@ const Community = () => {
     fetchUsers();
 
     // Create a more robust real-time subscription
-    import subscriptionManager from '@/utils/subscriptionManager';
-    
     const subscriptionKey = 'community_profiles';
     
     const channel = subscriptionManager.subscribe(subscriptionKey, () => 
