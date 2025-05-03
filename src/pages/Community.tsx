@@ -36,7 +36,7 @@ import { cn } from "@/lib/utils";
 import { ChevronUp } from 'lucide-react'; // Added import for ChevronUp icon
 import subscriptionManager from '@/utils/subscriptionManager';
 
-import { SUPPORTED_LANGUAGES } from '@/utils/languageUtils';
+import { SUPPORTED_LANGUAGES, getLanguageFlag } from '@/utils/languageUtils';
 
 // Helper function to get flag emoji for language
 const getLanguageFlag = (language?: string) => {
@@ -568,9 +568,9 @@ const Community = () => {
                           </SelectTrigger>
                           <SelectContent>
                             <SelectItem value="any">Any</SelectItem>
-                            {availableLanguages.filter(Boolean).map((language) => (
-                              <SelectItem key={`native-${language}`} value={language}>
-                                <span className="mr-2">{getLanguageFlag(language)}</span> {language}
+                            {SUPPORTED_LANGUAGES.map((language) => (
+                              <SelectItem key={`native-${language.code}`} value={language.name}>
+                                <span className="mr-2">{language.flag}</span> {language.name}
                               </SelectItem>
                             ))}
                           </SelectContent>
@@ -589,9 +589,9 @@ const Community = () => {
                           </SelectTrigger>
                           <SelectContent>
                             <SelectItem value="any">Any</SelectItem>
-                            {availableLanguages.filter(Boolean).map((language) => (
-                              <SelectItem key={`learning-${language}`} value={language}>
-                                <span className="mr-2">{getLanguageFlag(language)}</span> {language}
+                            {SUPPORTED_LANGUAGES.map((language) => (
+                              <SelectItem key={`learning-${language.code}`} value={language.name}>
+                                <span className="mr-2">{language.flag}</span> {language.name}
                               </SelectItem>
                             ))}
                           </SelectContent>

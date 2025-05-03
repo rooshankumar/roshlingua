@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/lib/supabase";
@@ -21,7 +21,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Separator } from "@/components/ui/separator";
 import { Shield, Bell, Key, User, Lock, Mail, Save, LogOut, Moon, Sun, Globe, Wallet, Camera, AlertTriangle } from "lucide-react";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
-import { useResponsive } from "@/hooks/use-mobile"; // Added import
+import { useResponsive } from "@/hooks/use-mobile";
+import { SUPPORTED_LANGUAGES, getLanguageOptions } from "@/utils/languageUtils";
+import { Search, ChevronsUpDown, Check } from "lucide-react";
 
 const Settings = () => {
   const { t } = useTranslation();
@@ -33,6 +35,17 @@ const Settings = () => {
   const [localBio, setLocalBio] = useState(profile?.bio || "");
   const [localProfile, setLocalProfile] = useState<any>(profile || {});
   const [isLoading, setIsLoading] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [notificationsEnabled, setNotificationsEnabled] = useState(false);
+  const [nativeLanguageInput, setNativeLanguageInput] = useState("");
+  const [learningLanguageInput, setLearningLanguageInput] = useState("");
+  const [showNativeLanguages, setShowNativeLanguages] = useState(false);
+  const [showLearningLanguages, setShowLearningLanguages] = useState(false);
+  const [nativeLanguageSearch, setNativeLanguageSearch] = useState("");
+  const [learningLanguageSearch, setLearningLanguageSearch] = useState("");
+  const nativeLanguageRef = useRef<HTMLDivElement>(null);
+  const learningLanguageRef = useRef<HTMLDivElement>(null);
+  const languageOptions = getLanguageOptions();
 
   const languages = [
     "English", "Spanish", "French", "German", "Italian",
@@ -291,6 +304,48 @@ const Settings = () => {
   const genderOptions = ["Male", "Female", "Rather not say"];
   const formattedDate = localProfile?.date_of_birth ? new Date(localProfile.date_of_birth).toISOString().split('T')[0] : null;
 
+  const handleNativeLanguageChange = (language: string) => {
+    setNativeLanguageInput(language);
+    handleProfileChange("native_language", language);
+    setShowNativeLanguages(false);
+  };
+
+  const handleLearningLanguageChange = (language: string) => {
+    setLearningLanguageInput(language);
+    handleProfileChange("learning_language", language);
+    setShowLearningLanguages(false);
+  };
+
+  useEffect(() => {
+    fetchProfile();
+  }, []);
+
+  // Set initial input values when profile loads
+  useEffect(() => {
+    if (localProfile) {
+      setNativeLanguageInput(localProfile.native_language || "");
+      setLearningLanguageInput(localProfile.learning_language || "");
+    }
+  }, [localProfile]);
+
+  // Close dropdowns when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (nativeLanguageRef.current && !nativeLanguageRef.current.contains(event.target as Node)) {
+        setShowNativeLanguages(false);
+      }
+      if (learningLanguageRef.current && !learningLanguageRef.current.contains(event.target as Node)) {
+        setShowLearningLanguages(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+
   return (
     <div className="mobile-container max-w-6xl pb-12 animate-fade-in">
       <div className="space-y-2 mb-8">
@@ -434,42 +489,95 @@ const Settings = () => {
                 <h3 className="text-xl font-semibold">Language Settings</h3>
                 <div className="grid gap-6 sm:grid-cols-2">
 
-                  <div className="space-y-2">
+                  <div className="relative space-y-2">
                     <Label htmlFor="nativeLanguage" className="text-base">Native Language</Label>
-                    <Select
-                      value={localProfile?.native_language || ""}
-                      onValueChange={(value) => handleProfileChange("native_language", value)}
-                    >
-                      <SelectTrigger id="nativeLanguage" className="h-12">
-                        <SelectValue placeholder="Select language" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {languages.map((language) => (
-                          <SelectItem key={language} value={language}>
-                            {language}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <div className="relative" ref={nativeLanguageRef}>
+                      <Input
+                        id="nativeLanguage"
+                        type="text"
+                        value={nativeLanguageInput}
+                        onChange={(e) => {
+                          setNativeLanguageInput(e.target.value);
+                          setNativeLanguageSearch(e.target.value);
+                        }}
+                        placeholder="Select or type your native language"
+                        className="h-12"
+                        onKeyDown={(e) => {
+                          if(e.key === 'Enter' && nativeLanguageInput){
+                            handleNativeLanguageChange(nativeLanguageInput)
+                          }
+                        }}
+                      />
+                      {showNativeLanguages && (
+                        <div className="absolute top-[calc(100%+0.5rem)] left-0 w-full bg-white border border-gray-200 rounded-md shadow-md z-10 max-h-60 overflow-y-auto">
+                          {languageOptions
+                            .filter((lang) =>
+                              lang.name.toLowerCase().includes(nativeLanguageSearch.toLowerCase())
+                            )
+                            .map((lang) => (
+                              <div
+                                key={lang.code}
+                                className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                                onClick={() => handleNativeLanguageChange(lang.name)}
+                              >
+                                {lang.name}
+                              </div>
+                            ))}
+                        </div>
+                      )}
+                      <button
+                        onClick={() => setShowNativeLanguages(!showNativeLanguages)}
+                        className="absolute top-1/2 right-2 -translate-y-1/2"
+                      >
+                        <ChevronsUpDown size={16} />
+                      </button>
+                    </div>
                   </div>
 
-                  <div className="space-y-2">
+
+                  <div className="relative space-y-2">
                     <Label htmlFor="learningLanguage" className="text-base">Learning Language</Label>
-                    <Select
-                      value={localProfile?.learning_language || ""}
-                      onValueChange={(value) => handleProfileChange("learning_language", value)}
-                    >
-                      <SelectTrigger id="learningLanguage" className="h-12">
-                        <SelectValue placeholder="Select language" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {languages.map((language) => (
-                          <SelectItem key={language} value={language}>
-                            {language}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <div className="relative" ref={learningLanguageRef}>
+                      <Input
+                        id="learningLanguage"
+                        type="text"
+                        value={learningLanguageInput}
+                        onChange={(e) => {
+                          setLearningLanguageInput(e.target.value);
+                          setLearningLanguageSearch(e.target.value);
+                        }}
+                        placeholder="Select or type your learning language"
+                        className="h-12"
+                        onKeyDown={(e) => {
+                          if(e.key === 'Enter' && learningLanguageInput){
+                            handleLearningLanguageChange(learningLanguageInput)
+                          }
+                        }}
+                      />
+                      {showLearningLanguages && (
+                        <div className="absolute top-[calc(100%+0.5rem)] left-0 w-full bg-white border border-gray-200 rounded-md shadow-md z-10 max-h-60 overflow-y-auto">
+                          {languageOptions
+                            .filter((lang) =>
+                              lang.name.toLowerCase().includes(learningLanguageSearch.toLowerCase())
+                            )
+                            .map((lang) => (
+                              <div
+                                key={lang.code}
+                                className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                                onClick={() => handleLearningLanguageChange(lang.name)}
+                              >
+                                {lang.name}
+                              </div>
+                            ))}
+                        </div>
+                      )}
+                      <button
+                        onClick={() => setShowLearningLanguages(!showLearningLanguages)}
+                        className="absolute top-1/2 right-2 -translate-y-1/2"
+                      >
+                        <ChevronsUpDown size={16} />
+                      </button>
+                    </div>
                   </div>
 
                   <div className="space-y-2 sm:col-span-2">
@@ -492,7 +600,7 @@ const Settings = () => {
                   </div>
                 </div>
 
-                </div>
+              </div>
             </CardContent>
             <CardFooter>
               <Button 
