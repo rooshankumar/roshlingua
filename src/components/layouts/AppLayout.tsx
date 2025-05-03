@@ -1,8 +1,10 @@
-import { ReactNode } from "react";
-import { NavLink, useLocation } from "react-router-dom";
+import { ReactNode, useEffect } from "react";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { Home, Users, MessageSquare, Settings } from "lucide-react";
 import MainNav from "../navigation/MainNav";
 import { NotificationDropdown } from "../notifications/NotificationDropdown";
+import { supabase } from "@/lib/supabase";
+import subscriptionManager from "@/utils/subscriptionManager";
 
 interface AppLayoutProps {
   children: ReactNode;
@@ -35,6 +37,33 @@ const AppLayout = ({ children }: AppLayoutProps) => {
   const location = useLocation();
   const isChatDetailRoute = location.pathname.match(/^\/chat\/[0-9a-f-]+$/);
   const isMobile = window.innerWidth < 768;
+
+  // Monitor connection status app-wide
+  useEffect(() => {
+    // Setup a global connection monitor
+    const connectionKey = "app_connection_monitor";
+    
+    const channel = subscriptionManager.subscribe(connectionKey, () =>
+      supabase.channel("global")
+        .on("system", { event: "disconnect" }, (payload) => {
+          console.log("Supabase disconnected:", payload);
+          // Create a reconnection attempt
+          setTimeout(() => {
+            console.log("Attempting to reconnect...");
+            // Force reconnection by creating a new subscription
+            subscriptionManager.unsubscribe(connectionKey);
+            subscriptionManager.subscribe(connectionKey, () =>
+              supabase.channel("global-reconnect")
+            );
+          }, 2000);
+        })
+        .subscribe()
+    );
+
+    return () => {
+      subscriptionManager.unsubscribe(connectionKey);
+    };
+  }, []);
 
   return (
     <div className="min-h-screen flex flex-col md:flex-row">

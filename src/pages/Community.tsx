@@ -261,15 +261,20 @@ const Community = () => {
     fetchUsers();
 
     // Create a more robust real-time subscription
-    const channel = supabase
-      .channel('public:profiles:changes')
-      .on('postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'profiles'
-        },
-        payload => {
+    import subscriptionManager from '@/utils/subscriptionManager';
+    
+    const subscriptionKey = 'community_profiles';
+    
+    const channel = subscriptionManager.subscribe(subscriptionKey, () => 
+      supabase
+        .channel('public:profiles:changes')
+        .on('postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: 'profiles'
+          },
+          payload => {
           console.log('Real-time profile update received:', payload);
 
           // Update the specific user in the state rather than re-fetching all users
@@ -320,7 +325,7 @@ const Community = () => {
 
     return () => {
       console.log('Unsubscribing from real-time updates');
-      channel.unsubscribe();
+      subscriptionManager.unsubscribe(subscriptionKey);
     };
   }, []);
 

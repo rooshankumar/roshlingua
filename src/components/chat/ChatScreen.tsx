@@ -12,6 +12,25 @@ import { Textarea } from '../ui/textarea';
 import { ScrollArea } from '../ui/scroll-area';
 import { Card, CardContent } from '../ui/card';
 
+// Simple subscription manager (replace with a more robust solution)
+const subscriptionManager = {
+  subscriptions: {},
+  subscribe: (key, callback) => {
+    const channel = supabase.channel(`messages:${key}`);
+    channel.on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, callback);
+    channel.subscribe();
+    subscriptionManager.subscriptions[key] = channel;
+    return channel;
+  },
+  unsubscribe: (key) => {
+    if (subscriptionManager.subscriptions[key]) {
+      subscriptionManager.subscriptions[key].unsubscribe();
+      delete subscriptionManager.subscriptions[key];
+    }
+  },
+};
+
+
 interface Props {
   conversation: {
     id: string;
@@ -44,9 +63,9 @@ export const ChatScreen = ({ conversation }: Props) => {
 
   useEffect(() => {
     if (!conversation?.id) return;
-    
+
     let isActive = true;
-    console.log('Setting up realtime chat for conversation:', conversation.id);
+    const subscriptionKey = `${conversation.id}:${page}`;
 
     const fetchMessages = async (loadMore = false) => {
       try {
@@ -87,61 +106,54 @@ export const ChatScreen = ({ conversation }: Props) => {
 
     fetchMessages();
 
-    const channel = supabase
-      .channel(`room:${conversation.id}`)
-      .on('postgres_changes', {
-        event: 'INSERT',
-        schema: 'public',
-        table: 'messages',
-        filter: `conversation_id=eq.${conversation.id}`,
-      }, async (payload) => {
-        console.log('New message received:', payload);
-        
-        // Fetch the complete message with sender info
-        const { data: newMessage } = await supabase
-          .from('messages')
-          .select(`
-            *,
-            sender:profiles!messages_sender_id_fkey(
-              id,
-              user_id,
-              full_name,
-              avatar_url,
-              last_seen
-            )
-          `)
-          .eq('id', payload.new.id)
-          .single();
+    const channel = subscriptionManager.subscribe(subscriptionKey, async (payload) => {
+      console.log('New message received:', payload);
 
-        if (newMessage) {
-          console.log('Fetched new message with sender:', newMessage);
-          setMessages(prev => {
-            const exists = prev.some(msg => msg.id === newMessage.id);
-            const updatedMessages = exists ? prev : [...prev, newMessage];
-            // Force a render after a small delay to ensure state update
-            setTimeout(() => scrollToLatestMessage(), 100);
-            return updatedMessages;
-          });
-        }
-      })
-      .subscribe();
+      // Fetch the complete message with sender info
+      const { data: newMessage } = await supabase
+        .from('messages')
+        .select(`
+          *,
+          sender:profiles!messages_sender_id_fkey(
+            id,
+            user_id,
+            full_name,
+            avatar_url,
+            last_seen
+          )
+        `)
+        .eq('id', payload.new.id)
+        .single();
+
+      if (newMessage) {
+        console.log('Fetched new message with sender:', newMessage);
+        setMessages(prev => {
+          const exists = prev.some(msg => msg.id === newMessage.id);
+          const updatedMessages = exists ? prev : [...prev, newMessage];
+          // Force a render after a small delay to ensure state update
+          setTimeout(() => scrollToLatestMessage(), 100);
+          return updatedMessages;
+        });
+      }
+    });
+
 
     return () => {
       isActive = false;
       console.log('Cleaning up chat subscription');
-      supabase.removeChannel(channel);
+      subscriptionManager.unsubscribe(subscriptionKey);
     };
   }, [conversation?.id, page]);
-  
+
   // Add a connection status checker and reconnect mechanism
   useEffect(() => {
     if (!conversation?.id) return;
-    
+
     let reconnectInterval: NodeJS.Timeout | null = null;
-    
+
     const checkConnection = () => {
       const channel = supabase.channel(`heartbeat:${conversation.id}`);
-      
+
       channel
         .subscribe((status) => {
           console.log('Chat connection status:', status);
@@ -155,13 +167,13 @@ export const ChatScreen = ({ conversation }: Props) => {
             }, 5000);
           }
         });
-        
+
       // Check connection every minute
       reconnectInterval = setInterval(checkConnection, 60000);
     };
-    
+
     checkConnection();
-    
+
     return () => {
       if (reconnectInterval) clearInterval(reconnectInterval);
     };

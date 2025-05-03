@@ -5,44 +5,48 @@ import { Button } from './ui/button';
 import { Badge } from './ui/badge';
 import { Loader2, RefreshCw } from 'lucide-react';
 
+import subscriptionManager from '@/utils/subscriptionManager';
+
 const RealtimeStatus = () => {
   const [status, setStatus] = useState<'connecting' | 'connected' | 'disconnected'>('connecting');
   const [lastMessage, setLastMessage] = useState<string | null>(null);
   const [reconnectAttempt, setReconnectAttempt] = useState(0);
-  const subscriptionRef = useRef<RealtimeChannel | null>(null);
 
   const setupChannel = useCallback(() => {
-    const channel = supabase.channel('realtime-status', {
-      config: {
-        broadcast: {
-          self: true
+    const subscriptionKey = 'realtime_status_indicator';
+    
+    return subscriptionManager.subscribe(subscriptionKey, () => 
+      supabase.channel('realtime-status', {
+        config: {
+          broadcast: {
+            self: true
+          }
         }
-      }
-    });
-
-    channel
+      })
       .on('broadcast', { event: 'test' }, (payload) => {
         setLastMessage(JSON.stringify(payload));
       })
       .on('presence', { event: 'sync' }, () => {
         setStatus('connected');
       })
-      .subscribe((status) => {
-        console.log('Realtime subscription status:', status);
-        if (status === 'SUBSCRIBED') {
+      .subscribe((channelStatus) => {
+        console.log('Realtime subscription status:', channelStatus);
+        if (channelStatus === 'SUBSCRIBED') {
           setStatus('connected');
-        } else if (status === 'CLOSED' || status === 'CHANNEL_ERROR') {
+        } else if (channelStatus === 'CLOSED' || channelStatus === 'CHANNEL_ERROR') {
           setStatus('disconnected');
           // Auto-reconnect after a delay
           setTimeout(() => {
             setReconnectAttempt(prev => prev + 1);
-          }, 5000);
+            // Force a new subscription
+            subscriptionManager.unsubscribe(subscriptionKey);
+            setupChannel();
+          }, 3000);
         } else {
           setStatus('connecting');
         }
-      });
-
-    return channel;
+      })
+    );
   }, []);
 
   useEffect(() => {
