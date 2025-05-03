@@ -59,19 +59,37 @@ export const ChatScreen = ({ conversation }: Props) => {
   const navigate = useNavigate();
 
   const scrollToLatestMessage = (smooth = true) => {
+    // Try both selector methods to ensure we find the right element
     const chatContainer = document.querySelector('[data-scrollbar]');
     if (chatContainer) {
+      // Force layout recalculation to get accurate scroll height
+      void chatContainer.getBoundingClientRect();
+      
+      // Use immediate auto scroll first to get to bottom quickly
       chatContainer.scrollTo({
-        top: chatContainer.scrollHeight,
-        behavior: smooth ? 'smooth' : 'auto'
+        top: 999999, // Large value to ensure we reach the bottom
+        behavior: 'auto'
       });
+      
+      // Then follow with a smooth scroll if requested (for visual polish)
+      if (smooth) {
+        requestAnimationFrame(() => {
+          chatContainer.scrollTo({
+            top: chatContainer.scrollHeight,
+            behavior: 'smooth'
+          });
+        });
+      }
     }
   };
 
   // Force scroll to bottom when user enters chat view
   useEffect(() => {
-    // When component mounts, force scroll to bottom
-    setTimeout(() => scrollToLatestMessage(false), 300);
+    // When component mounts, force scroll to bottom with higher priority and multiple attempts
+    const scrollAttempts = [100, 300, 600, 1000]; // Multiple attempts with increasing delays
+    scrollAttempts.forEach(delay => {
+      setTimeout(() => scrollToLatestMessage(false), delay);
+    });
     
     // Also scroll when window is resized or orientation changes
     const handleResize = () => scrollToLatestMessage(false);
@@ -250,10 +268,12 @@ export const ChatScreen = ({ conversation }: Props) => {
   // Always scroll to bottom when chat is first loaded and messages are fetched
   useEffect(() => {
     if (!isLoading && messages.length > 0) {
-      // Use a short timeout to ensure DOM is fully updated
-      setTimeout(() => scrollToLatestMessage(false), 100);
+      // Use multiple timeouts with increasing delays to ensure scrolling happens
+      [50, 150, 300].forEach(delay => {
+        setTimeout(() => scrollToLatestMessage(false), delay);
+      });
     }
-  }, [isLoading]);
+  }, [isLoading, messages.length]);
 
   const handleReact = async (messageId: string, emoji: string) => {
     if (!user?.id) return;
