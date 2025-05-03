@@ -74,7 +74,10 @@ const ToastClose = React.forwardRef<
   React.ComponentPropsWithoutRef<typeof ToastPrimitives.Close>
 >(({ className, ...props }, ref) => {
   const { iconSize, isTouch } = useResponsive();
-  const size = isTouch ? iconSize.base : iconSize.small;
+  // Add fallback values if iconSize is undefined or missing properties
+  const size = isTouch ? 
+    (iconSize?.base || 5) : 
+    (iconSize?.small || 4);
   const padding = isTouch ? 'p-2' : 'p-1';
 
   return (
