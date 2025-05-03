@@ -711,7 +711,7 @@ const Community = () => {
                         </span> 
                         <span>{user.native_language}</span>
                       </Badge>
-                      <Arrow className="h-4 w-4 text-primary" />
+                      <ArrowRight className="h-4 w-4 text-primary" />
                       <Badge variant="outline" className="text-xs py-1 px-2 bg-primary/5">
                         <span className="mr-1.5 text-base" aria-label={`Flag for ${user.learning_language}`}>
                           {getLanguageFlag(user.learning_language)}
