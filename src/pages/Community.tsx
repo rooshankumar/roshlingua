@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { Heart, Search, Filter, Flame, User, X, Globe, Arrow, Trophy } from 'lucide-react';
+import { Heart, Search, Filter, Flame, User, X, Globe, ArrowRight, Trophy } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from "@/components/ui/badge";
