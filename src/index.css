@@ -441,9 +441,8 @@
   }
   
   .responsive-card h3 {
-    @apply overflow-hidden text-ellipsis max-w-full;
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
+    @apply overflow-hidden text-ellipsis max-w-full whitespace-nowrap;
+    transition: font-size 0.2s ease;
   }
   
   @media (min-width: 640px) {
