@@ -398,16 +398,53 @@ export const ChatScreen = ({ conversation }: Props) => {
                     messageActions.classList.toggle('pointer-events-none');
                   }
                 }}
+                onTouchStart={(e) => {
+                  // Set up long press handler
+                  const element = e.currentTarget;
+                  const longPressTimer = setTimeout(() => {
+                    // Show message actions on long press
+                    const messageActions = document.getElementById(`message-actions-${message.id}`);
+                    if (messageActions) {
+                      // Add haptic feedback if supported
+                      if ('vibrate' in navigator) {
+                        navigator.vibrate(50);
+                      }
+                      messageActions.classList.remove('opacity-0');
+                      messageActions.classList.remove('pointer-events-none');
+                    }
+                  }, 500); // 500ms for long press
+                  
+                  // Store the timer ID to clear it on touchend
+                  element.setAttribute('data-long-press-timer', longPressTimer.toString());
+                }}
+                onTouchEnd={(e) => {
+                  // Clear the long press timer on touch end
+                  const element = e.currentTarget;
+                  const timerId = element.getAttribute('data-long-press-timer');
+                  if (timerId) {
+                    clearTimeout(parseInt(timerId));
+                    element.removeAttribute('data-long-press-timer');
+                  }
+                }}
+                onTouchMove={(e) => {
+                  // Clear the long press timer on touch move (user is scrolling)
+                  const element = e.currentTarget;
+                  const timerId = element.getAttribute('data-long-press-timer');
+                  if (timerId) {
+                    clearTimeout(parseInt(timerId));
+                    element.removeAttribute('data-long-press-timer');
+                  }
+                }}
               >
                 <div className={`flex flex-col gap-2 max-w-[85%] sm:max-w-[70%] group transition-all duration-300 relative`}>
                   {/* Message actions */}
                   <div 
                     id={`message-actions-${message.id}`}
-                    className="absolute -top-10 left-0 right-0 opacity-0 pointer-events-none transition-opacity duration-200 flex justify-center gap-2 z-10"
+                    className="absolute -top-14 left-0 right-0 opacity-0 pointer-events-none transition-opacity duration-200 flex justify-center gap-2 z-10"
                   >
-                    <div className="bg-muted/90 backdrop-blur-sm rounded-full p-1 shadow-md flex items-center gap-1">
+                    <div className="bg-muted/90 backdrop-blur-sm rounded-full p-1.5 shadow-md flex items-center gap-2 border border-border/30">
                       <button 
-                        className="p-1.5 hover:bg-background/30 rounded-full" 
+                        className="p-2 hover:bg-background/30 rounded-full mobile-touch-target" 
                         onClick={(e) => {
                           e.stopPropagation();
                           setReplyTo(message);
@@ -416,15 +453,19 @@ export const ChatScreen = ({ conversation }: Props) => {
                           if (messageActions) {
                             messageActions.classList.add('opacity-0', 'pointer-events-none');
                           }
+                          // Provide haptic feedback
+                          if ('vibrate' in navigator) {
+                            navigator.vibrate(25);
+                          }
                         }}
                       >
-                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                           <polyline points="9 17 4 12 9 7"></polyline>
                           <path d="M20 18v-2a4 4 0 0 0-4-4H4"></path>
                         </svg>
                       </button>
                       <button 
-                        className="p-1.5 hover:bg-background/30 rounded-full"
+                        className="p-2 hover:bg-background/30 rounded-full mobile-touch-target"
                         onClick={(e) => {
                           e.stopPropagation();
                           const emojiPicker = document.getElementById(`emoji-picker-${message.id}`);

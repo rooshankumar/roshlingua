@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
@@ -18,15 +17,15 @@ export const MessageReactions = ({ messageId, existingReactions = {} }: MessageR
 
   const handleReact = async (emoji: string) => {
     setIsLoading(true);
-    
+
     try {
       const userId = (await supabase.auth.getUser()).data.user?.id;
       if (!userId) return;
-      
+
       // Update local state optimistically
       setReactions(prev => {
         const updatedReactions = { ...prev };
-        
+
         if (!updatedReactions[emoji]) {
           updatedReactions[emoji] = [userId];
         } else if (!updatedReactions[emoji].includes(userId)) {
@@ -37,10 +36,10 @@ export const MessageReactions = ({ messageId, existingReactions = {} }: MessageR
             delete updatedReactions[emoji];
           }
         }
-        
+
         return updatedReactions;
       });
-      
+
       // Update in database with proper primary key handling
       const { data: existingReaction } = await supabase
         .from('message_reactions')
@@ -49,7 +48,7 @@ export const MessageReactions = ({ messageId, existingReactions = {} }: MessageR
         .eq('user_id', userId)
         .eq('emoji', emoji)
         .maybeSingle();
-        
+
       if (existingReaction) {
         // Delete the reaction if it exists
         await supabase
@@ -91,7 +90,7 @@ export const MessageReactions = ({ messageId, existingReactions = {} }: MessageR
           <span className="text-xs">{users.length}</span>
         </Button>
       ))}
-      
+
       <Popover>
         <PopoverTrigger asChild>
           <Button 
@@ -107,8 +106,14 @@ export const MessageReactions = ({ messageId, existingReactions = {} }: MessageR
             {commonEmojis.map(emoji => (
               <button
                 key={emoji}
-                className="text-xl hover:scale-125 transition-transform"
-                onClick={() => handleReact(emoji)}
+                className="text-xl hover:scale-125 transition-transform p-2 mobile-touch-target"
+                onClick={() => {
+                  handleReact(emoji);
+                  // Add haptic feedback for mobile
+                  if ('vibrate' in navigator) {
+                    navigator.vibrate(25); 
+                  }
+                }}
               >
                 {emoji}
               </button>

@@ -171,7 +171,7 @@
   .content-with-fixed-header {
     padding-top: 60px;
   }
-  
+
   .chat-detail-view {
     padding-top: 0;
     padding-bottom: 0;
@@ -332,6 +332,10 @@
 
   .mobile-touch-target {
     @apply min-h-[44px] min-w-[44px]; /* Apple HIG recommends 44x44 minimum touch targets */
+    -webkit-touch-callout: none; /* Disable iOS callout on long press */
+    -webkit-user-select: none; /* Disable text selection on long press */
+    user-select: none; /* Disable text selection on long press */
+    touch-action: manipulation; /* Optimize for touch */
   }
 
   .mobile-card {
@@ -435,67 +439,67 @@
   .page-container {
     @apply w-full max-w-7xl mx-auto px-2 sm:px-4 md:px-6 lg:px-8 animate-fade-in;
   }
-  
+
   .responsive-card {
     @apply border-x-0 sm:border-x border-t-0 first:border-t border-b sm:rounded-lg transition-all hover:border-primary/30 hover:shadow-lg bg-card/50 backdrop-blur-sm overflow-hidden;
   }
-  
+
   .responsive-card h3 {
     @apply overflow-hidden text-ellipsis max-w-full whitespace-nowrap;
     transition: font-size 0.2s ease, transform 0.2s ease;
     transform-origin: left;
   }
-  
+
   @media (max-width: 640px) {
     .responsive-card h3 {
       /* Further scaling for extremely long names on small screens */
       transform: scale(var(--name-scale, 1));
       --name-scale: 1;
     }
-    
+
     .responsive-card h3[data-length="long"] {
       --name-scale: 0.95;
     }
-    
+
     .responsive-card h3[data-length="very-long"] {
       --name-scale: 0.9;
     }
   }
-  
+
   @media (min-width: 640px) {
     .responsive-card {
       @apply border border-border rounded-lg;
     }
   }
-  
+
   @media (min-width: 1024px) {
     .responsive-card {
       @apply border shadow-sm hover:shadow-md rounded-xl;
     }
-    
+
     .responsive-card h3 {
       overflow: visible;
       display: block;
       -webkit-line-clamp: unset;
     }
   }
-  
+
   .responsive-grid {
     @apply grid gap-2 sm:gap-4 grid-cols-1 sm:grid-cols-2;
   }
-  
+
   @media (min-width: 1024px) {
     .responsive-grid {
       @apply gap-5 grid-cols-3;
     }
   }
-  
+
   @media (min-width: 1280px) {
     .responsive-grid {
       @apply gap-6 grid-cols-4;
     }
   }
-  
+
   .mobile-container {
     @apply container mx-auto px-2 sm:px-4 md:px-6 py-4 sm:py-6;
   }
@@ -626,4 +630,11 @@ html {
 .page-transition-exit-active {
   opacity: 0;
   transition: opacity 200ms;
+}
+
+/* Visual feedback for message long press */
+.message-long-press {
+  transform: scale(0.97);
+  transition: transform 0.2s ease-out;
+  background-color: rgba(0, 0, 0, 0.05);
 }
