@@ -666,90 +666,31 @@ const Community = () => {
               onClick={() => navigate(`/profile/${user.id}`)}
             >              
               <CardContent className="p-4">
-                <div className="space-y-4">
-                  {/* Header: Avatar, Name, Age, and Online Status */}
-                  <div className="flex items-start justify-between">
-                    <div className="flex gap-3">
-                      <div className="relative">
-                        <Avatar className="h-16 w-16 ring-2 ring-primary/10 group-hover:ring-primary/30 transition-all">
-                          <AvatarImage src={user.avatar_url} className="object-cover" />
-                          <AvatarFallback className="text-xl">{user.full_name?.charAt(0)}</AvatarFallback>
-                        </Avatar>
-                        <span className={cn(
-                          "absolute bottom-0 right-0 block h-3.5 w-3.5 rounded-full ring-2 ring-background transition-colors",
-                          user.is_online 
-                            ? "bg-green-500 ring-green-100/50" 
-                            : "bg-gray-300 ring-gray-100/50"
-                        )} />
-                      </div>
-                      <div>
-                        <h3 className="font-semibold text-lg group-hover:text-primary transition-colors">{user.full_name}</h3>
-                        <div className="flex items-center gap-2 mt-0.5 text-muted-foreground">
-                          <span className="text-sm">{user.age || '–'} years</span>
-                          {user.is_online && (
-                            <Badge variant="outline" className="bg-green-500/10 text-green-600 border-green-200/30">
-                              Online
-                            </Badge>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                    {user.streak_count > 0 && (
-                      <Badge variant="outline" className="bg-orange-500/10 text-orange-600 border-orange-200/30 flex items-center gap-1">
-                        <Flame className="h-3 w-3" />
-                        {user.streak_count}
-                      </Badge>
-                    )}
-                  </div>
-
-                  {/* Language Exchange Info */}
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2 p-2 rounded-lg bg-muted/50">
-                      <Badge variant="secondary" className="text-xs py-1 px-2">
-                        <span className="mr-1.5 text-base" aria-label={`Flag for ${user.native_language}`}>
+                <div className="flex items-center gap-4">
+                  <Avatar className="h-16 w-16">
+                    <AvatarImage src={user.avatar_url} alt={user.full_name} className="object-cover" />
+                    <AvatarFallback>{user.full_name?.charAt(0)}</AvatarFallback>
+                  </Avatar>
+                  
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-lg mb-1">{user.full_name}</h3>
+                    <p className="text-sm text-muted-foreground mb-2">{user.age || '–'} years</p>
+                    
+                    <div className="flex items-center gap-2">
+                      <Badge variant="secondary" className="text-xs">
+                        <span className="mr-1" aria-label={`Flag for ${user.native_language}`}>
                           {getLanguageFlag(user.native_language)}
-                        </span> 
-                        <span>{user.native_language}</span>
+                        </span>
+                        {user.native_language}
                       </Badge>
                       <ArrowRight className="h-4 w-4 text-primary" />
-                      <Badge variant="outline" className="text-xs py-1 px-2 bg-primary/5">
-                        <span className="mr-1.5 text-base" aria-label={`Flag for ${user.learning_language}`}>
+                      <Badge variant="outline" className="text-xs">
+                        <span className="mr-1" aria-label={`Flag for ${user.learning_language}`}>
                           {getLanguageFlag(user.learning_language)}
                         </span>
-                        <span>{user.learning_language}</span>
+                        {user.learning_language}
                       </Badge>
-                      {user.proficiency_level && (
-                        <Badge className="ml-auto text-[10px] h-5 bg-primary/10 text-primary border-0">
-                          {user.proficiency_level}
-                        </Badge>
-                      )}
                     </div>
-                    {user.bio && (
-                      <p className="text-sm text-muted-foreground line-clamp-2">
-                        {user.bio}
-                      </p>
-                    )}
-                  </div>
-
-                  {/* Footer Stats */}
-                  <div className="flex items-center justify-between text-xs text-muted-foreground pt-2 border-t">
-                    <div className="flex items-center gap-3">
-                      {user.likes_count > 0 && (
-                        <span className="flex items-center gap-1">
-                          <Heart className="h-3.5 w-3.5 text-red-500" />
-                          {user.likes_count}
-                        </span>
-                      )}
-                      {user.xp_points > 0 && (
-                        <span className="flex items-center gap-1">
-                          <Trophy className="h-3.5 w-3.5 text-yellow-500" />
-                          {user.xp_points} XP
-                        </span>
-                      )}
-                    </div>
-                    <span className="text-xs text-muted-foreground">
-                      Click to view profile
-                    </span>
                   </div>
                 </div>
               </CardContent>
