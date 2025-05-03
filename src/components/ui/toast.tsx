@@ -76,7 +76,7 @@ const ToastClose = React.forwardRef<
   const { iconSize, isTouch } = useResponsive();
   const size = isTouch ? iconSize.base : iconSize.small;
   const padding = isTouch ? 'p-2' : 'p-1';
-  
+
   return (
     <ToastPrimitives.Close
       ref={ref}
