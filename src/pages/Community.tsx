@@ -680,7 +680,7 @@ const Community = () => {
                     </div>
                     
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-1.5">
                         <h3 
                           className={`font-semibold leading-tight truncate ${
                             user.full_name?.length > 20
@@ -699,7 +699,7 @@ const Community = () => {
                         >
                           {user.full_name}
                         </h3>
-                        <span className="text-xs text-muted-foreground whitespace-nowrap">{user.age || '–'} y.o.</span>
+                        <span className="text-xs text-muted-foreground whitespace-nowrap">• {user.age || '–'} y.o.</span>
                       </div>
                       <p className="text-xs text-muted-foreground mt-0.5">
                         {user.is_online ? 
