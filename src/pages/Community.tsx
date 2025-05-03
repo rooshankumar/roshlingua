@@ -655,19 +655,19 @@ const Community = () => {
       </div>
 
       {filteredUsers.length > 0 ? (
-        <div className="responsive-grid lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-4 container mx-auto px-0 sm:px-4 lg:gap-6">
-          {filteredUsers.map((user) => (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 container mx-auto px-0 sm:px-4 lg:gap-6">
+          {filteredUsers.slice(0, 9).map((user) => (
             <Card 
               key={user.id} 
               className="responsive-card cursor-pointer group hover:border-primary/40"
               onClick={() => navigate(`/profile/${user.id}`)}
             >              
               <CardContent className="p-4 sm:p-6">
-                <div className="flex flex-col space-y-3">
+                <div className="flex flex-col space-y-4">
                   {/* Avatar and name in one row */}
                   <div className="flex items-center space-x-3">
                     <div className="relative shrink-0">
-                      <Avatar className="h-12 w-12 sm:h-14 sm:w-14">
+                      <Avatar className="h-14 w-14 sm:h-16 sm:w-16">
                         <AvatarImage src={user.avatar_url} alt={user.full_name} className="object-cover" />
                         <AvatarFallback>{user.full_name?.charAt(0)}</AvatarFallback>
                       </Avatar>
@@ -742,6 +742,25 @@ const Community = () => {
             </p>
           </CardContent>
         </Card>
+      )}
+
+      {/* Pagination */}
+      {filteredUsers.length > 9 && (
+        <div className="flex justify-center items-center mt-6 gap-2">
+          <Button 
+            variant="outline" 
+            onClick={() => {
+              // Logic for pagination would go here
+              // This is a placeholder for future enhancement
+              toast({
+                title: "Pagination",
+                description: "This feature will be implemented soon.",
+              });
+            }}
+          >
+            Show More Profiles
+          </Button>
+        </div>
       )}
 
       {/* Scroll to top button */}
