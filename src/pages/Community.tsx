@@ -52,6 +52,7 @@ interface User {
   username: string;
   date_of_birth: string | null;
   age: number | null; // Added age property
+  last_seen: string | null;
 }
 
 const Community = () => {
@@ -182,7 +183,8 @@ const Community = () => {
             date_of_birth,
             age,
             is_online,
-            username
+            username,
+            last_seen
           `)
           .neq('id', currentUser?.id);
 
@@ -207,11 +209,23 @@ const Community = () => {
           age: user.date_of_birth ? Math.floor((new Date().getTime() - new Date(user.date_of_birth).getTime()) / (365.25 * 24 * 60 * 60 * 1000)) : null,
         }));
 
+        // Sort users: online first, then by last seen (most recent first)
+        const sortedUsers = usersWithDefaults.sort((a, b) => {
+          // First by online status
+          if (a.is_online && !b.is_online) return -1;
+          if (!a.is_online && b.is_online) return 1;
+          
+          // Then by last_seen (most recent first)
+          const aLastSeen = a.last_seen ? new Date(a.last_seen).getTime() : 0;
+          const bLastSeen = b.last_seen ? new Date(b.last_seen).getTime() : 0;
+          return bLastSeen - aLastSeen;
+        });
+
         // Log the fetched users for debugging
-        console.log("Fetched users:", usersWithDefaults.length);
+        console.log("Fetched users:", sortedUsers.length);
         
-        setUsers(usersWithDefaults);
-        setFilteredUsers(usersWithDefaults);
+        setUsers(sortedUsers);
+        setFilteredUsers(sortedUsers);
       } catch (error) {
         console.error("Error fetching users:", error);
       }
@@ -312,12 +326,19 @@ const Community = () => {
     };
     
     document.addEventListener('visibilitychange', handleVisibilityChange);
+    
+    // Set up a regular refresh interval (every 30 seconds)
+    const refreshInterval = setInterval(() => {
+      console.log('Refreshing community data on interval');
+      fetchUsers();
+    }, 30000);
 
     // Cleanup function
     return () => {
       console.log('Unsubscribing from real-time updates');
       subscriptionManager.unsubscribe(subscriptionKey);
       document.removeEventListener('visibilitychange', handleVisibilityChange);
+      clearInterval(refreshInterval);
     };
   }, [user?.id]); // Add user?.id as dependency to re-initialize when user changes
 
@@ -650,6 +671,68 @@ const Community = () => {
             <div className="flex flex-wrap gap-2 animate-in fade-in">
               {renderActiveFilterBadges()}
             </div>
+            <Button 
+              variant="outline" 
+              size="icon"
+              className="ml-auto"
+              onClick={() => {
+                console.log('Manually refreshing community data');
+                const fetchUsers = async () => {
+                  try {
+                    const currentUser = (await supabase.auth.getUser()).data.user;
+                    const { data, error } = await supabase
+                      .from('profiles')
+                      .select(`
+                        id, full_name, native_language, learning_language, proficiency_level, bio, 
+                        avatar_url, streak_count, likes_count, date_of_birth, age, is_online, username, last_seen
+                      `)
+                      .neq('id', currentUser?.id);
+                    if (error) {
+                      console.error("Error fetching users:", error);
+                      return;
+                    }
+                    const usersWithDefaults = (data || []).map(user => ({
+                      ...user,
+                      username: user.username || user.full_name,
+                      full_name: user.full_name || 'Anonymous User',
+                      avatar_url: user.avatar_url || '/placeholder.svg',
+                      bio: user.bio || 'No bio available',
+                      native_language: user.native_language || 'English',
+                      learning_language: user.learning_language || 'Spanish',
+                      proficiency_level: user.proficiency_level || 'beginner',
+                      is_online: user.is_online || false,
+                      streak_count: user.streak_count || 1,
+                      likes_count: user.likes_count || 0,
+                      age: user.date_of_birth ? Math.floor((new Date().getTime() - new Date(user.date_of_birth).getTime()) / (365.25 * 24 * 60 * 60 * 1000)) : null,
+                    }));
+                    // Sort users: online first, then by last seen (most recent first)
+                    const sortedUsers = usersWithDefaults.sort((a, b) => {
+                      if (a.is_online && !b.is_online) return -1;
+                      if (!a.is_online && b.is_online) return 1;
+                      const aLastSeen = a.last_seen ? new Date(a.last_seen).getTime() : 0;
+                      const bLastSeen = b.last_seen ? new Date(b.last_seen).getTime() : 0;
+                      return bLastSeen - aLastSeen;
+                    });
+                    setUsers(sortedUsers);
+                    setFilteredUsers(sortedUsers);
+                    toast({
+                      title: "Refreshed",
+                      description: "Community profiles updated",
+                    });
+                  } catch (error) {
+                    console.error("Error refreshing users:", error);
+                    toast({
+                      title: "Error",
+                      description: "Failed to refresh profiles",
+                      variant: "destructive",
+                    });
+                  }
+                };
+                fetchUsers();
+              }}
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-refresh-cw"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M3 21v-5h5"/></svg>
+            </Button>
           </div>
         </div>
       </div>
