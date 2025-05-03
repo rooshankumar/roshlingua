@@ -264,8 +264,8 @@ const Community = () => {
     // Create a more robust real-time subscription
     const subscriptionKey = 'community_profiles';
     
-    const channel = subscriptionManager.subscribe(subscriptionKey, () => 
-      supabase
+    const channel = subscriptionManager.subscribe(subscriptionKey, () => {
+      return supabase
         .channel('public:profiles:changes')
         .on('postgres_changes',
           {
@@ -274,50 +274,51 @@ const Community = () => {
             table: 'profiles'
           },
           payload => {
-          console.log('Real-time profile update received:', payload);
+            console.log('Real-time profile update received:', payload);
 
-          // Update the specific user in the state rather than re-fetching all users
-          if (payload.new && payload.eventType) {
-            setUsers(prevUsers => {
-              // For INSERT event, add the new user if they're not already in the list
-              if (payload.eventType === 'INSERT' && !prevUsers.some(u => u.id === payload.new.id)) {
-                // Don't add the current user to the list
-                const isCurrentUser = payload.new.id === user?.id;
-                if (!isCurrentUser) {
-                  return [...prevUsers, payload.new as User];
+            // Update the specific user in the state rather than re-fetching all users
+            if (payload.new && payload.eventType) {
+              setUsers(prevUsers => {
+                // For INSERT event, add the new user if they're not already in the list
+                if (payload.eventType === 'INSERT' && !prevUsers.some(u => u.id === payload.new.id)) {
+                  // Don't add the current user to the list
+                  const isCurrentUser = payload.new.id === user?.id;
+                  if (!isCurrentUser) {
+                    return [...prevUsers, payload.new as User];
+                  }
                 }
-              }
 
-              // For UPDATE event, update the existing user
-              else if (payload.eventType === 'UPDATE') {
-                return prevUsers.map(u => 
-                  u.id === payload.new.id ? { ...u, ...payload.new } : u
-                );
-              }
+                // For UPDATE event, update the existing user
+                else if (payload.eventType === 'UPDATE') {
+                  return prevUsers.map(u => 
+                    u.id === payload.new.id ? { ...u, ...payload.new } : u
+                  );
+                }
 
-              // For DELETE event, remove the user
-              else if (payload.eventType === 'DELETE' && payload.old) {
-                return prevUsers.filter(u => u.id !== payload.old.id);
-              }
+                // For DELETE event, remove the user
+                else if (payload.eventType === 'DELETE' && payload.old) {
+                  return prevUsers.filter(u => u.id !== payload.old.id);
+                }
 
-              return prevUsers;
-            });
+                return prevUsers;
+              });
 
-            // We'll rely on the useEffect dependency array to update filtered users
-            // This ensures consistent filtering logic in one place
+              // We'll rely on the useEffect dependency array to update filtered users
+              // This ensures consistent filtering logic in one place
+            }
           }
-        }
-      )
-      .subscribe((status) => {
-        console.log('Community real-time subscription status:', status);
-        if (status === 'SUBSCRIBED') {
-          console.log('Successfully subscribed to real-time updates');
-        } else if (status !== 'SUBSCRIBED') {
-          console.warn('Real-time subscription issue:', status);
-          // Try to reconnect if needed
-          setTimeout(() => fetchUsers(), 3000);
-        }
-      });
+        )
+        .subscribe((status) => {
+          console.log('Community real-time subscription status:', status);
+          if (status === 'SUBSCRIBED') {
+            console.log('Successfully subscribed to real-time updates');
+          } else if (status !== 'SUBSCRIBED') {
+            console.warn('Real-time subscription issue:', status);
+            // Try to reconnect if needed
+            setTimeout(() => fetchUsers(), 3000);
+          }
+        });
+    });
 
     // Fetch users initially
     fetchUsers();
