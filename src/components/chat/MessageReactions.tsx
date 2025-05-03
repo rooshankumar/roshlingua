@@ -77,7 +77,7 @@ export const MessageReactions = ({ messageId, existingReactions = {} }: MessageR
   };
 
   return (
-    <div className="flex items-center gap-1 mt-1">
+    <div className="flex items-center gap-1 mt-1" data-message-reactions={messageId}>
       {Object.entries(reactions).map(([emoji, users]) => (
         <Button
           key={emoji}

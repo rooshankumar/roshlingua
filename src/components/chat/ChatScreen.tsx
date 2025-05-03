@@ -52,7 +52,8 @@ export const ChatScreen = ({ conversation }: Props) => {
   const [isSending, setIsSending] = useState(false);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
-  const [replyTo, setReplyTo] = useState<Message | null>(null); // Added state for reply functionality
+  const [replyTo, setReplyTo] = useState<Message | null>(null);
+  const [showReplyPreview, setShowReplyPreview] = useState(false);
   const MESSAGES_PER_PAGE = 50;
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
@@ -229,6 +230,62 @@ export const ChatScreen = ({ conversation }: Props) => {
     }
   }, [messages]);
 
+  const handleReact = async (messageId: string, emoji: string) => {
+    if (!user?.id) return;
+    
+    try {
+      // Find existing message reactions component and tell it to add this reaction
+      const messageReactions = document.querySelector(`[data-message-reactions="${messageId}"]`) as any;
+      if (messageReactions && messageReactions.__reactProps$) {
+        // Call onReact function if available through React props
+        if (messageReactions.__reactProps$.onReact) {
+          messageReactions.__reactProps$.onReact(emoji);
+        } else {
+          // Fallback: Create new MessageReactions component and manually trigger reaction
+          const reactionComponent = new MessageReactions({ 
+            messageId, 
+            existingReactions: {} 
+          });
+          await reactionComponent.handleReact(emoji);
+        }
+      } else {
+        // Direct API call if component not found
+        const userId = user.id;
+        
+        // Check if reaction exists
+        const { data: existingReaction } = await supabase
+          .from('message_reactions')
+          .select('*')
+          .eq('message_id', messageId)
+          .eq('user_id', userId)
+          .eq('emoji', emoji)
+          .maybeSingle();
+          
+        if (existingReaction) {
+          // Delete the reaction if it exists
+          await supabase
+            .from('message_reactions')
+            .delete()
+            .eq('message_id', messageId)
+            .eq('user_id', userId)
+            .eq('emoji', emoji);
+        } else {
+          // Insert a new reaction
+          await supabase
+            .from('message_reactions')
+            .insert({
+              message_id: messageId,
+              user_id: userId,
+              emoji: emoji,
+              created_at: new Date().toISOString()
+            });
+        }
+      }
+    } catch (error) {
+      console.error('Error adding reaction:', error);
+    }
+  };
+
   const handleSend = async (content?: string, attachment?: { url: string; filename: string; thumbnail?: string }) => {
     const messageContent = content || newMessage;
     if ((!messageContent.trim() && !attachment) || !user || !conversation?.id || isSending) return;
@@ -333,9 +390,81 @@ export const ChatScreen = ({ conversation }: Props) => {
                 style={{
                   animationDelay: `${index * 0.1}s`
                 }}
-                onDoubleClick={() => setReplyTo(message)}
+                onClick={() => {
+                  // Show message actions on click
+                  const messageActions = document.getElementById(`message-actions-${message.id}`);
+                  if (messageActions) {
+                    messageActions.classList.toggle('opacity-0');
+                    messageActions.classList.toggle('pointer-events-none');
+                  }
+                }}
               >
-                <div className={`flex flex-col gap-2 max-w-[85%] sm:max-w-[70%] group transition-all duration-300`}>
+                <div className={`flex flex-col gap-2 max-w-[85%] sm:max-w-[70%] group transition-all duration-300 relative`}>
+                  {/* Message actions */}
+                  <div 
+                    id={`message-actions-${message.id}`}
+                    className="absolute -top-10 left-0 right-0 opacity-0 pointer-events-none transition-opacity duration-200 flex justify-center gap-2 z-10"
+                  >
+                    <div className="bg-muted/90 backdrop-blur-sm rounded-full p-1 shadow-md flex items-center gap-1">
+                      <button 
+                        className="p-1.5 hover:bg-background/30 rounded-full" 
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setReplyTo(message);
+                          document.querySelector('textarea')?.focus();
+                          const messageActions = document.getElementById(`message-actions-${message.id}`);
+                          if (messageActions) {
+                            messageActions.classList.add('opacity-0', 'pointer-events-none');
+                          }
+                        }}
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <polyline points="9 17 4 12 9 7"></polyline>
+                          <path d="M20 18v-2a4 4 0 0 0-4-4H4"></path>
+                        </svg>
+                      </button>
+                      <button 
+                        className="p-1.5 hover:bg-background/30 rounded-full"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          const emojiPicker = document.getElementById(`emoji-picker-${message.id}`);
+                          if (emojiPicker) {
+                            emojiPicker.classList.toggle('hidden');
+                          }
+                        }}
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <circle cx="12" cy="12" r="10"></circle>
+                          <path d="M8 14s1.5 2 4 2 4-2 4-2"></path>
+                          <line x1="9" y1="9" x2="9.01" y2="9"></line>
+                          <line x1="15" y1="9" x2="15.01" y2="9"></line>
+                        </svg>
+                      </button>
+                    </div>
+                    
+                    {/* Emoji picker */}
+                    <div 
+                      id={`emoji-picker-${message.id}`}
+                      className="absolute -top-12 left-1/2 transform -translate-x-1/2 bg-muted/90 backdrop-blur-sm rounded-full p-1 shadow-md hidden"
+                    >
+                      <div className="flex items-center gap-1">
+                        {['👍', '❤️', '😂', '😮', '😢', '👏'].map(emoji => (
+                          <button 
+                            key={emoji}
+                            className="p-1 hover:bg-background/30 rounded-full text-lg"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleReact(message.id, emoji);
+                              document.getElementById(`emoji-picker-${message.id}`)?.classList.add('hidden');
+                              document.getElementById(`message-actions-${message.id}`)?.classList.add('opacity-0', 'pointer-events-none');
+                            }}
+                          >
+                            {emoji}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
                   {message.sender_id !== user?.id && (
                     <span className="text-xs text-muted-foreground ml-1">
                       {message.sender?.full_name}
@@ -468,6 +597,24 @@ export const ChatScreen = ({ conversation }: Props) => {
       {user?.id && (
         <div className="sticky bottom-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-xl border-t border-border/50">
           <CardContent className="p-4 max-w-4xl mx-auto">
+            {replyTo && (
+              <div className="mb-2 px-3 py-2 bg-muted/30 rounded-lg border-l-4 border-primary flex items-center justify-between">
+                <div className="flex flex-col">
+                  <span className="text-xs font-medium text-primary">
+                    Replying to {replyTo.sender?.full_name || 'User'}
+                  </span>
+                  <span className="text-sm text-muted-foreground truncate max-w-[300px]">
+                    {replyTo.content}
+                  </span>
+                </div>
+                <button 
+                  className="text-muted-foreground hover:text-foreground"
+                  onClick={() => setReplyTo(null)}
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
+            )}
             <div className="flex items-end gap-3">
               <VoiceRecorder onRecord={(url, filename) => handleSend(null, {url, filename})} /> {/* Added VoiceRecorder */}
               <ChatAttachment onAttach={(url, filename) => handleSend(newMessage, { url, filename })} />
