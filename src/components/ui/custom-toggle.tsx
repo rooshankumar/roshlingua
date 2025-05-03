@@ -10,7 +10,7 @@ const CustomToggle = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <SwitchPrimitives.Root
     className={cn(
-      "peer relative inline-flex h-7 w-14 shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=unchecked]:bg-gray-200 dark:data-[state=unchecked]:bg-gray-700",
+      "peer relative inline-flex h-7 w-14 shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-green-500 data-[state=unchecked]:bg-gray-200 dark:data-[state=unchecked]:bg-gray-700",
       className
     )}
     {...props}
@@ -22,7 +22,7 @@ const CustomToggle = React.forwardRef<
       )}
     >
       <Check
-        className="h-3 w-3 text-primary absolute opacity-0 transition-opacity data-[state=checked]:opacity-100"
+        className="h-3 w-3 text-white absolute opacity-0 transition-opacity data-[state=checked]:opacity-100"
         data-state={props.checked ? "checked" : "unchecked"}
       />
       <X
