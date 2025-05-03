@@ -116,14 +116,36 @@ export const handleImageLoadError = (e: React.SyntheticEvent<HTMLImageElement, E
   // Hide the failed image
   imageElement.style.display = 'none';
   
+  // Check if URL might be blocked (common for Supabase storage)
+  const isBlocked = url && isLikelyBlockedUrl(url);
+  
+  // Create safer, escaped URL
+  const safeUrl = url ? url.replace(/"/g, '&quot;') : '';
+  
   // Add fallback directly to parent element
   const parent = imageElement.parentElement;
   if (parent) {
-    parent.innerHTML = `
-      <div class="flex flex-col items-center justify-center p-4 bg-muted/30 border border-border rounded-lg">
-        <span class="text-sm text-muted-foreground">Image could not be loaded</span>
-        <a href="${url}" target="_blank" class="text-primary hover:underline mt-2">Open image in new tab</a>
-      </div>
-    `;
+    // Use createElement instead of innerHTML for better security
+    const fallbackDiv = document.createElement('div');
+    fallbackDiv.className = "flex flex-col items-center justify-center p-4 bg-muted/30 border border-border rounded-lg";
+    
+    const messageSpan = document.createElement('span');
+    messageSpan.className = "text-sm text-muted-foreground";
+    messageSpan.textContent = isBlocked ? 
+      "Image may be blocked by your browser" : 
+      "Image could not be loaded";
+    
+    const linkElement = document.createElement('a');
+    linkElement.href = safeUrl;
+    linkElement.target = "_blank";
+    linkElement.className = "text-primary hover:underline mt-2";
+    linkElement.textContent = "Open image in new tab";
+    
+    fallbackDiv.appendChild(messageSpan);
+    fallbackDiv.appendChild(linkElement);
+    
+    // Clear existing content and append the new elements
+    parent.innerHTML = '';
+    parent.appendChild(fallbackDiv);
   }
 };

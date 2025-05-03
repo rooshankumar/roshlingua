@@ -41,13 +41,34 @@ export const MessageReactions = ({ messageId, existingReactions = {} }: MessageR
         return updatedReactions;
       });
       
-      // Update in database
-      await supabase.from('message_reactions').upsert({
-        message_id: messageId,
-        user_id: userId,
-        emoji: emoji,
-        created_at: new Date().toISOString()
-      });
+      // Update in database with proper primary key handling
+      const { data: existingReaction } = await supabase
+        .from('message_reactions')
+        .select('*')
+        .eq('message_id', messageId)
+        .eq('user_id', userId)
+        .eq('emoji', emoji)
+        .maybeSingle();
+        
+      if (existingReaction) {
+        // Delete the reaction if it exists
+        await supabase
+          .from('message_reactions')
+          .delete()
+          .eq('message_id', messageId)
+          .eq('user_id', userId)
+          .eq('emoji', emoji);
+      } else {
+        // Insert a new reaction
+        await supabase
+          .from('message_reactions')
+          .insert({
+            message_id: messageId,
+            user_id: userId,
+            emoji: emoji,
+            created_at: new Date().toISOString()
+          });
+      }
     } catch (error) {
       console.error('Error adding reaction:', error);
     } finally {

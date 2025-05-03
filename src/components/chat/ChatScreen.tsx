@@ -362,6 +362,7 @@ export const ChatScreen = ({ conversation }: Props) => {
                                 onClick={() => window.open(message.attachment_url, '_blank')}
                                 onError={(e) => handleImageLoadError(e, message.attachment_url as string)}
                                 loading="lazy"
+                                referrerPolicy="no-referrer"
                               />
                               {/* Download button */}
                               <a 

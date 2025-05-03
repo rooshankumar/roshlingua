@@ -1,6 +1,6 @@
 
 import { useState, useRef, useEffect } from 'react';
-import { Mic, Square, Send } from 'lucide-react';
+import { Mic, Square, Send, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/lib/supabase';
 
