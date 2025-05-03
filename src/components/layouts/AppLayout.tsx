@@ -6,6 +6,7 @@ import { NotificationDropdown } from "../notifications/NotificationDropdown";
 import { supabase } from "@/lib/supabase";
 import subscriptionManager from "@/utils/subscriptionManager";
 import { useAuth } from '@/providers/AuthProvider';
+import RealtimeConnectionCheck from "../RealtimeConnectionCheck";
 
 
 interface AppLayoutProps {
