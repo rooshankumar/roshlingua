@@ -441,7 +441,16 @@
   }
   
   .responsive-card .truncate {
-    @apply max-w-[180px] sm:max-w-[220px] md:max-w-[250px] lg:max-w-[300px] xl:max-w-none;
+    @apply max-w-[180px] sm:max-w-[220px] md:max-w-[250px];
+  }
+  
+  @media (min-width: 1024px) {
+    .responsive-card .truncate {
+      max-width: none;
+      white-space: normal;
+      overflow: visible;
+      text-overflow: clip;
+    }
   }
   
   .responsive-grid {

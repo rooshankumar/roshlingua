@@ -702,14 +702,14 @@ const Community = () => {
       </div>
 
       {filteredUsers.length > 0 ? (
-        <div className="responsive-grid 2xl:grid-cols-5 container mx-auto px-0 sm:px-4">
+        <div className="responsive-grid lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 container mx-auto px-0 sm:px-4">
           {filteredUsers.map((user) => (
             <Card 
               key={user.id} 
               className="responsive-card cursor-pointer group"
               onClick={() => navigate(`/profile/${user.id}`)}
             >              
-              <CardContent className="p-4 sm:p-6">
+              <CardContent className="p-4 sm:p-6 lg:p-8">
                 <div className="flex items-center gap-6">
                   <div className="relative">
                     <Avatar className="h-16 w-16">
@@ -724,8 +724,8 @@ const Community = () => {
                     />
                   </div>
                   
-                  <div className="flex-1 min-w-0">
-                    <h3 className="font-semibold text-lg mb-1 truncate sm:max-w-[150px] md:max-w-[200px] lg:max-w-[250px] xl:max-w-none">{user.full_name}</h3>
+                  <div className="flex-1 min-w-0 overflow-hidden">
+                    <h3 className="font-semibold text-lg mb-1 truncate lg:overflow-visible lg:whitespace-normal">{user.full_name}</h3>
                     <p className="text-sm text-muted-foreground mb-2">{user.age || '–'} years</p>
                     
                     <div className="flex items-center gap-3">
