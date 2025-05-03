@@ -5,7 +5,7 @@ import MainNav from "../navigation/MainNav";
 import { NotificationDropdown } from "../notifications/NotificationDropdown";
 import { supabase } from "@/lib/supabase";
 import subscriptionManager from "@/utils/subscriptionManager";
-import { useAuth } from '@/providers/AuthProvider'; // Added import for useAuth
+import { useAuth } from '@/providers/AuthProvider';
 
 
 interface AppLayoutProps {
@@ -39,22 +39,19 @@ const AppLayout = ({ children }: AppLayoutProps) => {
   const location = useLocation();
   const isChatDetailRoute = location.pathname.match(/^\/chat\/[0-9a-f-]+$/);
   const isMobile = window.innerWidth < 768;
-  const { user, refreshSubscriptions } = useAuth(); // Added to access user authentication status and refreshSubscriptions
+  const { user, refreshSubscriptions } = useAuth();
 
 
   // Monitor connection status app-wide
   useEffect(() => {
-    // Setup a global connection monitor
     const connectionKey = "app_connection_monitor";
 
     const channel = subscriptionManager.subscribe(connectionKey, () =>
       supabase.channel("global")
         .on("system", { event: "disconnect" }, (payload) => {
           console.log("Supabase disconnected:", payload);
-          // Create a reconnection attempt
           setTimeout(() => {
             console.log("Attempting to reconnect...");
-            // Force reconnection by creating a new subscription
             subscriptionManager.unsubscribe(connectionKey);
             subscriptionManager.subscribe(connectionKey, () =>
               supabase.channel("global-reconnect")
@@ -73,16 +70,11 @@ const AppLayout = ({ children }: AppLayoutProps) => {
   useEffect(() => {
     window.scrollTo(0, 0);
 
-    // When route changes, refresh any active subscriptions
-    // This helps ensure data is fresh when switching between pages
     if (user?.id) {
       console.log('Route changed to:', location.pathname);
-
-      // Call the AuthProvider's refreshSubscriptions method to refresh data
       if (location.pathname) {
         setTimeout(() => {
           console.log('Refreshing subscriptions after page change');
-          // This will trigger a refresh of data in the current page
           refreshSubscriptions();
         }, 100);
       }
@@ -91,7 +83,6 @@ const AppLayout = ({ children }: AppLayoutProps) => {
 
   return (
     <div className="min-h-screen flex flex-col md:flex-row">
-      {/* Notification icon in top right corner - hidden on chat and settings pages */}
       {!location.pathname.includes('/chat') && !location.pathname.includes('/settings') && (
         <div className="absolute top-2 right-3 z-40 md:hidden">
           <NotificationDropdown className="mobile-touch-target" />
@@ -103,7 +94,6 @@ const AppLayout = ({ children }: AppLayoutProps) => {
       </div>
       <main className={`flex-1 pb-24 md:pb-4 pt-2 sm:pt-4 px-0 sm:px-3 md:px-6 overflow-x-hidden`}>{children}</main>
 
-      {/* Mobile Bottom Navigation */}
       {!isChatDetailRoute && (
         <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-background/90 backdrop-blur-xl border-t flex justify-around p-2 z-50 shadow-lg safe-area-bottom">
           {routes.map((route) => {
@@ -129,7 +119,12 @@ const AppLayout = ({ children }: AppLayoutProps) => {
         </nav>
       )}
 
-      {/* Safe area for bottom padding in mobile browsers */}
+      {/* Add hidden real-time connection health check */}
+      <div className="hidden">
+        {/* RealtimeConnectionCheck component needs to be implemented */}
+        <RealtimeConnectionCheck /> {/* Placeholder -  Implementation missing */}
+      </div>
+
       <style jsx="true" global="true">{`
         @supports (padding-bottom: env(safe-area-inset-bottom)) {
           .safe-area-bottom {

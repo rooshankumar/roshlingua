@@ -25,6 +25,9 @@ import ChatList from "./pages/ChatList"; // Added
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import AppLayout from "./components/layouts/AppLayout";
 import AuthLayout from "./components/layouts/AuthLayout";
+import { RealtimeStatus } from './components/RealtimeStatus';
+import RealtimeConnectionCheck from './components/RealtimeConnectionCheck'; // Added
+
 
 const queryClient = new QueryClient();
 

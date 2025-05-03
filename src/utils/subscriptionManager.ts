@@ -80,6 +80,18 @@ class SubscriptionManager {
     }
     return undefined;
   }
+  
+  // Get all active channels
+  getActiveChannels(): Map<string, RealtimeChannel> {
+    return this.activeChannels;
+  }
+  
+  // Refresh all subscriptions
+  refreshAll(): void {
+    console.log('Refreshing all real-time subscriptions');
+    const keys = Array.from(this.subscriptions.keys());
+    keys.forEach(key => this.refresh(key));
+  }
 
   // Cleanup all subscriptions
   cleanup() {
