@@ -280,19 +280,42 @@ const Profile = () => {
           <div className="flex-1 flex flex-col items-center md:items-start">
             <h1 className="text-3xl font-bold mb-2">{profile.full_name}</h1>
             
-            {profile.date_of_birth && (
-              <div className="mb-3">
+            <div className="flex flex-wrap gap-2 mb-3">
+              {profile.date_of_birth && (
                 <Badge variant="outline" className="px-2 py-1">
                   {getAgeFromDateOfBirth(profile.date_of_birth)} years old
                 </Badge>
-              </div>
-            )}
+              )}
+              
+              {/* Language Badges */}
+              {profile.proficiency_level && (
+                <Badge variant="outline" className="bg-primary/10 text-primary px-2 py-1">
+                  {profile.proficiency_level?.charAt(0).toUpperCase() + profile.proficiency_level?.slice(1) || "Beginner"} Level
+                </Badge>
+              )}
+            </div>
             
-            {/* About Section Directly Integrated */}
-            {profile.bio && (
-              <p className="text-muted-foreground text-sm mb-4 text-center md:text-left max-w-md">
-                {profile.bio}
-              </p>
+            {/* Languages Display */}
+            {(profile.native_language || profile.learning_language) && (
+              <div className="flex items-center gap-3 mb-4">
+                {profile.native_language && (
+                  <Badge variant="secondary" className="px-3 py-1.5">
+                    {getLanguageFlag(profile.native_language)}
+                    <span className="ml-2">{profile.native_language}</span>
+                  </Badge>
+                )}
+                
+                {profile.native_language && profile.learning_language && (
+                  <ArrowRight className="h-4 w-4 text-primary" />
+                )}
+                
+                {profile.learning_language && (
+                  <Badge className="px-3 py-1.5">
+                    {getLanguageFlag(profile.learning_language)}
+                    <span className="ml-2">{profile.learning_language}</span>
+                  </Badge>
+                )}
+              </div>
             )}
             
             {/* Joined Date */}
@@ -340,48 +363,30 @@ const Profile = () => {
         <div className="space-y-6">
           <Card className="glass-card">
             <CardHeader className="pb-2">
-              <CardTitle className="text-md font-semibold">Learning Goals</CardTitle>
+              <CardTitle className="text-md font-semibold">About & Learning Goals</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
+              {profile.bio && (
+                <div className="flex flex-col space-y-3">
+                  <div className="inline-flex items-center">
+                    <User className="h-4 w-4 text-primary mr-2" />
+                    <h3 className="text-sm font-medium">Bio</h3>
+                  </div>
+                  <p className="text-sm pl-6">{profile.bio}</p>
+                </div>
+              )}
+              
               <div className="flex flex-col space-y-3">
                 <div className="inline-flex items-center">
                   <GraduationCap className="h-4 w-4 text-primary mr-2" />
-                  <h3 className="text-sm font-medium">Goal</h3>
+                  <h3 className="text-sm font-medium">Learning Goal</h3>
                 </div>
                 <p className="text-sm pl-6">{profile.learning_goal || "No learning goal set"}</p>
               </div>
             </CardContent>
           </Card>
 
-          <Card className="glass-card">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-md font-semibold">Language Skills</CardTitle>
-              <div className="flex items-center justify-center mt-2">
-                <Badge variant="outline" className="bg-primary/10 text-primary">
-                  {profile.proficiency_level?.charAt(0).toUpperCase() + profile.proficiency_level?.slice(1) || "Beginner"} Level
-                </Badge>
-              </div>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-[1fr,auto,1fr] items-center gap-3">
-                <div className="flex items-center space-x-2">
-                  <Badge variant="secondary" className="px-3 py-1.5">
-                    {getLanguageFlag(profile.native_language)}
-                    <span className="ml-2">{profile.native_language || "Not specified"}</span>
-                  </Badge>
-                </div>
-                <div className="flex items-center justify-center">
-                  <ArrowRight className="h-4 w-4 text-primary" />
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Badge className="px-3 py-1.5">
-                    {getLanguageFlag(profile.learning_language)}
-                    <span className="ml-2">{profile.learning_language || "Not specified"}</span>
-                  </Badge>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+          {/* Language card has been removed and integrated into main profile card */}
 
           <Card className="glass-card">
             <CardHeader className="pb-2">
