@@ -658,15 +658,15 @@ const Community = () => {
       </div>
 
       {filteredUsers.length > 0 ? (
-        <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 container mx-auto px-4">
+        <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 container mx-auto px-4">
           {filteredUsers.map((user) => (
             <Card 
               key={user.id} 
-              className="overflow-hidden cursor-pointer group border hover:border-primary/30 hover:shadow-lg transition-all"
+              className="overflow-hidden cursor-pointer group border hover:border-primary/30 hover:shadow-lg transition-all bg-card/50 backdrop-blur-sm"
               onClick={() => navigate(`/profile/${user.id}`)}
             >              
-              <CardContent className="p-4">
-                <div className="flex items-center gap-4">
+              <CardContent className="p-6">
+                <div className="flex items-center gap-6">
                   <div className="relative">
                     <Avatar className="h-16 w-16">
                       <AvatarImage src={user.avatar_url} alt={user.full_name} className="object-cover" />
@@ -684,16 +684,16 @@ const Community = () => {
                     <h3 className="font-semibold text-lg mb-1">{user.full_name}</h3>
                     <p className="text-sm text-muted-foreground mb-2">{user.age || '–'} years</p>
                     
-                    <div className="flex items-center gap-2">
-                      <Badge variant="secondary" className="text-xs">
-                        <span className="mr-1" aria-label={`Flag for ${user.native_language}`}>
+                    <div className="flex items-center gap-3">
+                      <Badge variant="secondary" className="text-xs px-3 py-1.5">
+                        <span className="mr-2 text-base" aria-label={`Flag for ${user.native_language}`}>
                           {getLanguageFlag(user.native_language)}
                         </span>
                         {user.native_language}
                       </Badge>
-                      <ArrowRight className="h-4 w-4 text-primary hidden sm:block" />
-                      <Badge variant="outline" className="text-xs">
-                        <span className="mr-1" aria-label={`Flag for ${user.learning_language}`}>
+                      <ArrowRight className="h-4 w-4 text-primary" />
+                      <Badge variant="outline" className="text-xs px-3 py-1.5 bg-primary/5">
+                        <span className="mr-2 text-base" aria-label={`Flag for ${user.learning_language}`}>
                           {getLanguageFlag(user.learning_language)}
                         </span>
                         {user.learning_language}
