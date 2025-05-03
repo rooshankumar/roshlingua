@@ -709,10 +709,10 @@ const Community = () => {
               className="responsive-card cursor-pointer group hover:border-primary/40"
               onClick={() => navigate(`/profile/${user.id}`)}
             >              
-              <CardContent className="p-4 sm:p-6 lg:p-6 xl:p-7">
-                <div className="flex items-center gap-4 lg:gap-5">
+              <CardContent className="p-4 sm:p-6">
+                <div className="flex items-center gap-3 sm:gap-4">
                   <div className="relative shrink-0">
-                    <Avatar className="h-16 w-16">
+                    <Avatar className="h-14 w-14 sm:h-16 sm:w-16">
                       <AvatarImage src={user.avatar_url} alt={user.full_name} className="object-cover" />
                       <AvatarFallback>{user.full_name?.charAt(0)}</AvatarFallback>
                     </Avatar>
@@ -725,22 +725,22 @@ const Community = () => {
                   </div>
                   
                   <div className="flex-1 min-w-0 overflow-hidden">
-                    <h3 className="font-semibold text-lg mb-1 break-words hyphens-auto lg:overflow-visible lg:whitespace-normal lg:text-xl">{user.full_name}</h3>
-                    <p className="text-sm text-muted-foreground mb-2 lg:text-base">{user.age || '–'} years</p>
+                    <h3 className="font-semibold text-base sm:text-lg mb-1 break-words line-clamp-2 sm:line-clamp-1 md:line-clamp-none">{user.full_name}</h3>
+                    <p className="text-sm text-muted-foreground mb-2">{user.age || '–'} years</p>
                     
-                    <div className="flex items-center gap-3">
-                      <div className="flex items-center gap-2" title={`Native: ${user.native_language}`}>
-                        <span className="text-xl lg:text-2xl" aria-label={`Native language: ${user.native_language}`}>
+                    <div className="flex items-center gap-2 sm:gap-3">
+                      <div className="flex items-center gap-1 sm:gap-2" title={`Native: ${user.native_language}`}>
+                        <span className="text-lg sm:text-xl" aria-label={`Native language: ${user.native_language}`}>
                           {getLanguageFlag(user.native_language)}
                         </span>
-                        <span className="hidden lg:inline-block text-sm text-muted-foreground">{user.native_language}</span>
+                        <span className="hidden md:inline-block text-xs sm:text-sm text-muted-foreground">{user.native_language}</span>
                       </div>
-                      <ArrowRight className="h-4 w-4 text-primary shrink-0" />
-                      <div className="flex items-center gap-2" title={`Learning: ${user.learning_language}`}>
-                        <span className="text-xl lg:text-2xl" aria-label={`Learning language: ${user.learning_language}`}>
+                      <ArrowRight className="h-3 w-3 sm:h-4 sm:w-4 text-primary shrink-0" />
+                      <div className="flex items-center gap-1 sm:gap-2" title={`Learning: ${user.learning_language}`}>
+                        <span className="text-lg sm:text-xl" aria-label={`Learning language: ${user.learning_language}`}>
                           {getLanguageFlag(user.learning_language)}
                         </span>
-                        <span className="hidden lg:inline-block text-sm text-muted-foreground">{user.learning_language}</span>
+                        <span className="hidden md:inline-block text-xs sm:text-sm text-muted-foreground">{user.learning_language}</span>
                       </div>
                     </div>
                   </div>
