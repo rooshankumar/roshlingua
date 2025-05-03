@@ -5,6 +5,45 @@ interface LanguageOption {
   flag: string;
 }
 
+export const getLanguageFlag = (language?: string): string => {
+  if (!language) return "🌐";
+
+  const supportedLang = SUPPORTED_LANGUAGES.find(
+    lang => lang.name.toLowerCase() === language.toLowerCase()
+  );
+
+  if (supportedLang) {
+    return supportedLang.flag;
+  }
+
+  const languageToFlag: Record<string, string> = {
+    'English': '🇬🇧',
+    'Spanish': '🇪🇸',
+    'French': '🇫🇷',
+    'German': '🇩🇪',
+    'Italian': '🇮🇹',
+    'Portuguese': '🇵🇹',
+    'Russian': '🇷🇺',
+    'Japanese': '🇯🇵',
+    'Korean': '🇰🇷',
+    'Chinese': '🇨🇳',
+    'Arabic': '🇸🇦',
+    'Hindi': '🇮🇳',
+    'Turkish': '🇹🇷',
+    'Dutch': '🇳🇱',
+    'Swedish': '🇸🇪',
+    'Polish': '🇵🇱',
+    'Norwegian': '🇳🇴',
+    'Danish': '🇩🇰',
+    'Finnish': '🇫🇮',
+    'Czech': '🇨🇿',
+    'Greek': '🇬🇷',
+    'Hungarian': '🇭🇺'
+  };
+
+  return languageToFlag[language] || '🌐';
+};
+
 export const SUPPORTED_LANGUAGES: LanguageOption[] = [
   { code: 'en', name: 'English', flag: '🇺🇸' },
   { code: 'es', name: 'Spanish', flag: '🇪🇸' },
