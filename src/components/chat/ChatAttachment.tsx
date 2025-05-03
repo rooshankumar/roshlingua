@@ -2,10 +2,12 @@ import { useState } from 'react';
 import { Paperclip } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { Button } from '../ui/button';
-import { Loader2 } from 'lucide-react'; // Import Loader2
+import { Loader2 } from 'lucide-react';
+import { generateImageThumbnail } from '@/utils/imageUtils';
+import { toast } from '@/components/ui/use-toast';
 
 interface ChatAttachmentProps {
-  onAttach: (url: string, filename: string) => void;
+  onAttach: (url: string, filename: string, thumbnail?: string) => void;
 }
 
 export const ChatAttachment = ({ onAttach }: ChatAttachmentProps) => {
@@ -24,6 +26,18 @@ export const ChatAttachment = ({ onAttach }: ChatAttachmentProps) => {
       // Validate file size (10MB max)
       if (file.size > 10 * 1024 * 1024) {
         throw new Error("File size exceeds 10MB limit.");
+      }
+      
+      // Generate a thumbnail if it's an image (for preview)
+      let thumbnailDataUrl: string | undefined;
+      if (file.type.startsWith('image/')) {
+        try {
+          thumbnailDataUrl = await generateImageThumbnail(file);
+          console.log("Generated thumbnail preview");
+        } catch (err) {
+          console.warn("Failed to generate thumbnail:", err);
+          // Continue without thumbnail
+        }
       }
       
       // Create a more unique filename with timestamp
@@ -56,14 +70,18 @@ export const ChatAttachment = ({ onAttach }: ChatAttachmentProps) => {
       
       console.log("File uploaded successfully:", publicUrl);
       
-      onAttach(publicUrl, file.name);
+      // Pass the thumbnail along with the URL and filename
+      onAttach(publicUrl, file.name, thumbnailDataUrl);
 
       // Reset the input after successful upload
       event.target.value = '';
     } catch (error) {
       console.error('Error uploading file:', error);
-      // You could add toast notification here
-      alert(`Upload failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      toast({
+        title: "Upload failed",
+        description: error instanceof Error ? error.message : 'Unknown error',
+        variant: "destructive"
+      });
     } finally {
       setUploading(false);
     }

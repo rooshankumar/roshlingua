@@ -20,6 +20,17 @@ export interface Message {
   created_at: string;
   is_read: boolean;
   language: string;
+  attachment_url?: string | null;
+  attachment_name?: string | null;
+  attachment_thumbnail?: string | null;
+  sender?: {
+    id: string;
+    email: string;
+    full_name: string;
+    avatar_url?: string;
+    last_seen?: string;
+  };
+  is_delivered?: boolean;
 }
 
 export interface Conversation {

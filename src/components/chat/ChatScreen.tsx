@@ -225,7 +225,7 @@ export const ChatScreen = ({ conversation }: Props) => {
     }
   }, [messages]);
 
-  const handleSend = async (content?: string, attachment?: { url: string; filename: string }) => {
+  const handleSend = async (content?: string, attachment?: { url: string; filename: string; thumbnail?: string }) => {
     const messageContent = content || newMessage;
     if ((!messageContent.trim() && !attachment) || !user || !conversation?.id || isSending) return;
 
@@ -237,7 +237,8 @@ export const ChatScreen = ({ conversation }: Props) => {
     if (attachment) {
       console.log('Sending message with attachment:', {
         url: attachment.url,
-        filename: attachment.filename
+        filename: attachment.filename,
+        hasThumbnail: !!attachment.thumbnail
       });
     }
 
@@ -250,6 +251,7 @@ export const ChatScreen = ({ conversation }: Props) => {
       is_read: false,
       attachment_url: attachment?.url,
       attachment_name: attachment?.filename,
+      attachment_thumbnail: attachment?.thumbnail,
       created_at: timestamp,
       sender: {
         id: user.id,
@@ -345,55 +347,92 @@ export const ChatScreen = ({ conversation }: Props) => {
                         <div className="mt-1 rounded-lg overflow-hidden">
                           {message.attachment_url?.match(/\.(jpg|jpeg|png|gif|webp|avif)$/i) ? (
                             <div className="relative">
-                              <img 
-                                src={message.attachment_url} 
-                                alt={message.attachment_name || "Image"} 
-                                loading="lazy"
-                                onLoad={(e) => {
-                                  console.log("Image loaded successfully:", message.attachment_url);
-                                  // Show image and hide fallback
-                                  const target = e.target as HTMLImageElement;
-                                  target.style.display = 'block';
-                                  const fallback = target.parentElement?.querySelector('.image-fallback');
-                                  if (fallback) {
-                                    fallback.classList.add('hidden');
-                                  }
-                                }}
-                                onError={(e) => {
-                                  console.error("Image load error:", e, "URL:", message.attachment_url);
-                                  // Try to reload image with cache busting
-                                  const target = e.target as HTMLImageElement;
-                                  target.style.display = 'none'; // Hide the image element
-                                  
-                                  // Show the fallback
-                                  const fallback = target.parentElement?.querySelector('.image-fallback');
-                                  if (fallback) {
-                                    fallback.classList.remove('hidden');
-                                  }
-                                  
-                                  // Try a cross-origin proxy as a last resort
-                                  if (!target.src.includes('?')) {
-                                    setTimeout(() => {
-                                      target.src = `${message.attachment_url}?t=${new Date().getTime()}`;
-                                    }, 1000);
-                                  }
-                                }}
-                                className="max-w-[300px] max-h-[300px] object-cover rounded-lg hover:scale-105 transition-transform duration-300 cursor-pointer"
-                                onClick={() => window.open(message.attachment_url, '_blank')}
-                              />
-                              <div className="image-fallback hidden flex flex-col items-center justify-center p-4 bg-muted/30 border border-border rounded-lg w-[200px] h-[150px]">
-                                <FileText className="h-6 w-6 mb-2 text-muted-foreground" />
-                                <span className="text-sm text-muted-foreground">
-                                  {message.attachment_name || "Image"}
-                                </span>
-                                <Button 
-                                  variant="outline" 
-                                  size="sm" 
-                                  className="mt-2"
+                              {/* Use thumbnail if available (from optimistic rendering) */}
+                              {message.attachment_thumbnail ? (
+                                <img 
+                                  src={message.attachment_thumbnail} 
+                                  alt={message.attachment_name || "Image preview"} 
+                                  className="max-w-[300px] max-h-[300px] object-cover rounded-lg hover:scale-105 transition-transform duration-300 cursor-pointer"
                                   onClick={() => window.open(message.attachment_url, '_blank')}
+                                />
+                              ) : (
+                                <>
+                                  <img 
+                                    src={message.attachment_url} 
+                                    alt={message.attachment_name || "Image"} 
+                                    loading="lazy"
+                                    onLoad={(e) => {
+                                      console.log("Image loaded successfully:", message.attachment_url);
+                                      // Show image and hide fallback
+                                      const target = e.target as HTMLImageElement;
+                                      target.style.display = 'block';
+                                      const fallback = target.parentElement?.querySelector('.image-fallback');
+                                      if (fallback) {
+                                        fallback.classList.add('hidden');
+                                      }
+                                    }}
+                                    onError={(e) => {
+                                      console.error("Image load error:", e, "URL:", message.attachment_url);
+                                      // Hide the image element
+                                      const target = e.target as HTMLImageElement;
+                                      target.style.display = 'none';
+                                      
+                                      // Show the fallback
+                                      const fallback = target.parentElement?.querySelector('.image-fallback');
+                                      if (fallback) {
+                                        fallback.classList.remove('hidden');
+                                      }
+                                      
+                                      if (isLikelyBlockedUrl(message.attachment_url)) {
+                                        console.log("Image likely blocked by browser:", message.attachment_url);
+                                      } else {
+                                        // Try a final cache-busting attempt
+                                        if (!target.src.includes('?')) {
+                                          setTimeout(() => {
+                                            target.src = `${message.attachment_url}?t=${new Date().getTime()}`;
+                                          }, 1000);
+                                        }
+                                      }
+                                    }}
+                                    className="max-w-[300px] max-h-[300px] object-cover rounded-lg hover:scale-105 transition-transform duration-300 cursor-pointer"
+                                    onClick={() => window.open(message.attachment_url, '_blank')}
+                                  />
+                                  <div className="image-fallback hidden flex flex-col items-center justify-center p-4 bg-muted/30 border border-border rounded-lg w-[200px] h-[150px]">
+                                    <Image className="h-6 w-6 mb-2 text-muted-foreground" />
+                                    <span className="text-sm text-muted-foreground">
+                                      {message.attachment_name || "Image"}
+                                    </span>
+                                    <span className="text-xs text-muted-foreground/70 mt-1 mb-2 max-w-[180px] text-center">
+                                      {isLikelyBlockedUrl(message.attachment_url) 
+                                        ? "Image may be blocked by your browser" 
+                                        : "Unable to load image"}
+                                    </span>
+                                    <Button 
+                                      variant="outline" 
+                                      size="sm"
+                                      onClick={() => window.open(message.attachment_url, '_blank')}
+                                    >
+                                      Open Image
+                                    </Button>
+                                  </div>
+                                </>
+                              )}
+                              {/* Always show a download badge */}
+                              <div className="absolute top-2 right-2 bg-black/40 backdrop-blur-sm rounded-full p-1 opacity-70 hover:opacity-100 transition-opacity">
+                                <a 
+                                  href={message.attachment_url}
+                                  download={message.attachment_name}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  onClick={(e) => e.stopPropagation()}
+                                  className="text-white"
                                 >
-                                  Open Image
-                                </Button>
+                                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                    <polyline points="7 10 12 15 17 10"></polyline>
+                                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                                  </svg>
+                                </a>
                               </div>
                             </div>
                           ) : message.attachment_url?.match(/\.(mp4|webm|ogg)$/i) ? (
@@ -401,18 +440,36 @@ export const ChatScreen = ({ conversation }: Props) => {
                               src={message.attachment_url}
                               controls
                               className="max-w-[300px] rounded-lg"
+                              onError={() => {
+                                console.error("Video failed to load:", message.attachment_url);
+                              }}
                             />
                           ) : message.attachment_url?.match(/\.(mp3|wav|aac)$/i) ? (
                             <audio 
                               src={message.attachment_url}
                               controls
                               className="max-w-[300px]"
+                              onError={() => {
+                                console.error("Audio failed to load:", message.attachment_url);
+                              }}
                             />
                           ) : message.attachment_url?.match(/\.(pdf)$/i) ? (
-                            <iframe
-                              src={message.attachment_url}
-                              className="w-[300px] h-[400px] rounded-lg border border-border"
-                            />
+                            <div className="flex flex-col items-center">
+                              <iframe
+                                src={message.attachment_url}
+                                className="w-[300px] h-[400px] rounded-lg border border-border"
+                                onError={() => {
+                                  console.error("PDF failed to load:", message.attachment_url);
+                                }}
+                              />
+                              <a 
+                                href={message.attachment_url}
+                                download
+                                className="text-sm mt-1 text-muted-foreground hover:text-foreground"
+                              >
+                                Download PDF
+                              </a>
+                            </div>
                           ) : message.attachment_url ? (
                             <div className="flex items-center gap-3 p-3 bg-background/10 rounded-lg hover:bg-background/20 transition-colors duration-200">
                               <FileText className="h-5 w-5" />
