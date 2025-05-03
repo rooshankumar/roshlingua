@@ -24,6 +24,8 @@ import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { useResponsive } from "@/hooks/use-mobile";
 import { SUPPORTED_LANGUAGES, getLanguageOptions } from "@/utils/languageUtils";
 import { Search, ChevronsUpDown, Check } from "lucide-react";
+import { RefreshCw } from "lucide-react";
+
 
 const Settings = () => {
   const { t } = useTranslation();
@@ -316,8 +318,38 @@ const Settings = () => {
     setShowLearningLanguages(false);
   };
 
+  const loadUserProfile = async () => {
+    //Implementation to fetch and update profile data.  Replace with your actual logic.
+    if (!user?.id) return;
+    try {
+      setIsLoading(true);
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', user.id)
+        .single();
+
+      if (error) throw error;
+      if(data){
+        const formattedProfile = {
+          ...data,
+          date_of_birth: data.date_of_birth ? new Date(data.date_of_birth).toISOString().split('T')[0] : ''
+        };
+        setLocalProfile(formattedProfile);
+        setLocalBio(data.bio || "");
+      }
+
+    } catch (error) {
+      console.error("Error loading user profile:", error);
+      toast({ title: "Error", description: "Failed to load profile", variant: "destructive" });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+
   useEffect(() => {
-    fetchProfile();
+    loadUserProfile();
   }, []);
 
   // Set initial input values when profile loads
@@ -611,6 +643,12 @@ const Settings = () => {
                 <Save className="h-5 w-5 mr-2" />
                 {isLoading ? "Saving..." : "Save Changes"}
               </Button>
+              <CardFooter>
+                  <Button variant="outline" onClick={() => loadUserProfile()} className="w-full sm:w-auto">
+                    <RefreshCw className="h-4 w-4 mr-2" />
+                    Refresh Profile Data
+                  </Button>
+                </CardFooter>
             </CardFooter>
           </Card>
         </TabsContent>
@@ -840,8 +878,7 @@ const Settings = () => {
                 <Separator />
                 <div className="grid gap-4">
                   <div className="flex items-center text-sm">
-                    <svg className="h-4 w-4 mr-2 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    <svg className="h-4 w-4 mr-2 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>
                     Basic conversation features
                   </div>
