@@ -217,7 +217,7 @@ const Profile = () => {
   const userLevel = calculateLevel(totalXp);
 
   return (
-    <div className="container pb-12 pt-6 animate-fade-in max-w-5xl mx-auto">
+    <div className="container pb-12 pt-6 animate-fade-in max-w-7xl mx-auto px-2 sm:px-4">
       {/* Back Button */}
       <div className="w-full flex items-center mb-6">
         <Button variant="ghost" size="sm" asChild className="group flex items-center gap-2 hover:bg-primary/10">
@@ -334,7 +334,7 @@ const Profile = () => {
       </Card>
 
       {/* Profile Info */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
         {/* Left Column - Personal Info */}
         <div className="space-y-6">
           <Card className="glass-card">
