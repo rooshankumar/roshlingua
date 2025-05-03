@@ -15,7 +15,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
+import { CustomToggle } from "@/components/ui/custom-toggle";
 import { Heart, Search, Filter, Flame, User, X, Globe, ArrowRight, Trophy } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
@@ -616,7 +616,7 @@ const Community = () => {
                   </div>
 
                   <div className="flex items-center gap-3 p-4 rounded-lg bg-green-500/10 border border-green-500/20">
-                    <Switch
+                    <CustomToggle
                       id="online-mode"
                       checked={onlineOnly}
                       onCheckedChange={setOnlineOnly}
