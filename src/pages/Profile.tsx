@@ -356,24 +356,27 @@ const Profile = () => {
             <CardHeader className="pb-2">
               <CardTitle className="text-md font-semibold">Language Skills</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-2">
-                  <Languages className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-sm">Native language:</span>
+            <CardContent>
+              <div className="flex items-center justify-between gap-4">
+                <div className="flex items-center gap-3 flex-1">
+                  <div className="flex items-center gap-2">
+                    <Languages className="h-4 w-4 text-muted-foreground" />
+                    <span className="text-sm">Native:</span>
+                  </div>
+                  <Badge variant="secondary">{profile.native_language || "Not specified"}</Badge>
                 </div>
-                <Badge variant="secondary">{profile.native_language || "Not specified"}</Badge>
-              </div>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-2">
-                  <Languages className="h-4 w-4 text-primary" />
-                  <span className="text-sm">Learning:</span>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Badge>{profile.learning_language || "Not specified"}</Badge>
-                  <Badge variant="outline" className="bg-muted">
-                    {profile.proficiency_level || "beginner"}
-                  </Badge>
+                <ArrowRight className="h-4 w-4 text-primary shrink-0" />
+                <div className="flex items-center gap-3 flex-1">
+                  <div className="flex items-center gap-2">
+                    <Languages className="h-4 w-4 text-primary" />
+                    <span className="text-sm">Learning:</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Badge>{profile.learning_language || "Not specified"}</Badge>
+                    <Badge variant="outline" className="bg-muted">
+                      {profile.proficiency_level || "beginner"}
+                    </Badge>
+                  </div>
                 </div>
               </div>
             </CardContent>
