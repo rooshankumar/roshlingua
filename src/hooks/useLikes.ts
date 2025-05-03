@@ -51,7 +51,7 @@ export function useLikes(targetUserId?: string, currentUserId?: string | null) {
 
     try {
       if (newIsLiked) {
-        // Add like
+        // Add like to user_likes table
         const { error } = await supabase
           .from('user_likes')
           .insert({
@@ -61,10 +61,19 @@ export function useLikes(targetUserId?: string, currentUserId?: string | null) {
           });
 
         if (error) throw error;
+        
+        // Increment likes_count in profiles table
+        const { error: updateError } = await supabase
+          .from('profiles')
+          .update({ likes_count: likeCount + 1 })
+          .eq('id', targetUserId);
+          
+        if (updateError) throw updateError;
+        
         setLikeCount(prev => prev + 1);
         setIsLiked(true);
       } else {
-        // Remove like
+        // Remove like from user_likes table
         const { error } = await supabase
           .from('user_likes')
           .delete()
@@ -72,6 +81,15 @@ export function useLikes(targetUserId?: string, currentUserId?: string | null) {
           .eq('liked_id', targetUserId);
 
         if (error) throw error;
+        
+        // Decrement likes_count in profiles table (ensure it doesn't go below 0)
+        const { error: updateError } = await supabase
+          .from('profiles')
+          .update({ likes_count: Math.max(0, likeCount - 1) })
+          .eq('id', targetUserId);
+          
+        if (updateError) throw updateError;
+        
         setLikeCount(prev => prev - 1);
         setIsLiked(false);
       }
