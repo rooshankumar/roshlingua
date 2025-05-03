@@ -1,0 +1,652 @@
+[plugin:vite:react-swc] × the name `SubscriptionManager` is defined multiple times
+     ╭─[/home/runner/workspace/src/utils/subscriptionManager.ts:4:1]
+   1 │ import { RealtimeChannel } from '@supabase/supabase-js';
+   2 │ 
+   3 │ // Enhanced subscription manager to maintain active subscriptions
+   4 │ class SubscriptionManager {
+     ·       ─────────┬─────────
+     ·                ╰── previous definition of `SubscriptionManager` here
+   5 │   private subscriptions: Map<string, Function> = new Map();
+   6 │   private activeChannels: Map<string, RealtimeChannel> = new Map();
+   7 │ 
+   8 │   // Subscribe with a key and a function that creates a Supabase channel
+   9 │   subscribe(key: string, createChannelFn: Function): RealtimeChannel {
+  10 │     // Check if we already have an active channel for this key
+  11 │     if (this.activeChannels.has(key)) {
+  12 │       console.log(`Using existing subscription for ${key}`);
+  13 │       return this.activeChannels.get(key)!;
+  14 │     }
+  15 │ 
+  16 │     console.log(`Creating new subscription for ${key}`);
+  17 │ 
+  18 │     // Store the creation function
+  19 │     this.subscriptions.set(key, createChannelFn);
+  20 │ 
+  21 │     // Create and store the actual channel
+  22 │     const channel = createChannelFn();
+  23 │     this.activeChannels.set(key, channel);
+  24 │ 
+  25 │     return channel;
+  26 │   }
+  27 │ 
+  28 │   // Unsubscribe by key
+  29 │   unsubscribe(key: string) {
+  30 │     if (this.activeChannels.has(key)) {
+  31 │       console.log(`Unsubscribing from ${key}`);
+  32 │ 
+  33 │       // Get the channel and unsubscribe
+  34 │       const channel = this.activeChannels.get(key);
+  35 │       if (channel && typeof channel.unsubscribe === 'function') {
+  36 │         try {
+  37 │           channel.unsubscribe();
+  38 │         } catch (error) {
+  39 │           console.error(`Error unsubscribing from ${key}:`, error);
+  40 │         }
+  41 │       }
+  42 │ 
+  43 │       // Remove from our maps
+  44 │       this.activeChannels.delete(key);
+  45 │       this.subscriptions.delete(key);
+  46 │     }
+  47 │   }
+  48 │ 
+  49 │   // Get an existing channel by key
+  50 │   getChannel(key: string): RealtimeChannel | undefined {
+  51 │     return this.activeChannels.get(key);
+  52 │   }
+  53 │ 
+  54 │   // Check if a subscription exists
+  55 │   hasSubscription(key: string): boolean {
+  56 │     return this.activeChannels.has(key);
+  57 │   }
+  58 │ 
+  59 │   // Refresh a specific subscription
+  60 │   refresh(key: string): RealtimeChannel | undefined {
+  61 │     if (this.subscriptions.has(key)) {
+  62 │       // Unsubscribe first if there's an active channel
+  63 │       if (this.activeChannels.has(key)) {
+  64 │         const channel = this.activeChannels.get(key);
+  65 │         if (channel && typeof channel.unsubscribe === 'function') {
+  66 │           try {
+  67 │             channel.unsubscribe();
+  68 │           } catch (error) {
+  69 │             console.error(`Error unsubscribing from ${key} during refresh:`, error);
+  70 │           }
+  71 │         }
+  72 │         this.activeChannels.delete(key);
+  73 │       }
+  74 │ 
+  75 │       // Create a new subscription
+  76 │       const createFn = this.subscriptions.get(key)!;
+  77 │       const newChannel = createFn();
+  78 │       this.activeChannels.set(key, newChannel);
+  79 │       return newChannel;
+  80 │     }
+  81 │     return undefined;
+  82 │   }
+  83 │   
+  84 │   // Get all active channels
+  85 │   getActiveChannels(): Map<string, RealtimeChannel> {
+  86 │     return this.activeChannels;
+  87 │   }
+  88 │   
+  89 │   // Refresh all subscriptions
+  90 │   refreshAll(): void {
+  91 │     console.log('Refreshing all real-time subscriptions');
+  92 │     const keys = Array.from(this.subscriptions.keys());
+  93 │     keys.forEach(key => this.refresh(key));
+  94 │   }
+  95 │ 
+  96 │   // Cleanup all subscriptions
+  97 │   cleanup() {
+  98 │     const count = this.activeChannels.size;
+  99 │ 
+ 100 │     // Properly unsubscribe from all channels
+ 101 │     this.activeChannels.forEach((channel, key) => {
+ 102 │       if (channel && typeof channel.unsubscribe === 'function') {
+ 103 │         try {
+ 104 │           channel.unsubscribe();
+ 105 │         } catch (error) {
+ 106 │           console.error(`Error unsubscribing from ${key} during cleanup:`, error);
+ 107 │         }
+ 108 │       }
+ 109 │     });
+ 110 │ 
+ 111 │     this.activeChannels.clear();
+ 112 │     this.subscriptions.clear();
+ 113 │     console.log(`Cleaned up ${count} subscriptions`);
+ 114 │   }
+ 115 │ }
+ 116 │ 
+ 117 │ const subscriptionManager = new SubscriptionManager();
+ 118 │ 
+ 119 │ // Handle cleanup when window is closing or refreshing
+ 120 │ if (typeof window !== 'undefined') {
+ 121 │   window.addEventListener('beforeunload', () => {
+ 122 │     subscriptionManager.cleanup();
+ 123 │   });
+ 124 │ }
+ 125 │ 
+ 126 │ export default subscriptionManager;
+ 127 │ import { RealtimeChannel } from '@supabase/supabase-js';
+ 128 │ import { supabase } from '@/lib/supabase';
+ 129 │ 
+ 130 │ type SubscriptionCreator = () => RealtimeChannel;
+ 131 │ type CleanupFunction = () => void;
+ 132 │ 
+ 133 │ interface Subscription {
+ 134 │   key: string;
+ 135 │   channel: RealtimeChannel | null;
+ 136 │   creator: SubscriptionCreator;
+ 137 │   lastRefreshed: number;
+ 138 │ }
+ 139 │ 
+ 140 │ /**
+ 141 │  * Manages all Supabase real-time subscriptions in the application
+ 142 │  * Provides methods to create, refresh, and clean up subscriptions
+ 143 │  */
+ 144 │ class SubscriptionManager {
+     ·       ─────────┬─────────
+     ·                ╰── `SubscriptionManager` redefined here
+ 145 │   private subscriptions: Map<string, Subscription> = new Map();
+ 146 │   private cleanupFunctions: Map<string, CleanupFunction> = new Map();
+ 147 │   private debug: boolean = false;
+     ╰────
+  × the name `subscriptionManager` is defined multiple times
+     ╭─[/home/runner/workspace/src/utils/subscriptionManager.ts:117:1]
+ 114 │   }
+ 115 │ }
+ 116 │ 
+ 117 │ const subscriptionManager = new SubscriptionManager();
+     ·       ─────────┬─────────
+     ·                ╰── previous definition of `subscriptionManager` here
+ 118 │ 
+ 119 │ // Handle cleanup when window is closing or refreshing
+ 120 │ if (typeof window !== 'undefined') {
+ 121 │   window.addEventListener('beforeunload', () => {
+ 122 │     subscriptionManager.cleanup();
+ 123 │   });
+ 124 │ }
+ 125 │ 
+ 126 │ export default subscriptionManager;
+ 127 │ import { RealtimeChannel } from '@supabase/supabase-js';
+ 128 │ import { supabase } from '@/lib/supabase';
+ 129 │ 
+ 130 │ type SubscriptionCreator = () => RealtimeChannel;
+ 131 │ type CleanupFunction = () => void;
+ 132 │ 
+ 133 │ interface Subscription {
+ 134 │   key: string;
+ 135 │   channel: RealtimeChannel | null;
+ 136 │   creator: SubscriptionCreator;
+ 137 │   lastRefreshed: number;
+ 138 │ }
+ 139 │ 
+ 140 │ /**
+ 141 │  * Manages all Supabase real-time subscriptions in the application
+ 142 │  * Provides methods to create, refresh, and clean up subscriptions
+ 143 │  */
+ 144 │ class SubscriptionManager {
+ 145 │   private subscriptions: Map<string, Subscription> = new Map();
+ 146 │   private cleanupFunctions: Map<string, CleanupFunction> = new Map();
+ 147 │   private debug: boolean = false;
+ 148 │   private isRefreshing: boolean = false;
+ 149 │ 
+ 150 │   constructor() {
+ 151 │     this.log('Subscription manager initialized');
+ 152 │     
+ 153 │     // Listen for visibility changes to refresh subscriptions when tab becomes active
+ 154 │     if (typeof document !== 'undefined') {
+ 155 │       document.addEventListener('visibilitychange', this.handleVisibilityChange);
+ 156 │     }
+ 157 │   }
+ 158 │ 
+ 159 │   /**
+ 160 │    * Enable or disable debug logging
+ 161 │    */
+ 162 │   setDebug(enabled: boolean): void {
+ 163 │     this.debug = enabled;
+ 164 │   }
+ 165 │ 
+ 166 │   /**
+ 167 │    * Log messages when debug is enabled
+ 168 │    */
+ 169 │   private log(...args: any[]): void {
+ 170 │     if (this.debug) {
+ 171 │       console.log('[SubscriptionManager]', ...args);
+ 172 │     }
+ 173 │   }
+ 174 │ 
+ 175 │   /**
+ 176 │    * Subscribe to a real-time channel with automatic reconnection
+ 177 │    * @param key Unique identifier for this subscription
+ 178 │    * @param creator Function that creates and returns a RealtimeChannel
+ 179 │    * @returns The RealtimeChannel that was created
+ 180 │    */
+ 181 │   subscribe(key: string, creator: SubscriptionCreator): RealtimeChannel {
+ 182 │     if (this.subscriptions.has(key)) {
+ 183 │       this.log(`Subscription already exists for key: ${key}, returning existing channel`);
+ 184 │       const existing = this.subscriptions.get(key);
+ 185 │       if (existing?.channel) {
+ 186 │         return existing.channel;
+ 187 │       }
+ 188 │     }
+ 189 │ 
+ 190 │     this.log(`Creating new subscription for key: ${key}`);
+ 191 │     const channel = creator();
+ 192 │     
+ 193 │     this.subscriptions.set(key, {
+ 194 │       key,
+ 195 │       channel,
+ 196 │       creator,
+ 197 │       lastRefreshed: Date.now()
+ 198 │     });
+ 199 │ 
+ 200 │     return channel;
+ 201 │   }
+ 202 │ 
+ 203 │   /**
+ 204 │    * Unsubscribe and remove a specific subscription
+ 205 │    * @param key The key of the subscription to unsubscribe
+ 206 │    */
+ 207 │   unsubscribe(key: string): void {
+ 208 │     const subscription = this.subscriptions.get(key);
+ 209 │     if (subscription) {
+ 210 │       this.log(`Unsubscribing from key: ${key}`);
+ 211 │       try {
+ 212 │         if (subscription.channel) {
+ 213 │           subscription.channel.unsubscribe();
+ 214 │         }
+ 215 │       } catch (err) {
+ 216 │         this.log(`Error unsubscribing from ${key}:`, err);
+ 217 │       }
+ 218 │       this.subscriptions.delete(key);
+ 219 │     }
+ 220 │     
+ 221 │     // Run cleanup function if exists
+ 222 │     if (this.cleanupFunctions.has(key)) {
+ 223 │       try {
+ 224 │         this.cleanupFunctions.get(key)?.();
+ 225 │       } catch (err) {
+ 226 │         this.log(`Error running cleanup for ${key}:`, err);
+ 227 │       }
+ 228 │       this.cleanupFunctions.delete(key);
+ 229 │     }
+ 230 │   }
+ 231 │ 
+ 232 │   /**
+ 233 │    * Register a cleanup function to be called when a subscription is unsubscribed
+ 234 │    * @param key The subscription key
+ 235 │    * @param cleanup The cleanup function
+ 236 │    */
+ 237 │   registerCleanup(key: string, cleanup: CleanupFunction): void {
+ 238 │     this.cleanupFunctions.set(key, cleanup);
+ 239 │   }
+ 240 │ 
+ 241 │   /**
+ 242 │    * Refresh a specific subscription by unsubscribing and resubscribing
+ 243 │    * @param key The key of the subscription to refresh
+ 244 │    */
+ 245 │   refresh(key: string): void {
+ 246 │     this.log(`Refreshing subscription for key: ${key}`);
+ 247 │     const subscription = this.subscriptions.get(key);
+ 248 │     if (subscription) {
+ 249 │       try {
+ 250 │         if (subscription.channel) {
+ 251 │           subscription.channel.unsubscribe();
+ 252 │         }
+ 253 │         const newChannel = subscription.creator();
+ 254 │         
+ 255 │         this.subscriptions.set(key, {
+ 256 │           ...subscription,
+ 257 │           channel: newChannel,
+ 258 │           lastRefreshed: Date.now()
+ 259 │         });
+ 260 │         
+ 261 │         this.log(`Successfully refreshed subscription for key: ${key}`);
+ 262 │       } catch (err) {
+ 263 │         this.log(`Error refreshing subscription ${key}:`, err);
+ 264 │       }
+ 265 │     }
+ 266 │   }
+ 267 │ 
+ 268 │   /**
+ 269 │    * Refresh all subscriptions in the application
+ 270 │    */
+ 271 │   refreshAll(): void {
+ 272 │     if (this.isRefreshing) {
+ 273 │       this.log('Already refreshing all subscriptions, skipping');
+ 274 │       return;
+ 275 │     }
+ 276 │ 
+ 277 │     this.isRefreshing = true;
+ 278 │     this.log(`Refreshing all ${this.subscriptions.size} subscriptions`);
+ 279 │     
+ 280 │     // Create a new array of entries to avoid modification during iteration
+ 281 │     const entries = [...this.subscriptions.entries()];
+ 282 │     
+ 283 │     for (const [key, subscription] of entries) {
+ 284 │       try {
+ 285 │         this.refresh(key);
+ 286 │       } catch (err) {
+ 287 │         this.log(`Error refreshing subscription ${key}:`, err);
+ 288 │       }
+ 289 │     }
+ 290 │     
+ 291 │     this.isRefreshing = false;
+ 292 │     this.log('Finished refreshing all subscriptions');
+ 293 │   }
+ 294 │ 
+ 295 │   /**
+ 296 │    * Cleanup all subscriptions (used when logging out)
+ 297 │    */
+ 298 │   cleanup(): void {
+ 299 │     this.log(`Cleaning up all ${this.subscriptions.size} subscriptions`);
+ 300 │     
+ 301 │     // Create a new array of keys to avoid modification during iteration
+ 302 │     const keys = [...this.subscriptions.keys()];
+ 303 │     
+ 304 │     for (const key of keys) {
+ 305 │       this.unsubscribe(key);
+ 306 │     }
+ 307 │     
+ 308 │     this.log('Finished cleaning up all subscriptions');
+ 309 │   }
+ 310 │ 
+ 311 │   /**
+ 312 │    * Handle visibility change events to refresh subscriptions when tab becomes active
+ 313 │    */
+ 314 │   private handleVisibilityChange = (): void => {
+ 315 │     if (document.visibilityState === 'visible') {
+ 316 │       this.log('Page became visible, checking subscriptions');
+ 317 │       
+ 318 │       // Only refresh if it's been more than 60 seconds since the last refresh
+ 319 │       const staleTime = 60 * 1000; // 60 seconds
+ 320 │       const now = Date.now();
+ 321 │       let needsRefresh = false;
+ 322 │       
+ 323 │       for (const subscription of this.subscriptions.values()) {
+ 324 │         if (now - subscription.lastRefreshed > staleTime) {
+ 325 │           needsRefresh = true;
+ 326 │           break;
+ 327 │         }
+ 328 │       }
+ 329 │       
+ 330 │       if (needsRefresh) {
+ 331 │         this.log('Found stale subscriptions, refreshing all');
+ 332 │         this.refreshAll();
+ 333 │       }
+ 334 │     }
+ 335 │   };
+ 336 │ 
+ 337 │   /**
+ 338 │    * Get subscription status information for debugging
+ 339 │    */
+ 340 │   getStatus(): { subscriptions: number, channels: string[] } {
+ 341 │     return {
+ 342 │       subscriptions: this.subscriptions.size,
+ 343 │       channels: Array.from(this.subscriptions.keys())
+ 344 │     };
+ 345 │   }
+ 346 │ }
+ 347 │ 
+ 348 │ // Create singleton instance
+ 349 │ const subscriptionManager = new SubscriptionManager();
+     ·       ─────────┬─────────
+     ·                ╰── `subscriptionManager` redefined here
+ 350 │ 
+ 351 │ // Enable debug in development
+ 352 │ if (import.meta.env.DEV) {
+     ╰────
+  × the name `default` is exported multiple times
+     ╭─[/home/runner/workspace/src/utils/subscriptionManager.ts:126:1]
+ 123 │   });
+ 124 │ }
+ 125 │ 
+ 126 │ export default subscriptionManager;
+     · ─────────────────┬─────────────────
+     ·                  ╰── previous exported here
+ 127 │ import { RealtimeChannel } from '@supabase/supabase-js';
+ 128 │ import { supabase } from '@/lib/supabase';
+ 129 │ 
+ 130 │ type SubscriptionCreator = () => RealtimeChannel;
+ 131 │ type CleanupFunction = () => void;
+ 132 │ 
+ 133 │ interface Subscription {
+ 134 │   key: string;
+ 135 │   channel: RealtimeChannel | null;
+ 136 │   creator: SubscriptionCreator;
+ 137 │   lastRefreshed: number;
+ 138 │ }
+ 139 │ 
+ 140 │ /**
+ 141 │  * Manages all Supabase real-time subscriptions in the application
+ 142 │  * Provides methods to create, refresh, and clean up subscriptions
+ 143 │  */
+ 144 │ class SubscriptionManager {
+ 145 │   private subscriptions: Map<string, Subscription> = new Map();
+ 146 │   private cleanupFunctions: Map<string, CleanupFunction> = new Map();
+ 147 │   private debug: boolean = false;
+ 148 │   private isRefreshing: boolean = false;
+ 149 │ 
+ 150 │   constructor() {
+ 151 │     this.log('Subscription manager initialized');
+ 152 │     
+ 153 │     // Listen for visibility changes to refresh subscriptions when tab becomes active
+ 154 │     if (typeof document !== 'undefined') {
+ 155 │       document.addEventListener('visibilitychange', this.handleVisibilityChange);
+ 156 │     }
+ 157 │   }
+ 158 │ 
+ 159 │   /**
+ 160 │    * Enable or disable debug logging
+ 161 │    */
+ 162 │   setDebug(enabled: boolean): void {
+ 163 │     this.debug = enabled;
+ 164 │   }
+ 165 │ 
+ 166 │   /**
+ 167 │    * Log messages when debug is enabled
+ 168 │    */
+ 169 │   private log(...args: any[]): void {
+ 170 │     if (this.debug) {
+ 171 │       console.log('[SubscriptionManager]', ...args);
+ 172 │     }
+ 173 │   }
+ 174 │ 
+ 175 │   /**
+ 176 │    * Subscribe to a real-time channel with automatic reconnection
+ 177 │    * @param key Unique identifier for this subscription
+ 178 │    * @param creator Function that creates and returns a RealtimeChannel
+ 179 │    * @returns The RealtimeChannel that was created
+ 180 │    */
+ 181 │   subscribe(key: string, creator: SubscriptionCreator): RealtimeChannel {
+ 182 │     if (this.subscriptions.has(key)) {
+ 183 │       this.log(`Subscription already exists for key: ${key}, returning existing channel`);
+ 184 │       const existing = this.subscriptions.get(key);
+ 185 │       if (existing?.channel) {
+ 186 │         return existing.channel;
+ 187 │       }
+ 188 │     }
+ 189 │ 
+ 190 │     this.log(`Creating new subscription for key: ${key}`);
+ 191 │     const channel = creator();
+ 192 │     
+ 193 │     this.subscriptions.set(key, {
+ 194 │       key,
+ 195 │       channel,
+ 196 │       creator,
+ 197 │       lastRefreshed: Date.now()
+ 198 │     });
+ 199 │ 
+ 200 │     return channel;
+ 201 │   }
+ 202 │ 
+ 203 │   /**
+ 204 │    * Unsubscribe and remove a specific subscription
+ 205 │    * @param key The key of the subscription to unsubscribe
+ 206 │    */
+ 207 │   unsubscribe(key: string): void {
+ 208 │     const subscription = this.subscriptions.get(key);
+ 209 │     if (subscription) {
+ 210 │       this.log(`Unsubscribing from key: ${key}`);
+ 211 │       try {
+ 212 │         if (subscription.channel) {
+ 213 │           subscription.channel.unsubscribe();
+ 214 │         }
+ 215 │       } catch (err) {
+ 216 │         this.log(`Error unsubscribing from ${key}:`, err);
+ 217 │       }
+ 218 │       this.subscriptions.delete(key);
+ 219 │     }
+ 220 │     
+ 221 │     // Run cleanup function if exists
+ 222 │     if (this.cleanupFunctions.has(key)) {
+ 223 │       try {
+ 224 │         this.cleanupFunctions.get(key)?.();
+ 225 │       } catch (err) {
+ 226 │         this.log(`Error running cleanup for ${key}:`, err);
+ 227 │       }
+ 228 │       this.cleanupFunctions.delete(key);
+ 229 │     }
+ 230 │   }
+ 231 │ 
+ 232 │   /**
+ 233 │    * Register a cleanup function to be called when a subscription is unsubscribed
+ 234 │    * @param key The subscription key
+ 235 │    * @param cleanup The cleanup function
+ 236 │    */
+ 237 │   registerCleanup(key: string, cleanup: CleanupFunction): void {
+ 238 │     this.cleanupFunctions.set(key, cleanup);
+ 239 │   }
+ 240 │ 
+ 241 │   /**
+ 242 │    * Refresh a specific subscription by unsubscribing and resubscribing
+ 243 │    * @param key The key of the subscription to refresh
+ 244 │    */
+ 245 │   refresh(key: string): void {
+ 246 │     this.log(`Refreshing subscription for key: ${key}`);
+ 247 │     const subscription = this.subscriptions.get(key);
+ 248 │     if (subscription) {
+ 249 │       try {
+ 250 │         if (subscription.channel) {
+ 251 │           subscription.channel.unsubscribe();
+ 252 │         }
+ 253 │         const newChannel = subscription.creator();
+ 254 │         
+ 255 │         this.subscriptions.set(key, {
+ 256 │           ...subscription,
+ 257 │           channel: newChannel,
+ 258 │           lastRefreshed: Date.now()
+ 259 │         });
+ 260 │         
+ 261 │         this.log(`Successfully refreshed subscription for key: ${key}`);
+ 262 │       } catch (err) {
+ 263 │         this.log(`Error refreshing subscription ${key}:`, err);
+ 264 │       }
+ 265 │     }
+ 266 │   }
+ 267 │ 
+ 268 │   /**
+ 269 │    * Refresh all subscriptions in the application
+ 270 │    */
+ 271 │   refreshAll(): void {
+ 272 │     if (this.isRefreshing) {
+ 273 │       this.log('Already refreshing all subscriptions, skipping');
+ 274 │       return;
+ 275 │     }
+ 276 │ 
+ 277 │     this.isRefreshing = true;
+ 278 │     this.log(`Refreshing all ${this.subscriptions.size} subscriptions`);
+ 279 │     
+ 280 │     // Create a new array of entries to avoid modification during iteration
+ 281 │     const entries = [...this.subscriptions.entries()];
+ 282 │     
+ 283 │     for (const [key, subscription] of entries) {
+ 284 │       try {
+ 285 │         this.refresh(key);
+ 286 │       } catch (err) {
+ 287 │         this.log(`Error refreshing subscription ${key}:`, err);
+ 288 │       }
+ 289 │     }
+ 290 │     
+ 291 │     this.isRefreshing = false;
+ 292 │     this.log('Finished refreshing all subscriptions');
+ 293 │   }
+ 294 │ 
+ 295 │   /**
+ 296 │    * Cleanup all subscriptions (used when logging out)
+ 297 │    */
+ 298 │   cleanup(): void {
+ 299 │     this.log(`Cleaning up all ${this.subscriptions.size} subscriptions`);
+ 300 │     
+ 301 │     // Create a new array of keys to avoid modification during iteration
+ 302 │     const keys = [...this.subscriptions.keys()];
+ 303 │     
+ 304 │     for (const key of keys) {
+ 305 │       this.unsubscribe(key);
+ 306 │     }
+ 307 │     
+ 308 │     this.log('Finished cleaning up all subscriptions');
+ 309 │   }
+ 310 │ 
+ 311 │   /**
+ 312 │    * Handle visibility change events to refresh subscriptions when tab becomes active
+ 313 │    */
+ 314 │   private handleVisibilityChange = (): void => {
+ 315 │     if (document.visibilityState === 'visible') {
+ 316 │       this.log('Page became visible, checking subscriptions');
+ 317 │       
+ 318 │       // Only refresh if it's been more than 60 seconds since the last refresh
+ 319 │       const staleTime = 60 * 1000; // 60 seconds
+ 320 │       const now = Date.now();
+ 321 │       let needsRefresh = false;
+ 322 │       
+ 323 │       for (const subscription of this.subscriptions.values()) {
+ 324 │         if (now - subscription.lastRefreshed > staleTime) {
+ 325 │           needsRefresh = true;
+ 326 │           break;
+ 327 │         }
+ 328 │       }
+ 329 │       
+ 330 │       if (needsRefresh) {
+ 331 │         this.log('Found stale subscriptions, refreshing all');
+ 332 │         this.refreshAll();
+ 333 │       }
+ 334 │     }
+ 335 │   };
+ 336 │ 
+ 337 │   /**
+ 338 │    * Get subscription status information for debugging
+ 339 │    */
+ 340 │   getStatus(): { subscriptions: number, channels: string[] } {
+ 341 │     return {
+ 342 │       subscriptions: this.subscriptions.size,
+ 343 │       channels: Array.from(this.subscriptions.keys())
+ 344 │     };
+ 345 │   }
+ 346 │ }
+ 347 │ 
+ 348 │ // Create singleton instance
+ 349 │ const subscriptionManager = new SubscriptionManager();
+ 350 │ 
+ 351 │ // Enable debug in development
+ 352 │ if (import.meta.env.DEV) {
+ 353 │   subscriptionManager.setDebug(true);
+ 354 │ }
+ 355 │ 
+ 356 │ export default subscriptionManager;
+     · ─────────────────┬─────────────────
+     ·                  ╰── exported more than once
+     ╰────
+
+Advice:   ☞ Exported identifiers must be unique
+/home/runner/workspace/src/utils/subscriptionManager.ts:4:1
+34 |        const channel = this.activeChannels.get(key);
+35 |        if (channel && typeof channel.unsubscribe === 'function') {
+36 |          try {
+   |       ^
+37 |            channel.unsubscribe();
+38 |          } catch (error) {
+Click outside, press Esc key, or fix the code to dismiss.
+You can also disable this overlay by setting server.hmr.overlay to false in vite.config.ts
