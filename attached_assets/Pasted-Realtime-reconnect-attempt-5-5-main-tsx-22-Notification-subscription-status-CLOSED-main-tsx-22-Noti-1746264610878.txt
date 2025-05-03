@@ -1,0 +1,177 @@
+Realtime reconnect attempt 5/5
+main.tsx:22 Notification subscription status: CLOSED
+main.tsx:22 Notification subscription status: SUBSCRIBED
+2main.tsx:22 Fallback notifications refresh
+client:223 [vite] hot updated: /src/pages/Profile.tsx
+client:223 [vite] hot updated: /src/index.css
+Profile.tsx:368 Uncaught ReferenceError: getLanguageFlag is not defined
+    at Profile (Profile.tsx:368:56)
+    at renderWithHooks (chunk-W6L2VRDA.js?v=1e956288:11548:26)
+    at updateFunctionComponent (chunk-W6L2VRDA.js?v=1e956288:14582:28)
+    at beginWork (chunk-W6L2VRDA.js?v=1e956288:15924:22)
+    at HTMLUnknownElement.callCallback2 (chunk-W6L2VRDA.js?v=1e956288:3674:22)
+    at Object.invokeGuardedCallbackDev (chunk-W6L2VRDA.js?v=1e956288:3699:24)
+    at invokeGuardedCallback (chunk-W6L2VRDA.js?v=1e956288:3733:39)
+    at beginWork$1 (chunk-W6L2VRDA.js?v=1e956288:19765:15)
+    at performUnitOfWork (chunk-W6L2VRDA.js?v=1e956288:19198:20)
+    at workLoopSync (chunk-W6L2VRDA.js?v=1e956288:19137:13)
+Profile @ Profile.tsx:368
+renderWithHooks @ chunk-W6L2VRDA.js?v=1e956288:11548
+updateFunctionComponent @ chunk-W6L2VRDA.js?v=1e956288:14582
+beginWork @ chunk-W6L2VRDA.js?v=1e956288:15924
+callCallback2 @ chunk-W6L2VRDA.js?v=1e956288:3674
+invokeGuardedCallbackDev @ chunk-W6L2VRDA.js?v=1e956288:3699
+invokeGuardedCallback @ chunk-W6L2VRDA.js?v=1e956288:3733
+beginWork$1 @ chunk-W6L2VRDA.js?v=1e956288:19765
+performUnitOfWork @ chunk-W6L2VRDA.js?v=1e956288:19198
+workLoopSync @ chunk-W6L2VRDA.js?v=1e956288:19137
+renderRootSync @ chunk-W6L2VRDA.js?v=1e956288:19116
+performSyncWorkOnRoot @ chunk-W6L2VRDA.js?v=1e956288:18874
+flushSyncCallbacks @ chunk-W6L2VRDA.js?v=1e956288:9119
+flushSync @ chunk-W6L2VRDA.js?v=1e956288:18959
+scheduleRefresh @ chunk-W6L2VRDA.js?v=1e956288:20004
+(anonymous) @ @react-refresh:160
+performReactRefresh @ @react-refresh:150
+(anonymous) @ @react-refresh:397
+setTimeout
+(anonymous) @ @react-refresh:388
+validateRefreshBoundaryAndEnqueueUpdate @ @react-refresh:427
+(anonymous) @ Profile.tsx?t=1746264460516:1493
+(anonymous) @ client:34
+(anonymous) @ client:218
+(anonymous) @ client:193
+queueUpdate @ client:193
+await in queueUpdate
+(anonymous) @ client:638
+handleMessage @ client:636
+(anonymous) @ client:546Understand this error
+Profile.tsx:368 Uncaught ReferenceError: getLanguageFlag is not defined
+    at Profile (Profile.tsx:368:56)
+    at renderWithHooks (chunk-W6L2VRDA.js?v=1e956288:11548:26)
+    at updateFunctionComponent (chunk-W6L2VRDA.js?v=1e956288:14582:28)
+    at beginWork (chunk-W6L2VRDA.js?v=1e956288:15924:22)
+    at HTMLUnknownElement.callCallback2 (chunk-W6L2VRDA.js?v=1e956288:3674:22)
+    at Object.invokeGuardedCallbackDev (chunk-W6L2VRDA.js?v=1e956288:3699:24)
+    at invokeGuardedCallback (chunk-W6L2VRDA.js?v=1e956288:3733:39)
+    at beginWork$1 (chunk-W6L2VRDA.js?v=1e956288:19765:15)
+    at performUnitOfWork (chunk-W6L2VRDA.js?v=1e956288:19198:20)
+    at workLoopSync (chunk-W6L2VRDA.js?v=1e956288:19137:13)
+Profile @ Profile.tsx:368
+renderWithHooks @ chunk-W6L2VRDA.js?v=1e956288:11548
+updateFunctionComponent @ chunk-W6L2VRDA.js?v=1e956288:14582
+beginWork @ chunk-W6L2VRDA.js?v=1e956288:15924
+callCallback2 @ chunk-W6L2VRDA.js?v=1e956288:3674
+invokeGuardedCallbackDev @ chunk-W6L2VRDA.js?v=1e956288:3699
+invokeGuardedCallback @ chunk-W6L2VRDA.js?v=1e956288:3733
+beginWork$1 @ chunk-W6L2VRDA.js?v=1e956288:19765
+performUnitOfWork @ chunk-W6L2VRDA.js?v=1e956288:19198
+workLoopSync @ chunk-W6L2VRDA.js?v=1e956288:19137
+renderRootSync @ chunk-W6L2VRDA.js?v=1e956288:19116
+recoverFromConcurrentError @ chunk-W6L2VRDA.js?v=1e956288:18736
+performSyncWorkOnRoot @ chunk-W6L2VRDA.js?v=1e956288:18879
+flushSyncCallbacks @ chunk-W6L2VRDA.js?v=1e956288:9119
+flushSync @ chunk-W6L2VRDA.js?v=1e956288:18959
+scheduleRefresh @ chunk-W6L2VRDA.js?v=1e956288:20004
+(anonymous) @ @react-refresh:160
+performReactRefresh @ @react-refresh:150
+(anonymous) @ @react-refresh:397
+setTimeout
+(anonymous) @ @react-refresh:388
+validateRefreshBoundaryAndEnqueueUpdate @ @react-refresh:427
+(anonymous) @ Profile.tsx?t=1746264460516:1493
+(anonymous) @ client:34
+(anonymous) @ client:218
+(anonymous) @ client:193
+queueUpdate @ client:193
+await in queueUpdate
+(anonymous) @ client:638
+handleMessage @ client:636
+(anonymous) @ client:546Understand this error
+@react-refresh:160 The above error occurred in the <Profile> component:
+
+    at Profile (https://0922346b-6200-4274-ba9e-7b235936648c-00-jd9plnp8qg12.pike.replit.dev/src/pages/Profile.tsx?t=1746264591556:28:20)
+    at main
+    at div
+    at AppLayout (https://0922346b-6200-4274-ba9e-7b235936648c-00-jd9plnp8qg12.pike.replit.dev/src/components/layouts/AppLayout.tsx:37:22)
+    at ProtectedRoute (https://0922346b-6200-4274-ba9e-7b235936648c-00-jd9plnp8qg12.pike.replit.dev/src/components/auth/ProtectedRoute.tsx:15:27)
+    at RenderedRoute (https://0922346b-6200-4274-ba9e-7b235936648c-00-jd9plnp8qg12.pike.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=08de39b8:4069:5)
+    at Routes (https://0922346b-6200-4274-ba9e-7b235936648c-00-jd9plnp8qg12.pike.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=08de39b8:4508:5)
+    at AppRoutes (https://0922346b-6200-4274-ba9e-7b235936648c-00-jd9plnp8qg12.pike.replit.dev/src/App.tsx?t=1746264340491:40:33)
+    at AuthProvider (https://0922346b-6200-4274-ba9e-7b235936648c-00-jd9plnp8qg12.pike.replit.dev/src/providers/AuthProvider.tsx:23:32)
+    at Router (https://0922346b-6200-4274-ba9e-7b235936648c-00-jd9plnp8qg12.pike.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=08de39b8:4451:15)
+    at BrowserRouter (https://0922346b-6200-4274-ba9e-7b235936648c-00-jd9plnp8qg12.pike.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=08de39b8:5196:5)
+    at ThemeProvider (https://0922346b-6200-4274-ba9e-7b235936648c-00-jd9plnp8qg12.pike.replit.dev/src/components/theme-provider.tsx:17:33)
+    at QueryClientProvider (https://0922346b-6200-4274-ba9e-7b235936648c-00-jd9plnp8qg12.pike.replit.dev/node_modules/.vite/deps/@tanstack_react-query.js?v=34aeac3f:2794:3)
+    at App
+
+Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://reactjs.org/link/error-boundaries to learn more about error boundaries.
+logCapturedError @ chunk-W6L2VRDA.js?v=1e956288:14032
+update.callback @ chunk-W6L2VRDA.js?v=1e956288:14052
+callCallback @ chunk-W6L2VRDA.js?v=1e956288:11248
+commitUpdateQueue @ chunk-W6L2VRDA.js?v=1e956288:11265
+commitLayoutEffectOnFiber @ chunk-W6L2VRDA.js?v=1e956288:17093
+commitLayoutMountEffects_complete @ chunk-W6L2VRDA.js?v=1e956288:17980
+commitLayoutEffects_begin @ chunk-W6L2VRDA.js?v=1e956288:17969
+commitLayoutEffects @ chunk-W6L2VRDA.js?v=1e956288:17920
+commitRootImpl @ chunk-W6L2VRDA.js?v=1e956288:19353
+commitRoot @ chunk-W6L2VRDA.js?v=1e956288:19277
+performSyncWorkOnRoot @ chunk-W6L2VRDA.js?v=1e956288:18895
+flushSyncCallbacks @ chunk-W6L2VRDA.js?v=1e956288:9119
+flushSync @ chunk-W6L2VRDA.js?v=1e956288:18959
+scheduleRefresh @ chunk-W6L2VRDA.js?v=1e956288:20004
+(anonymous) @ @react-refresh:160
+performReactRefresh @ @react-refresh:150
+(anonymous) @ @react-refresh:397
+setTimeout
+(anonymous) @ @react-refresh:388
+validateRefreshBoundaryAndEnqueueUpdate @ @react-refresh:427
+(anonymous) @ Profile.tsx?t=1746264460516:1493
+(anonymous) @ client:34
+(anonymous) @ client:218
+(anonymous) @ client:193
+queueUpdate @ client:193
+await in queueUpdate
+(anonymous) @ client:638
+handleMessage @ client:636
+(anonymous) @ client:546Understand this error
+main.tsx:22 Notification subscription status: CLOSED
+Profile.tsx:368 Uncaught (in promise) ReferenceError: getLanguageFlag is not defined
+    at Profile (Profile.tsx:368:56)
+    at renderWithHooks (chunk-W6L2VRDA.js?v=1e956288:11548:26)
+    at updateFunctionComponent (chunk-W6L2VRDA.js?v=1e956288:14582:28)
+    at beginWork (chunk-W6L2VRDA.js?v=1e956288:15924:22)
+    at beginWork$1 (chunk-W6L2VRDA.js?v=1e956288:19753:22)
+    at performUnitOfWork (chunk-W6L2VRDA.js?v=1e956288:19198:20)
+    at workLoopSync (chunk-W6L2VRDA.js?v=1e956288:19137:13)
+    at renderRootSync (chunk-W6L2VRDA.js?v=1e956288:19116:15)
+    at recoverFromConcurrentError (chunk-W6L2VRDA.js?v=1e956288:18736:28)
+    at performSyncWorkOnRoot (chunk-W6L2VRDA.js?v=1e956288:18879:28)
+Profile @ Profile.tsx:368
+renderWithHooks @ chunk-W6L2VRDA.js?v=1e956288:11548
+updateFunctionComponent @ chunk-W6L2VRDA.js?v=1e956288:14582
+beginWork @ chunk-W6L2VRDA.js?v=1e956288:15924
+beginWork$1 @ chunk-W6L2VRDA.js?v=1e956288:19753
+performUnitOfWork @ chunk-W6L2VRDA.js?v=1e956288:19198
+workLoopSync @ chunk-W6L2VRDA.js?v=1e956288:19137
+renderRootSync @ chunk-W6L2VRDA.js?v=1e956288:19116
+recoverFromConcurrentError @ chunk-W6L2VRDA.js?v=1e956288:18736
+performSyncWorkOnRoot @ chunk-W6L2VRDA.js?v=1e956288:18879
+flushSyncCallbacks @ chunk-W6L2VRDA.js?v=1e956288:9119
+flushSync @ chunk-W6L2VRDA.js?v=1e956288:18959
+scheduleRefresh @ chunk-W6L2VRDA.js?v=1e956288:20004
+(anonymous) @ @react-refresh:160
+performReactRefresh @ @react-refresh:150
+(anonymous) @ @react-refresh:397
+setTimeout
+(anonymous) @ @react-refresh:388
+validateRefreshBoundaryAndEnqueueUpdate @ @react-refresh:427
+(anonymous) @ Profile.tsx?t=1746264460516:1493
+(anonymous) @ client:34
+(anonymous) @ client:218
+(anonymous) @ client:193
+queueUpdate @ client:193
+await in queueUpdate
+(anonymous) @ client:638
+handleMessage @ client:636
+(anonymous) @ client:546Understand this error
