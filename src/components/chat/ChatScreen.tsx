@@ -68,6 +68,22 @@ export const ChatScreen = ({ conversation }: Props) => {
     }
   };
 
+  // Force scroll to bottom when user enters chat view
+  useEffect(() => {
+    // When component mounts, force scroll to bottom
+    setTimeout(() => scrollToLatestMessage(false), 300);
+    
+    // Also scroll when window is resized or orientation changes
+    const handleResize = () => scrollToLatestMessage(false);
+    window.addEventListener('resize', handleResize);
+    window.addEventListener('orientationchange', handleResize);
+    
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      window.removeEventListener('orientationchange', handleResize);
+    };
+  }, []);
+
   useEffect(() => {
     if (!conversation?.id) return;
 
@@ -100,9 +116,10 @@ export const ChatScreen = ({ conversation }: Props) => {
           return newMessages;
         });
 
+        // Always scroll to latest messages when fetching initial messages
         if (!loadMore) {
           // Use a small timeout to ensure DOM is updated
-          setTimeout(scrollToLatestMessage, 100);
+          setTimeout(() => scrollToLatestMessage(false), 150);
         }
       } catch (error) {
         console.error('Error fetching messages:', error);
@@ -223,12 +240,20 @@ export const ChatScreen = ({ conversation }: Props) => {
     };
   }, [conversation?.id]);
 
-  // Auto-scroll when messages change
+  // Auto-scroll when messages change or component mounts
   useEffect(() => {
     if (messages.length > 0) {
       scrollToLatestMessage();
     }
   }, [messages]);
+
+  // Always scroll to bottom when chat is first loaded and messages are fetched
+  useEffect(() => {
+    if (!isLoading && messages.length > 0) {
+      // Use a short timeout to ensure DOM is fully updated
+      setTimeout(() => scrollToLatestMessage(false), 100);
+    }
+  }, [isLoading]);
 
   const handleReact = async (messageId: string, emoji: string) => {
     if (!user?.id) return;
