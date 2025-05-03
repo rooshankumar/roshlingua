@@ -658,7 +658,7 @@ const Community = () => {
       </div>
 
       {filteredUsers.length > 0 ? (
-        <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 max-w 2xl:grid-cols-5">
+        <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 container mx-auto px-4">
           {filteredUsers.map((user) => (
             <Card 
               key={user.id} 
@@ -666,17 +666,25 @@ const Community = () => {
               onClick={() => navigate(`/profile/${user.id}`)}
             >              
               <CardContent className="p-4">
-                <div className="flex flex-col sm:flex-row items-center gap-4">
-                  <Avatar className="h-20 w-20 sm:h-16 sm:w-16">
-                    <AvatarImage src={user.avatar_url} alt={user.full_name} className="object-cover" />
-                    <AvatarFallback>{user.full_name?.charAt(0)}</AvatarFallback>
-                  </Avatar>
+                <div className="flex items-center gap-4">
+                  <div className="relative">
+                    <Avatar className="h-16 w-16">
+                      <AvatarImage src={user.avatar_url} alt={user.full_name} className="object-cover" />
+                      <AvatarFallback>{user.full_name?.charAt(0)}</AvatarFallback>
+                    </Avatar>
+                    <span 
+                      className={cn(
+                        "absolute bottom-0 right-0 block h-3 w-3 rounded-full ring-2 ring-background",
+                        user.is_online ? "bg-green-500" : "bg-gray-400"
+                      )} 
+                    />
+                  </div>
                   
-                  <div className="flex-1 text-center sm:text-left">
+                  <div className="flex-1">
                     <h3 className="font-semibold text-lg mb-1">{user.full_name}</h3>
                     <p className="text-sm text-muted-foreground mb-2">{user.age || '–'} years</p>
                     
-                    <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2">
+                    <div className="flex items-center gap-2">
                       <Badge variant="secondary" className="text-xs">
                         <span className="mr-1" aria-label={`Flag for ${user.native_language}`}>
                           {getLanguageFlag(user.native_language)}
