@@ -356,13 +356,18 @@ const Profile = () => {
           <Card className="glass-card">
             <CardHeader className="pb-2">
               <CardTitle className="text-md font-semibold">Language Skills</CardTitle>
+              <div className="flex items-center justify-center mt-2">
+                <Badge variant="outline" className="bg-primary/10 text-primary">
+                  {profile.proficiency_level?.charAt(0).toUpperCase() + profile.proficiency_level?.slice(1) || "Beginner"} Level
+                </Badge>
+              </div>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-[1fr,auto,1fr] items-center gap-3">
                 <div className="flex items-center space-x-2">
                   <Badge variant="secondary" className="px-3 py-1.5">
-                    <Languages className="h-4 w-4 text-muted-foreground mr-2" />
-                    {profile.native_language || "Not specified"}
+                    {getLanguageFlag(profile.native_language)}
+                    <span className="ml-2">{profile.native_language || "Not specified"}</span>
                   </Badge>
                 </div>
                 <div className="flex items-center justify-center">
@@ -370,15 +375,10 @@ const Profile = () => {
                 </div>
                 <div className="flex items-center space-x-2">
                   <Badge className="px-3 py-1.5">
-                    <Languages className="h-4 w-4 text-primary mr-2" />
-                    {profile.learning_language || "Not specified"}
+                    {getLanguageFlag(profile.learning_language)}
+                    <span className="ml-2">{profile.learning_language || "Not specified"}</span>
                   </Badge>
                 </div>
-              </div>
-              <div className="flex items-center justify-center">
-                <Badge variant="outline" className="bg-muted/50">
-                  {profile.proficiency_level || "beginner"} level
-                </Badge>
               </div>
             </CardContent>
           </Card>
