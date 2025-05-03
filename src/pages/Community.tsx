@@ -680,25 +680,32 @@ const Community = () => {
                     </div>
                     
                     <div className="flex-1 min-w-0">
-                      <h3 
-                        className={`font-semibold leading-tight truncate ${
-                          user.full_name?.length > 20
-                            ? 'text-xs sm:text-sm'
-                            : user.full_name?.length > 15
-                              ? 'text-sm sm:text-base'
-                              : 'text-base sm:text-lg'
-                        }`}
-                        data-length={
-                          user.full_name?.length > 20 
-                            ? 'very-long' 
-                            : user.full_name?.length > 15 
-                              ? 'long' 
-                              : 'normal'
-                        }
-                      >
-                        {user.full_name}
-                      </h3>
-                      <p className="text-sm text-muted-foreground">{user.age || '–'} years</p>
+                      <div className="flex items-center gap-2">
+                        <h3 
+                          className={`font-semibold leading-tight truncate ${
+                            user.full_name?.length > 20
+                              ? 'text-xs sm:text-sm'
+                              : user.full_name?.length > 15
+                                ? 'text-sm sm:text-base'
+                                : 'text-base sm:text-lg'
+                          }`}
+                          data-length={
+                            user.full_name?.length > 20 
+                              ? 'very-long' 
+                              : user.full_name?.length > 15 
+                                ? 'long' 
+                                : 'normal'
+                          }
+                        >
+                          {user.full_name}
+                        </h3>
+                        <span className="text-xs text-muted-foreground whitespace-nowrap">{user.age || '–'} y.o.</span>
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-0.5">
+                        {user.is_online ? 
+                          <span className="flex items-center"><span className="h-1.5 w-1.5 rounded-full bg-green-500 inline-block mr-1"></span>Online</span> : 
+                          "Offline"}
+                      </p>
                     </div>
                   </div>
                   
