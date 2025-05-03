@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Send, Loader2, FileText, Check, Image } from 'lucide-react';
+import { Send, Loader2, FileText, Check, Image, X } from 'lucide-react';
 import { ChatAttachment } from './ChatAttachment';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
@@ -13,6 +13,9 @@ import { ScrollArea } from '../ui/scroll-area';
 import { Card, CardContent } from '../ui/card';
 import { toast } from '@/components/ui/use-toast';
 import { handleImageLoadError, isLikelyBlockedUrl } from '@/utils/imageUtils';
+import { VoiceRecorder } from './VoiceRecorder'; // Imported VoiceRecorder component
+import { MessageReactions } from './MessageReactions'; // Added import for MessageReactions
+
 
 // Simple subscription manager (replace with a more robust solution)
 const subscriptionManager = {
@@ -49,6 +52,7 @@ export const ChatScreen = ({ conversation }: Props) => {
   const [isSending, setIsSending] = useState(false);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
+  const [replyTo, setReplyTo] = useState<Message | null>(null); // Added state for reply functionality
   const MESSAGES_PER_PAGE = 50;
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
@@ -140,23 +144,23 @@ export const ChatScreen = ({ conversation }: Props) => {
           if (newMessage) {
             console.log('Fetched new message with sender:', newMessage);
             console.log('Message has attachment:', newMessage.attachment_url);
-            
+
             setMessages(prev => {
               const exists = prev.some(msg => msg.id === newMessage.id);
               if (exists) return prev;
-              
+
               // Ensure attachment properties are properly included and log them
               console.log('Processing message with attachment:', 
                 newMessage.id, 
                 'URL:', newMessage.attachment_url,
                 'Name:', newMessage.attachment_name);
-              
+
               const messageWithAttachment = {
                 ...newMessage,
                 attachment_url: newMessage.attachment_url || null,
                 attachment_name: newMessage.attachment_name || null
               };
-              
+
               const updatedMessages = [...prev, messageWithAttachment];
               // Force a scroll after a small delay to ensure state update
               setTimeout(() => scrollToLatestMessage(), 100);
@@ -232,7 +236,7 @@ export const ChatScreen = ({ conversation }: Props) => {
     setIsSending(true);
     const tempId = crypto.randomUUID();
     const timestamp = new Date().toISOString();
-    
+
     // Log attachment information for debugging
     if (attachment) {
       console.log('Sending message with attachment:', {
@@ -259,7 +263,8 @@ export const ChatScreen = ({ conversation }: Props) => {
         full_name: user.user_metadata?.full_name || '',
         avatar_url: user.user_metadata?.avatar_url,
         last_seen: timestamp
-      }
+      },
+      reactions: [] // Initialize reactions array
     };
 
     setMessages(prev => [...prev, optimisticMessage]);
@@ -320,6 +325,7 @@ export const ChatScreen = ({ conversation }: Props) => {
           <div className="space-y-6">
             {messages.map((message, index) => (
               <div
+                id={`message-${message.id}`} // Added ID for scroll navigation
                 key={message.id}
                 className={`flex items-start gap-3 animate-slide-up ${
                   message.sender_id === user?.id ? 'flex-row-reverse' : 'flex-row'
@@ -327,6 +333,7 @@ export const ChatScreen = ({ conversation }: Props) => {
                 style={{
                   animationDelay: `${index * 0.1}s`
                 }}
+                onDoubleClick={() => setReplyTo(message)}
               >
                 <div className={`flex flex-col gap-2 max-w-[85%] sm:max-w-[70%] group transition-all duration-300`}>
                   {message.sender_id !== user?.id && (
@@ -343,6 +350,7 @@ export const ChatScreen = ({ conversation }: Props) => {
                       }`}
                     >
                       <p className="leading-relaxed mb-2">{message.content}</p>
+                      <MessageReactions messageId={message.id} existingReactions={message.reactions} /> {/* Added MessageReactions component */}
                       {message.attachment_url && (
                         <div className="mt-1 rounded-lg overflow-hidden">
                           {message.attachment_url?.match(/\.(jpg|jpeg|png|gif|webp|avif)$/i) ? (
@@ -460,6 +468,7 @@ export const ChatScreen = ({ conversation }: Props) => {
         <div className="sticky bottom-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-xl border-t border-border/50">
           <CardContent className="p-4 max-w-4xl mx-auto">
             <div className="flex items-end gap-3">
+              <VoiceRecorder onRecord={(url, filename) => handleSend(null, {url, filename})} /> {/* Added VoiceRecorder */}
               <ChatAttachment onAttach={(url, filename) => handleSend(newMessage, { url, filename })} />
               <Textarea
                 value={newMessage}

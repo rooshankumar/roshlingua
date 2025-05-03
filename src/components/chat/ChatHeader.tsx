@@ -1,6 +1,5 @@
-
 import { useNavigate } from 'react-router-dom';
-import { ChevronLeft, MoreVertical } from 'lucide-react';
+import { ChevronLeft, MoreVertical, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { UserStatus } from '@/components/UserStatus';
@@ -11,6 +10,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { supabase } from '@/lib/supabase';
+import { ChatSearch } from './ChatSearch';
 
 interface Props {
   conversation: {
@@ -24,9 +24,11 @@ interface Props {
       last_seen?: string;
     };
   };
+  messages?: any[];
+  onScrollToMessage?: (messageId: string) => void;
 }
 
-export const ChatHeader = ({ conversation }: Props) => {
+export const ChatHeader = ({ conversation, messages = [], onScrollToMessage }: Props) => {
   const navigate = useNavigate();
   const participant = conversation?.participant;
 
@@ -69,40 +71,48 @@ export const ChatHeader = ({ conversation }: Props) => {
             />
           </div>
         </div>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon">
-              <MoreVertical className="h-5 w-5" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={handleReport}>
-              Report User
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={handleBlock}>
-              Block User
-            </DropdownMenuItem>
-            <DropdownMenuItem 
-              onClick={() => {
-                if (window.confirm('Are you sure you want to delete this conversation?')) {
-                  supabase
-                    .from('conversations')
-                    .delete()
-                    .eq('id', conversation.id)
-                    .then(() => {
-                      navigate('/chat');
-                    })
-                    .catch((error) => {
-                      console.error('Error deleting conversation:', error);
-                    });
-                }
-              }} 
-              className="text-destructive"
-            >
-              Delete Conversation
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <div className="flex items-center justify-end gap-1 sm:gap-2">
+          {onScrollToMessage && messages.length > 0 && (
+            <ChatSearch 
+              messages={messages} 
+              onSearchResult={(messageId) => onScrollToMessage(messageId)} 
+            />
+          )}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon">
+                <MoreVertical className="h-5 w-5" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={handleReport}>
+                Report User
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={handleBlock}>
+                Block User
+              </DropdownMenuItem>
+              <DropdownMenuItem 
+                onClick={() => {
+                  if (window.confirm('Are you sure you want to delete this conversation?')) {
+                    supabase
+                      .from('conversations')
+                      .delete()
+                      .eq('id', conversation.id)
+                      .then(() => {
+                        navigate('/chat');
+                      })
+                      .catch((error) => {
+                        console.error('Error deleting conversation:', error);
+                      });
+                  }
+                }} 
+                className="text-destructive"
+              >
+                Delete Conversation
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
       </div>
     </div>
   );
