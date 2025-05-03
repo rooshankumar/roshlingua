@@ -728,7 +728,7 @@ const Community = () => {
                     
                     <div className="flex-1 min-w-0">
                       <h3 className={`font-semibold leading-tight truncate ${
-                        user.full_name?.length > 15 
+                        user.full_name?.length > 12 
                           ? 'text-sm sm:text-base' 
                           : 'text-base sm:text-lg'
                       }`}>
