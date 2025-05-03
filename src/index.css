@@ -445,6 +445,10 @@
   }
   
   @media (min-width: 1024px) {
+    .responsive-card {
+      @apply border shadow-sm hover:shadow-md rounded-xl;
+    }
+    
     .responsive-card .truncate {
       max-width: none;
       white-space: normal;
@@ -454,7 +458,19 @@
   }
   
   .responsive-grid {
-    @apply grid gap-2 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4;
+    @apply grid gap-2 sm:gap-4 grid-cols-1 sm:grid-cols-2;
+  }
+  
+  @media (min-width: 1024px) {
+    .responsive-grid {
+      @apply gap-5 grid-cols-3;
+    }
+  }
+  
+  @media (min-width: 1280px) {
+    .responsive-grid {
+      @apply gap-6 grid-cols-4;
+    }
   }
   
   .mobile-container {
