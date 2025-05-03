@@ -308,8 +308,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const refreshSubscriptions = () => {
-    console.log('Refreshing subscriptions - Placeholder implementation');
-    // Real implementation would use subscriptionManager here.
+    console.log('Refreshing all real-time subscriptions');
+    subscriptionManager.refreshAll();
   };
 
 
@@ -353,9 +353,5 @@ export function useAuth() {
   return context;
 }
 
-// Placeholder for subscriptionManager module
-const subscriptionManager = {
-  cleanup: () => {
-    console.log('subscriptionManager.cleanup() called - Placeholder implementation');
-  }
-};
+// Import the actual subscription manager
+import subscriptionManager from '@/utils/subscriptionManager';
