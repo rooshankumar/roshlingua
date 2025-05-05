@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { CustomToggle } from "@/components/ui/custom-toggle";
-import { Heart, Search, Filter, Flame, User, X, Globe, ArrowRight, Trophy, UserCircle2, CircleUser } from 'lucide-react';
+import { Heart, Search, Filter, Flame, User, X, Globe, ArrowRight, Trophy } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from "@/components/ui/badge";
@@ -871,9 +871,21 @@ const Community = () => {
                         >
                           {user.full_name}
                         </h3>
-                        {/* Gender Icon */}
-                        {user.gender === 'male' && <UserCircle2 className="h-4 w-4 text-blue-500" />}
-                        {user.gender === 'female' && <CircleUser className="h-4 w-4 text-pink-500" />}
+                        {/* Gender and Age Icon */}
+                        {user.gender === 'male' && user.age && (
+                          <img 
+                            src={user.age <= 22 ? "/icons/young-male.png" : "/icons/adult-male.png"} 
+                            alt="Male" 
+                            className="h-4 w-4 object-contain" 
+                          />
+                        )}
+                        {user.gender === 'female' && user.age && (
+                          <img 
+                            src={user.age <= 22 ? "/icons/young-female.png" : "/icons/adult-female.png"} 
+                            alt="Female" 
+                            className="h-4 w-4 object-contain" 
+                          />
+                        )}
                         <span className="text-xs text-muted-foreground whitespace-nowrap">• <span className="font-bold">{user.age || '–'}</span> y.o.</span>
                       </div>
                       <p className="text-xs text-muted-foreground mt-0.5">
