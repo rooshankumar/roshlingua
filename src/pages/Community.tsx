@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { CustomToggle } from "@/components/ui/custom-toggle";
-import { Heart, Search, Filter, Flame, User, X, Globe, ArrowRight, Trophy, Male, Female } from 'lucide-react';
+import { Heart, Search, Filter, Flame, User, X, Globe, ArrowRight, Trophy, Mars as MaleIcon, Venus as FemaleIcon } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from "@/components/ui/badge";
@@ -872,8 +872,8 @@ const Community = () => {
                           {user.full_name}
                         </h3>
                         {/* Gender Icon */}
-                        {user.gender === 'male' && <Male className="h-4 w-4 text-blue-500" />}
-                        {user.gender === 'female' && <Female className="h-4 w-4 text-pink-500" />}
+                        {user.gender === 'male' && <MaleIcon className="h-4 w-4 text-blue-500" />}
+                        {user.gender === 'female' && <FemaleIcon className="h-4 w-4 text-pink-500" />}
                         <span className="text-xs text-muted-foreground whitespace-nowrap">• <span className="font-bold">{user.age || '–'}</span> y.o.</span>
                       </div>
                       <p className="text-xs text-muted-foreground mt-0.5">
