@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { CustomToggle } from "@/components/ui/custom-toggle";
-import { Heart, Search, Filter, Flame, User, X, Globe, ArrowRight, Trophy } from 'lucide-react';
+import { Heart, Search, Filter, Flame, User, X, Globe, ArrowRight, Trophy, GenderMale, GenderFemale } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from "@/components/ui/badge";
@@ -53,6 +53,7 @@ interface User {
   date_of_birth: string | null;
   age: number | null; // Added age property
   last_seen: string | null;
+  gender: string | null; // Added gender property
 }
 
 const Community = () => {
@@ -185,7 +186,8 @@ const Community = () => {
             age,
             is_online,
             username,
-            last_seen
+            last_seen,
+            gender
           `)
           .neq('id', currentUser?.id);
 
@@ -208,6 +210,7 @@ const Community = () => {
           streak_count: user.streak_count || 1,
           likes_count: user.likes_count || 0,
           age: user.date_of_birth ? Math.floor((new Date().getTime() - new Date(user.date_of_birth).getTime()) / (365.25 * 24 * 60 * 60 * 1000)) : null,
+          gender: user.gender || null, // Added gender default
         }));
 
         // Sort users: online first, then by last seen (most recent first)
@@ -272,6 +275,7 @@ const Community = () => {
                         is_online: payload.new.is_online || false,
                         streak_count: payload.new.streak_count || 1,
                         likes_count: payload.new.likes_count || 0,
+                        gender: payload.new.gender || null, // Added gender default for new users
                       };
                       updatedUsers = [...updatedUsers, newUser as User];
                     }
@@ -366,7 +370,8 @@ const Community = () => {
             age,
             is_online,
             username,
-            last_seen
+            last_seen,
+            gender
           `)
           .neq('id', currentUser?.id);
 
@@ -389,6 +394,7 @@ const Community = () => {
           streak_count: user.streak_count || 1,
           likes_count: user.likes_count || 0,
           age: user.date_of_birth ? Math.floor((new Date().getTime() - new Date(user.date_of_birth).getTime()) / (365.25 * 24 * 60 * 60 * 1000)) : null,
+          gender: user.gender || null, // Added gender default
         }));
 
         // Sort users: online first, then by last seen (most recent first)
@@ -766,7 +772,7 @@ const Community = () => {
                       .from('profiles')
                       .select(`
                         id, full_name, native_language, learning_language, proficiency_level, bio, 
-                        avatar_url, streak_count, likes_count, date_of_birth, age, is_online, username, last_seen
+                        avatar_url, streak_count, likes_count, date_of_birth, age, is_online, username, last_seen, gender
                       `)
                       .neq('id', currentUser?.id);
                     if (error) {
@@ -786,6 +792,7 @@ const Community = () => {
                       streak_count: user.streak_count || 1,
                       likes_count: user.likes_count || 0,
                       age: user.date_of_birth ? Math.floor((new Date().getTime() - new Date(user.date_of_birth).getTime()) / (365.25 * 24 * 60 * 60 * 1000)) : null,
+                      gender: user.gender || null, // Added gender default
                     }));
                     // Sort users: online first, then by last seen (most recent first)
                     const sortedUsers = usersWithDefaults.sort((a, b) => {
@@ -864,7 +871,10 @@ const Community = () => {
                         >
                           {user.full_name}
                         </h3>
-                        <span className="text-xs text-muted-foreground whitespace-nowrap">• {user.age || '–'} y.o.</span>
+                        <span className="text-xs text-muted-foreground whitespace-nowrap">• <span className="font-bold">{user.age || '–'}</span> y.o.</span>
+                        {/* Gender Icon */}
+                        {user.gender === 'male' && <GenderMale className="h-4 w-4 text-blue-500" />}
+                        {user.gender === 'female' && <GenderFemale className="h-4 w-4 text-pink-500" />}
                       </div>
                       <p className="text-xs text-muted-foreground mt-0.5">
                         {user.is_online ? 
