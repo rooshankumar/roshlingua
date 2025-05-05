@@ -9,7 +9,7 @@ import { useTranslation } from 'react-i18next';
 import { useResponsive } from "@/hooks/use-mobile";
 import { NotificationDropdown } from "@/components/notifications/NotificationDropdown";
 
-// Custom SVG Icon component
+// Custom Icon component
 const CustomIcon = ({ src, size = 24, className = "" }) => {
   return (
     <img 
@@ -26,23 +26,23 @@ const routes = [
   {
     path: "/dashboard",
     label: "dashboard",
-    icon: (props) => <CustomIcon src="/icons/dashboard-icon.svg" {...props} />
+    icon: (props) => <CustomIcon src="/icons/dashboard-icon.png" {...props} />
   },
   {
     path: "/community",
     label: "Community",
-    icon: (props) => <CustomIcon src="/icons/community-icon.svg" {...props} />
+    icon: (props) => <CustomIcon src="/icons/community-icon.png" {...props} />
   },
   {
     path: "/chat",
     label: "Chat",
-    icon: (props) => <CustomIcon src="/icons/chat-icon.svg" {...props} />,
+    icon: (props) => <CustomIcon src="/icons/chat-icon.png" {...props} />,
     notificationCount: (notifications) => notifications?.unreadMessages || 0
   },
   {
     path: "/settings",
     label: "Settings",
-    icon: (props) => <CustomIcon src="/icons/settings-icon.svg" {...props} />
+    icon: (props) => <CustomIcon src="/icons/settings-icon.png" {...props} />
   }
 ];
 
