@@ -67,7 +67,7 @@ const RealtimeConnectionCheck = () => {
       });
     }
 
-    // Set up periodic health checks
+    // Set up periodic health checks with less frequent interval
     const healthCheckInterval = setInterval(() => {
       if (!isActive) return;
       
@@ -76,9 +76,14 @@ const RealtimeConnectionCheck = () => {
       if (connectionStatus === 'disconnected') {
         console.log('Attempting to refresh real-time connections');
         setReconnectAttempts(prev => prev + 1);
-        subscriptionManager.refreshAll();
+        // Only refresh all if we haven't tried too many times
+        if (reconnectAttempts < 3) {
+          subscriptionManager.refreshAll();
+        } else {
+          console.log('Too many reconnect attempts, waiting for user interaction');
+        }
       }
-    }, 30000); // Check every 30 seconds
+    }, 60000); // Check every 60 seconds instead of 30 to reduce load
 
     // Refresh connections when page visibility changes (tab becomes active)
     const handleVisibilityChange = () => {

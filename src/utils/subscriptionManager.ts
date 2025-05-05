@@ -185,26 +185,50 @@ class SubscriptionManager {
   /**
    * Handle visibility change events to refresh subscriptions when tab becomes active
    */
+  private lastGlobalRefresh: number = Date.now();
+  private refreshDebounceTimer: NodeJS.Timeout | null = null;
+  
   private handleVisibilityChange = (): void => {
     if (document.visibilityState === 'visible') {
       this.log('Page became visible, checking subscriptions');
 
-      // Only refresh if it's been more than 60 seconds since the last refresh
-      const staleTime = 60 * 1000; // 60 seconds
+      // Use a longer stale time to reduce unnecessary refreshes
+      const staleTime = 120 * 1000; // 2 minutes
       const now = Date.now();
-      let needsRefresh = false;
-
-      for (const subscription of this.subscriptions.values()) {
-        if (now - subscription.lastRefreshed > staleTime) {
-          needsRefresh = true;
-          break;
+      
+      // Avoid refreshing too frequently
+      if (now - this.lastGlobalRefresh < 30000) {
+        this.log('Skipping refresh, last global refresh was too recent');
+        return;
+      }
+      
+      // Debounce rapid visibility changes
+      if (this.refreshDebounceTimer) {
+        clearTimeout(this.refreshDebounceTimer);
+      }
+      
+      this.refreshDebounceTimer = setTimeout(() => {
+        let needsRefresh = false;
+        
+        // Only check a few subscriptions as a sample to determine if refresh is needed
+        let count = 0;
+        for (const subscription of this.subscriptions.values()) {
+          if (now - subscription.lastRefreshed > staleTime) {
+            needsRefresh = true;
+            break;
+          }
+          // Sample at most 5 subscriptions to avoid performance issues
+          if (++count >= 5) break;
         }
-      }
-
-      if (needsRefresh) {
-        this.log('Found stale subscriptions, refreshing all');
-        this.refreshAll();
-      }
+        
+        if (needsRefresh) {
+          this.log('Found stale subscriptions, refreshing all');
+          this.refreshAll();
+          this.lastGlobalRefresh = Date.now();
+        }
+        
+        this.refreshDebounceTimer = null;
+      }, 500);
     }
   };
 

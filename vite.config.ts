@@ -1,34 +1,31 @@
-import { defineConfig } from "vite";
-import react from "@vitejs/plugin-react-swc";
-import path from "path";
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react-swc'
+import path from 'path'
 
 // https://vitejs.dev/config/
-export default defineConfig(({ mode }) => ({
-  server: {
-    host: "::",
-    port: 8080,
-    hmr: {
-      overlay: true,
-      timeout: 2000,
-      clientPort: 443
-    },
-    watch: {
-      usePolling: true,
-      interval: 1000,
-    },
-  },
-  plugins: [
-    react({
-      devTarget: 'es2022',
-      fastRefresh: true
-    }),
-  ],
+export default defineConfig({
+  plugins: [react()],
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
     },
   },
   optimizeDeps: {
-    force: true,
-  }
-}));
+    include: ['react', 'react-dom', 'react-router-dom', '@supabase/supabase-js'],
+    exclude: [],
+  },
+  build: {
+    sourcemap: true,
+    // Improve build performance
+    minify: 'esbuild',
+    target: 'esnext',
+  },
+  server: {
+    // Improve HMR performance
+    hmr: {
+      overlay: false,
+    },
+    // Increase timeout for slow connections
+    hmrTimeout: 5000,
+  },
+})

@@ -18,15 +18,15 @@ import NotFound from "./pages/NotFound";
 import Onboarding from "./pages/Onboarding";
 import Community from "./pages/Community";
 import Chat from "./pages/Chat";
-import Settings from "./pages/Settings"; // Added
-import ChatList from "./pages/ChatList"; // Added
+import Settings from "./pages/Settings";
+import ChatList from "./pages/ChatList";
 
 // Components
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import AppLayout from "./components/layouts/AppLayout";
 import AuthLayout from "./components/layouts/AuthLayout";
 import { RealtimeStatus } from './components/RealtimeStatus';
-import RealtimeConnectionCheck from './components/RealtimeConnectionCheck'; // Added
+import RealtimeConnectionCheck from './components/RealtimeConnectionCheck';
 
 
 const queryClient = new QueryClient();
@@ -107,7 +107,7 @@ const AppRoutes = () => {
         <Route path="/chat" element={
           <ProtectedRoute>
             <AppLayout>
-              <ChatList /> {/* Updated */}
+              <ChatList />
             </AppLayout>
           </ProtectedRoute>
         } />
@@ -142,7 +142,7 @@ const App = () => {
           <AuthProvider>
             <AppRoutes />
             <Toaster />
-            <HMRHandler />
+            <HMRHandler /> {/* Added HMR handler */}
             <Analytics debug={false} />
             <SpeedInsights debug={false} />
           </AuthProvider>

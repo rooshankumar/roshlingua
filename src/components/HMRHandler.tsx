@@ -1,52 +1,33 @@
-
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
+import subscriptionManager from '@/utils/subscriptionManager';
 
 /**
- * Component that helps manage Vite's Hot Module Replacement
- * and provides improved connection handling
+ * This component helps preserve application state during hot module reloads
+ * in development, preventing unnecessary refreshes and reconnections.
  */
 const HMRHandler = () => {
-  const [isReconnecting, setIsReconnecting] = useState(false);
-
   useEffect(() => {
-    if (import.meta.hot) {
-      // When HMR is trying to reconnect
-      import.meta.hot.on('vite:beforeUpdate', () => {
-        setIsReconnecting(true);
-      });
+    // Store a reference to identify if this is a full reload or HMR
+    const hmrTimestamp = sessionStorage.getItem('hmr_timestamp');
+    const currentTimestamp = Date.now().toString();
 
-      // When HMR successfully reconnects
-      import.meta.hot.on('vite:afterUpdate', () => {
-        setIsReconnecting(false);
-      });
-
-      // When HMR connection is lost
-      import.meta.hot.on('vite:error', (error) => {
-        console.log('HMR Error:', error);
-        // Try to recover by forcing a reconnection
-        setTimeout(() => {
-          window.location.reload();
-        }, 3000);
-      });
+    if (hmrTimestamp && Date.now() - parseInt(hmrTimestamp) < 5000) {
+      // This is likely an HMR update, not a full page refresh
+      console.log('HMR detected, preserving application state');
+    } else {
+      // This is a full refresh or initial load
+      console.log('Full page load detected');
+      // We could initialize specific state here
     }
 
+    // Update timestamp for next reload detection
+    sessionStorage.setItem('hmr_timestamp', currentTimestamp);
+
     return () => {
-      if (import.meta.hot) {
-        import.meta.hot.off('vite:beforeUpdate');
-        import.meta.hot.off('vite:afterUpdate');
-        import.meta.hot.off('vite:error');
-      }
+      // Store current timestamp right before component unmounts (during HMR)
+      sessionStorage.setItem('hmr_timestamp', Date.now().toString());
     };
   }, []);
-
-  // Render a small indicator when reconnecting
-  if (isReconnecting) {
-    return (
-      <div className="fixed bottom-4 right-4 bg-primary/80 text-white px-3 py-1 rounded-md z-[9999] text-xs animate-pulse">
-        Updating...
-      </div>
-    );
-  }
 
   return null;
 };

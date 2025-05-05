@@ -308,9 +308,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const refreshSubscriptions = () => {
+    // Don't refresh if no user is logged in
+    if (!user?.id) {
+      console.log('No user logged in, skipping subscription refresh');
+      return;
+    }
+    
     console.log('Refreshing all real-time subscriptions');
-    subscriptionManager.refreshAll();
+    // Debounce refresh operations to prevent multiple rapid refreshes
+    if (refreshSubscriptionTimer.current) {
+      clearTimeout(refreshSubscriptionTimer.current);
+    }
+    
+    refreshSubscriptionTimer.current = setTimeout(() => {
+      subscriptionManager.refreshAll();
+      refreshSubscriptionTimer.current = null;
+    }, 300);
   };
+  
+  // Add a ref to store the timer
+  const refreshSubscriptionTimer = useRef<NodeJS.Timeout | null>(null);
 
 
   const value: AuthContextType = {
