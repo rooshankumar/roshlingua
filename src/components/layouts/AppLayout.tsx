@@ -28,22 +28,22 @@ const routes = [
   {
     path: "/Dashboard",
     label: "Dashboard",
-    icon: (props) => <CustomIcon src="/icons/dashboard-icon.svg" {...props} />
+    icon: (props) => <CustomIcon src="/icons/dashboard-icon.png" {...props} />
   },
   {
     path: "/community",
     label: "Community",
-    icon: (props) => <CustomIcon src="/icons/community-icon.svg" {...props} />
+    icon: (props) => <CustomIcon src="/icons/community-icon.png" {...props} />
   },
   {
     path: "/chat",
     label: "Chat",
-    icon: (props) => <CustomIcon src="/icons/chat-icon.svg" {...props} />
+    icon: (props) => <CustomIcon src="/icons/chat-icon.png" {...props} />
   },
   {
     path: "/settings",
     label: "Settings",
-    icon: (props) => <CustomIcon src="/icons/settings-icon.svg" {...props} />
+    icon: (props) => <CustomIcon src="/icons/settings-icon.png" {...props} />
   }
 ];
 
