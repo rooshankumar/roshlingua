@@ -808,7 +808,7 @@ const Community = () => {
                       title: "Refreshed",
                       description: "Community profiles updated",
                     });
-                  } catch (error) {
+                  }                  catch (error) {
                     console.error("Error refreshing users:", error);
                     toast({
                       title: "Error",
@@ -852,7 +852,7 @@ const Community = () => {
                     </div>
 
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-1.5">
+                      <div className="flex items-center justify-between">
                         <h3 
                           className={`font-semibold leading-tight truncate ${
                             user.full_name?.length > 20
@@ -860,7 +860,7 @@ const Community = () => {
                               : user.full_name?.length > 15
                                 ? 'text-sm sm:text-base'
                                 : 'text-base sm:text-lg'
-                          }`}
+                          } max-w-[65%]`}
                           data-length={
                             user.full_name?.length > 20 
                               ? 'very-long' 
@@ -871,22 +871,24 @@ const Community = () => {
                         >
                           {user.full_name}
                         </h3>
-                        {/* Gender and Age Icon */}
-                        {user.gender === 'male' && user.age && (
-                          <img 
-                            src={user.age <= 22 ? "/icons/young-male.png" : "/icons/adult-male.png"} 
-                            alt="Male" 
-                            className="h-4 w-4 object-contain" 
-                          />
-                        )}
-                        {user.gender === 'female' && user.age && (
-                          <img 
-                            src={user.age <= 22 ? "/icons/young-female.png" : "/icons/adult-female.png"} 
-                            alt="Female" 
-                            className="h-4 w-4 object-contain" 
-                          />
-                        )}
-                        <span className="text-xs text-muted-foreground whitespace-nowrap">• <span className="font-bold">{user.age || '–'}</span> y.o.</span>
+                        <div className="flex items-center gap-1">
+                          {/* Gender and Age Icon */}
+                          {user.gender === 'male' && user.age && (
+                            <img 
+                              src={user.age <= 22 ? "/icons/young-male.png" : "/icons/adult-male.png"} 
+                              alt="Male" 
+                              className="h-4 w-4 object-contain" 
+                            />
+                          )}
+                          {user.gender === 'female' && user.age && (
+                            <img 
+                              src={user.age <= 22 ? "/icons/young-female.png" : "/icons/adult-female.png"} 
+                              alt="Female" 
+                              className="h-4 w-4 object-contain" 
+                            />
+                          )}
+                          <span className="text-xs text-muted-foreground whitespace-nowrap"><span className="font-bold">{user.age || '–'}</span> y.o.</span>
+                        </div>
                       </div>
                       <p className="text-xs text-muted-foreground mt-0.5">
                         {user.is_online ? 
