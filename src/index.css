@@ -662,5 +662,18 @@ html {
   .message-actions-menu.active {
     opacity: 1;
     pointer-events: auto;
+
+/* Community card mobile optimizations */
+@media (max-width: 640px) {
+  .responsive-card {
+    width: 100%;
+    max-width: 100%;
+    border-radius: 0;
+    margin-left: -1rem;
+    margin-right: -1rem;
+    width: calc(100% + 2rem);
+  }
+}
+
   }
 }

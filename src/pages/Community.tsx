@@ -550,7 +550,7 @@ const Community = () => {
 
 
   return (
-    <div className="container mx-auto py-6 space-y-4">
+    <div className="container mx-auto py-6 space-y-4 px-0 sm:px-4">
       <div className="flex flex-col space-y-1 mb-6">
         <h1 className="text-2xl font-bold">Community</h1>
         <p className="text-muted-foreground">
@@ -820,11 +820,11 @@ const Community = () => {
       </div>
 
       {filteredUsers.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 container mx-auto px-0 sm:px-4 lg:gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 w-full container mx-auto px-0 sm:px-4 lg:gap-6">
           {filteredUsers.slice(0, 9).map((user) => (
             <Card 
               key={user.id} 
-              className="responsive-card cursor-pointer group hover:border-primary/40"
+              className="responsive-card cursor-pointer group hover:border-primary/40 w-full mx-auto sm:mx-0"
               onClick={() => navigate(`/profile/${user.id}`)}
             >              
               <CardContent className="p-4 sm:p-6">
@@ -880,14 +880,14 @@ const Community = () => {
                       <span className="text-lg sm:text-xl" aria-label={`Native language: ${user.native_language}`}>
                         {getLanguageFlag(user.native_language)}
                       </span>
-                      <span className="hidden md:inline-block text-xs sm:text-sm text-muted-foreground">{user.native_language}</span>
+                      <span className="inline-block text-xs sm:text-sm text-muted-foreground">{user.native_language}</span>
                     </div>
                     <ArrowRight className="h-3 w-3 sm:h-4 sm:w-4 text-primary shrink-0" />
                     <div className="flex items-center gap-1 sm:gap-2" title={`Learning: ${user.learning_language}`}>
                       <span className="text-lg sm:text-xl" aria-label={`Learning language: ${user.learning_language}`}>
                         {getLanguageFlag(user.learning_language)}
                       </span>
-                      <span className="hidden md:inline-block text-xs sm:text-sm text-muted-foreground">{user.learning_language}</span>
+                      <span className="inline-block text-xs sm:text-sm text-muted-foreground">{user.learning_language}</span>
                     </div>
                   </div>
                 </div>
