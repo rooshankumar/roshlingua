@@ -7,7 +7,7 @@ import subscriptionManager from "@/utils/subscriptionManager";
 import { useAuth } from '@/providers/AuthProvider';
 import RealtimeConnectionCheck from "../RealtimeConnectionCheck";
 
-// Custom Icon component
+// Custom SVG Icon component
 const CustomIcon = ({ src, size = 24, className = "" }) => {
   return (
     <img 
@@ -28,22 +28,22 @@ const routes = [
   {
     path: "/Dashboard",
     label: "Dashboard",
-    icon: (props) => <CustomIcon src="/icons/dashboard-icon.png" {...props} />
+    icon: (props) => <CustomIcon src="/icons/dashboard-icon.svg" {...props} />
   },
   {
     path: "/community",
     label: "Community",
-    icon: (props) => <CustomIcon src="/icons/community-icon.png" {...props} />
+    icon: (props) => <CustomIcon src="/icons/community-icon.svg" {...props} />
   },
   {
     path: "/chat",
     label: "Chat",
-    icon: (props) => <CustomIcon src="/icons/chat-icon.png" {...props} />
+    icon: (props) => <CustomIcon src="/icons/chat-icon.svg" {...props} />
   },
   {
     path: "/settings",
     label: "Settings",
-    icon: (props) => <CustomIcon src="/icons/settings-icon.png" {...props} />
+    icon: (props) => <CustomIcon src="/icons/settings-icon.svg" {...props} />
   }
 ];
 
