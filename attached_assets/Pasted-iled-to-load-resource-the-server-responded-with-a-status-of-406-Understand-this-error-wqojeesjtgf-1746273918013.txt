@@ -1,0 +1,66 @@
+iled to load resource: the server responded with a status of 406 ()Understand this error
+wqojeesjtgfcftpnzaet.supabase.co/rest/v1/messages?select=content%2Ccreated_at&conversation_id=eq.f29b194a-7004-4a50-8d87-c8a31c03a20d&order=created_at.desc&limit=1:1 
+            
+            
+           Failed to load resource: the server responded with a status of 406 ()Understand this error
+wqojeesjtgfcftpnzaet.supabase.co/rest/v1/messages?select=content%2Ccreated_at&conversation_id=eq.f74683b7-55ef-41c5-92c8-c827d0e30fd4&order=created_at.desc&limit=1:1 
+            
+            
+           Failed to load resource: the server responded with a status of 406 ()Understand this error
+wqojeesjtgfcftpnzaet.supabase.co/rest/v1/message_reactions:1 
+            
+            
+           Failed to load resource: the server responded with a status of 400 ()Understand this error
+imageUtils.ts:113 Image load error: SyntheticBaseEvent URL: https://wqojeesjtgfcftpnzaet.supabase.co/storage/v1/object/public/attachments/0.8482384585340423.png
+handleImageLoadError @ imageUtils.ts:113Understand this error
+2VoiceRecorder.tsx:165 Uncaught ReferenceError: X is not defined
+    at VoiceRecorder (VoiceRecorder.tsx:165:14)
+    at renderWithHooks (chunk-W6L2VRDA.js?v=d7a99ba2:11548:26)
+    at updateFunctionComponent (chunk-W6L2VRDA.js?v=d7a99ba2:14582:28)
+    at beginWork (chunk-W6L2VRDA.js?v=d7a99ba2:15924:22)
+    at HTMLUnknownElement.callCallback2 (chunk-W6L2VRDA.js?v=d7a99ba2:3674:22)
+    at Object.invokeGuardedCallbackDev (chunk-W6L2VRDA.js?v=d7a99ba2:3699:24)
+    at invokeGuardedCallback (chunk-W6L2VRDA.js?v=d7a99ba2:3733:39)
+    at beginWork$1 (chunk-W6L2VRDA.js?v=d7a99ba2:19765:15)
+    at performUnitOfWork (chunk-W6L2VRDA.js?v=d7a99ba2:19198:20)
+    at workLoopSync (chunk-W6L2VRDA.js?v=d7a99ba2:19137:13)Understand this error
+chunk-W6L2VRDA.js?v=d7a99ba2:14032 The above error occurred in the <VoiceRecorder> component:
+
+    at VoiceRecorder (https://fc0a7c56-22d1-4a62-9ddb-6c58052252f2-00-1n6jtz3qblrnx.pike.replit.dev/src/components/chat/VoiceRecorder.tsx?t=1746273856654:15:33)
+    at div
+    at div
+    at _c8 (https://fc0a7c56-22d1-4a62-9ddb-6c58052252f2-00-1n6jtz3qblrnx.pike.replit.dev/src/components/ui/card.tsx:56:61)
+    at div
+    at div
+    at _c (https://fc0a7c56-22d1-4a62-9ddb-6c58052252f2-00-1n6jtz3qblrnx.pike.replit.dev/src/components/ui/card.tsx:12:53)
+    at ChatScreen (https://fc0a7c56-22d1-4a62-9ddb-6c58052252f2-00-1n6jtz3qblrnx.pike.replit.dev/src/components/chat/ChatScreen.tsx?t=1746273856654:47:30)
+    at div
+    at ChatPage (https://fc0a7c56-22d1-4a62-9ddb-6c58052252f2-00-1n6jtz3qblrnx.pike.replit.dev/src/pages/Chat.tsx?t=1746273856654:20:32)
+    at main
+    at div
+    at AppLayout (https://fc0a7c56-22d1-4a62-9ddb-6c58052252f2-00-1n6jtz3qblrnx.pike.replit.dev/src/components/layouts/AppLayout.tsx?t=1746271746036:42:22)
+    at ProtectedRoute (https://fc0a7c56-22d1-4a62-9ddb-6c58052252f2-00-1n6jtz3qblrnx.pike.replit.dev/src/components/auth/ProtectedRoute.tsx:15:27)
+    at RenderedRoute (https://fc0a7c56-22d1-4a62-9ddb-6c58052252f2-00-1n6jtz3qblrnx.pike.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=bb187f63:4069:5)
+    at Routes (https://fc0a7c56-22d1-4a62-9ddb-6c58052252f2-00-1n6jtz3qblrnx.pike.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=bb187f63:4508:5)
+    at AppRoutes (https://fc0a7c56-22d1-4a62-9ddb-6c58052252f2-00-1n6jtz3qblrnx.pike.replit.dev/src/App.tsx?t=1746273856654:40:33)
+    at AuthProvider (https://fc0a7c56-22d1-4a62-9ddb-6c58052252f2-00-1n6jtz3qblrnx.pike.replit.dev/src/providers/AuthProvider.tsx:24:32)
+    at Router (https://fc0a7c56-22d1-4a62-9ddb-6c58052252f2-00-1n6jtz3qblrnx.pike.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=bb187f63:4451:15)
+    at BrowserRouter (https://fc0a7c56-22d1-4a62-9ddb-6c58052252f2-00-1n6jtz3qblrnx.pike.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=bb187f63:5196:5)
+    at ThemeProvider (https://fc0a7c56-22d1-4a62-9ddb-6c58052252f2-00-1n6jtz3qblrnx.pike.replit.dev/src/components/theme-provider.tsx:17:33)
+    at QueryClientProvider (https://fc0a7c56-22d1-4a62-9ddb-6c58052252f2-00-1n6jtz3qblrnx.pike.replit.dev/node_modules/.vite/deps/@tanstack_react-query.js?v=2ab7d870:2794:3)
+    at App
+
+Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://reactjs.org/link/error-boundaries to learn more about error boundaries.
+logCapturedError @ chunk-W6L2VRDA.js?v=d7a99ba2:14032Understand this error
+chunk-W6L2VRDA.js?v=d7a99ba2:19413 Uncaught ReferenceError: X is not defined
+    at VoiceRecorder (VoiceRecorder.tsx:165:14)
+    at renderWithHooks (chunk-W6L2VRDA.js?v=d7a99ba2:11548:26)
+    at updateFunctionComponent (chunk-W6L2VRDA.js?v=d7a99ba2:14582:28)
+    at beginWork (chunk-W6L2VRDA.js?v=d7a99ba2:15924:22)
+    at beginWork$1 (chunk-W6L2VRDA.js?v=d7a99ba2:19753:22)
+    at performUnitOfWork (chunk-W6L2VRDA.js?v=d7a99ba2:19198:20)
+    at workLoopSync (chunk-W6L2VRDA.js?v=d7a99ba2:19137:13)
+    at renderRootSync (chunk-W6L2VRDA.js?v=d7a99ba2:19116:15)
+    at recoverFromConcurrentError (chunk-W6L2VRDA.js?v=d7a99ba2:18736:28)
+    at performConcurrentWorkOnRoot (chunk-W6L2VRDA.js?v=d7a99ba2:18684:30)Understand this error

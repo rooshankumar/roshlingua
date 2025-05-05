@@ -1,5 +1,6 @@
 import { ReactNode, useEffect } from "react";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
+import { Home, Users, MessageSquare, Settings } from "lucide-react";
 import MainNav from "../navigation/MainNav";
 import { NotificationDropdown } from "../notifications/NotificationDropdown";
 import { supabase } from "@/lib/supabase";
@@ -7,18 +8,6 @@ import subscriptionManager from "@/utils/subscriptionManager";
 import { useAuth } from '@/providers/AuthProvider';
 import RealtimeConnectionCheck from "../RealtimeConnectionCheck";
 
-// Custom SVG Icon component
-const CustomIcon = ({ src, size = 24, className = "" }) => {
-  return (
-    <img 
-      src={src} 
-      width={size} 
-      height={size} 
-      className={className} 
-      alt="icon"
-    />
-  );
-};
 
 interface AppLayoutProps {
   children: ReactNode;
@@ -28,22 +17,22 @@ const routes = [
   {
     path: "/Dashboard",
     label: "Dashboard",
-    icon: (props) => <CustomIcon src="/icons/dashboard-icon.svg" {...props} />
+    icon: Home
   },
   {
     path: "/community",
     label: "Community",
-    icon: (props) => <CustomIcon src="/icons/community-icon.svg" {...props} />
+    icon: Users
   },
   {
     path: "/chat",
     label: "Chat",
-    icon: (props) => <CustomIcon src="/icons/chat-icon.svg" {...props} />
+    icon: MessageSquare
   },
   {
     path: "/settings",
     label: "Settings",
-    icon: (props) => <CustomIcon src="/icons/settings-icon.svg" {...props} />
+    icon: Settings
   }
 ];
 
@@ -123,7 +112,7 @@ const AppLayout = ({ children }: AppLayoutProps) => {
                   }`
                 }
               >
-                <route.icon size={20} className={`${isActive ? 'animate-pulse' : ''}`} />
+                <route.icon className={`h-5 w-5 ${isActive ? 'animate-pulse' : ''}`} />
                 <span className="text-xs mt-1 font-medium">{route.label}</span>
               </NavLink>
             );
