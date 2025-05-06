@@ -159,7 +159,7 @@ export const handleImageLoadError = (event: React.SyntheticEvent<HTMLImageElemen
       const bucketName = bucketMatch[1];
       console.log(`Bucket name detected in URL: '${bucketName}'`);
     }
-    
+
     // Try to load with cache busting if it's a Supabase URL and we haven't already
     if (!src.includes('t=')) {
       const timestamp = Date.now();
@@ -172,12 +172,12 @@ export const handleImageLoadError = (event: React.SyntheticEvent<HTMLImageElemen
 
   // If we already tried cache busting or it's not a Supabase URL, hide the broken image
   img.style.display = 'none';
-  
+
   // Add a helpful fallback element
   const parent = img.parentNode;
   if (parent) {
     const fallbackElement = document.createElement('div');
-    fallbackElement.className = 'bg-gray-100 dark:bg-gray-800 p-2 rounded-md text-sm text-center';
+    fallbackElement.className = 'p-2 rounded-md text-sm text-center';
     fallbackElement.innerText = src.includes('supabase.co/storage') ? 
       'Storage error: Please check if bucket exists in your Supabase project' : 
       fallbackText;

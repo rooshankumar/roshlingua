@@ -652,13 +652,13 @@ export const ChatScreen = ({ conversation }: Props) => {
                                 loading="eager"
                                 referrerPolicy="no-referrer"
                                 fetchPriority="high"
+                                onClick={() => window.open(message.attachment_url, '_blank')}
                               />
                             </a>
                           ) : message.attachment_url?.match(/\.(mp4|webm|ogg)$/i) ? (
                             <video 
                               src={`${message.attachment_url}${message.attachment_url.includes('?') ? '&' : '?'}t=${Date.now()}`}
                               controls
-                              autoPlay
                               className="max-w-[300px] rounded-lg"
                               preload="auto"
                               onError={() => {
@@ -669,7 +669,6 @@ export const ChatScreen = ({ conversation }: Props) => {
                             <audio 
                               src={message.attachment_url}
                               controls
-                              autoPlay
                               className="max-w-[300px]"
                               preload="auto"
                               onError={() => {
@@ -688,14 +687,15 @@ export const ChatScreen = ({ conversation }: Props) => {
                               />
                               <a 
                                 href={message.attachment_url}
-                                download
-                                className="text-sm mt-1 text-muted-foreground hover:text-foreground"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-sm mt-1 hover:underline"
                               >
-                                Download PDF
+                                View Full PDF
                               </a>
                             </div>
                           ) : message.attachment_url ? (
-                            <div className="flex items-center gap-3 p-3 bg-background/10 rounded-lg hover:bg-background/20 transition-colors duration-200">
+                            <div className="flex items-center gap-3 p-3 rounded-lg">
                               <FileText className="h-5 w-5" />
                               <a 
                                 href={message.attachment_url} 
@@ -703,7 +703,7 @@ export const ChatScreen = ({ conversation }: Props) => {
                                 rel="noopener noreferrer"
                                 className="text-sm font-medium hover:underline"
                               >
-                                {message.attachment_name || 'Download attachment'}
+                                {message.attachment_name || 'View attachment'}
                               </a>
                             </div>
                           ) : null}

@@ -201,7 +201,7 @@ export const ChatAttachment = ({ onAttach }: ChatAttachmentProps) => {
       />
       
       {previewUrl && (
-        <div className="absolute bottom-full mb-2 right-0 bg-background border rounded-lg p-2 shadow-md animate-in fade-in-0 zoom-in-95 duration-200 w-[200px]">
+        <div className="absolute bottom-full mb-2 right-0 border rounded-lg p-2 shadow-md animate-in fade-in-0 zoom-in-95 duration-200 w-[200px]">
           <div className="flex justify-between items-center mb-1">
             <span className="text-xs font-medium truncate max-w-[150px]">{fileName}</span>
             <Button 
@@ -215,11 +215,11 @@ export const ChatAttachment = ({ onAttach }: ChatAttachmentProps) => {
           </div>
           
           {fileType.startsWith('image/') && (
-            <img src={previewUrl} alt="Preview" className="w-full h-24 object-contain rounded" />
+            <img src={previewUrl} alt="Preview" className="w-full h-24 object-contain rounded cursor-pointer" onClick={() => window.open(previewUrl, '_blank')} />
           )}
           
           {!fileType.startsWith('image/') && (
-            <div className="bg-muted/50 h-16 flex items-center justify-center rounded">
+            <div className="h-16 flex items-center justify-center rounded">
               {getFileIcon()}
             </div>
           )}
