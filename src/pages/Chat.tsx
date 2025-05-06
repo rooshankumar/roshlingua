@@ -12,8 +12,14 @@ const ChatPage = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [conversation, setConversation] = useState<any>(null);
 
+  // Import useUnreadMessages hook
+  const { markConversationAsRead, setActiveConversationId } = useUnreadMessages(user?.id);
+
   useEffect(() => {
     if (!user || !conversationId) return;
+
+    // Set this as the active conversation
+    setActiveConversationId(conversationId);
 
     const loadConversation = async () => {
       try {
@@ -65,17 +71,8 @@ const ChatPage = () => {
             throw messagesError;
           }
 
-          // Mark messages as read
-          const { error: readError } = await supabase
-            .from('messages')
-            .update({ is_read: true })
-            .eq('conversation_id', conversationId)
-            .eq('recipient_id', user.id)
-            .eq('is_read', false);
-
-          if (readError) {
-            console.error('Error marking messages as read:', readError);
-          }
+          // Use the hook function to mark messages as read (this will update both DB and local state)
+          await markConversationAsRead(conversationId);
 
           setConversation({
             id: conversationId,
@@ -96,7 +93,12 @@ const ChatPage = () => {
     };
 
     loadConversation();
-  }, [user, conversationId]);
+
+    // Cleanup function - clear active conversation when unmounting
+    return () => {
+      setActiveConversationId(null);
+    };
+  }, [user, conversationId, markConversationAsRead, setActiveConversationId]);
 
   if (!user) {
     return (

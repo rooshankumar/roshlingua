@@ -3,6 +3,7 @@ import { supabase } from '@/lib/supabase';
 
 export function useUnreadMessages(userId: string | undefined) {
   const [unreadCounts, setUnreadCounts] = useState<Record<string, number>>({});
+  const [activeConversationId, setActiveConversationId] = useState<string | null>(null);
   
   // Function to fetch initial unread counts
   const fetchInitialUnreadCounts = async () => {
@@ -18,7 +19,12 @@ export function useUnreadMessages(userId: string | undefined) {
       
       if (data) {
         const counts = data.reduce((acc, item) => {
-          acc[item.conversation_id] = item.unread_count || 0;
+          // If we're currently viewing this conversation, force count to 0
+          if (activeConversationId === item.conversation_id) {
+            acc[item.conversation_id] = 0;
+          } else {
+            acc[item.conversation_id] = item.unread_count || 0;
+          }
           return acc;
         }, {} as Record<string, number>);
         
@@ -34,6 +40,11 @@ export function useUnreadMessages(userId: string | undefined) {
     if (!userId || !conversationId) return;
     
     try {
+      console.log(`Marking conversation ${conversationId} as read`);
+      
+      // Set active conversation
+      setActiveConversationId(conversationId);
+      
       // Update messages as read
       await supabase
         .from('messages')
@@ -45,11 +56,14 @@ export function useUnreadMessages(userId: string | undefined) {
       // Update conversation participant record
       await supabase
         .from('conversation_participants')
-        .update({ unread_count: 0 })
+        .update({ 
+          unread_count: 0,
+          last_read_at: new Date().toISOString()
+        })
         .eq('user_id', userId)
         .eq('conversation_id', conversationId);
         
-      // Update local state
+      // Update local state immediately
       setUnreadCounts(prev => ({
         ...prev,
         [conversationId]: 0
@@ -75,7 +89,9 @@ export function useUnreadMessages(userId: string | undefined) {
         filter: `recipient_id=eq.${userId}`,
       }, (payload) => {
         const message = payload.new as any;
-        if (!message.is_read) {
+        
+        // Don't increment if we're actively viewing this conversation
+        if (!message.is_read && message.conversation_id !== activeConversationId) {
           setUnreadCounts(prev => ({
             ...prev,
             [message.conversation_id]: (prev[message.conversation_id] || 0) + 1
@@ -90,8 +106,16 @@ export function useUnreadMessages(userId: string | undefined) {
       }, (payload) => {
         const message = payload.new as any;
         if (message.is_read) {
-          // Individual message read - check if this was the last unread one
-          fetchInitialUnreadCounts(); // Refresh counts from server
+          // If it's from the active conversation, keep count at 0
+          if (message.conversation_id === activeConversationId) {
+            setUnreadCounts(prev => ({
+              ...prev,
+              [message.conversation_id]: 0
+            }));
+          } else {
+            // For other conversations, refresh counts from server
+            fetchInitialUnreadCounts();
+          }
         }
       })
       .on('postgres_changes', {
@@ -114,7 +138,11 @@ export function useUnreadMessages(userId: string | undefined) {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [userId]);
+  }, [userId, activeConversationId]);
 
-  return { unreadCounts, markConversationAsRead };
+  return { 
+    unreadCounts, 
+    markConversationAsRead,
+    setActiveConversationId
+  };
 }

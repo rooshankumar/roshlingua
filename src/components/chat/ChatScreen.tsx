@@ -15,6 +15,7 @@ import { toast } from '@/components/ui/use-toast';
 import { handleImageLoadError, isLikelyBlockedUrl } from '@/utils/imageUtils';
 import { VoiceRecorder } from './VoiceRecorder'; // Imported VoiceRecorder component
 import { MessageReactions } from './MessageReactions'; // Added import for MessageReactions
+import { useUnreadMessages } from '@/providers/UnreadMessagesProvider'; // Import useUnreadMessages hook
 
 
 // Simple subscription manager (replace with a more robust solution)
@@ -416,27 +417,26 @@ export const ChatScreen = ({ conversation }: Props) => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
-  // Function to mark messages as read
+  // Import useUnreadMessages hook
+  const { markConversationAsRead } = useUnreadMessages(user?.id);
+
+  // Mark messages as read
   const markMessagesAsRead = async (conversationId: string) => {
     try {
-      // Mark messages as read in database
-      await supabase
-        .from('messages')
-        .update({ is_read: true })
-        .eq('conversation_id', conversationId)
-        .eq('is_read', false);
+      if (!user?.id) return;
 
-
+      // Use the hook function to mark messages as read and update the unread count
+      await markConversationAsRead(conversationId);
     } catch (error) {
       console.error('Error marking messages as read:', error);
     }
   };
 
   useEffect(() => {
-    if (conversation?.id) {
+    if (conversation?.id && user?.id) {
       markMessagesAsRead(conversation.id);
     }
-  }, [conversation?.id]);
+  }, [conversation?.id, user?.id]);
 
 
   return (

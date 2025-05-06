@@ -18,6 +18,7 @@ export const ConversationItem = ({
   onClick,
 }: ConversationItemProps) => {
   const otherParticipant = getOtherParticipant(conversation, currentUserId);
+  // Only show as unread if we have a positive unread count that's explicitly set
   const hasUnread = (conversation.unreadCount || 0) > 0;
   const lastMessage = conversation.lastMessage;
 
@@ -48,7 +49,7 @@ export const ConversationItem = ({
           "absolute bottom-0 right-0 block h-3 w-3 rounded-full ring-2 ring-background",
           otherParticipant.isOnline ? "bg-green-500" : "bg-gray-400"
         )} />
-        
+
         {/* Unread notification dot - show in top right only if has unread messages */}
         {hasUnread && (
           <span className="absolute -top-1 -right-1 bg-destructive text-destructive-foreground rounded-full min-w-[16px] h-4 flex items-center justify-center text-xs font-medium px-1">
