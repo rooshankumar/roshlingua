@@ -19,28 +19,29 @@ const ChatPage = () => {
     if (conversationId && user?.id) {
       console.log('Setting active conversation:', conversationId);
       
-      // Explicitly force unread count to 0 in local state first
-      setUnreadCounts(prev => ({
-        ...prev,
-        [conversationId]: 0
-      }));
-      
-      // Mark as read immediately - handles both UI update and DB update
-      markConversationAsRead(conversationId);
-      
-      // This forces a UI update right away
+      // Set the active conversation ID first
       setActiveConversationId(conversationId);
       
-      // Also refresh all counts immediately and after a delay to ensure consistency
+      // Force a complete reset of the unread count
+      forceResetUnreadCount(conversationId);
+      
+      // Also mark as read to ensure database consistency
+      markConversationAsRead(conversationId);
+      
+      // Perform multiple refreshes with increasing delays to ensure UI consistency
       refreshUnreadCounts();
       
-      const timer = setTimeout(() => {
-        refreshUnreadCounts();
-      }, 500);
+      const timers = [100, 500, 1500].map(delay => 
+        setTimeout(() => {
+          refreshUnreadCounts();
+          // Double-check that the unread count is properly reset
+          forceResetUnreadCount(conversationId);
+        }, delay)
+      );
       
-      return () => clearTimeout(timer);
+      return () => timers.forEach(timer => clearTimeout(timer));
     }
-  }, [conversationId, user?.id, markConversationAsRead, setActiveConversationId, refreshUnreadCounts, setUnreadCounts]);
+  }, [conversationId, user?.id, markConversationAsRead, setActiveConversationId, refreshUnreadCounts, forceResetUnreadCount]);
 
   useEffect(() => {
     if (!user || !conversationId) return;

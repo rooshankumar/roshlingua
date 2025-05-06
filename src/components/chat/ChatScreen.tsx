@@ -91,6 +91,17 @@ export const ChatScreen = ({ conversation }: Props) => {
     scrollAttempts.forEach(delay => {
       setTimeout(() => scrollToLatestMessage(false), delay);
     });
+    
+    // Also force reset unread counts for this conversation
+    if (conversation?.id && user?.id) {
+      // Import the hook function
+      const { setUnreadCounts } = useUnreadMessages(user.id);
+      // Force local state update
+      setUnreadCounts(prev => ({
+        ...prev,
+        [conversation.id]: 0
+      }));
+    }
 
     // Also scroll when window is resized or orientation changes
     const handleResize = () => scrollToLatestMessage(false);
