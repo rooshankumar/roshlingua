@@ -255,7 +255,7 @@ export function useUnreadMessages(userId: string | undefined) {
                   }
                 } else {
                   console.log('Database update verified, unread count reset');
-                  
+
                   // Force another local state update to ensure UI is consistent
                   setUnreadCounts(prev => ({
                     ...prev,
@@ -269,7 +269,7 @@ export function useUnreadMessages(userId: string | undefined) {
                 }
               }
             };
-            
+
             await updateDb();
           }
         } finally {
@@ -279,7 +279,7 @@ export function useUnreadMessages(userId: string | undefined) {
 
       // Execute immediately
       updateUnreadCount();
-      
+
       // And also after a short delay as a backup
       const timeoutId = setTimeout(updateUnreadCount, 500);
       return () => clearTimeout(timeoutId);
@@ -318,3 +318,10 @@ export function useUnreadMessages(userId: string | undefined) {
     }, [userId])
   };
 }
+
+// Add a debug function to help troubleshoot read status issues
+useEffect(() => {
+  if (activeConversationId && userId) {
+    console.log(`[DEBUG] Active conversation: ${activeConversationId}, unread count: ${unreadCounts[activeConversationId] || 0}`);
+  }
+}, [activeConversationId, unreadCounts, userId]);

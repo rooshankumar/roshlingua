@@ -122,6 +122,39 @@ export const fetchMessages = async (conversationId: string, currentUserId: strin
       if (participantError) throw participantError;
       
       console.log(`Successfully marked messages as read and updated participant record`);
+      
+      // Verification check to ensure changes were properly applied
+      setTimeout(async () => {
+        try {
+          // Verify conversation_participants record was updated
+          const { data: verification, error: verifyError } = await supabase
+            .from('conversation_participants')
+            .select('unread_count')
+            .eq('conversation_id', conversationId)
+            .eq('user_id', currentUserId)
+            .single();
+            
+          if (verifyError) {
+            console.error('Error verifying participant update:', verifyError);
+          } else if (verification && verification.unread_count > 0) {
+            console.warn(`Verification failed: unread_count still ${verification.unread_count}, forcing update`);
+            
+            // Force another update attempt if verification failed
+            await supabase
+              .from('conversation_participants')
+              .update({ 
+                unread_count: 0,
+                last_read_at: new Date().toISOString()
+              })
+              .eq('conversation_id', conversationId)
+              .eq('user_id', currentUserId);
+          } else {
+            console.log('Verification passed: unread_count properly reset');
+          }
+        } catch (verifyErr) {
+          console.error('Error in verification check:', verifyErr);
+        }
+      }, 1000);
     } catch (error) {
       console.error('Error updating read status:', error);
     }

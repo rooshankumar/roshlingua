@@ -460,16 +460,46 @@ export const ChatScreen = ({ conversation }: Props) => {
       markMessagesAsRead(conversation.id);
 
       // Also mark as read when messages are received or updated
-      if (messages.length > 0) {
-        // Mark as read both at the message level and the conversation participant level
-        markMessagesAsRead(conversation.id, user.id);
+      if (messages.length > 0 && conversation?.id && user?.id) {
+        console.log(`[READ-STATUS] Marking messages as read in conversation ${conversation.id}`);
         
-        // Forcefully update local unread state to ensure UI is consistent
-        const { setUnreadCounts } = useUnreadMessages(user.id);
-        setUnreadCounts(prev => ({
-          ...prev,
-          [conversation.id]: 0
-        }));
+        // Execute in sequence to prevent race conditions
+        (async () => {
+          try {
+            // First mark messages as read in the messages table
+            await markMessagesAsRead(conversation.id, user.id);
+            
+            // Then explicitly update the conversation_participants table
+            await supabase
+              .from('conversation_participants')
+              .update({ 
+                unread_count: 0,
+                last_read_at: new Date().toISOString()
+              })
+              .eq('conversation_id', conversation.id)
+              .eq('user_id', user.id);
+            
+            // Log confirmation for debugging
+            console.log(`[READ-STATUS] Successfully marked conversation ${conversation.id} as read`);
+            
+            // Forcefully request an unread counts refresh to ensure UI consistency
+            const { refreshUnreadCounts, forceResetUnreadCount, setUnreadCounts } = useUnreadMessages(user.id);
+            
+            // Apply multiple strategies for maximum reliability
+            setUnreadCounts(prev => ({
+              ...prev,
+              [conversation.id]: 0
+            }));
+            
+            // Force a reset with a slight delay to ensure database operations completed
+            setTimeout(() => {
+              forceResetUnreadCount(conversation.id);
+              refreshUnreadCounts();
+            }, 500);
+          } catch (error) {
+            console.error("[READ-STATUS] Error updating read status:", error);
+          }
+        })();
       }
     }
   }, [conversation?.id, user?.id, messages.length]);
