@@ -1,10 +1,12 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { supabase } from '@/lib/supabase';
+import { RealtimeChannel } from '@supabase/supabase-js';
 
 export function useUnreadMessages(userId: string | undefined) {
   const [unreadCounts, setUnreadCounts] = useState<Record<string, number>>({});
   const [activeConversationId, setActiveConversationId] = useState<string | null>(null);
-  const [isSubscribed, setIsSubscribed] = useState(false);
+  const channelRef = useRef<RealtimeChannel | null>(null);
+  const isSubscribedRef = useRef(false);
   
   // Function to fetch initial unread counts
   const fetchInitialUnreadCounts = useCallback(async () => {
@@ -122,77 +124,88 @@ export function useUnreadMessages(userId: string | undefined) {
     }
   }, [userId]);
 
+  // Setup unread messages subscription - separate from the activeConversationId dependency
   useEffect(() => {
     if (!userId) return;
     
     // Fetch initial unread counts
     fetchInitialUnreadCounts();
 
-    // Avoid duplicate subscriptions
-    if (isSubscribed) return;
-
-    // Subscribe to new messages
-    try {
-      const channel = supabase
-        .channel('unread-messages')
-        .on('postgres_changes', {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'messages',
-        }, (payload) => {
-          const message = payload.new as any;
-          
-          // Only count messages not sent by the current user
-          if (message.sender_id !== userId) {
-            // Don't increment if we're actively viewing this conversation
-            if (message.conversation_id !== activeConversationId) {
+    // Only create a new subscription if we don't already have one
+    if (!isSubscribedRef.current && !channelRef.current) {
+      console.log('Setting up unread messages subscription');
+      
+      try {
+        // Create a new channel
+        channelRef.current = supabase
+          .channel('unread-messages')
+          .on('postgres_changes', {
+            event: 'INSERT',
+            schema: 'public',
+            table: 'messages',
+          }, (payload) => {
+            const message = payload.new as any;
+            
+            // Only count messages not sent by the current user
+            if (message.sender_id !== userId) {
+              // Don't increment if we're actively viewing this conversation
+              if (message.conversation_id !== activeConversationId) {
+                setUnreadCounts(prev => ({
+                  ...prev,
+                  [message.conversation_id]: (prev[message.conversation_id] || 0) + 1
+                }));
+                console.log(`New message in conversation ${message.conversation_id}, updated count:`, 
+                  (unreadCounts[message.conversation_id] || 0) + 1);
+              }
+            }
+          })
+          .on('postgres_changes', {
+            event: 'UPDATE',
+            schema: 'public',
+            table: 'conversation_participants',
+            filter: `user_id=eq.${userId}`,
+          }, (payload) => {
+            const participant = payload.new as any;
+            // Only update if unread count is explicitly set to 0
+            if (participant.unread_count === 0) {
               setUnreadCounts(prev => ({
                 ...prev,
-                [message.conversation_id]: (prev[message.conversation_id] || 0) + 1
+                [participant.conversation_id]: 0
               }));
-              console.log(`New message in conversation ${message.conversation_id}, updated count:`, 
-                (unreadCounts[message.conversation_id] || 0) + 1);
+              console.log(`Conversation ${participant.conversation_id} marked as read`);
             }
-          }
-        })
-        .on('postgres_changes', {
-          event: 'UPDATE',
-          schema: 'public',
-          table: 'conversation_participants',
-          filter: `user_id=eq.${userId}`,
-        }, (payload) => {
-          const participant = payload.new as any;
-          // Only update if unread count is explicitly set to 0
-          if (participant.unread_count === 0) {
-            setUnreadCounts(prev => ({
-              ...prev,
-              [participant.conversation_id]: 0
-            }));
-            console.log(`Conversation ${participant.conversation_id} marked as read`);
-          }
-        })
-        .subscribe(status => {
-          console.log('Unread messages subscription status:', status);
-          if (status === 'SUBSCRIBED') {
-            setIsSubscribed(true);
-          }
-        });
-
-      return () => {
-        console.log('Removing unread messages subscription');
-        supabase.removeChannel(channel);
-        setIsSubscribed(false);
-      };
-    } catch (error) {
-      console.error('Error setting up unread messages subscription:', error);
-      setIsSubscribed(false);
+          })
+          .subscribe(status => {
+            console.log('Unread messages subscription status:', status);
+            if (status === 'SUBSCRIBED') {
+              isSubscribedRef.current = true;
+            } else if (status === 'CLOSED' || status === 'CHANNEL_ERROR') {
+              // Only set to false when actually closed, not during initial connection
+              isSubscribedRef.current = false;
+            }
+          });
+      } catch (error) {
+        console.error('Error setting up unread messages subscription:', error);
+        isSubscribedRef.current = false;
+        channelRef.current = null;
+      }
     }
-  }, [userId, activeConversationId, fetchInitialUnreadCounts, isSubscribed]);
 
-  // Refresh counts when active conversation changes
+    // Cleanup function that only runs when component is unmounted
+    return () => {
+      if (channelRef.current) {
+        console.log('Removing unread messages subscription');
+        supabase.removeChannel(channelRef.current);
+        channelRef.current = null;
+        isSubscribedRef.current = false;
+      }
+    };
+  }, [userId, fetchInitialUnreadCounts]); // Remove activeConversationId from deps
+
+  // Update unread counts when active conversation changes
   useEffect(() => {
     if (activeConversationId) {
-      // Update local state immediately while the API call processes
+      // Update local state immediately 
       setUnreadCounts(prev => ({
         ...prev,
         [activeConversationId]: 0
