@@ -59,8 +59,8 @@ export function useUnreadMessages(userId: string | undefined) {
         [conversationId]: 0
       }));
 
-      // 3. Update database (don't wait for this to complete)
-      const updatePromise = Promise.all([
+      // 3. Update database (need to await to ensure complete update)
+      await Promise.all([
         // Update messages
         supabase
           .from('messages')
@@ -80,15 +80,13 @@ export function useUnreadMessages(userId: string | undefined) {
           .eq('conversation_id', conversationId)
       ]);
 
-      // Handle any errors but don't block the UI
-      updatePromise.catch(error => {
-        console.error('Error updating read status in database:', error);
-      });
+      // 4. Force a refresh of unread counts 
+      await fetchUnreadCounts();
 
     } catch (error) {
       console.error('Error marking conversation as read:', error);
     }
-  }, [userId]);
+  }, [userId, fetchUnreadCounts]);
 
   // Setup subscription to messages and participant updates
   useEffect(() => {

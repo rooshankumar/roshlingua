@@ -19,8 +19,8 @@ export const ConversationItem = ({
 }: ConversationItemProps) => {
   const otherParticipant = getOtherParticipant(conversation, currentUserId);
   // Only show as unread if we have a positive unread count
-  // Explicitly check for positive number greater than zero
-  const hasUnread = typeof conversation.unreadCount === 'number' && conversation.unreadCount > 0;
+  // Using strict comparison to ensure no falsy values are treated as 0
+  const hasUnread = conversation.unreadCount > 0;
   const lastMessage = conversation.lastMessage;
 
   const getInitials = (name: string) => {
