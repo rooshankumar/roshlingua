@@ -1,70 +1,30 @@
+
 import { supabase } from '@/lib/supabase';
 
-// Export checkStreakAchievements for direct use
-export const checkStreakAchievements = async (userId: string) => {
-  try {
-    // Get current streak and XP information
-    const { data: userData, error } = await supabase
-      .from('profiles')
-      .select('streak_count, xp_points')
-      .eq('id', userId)
-      .single();
-      
-    if (error) {
-      console.error('Error fetching user data for achievement check:', error);
-      return;
-    }
-    
-    if (userData) {
-      await checkStreakAchievements(userId, userData.streak_count || 0, userData.xp_points || 0);
-    }
-  } catch (error) {
-    console.error('Error checking achievements directly:', error);
-  }
-};
-
-export const updateUserActivity = async (userId: string) => {
-  try {
-    // First get current streak info
-    const { data: currentData } = await supabase
-      .from('profiles')
-      .select('streak_count, last_seen')
-      .eq('id', userId)
-      .single();
-
-    // Update last_seen to trigger streak calculation
-    const { error } = await supabase
-      .from('profiles')
-      .update({ 
-        last_seen: new Date().toISOString()
-      })
-      .eq('id', userId);
-
-    if (error) throw error;
-
-    // Fetch updated streak
-    const { data: updatedData } = await supabase
-      .from('profiles')
-      .select('streak_count, xp_points')
-      .eq('id', userId)
-      .single();
-
-    if (updatedData) {
-      // Check for achievement updates
-      await checkStreakAchievements(userId, updatedData.streak_count, updatedData.xp_points || 0);
-    }
-
-    return updatedData?.streak_count;
-  } catch (error) {
-    console.error('Error updating user activity:', error);
-    return null;
-  }
-};
-
 // Function to check streak-based achievements
-const checkStreakAchievements = async (userId: string, streakCount: number, xpPoints: number) => {
+export const checkStreakAchievements = async (userId: string, streakCount: number = 0, xpPoints: number = 0) => {
   try {
     console.log(`Checking achievements for user ${userId} with streak ${streakCount} and XP ${xpPoints}`);
+    
+    // If streakCount and xpPoints weren't provided, fetch them
+    if (arguments.length === 1) {
+      // Get current streak and XP information
+      const { data: userData, error } = await supabase
+        .from('profiles')
+        .select('streak_count, xp_points')
+        .eq('id', userId)
+        .single();
+        
+      if (error) {
+        console.error('Error fetching user data for achievement check:', error);
+        return;
+      }
+      
+      if (userData) {
+        streakCount = userData.streak_count || 0;
+        xpPoints = userData.xp_points || 0;
+      }
+    }
     
     // Get existing achievements
     const { data: existingAchievements, error: achievementError } = await supabase
@@ -104,6 +64,44 @@ const checkStreakAchievements = async (userId: string, streakCount: number, xpPo
     
   } catch (error) {
     console.error('Error checking streak achievements:', error);
+  }
+};
+
+export const updateUserActivity = async (userId: string) => {
+  try {
+    // First get current streak info
+    const { data: currentData } = await supabase
+      .from('profiles')
+      .select('streak_count, last_seen')
+      .eq('id', userId)
+      .single();
+
+    // Update last_seen to trigger streak calculation
+    const { error } = await supabase
+      .from('profiles')
+      .update({ 
+        last_seen: new Date().toISOString()
+      })
+      .eq('id', userId);
+
+    if (error) throw error;
+
+    // Fetch updated streak
+    const { data: updatedData } = await supabase
+      .from('profiles')
+      .select('streak_count, xp_points')
+      .eq('id', userId)
+      .single();
+
+    if (updatedData) {
+      // Check for achievement updates
+      await checkStreakAchievements(userId, updatedData.streak_count, updatedData.xp_points || 0);
+    }
+
+    return updatedData?.streak_count;
+  } catch (error) {
+    console.error('Error updating user activity:', error);
+    return null;
   }
 };
 
