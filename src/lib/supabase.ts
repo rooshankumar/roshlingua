@@ -1,5 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
-import type { Database } from '@/types/supabase';
+import type { Database } from './database.types';
 
 // Get environment variables
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
@@ -9,8 +9,14 @@ if (!supabaseUrl || !supabaseAnonKey) {
   throw new Error('Supabase environment variables are missing');
 }
 
-// Create a single supabase client for the entire app
+// Create client with proper headers to prevent 406 Not Acceptable errors
 export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
+  global: {
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+    },
+  },
   auth: {
     autoRefreshToken: true,
     persistSession: true,
@@ -89,11 +95,6 @@ export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
       }
     }
   },
-  global: {
-    headers: {
-      'Accept': 'application/json, application/vnd.pgrst.object+json'
-    }
-  }
 });
 
 // Simple auth helpers

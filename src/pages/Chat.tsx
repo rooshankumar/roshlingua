@@ -10,27 +10,27 @@ import { useUnreadMessages } from "@/hooks/useUnreadMessages";
 const ChatPage = () => {
   const { conversationId } = useParams();
   const { user } = useAuth();
+  const { markConversationAsRead, setActiveConversationId, forceResetUnreadCount, refreshUnreadCounts } = useUnreadMessages(user?.id);
   const [isLoading, setIsLoading] = useState(true);
   const [conversation, setConversation] = useState<any>(null);
-  const { markConversationAsRead, setActiveConversationId, clearAllUnreadCounts, refreshUnreadCounts } = useUnreadMessages(user?.id);
 
   // Update active conversation and mark as read when conversation ID changes
   useEffect(() => {
     if (conversationId && user?.id) {
       console.log('Setting active conversation:', conversationId);
-      
+
       // Set the active conversation ID first
       setActiveConversationId(conversationId);
-      
+
       // Force a complete reset of the unread count
       forceResetUnreadCount(conversationId);
-      
+
       // Also mark as read to ensure database consistency
       markConversationAsRead(conversationId);
-      
+
       // Perform multiple refreshes with increasing delays to ensure UI consistency
       refreshUnreadCounts();
-      
+
       const timers = [100, 500, 1500].map(delay => 
         setTimeout(() => {
           refreshUnreadCounts();
@@ -38,7 +38,7 @@ const ChatPage = () => {
           forceResetUnreadCount(conversationId);
         }, delay)
       );
-      
+
       return () => timers.forEach(timer => clearTimeout(timer));
     }
   }, [conversationId, user?.id, markConversationAsRead, setActiveConversationId, refreshUnreadCounts, forceResetUnreadCount]);
