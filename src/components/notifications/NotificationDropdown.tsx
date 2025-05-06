@@ -4,6 +4,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/useAuth';
 import { useNotifications } from '@/hooks/useNotifications';
+import { useNotificationSystem } from '@/hooks/useNotificationSystem';
 import { Separator } from '@/components/ui/separator';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { NotificationCard } from './NotificationCard';
@@ -14,16 +15,21 @@ export function NotificationDropdown({ className = "" }) {
   const { user } = useAuth();
   const { 
     notifications, 
-    unreadCount, 
     markAllAsRead, 
     loading,
     isConnected 
   } = useNotifications(user?.id);
+  
+  // Get the unread count from the new notification system
+  const { unreadCount, playNotificationSound } = useNotificationSystem();
 
   // Force refresh notifications when dropdown is opened
   useEffect(() => {
-    // We could add a manual refresh function here if needed
-  }, [open]);
+    if (open && unreadCount > 0) {
+      // Play notification sound when the dropdown is opened with unread notifications
+      playNotificationSound();
+    }
+  }, [open, unreadCount, playNotificationSound]);
 
   const handleMarkAllAsRead = () => {
     markAllAsRead();

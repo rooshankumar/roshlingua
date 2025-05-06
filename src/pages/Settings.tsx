@@ -8,6 +8,7 @@ import { CustomToggle } from "@/components/ui/custom-toggle";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/providers/AuthProvider";
 import { useRealtimeProfile } from "@/hooks/useRealtimeProfile";
+import { useNotificationSystem } from "@/hooks/useNotificationSystem";
 import {
   Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter
 } from "@/components/ui/card";
@@ -260,13 +261,20 @@ const Settings = () => {
     });
   };
 
+  // Legacy notification settings - keep for backwards compatibility
   const [notificationSettings, setNotificationSettings] = useState({
     newMessages: true,
     profileViews: true,
     learningReminders: true,
     streakReminders: true,
-    marketingEmails: false,
   });
+
+  // New comprehensive notification preferences system
+  const { 
+    preferences: notificationPreferences, 
+    updatePreferences: updateNotificationPreferences,
+    isInitialized: preferencesLoaded
+  } = useNotificationSystem();
 
   const handleNotificationChange = (field: string, value: boolean) => {
     setNotificationSettings(prev => ({
@@ -730,31 +738,31 @@ const Settings = () => {
                     id: "newMessages",
                     label: "New messages",
                     description: "Get notified about new messages",
-                    value: notificationSettings.newMessages
+                    value: notificationPreferences?.newMessages || notificationSettings.newMessages
                   },
                   {
                     id: "profileViews",
                     label: "Profile views",
                     description: "Know when someone views your profile",
-                    value: notificationSettings.profileViews
+                    value: notificationPreferences?.profileViews || notificationSettings.profileViews
                   },
                   {
                     id: "learningReminders",
                     label: "Learning reminders",
                     description: "Daily practice reminders",
-                    value: notificationSettings.learningReminders
+                    value: notificationPreferences?.learningReminders || notificationSettings.learningReminders
                   },
                   {
                     id: "streakReminders",
                     label: "Streak reminders",
                     description: "Maintain your daily streak",
-                    value: notificationSettings.streakReminders
+                    value: notificationPreferences?.streakReminders || notificationSettings.streakReminders
                   },
                   {
                     id: "marketingEmails",
                     label: "Marketing emails",
                     description: "Receive updates and offers",
-                    value: notificationSettings.marketingEmails
+                    value: notificationPreferences?.marketingEmails || notificationSettings.marketingEmails
                   }
                 ].map((setting, i) => (
                   <div key={setting.id}>
@@ -766,7 +774,11 @@ const Settings = () => {
                       <CustomToggle
                         id={setting.id}
                         checked={setting.value}
-                        onCheckedChange={(value) => handleNotificationChange(setting.id, value)}
+                        onCheckedChange={(value) => {
+                          // Update both legacy and new settings for consistency
+                          handleNotificationChange(setting.id, value);
+                          updateNotificationPreferences({...notificationPreferences, [setting.id]: value});
+                        }}
                       />
                     </div>
                     {i < 4 && <Separator className="my-4" />}
