@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { supabase } from '@/lib/supabase';
 import { RealtimeChannel } from '@supabase/supabase-js';
@@ -286,43 +287,14 @@ export function useUnreadMessages(userId: string | undefined) {
     }
   }, [activeConversationId, userId]);
 
-  return {
-    unreadCounts,
-    markConversationAsRead,
-    setActiveConversationId,
-    refreshUnreadCounts: fetchUnreadCounts,
-    forceResetUnreadCount,
-    // Expose for component that requires direct setUnreadCounts access
-    setUnreadCounts,
-    // Utility to clear all unread counts
-    clearAllUnreadCounts: useCallback(async () => {
-      if (!userId) return;
-
-      // Update local state immediately
-      setUnreadCounts({});
-
-      // Update database
-      try {
-        await supabase
-          .from('conversation_participants')
-          .update({ 
-            unread_count: 0,
-            last_read_at: new Date().toISOString()
-          })
-          .eq('user_id', userId);
-
-        console.log('All unread counts cleared');
-      } catch (error) {
-        console.error('Error clearing all unread counts:', error);
-      }
-    }, [userId])
   // Add a debug function to help troubleshoot read status issues
   useEffect(() => {
     if (activeConversationId && userId) {
       console.log(`[DEBUG] Active conversation: ${activeConversationId}, unread count: ${unreadCounts[activeConversationId] || 0}`);
     }
   }, [activeConversationId, unreadCounts, userId]);
-  
+
+  // Return the hook's API
   return {
     unreadCounts,
     markConversationAsRead,
