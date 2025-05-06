@@ -110,8 +110,8 @@ export const ChatAttachment = ({ onAttach }: ChatAttachmentProps) => {
         throw new Error("Failed to get public URL for uploaded file");
       }
 
-      // Append a timestamp to the URL to prevent caching issues
-      const publicUrl = `${data.publicUrl}?t=${timestamp}`;
+      // Append a timestamp and cache control to the URL to prevent caching issues
+      const publicUrl = `${data.publicUrl}?t=${timestamp}&cache=no-store`;
 
       console.log("File uploaded successfully:", publicUrl);
       

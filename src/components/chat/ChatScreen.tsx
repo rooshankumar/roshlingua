@@ -616,7 +616,7 @@ export const ChatScreen = ({ conversation }: Props) => {
                             </a>
                           ) : message.attachment_url?.match(/\.(mp4|webm|ogg)$/i) ? (
                             <video 
-                              src={message.attachment_url}
+                              src={`${message.attachment_url}${message.attachment_url.includes('?') ? '&' : '?'}t=${Date.now()}`}
                               controls
                               autoPlay
                               className="max-w-[300px] rounded-lg"

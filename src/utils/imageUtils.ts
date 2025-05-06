@@ -142,23 +142,26 @@ export const preloadImage = (url: string): Promise<string> => {
   });
 };
 
-export const handleImageLoadError = (event: React.SyntheticEvent<HTMLImageElement, Event>, fallbackUrl?: string) => {
-  const img = event.currentTarget;
-  console.error('Image failed to load:', img.src);
+export const handleImageLoadError = (event: React.SyntheticEvent<HTMLImageElement, Event>, fallbackText = "Image failed to load") => {
+  const img = event.target as HTMLImageElement;
+  const src = img.src;
 
-  // If the image is likely blocked or failed to load, try a fallback or display error
-  if (fallbackUrl) {
-    img.src = fallbackUrl;
-  } else {
-    img.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjIwMCIgaGVpZ2h0PSIyMDAiIGZpbGw9IiNFRUVFRUUiLz48dGV4dCB4PSI1MCUiIHk9IjUwJSIgZG9taW5hbnQtYmFzZWxpbmU9Im1pZGRsZSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1zaXplPSIyNnB4IiBmaWxsPSIjOTk5OTk5Ij5JbWFnZSBsb2FkaW5nIGZhaWxlZDwvdGV4dD48L3N2Zz4=';
+  console.error(`Image failed to load: ${src}`);
+
+  // Set the alt text to provide context about the failed image
+  img.alt = fallbackText;
+
+  // Try to load with cache busting if it's a Supabase URL
+  if (src.includes('supabase.co/storage') && !src.includes('t=')) {
+    const timestamp = Date.now();
+    const newSrc = `${src}${src.includes('?') ? '&' : '?'}t=${timestamp}`;
+    console.log(`Retrying with cache busting: ${newSrc}`);
+    img.src = newSrc;
+    return;
   }
 
-  // Remove any loading indicators
-  img.classList.remove('animate-pulse');
-  img.parentElement?.classList.remove('shimmer');
-
-  // Optional: Add error class for styling
-  img.classList.add('image-error');
+  // If we already tried cache busting or it's not a Supabase URL, hide the broken image
+  img.style.display = 'none';
 };
 
 export const compressImage = async (file: File, options = { quality: 0.8, maxWidth: 1200 }): Promise<File> => {

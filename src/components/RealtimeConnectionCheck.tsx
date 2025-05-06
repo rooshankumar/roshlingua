@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useLocation } from 'react-router-dom';
@@ -19,10 +18,10 @@ const RealtimeConnectionCheck = () => {
   // Monitor the real-time connection status and refresh when needed
   useEffect(() => {
     console.log('Setting up real-time connection monitor');
-    
+
     let isActive = true;
     const subscriptionKey = 'global-connection-monitor';
-    
+
     // Create a health check channel
     const healthChannel = subscriptionManager.subscribe(subscriptionKey, () => 
       supabase.channel('connection-health-check')
@@ -70,9 +69,9 @@ const RealtimeConnectionCheck = () => {
     // Set up periodic health checks with less frequent interval
     const healthCheckInterval = setInterval(() => {
       if (!isActive) return;
-      
+
       setLastCheck(Date.now());
-      
+
       if (connectionStatus === 'disconnected') {
         console.log('Attempting to refresh real-time connections');
         setReconnectAttempts(prev => prev + 1);
@@ -88,11 +87,11 @@ const RealtimeConnectionCheck = () => {
     // Refresh connections when page visibility changes (tab becomes active)
     const handleVisibilityChange = () => {
       if (!isActive) return;
-      
+
       if (document.visibilityState === 'visible') {
         console.log('Page became visible, checking real-time connections');
         setLastCheck(Date.now());
-        
+
         // Force refresh connections if it's been more than a minute since last activity
         // or if the connection status is disconnected
         if (Date.now() - lastCheck > 60000 || connectionStatus === 'disconnected') {
@@ -119,12 +118,12 @@ const RealtimeConnectionCheck = () => {
     if (connectionStatus === 'disconnected' && reconnectAttempts < 5) {
       const reconnectDelay = Math.min(2000 * (reconnectAttempts + 1), 10000);
       console.log(`Will attempt reconnection in ${reconnectDelay}ms (attempt ${reconnectAttempts + 1})`);
-      
+
       const timer = setTimeout(() => {
         console.log(`Attempting to reconnect real-time connections (attempt ${reconnectAttempts + 1})`);
         subscriptionManager.refreshAll();
       }, reconnectDelay);
-      
+
       return () => clearTimeout(timer);
     }
   }, [connectionStatus, reconnectAttempts]);
@@ -134,7 +133,7 @@ const RealtimeConnectionCheck = () => {
     const updatePresence = async () => {
       try {
         const channel = supabase.channel('connection-health-check');
-        
+
         if (user?.id) {
           channel.track({
             user_id: user.id,
@@ -152,7 +151,7 @@ const RealtimeConnectionCheck = () => {
         console.error('Error updating presence data:', err);
       }
     };
-    
+
     updatePresence();
   }, [location.pathname, user?.id]);
 

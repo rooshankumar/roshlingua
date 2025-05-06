@@ -2,8 +2,8 @@ import { createClient } from '@supabase/supabase-js';
 import type { Database } from '@/types/supabase';
 
 // Get environment variables
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string;
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY as string;
 
 if (!supabaseUrl || !supabaseAnonKey) {
   throw new Error('Supabase environment variables are missing');
@@ -89,10 +89,29 @@ export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
       }
     }
   },
+  realtime: {
+    params: {
+      eventsPerSecond: 10
+    }
+  },
   global: {
     headers: {
-      'Accept': 'application/json, application/vnd.pgrst.object+json'
-    }
+      'Accept': 'application/json, application/vnd.pgrst.object+json',
+      'Cache-Control': 'no-cache',
+      'Pragma': 'no-cache',
+      'Expires': '0',
+    },
+    fetch: (url, options) => {
+      // Add cache busting for storage URLs
+      if (url.toString().includes('/storage/v1/object/public/')) {
+        const separator = url.toString().includes('?') ? '&' : '?';
+        url = new URL(`${url.toString()}${separator}t=${Date.now()}`);
+      }
+      return fetch(url, {
+        ...options,
+        cache: 'no-store',
+      });
+    },
   }
 });
 
