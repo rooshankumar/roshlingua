@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { getLanguageFlag } from "@/utils/languageUtils";
@@ -69,7 +70,7 @@ const Profile = () => {
         .eq('user_id', id);
 
       if (error) throw error;
-
+      
       // Map DB achievements to full achievement data from constant
       const enrichedAchievements = data?.map(ua => {
         const achievementDetails = ACHIEVEMENTS.find(a => a.id === ua.achievement_id);
@@ -79,9 +80,9 @@ const Profile = () => {
           unlocked_at: new Date(ua.unlocked_at).toLocaleDateString()
         };
       }) || [];
-
+      
       setUserAchievements(enrichedAchievements);
-
+      
     } catch (err) {
       console.error("Error fetching achievements:", err);
     }
@@ -93,7 +94,7 @@ const Profile = () => {
     }
   }, [profile]);
 
-
+  
 
   const handleStartChat = async (userId) => {
     try {
@@ -112,7 +113,7 @@ const Profile = () => {
 
       // Get all conversations where both users are participants
       const conversationIds = existingConversations.map(c => c.conversation_id);
-
+      
       if (conversationIds.length > 0) {
         const { data: sharedConversations, error: sharedError } = await supabase
           .from('conversation_participants')
@@ -129,7 +130,7 @@ const Profile = () => {
           return;
         }
       }
-
+      
       // Create new conversation if none exists
       const { data: newConversation, error: createError } = await supabase
         .from('conversations')
@@ -168,7 +169,7 @@ const Profile = () => {
       month: 'long'
     });
   };
-
+  
   const getAgeFromDateOfBirth = (dateString: string) => {
     if (!dateString) return null;
     const birthDate = new Date(dateString);
@@ -266,7 +267,7 @@ const Profile = () => {
                     className="max-w-full max-h-[75vh] object-contain rounded-md"
                   />
                 </div>
-
+                
                 <div className="p-4 bg-background">
                   <h3 className="text-lg font-semibold">{profile.full_name}</h3>
                   <p className="text-sm text-muted-foreground">Profile picture</p>
@@ -278,7 +279,7 @@ const Profile = () => {
           {/* Profile Info and Action Buttons */}
           <div className="flex-1 flex flex-col items-center md:items-start">
             <h1 className="text-3xl font-bold mb-2">{profile.full_name}</h1>
-
+            
             {/* Age Display */}
             {profile.date_of_birth && (
               <div className="mb-2">
@@ -287,7 +288,7 @@ const Profile = () => {
                 </Badge>
               </div>
             )}
-
+            
             {/* Languages Display */}
             {(profile.native_language || profile.learning_language) && (
               <div className="flex items-center gap-3 mb-3">
@@ -297,11 +298,11 @@ const Profile = () => {
                     <span className="ml-2">{profile.native_language}</span>
                   </Badge>
                 )}
-
+                
                 {profile.native_language && profile.learning_language && (
                   <ArrowRight className="h-4 w-4 text-primary" />
                 )}
-
+                
                 {profile.learning_language && (
                   <Badge className="px-3 py-1.5">
                     {getLanguageFlag(profile.learning_language)}
@@ -310,7 +311,7 @@ const Profile = () => {
                 )}
               </div>
             )}
-
+            
             {/* Proficiency Level */}
             {profile.proficiency_level && (
               <div className="mb-4">
@@ -319,13 +320,13 @@ const Profile = () => {
                 </Badge>
               </div>
             )}
-
+            
             {/* Joined Date */}
             <div className="flex items-center mb-4 text-sm text-muted-foreground">
               <Calendar className="h-4 w-4 mr-2" />
               Joined {calculateJoinDate(profile.created_at)}
             </div>
-
+            
             {/* Action Buttons */}
             <div className="flex flex-wrap gap-2 mt-2">
               {!isCurrentUser && (
@@ -335,7 +336,7 @@ const Profile = () => {
                     currentUserId={user?.id}
                     className="button-hover"
                   />
-
+                  
                   <Button 
                     size="sm" 
                     className="button-hover"
@@ -434,7 +435,7 @@ const Profile = () => {
                   <span className="font-medium">{totalXp} XP</span>
                 </div>
                 <Progress value={userLevel.progress} className="h-2" />
-
+                
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-4">
                   <div className="flex flex-col items-center bg-muted/50 p-3 rounded-lg">
                     <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center mb-2">
@@ -443,7 +444,7 @@ const Profile = () => {
                     <span className="text-sm font-medium">Vocabulary</span>
                     <span className="text-xs text-muted-foreground">Coming Soon</span>
                   </div>
-
+                  
                   <div className="flex flex-col items-center bg-muted/50 p-3 rounded-lg">
                     <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center mb-2">
                       <FileText className="h-4 w-4 text-primary" />
@@ -451,7 +452,7 @@ const Profile = () => {
                     <span className="text-sm font-medium">Grammar</span>
                     <span className="text-xs text-muted-foreground">Coming Soon</span>
                   </div>
-
+                  
                   <div className="flex flex-col items-center bg-muted/50 p-3 rounded-lg">
                     <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center mb-2">
                       <MessageCircle className="h-4 w-4 text-primary" />
@@ -459,7 +460,7 @@ const Profile = () => {
                     <span className="text-sm font-medium">Speaking</span>
                     <span className="text-xs text-muted-foreground">Coming Soon</span>
                   </div>
-
+                  
                   <div className="flex flex-col items-center bg-muted/50 p-3 rounded-lg">
                     <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center mb-2">
                       <Mail className="h-4 w-4 text-primary" />
@@ -519,7 +520,7 @@ const Profile = () => {
                 </Card>
               )}
             </TabsContent>
-
+            
             <TabsContent value="activity">
               <Card className="bg-muted/20">
                 <CardContent className="flex flex-col items-center justify-center text-center p-8">

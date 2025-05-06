@@ -874,22 +874,18 @@ const Community = () => {
                         <div className="flex items-center gap-1">
                           {/* Gender and Age Icon */}
                           {user.gender === 'male' && user.age && (
-                            <div className="h-4 w-4 rounded-full bg-blue-500 flex items-center justify-center">
-                              <img 
-                                src={user.age <= 22 ? "/icons/young-male.png" : "/icons/adult-male.png"} 
-                                alt="Male" 
-                                className="h-3 w-3 object-contain" 
-                              />
-                            </div>
+                            <img 
+                              src={user.age <= 22 ? "/icons/young-male.png" : "/icons/adult-male.png"} 
+                              alt="Male" 
+                              className="h-4 w-4 object-contain" 
+                            />
                           )}
                           {user.gender === 'female' && user.age && (
-                            <div className="h-4 w-4 rounded-full bg-pink-500 flex items-center justify-center">
-                              <img 
-                                src={user.age <= 22 ? "/icons/young-female.png" : "/icons/adult-female.png"} 
-                                alt="Female" 
-                                className="h-3 w-3 object-contain" 
-                              />
-                            </div>
+                            <img 
+                              src={user.age <= 22 ? "/icons/young-female.png" : "/icons/adult-female.png"} 
+                              alt="Female" 
+                              className="h-4 w-4 object-contain" 
+                            />
                           )}
                           <span className="text-xs text-muted-foreground whitespace-nowrap"><span className="font-bold">{user.age || '–'}</span> y.o.</span>
                         </div>
