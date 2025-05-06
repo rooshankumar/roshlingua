@@ -1,21 +1,27 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/lib/supabase';
 
 export function useUnreadMessages(userId: string | undefined) {
   const [unreadCounts, setUnreadCounts] = useState<Record<string, number>>({});
   const [activeConversationId, setActiveConversationId] = useState<string | null>(null);
+  const [isSubscribed, setIsSubscribed] = useState(false);
   
   // Function to fetch initial unread counts
-  const fetchInitialUnreadCounts = async () => {
+  const fetchInitialUnreadCounts = useCallback(async () => {
     if (!userId) return;
     
     try {
+      console.log('Fetching initial unread counts for user:', userId);
+      
       const { data, error } = await supabase
         .from('conversation_participants')
         .select('conversation_id, unread_count')
         .eq('user_id', userId);
         
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching unread counts:', error);
+        return;
+      }
       
       if (data) {
         const counts = data.reduce((acc, item) => {
@@ -28,33 +34,38 @@ export function useUnreadMessages(userId: string | undefined) {
           return acc;
         }, {} as Record<string, number>);
         
+        console.log('Setting unread counts:', counts);
         setUnreadCounts(counts);
       }
     } catch (error) {
       console.error('Error fetching unread counts:', error);
     }
-  };
+  }, [userId, activeConversationId]);
 
   // Function to mark messages as read for a conversation
-  const markConversationAsRead = async (conversationId: string) => {
+  const markConversationAsRead = useCallback(async (conversationId: string) => {
     if (!userId || !conversationId) return;
     
     try {
-      console.log(`Marking conversation ${conversationId} as read`);
+      console.log(`Marking conversation ${conversationId} as read for user ${userId}`);
       
       // Set active conversation
       setActiveConversationId(conversationId);
       
       // Update messages as read
-      await supabase
+      const { error: messagesError } = await supabase
         .from('messages')
         .update({ is_read: true })
-        .eq('recipient_id', userId)
         .eq('conversation_id', conversationId)
-        .eq('is_read', false);
+        .eq('is_read', false)
+        .not('sender_id', 'eq', userId);
+      
+      if (messagesError) {
+        console.error('Error updating messages as read:', messagesError);
+      }
       
       // Update conversation participant record
-      await supabase
+      const { error: participantError } = await supabase
         .from('conversation_participants')
         .update({ 
           unread_count: 0,
@@ -63,15 +74,53 @@ export function useUnreadMessages(userId: string | undefined) {
         .eq('user_id', userId)
         .eq('conversation_id', conversationId);
         
+      if (participantError) {
+        console.error('Error updating conversation participant:', participantError);
+      }
+      
       // Update local state immediately
       setUnreadCounts(prev => ({
         ...prev,
         [conversationId]: 0
       }));
+      
+      console.log(`Marked conversation ${conversationId} as read, new unread counts:`, {
+        ...unreadCounts,
+        [conversationId]: 0
+      });
     } catch (error) {
       console.error('Error marking conversation as read:', error);
     }
-  };
+  }, [userId, unreadCounts]);
+
+  // Force clear all unread counts - useful for when we're sure all messages are read
+  const clearAllUnreadCounts = useCallback(async () => {
+    if (!userId) return;
+    
+    try {
+      console.log('Clearing all unread counts for user:', userId);
+      
+      // Update all conversation participants for this user
+      const { error } = await supabase
+        .from('conversation_participants')
+        .update({ 
+          unread_count: 0,
+          last_read_at: new Date().toISOString()
+        })
+        .eq('user_id', userId);
+        
+      if (error) {
+        console.error('Error clearing all unread counts:', error);
+        return;
+      }
+      
+      // Clear local state
+      setUnreadCounts({});
+      console.log('All unread counts cleared');
+    } catch (error) {
+      console.error('Error clearing all unread counts:', error);
+    }
+  }, [userId]);
 
   useEffect(() => {
     if (!userId) return;
@@ -79,70 +128,83 @@ export function useUnreadMessages(userId: string | undefined) {
     // Fetch initial unread counts
     fetchInitialUnreadCounts();
 
+    // Avoid duplicate subscriptions
+    if (isSubscribed) return;
+
     // Subscribe to new messages
-    const channel = supabase
-      .channel('unread-messages')
-      .on('postgres_changes', {
-        event: 'INSERT',
-        schema: 'public',
-        table: 'messages',
-        filter: `recipient_id=eq.${userId}`,
-      }, (payload) => {
-        const message = payload.new as any;
-        
-        // Don't increment if we're actively viewing this conversation
-        if (!message.is_read && message.conversation_id !== activeConversationId) {
-          setUnreadCounts(prev => ({
-            ...prev,
-            [message.conversation_id]: (prev[message.conversation_id] || 0) + 1
-          }));
-        }
-      })
-      .on('postgres_changes', {
-        event: 'UPDATE',
-        schema: 'public',
-        table: 'messages',
-        filter: `recipient_id=eq.${userId}`,
-      }, (payload) => {
-        const message = payload.new as any;
-        if (message.is_read) {
-          // If it's from the active conversation, keep count at 0
-          if (message.conversation_id === activeConversationId) {
+    try {
+      const channel = supabase
+        .channel('unread-messages')
+        .on('postgres_changes', {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'messages',
+        }, (payload) => {
+          const message = payload.new as any;
+          
+          // Only count messages not sent by the current user
+          if (message.sender_id !== userId) {
+            // Don't increment if we're actively viewing this conversation
+            if (message.conversation_id !== activeConversationId) {
+              setUnreadCounts(prev => ({
+                ...prev,
+                [message.conversation_id]: (prev[message.conversation_id] || 0) + 1
+              }));
+              console.log(`New message in conversation ${message.conversation_id}, updated count:`, 
+                (unreadCounts[message.conversation_id] || 0) + 1);
+            }
+          }
+        })
+        .on('postgres_changes', {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'conversation_participants',
+          filter: `user_id=eq.${userId}`,
+        }, (payload) => {
+          const participant = payload.new as any;
+          // Only update if unread count is explicitly set to 0
+          if (participant.unread_count === 0) {
             setUnreadCounts(prev => ({
               ...prev,
-              [message.conversation_id]: 0
+              [participant.conversation_id]: 0
             }));
-          } else {
-            // For other conversations, refresh counts from server
-            fetchInitialUnreadCounts();
+            console.log(`Conversation ${participant.conversation_id} marked as read`);
           }
-        }
-      })
-      .on('postgres_changes', {
-        event: 'UPDATE',
-        schema: 'public',
-        table: 'conversation_participants',
-        filter: `user_id=eq.${userId}`,
-      }, (payload) => {
-        const participant = payload.new as any;
-        if (participant.unread_count === 0) {
-          // Reset count when conversation participant record is updated
-          setUnreadCounts(prev => ({
-            ...prev,
-            [participant.conversation_id]: 0
-          }));
-        }
-      })
-      .subscribe();
+        })
+        .subscribe(status => {
+          console.log('Unread messages subscription status:', status);
+          if (status === 'SUBSCRIBED') {
+            setIsSubscribed(true);
+          }
+        });
 
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [userId, activeConversationId]);
+      return () => {
+        console.log('Removing unread messages subscription');
+        supabase.removeChannel(channel);
+        setIsSubscribed(false);
+      };
+    } catch (error) {
+      console.error('Error setting up unread messages subscription:', error);
+      setIsSubscribed(false);
+    }
+  }, [userId, activeConversationId, fetchInitialUnreadCounts, isSubscribed]);
+
+  // Refresh counts when active conversation changes
+  useEffect(() => {
+    if (activeConversationId) {
+      // Update local state immediately while the API call processes
+      setUnreadCounts(prev => ({
+        ...prev,
+        [activeConversationId]: 0
+      }));
+    }
+  }, [activeConversationId]);
 
   return { 
     unreadCounts, 
     markConversationAsRead,
-    setActiveConversationId
+    setActiveConversationId,
+    clearAllUnreadCounts,
+    refreshUnreadCounts: fetchInitialUnreadCounts
   };
 }

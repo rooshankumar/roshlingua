@@ -5,15 +5,28 @@ import { Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/lib/supabase';
 import { ChatScreen } from '@/components/chat/ChatScreen';
+import { useUnreadMessages } from "@/hooks/useUnreadMessages";
 
 const ChatPage = () => {
   const { conversationId } = useParams();
   const { user } = useAuth();
   const [isLoading, setIsLoading] = useState(true);
   const [conversation, setConversation] = useState<any>(null);
+  const { markConversationAsRead, setActiveConversationId, clearAllUnreadCounts, refreshUnreadCounts } = useUnreadMessages(user?.id);
 
-  // Import useUnreadMessages hook
-  const { markConversationAsRead, setActiveConversationId } = useUnreadMessages(user?.id);
+  // Update active conversation and mark as read when conversation ID changes
+  useEffect(() => {
+    if (conversationId && user?.id) {
+      console.log('Setting active conversation:', conversationId);
+      setActiveConversationId(conversationId);
+      markConversationAsRead(conversationId);
+
+      // Refresh unread counts after a delay to ensure DB operations complete
+      setTimeout(() => {
+        refreshUnreadCounts();
+      }, 1000);
+    }
+  }, [conversationId, user?.id, markConversationAsRead, setActiveConversationId, refreshUnreadCounts]);
 
   useEffect(() => {
     if (!user || !conversationId) return;

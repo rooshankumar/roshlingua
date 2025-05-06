@@ -425,6 +425,7 @@ export const ChatScreen = ({ conversation }: Props) => {
     try {
       if (!user?.id) return;
 
+      console.log('ChatScreen: Marking conversation as read:', conversationId);
       // Use the hook function to mark messages as read and update the unread count
       await markConversationAsRead(conversationId);
     } catch (error) {
@@ -434,9 +435,15 @@ export const ChatScreen = ({ conversation }: Props) => {
 
   useEffect(() => {
     if (conversation?.id && user?.id) {
+      // Mark as read when conversation is loaded or changes
       markMessagesAsRead(conversation.id);
+      
+      // Also mark as read when messages are received or updated
+      if (messages.length > 0) {
+        markMessagesAsRead(conversation.id);
+      }
     }
-  }, [conversation?.id, user?.id]);
+  }, [conversation?.id, user?.id, messages.length]);
 
 
   return (
