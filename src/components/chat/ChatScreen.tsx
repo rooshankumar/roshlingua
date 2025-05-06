@@ -439,6 +439,23 @@ export const ChatScreen = ({ conversation }: Props) => {
     }
   }, [conversation?.id]);
 
+  const handleImageLoadError = (e: React.SyntheticEvent<HTMLImageElement>) => {
+    const imgSrc = e.currentTarget.src;
+    console.error('Image failed to load:', imgSrc);
+
+    // Try loading without the cache buster parameter if it exists
+    if (imgSrc.includes('?t=')) {
+      e.currentTarget.src = imgSrc.split('?t=')[0];
+    } else {
+      // Show a fallback UI
+      e.currentTarget.style.display = 'none';
+      const fallbackElement = document.createElement('div');
+      fallbackElement.className = 'bg-gray-100 dark:bg-gray-800 p-2 rounded-md text-sm text-center';
+      fallbackElement.innerText = 'Image not available';
+      e.currentTarget.parentNode?.appendChild(fallbackElement);
+    }
+  };
+
 
   return (
     <Card className="fixed inset-0 flex flex-col w-full h-full md:static md:h-screen md:max-w-4xl md:mx-auto md:rounded-2xl border-none shadow-2xl overflow-hidden bg-gradient-to-b from-background/95 to-background/90 backdrop-blur-lg">

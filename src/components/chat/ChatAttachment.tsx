@@ -88,6 +88,8 @@ export const ChatAttachment = ({ onAttach }: ChatAttachmentProps) => {
 
       console.log("Uploading file:", fileName, "Size:", (file.size / 1024).toFixed(2) + "KB");
 
+      console.log("Uploading to bucket 'attachments' with path:", filePath);
+      
       // Upload with content-type header to ensure proper MIME type
       const { error: uploadError } = await supabase.storage
         .from('attachments')
@@ -96,6 +98,10 @@ export const ChatAttachment = ({ onAttach }: ChatAttachmentProps) => {
           cacheControl: '3600', // 1 hour cache
           upsert: true // Overwrite if exists
         });
+        
+      if (uploadError) {
+        console.error("Upload error:", uploadError);
+      }
 
       if (uploadError) {
         throw uploadError;
