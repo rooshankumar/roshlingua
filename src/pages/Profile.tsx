@@ -23,6 +23,9 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+
+import { updateUserActivity, checkStreakAchievements } from "@/utils/streakUtils";
+
 import { 
   Dialog, 
   DialogContent, 
@@ -96,15 +99,25 @@ const Profile = () => {
 
   // Check achievements when viewing profile
   useEffect(() => {
-    if (user?.id && profile && profile.id === user.id) {
-      // Only check achievements on own profile
-      checkAchievements({ 
-        xp: profile.xp_points || 0, 
-        streak: profile.streak_count || 0,
-        lessons: 0 // You may need to add this data
-      });
+    if (profile) {
+      console.log("Profile loaded with streak:", profile.streak_count);
+      
+      // Check for achievements regardless of whose profile it is
+      // This helps ensure achievements are updated even when viewing other profiles
+      if (profile.id && profile.streak_count && profile.streak_count >= 3) {
+        checkStreakAchievements(profile.id);
+      }
+      
+      // Also run the regular achievements check for the current user
+      if (user?.id && profile.id === user.id) {
+        checkAchievements({ 
+          xp: profile.xp_points || 0, 
+          streak: profile.streak_count || 0,
+          lessons: 0
+        });
+      }
     }
-  }, [user?.id, profile?.id]);
+  }, [user?.id, profile]);
 
 
   const handleStartChat = async (userId) => {
