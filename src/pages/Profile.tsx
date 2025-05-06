@@ -289,6 +289,29 @@ const Profile = () => {
               </div>
             )}
             
+            {/* Gender Display with Icon */}
+            {profile.gender && (
+              <div className="mb-2 flex items-center gap-2">
+                <Badge variant="outline" className="px-2 py-1 flex items-center gap-1.5">
+                  {profile.gender === 'male' && (
+                    <img 
+                      src="/icons/male.png.png" 
+                      alt="Male" 
+                      className="h-4 w-4 object-contain" 
+                    />
+                  )}
+                  {profile.gender === 'female' && (
+                    <img 
+                      src="/icons/female.png.png" 
+                      alt="Female" 
+                      className="h-4 w-4 object-contain" 
+                    />
+                  )}
+                  <span>{profile.gender.charAt(0).toUpperCase() + profile.gender.slice(1)}</span>
+                </Badge>
+              </div>
+            )}
+            
             {/* Languages Display */}
             {(profile.native_language || profile.learning_language) && (
               <div className="flex items-center gap-3 mb-3">
