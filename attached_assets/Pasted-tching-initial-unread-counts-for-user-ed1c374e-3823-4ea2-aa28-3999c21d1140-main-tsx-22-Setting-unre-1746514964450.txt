@@ -1,0 +1,76 @@
+tching initial unread counts for user: ed1c374e-3823-4ea2-aa28-3999c21d1140
+main.tsx:22 Setting unread counts: {ab2f96f3-7324-43cf-b999-272e2976e691: 0, f29b194a-7004-4a50-8d87-c8a31c03a20d: 0, 393dfd0a-49b7-4344-85b2-7a89c1cff4f5: 0, 585ef0ce-cde7-424f-bc01-fc67ea7a9d1f: 0, f74683b7-55ef-41c5-92c8-c827d0e30fd4: 0, …}
+main.tsx:22 Setting unread counts: {ab2f96f3-7324-43cf-b999-272e2976e691: 0, f29b194a-7004-4a50-8d87-c8a31c03a20d: 0, 393dfd0a-49b7-4344-85b2-7a89c1cff4f5: 0, 585ef0ce-cde7-424f-bc01-fc67ea7a9d1f: 0, f74683b7-55ef-41c5-92c8-c827d0e30fd4: 0, …}
+main.tsx:22 Unread messages subscription status: SUBSCRIBED
+main.tsx:22 Removing unread messages subscription
+main.tsx:22 Unread messages subscription status: CLOSED
+2main.tsx:22 Fetching initial unread counts for user: ed1c374e-3823-4ea2-aa28-3999c21d1140
+main.tsx:22 Setting unread counts: {ab2f96f3-7324-43cf-b999-272e2976e691: 0, f29b194a-7004-4a50-8d87-c8a31c03a20d: 0, 393dfd0a-49b7-4344-85b2-7a89c1cff4f5: 0, 585ef0ce-cde7-424f-bc01-fc67ea7a9d1f: 0, f74683b7-55ef-41c5-92c8-c827d0e30fd4: 0, …}
+main.tsx:22 Unread messages subscription status: SUBSCRIBED
+main.tsx:22 Removing unread messages subscription
+main.tsx:22 Unread messages subscription status: CLOSED
+2main.tsx:22 Fetching initial unread counts for user: ed1c374e-3823-4ea2-aa28-3999c21d1140
+main.tsx:22 Setting unread counts: {ab2f96f3-7324-43cf-b999-272e2976e691: 0, f29b194a-7004-4a50-8d87-c8a31c03a20d: 0, 393dfd0a-49b7-4344-85b2-7a89c1cff4f5: 0, 585ef0ce-cde7-424f-bc01-fc67ea7a9d1f: 0, f74683b7-55ef-41c5-92c8-c827d0e30fd4: 0, …}
+main.tsx:22 Unread messages subscription status: SUBSCRIBED
+main.tsx:22 Removing unread messages subscription
+main.tsx:22 Unread messages subscription status: CLOSED
+2main.tsx:22 Fetching initial unread counts for user: ed1c374e-3823-4ea2-aa28-3999c21d1140
+main.tsx:22 Setting unread counts: {ab2f96f3-7324-43cf-b999-272e2976e691: 0, f29b194a-7004-4a50-8d87-c8a31c03a20d: 0, 393dfd0a-49b7-4344-85b2-7a89c1cff4f5: 0, 585ef0ce-cde7-424f-bc01-fc67ea7a9d1f: 0, f74683b7-55ef-41c5-92c8-c827d0e30fd4: 0, …}
+main.tsx:22 Unread messages subscription status: SUBSCRIBED
+main.tsx:22 Removing unread messages subscription
+main.tsx:22 Unread messages subscription status: CLOSED
+2main.tsx:22 Fetching initial unread counts for user: ed1c374e-3823-4ea2-aa28-3999c21d1140
+main.tsx:22 Setting unread counts: {ab2f96f3-7324-43cf-b999-272e2976e691: 0, f29b194a-7004-4a50-8d87-c8a31c03a20d: 0, 393dfd0a-49b7-4344-85b2-7a89c1cff4f5: 0, 585ef0ce-cde7-424f-bc01-fc67ea7a9d1f: 0, f74683b7-55ef-41c5-92c8-c827d0e30fd4: 0, …}
+main.tsx:22 Setting unread counts: {ab2f96f3-7324-43cf-b999-272e2976e691: 0, f29b194a-7004-4a50-8d87-c8a31c03a20d: 0, 393dfd0a-49b7-4344-85b2-7a89c1cff4f5: 0, 585ef0ce-cde7-424f-bc01-fc67ea7a9d1f: 0, f74683b7-55ef-41c5-92c8-c827d0e30fd4: 0, …}
+main.tsx:22 Unread messages subscription status: SUBSCRIBED
+main.tsx:22 Removing unread messages subscription
+main.tsx:22 Unread messages subscription status: CLOSED
+2main.tsx:22 Fetching initial unread counts for user: ed1c374e-3823-4ea2-aa28-3999c21d1140
+main.tsx:22 Setting unread counts: {ab2f96f3-7324-43cf-b999-272e2976e691: 0, f29b194a-7004-4a50-8d87-c8a31c03a20d: 0, 393dfd0a-49b7-4344-85b2-7a89c1cff4f5: 0, 585ef0ce-cde7-424f-bc01-fc67ea7a9d1f: 0, f74683b7-55ef-41c5-92c8-c827d0e30fd4: 0, …}
+main.tsx:22 Unread messages subscription status: SUBSCRIBED
+main.tsx:22 Removing unread messages subscription
+main.tsx:22 Unread messages subscription status: CLOSED
+2main.tsx:22 Fetching initial unread counts for user: ed1c374e-3823-4ea2-aa28-3999c21d1140
+main.tsx:22 Setting unread counts: {ab2f96f3-7324-43cf-b999-272e2976e691: 0, f29b194a-7004-4a50-8d87-c8a31c03a20d: 0, 393dfd0a-49b7-4344-85b2-7a89c1cff4f5: 0, 585ef0ce-cde7-424f-bc01-fc67ea7a9d1f: 0, f74683b7-55ef-41c5-92c8-c827d0e30fd4: 0, …}
+main.tsx:22 Unread messages subscription status: SUBSCRIBED
+main.tsx:22 Removing unread messages subscription
+main.tsx:22 Unread messages subscription status: CLOSED
+2main.tsx:22 Fetching initial unread counts for user: ed1c374e-3823-4ea2-aa28-3999c21d1140
+main.tsx:22 Setting unread counts: {ab2f96f3-7324-43cf-b999-272e2976e691: 0, f29b194a-7004-4a50-8d87-c8a31c03a20d: 0, 393dfd0a-49b7-4344-85b2-7a89c1cff4f5: 0, 585ef0ce-cde7-424f-bc01-fc67ea7a9d1f: 0, f74683b7-55ef-41c5-92c8-c827d0e30fd4: 0, …}
+main.tsx:22 Unread messages subscription status: SUBSCRIBED
+main.tsx:22 Removing unread messages subscription
+main.tsx:22 Unread messages subscription status: CLOSED
+main.tsx:22 Fetching initial unread counts for user: ed1c374e-3823-4ea2-aa28-3999c21d1140
+main.tsx:22 Setting unread counts: {ab2f96f3-7324-43cf-b999-272e2976e691: 0, f29b194a-7004-4a50-8d87-c8a31c03a20d: 0, 393dfd0a-49b7-4344-85b2-7a89c1cff4f5: 0, 585ef0ce-cde7-424f-bc01-fc67ea7a9d1f: 0, f74683b7-55ef-41c5-92c8-c827d0e30fd4: 0, …}
+main.tsx:22 Fetching initial unread counts for user: ed1c374e-3823-4ea2-aa28-3999c21d1140
+main.tsx:22 Setting unread counts: {ab2f96f3-7324-43cf-b999-272e2976e691: 0, f29b194a-7004-4a50-8d87-c8a31c03a20d: 0, 393dfd0a-49b7-4344-85b2-7a89c1cff4f5: 0, 585ef0ce-cde7-424f-bc01-fc67ea7a9d1f: 0, f74683b7-55ef-41c5-92c8-c827d0e30fd4: 0, …}
+main.tsx:22 Unread messages subscription status: SUBSCRIBED
+main.tsx:22 Removing unread messages subscription
+main.tsx:22 Unread messages subscription status: CLOSED
+2main.tsx:22 Fetching initial unread counts for user: ed1c374e-3823-4ea2-aa28-3999c21d1140
+main.tsx:22 Unread messages subscription status: SUBSCRIBED
+main.tsx:22 Removing unread messages subscription
+main.tsx:22 Unread messages subscription status: CLOSED
+main.tsx:22 Fetching initial unread counts for user: ed1c374e-3823-4ea2-aa28-3999c21d1140
+main.tsx:22 Setting unread counts: {ab2f96f3-7324-43cf-b999-272e2976e691: 0, f29b194a-7004-4a50-8d87-c8a31c03a20d: 0, 393dfd0a-49b7-4344-85b2-7a89c1cff4f5: 0, 585ef0ce-cde7-424f-bc01-fc67ea7a9d1f: 0, f74683b7-55ef-41c5-92c8-c827d0e30fd4: 0, …}
+main.tsx:22 Fetching initial unread counts for user: ed1c374e-3823-4ea2-aa28-3999c21d1140
+main.tsx:22 Setting unread counts: {ab2f96f3-7324-43cf-b999-272e2976e691: 0, f29b194a-7004-4a50-8d87-c8a31c03a20d: 0, 393dfd0a-49b7-4344-85b2-7a89c1cff4f5: 0, 585ef0ce-cde7-424f-bc01-fc67ea7a9d1f: 0, f74683b7-55ef-41c5-92c8-c827d0e30fd4: 0, …}
+main.tsx:22 Unread messages subscription status: SUBSCRIBED
+main.tsx:22 Removing unread messages subscription
+main.tsx:22 Unread messages subscription status: CLOSED
+2main.tsx:22 Fetching initial unread counts for user: ed1c374e-3823-4ea2-aa28-3999c21d1140
+main.tsx:22 Setting unread counts: {ab2f96f3-7324-43cf-b999-272e2976e691: 0, f29b194a-7004-4a50-8d87-c8a31c03a20d: 0, 393dfd0a-49b7-4344-85b2-7a89c1cff4f5: 0, 585ef0ce-cde7-424f-bc01-fc67ea7a9d1f: 0, f74683b7-55ef-41c5-92c8-c827d0e30fd4: 0, …}
+main.tsx:22 Unread messages subscription status: SUBSCRIBED
+main.tsx:22 Removing unread messages subscription
+main.tsx:22 Unread messages subscription status: CLOSED
+2main.tsx:22 Fetching initial unread counts for user: ed1c374e-3823-4ea2-aa28-3999c21d1140
+main.tsx:22 Setting unread counts: {ab2f96f3-7324-43cf-b999-272e2976e691: 0, f29b194a-7004-4a50-8d87-c8a31c03a20d: 0, 393dfd0a-49b7-4344-85b2-7a89c1cff4f5: 0, 585ef0ce-cde7-424f-bc01-fc67ea7a9d1f: 0, f74683b7-55ef-41c5-92c8-c827d0e30fd4: 0, …}
+main.tsx:22 Unread messages subscription status: SUBSCRIBED
+main.tsx:22 Removing unread messages subscription
+main.tsx:22 Unread messages subscription status: CLOSED
+2main.tsx:22 Fetching initial unread counts for user: ed1c374e-3823-4ea2-aa28-3999c21d1140
+main.tsx:22 Setting unread counts: {ab2f96f3-7324-43cf-b999-272e2976e691: 0, f29b194a-7004-4a50-8d87-c8a31c03a20d: 0, 393dfd0a-49b7-4344-85b2-7a89c1cff4f5: 0, 585ef0ce-cde7-424f-bc01-fc67ea7a9d1f: 0, f74683b7-55ef-41c5-92c8-c827d0e30fd4: 0, …}
+main.tsx:22 Unread messages subscription status: SUBSCRIBED
+main.tsx:22 Removing unread messages subscription
+main.tsx:22 Unread messages subscription status: CLOSED
+2main.tsx:22 Fetching ini
