@@ -871,22 +871,25 @@ const Community = () => {
                         >
                           {user.full_name}
                         </h3>
-                        <div className="flex items-center gap-1">
-                          {/* Gender and Age Icon */}
-                          {user.gender === 'male' && (
-                            <img 
-                              src="/icons/male.png.png" 
-                              alt="Male" 
-                              className="h-4 w-4 object-contain" 
-                            />
-                          )}
-                          {user.gender === 'female' && (
-                            <img 
-                              src="/icons/female.png.png" 
-                              alt="Female" 
-                              className="h-4 w-4 object-contain" 
-                            />
-                          )}
+                        <div className="flex items-center gap-2">
+                          {/* Gender and Age in same row */}
+                          <div className="flex items-center gap-1">
+                            {user.gender === 'male' && (
+                              <img 
+                                src="/icons/male.png.png" 
+                                alt="Male" 
+                                className="h-4 w-4 object-contain" 
+                              />
+                            )}
+                            {user.gender === 'female' && (
+                              <img 
+                                src="/icons/female.png.png" 
+                                alt="Female" 
+                                className="h-4 w-4 object-contain" 
+                              />
+                            )}
+                            <span className="text-xs">{user.gender?.charAt(0).toUpperCase() + user.gender?.slice(1)}</span>
+                          </div>
                           <span className="text-xs text-muted-foreground whitespace-nowrap"><span className="font-bold">{user.age || '–'}</span> y.o.</span>
                         </div>
                       </div>
