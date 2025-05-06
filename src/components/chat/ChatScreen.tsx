@@ -15,7 +15,7 @@ import { toast } from '@/components/ui/use-toast';
 import { handleImageLoadError, isLikelyBlockedUrl } from '@/utils/imageUtils';
 import { VoiceRecorder } from './VoiceRecorder'; // Imported VoiceRecorder component
 import { MessageReactions } from './MessageReactions'; // Added import for MessageReactions
-import { useUnreadMessages } from '@/providers/UnreadMessagesProvider'; // Import useUnreadMessages hook
+import { useUnreadMessages } from '@/hooks/useUnreadMessages'; // Import useUnreadMessages hook
 
 
 // Simple subscription manager (replace with a more robust solution)
