@@ -439,15 +439,38 @@ export const ChatScreen = ({ conversation }: Props) => {
     }
   }, [conversation?.id]);
 
-  const handleImageLoadError = (e: React.SyntheticEvent<HTMLImageElement>) => {
-    const imgSrc = e.currentTarget.src;
+  const handleImageLoadError = (e: React.SyntheticEvent<HTMLImageElement>, originalUrl?: string) => {
+    const imgSrc = originalUrl || e.currentTarget.src;
     console.error('Image failed to load:', imgSrc);
 
     // Try loading without the cache buster parameter if it exists
     if (imgSrc.includes('?t=')) {
-      e.currentTarget.src = imgSrc.split('?t=')[0];
+      const cleanUrl = imgSrc.split('?t=')[0];
+      e.currentTarget.src = cleanUrl;
+      console.log("Retrying with clean URL:", cleanUrl);
+      return;
+    }
+    
+    // Check if the URL is from Supabase storage and try a different format
+    if (imgSrc.includes('supabase.co/storage')) {
+      // Show a fallback UI immediately so user sees something
+      e.currentTarget.style.display = 'none';
+      const fallbackElement = document.createElement('div');
+      fallbackElement.className = 'bg-gray-100 dark:bg-gray-800 p-2 rounded-md text-sm text-center';
+      fallbackElement.innerText = 'Image not available';
+      e.currentTarget.parentNode?.appendChild(fallbackElement);
+      
+      // Try to diagnose the bucket issue
+      const bucketMatch = imgSrc.match(/\/public\/([^\/]+)\//);
+      if (bucketMatch && bucketMatch[1]) {
+        const bucketName = bucketMatch[1];
+        console.log(`Storage bucket issue detected with '${bucketName}'. Please check if bucket exists.`);
+        
+        // Show more informative message
+        fallbackElement.innerText = `Storage bucket issue detected. Please check if '${bucketName}' bucket exists.`;
+      }
     } else {
-      // Show a fallback UI
+      // Default fallback for non-Supabase images
       e.currentTarget.style.display = 'none';
       const fallbackElement = document.createElement('div');
       fallbackElement.className = 'bg-gray-100 dark:bg-gray-800 p-2 rounded-md text-sm text-center';

@@ -87,7 +87,24 @@ export const ChatAttachment = ({ onAttach }: ChatAttachmentProps) => {
       const filePath = `${fileName}`;
 
       console.log("Uploading file:", fileName, "Size:", (file.size / 1024).toFixed(2) + "KB");
-
+      
+      // First, check if the bucket exists, if not create it
+      const { data: buckets } = await supabase.storage.listBuckets();
+      const bucketExists = buckets?.some(bucket => bucket.name === 'attachments');
+      
+      if (!bucketExists) {
+        console.log("Bucket 'attachments' doesn't exist, creating it...");
+        const { error: createBucketError } = await supabase.storage.createBucket('attachments', {
+          public: true
+        });
+        
+        if (createBucketError) {
+          console.error("Error creating bucket:", createBucketError);
+          throw new Error("Failed to create storage bucket: " + createBucketError.message);
+        }
+        console.log("Bucket 'attachments' created successfully");
+      }
+      
       console.log("Uploading to bucket 'attachments' with path:", filePath);
       
       // Upload with content-type header to ensure proper MIME type

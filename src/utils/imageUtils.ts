@@ -151,17 +151,38 @@ export const handleImageLoadError = (event: React.SyntheticEvent<HTMLImageElemen
   // Set the alt text to provide context about the failed image
   img.alt = fallbackText;
 
-  // Try to load with cache busting if it's a Supabase URL
-  if (src.includes('supabase.co/storage') && !src.includes('t=')) {
-    const timestamp = Date.now();
-    const newSrc = `${src}${src.includes('?') ? '&' : '?'}t=${timestamp}`;
-    console.log(`Retrying with cache busting: ${newSrc}`);
-    img.src = newSrc;
-    return;
+  // First, check if this is a Supabase URL
+  if (src.includes('supabase.co/storage')) {
+    // Extract the bucket name for diagnosis
+    const bucketMatch = src.match(/\/public\/([^\/]+)\//);
+    if (bucketMatch && bucketMatch[1]) {
+      const bucketName = bucketMatch[1];
+      console.log(`Bucket name detected in URL: '${bucketName}'`);
+    }
+    
+    // Try to load with cache busting if it's a Supabase URL and we haven't already
+    if (!src.includes('t=')) {
+      const timestamp = Date.now();
+      const newSrc = `${src}${src.includes('?') ? '&' : '?'}t=${timestamp}`;
+      console.log(`Retrying with cache busting: ${newSrc}`);
+      img.src = newSrc;
+      return;
+    }
   }
 
   // If we already tried cache busting or it's not a Supabase URL, hide the broken image
   img.style.display = 'none';
+  
+  // Add a helpful fallback element
+  const parent = img.parentNode;
+  if (parent) {
+    const fallbackElement = document.createElement('div');
+    fallbackElement.className = 'bg-gray-100 dark:bg-gray-800 p-2 rounded-md text-sm text-center';
+    fallbackElement.innerText = src.includes('supabase.co/storage') ? 
+      'Storage error: Please check if bucket exists in your Supabase project' : 
+      fallbackText;
+    parent.appendChild(fallbackElement);
+  }
 };
 
 export const compressImage = async (file: File, options = { quality: 0.8, maxWidth: 1200 }): Promise<File> => {
