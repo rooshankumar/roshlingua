@@ -440,7 +440,7 @@ export const ChatScreen = ({ conversation }: Props) => {
 
 
   return (
-    <Card className="fixed inset-0 flex flex-col md:static md:h-screen md:max-w-4xl md:mx-auto md:rounded-2xl border-none shadow-2xl overflow-hidden bg-gradient-to-b from-background/95 to-background/90 backdrop-blur-lg">
+    <Card className="fixed inset-0 flex flex-col w-full h-full md:static md:h-screen md:max-w-4xl md:mx-auto md:rounded-2xl border-none shadow-2xl overflow-hidden bg-gradient-to-b from-background/95 to-background/90 backdrop-blur-lg">
       <div className="sticky top-0 left-0 right-0 z-40 bg-background/95 backdrop-blur-xl">
         <ChatHeader conversation={conversation} />
       </div>

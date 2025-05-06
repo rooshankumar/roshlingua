@@ -5,12 +5,15 @@ import { Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/lib/supabase';
 import { ChatScreen } from '@/components/chat/ChatScreen';
+import { useResponsive } from '@/hooks/useResponsive'; // Assumed hook
 
 const ChatPage = () => {
   const { conversationId } = useParams();
   const { user } = useAuth();
   const [isLoading, setIsLoading] = useState(true);
   const [conversation, setConversation] = useState<any>(null);
+  const { deviceSize } = useResponsive();
+  const isMobile = deviceSize === 'xs' || deviceSize === 'sm';
 
   useEffect(() => {
     if (!user || !conversationId) return;
@@ -153,7 +156,7 @@ const ChatPage = () => {
   }
 
   return (
-    <div className="min-h-screen md:bg-muted/30 max-w-full overflow-hidden">
+    <div className={isMobile ? "fixed inset-0 z-50 bg-background" : "min-h-screen md:bg-muted/30 max-w-full overflow-hidden"}>
       <ChatScreen conversation={conversation} />
     </div>
   );
