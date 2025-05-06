@@ -325,7 +325,7 @@
   .message-actions {
     @apply opacity-0 md:group-hover:opacity-100 transition-opacity duration-200;
     /* On mobile, make tap show actions */
-    @apply touch-device:active:opacity-100;
+    @apply touch:opacity-100 active:opacity-100;
   }
 
   .chat-input-container {

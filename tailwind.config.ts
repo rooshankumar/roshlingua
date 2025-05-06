@@ -168,8 +168,10 @@ export default {
 	plugins: [
 		require("tailwindcss-animate"),
 		function({ addVariant }) {
-			// Add a touch-device variant
+			// Add touch-device variants
 			addVariant('touch', '@media (hover: none) { &:not(html) }');
+			addVariant('touch-device', '@media (hover: none) { &:not(html) }');
+			addVariant('touch-device-active', '@media (hover: none) { &:active:not(html) }');
 		}
 	],
 } satisfies Config;

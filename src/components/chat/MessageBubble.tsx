@@ -52,13 +52,13 @@ export const MessageBubble = ({ message, isCurrentUser, isRead = false, onReacti
                 className={`max-w-[260px] md:max-w-[300px] rounded-lg cursor-pointer ${!imageLoaded ? 'min-h-[100px] bg-muted animate-pulse' : ''}`}
                 onLoad={() => setImageLoaded(true)}
                 onError={(e) => handleImageLoadError(e, "Image failed to load")}
-                onClick={() => window.open(message.attachment_url, '_blank')}
+                
               />
               <a 
                 href={message.attachment_url}
                 download={message.attachment_name || "download"}
                 className="absolute top-2 right-2 bg-black/60 text-white p-1 rounded-full hover:bg-black/80 transition-colors"
-                onClick={(e) => e.stopPropagation()}
+                
               >
                 <Download className="h-4 w-4" />
               </a>

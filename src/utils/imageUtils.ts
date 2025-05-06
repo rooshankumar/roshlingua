@@ -168,3 +168,76 @@ export const handleImageLoadError = (e: React.SyntheticEvent<HTMLImageElement, E
     parent.appendChild(fallbackDiv);
   }
 };
+
+export const compressImage = async (file: File, options = { quality: 0.8, maxWidth: 1200 }): Promise<File> => {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.src = URL.createObjectURL(file);
+
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      let width = img.width;
+      let height = img.height;
+
+      // Resize if needed
+      if (width > options.maxWidth) {
+        height = (height * options.maxWidth) / width;
+        width = options.maxWidth;
+      }
+
+      canvas.width = width;
+      canvas.height = height;
+
+      const ctx = canvas.getContext('2d');
+      if (!ctx) {
+        reject(new Error('Failed to get canvas context'));
+        return;
+      }
+
+      ctx.drawImage(img, 0, 0, width, height);
+
+      canvas.toBlob(
+        (blob) => {
+          if (!blob) {
+            reject(new Error('Failed to create blob'));
+            return;
+          }
+
+          // Create a new File
+          const compressedFile = new File([blob], file.name, {
+            type: 'image/jpeg',
+            lastModified: new Date().getTime(),
+          });
+
+          // Clean up
+          URL.revokeObjectURL(img.src);
+
+          resolve(compressedFile);
+        },
+        'image/jpeg',
+        options.quality
+      );
+    };
+
+    img.onerror = () => {
+      reject(new Error('Failed to load image'));
+      URL.revokeObjectURL(img.src);
+    };
+  });
+};
+
+// Function to check if a file type is an image
+export const isImageFile = (fileType: string): boolean => {
+  return fileType.startsWith('image/');
+};
+
+// Function to get a thumbnail preview for file
+export const getFileThumbnailUrl = async (file: File): Promise<string> => {
+  if (isImageFile(file.type)) {
+    return URL.createObjectURL(file);
+  }
+
+  // For non-image files, return appropriate icon based on file type
+  // This could be extended with more file type icons
+  return '/placeholder.svg';
+};
