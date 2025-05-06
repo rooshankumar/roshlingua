@@ -217,6 +217,7 @@ export function useUnreadMessages(userId: string | undefined) {
   useEffect(() => {
     if (activeConversationId) {
       // Update local state immediately 
+      console.log(`Setting unread count to 0 for active conversation: ${activeConversationId}`);
       setUnreadCounts(prev => ({
         ...prev,
         [activeConversationId]: 0
