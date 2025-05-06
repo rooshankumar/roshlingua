@@ -280,14 +280,28 @@ const Profile = () => {
           <div className="flex-1 flex flex-col items-center md:items-start">
             <h1 className="text-3xl font-bold mb-2">{profile.full_name}</h1>
             
-            {/* Age Display */}
-            {profile.date_of_birth && (
-              <div className="mb-2">
+            {/* Age and Gender Display */}
+            <div className="flex items-center gap-2 mb-2">
+              {profile.gender === 'male' && (
+                <img 
+                  src="/icons/young-male.png"
+                  alt="Male" 
+                  className="h-6 w-6 object-contain rounded-full" 
+                />
+              )}
+              {profile.gender === 'female' && (
+                <img 
+                  src="/icons/young-female.png"
+                  alt="Female" 
+                  className="h-6 w-6 object-contain rounded-full" 
+                />
+              )}
+              {profile.date_of_birth && (
                 <Badge variant="outline" className="px-2 py-1">
                   {getAgeFromDateOfBirth(profile.date_of_birth)} years old
                 </Badge>
-              </div>
-            )}
+              )}
+            </div>
             
             {/* Languages Display */}
             {(profile.native_language || profile.learning_language) && (
