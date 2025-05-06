@@ -19,7 +19,8 @@ export const ConversationItem = ({
 }: ConversationItemProps) => {
   const otherParticipant = getOtherParticipant(conversation, currentUserId);
   // Only show as unread if we have a positive unread count
-  const hasUnread = (conversation.unreadCount > 0);
+  // Explicitly check for positive number greater than zero
+  const hasUnread = typeof conversation.unreadCount === 'number' && conversation.unreadCount > 0;
   const lastMessage = conversation.lastMessage;
 
   const getInitials = (name: string) => {
@@ -51,7 +52,7 @@ export const ConversationItem = ({
         )} />
 
         {/* Unread notification dot - show in top right only if has unread messages */}
-        {conversation.unreadCount > 0 && (
+        {hasUnread && (
           <span className="absolute -top-1 -right-1 bg-destructive text-destructive-foreground rounded-full min-w-[16px] h-4 flex items-center justify-center text-xs font-medium px-1">
             {conversation.unreadCount}
           </span>

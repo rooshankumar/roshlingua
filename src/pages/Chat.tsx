@@ -18,13 +18,19 @@ const ChatPage = () => {
   useEffect(() => {
     if (conversationId && user?.id) {
       console.log('Setting active conversation:', conversationId);
-      setActiveConversationId(conversationId);
+      
+      // Mark as read immediately - handles both UI update and DB update
       markConversationAsRead(conversationId);
-
-      // Refresh unread counts after a delay to ensure DB operations complete
-      setTimeout(() => {
+      
+      // This forces a UI update right away
+      setActiveConversationId(conversationId);
+      
+      // Also refresh all counts after a delay to ensure consistency
+      const timer = setTimeout(() => {
         refreshUnreadCounts();
-      }, 1000);
+      }, 300);
+      
+      return () => clearTimeout(timer);
     }
   }, [conversationId, user?.id, markConversationAsRead, setActiveConversationId, refreshUnreadCounts]);
 
