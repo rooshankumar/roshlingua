@@ -15,6 +15,7 @@ import { toast } from '@/components/ui/use-toast';
 import { handleImageLoadError, isLikelyBlockedUrl } from '@/utils/imageUtils';
 import { VoiceRecorder } from './VoiceRecorder'; // Imported VoiceRecorder component
 import { MessageReactions } from './MessageReactions'; // Added import for MessageReactions
+import { Dialog, DialogContent } from '../ui/dialog'; // Import Dialog and DialogContent
 
 
 // Simple subscription manager (replace with a more robust solution)
@@ -54,6 +55,8 @@ export const ChatScreen = ({ conversation }: Props) => {
   const [hasMore, setHasMore] = useState(true);
   const [replyTo, setReplyTo] = useState<Message | null>(null);
   const [showReplyPreview, setShowReplyPreview] = useState(false);
+  const [showImagePreview, setShowImagePreview] = useState(false); // State for image preview dialog
+  const [imagePreview, setImagePreview] = useState<{ url: string; name?: string } | null>(null); // State for image preview data
   const MESSAGES_PER_PAGE = 50;
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
@@ -450,7 +453,7 @@ export const ChatScreen = ({ conversation }: Props) => {
       console.log("Retrying with clean URL:", cleanUrl);
       return;
     }
-    
+
     // Check if the URL is from Supabase storage and try a different format
     if (imgSrc.includes('supabase.co/storage')) {
       // Show a fallback UI immediately so user sees something
@@ -459,13 +462,13 @@ export const ChatScreen = ({ conversation }: Props) => {
       fallbackElement.className = 'bg-gray-100 dark:bg-gray-800 p-2 rounded-md text-sm text-center';
       fallbackElement.innerText = 'Image not available';
       e.currentTarget.parentNode?.appendChild(fallbackElement);
-      
+
       // Try to diagnose the bucket issue
       const bucketMatch = imgSrc.match(/\/public\/([^\/]+)\//);
       if (bucketMatch && bucketMatch[1]) {
         const bucketName = bucketMatch[1];
         console.log(`Storage bucket issue detected with '${bucketName}'. Please check if bucket exists.`);
-        
+
         // Show more informative message
         fallbackElement.innerText = `Storage bucket issue detected. Please check if '${bucketName}' bucket exists.`;
       }
@@ -652,7 +655,10 @@ export const ChatScreen = ({ conversation }: Props) => {
                                 loading="eager"
                                 referrerPolicy="no-referrer"
                                 fetchPriority="high"
-                                onClick={() => window.open(message.attachment_url, '_blank')}
+                                onClick={() => {
+                                  setImagePreview({ url: message.attachment_url, name: message.attachment_name });
+                                  setShowImagePreview(true);
+                                }}
                               />
                             </a>
                           ) : message.attachment_url?.match(/\.(mp4|webm|ogg)$/i) ? (
@@ -735,6 +741,29 @@ export const ChatScreen = ({ conversation }: Props) => {
               </div>
             ))}
             <div ref={messagesEndRef} />
+
+            {/* Full Image Preview Dialog */}
+            <Dialog open={showImagePreview} onOpenChange={setShowImagePreview}>
+              <DialogContent className="sm:max-w-[90vw] max-h-[90vh] overflow-auto p-0">
+                <div className="relative w-full h-full flex items-center justify-center bg-black">
+                  <Button
+                    onClick={() => setShowImagePreview(false)}
+                    variant="ghost"
+                    size="icon"
+                    className="absolute top-2 right-2 text-white hover:bg-white/20 z-50"
+                  >
+                    <X className="h-5 w-5" />
+                  </Button>
+                  {imagePreview && (
+                    <img 
+                      src={imagePreview.url} 
+                      alt={imagePreview.name || "Image preview"} 
+                      className="max-w-full max-h-[85vh] object-contain" 
+                    />
+                  )}
+                </div>
+              </DialogContent>
+            </Dialog>
           </div>
         </ScrollArea>
       ) : (
@@ -785,7 +814,7 @@ export const ChatScreen = ({ conversation }: Props) => {
                 className="h-[45px] w-[45px] rounded-2xl bg-primary hover:bg-primary/90 transition-all duration-200 hover:scale-105 active:scale-95"
               >
                 {isSending ? (
-                  <Loader2 className="h-5 w-5 animate-spin" />
+                  <Loader2 className<Loader2 className="h-5 w-5 animate-spin" />
                 ) : (
                   <Send className="h-5 w-5" />
                 )}

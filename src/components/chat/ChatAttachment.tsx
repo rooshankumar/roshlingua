@@ -9,6 +9,8 @@ import { Download } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Progress } from '@/components/ui/progress';
+import { Dialog, DialogContent } from '@/components/ui/dialog';
+
 
 interface ChatAttachmentProps {
   onAttach: (url: string, filename: string, thumbnail?: string) => void;
@@ -20,6 +22,7 @@ export const ChatAttachment = ({ onAttach }: ChatAttachmentProps) => {
   const [uploadProgress, setUploadProgress] = useState(0);
   const [fileName, setFileName] = useState('');
   const [fileType, setFileType] = useState('');
+  const [showFullPreview, setShowFullPreview] = useState(false);
 
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     try {
@@ -87,26 +90,26 @@ export const ChatAttachment = ({ onAttach }: ChatAttachmentProps) => {
       const filePath = `${fileName}`;
 
       console.log("Uploading file:", fileName, "Size:", (file.size / 1024).toFixed(2) + "KB");
-      
+
       // First, check if the bucket exists, if not create it
       const { data: buckets } = await supabase.storage.listBuckets();
       const bucketExists = buckets?.some(bucket => bucket.name === 'attachments');
-      
+
       if (!bucketExists) {
         console.log("Bucket 'attachments' doesn't exist, creating it...");
         const { error: createBucketError } = await supabase.storage.createBucket('attachments', {
           public: true
         });
-        
+
         if (createBucketError) {
           console.error("Error creating bucket:", createBucketError);
           throw new Error("Failed to create storage bucket: " + createBucketError.message);
         }
         console.log("Bucket 'attachments' created successfully");
       }
-      
+
       console.log("Uploading to bucket 'attachments' with path:", filePath);
-      
+
       // Upload with content-type header to ensure proper MIME type
       const { error: uploadError } = await supabase.storage
         .from('attachments')
@@ -115,7 +118,7 @@ export const ChatAttachment = ({ onAttach }: ChatAttachmentProps) => {
           cacheControl: '3600', // 1 hour cache
           upsert: true // Overwrite if exists
         });
-        
+
       if (uploadError) {
         console.error("Upload error:", uploadError);
       }
@@ -137,7 +140,7 @@ export const ChatAttachment = ({ onAttach }: ChatAttachmentProps) => {
       const publicUrl = `${data.publicUrl}?t=${timestamp}&cache=no-store`;
 
       console.log("File uploaded successfully:", publicUrl);
-      
+
       // Complete the progress animation
       clearInterval(progressInterval);
       setUploadProgress(100);
@@ -154,14 +157,14 @@ export const ChatAttachment = ({ onAttach }: ChatAttachmentProps) => {
 
       // Reset the input after successful upload
       event.target.value = '';
-      
+
       // Reset preview after a short delay
       setTimeout(() => {
         setPreviewUrl(null);
         setUploadProgress(0);
         setUploading(false);
       }, 1000);
-      
+
     } catch (error) {
       console.error('Error uploading file:', error);
       setUploadProgress(0);
@@ -199,7 +202,7 @@ export const ChatAttachment = ({ onAttach }: ChatAttachmentProps) => {
         onChange={handleFileChange}
         accept="image/*,video/*,audio/*,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-powerpoint,application/vnd.openxmlformats-officedocument.presentationml.presentation,text/plain"
       />
-      
+
       {previewUrl && (
         <div className="absolute bottom-full mb-2 right-0 border rounded-lg p-2 shadow-md animate-in fade-in-0 zoom-in-95 duration-200 w-[200px]">
           <div className="flex justify-between items-center mb-1">
@@ -213,17 +216,17 @@ export const ChatAttachment = ({ onAttach }: ChatAttachmentProps) => {
               <X className="h-3 w-3" />
             </Button>
           </div>
-          
+
           {fileType.startsWith('image/') && (
-            <img src={previewUrl} alt="Preview" className="w-full h-24 object-contain rounded cursor-pointer" onClick={() => window.open(previewUrl, '_blank')} />
+            <img src={previewUrl} alt="Preview" className="w-full h-24 object-contain rounded cursor-pointer" onClick={() => setShowFullPreview(true)} />
           )}
-          
+
           {!fileType.startsWith('image/') && (
             <div className="h-16 flex items-center justify-center rounded">
               {getFileIcon()}
             </div>
           )}
-          
+
           {uploading && (
             <div className="mt-2">
               <Progress value={uploadProgress} className="h-1" />
@@ -234,7 +237,7 @@ export const ChatAttachment = ({ onAttach }: ChatAttachmentProps) => {
           )}
         </div>
       )}
-      
+
       <label htmlFor="fileUpload">
         <Button
           variant="outline"
@@ -251,6 +254,29 @@ export const ChatAttachment = ({ onAttach }: ChatAttachmentProps) => {
           )}
         </Button>
       </label>
+
+      {/* Full preview dialog */}
+      <Dialog open={showFullPreview} onOpenChange={setShowFullPreview}>
+        <DialogContent className="sm:max-w-[90vw] max-h-[90vh] overflow-auto p-0">
+          <div className="relative w-full h-full flex items-center justify-center bg-black">
+            <Button
+              onClick={() => setShowFullPreview(false)}
+              variant="ghost"
+              size="icon"
+              className="absolute top-2 right-2 text-white hover:bg-white/20 z-50"
+            >
+              <X className="h-5 w-5" />
+            </Button>
+            {previewUrl && (
+              <img 
+                src={previewUrl} 
+                alt={fileName} 
+                className="max-w-full max-h-[85vh] object-contain" 
+              />
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

@@ -82,20 +82,22 @@ export const MessageBubble = ({ message, isCurrentUser, isRead = false, onReacti
                 <Skeleton className="w-[260px] md:w-[300px] h-[200px] rounded-lg" />
               ) : (
                 <>
-                  <a href={message.attachment_url} target="_blank" rel="noreferrer">
-                    <img 
-                      src={message.attachment_url}
-                      alt={message.attachment_name || "Image attachment"}
-                      className="max-w-[260px] md:max-w-[300px] max-h-[350px] rounded-lg object-contain cursor-pointer hover:scale-105 transition-transform duration-200"
-                      loading="eager"
-                      onLoad={() => setImageLoaded(true)}
-                      onError={(e) => handleImageLoadError(e, "Image failed to load")}
-                      onClick={(e) => {
-                        e.preventDefault();
-                        window.open(message.attachment_url, '_blank');
-                      }}
-                    />
-                  </a>
+                  <img 
+                    src={message.attachment_url}
+                    alt={message.attachment_name || "Image attachment"}
+                    className="max-w-[260px] md:max-w-[300px] max-h-[350px] rounded-lg object-contain cursor-pointer hover:scale-105 transition-transform duration-200"
+                    loading="eager"
+                    onLoad={() => setImageLoaded(true)}
+                    onError={(e) => handleImageLoadError(e, "Image failed to load")}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      // Set the target of the click event to be handled by parent component
+                      const clickEvent = new CustomEvent('image-preview', { 
+                        detail: { url: message.attachment_url, name: message.attachment_name } 
+                      });
+                      document.dispatchEvent(clickEvent);
+                    }}
+                  />
                   <a 
                     href={message.attachment_url}
                     download={message.attachment_name || "download"}
