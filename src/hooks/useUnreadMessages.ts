@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { supabase } from '@/lib/supabase';
 import { RealtimeChannel } from '@supabase/supabase-js';
@@ -12,10 +11,10 @@ export function useUnreadMessages(userId: string | undefined) {
   // Fetch initial unread counts and make sure they're accurate
   const fetchUnreadCounts = useCallback(async () => {
     if (!userId) return;
-    
+
     try {
       console.log('Fetching unread counts for user:', userId);
-      
+
       // Get the source of truth from the database
       const { data, error } = await supabase
         .from('conversation_participants')
@@ -51,11 +50,11 @@ export function useUnreadMessages(userId: string | undefined) {
   // to avoid race conditions
   const markConversationAsRead = useCallback(async (conversationId: string) => {
     if (!userId || !conversationId || isSyncing.current) return;
-    
+
     try {
       isSyncing.current = true;
       console.log(`Marking conversation ${conversationId} as read`);
-      
+
       // 1. Update local state immediately
       setActiveConversationId(conversationId);
       setUnreadCounts(prev => ({
@@ -85,7 +84,7 @@ export function useUnreadMessages(userId: string | undefined) {
       ];
 
       await Promise.all(promises);
-      
+
       // 3. Verify changes were applied correctly
       const { data, error } = await supabase
         .from('conversation_participants')
@@ -93,7 +92,7 @@ export function useUnreadMessages(userId: string | undefined) {
         .eq('user_id', userId)
         .eq('conversation_id', conversationId)
         .single();
-        
+
       if (error) {
         console.error('Error verifying read status:', error);
       } else if (data && data.unread_count > 0) {
@@ -105,7 +104,7 @@ export function useUnreadMessages(userId: string | undefined) {
           .eq('user_id', userId)
           .eq('conversation_id', conversationId);
       }
-      
+
       console.log('Successfully marked conversation as read');
     } catch (error) {
       console.error('Error marking conversation as read:', error);
@@ -118,16 +117,16 @@ export function useUnreadMessages(userId: string | undefined) {
   // This is a more aggressive approach when normal methods fail
   const forceResetUnreadCount = useCallback(async (conversationId: string) => {
     if (!userId || !conversationId) return;
-    
+
     console.log(`Force resetting unread count for ${conversationId}`);
-    
+
     try {
       // Local state update
       setUnreadCounts(prev => ({
         ...prev,
         [conversationId]: 0
       }));
-      
+
       // Direct database update with retry
       const updateDb = async (retries = 3) => {
         try {
@@ -136,7 +135,7 @@ export function useUnreadMessages(userId: string | undefined) {
             .update({ unread_count: 0 })
             .eq('user_id', userId)
             .eq('conversation_id', conversationId);
-            
+
           if (error) throw error;
           console.log('Force reset successful');
         } catch (err) {
@@ -147,7 +146,7 @@ export function useUnreadMessages(userId: string | undefined) {
           }
         }
       };
-      
+
       await updateDb();
     } catch (error) {
       console.error('Error in force reset:', error);
@@ -191,7 +190,7 @@ export function useUnreadMessages(userId: string | undefined) {
         filter: `user_id=eq.${userId}`,
       }, (payload) => {
         const participant = payload.new as any;
-        
+
         // Only update if this is not the active conversation
         if (participant.conversation_id && participant.conversation_id !== activeConversationId) {
           setUnreadCounts(prev => ({
@@ -215,17 +214,36 @@ export function useUnreadMessages(userId: string | undefined) {
   useEffect(() => {
     if (activeConversationId && userId) {
       console.log(`Active conversation changed to ${activeConversationId}, clearing unread count`);
-      
-      // Immediately update local state
-      setUnreadCounts(prev => ({
-        ...prev,
-        [activeConversationId]: 0
-      }));
-      
-      // Also force a database update to ensure consistency
-      forceResetUnreadCount(activeConversationId);
+
+      // Synchronize local and remote state
+      const updateUnreadCount = async () => {
+        // Update local state
+        setUnreadCounts(prev => ({
+          ...prev,
+          [activeConversationId]: 0,
+        }));
+
+        // Update remote state with error handling
+        try {
+          const { error } = await supabase
+            .from('conversation_participants')
+            .update({ unread_count: 0 })
+            .eq('user_id', userId)
+            .eq('conversation_id', activeConversationId);
+
+          if (error) {
+            console.error('Error updating read status in database:', error);
+          } else {
+            console.log('Database update verified, unread count reset');
+          }
+        } catch (err) {
+          console.error('Database sync error:', err);
+        }
+      };
+
+      updateUnreadCount();
     }
-  }, [activeConversationId, userId, forceResetUnreadCount]);
+  }, [activeConversationId, userId]);
 
   return {
     unreadCounts,
