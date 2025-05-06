@@ -461,7 +461,15 @@ export const ChatScreen = ({ conversation }: Props) => {
 
       // Also mark as read when messages are received or updated
       if (messages.length > 0) {
-        markMessagesAsRead(conversation.id);
+        // Mark as read both at the message level and the conversation participant level
+        markMessagesAsRead(conversation.id, user.id);
+        
+        // Forcefully update local unread state to ensure UI is consistent
+        const { setUnreadCounts } = useUnreadMessages(user.id);
+        setUnreadCounts(prev => ({
+          ...prev,
+          [conversation.id]: 0
+        }));
       }
     }
   }, [conversation?.id, user?.id, messages.length]);
