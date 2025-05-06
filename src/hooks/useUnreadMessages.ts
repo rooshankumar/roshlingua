@@ -217,31 +217,72 @@ export function useUnreadMessages(userId: string | undefined) {
 
       // Synchronize local and remote state
       const updateUnreadCount = async () => {
-        // Update local state
+        // Update local state immediately and aggressively to fix UI
         setUnreadCounts(prev => ({
           ...prev,
           [activeConversationId]: 0,
         }));
 
-        // Update remote state with error handling
-        try {
-          const { error } = await supabase
-            .from('conversation_participants')
-            .update({ unread_count: 0 })
-            .eq('user_id', userId)
-            .eq('conversation_id', activeConversationId);
+        // Prevent race conditions with a lock
+        if (isSyncing.current) return;
+        isSyncing.current = true;
 
-          if (error) {
-            console.error('Error updating read status in database:', error);
-          } else {
-            console.log('Database update verified, unread count reset');
+        try {
+          // First verify if there's actually an unread count in the database
+          const { data, error: checkError } = await supabase
+            .from('conversation_participants')
+            .select('unread_count')
+            .eq('user_id', userId)
+            .eq('conversation_id', activeConversationId)
+            .single();
+
+          if (checkError) {
+            console.error('Error checking unread count:', checkError);
+          } else if (data && data.unread_count > 0) {
+            // Update remote state with error handling and retry logic
+            const updateDb = async (retries = 2) => {
+              try {
+                const { error } = await supabase
+                  .from('conversation_participants')
+                  .update({ unread_count: 0 })
+                  .eq('user_id', userId)
+                  .eq('conversation_id', activeConversationId);
+
+                if (error) {
+                  console.error('Error updating read status in database:', error);
+                  if (retries > 0) {
+                    setTimeout(() => updateDb(retries - 1), 300);
+                  }
+                } else {
+                  console.log('Database update verified, unread count reset');
+                  
+                  // Force another local state update to ensure UI is consistent
+                  setUnreadCounts(prev => ({
+                    ...prev,
+                    [activeConversationId]: 0,
+                  }));
+                }
+              } catch (err) {
+                console.error('Database sync error:', err);
+                if (retries > 0) {
+                  setTimeout(() => updateDb(retries - 1), 300);
+                }
+              }
+            };
+            
+            await updateDb();
           }
-        } catch (err) {
-          console.error('Database sync error:', err);
+        } finally {
+          isSyncing.current = false;
         }
       };
 
+      // Execute immediately
       updateUnreadCount();
+      
+      // And also after a short delay as a backup
+      const timeoutId = setTimeout(updateUnreadCount, 500);
+      return () => clearTimeout(timeoutId);
     }
   }, [activeConversationId, userId]);
 

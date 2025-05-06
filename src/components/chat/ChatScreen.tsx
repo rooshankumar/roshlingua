@@ -94,13 +94,23 @@ export const ChatScreen = ({ conversation }: Props) => {
     
     // Also force reset unread counts for this conversation
     if (conversation?.id && user?.id) {
-      // Import the hook function
-      const { setUnreadCounts } = useUnreadMessages(user.id);
-      // Force local state update
+      // Import the hook functions
+      const { setUnreadCounts, forceResetUnreadCount } = useUnreadMessages(user.id);
+      
+      // Aggressively reset both local state and database
       setUnreadCounts(prev => ({
         ...prev,
         [conversation.id]: 0
       }));
+      
+      // Force database reset in case local state isn't syncing properly
+      // Try multiple times with increasing delays
+      [0, 500, 1500].forEach(delay => {
+        setTimeout(() => {
+          console.log(`Force resetting unread count for ${conversation.id} (delay: ${delay}ms)`);
+          forceResetUnreadCount(conversation.id);
+        }, delay);
+      });
     }
 
     // Also scroll when window is resized or orientation changes

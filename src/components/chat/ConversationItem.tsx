@@ -19,7 +19,8 @@ export const ConversationItem = ({
 }: ConversationItemProps) => {
   const otherParticipant = getOtherParticipant(conversation, currentUserId);
   // Explicitly check for positive number with Number coercion in case unreadCount is undefined
-  const unreadCount = Number(conversation.unreadCount) || 0;
+  // Force coercion to number and ensure active conversations never show unread
+  const unreadCount = isActive ? 0 : Number(conversation.unreadCount) || 0;
   const hasUnread = unreadCount > 0;
   const lastMessage = conversation.lastMessage;
 
