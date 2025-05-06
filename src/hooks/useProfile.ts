@@ -21,6 +21,7 @@ export function useProfile(userId: string) {
             full_name,
             age,
             bio,
+            gender,
             native_language,
             learning_language,
             proficiency_level,

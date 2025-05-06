@@ -290,24 +290,24 @@ const Profile = () => {
             )}
             
             {/* Gender Display with Icon */}
-            {profile.gender && (
+            {profile.gender && profile.gender !== 'Rather not say' && (
               <div className="mb-2 flex items-center gap-2">
-                <Badge variant="outline" className="px-2 py-1 flex items-center gap-1.5">
+                <Badge variant="outline" className="px-3 py-1.5 flex items-center gap-2 bg-primary/5">
                   {profile.gender === 'male' && (
                     <img 
                       src="/icons/male.png.png" 
                       alt="Male" 
-                      className="h-4 w-4 object-contain" 
+                      className="h-5 w-5 object-contain" 
                     />
                   )}
                   {profile.gender === 'female' && (
                     <img 
                       src="/icons/female.png.png" 
                       alt="Female" 
-                      className="h-4 w-4 object-contain" 
+                      className="h-5 w-5 object-contain" 
                     />
                   )}
-                  <span>{profile.gender.charAt(0).toUpperCase() + profile.gender.slice(1)}</span>
+                  <span className="font-medium">{profile.gender.charAt(0).toUpperCase() + profile.gender.slice(1)}</span>
                 </Badge>
               </div>
             )}
