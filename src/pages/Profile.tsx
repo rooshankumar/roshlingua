@@ -280,18 +280,10 @@ const Profile = () => {
           <div className="flex-1 flex flex-col items-center md:items-start">
             <h1 className="text-3xl font-bold mb-2">{profile.full_name}</h1>
             
-            {/* Age Display */}
-            {profile.date_of_birth && (
-              <div className="mb-2">
-                <Badge variant="outline" className="px-2 py-1">
-                  {getAgeFromDateOfBirth(profile.date_of_birth)} years old
-                </Badge>
-              </div>
-            )}
-            
-            {/* Gender Display with Icon */}
-            {profile.gender && profile.gender !== 'Rather not say' && (
-              <div className="mb-2 flex items-center gap-2">
+            {/* Gender and Age in Same Row */}
+            <div className="mb-2 flex items-center gap-3">
+              {/* Gender Display with Icon */}
+              {profile.gender && profile.gender !== 'Rather not say' && (
                 <Badge variant="outline" className="px-3 py-1.5 flex items-center gap-2 bg-primary/5">
                   {profile.gender === 'male' && (
                     <img 
@@ -309,8 +301,15 @@ const Profile = () => {
                   )}
                   <span className="font-medium">{profile.gender.charAt(0).toUpperCase() + profile.gender.slice(1)}</span>
                 </Badge>
-              </div>
-            )}
+              )}
+              
+              {/* Age Display */}
+              {profile.date_of_birth && (
+                <Badge variant="outline" className="px-3 py-1.5">
+                  <span className="font-medium">{getAgeFromDateOfBirth(profile.date_of_birth)}</span> y.o.
+                </Badge>
+              )}
+            </div>
             
             {/* Languages Display */}
             {(profile.native_language || profile.learning_language) && (
