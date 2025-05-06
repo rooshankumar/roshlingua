@@ -1,4 +1,3 @@
-
 import { useState, useRef, KeyboardEvent } from "react";
 import { Send, Languages, Check, X, Paperclip, Image, FileText, File } from "lucide-react";
 import { ChatAttachment } from "./ChatAttachment";
@@ -7,7 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 interface ChatInputProps {
-  onSendMessage: (content: string, attachment?: { url: string; filename: string }) => void;
+  onSendMessage: (content: string, attachment?: { url: string; filename: string; thumbnail?: string }) => void;
   learningLanguage: string;
 }
 
@@ -15,7 +14,7 @@ export const ChatInput = ({ onSendMessage, learningLanguage }: ChatInputProps) =
   const [message, setMessage] = useState("");
   const [isChecking, setIsChecking] = useState(false);
   const [suggestions, setSuggestions] = useState<string[]>([]);
-  const [attachment, setAttachment] = useState<{ url: string; filename: string } | null>(null);
+  const [attachment, setAttachment] = useState<{ url: string; filename: string; thumbnail?: string } | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const handleSend = () => {
@@ -57,10 +56,11 @@ export const ChatInput = ({ onSendMessage, learningLanguage }: ChatInputProps) =
         />
         <div className="flex gap-2">
           <ChatAttachment 
-            onAttach={(url, filename) => setAttachment({ url, filename })} 
+            onAttach={(url, filename, thumbnail) => setAttachment({ url, filename, thumbnail })} 
           />
           {attachment && (
             <div className="flex items-center gap-2 px-2 py-1 bg-muted rounded">
+              {attachment.thumbnail && <img src={attachment.thumbnail} alt={attachment.filename} className="h-8 w-8 object-cover rounded" />}
               <Paperclip className="h-4 w-4" />
               <span className="text-sm truncate max-w-[100px]">{attachment.filename}</span>
               <Button

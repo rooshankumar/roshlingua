@@ -194,7 +194,8 @@ export const ChatScreen = ({ conversation }: Props) => {
               const messageWithAttachment = {
                 ...newMessage,
                 attachment_url: newMessage.attachment_url || null,
-                attachment_name: newMessage.attachment_name || null
+                attachment_name: newMessage.attachment_name || null,
+                attachment_thumbnail: newMessage.attachment_thumbnail || null // Added thumbnail handling
               };
 
               const updatedMessages = [...prev, messageWithAttachment];
@@ -602,30 +603,16 @@ export const ChatScreen = ({ conversation }: Props) => {
                       {message.attachment_url && (
                         <div className="mt-1 rounded-lg overflow-hidden">
                           {message.attachment_url?.match(/\.(jpg|jpeg|png|gif|webp|avif)$/i) ? (
-                            <div className="relative">
+                            <a href={message.attachment_url} target="_blank" rel="noopener noreferrer" className="block"> {/* Changed to <a> tag */}
                               <img 
                                 src={message.attachment_url} 
                                 alt={message.attachment_name || "Image"}
                                 className="max-w-[300px] max-h-[300px] object-cover rounded-lg hover:scale-105 transition-transform duration-200 cursor-pointer"
-                                onClick={() => window.open(message.attachment_url, '_blank')}
                                 onError={(e) => handleImageLoadError(e, message.attachment_url as string)}
                                 loading="lazy"
                                 referrerPolicy="no-referrer"
                               />
-                              {/* Download button */}
-                              <a 
-                                href={message.attachment_url}
-                                download={message.attachment_name}
-                                className="absolute top-2 right-2 bg-black/60 text-white p-1 rounded-full hover:bg-black/80 transition-colors"
-                                onClick={(e) => e.stopPropagation()}
-                              >
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                                  <polyline points="7 10 12 15 17 10"></polyline>
-                                  <line x1="12" y1="15" x2="12" y2="3"></line>
-                                </svg>
-                              </a>
-                            </div>
+                            </a>
                           ) : message.attachment_url?.match(/\.(mp4|webm|ogg)$/i) ? (
                             <video 
                               src={message.attachment_url}

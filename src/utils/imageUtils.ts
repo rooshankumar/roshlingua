@@ -9,56 +9,64 @@ import { toast } from '@/components/ui/use-toast';
  * @param file The original image file
  * @returns A promise that resolves to a data URL for preview
  */
-export const generateImageThumbnail = async (file: File): Promise<string> => {
+export async function generateImageThumbnail(file: File, maxWidth = 300, maxHeight = 300): Promise<string> {
   return new Promise((resolve, reject) => {
-    if (!file.type.startsWith('image/')) {
-      reject(new Error('Not an image file'));
-      return;
-    }
-
     const reader = new FileReader();
-    reader.onload = (e) => {
-      const img = new Image();
-      img.onload = () => {
-        // Create a canvas to resize the image
-        const canvas = document.createElement('canvas');
-        const ctx = canvas.getContext('2d');
+    reader.onload = function(e) {
+      if (!e.target?.result) {
+        reject(new Error('Failed to read file'));
+        return;
+      }
 
-        // Set dimensions (max 300px)
-        const maxSize = 300;
+      const img = new Image();
+      img.src = e.target.result as string;
+
+      img.onload = function() {
+        const canvas = document.createElement('canvas');
         let width = img.width;
         let height = img.height;
 
+        // Calculate dimensions to maintain aspect ratio
         if (width > height) {
-          if (width > maxSize) {
-            height = Math.round(height * (maxSize / width));
-            width = maxSize;
+          if (width > maxWidth) {
+            height = Math.round(height * maxWidth / width);
+            width = maxWidth;
           }
         } else {
-          if (height > maxSize) {
-            width = Math.round(width * (maxSize / height));
-            height = maxSize;
+          if (height > maxHeight) {
+            width = Math.round(width * maxHeight / height);
+            height = maxHeight;
           }
         }
 
         canvas.width = width;
         canvas.height = height;
 
-        ctx?.drawImage(img, 0, 0, width, height);
+        const ctx = canvas.getContext('2d');
+        if (!ctx) {
+          reject(new Error('Failed to get canvas context'));
+          return;
+        }
 
-        // Get data URL (medium quality for thumbnails)
+        ctx.drawImage(img, 0, 0, width, height);
+
+        // Create thumbnail as data URL
         const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
         resolve(dataUrl);
       };
 
-      img.onerror = () => reject(new Error('Failed to generate thumbnail'));
-      img.src = e.target?.result as string;
+      img.onerror = function() {
+        reject(new Error('Failed to load image'));
+      };
     };
 
-    reader.onerror = () => reject(new Error('Failed to read file'));
+    reader.onerror = function() {
+      reject(new Error('Failed to read file'));
+    };
+
     reader.readAsDataURL(file);
   });
-};
+}
 
 /**
  * Create a blob URL from a base64 string
@@ -104,46 +112,57 @@ export const base64ToBlob = (base64: string): string => {
 /**
  * Checks if a URL is likely being blocked by browser extensions or client settings
  */
-export const isLikelyBlockedUrl = (url: string): boolean => {
-  // Check if URL contains common patterns that might be blocked
-  return url.includes('supabase.co/storage');
-};
+export function isLikelyBlockedUrl(url: string): boolean {
+  // Keyword based approach (common ad/tracking domains)
+  const blockedDomainKeywords = [
+    'googletagmanager',
+    'analytics',
+    'adservice',
+    'googleads',
+    'doubleclick',
+    'googlesyndication',
+    'adsystem',
+    'adnxs',
+  ];
+
+  return blockedDomainKeywords.some(keyword => url.includes(keyword));
+}
 
 export const handleImageLoadError = (e: React.SyntheticEvent<HTMLImageElement, Event>, url: string) => {
   console.error("Image load error:", e, "URL:", url);
   const imageElement = e.target as HTMLImageElement;
-  
+
   // Hide the failed image
   imageElement.style.display = 'none';
-  
+
   // Check if URL might be blocked (common for Supabase storage)
   const isBlocked = url && isLikelyBlockedUrl(url);
-  
+
   // Create safer, escaped URL
   const safeUrl = url ? url.replace(/"/g, '&quot;') : '';
-  
+
   // Add fallback directly to parent element
   const parent = imageElement.parentElement;
   if (parent) {
     // Use createElement instead of innerHTML for better security
     const fallbackDiv = document.createElement('div');
     fallbackDiv.className = "flex flex-col items-center justify-center p-4 bg-muted/30 border border-border rounded-lg";
-    
+
     const messageSpan = document.createElement('span');
     messageSpan.className = "text-sm text-muted-foreground";
     messageSpan.textContent = isBlocked ? 
       "Image may be blocked by your browser" : 
       "Image could not be loaded";
-    
+
     const linkElement = document.createElement('a');
     linkElement.href = safeUrl;
     linkElement.target = "_blank";
     linkElement.className = "text-primary hover:underline mt-2";
     linkElement.textContent = "Open image in new tab";
-    
+
     fallbackDiv.appendChild(messageSpan);
     fallbackDiv.appendChild(linkElement);
-    
+
     // Clear existing content and append the new elements
     parent.innerHTML = '';
     parent.appendChild(fallbackDiv);

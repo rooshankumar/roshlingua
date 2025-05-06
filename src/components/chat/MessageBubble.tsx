@@ -1,116 +1,122 @@
-
-import { useState } from "react";
-import { Message } from "@/types/chat";
-import { Button } from "@/components/ui/button";
-import { translate, VolumeIcon, Bookmark, Check } from "lucide-react";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { useState } from 'react';
+import { Smile, Check, MessageCircle, Download } from 'lucide-react';
+import { Message } from '@/types/chat';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { MessageReactions } from './MessageReactions';
+import { formatRelativeTime } from '@/utils/chatUtils';
+import { handleImageLoadError } from '@/utils/imageUtils';
 
 interface MessageBubbleProps {
   message: Message;
-  isOwnMessage: boolean;
-  learningLanguage: string;
-  nativeLanguage: string;
+  isCurrentUser: boolean;
+  isRead?: boolean;
+  onReaction?: (emoji: string) => void;
+  isLast?: boolean;
 }
 
-export const MessageBubble = ({ 
-  message, 
-  isOwnMessage,
-  learningLanguage,
-  nativeLanguage
-}: MessageBubbleProps) => {
-  const [showTranslation, setShowTranslation] = useState(false);
-  const [isSaved, setIsSaved] = useState(false);
-  const [translation, setTranslation] = useState("");
+export const MessageBubble = ({ message, isCurrentUser, isRead = false, onReaction, isLast = false }: MessageBubbleProps) => {
+  const [showReactionPicker, setShowReactionPicker] = useState(false);
+  const [imageLoaded, setImageLoaded] = useState(false);
 
-  const handleTranslate = async () => {
-    if (!showTranslation) {
-      // Mock translation - replace with actual translation API
-      setTranslation("This is a translated version of the message");
-    }
-    setShowTranslation(!showTranslation);
+  const toggleReactionPicker = () => {
+    setShowReactionPicker(!showReactionPicker);
   };
 
-  const handleSpeak = () => {
-    const utterance = new SpeechSynthesisUtterance(message.content);
-    utterance.lang = learningLanguage.toLowerCase().includes('english') ? 'en-US' : 'es-ES';
-    window.speechSynthesis.speak(utterance);
-  };
+  // Format time from ISO string to relative time (e.g. "2 hours ago")
+  const formattedTime = formatRelativeTime(message.created_at);
 
-  const handleSave = () => {
-    setIsSaved(!isSaved);
-    // Add to saved phrases in your backend
-  };
+  // Check if the attachment is an image
+  const isImageAttachment = message.attachment_url?.match(/\.(jpg|jpeg|png|gif|webp)$/i);
 
   return (
-    <div 
-      className={`message-bubble group flex flex-col gap-1 ${isOwnMessage ? "ml-auto items-end" : ""}`}
-    >
-      <div
-        className={`p-3 rounded-2xl shadow-sm ${
-          isOwnMessage 
-            ? "bg-gradient-to-br from-primary to-primary/90 text-primary-foreground" 
-            : "bg-muted/80 backdrop-blur-sm"
-        }`}
-      >
-        <p>{message.content}</p>
-        {showTranslation && (
-          <div className="mt-2 pt-2 border-t border-primary/20 text-sm opacity-80">
-            {translation}
-          </div>
-        )}
-      </div>
-      
-      <div className="flex gap-1">
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              className="h-8 w-8 p-0" 
-              onClick={handleTranslate}
-            >
-              <Translate className="h-4 w-4" />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>
-            {showTranslation ? "Hide translation" : "Show translation"}
-          </TooltipContent>
-        </Tooltip>
+    <div className={`group flex items-end gap-2 ${isCurrentUser ? 'justify-end' : 'justify-start'}`}>
+      {!isCurrentUser && (
+        <Avatar className="h-8 w-8">
+          <AvatarImage src={message.sender?.avatar_url || "/placeholder.svg"} alt={message.sender?.full_name || "User"} />
+          <AvatarFallback>
+            {message.sender?.full_name?.charAt(0) || message.sender?.email?.charAt(0) || "U"}
+          </AvatarFallback>
+        </Avatar>
+      )}
 
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              className="h-8 w-8 p-0"
-              onClick={handleSpeak}
-            >
-              <VolumeIcon className="h-4 w-4" />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>Listen to pronunciation</TooltipContent>
-        </Tooltip>
+      <div className={`flex flex-col ${isCurrentUser ? 'items-end' : 'items-start'}`}>
+        <div 
+          className={`message-bubble ${isCurrentUser ? 'sent bg-primary text-primary-foreground' : 'received bg-muted text-muted-foreground'} p-3 rounded-2xl shadow-sm ${message.attachment_url ? 'p-0 overflow-hidden' : 'p-3'}`}
+        >
+          {/* Image attachment */}
+          {isImageAttachment && (
+            <div className="relative">
+              <img 
+                src={message.attachment_url}
+                alt={message.attachment_name || "Image attachment"}
+                className={`max-w-[260px] md:max-w-[300px] rounded-lg cursor-pointer ${!imageLoaded ? 'min-h-[100px] bg-muted animate-pulse' : ''}`}
+                onLoad={() => setImageLoaded(true)}
+                onError={(e) => handleImageLoadError(e, "Image failed to load")}
+                onClick={() => window.open(message.attachment_url, '_blank')}
+              />
+              <a 
+                href={message.attachment_url}
+                download={message.attachment_name || "download"}
+                className="absolute top-2 right-2 bg-black/60 text-white p-1 rounded-full hover:bg-black/80 transition-colors"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <Download className="h-4 w-4" />
+              </a>
+            </div>
+          )}
 
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              className="h-8 w-8 p-0"
-              onClick={handleSave}
-            >
-              {isSaved ? (
-                <Check className="h-4 w-4 text-green-500" />
-              ) : (
-                <BookMark className="h-4 w-4" />
-              )}
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>
-            {isSaved ? "Saved to phrases" : "Save phrase"}
-          </TooltipContent>
-        </Tooltip>
+          {/* Non-image attachment (files, etc.) */}
+          {message.attachment_url && !isImageAttachment && (
+            <div className="flex items-center gap-2 p-3">
+              <div className="bg-background/20 p-2 rounded-full">
+                <Download className="h-5 w-5" />
+              </div>
+              <div className="flex-1 overflow-hidden">
+                <p className="text-sm font-medium truncate">
+                  {message.attachment_name || "Attachment"}
+                </p>
+                <a 
+                  href={message.attachment_url}
+                  download
+                  className="text-xs underline hover:text-primary transition-colors"
+                >
+                  Download
+                </a>
+              </div>
+            </div>
+          )}
+
+          {/* Message content */}
+          {message.content && (
+            <div className={message.attachment_url ? 'p-3 pt-2' : ''}>
+              {message.content}
+            </div>
+          )}
+        </div>
+
+        {/* Time and read receipts */}
+        <div className="flex items-center gap-1 mt-1 text-xs text-muted-foreground/70">
+          <span>{formattedTime}</span>
+          {isCurrentUser && isRead && <Check className="h-3 w-3" />}
+        </div>
       </div>
+
+      {/* Reactions */}
+      <div className="message-actions flex items-center">
+        <button
+          onClick={toggleReactionPicker}
+          className="text-muted-foreground/50 hover:text-muted-foreground p-1 rounded-full"
+        >
+          <Smile className="h-4 w-4" />
+        </button>
+      </div>
+
+      {showReactionPicker && (
+        <MessageReactions onSelect={(emoji) => {
+          if (onReaction) onReaction(emoji);
+          setShowReactionPicker(false);
+        }} />
+      )}
     </div>
   );
 };

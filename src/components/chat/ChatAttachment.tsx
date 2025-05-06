@@ -75,7 +75,7 @@ export const ChatAttachment = ({ onAttach }: ChatAttachmentProps) => {
       const publicUrl = `${data.publicUrl}?t=${timestamp}`;
 
       console.log("File uploaded successfully:", publicUrl);
-      
+
       // Show success message
       toast({
         title: "File uploaded",
