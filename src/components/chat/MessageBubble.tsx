@@ -1,10 +1,11 @@
-import { useState } from 'react';
-import { Smile, Check, MessageCircle, Download } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Smile, Check, MessageCircle, Download, FileText, Image as ImageIcon, Video, FileAudio } from 'lucide-react';
 import { Message } from '@/types/chat';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { MessageReactions } from './MessageReactions';
 import { formatRelativeTime } from '@/utils/chatUtils';
-import { handleImageLoadError } from '@/utils/imageUtils';
+import { handleImageLoadError, preloadImage } from '@/utils/imageUtils';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface MessageBubbleProps {
   message: Message;
@@ -17,16 +18,47 @@ interface MessageBubbleProps {
 export const MessageBubble = ({ message, isCurrentUser, isRead = false, onReaction, isLast = false }: MessageBubbleProps) => {
   const [showReactionPicker, setShowReactionPicker] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
+  const [isPreloading, setIsPreloading] = useState(true);
+
+  // Format time from ISO string to relative time (e.g. "2 hours ago")
+  const formattedTime = formatRelativeTime(message.created_at);
+
+  // Check attachment type
+  const isImageAttachment = message.attachment_url?.match(/\.(jpg|jpeg|png|gif|webp|avif)$/i);
+  const isVideoAttachment = message.attachment_url?.match(/\.(mp4|webm|ogg)$/i);
+  const isAudioAttachment = message.attachment_url?.match(/\.(mp3|wav|aac)$/i);
+  const isPdfAttachment = message.attachment_url?.match(/\.(pdf)$/i);
+
+  // Preload images immediately on component mount
+  useEffect(() => {
+    if (isImageAttachment && message.attachment_url) {
+      setIsPreloading(true);
+      preloadImage(message.attachment_url)
+        .then(() => {
+          setImageLoaded(true);
+          setIsPreloading(false);
+        })
+        .catch(error => {
+          console.error('Failed to preload image:', error);
+          setIsPreloading(false);
+        });
+    } else {
+      setIsPreloading(false);
+    }
+  }, [message.attachment_url, isImageAttachment]);
 
   const toggleReactionPicker = () => {
     setShowReactionPicker(!showReactionPicker);
   };
 
-  // Format time from ISO string to relative time (e.g. "2 hours ago")
-  const formattedTime = formatRelativeTime(message.created_at);
-
-  // Check if the attachment is an image
-  const isImageAttachment = message.attachment_url?.match(/\.(jpg|jpeg|png|gif|webp)$/i);
+  // Function to get attachment icon based on file type
+  const getAttachmentIcon = () => {
+    if (isImageAttachment) return <ImageIcon className="h-5 w-5" />;
+    if (isVideoAttachment) return <Video className="h-5 w-5" />;
+    if (isAudioAttachment) return <FileAudio className="h-5 w-5" />;
+    if (isPdfAttachment) return <FileText className="h-5 w-5" />;
+    return <Download className="h-5 w-5" />;
+  };
 
   return (
     <div className={`group flex items-end gap-2 ${isCurrentUser ? 'justify-end' : 'justify-start'}`}>
@@ -41,35 +73,92 @@ export const MessageBubble = ({ message, isCurrentUser, isRead = false, onReacti
 
       <div className={`flex flex-col ${isCurrentUser ? 'items-end' : 'items-start'}`}>
         <div 
-          className={`message-bubble ${isCurrentUser ? 'sent bg-primary text-primary-foreground' : 'received bg-muted text-muted-foreground'} p-3 rounded-2xl shadow-sm ${message.attachment_url ? 'p-0 overflow-hidden' : 'p-3'}`}
+          className={`message-bubble ${isCurrentUser ? 'sent bg-primary text-primary-foreground' : 'received bg-muted text-muted-foreground'} rounded-2xl shadow-sm ${message.attachment_url ? 'overflow-hidden' : 'p-3'}`}
         >
           {/* Image attachment */}
           {isImageAttachment && (
             <div className="relative">
-              <img 
+              {isPreloading ? (
+                <Skeleton className="w-[260px] md:w-[300px] h-[200px] rounded-lg" />
+              ) : (
+                <>
+                  <a href={message.attachment_url} target="_blank" rel="noreferrer">
+                    <img 
+                      src={message.attachment_url}
+                      alt={message.attachment_name || "Image attachment"}
+                      className="max-w-[260px] md:max-w-[300px] max-h-[350px] rounded-lg object-contain cursor-pointer"
+                      loading="eager"
+                      onLoad={() => setImageLoaded(true)}
+                      onError={(e) => handleImageLoadError(e, "Image failed to load")}
+                    />
+                  </a>
+                  <a 
+                    href={message.attachment_url}
+                    download={message.attachment_name || "download"}
+                    className="absolute top-2 right-2 bg-black/60 text-white p-1 rounded-full hover:bg-black/80 transition-colors"
+                  >
+                    <Download className="h-4 w-4" />
+                  </a>
+                </>
+              )}
+            </div>
+          )}
+
+          {/* Video attachment */}
+          {isVideoAttachment && (
+            <div className="p-2">
+              <video 
                 src={message.attachment_url}
-                alt={message.attachment_name || "Image attachment"}
-                className={`max-w-[260px] md:max-w-[300px] rounded-lg cursor-pointer ${!imageLoaded ? 'min-h-[100px] bg-muted animate-pulse' : ''}`}
-                onLoad={() => setImageLoaded(true)}
-                onError={(e) => handleImageLoadError(e, "Image failed to load")}
-                
+                controls
+                autoPlay={true}
+                preload="auto"
+                className="max-w-[260px] md:max-w-[300px] rounded-lg"
+                controlsList="nodownload"
+              />
+            </div>
+          )}
+
+          {/* Audio attachment */}
+          {isAudioAttachment && (
+            <div className="p-3">
+              <p className="text-sm font-medium mb-1">
+                {message.attachment_name || "Audio file"}
+              </p>
+              <audio 
+                src={message.attachment_url}
+                controls
+                autoPlay
+                preload="auto"
+                className="w-full max-w-[260px]"
+              />
+            </div>
+          )}
+
+          {/* PDF attachment */}
+          {isPdfAttachment && (
+            <div className="p-3">
+              <p className="text-sm font-medium mb-2">
+                {message.attachment_name || "PDF document"}
+              </p>
+              <iframe
+                src={message.attachment_url}
+                className="w-[260px] h-[200px] md:w-[300px] md:h-[250px] rounded-lg border border-border"
               />
               <a 
                 href={message.attachment_url}
-                download={message.attachment_name || "download"}
-                className="absolute top-2 right-2 bg-black/60 text-white p-1 rounded-full hover:bg-black/80 transition-colors"
-                
+                download
+                className="text-xs mt-1 underline hover:text-primary transition-colors block text-center"
               >
-                <Download className="h-4 w-4" />
+                Download PDF
               </a>
             </div>
           )}
 
-          {/* Non-image attachment (files, etc.) */}
-          {message.attachment_url && !isImageAttachment && (
+          {/* Other file attachment */}
+          {message.attachment_url && !isImageAttachment && !isVideoAttachment && !isAudioAttachment && !isPdfAttachment && (
             <div className="flex items-center gap-2 p-3">
               <div className="bg-background/20 p-2 rounded-full">
-                <Download className="h-5 w-5" />
+                {getAttachmentIcon()}
               </div>
               <div className="flex-1 overflow-hidden">
                 <p className="text-sm font-medium truncate">

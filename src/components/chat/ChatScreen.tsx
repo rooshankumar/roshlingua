@@ -603,21 +603,24 @@ export const ChatScreen = ({ conversation }: Props) => {
                       {message.attachment_url && (
                         <div className="mt-1 rounded-lg overflow-hidden">
                           {message.attachment_url?.match(/\.(jpg|jpeg|png|gif|webp|avif)$/i) ? (
-                            <a href={message.attachment_url} target="_blank" rel="noopener noreferrer" className="block"> {/* Changed to <a> tag */}
+                            <a href={message.attachment_url} target="_blank" rel="noopener noreferrer" className="block"> 
                               <img 
                                 src={message.attachment_url} 
                                 alt={message.attachment_name || "Image"}
-                                className="max-w-[300px] max-h-[300px] object-cover rounded-lg hover:scale-105 transition-transform duration-200 cursor-pointer"
+                                className="max-w-[300px] max-h-[300px] object-contain rounded-lg hover:scale-105 transition-transform duration-200 cursor-pointer"
                                 onError={(e) => handleImageLoadError(e, message.attachment_url as string)}
-                                loading="lazy"
+                                loading="eager"
                                 referrerPolicy="no-referrer"
+                                fetchPriority="high"
                               />
                             </a>
                           ) : message.attachment_url?.match(/\.(mp4|webm|ogg)$/i) ? (
                             <video 
                               src={message.attachment_url}
                               controls
+                              autoPlay
                               className="max-w-[300px] rounded-lg"
+                              preload="auto"
                               onError={() => {
                                 console.error("Video failed to load:", message.attachment_url);
                               }}
@@ -626,7 +629,9 @@ export const ChatScreen = ({ conversation }: Props) => {
                             <audio 
                               src={message.attachment_url}
                               controls
+                              autoPlay
                               className="max-w-[300px]"
+                              preload="auto"
                               onError={() => {
                                 console.error("Audio failed to load:", message.attachment_url);
                               }}
@@ -636,6 +641,7 @@ export const ChatScreen = ({ conversation }: Props) => {
                               <iframe
                                 src={message.attachment_url}
                                 className="w-[300px] h-[400px] rounded-lg border border-border"
+                                onLoad={() => console.log("PDF loaded successfully")}
                                 onError={() => {
                                   console.error("PDF failed to load:", message.attachment_url);
                                 }}

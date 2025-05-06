@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Paperclip } from 'lucide-react';
+import { Paperclip, Image as ImageIcon, FileText, Video, FileAudio, X } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { Button } from '../ui/button';
 import { Loader2 } from 'lucide-react';
@@ -8,7 +8,7 @@ import { toast } from '@/components/ui/use-toast';
 import { Download } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Skeleton } from '@/components/ui/skeleton';
-
+import { Progress } from '@/components/ui/progress';
 
 interface ChatAttachmentProps {
   onAttach: (url: string, filename: string, thumbnail?: string) => void;
@@ -16,21 +16,56 @@ interface ChatAttachmentProps {
 
 export const ChatAttachment = ({ onAttach }: ChatAttachmentProps) => {
   const [uploading, setUploading] = useState(false);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [fileName, setFileName] = useState('');
+  const [fileType, setFileType] = useState('');
 
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     try {
-      setUploading(true);
-
       if (!event.target.files || event.target.files.length === 0) {
         throw new Error("You must select a file to upload.");
       }
 
       const file = event.target.files[0];
+      setFileName(file.name);
+      setFileType(file.type);
 
       // Validate file size (10MB max)
       if (file.size > 10 * 1024 * 1024) {
         throw new Error("File size exceeds 10MB limit.");
       }
+
+      // Generate preview for images
+      if (file.type.startsWith('image/')) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          setPreviewUrl(e.target?.result as string);
+        };
+        reader.readAsDataURL(file);
+      } else if (file.type.startsWith('video/')) {
+        setPreviewUrl('/icons/video-placeholder.png'); // Use a generic video icon as placeholder
+      } else if (file.type.startsWith('audio/')) {
+        setPreviewUrl('/icons/audio-placeholder.png'); // Use a generic audio icon as placeholder
+      } else if (file.type === 'application/pdf') {
+        setPreviewUrl('/icons/pdf-placeholder.png'); // Use a generic PDF icon as placeholder
+      } else {
+        setPreviewUrl('/icons/file-placeholder.png'); // Generic file icon
+      }
+
+      setUploading(true);
+      setUploadProgress(0);
+
+      // Simulate upload progress
+      const progressInterval = setInterval(() => {
+        setUploadProgress(prev => {
+          if (prev >= 95) {
+            clearInterval(progressInterval);
+            return 95;
+          }
+          return prev + 5;
+        });
+      }, 100);
 
       // Generate a thumbnail if it's an image (for preview)
       let thumbnailDataUrl: string | undefined;
@@ -79,6 +114,10 @@ export const ChatAttachment = ({ onAttach }: ChatAttachmentProps) => {
       const publicUrl = `${data.publicUrl}?t=${timestamp}`;
 
       console.log("File uploaded successfully:", publicUrl);
+      
+      // Complete the progress animation
+      clearInterval(progressInterval);
+      setUploadProgress(100);
 
       // Show success message
       toast({
@@ -92,20 +131,44 @@ export const ChatAttachment = ({ onAttach }: ChatAttachmentProps) => {
 
       // Reset the input after successful upload
       event.target.value = '';
+      
+      // Reset preview after a short delay
+      setTimeout(() => {
+        setPreviewUrl(null);
+        setUploadProgress(0);
+        setUploading(false);
+      }, 1000);
+      
     } catch (error) {
       console.error('Error uploading file:', error);
+      setUploadProgress(0);
+      setPreviewUrl(null);
       toast({
         title: "Upload failed",
         description: error instanceof Error ? error.message : 'Unknown error',
         variant: "destructive"
       });
-    } finally {
       setUploading(false);
     }
   };
 
+  // Get icon based on file type
+  const getFileIcon = () => {
+    if (fileType.startsWith('image/')) return <ImageIcon className="h-5 w-5" />;
+    if (fileType.startsWith('video/')) return <Video className="h-5 w-5" />;
+    if (fileType.startsWith('audio/')) return <FileAudio className="h-5 w-5" />;
+    if (fileType === 'application/pdf') return <FileText className="h-5 w-5" />;
+    return <FileText className="h-5 w-5" />;
+  };
+
+  const cancelUpload = () => {
+    setUploading(false);
+    setPreviewUrl(null);
+    setUploadProgress(0);
+  };
+
   return (
-    <div>
+    <div className="relative">
       <input
         type="file"
         id="fileUpload"
@@ -113,6 +176,42 @@ export const ChatAttachment = ({ onAttach }: ChatAttachmentProps) => {
         onChange={handleFileChange}
         accept="image/*,video/*,audio/*,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-powerpoint,application/vnd.openxmlformats-officedocument.presentationml.presentation,text/plain"
       />
+      
+      {previewUrl && (
+        <div className="absolute bottom-full mb-2 right-0 bg-background border rounded-lg p-2 shadow-md animate-in fade-in-0 zoom-in-95 duration-200 w-[200px]">
+          <div className="flex justify-between items-center mb-1">
+            <span className="text-xs font-medium truncate max-w-[150px]">{fileName}</span>
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              className="h-5 w-5 p-0" 
+              onClick={cancelUpload}
+            >
+              <X className="h-3 w-3" />
+            </Button>
+          </div>
+          
+          {fileType.startsWith('image/') && (
+            <img src={previewUrl} alt="Preview" className="w-full h-24 object-contain rounded" />
+          )}
+          
+          {!fileType.startsWith('image/') && (
+            <div className="bg-muted/50 h-16 flex items-center justify-center rounded">
+              {getFileIcon()}
+            </div>
+          )}
+          
+          {uploading && (
+            <div className="mt-2">
+              <Progress value={uploadProgress} className="h-1" />
+              <span className="text-xs text-muted-foreground mt-1 block">
+                {uploadProgress < 100 ? 'Uploading...' : 'Complete!'}
+              </span>
+            </div>
+          )}
+        </div>
+      )}
+      
       <label htmlFor="fileUpload">
         <Button
           variant="outline"

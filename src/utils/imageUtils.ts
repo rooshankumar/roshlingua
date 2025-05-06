@@ -128,45 +128,37 @@ export function isLikelyBlockedUrl(url: string): boolean {
   return blockedDomainKeywords.some(keyword => url.includes(keyword));
 }
 
-export const handleImageLoadError = (e: React.SyntheticEvent<HTMLImageElement, Event>, url: string) => {
-  console.error("Image load error:", e, "URL:", url);
-  const imageElement = e.target as HTMLImageElement;
+export const preloadImage = (url: string): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    if (!url) {
+      reject(new Error('No URL provided'));
+      return;
+    }
 
-  // Hide the failed image
-  imageElement.style.display = 'none';
+    const img = new Image();
+    img.onload = () => resolve(url);
+    img.onerror = () => reject(new Error(`Failed to load image: ${url}`));
+    img.src = url;
+  });
+};
 
-  // Check if URL might be blocked (common for Supabase storage)
-  const isBlocked = url && isLikelyBlockedUrl(url);
+export const handleImageLoadError = (event: React.SyntheticEvent<HTMLImageElement, Event>, fallbackUrl?: string) => {
+  const img = event.currentTarget;
+  console.error('Image failed to load:', img.src);
 
-  // Create safer, escaped URL
-  const safeUrl = url ? url.replace(/"/g, '&quot;') : '';
-
-  // Add fallback directly to parent element
-  const parent = imageElement.parentElement;
-  if (parent) {
-    // Use createElement instead of innerHTML for better security
-    const fallbackDiv = document.createElement('div');
-    fallbackDiv.className = "flex flex-col items-center justify-center p-4 bg-muted/30 border border-border rounded-lg";
-
-    const messageSpan = document.createElement('span');
-    messageSpan.className = "text-sm text-muted-foreground";
-    messageSpan.textContent = isBlocked ? 
-      "Image may be blocked by your browser" : 
-      "Image could not be loaded";
-
-    const linkElement = document.createElement('a');
-    linkElement.href = safeUrl;
-    linkElement.target = "_blank";
-    linkElement.className = "text-primary hover:underline mt-2";
-    linkElement.textContent = "Open image in new tab";
-
-    fallbackDiv.appendChild(messageSpan);
-    fallbackDiv.appendChild(linkElement);
-
-    // Clear existing content and append the new elements
-    parent.innerHTML = '';
-    parent.appendChild(fallbackDiv);
+  // If the image is likely blocked or failed to load, try a fallback or display error
+  if (fallbackUrl) {
+    img.src = fallbackUrl;
+  } else {
+    img.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjIwMCIgaGVpZ2h0PSIyMDAiIGZpbGw9IiNFRUVFRUUiLz48dGV4dCB4PSI1MCUiIHk9IjUwJSIgZG9taW5hbnQtYmFzZWxpbmU9Im1pZGRsZSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1zaXplPSIyNnB4IiBmaWxsPSIjOTk5OTk5Ij5JbWFnZSBsb2FkaW5nIGZhaWxlZDwvdGV4dD48L3N2Zz4=';
   }
+
+  // Remove any loading indicators
+  img.classList.remove('animate-pulse');
+  img.parentElement?.classList.remove('shimmer');
+
+  // Optional: Add error class for styling
+  img.classList.add('image-error');
 };
 
 export const compressImage = async (file: File, options = { quality: 0.8, maxWidth: 1200 }): Promise<File> => {
