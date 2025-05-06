@@ -124,12 +124,15 @@ export function useUnreadMessages(userId: string | undefined) {
     }
   }, [userId]);
 
-  // Setup unread messages subscription - separate from the activeConversationId dependency
+  // Setup unread messages subscription - stable subscription that doesn't constantly reconnect
   useEffect(() => {
     if (!userId) return;
     
     // Fetch initial unread counts
     fetchInitialUnreadCounts();
+
+    // Create a stable channel ID that includes the user ID to avoid conflicts
+    const channelId = `unread-messages-${userId}`;
 
     // Only create a new subscription if we don't already have one
     if (!isSubscribedRef.current && !channelRef.current) {
@@ -138,7 +141,7 @@ export function useUnreadMessages(userId: string | undefined) {
       try {
         // Create a new channel
         channelRef.current = supabase
-          .channel('unread-messages')
+          .channel(channelId)
           .on('postgres_changes', {
             event: 'INSERT',
             schema: 'public',
@@ -175,8 +178,8 @@ export function useUnreadMessages(userId: string | undefined) {
               console.log(`Conversation ${participant.conversation_id} marked as read`);
             }
           })
-          .subscribe(status => {
-            console.log('Unread messages subscription status:', status);
+          .subscribe((status) => {
+            console.log(`Unread messages subscription status (${channelId}):`, status);
             if (status === 'SUBSCRIBED') {
               isSubscribedRef.current = true;
             } else if (status === 'CLOSED' || status === 'CHANNEL_ERROR') {
@@ -191,16 +194,24 @@ export function useUnreadMessages(userId: string | undefined) {
       }
     }
 
-    // Cleanup function that only runs when component is unmounted
+    // Cleanup function that only runs when component is unmounted, not on every render
     return () => {
+      // Only clean up on unmount, not when dependencies change
       if (channelRef.current) {
-        console.log('Removing unread messages subscription');
+        console.log(`Removing unread messages subscription (${channelId}) - component unmounting`);
         supabase.removeChannel(channelRef.current);
         channelRef.current = null;
         isSubscribedRef.current = false;
       }
     };
-  }, [userId, fetchInitialUnreadCounts]); // Remove activeConversationId from deps
+  }, [userId]); // Removed fetchInitialUnreadCounts to avoid recreation of subscription
+  
+  // Separate effect for fetching counts when dependencies change
+  useEffect(() => {
+    if (userId) {
+      fetchInitialUnreadCounts();
+    }
+  }, [userId, fetchInitialUnreadCounts]);
 
   // Update unread counts when active conversation changes
   useEffect(() => {

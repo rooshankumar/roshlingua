@@ -13,12 +13,12 @@ import { ScrollArea } from '../ui/scroll-area';
 import { Card, CardContent } from '../ui/card';
 import { toast } from '@/components/ui/use-toast';
 import { handleImageLoadError, isLikelyBlockedUrl } from '@/utils/imageUtils';
-import { VoiceRecorder } from './VoiceRecorder'; // Imported VoiceRecorder component
-import { MessageReactions } from './MessageReactions'; // Added import for MessageReactions
-import { useUnreadMessages } from '@/hooks/useUnreadMessages'; // Import useUnreadMessages hook
+import { VoiceRecorder } from './VoiceRecorder';
+import { MessageReactions } from './MessageReactions';
+import { useUnreadMessages } from '@/hooks/useUnreadMessages';
+import { subscribeToMessages } from '@/services/chatService'; // Import the chat service
 
-
-// Simple subscription manager (replace with a more robust solution)
+// For managing chat subscriptions
 const subscriptionManager = {
   subscriptions: {},
   subscribe: (key, callback) => {

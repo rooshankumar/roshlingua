@@ -59,10 +59,15 @@ export const subscribeToMessages = async (conversationId: string, onMessage: (me
     )
     .subscribe();
 
-  // Subscribe to user presence
-  channel.track({
-    online_at: new Date().toISOString(),
-    user_id: (await supabase.auth.getUser()).data.user?.id
+  // Properly handle presence tracking after subscription is established
+  channel.on('subscription', (status) => {
+    if (status === 'SUBSCRIBED') {
+      // Only track presence after channel is fully subscribed
+      channel.track({
+        online_at: new Date().toISOString(),
+        user_id: (supabase.auth.getUser()).data.user?.id
+      });
+    }
   });
 
   subscriptions.set(conversationId, channel);
