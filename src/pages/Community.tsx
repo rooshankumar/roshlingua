@@ -873,16 +873,16 @@ const Community = () => {
                         </h3>
                         <div className="flex items-center gap-1">
                           {/* Gender and Age Icon */}
-                          {user.gender === 'male' && user.age && (
+                          {user.gender === 'male' && (
                             <img 
-                              src={user.age <= 22 ? "/icons/young-male.png" : "/icons/adult-male.png"} 
+                              src="/icons/male.png.png" 
                               alt="Male" 
                               className="h-4 w-4 object-contain" 
                             />
                           )}
-                          {user.gender === 'female' && user.age && (
+                          {user.gender === 'female' && (
                             <img 
-                              src={user.age <= 22 ? "/icons/young-female.png" : "/icons/adult-female.png"} 
+                              src="/icons/female.png.png" 
                               alt="Female" 
                               className="h-4 w-4 object-contain" 
                             />
