@@ -294,6 +294,29 @@ export function useUnreadMessages(userId: string | undefined) {
     }
   }, [activeConversationId, unreadCounts, userId]);
 
+  // Create a function to clear all unread counts
+  const clearAllUnreadCounts = useCallback(async () => {
+    if (!userId) return;
+
+    // Update local state immediately
+    setUnreadCounts({});
+
+    // Update database
+    try {
+      await supabase
+        .from('conversation_participants')
+        .update({ 
+          unread_count: 0,
+          last_read_at: new Date().toISOString()
+        })
+        .eq('user_id', userId);
+
+      console.log('All unread counts cleared');
+    } catch (error) {
+      console.error('Error clearing all unread counts:', error);
+    }
+  }, [userId]);
+
   // Return the hook's API
   return {
     unreadCounts,
@@ -301,29 +324,7 @@ export function useUnreadMessages(userId: string | undefined) {
     setActiveConversationId,
     refreshUnreadCounts: fetchUnreadCounts,
     forceResetUnreadCount,
-    // Expose for component that requires direct setUnreadCounts access
     setUnreadCounts,
-    // Utility to clear all unread counts
-    clearAllUnreadCounts: useCallback(async () => {
-      if (!userId) return;
-
-      // Update local state immediately
-      setUnreadCounts({});
-
-      // Update database
-      try {
-        await supabase
-          .from('conversation_participants')
-          .update({ 
-            unread_count: 0,
-            last_read_at: new Date().toISOString()
-          })
-          .eq('user_id', userId);
-
-        console.log('All unread counts cleared');
-      } catch (error) {
-        console.error('Error clearing all unread counts:', error);
-      }
-    }, [userId])
+    clearAllUnreadCounts
   };
 }
