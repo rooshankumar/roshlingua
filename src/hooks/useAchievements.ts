@@ -152,22 +152,33 @@ export function useAchievements(userId: string) {
   const checkAchievements = async (stats: { xp: number; streak: number; lessons: number }) => {
     if (!userId) return; // Added null check for userId
 
-    // Get latest XP from profile
+    // Get latest profile data including XP and streak
     const { data: profileData } = await supabase
       .from('profiles')
-      .select('xp_points')
+      .select('xp_points, streak_count')
       .eq('id', userId)
       .single();
 
     const currentXP = profileData?.xp_points || 0;
+    const currentStreak = profileData?.streak_count || 0;
+
+    console.log('Checking achievements with XP:', currentXP, 'Streak:', currentStreak);
 
     for (const achievement of ACHIEVEMENTS) {
       const isUnlocked = unlockedAchievements.some(ua => ua.achievement_id === achievement.id);
       if (!isUnlocked) {
-        const statValue = achievement.condition.type === 'xp'
-          ? currentXP
-          : stats[achievement.condition.type];
+        let statValue;
+        
+        if (achievement.condition.type === 'xp') {
+          statValue = currentXP;
+        } else if (achievement.condition.type === 'streak') {
+          statValue = currentStreak; // Use streak from database directly
+        } else {
+          statValue = stats[achievement.condition.type] || 0;
+        }
 
+        console.log(`Checking achievement ${achievement.id}: ${statValue} >= ${achievement.condition.threshold}`);
+        
         if (statValue >= achievement.condition.threshold) {
           await unlockAchievement(achievement.id);
         }
@@ -196,9 +207,22 @@ export function useAchievements(userId: string) {
     }
   };
 
-  // Placeholder function - needs to be implemented elsewhere
+  // Implement addXP function using Supabase function
   const addXP = async (userId: string, source: string, amount: number) => {
-      //Implement your logic to add XP here.  This is a placeholder.
+    try {
+      const { data, error } = await supabase.rpc('increment_xp', {
+        user_id: userId,
+        action_type: source
+      });
+      
+      if (error) throw error;
+      
+      console.log(`Added ${amount} XP from ${source}`);
+      return data;
+    } catch (error) {
+      console.error('Error adding XP:', error);
+      return null;
+    }
   };
 
   return {
