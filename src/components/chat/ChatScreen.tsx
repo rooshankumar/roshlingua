@@ -64,13 +64,13 @@ export const ChatScreen = ({ conversation }: Props) => {
     if (chatContainer) {
       // Force layout recalculation to get accurate scroll height
       void chatContainer.getBoundingClientRect();
-      
+
       // Use immediate auto scroll first to get to bottom quickly
       chatContainer.scrollTo({
         top: 999999, // Large value to ensure we reach the bottom
         behavior: 'auto'
       });
-      
+
       // Then follow with a smooth scroll if requested (for visual polish)
       if (smooth) {
         requestAnimationFrame(() => {
@@ -90,12 +90,12 @@ export const ChatScreen = ({ conversation }: Props) => {
     scrollAttempts.forEach(delay => {
       setTimeout(() => scrollToLatestMessage(false), delay);
     });
-    
+
     // Also scroll when window is resized or orientation changes
     const handleResize = () => scrollToLatestMessage(false);
     window.addEventListener('resize', handleResize);
     window.addEventListener('orientationchange', handleResize);
-    
+
     return () => {
       window.removeEventListener('resize', handleResize);
       window.removeEventListener('orientationchange', handleResize);
@@ -277,7 +277,7 @@ export const ChatScreen = ({ conversation }: Props) => {
 
   const handleReact = async (messageId: string, emoji: string) => {
     if (!user?.id) return;
-    
+
     try {
       // Find existing message reactions component and tell it to add this reaction
       const messageReactions = document.querySelector(`[data-message-reactions="${messageId}"]`) as any;
@@ -296,7 +296,7 @@ export const ChatScreen = ({ conversation }: Props) => {
       } else {
         // Direct API call if component not found
         const userId = user.id;
-        
+
         // Check if reaction exists
         const { data: existingReaction } = await supabase
           .from('message_reactions')
@@ -305,7 +305,7 @@ export const ChatScreen = ({ conversation }: Props) => {
           .eq('user_id', userId)
           .eq('emoji', emoji)
           .maybeSingle();
-          
+
         if (existingReaction) {
           // Delete the reaction if it exists
           await supabase
@@ -416,6 +416,29 @@ export const ChatScreen = ({ conversation }: Props) => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
+  // Function to mark messages as read
+  const markMessagesAsRead = async (conversationId: string) => {
+    try {
+      // Mark messages as read in database
+      await supabase
+        .from('messages')
+        .update({ is_read: true })
+        .eq('conversation_id', conversationId)
+        .eq('is_read', false);
+
+
+    } catch (error) {
+      console.error('Error marking messages as read:', error);
+    }
+  };
+
+  useEffect(() => {
+    if (conversation?.id) {
+      markMessagesAsRead(conversation.id);
+    }
+  }, [conversation?.id]);
+
+
   return (
     <Card className="fixed inset-0 flex flex-col md:static md:h-screen md:max-w-4xl md:mx-auto md:rounded-2xl border-none shadow-2xl overflow-hidden bg-gradient-to-b from-background/95 to-background/90 backdrop-blur-lg">
       <div className="sticky top-0 left-0 right-0 z-40 bg-background/95 backdrop-blur-xl">
@@ -447,10 +470,10 @@ export const ChatScreen = ({ conversation }: Props) => {
                   // Set up long press handler
                   const element = e.currentTarget;
                   const messageId = message.id;
-                  
+
                   // Add visual feedback
                   element.classList.add('message-long-press');
-                  
+
                   const longPressTimer = setTimeout(() => {
                     // Show message actions on long press
                     const messageActions = document.getElementById(`message-actions-${messageId}`);
@@ -464,7 +487,7 @@ export const ChatScreen = ({ conversation }: Props) => {
                       messageActions.classList.add('active');
                     }
                   }, 400); // 400ms for long press - slightly faster for better responsiveness
-                  
+
                   // Store the timer ID to clear it on touchend
                   element.setAttribute('data-long-press-timer', longPressTimer.toString());
                 }}
@@ -476,7 +499,7 @@ export const ChatScreen = ({ conversation }: Props) => {
                     clearTimeout(parseInt(timerId));
                     element.removeAttribute('data-long-press-timer');
                   }
-                  
+
                   // Remove visual feedback
                   element.classList.remove('message-long-press');
                 }}
@@ -537,7 +560,7 @@ export const ChatScreen = ({ conversation }: Props) => {
                         </svg>
                       </button>
                     </div>
-                    
+
                     {/* Emoji picker */}
                     <div 
                       id={`emoji-picker-${message.id}`}

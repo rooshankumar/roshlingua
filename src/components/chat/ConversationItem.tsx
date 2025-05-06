@@ -43,10 +43,18 @@ export const ConversationItem = ({
           <AvatarImage src={otherParticipant.avatar} alt={otherParticipant.name} />
           <AvatarFallback>{getInitials(otherParticipant.name)}</AvatarFallback>
         </Avatar>
+        {/* Online status indicator (green dot) */}
         <span className={cn(
           "absolute bottom-0 right-0 block h-3 w-3 rounded-full ring-2 ring-background",
           otherParticipant.isOnline ? "bg-green-500" : "bg-gray-400"
         )} />
+        
+        {/* Unread notification dot - show in top right only if has unread messages */}
+        {hasUnread && (
+          <span className="absolute -top-1 -right-1 bg-destructive text-destructive-foreground rounded-full min-w-[16px] h-4 flex items-center justify-center text-xs font-medium px-1">
+            {conversation.unreadCount}
+          </span>
+        )}
       </div>
       <div className="flex-1 min-w-0">
         <div className="flex justify-between items-center">
@@ -69,9 +77,6 @@ export const ConversationItem = ({
           </p>
         )}
       </div>
-      {hasUnread && (
-        <div className="h-2.5 w-2.5 rounded-full bg-chat-primary" />
-      )}
     </div>
   );
 };
