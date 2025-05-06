@@ -51,8 +51,14 @@ export function useUnreadMessages(userId: string | undefined) {
     try {
       console.log(`Marking conversation ${conversationId} as read for user ${userId}`);
       
-      // Set active conversation
+      // Set active conversation immediately (this will update the UI right away)
       setActiveConversationId(conversationId);
+      
+      // Update local state immediately before the database calls
+      setUnreadCounts(prev => ({
+        ...prev,
+        [conversationId]: 0
+      }));
       
       // Update messages as read
       const { error: messagesError } = await supabase
@@ -80,12 +86,6 @@ export function useUnreadMessages(userId: string | undefined) {
         console.error('Error updating conversation participant:', participantError);
       }
       
-      // Update local state immediately
-      setUnreadCounts(prev => ({
-        ...prev,
-        [conversationId]: 0
-      }));
-      
       console.log(`Marked conversation ${conversationId} as read, new unread counts:`, {
         ...unreadCounts,
         [conversationId]: 0
@@ -93,7 +93,7 @@ export function useUnreadMessages(userId: string | undefined) {
     } catch (error) {
       console.error('Error marking conversation as read:', error);
     }
-  }, [userId, unreadCounts]);
+  }, [userId]);
 
   // Force clear all unread counts - useful for when we're sure all messages are read
   const clearAllUnreadCounts = useCallback(async () => {

@@ -18,8 +18,8 @@ export const ConversationItem = ({
   onClick,
 }: ConversationItemProps) => {
   const otherParticipant = getOtherParticipant(conversation, currentUserId);
-  // Only show as unread if we have a positive unread count that's explicitly set
-  const hasUnread = (conversation.unreadCount || 0) > 0;
+  // Only show as unread if we have a positive unread count
+  const hasUnread = (conversation.unreadCount > 0);
   const lastMessage = conversation.lastMessage;
 
   const getInitials = (name: string) => {

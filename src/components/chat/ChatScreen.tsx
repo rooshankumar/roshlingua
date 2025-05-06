@@ -437,7 +437,7 @@ export const ChatScreen = ({ conversation }: Props) => {
     if (conversation?.id && user?.id) {
       // Mark as read when conversation is loaded or changes
       markMessagesAsRead(conversation.id);
-      
+
       // Also mark as read when messages are received or updated
       if (messages.length > 0) {
         markMessagesAsRead(conversation.id);
