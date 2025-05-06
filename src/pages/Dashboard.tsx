@@ -21,7 +21,6 @@ import { cn } from "@/lib/utils";
 
 import { useAchievements, ACHIEVEMENTS } from '@/hooks/useAchievements';
 import { AchievementsList } from '@/components/AchievementsList';
-import { toast } from "@/components/ui/toast";
 
 const Dashboard = () => {
   const { user } = useAuth();
@@ -292,20 +291,6 @@ const Dashboard = () => {
     };
   }, [user?.id]); // Only re-run when user ID changes
 
-  const fixStreakAchievements = async () => {
-    try {
-      //This needs proper implementation based on your database schema
-      //It should find users with streak >=3 and missing "Consistent Learner" achievement, then update.
-      const { data, error } = await supabase.rpc('fix_streak_achievements');
-      if (error) throw error;
-      return { fixed: data.count, error: null };
-    } catch (error) {
-      console.error("Error fixing streak achievements:", error);
-      return { fixed: 0, error };
-    }
-  };
-
-
   return (
     <div className="mobile-container pb-8 animate-fade-up"> {/* Added mobile-container class */}
       <div className="relative space-y-2 mb-8 p-4 rounded-xl bg-gradient-to-r from-primary/10 via-primary/5 to-background"> {/* Reduced p-8 to p-4 */}
@@ -384,51 +369,6 @@ const Dashboard = () => {
             </div>
           </CardContent>
         </Card>
-
-        {/* Admin Tools - Only visible to admins */}
-        {user?.email?.includes('admin') && (
-          <Card className="col-span-full">
-            <CardHeader>
-              <CardTitle>Admin Tools</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div>
-                  <h3 className="font-medium mb-2">Achievement Fixes</h3>
-                  <Button 
-                    variant="outline" 
-                    onClick={async () => {
-                      try {
-                        const { fixed, error } = await fixStreakAchievements();
-                        if (error) {
-                          toast({
-                            title: "Error fixing achievements",
-                            description: "Check console for details",
-                            variant: "destructive"
-                          });
-                        } else {
-                          toast({
-                            title: "Streak Achievements Fixed",
-                            description: `Fixed achievements for ${fixed} users`,
-                          });
-                        }
-                      } catch (err) {
-                        console.error(err);
-                        toast({
-                          title: "Error",
-                          description: "Something went wrong",
-                          variant: "destructive"
-                        });
-                      }
-                    }}
-                  >
-                    Fix Streak Achievements
-                  </Button>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        )}
       </div>
 
 

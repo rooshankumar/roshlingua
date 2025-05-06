@@ -149,44 +149,24 @@ export function useAchievements(userId: string) {
     };
   };
 
-  const checkAchievements = async (stats: { xp?: number; streak?: number; conversations?: number; messages?: number } = {}) => {
+  const checkAchievements = async (stats: { xp: number; streak: number; lessons: number }) => {
     if (!userId) return; // Added null check for userId
 
-    // Get latest profile data with XP and streak
+    // Get latest XP from profile
     const { data: profileData } = await supabase
       .from('profiles')
-      .select('xp_points, streak_count')
+      .select('xp_points')
       .eq('id', userId)
       .single();
 
-    if (!profileData) return;
-
-    const currentStats = {
-      xp: profileData.xp_points || 0,
-      streak: profileData.streak_count || 0,
-      conversations: stats.conversations || 0,
-      messages: stats.messages || 0
-    };
+    const currentXP = profileData?.xp_points || 0;
 
     for (const achievement of ACHIEVEMENTS) {
       const isUnlocked = unlockedAchievements.some(ua => ua.achievement_id === achievement.id);
       if (!isUnlocked) {
-        // Use the appropriate stat value based on achievement condition type
-        let statValue = 0;
-        switch (achievement.condition.type) {
-          case 'xp':
-            statValue = currentStats.xp;
-            break;
-          case 'streak':
-            statValue = currentStats.streak;
-            break;
-          case 'conversations':
-            statValue = currentStats.conversations;
-            break;
-          case 'messages':
-            statValue = currentStats.messages;
-            break;
-        }
+        const statValue = achievement.condition.type === 'xp'
+          ? currentXP
+          : stats[achievement.condition.type];
 
         if (statValue >= achievement.condition.threshold) {
           await unlockAchievement(achievement.id);

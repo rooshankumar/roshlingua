@@ -25,20 +25,6 @@ export const updateUserActivity = async (userId: string) => {
       .select('streak_count')
       .eq('id', userId)
       .single();
-      
-    // If the streak was updated, check for streak-related achievements
-    if (updatedData && (currentData?.streak_count !== updatedData.streak_count)) {
-      try {
-        // Dynamically import to avoid circular dependencies
-        const { useAchievements } = await import('@/hooks/useAchievements');
-        const { checkAchievements } = useAchievements(userId);
-        
-        // Check achievements with the updated streak count
-        await checkAchievements({ streak: updatedData.streak_count });
-      } catch (err) {
-        console.error('Error checking achievements after streak update:', err);
-      }
-    }
 
     return updatedData?.streak_count;
   } catch (error) {
