@@ -13,12 +13,11 @@ import { ScrollArea } from '../ui/scroll-area';
 import { Card, CardContent } from '../ui/card';
 import { toast } from '@/components/ui/use-toast';
 import { handleImageLoadError, isLikelyBlockedUrl } from '@/utils/imageUtils';
-import { VoiceRecorder } from './VoiceRecorder';
-import { MessageReactions } from './MessageReactions';
-import { useUnreadMessages } from '@/hooks/useUnreadMessages';
-import { subscribeToMessages } from '@/services/chatService'; // Import the chat service
+import { VoiceRecorder } from './VoiceRecorder'; // Imported VoiceRecorder component
+import { MessageReactions } from './MessageReactions'; // Added import for MessageReactions
 
-// For managing chat subscriptions
+
+// Simple subscription manager (replace with a more robust solution)
 const subscriptionManager = {
   subscriptions: {},
   subscribe: (key, callback) => {
@@ -91,27 +90,6 @@ export const ChatScreen = ({ conversation }: Props) => {
     scrollAttempts.forEach(delay => {
       setTimeout(() => scrollToLatestMessage(false), delay);
     });
-    
-    // Also force reset unread counts for this conversation
-    if (conversation?.id && user?.id) {
-      // Import the hook functions
-      const { setUnreadCounts, forceResetUnreadCount } = useUnreadMessages(user.id);
-      
-      // Aggressively reset both local state and database
-      setUnreadCounts(prev => ({
-        ...prev,
-        [conversation.id]: 0
-      }));
-      
-      // Force database reset in case local state isn't syncing properly
-      // Try multiple times with increasing delays
-      [0, 500, 1500].forEach(delay => {
-        setTimeout(() => {
-          console.log(`Force resetting unread count for ${conversation.id} (delay: ${delay}ms)`);
-          forceResetUnreadCount(conversation.id);
-        }, delay);
-      });
-    }
 
     // Also scroll when window is resized or orientation changes
     const handleResize = () => scrollToLatestMessage(false);
@@ -438,71 +416,27 @@ export const ChatScreen = ({ conversation }: Props) => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
-  // Import useUnreadMessages hook
-  const { markConversationAsRead } = useUnreadMessages(user?.id);
-
-  // Mark messages as read
+  // Function to mark messages as read
   const markMessagesAsRead = async (conversationId: string) => {
     try {
-      if (!user?.id) return;
+      // Mark messages as read in database
+      await supabase
+        .from('messages')
+        .update({ is_read: true })
+        .eq('conversation_id', conversationId)
+        .eq('is_read', false);
 
-      console.log('ChatScreen: Marking conversation as read:', conversationId);
-      // Use the hook function to mark messages as read and update the unread count
-      await markConversationAsRead(conversationId);
+
     } catch (error) {
       console.error('Error marking messages as read:', error);
     }
   };
 
   useEffect(() => {
-    if (conversation?.id && user?.id) {
-      // Mark as read when conversation is loaded or changes
+    if (conversation?.id) {
       markMessagesAsRead(conversation.id);
-
-      // Also mark as read when messages are received or updated
-      if (messages.length > 0 && conversation?.id && user?.id) {
-        console.log(`[READ-STATUS] Marking messages as read in conversation ${conversation.id}`);
-        
-        // Execute in sequence to prevent race conditions
-        (async () => {
-          try {
-            // First mark messages as read in the messages table
-            await markMessagesAsRead(conversation.id, user.id);
-            
-            // Then explicitly update the conversation_participants table
-            await supabase
-              .from('conversation_participants')
-              .update({ 
-                unread_count: 0,
-                last_read_at: new Date().toISOString()
-              })
-              .eq('conversation_id', conversation.id)
-              .eq('user_id', user.id);
-            
-            // Log confirmation for debugging
-            console.log(`[READ-STATUS] Successfully marked conversation ${conversation.id} as read`);
-            
-            // Forcefully request an unread counts refresh to ensure UI consistency
-            const { refreshUnreadCounts, forceResetUnreadCount, setUnreadCounts } = useUnreadMessages(user.id);
-            
-            // Apply multiple strategies for maximum reliability
-            setUnreadCounts(prev => ({
-              ...prev,
-              [conversation.id]: 0
-            }));
-            
-            // Force a reset with a slight delay to ensure database operations completed
-            setTimeout(() => {
-              forceResetUnreadCount(conversation.id);
-              refreshUnreadCounts();
-            }, 500);
-          } catch (error) {
-            console.error("[READ-STATUS] Error updating read status:", error);
-          }
-        })();
-      }
     }
-  }, [conversation?.id, user?.id, messages.length]);
+  }, [conversation?.id]);
 
 
   return (

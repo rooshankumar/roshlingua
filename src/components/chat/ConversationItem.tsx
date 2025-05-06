@@ -18,10 +18,7 @@ export const ConversationItem = ({
   onClick,
 }: ConversationItemProps) => {
   const otherParticipant = getOtherParticipant(conversation, currentUserId);
-  // Explicitly check for positive number with Number coercion in case unreadCount is undefined
-  // Force coercion to number and ensure active conversations never show unread
-  const unreadCount = isActive ? 0 : Number(conversation.unreadCount) || 0;
-  const hasUnread = unreadCount > 0;
+  const hasUnread = (conversation.unreadCount || 0) > 0;
   const lastMessage = conversation.lastMessage;
 
   const getInitials = (name: string) => {
@@ -51,14 +48,11 @@ export const ConversationItem = ({
           "absolute bottom-0 right-0 block h-3 w-3 rounded-full ring-2 ring-background",
           otherParticipant.isOnline ? "bg-green-500" : "bg-gray-400"
         )} />
-
+        
         {/* Unread notification dot - show in top right only if has unread messages */}
-        {unreadCount > 0 && (
-          <span 
-            className="absolute -top-1 -right-1 bg-destructive text-destructive-foreground rounded-full min-w-[16px] h-4 flex items-center justify-center text-xs font-medium px-1 animate-pulse"
-            title={`${unreadCount} unread message${unreadCount === 1 ? '' : 's'}`}
-          >
-            {unreadCount}
+        {hasUnread && (
+          <span className="absolute -top-1 -right-1 bg-destructive text-destructive-foreground rounded-full min-w-[16px] h-4 flex items-center justify-center text-xs font-medium px-1">
+            {conversation.unreadCount}
           </span>
         )}
       </div>

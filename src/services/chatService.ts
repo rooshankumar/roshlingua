@@ -59,15 +59,10 @@ export const subscribeToMessages = async (conversationId: string, onMessage: (me
     )
     .subscribe();
 
-  // Properly handle presence tracking after subscription is established
-  channel.on('subscription', (status) => {
-    if (status === 'SUBSCRIBED') {
-      // Only track presence after channel is fully subscribed
-      channel.track({
-        online_at: new Date().toISOString(),
-        user_id: (supabase.auth.getUser()).data.user?.id
-      });
-    }
+  // Subscribe to user presence
+  channel.track({
+    online_at: new Date().toISOString(),
+    user_id: (await supabase.auth.getUser()).data.user?.id
   });
 
   subscriptions.set(conversationId, channel);
@@ -98,66 +93,10 @@ export const fetchMessages = async (conversationId: string, currentUserId: strin
   ) || [];
 
   if (unreadMessages.length > 0) {
-    console.log(`Marking ${unreadMessages.length} messages as read in conversation ${conversationId}`);
-    
-    try {
-      // Update message read status
-      const { error: updateError } = await supabase
-        .from('messages')
-        .update({ is_read: true })
-        .in('id', unreadMessages.map(msg => msg.id));
-      
-      if (updateError) throw updateError;
-      
-      // CRITICAL: Also update the conversation_participants table to reflect 0 unread messages
-      const { error: participantError } = await supabase
-        .from('conversation_participants')
-        .update({ 
-          unread_count: 0,
-          last_read_at: new Date().toISOString()
-        })
-        .eq('conversation_id', conversationId)
-        .eq('user_id', currentUserId);
-      
-      if (participantError) throw participantError;
-      
-      console.log(`Successfully marked messages as read and updated participant record`);
-      
-      // Verification check to ensure changes were properly applied
-      setTimeout(async () => {
-        try {
-          // Verify conversation_participants record was updated
-          const { data: verification, error: verifyError } = await supabase
-            .from('conversation_participants')
-            .select('unread_count')
-            .eq('conversation_id', conversationId)
-            .eq('user_id', currentUserId)
-            .single();
-            
-          if (verifyError) {
-            console.error('Error verifying participant update:', verifyError);
-          } else if (verification && verification.unread_count > 0) {
-            console.warn(`Verification failed: unread_count still ${verification.unread_count}, forcing update`);
-            
-            // Force another update attempt if verification failed
-            await supabase
-              .from('conversation_participants')
-              .update({ 
-                unread_count: 0,
-                last_read_at: new Date().toISOString()
-              })
-              .eq('conversation_id', conversationId)
-              .eq('user_id', currentUserId);
-          } else {
-            console.log('Verification passed: unread_count properly reset');
-          }
-        } catch (verifyErr) {
-          console.error('Error in verification check:', verifyErr);
-        }
-      }, 1000);
-    } catch (error) {
-      console.error('Error updating read status:', error);
-    }
+    await supabase
+      .from('messages')
+      .update({ is_read: true })
+      .in('id', unreadMessages.map(msg => msg.id));
   }
 
   return data || [];
@@ -344,61 +283,15 @@ export const fetchConversationsOld = async (userId: string) => {
 
 // ✅ Mark Messages as Read (Optimized)
 export const markMessagesAsRead = async (conversationId: string, userId: string) => {
-  try {
-    console.log(`Marking all messages as read for user ${userId} in conversation ${conversationId}`);
-    
-    // First, update all unread messages that weren't sent by the current user
-    const { data: messages, error: fetchError } = await supabase
-      .from('messages')
-      .select('id')
-      .eq('conversation_id', conversationId)
-      .neq('sender_id', userId)
-      .eq('is_read', false);
-      
-    if (fetchError) throw fetchError;
-    
-    if (messages && messages.length > 0) {
-      const messageIds = messages.map(msg => msg.id);
-      
-      // Update the messages to be read
-      const { error: updateError } = await supabase
-        .from('messages')
-        .update({ is_read: true })
-        .in('id', messageIds);
-        
-      if (updateError) throw updateError;
-      
-      console.log(`Marked ${messageIds.length} messages as read`);
-    }
-    
-    // Then, ensure the conversation_participants record is updated
-    const { error: participantError } = await supabase
-      .from('conversation_participants')
-      .update({ 
-        unread_count: 0,
-        last_read_at: new Date().toISOString() 
-      })
-      .eq('conversation_id', conversationId)
-      .eq('user_id', userId);
-      
-    if (participantError) throw participantError;
-    
-    console.log(`Updated conversation_participants record for ${userId}`);
-    
-    // For debugging - verify the update worked
-    const { data: verification } = await supabase
-      .from('conversation_participants')
-      .select('unread_count')
-      .eq('conversation_id', conversationId)
-      .eq('user_id', userId)
-      .single();
-      
-    console.log(`Verification: unread_count is now ${verification?.unread_count}`);
-    
-    return true;
-  } catch (error) {
-    console.error('Error in markMessagesAsRead:', error);
-    return false;
+  const { error } = await supabase
+    .from('messages')
+    .update({ is_read: true })
+    .eq('conversation_id', conversationId)
+    .eq('recipient_id', userId)
+    .eq('is_read', false);
+
+  if (error) {
+    console.error('Error marking messages as read:', error);
   }
 };
 

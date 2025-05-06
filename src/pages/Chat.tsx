@@ -5,49 +5,15 @@ import { Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/lib/supabase';
 import { ChatScreen } from '@/components/chat/ChatScreen';
-import { useUnreadMessages } from "@/hooks/useUnreadMessages";
 
 const ChatPage = () => {
   const { conversationId } = useParams();
   const { user } = useAuth();
-  const { markConversationAsRead, setActiveConversationId, forceResetUnreadCount, refreshUnreadCounts } = useUnreadMessages(user?.id);
   const [isLoading, setIsLoading] = useState(true);
   const [conversation, setConversation] = useState<any>(null);
 
-  // Update active conversation and mark as read when conversation ID changes
-  useEffect(() => {
-    if (conversationId && user?.id) {
-      console.log('Setting active conversation:', conversationId);
-
-      // Set the active conversation ID first
-      setActiveConversationId(conversationId);
-
-      // Force a complete reset of the unread count
-      forceResetUnreadCount(conversationId);
-
-      // Also mark as read to ensure database consistency
-      markConversationAsRead(conversationId);
-
-      // Perform multiple refreshes with increasing delays to ensure UI consistency
-      refreshUnreadCounts();
-
-      const timers = [100, 500, 1500].map(delay => 
-        setTimeout(() => {
-          refreshUnreadCounts();
-          // Double-check that the unread count is properly reset
-          forceResetUnreadCount(conversationId);
-        }, delay)
-      );
-
-      return () => timers.forEach(timer => clearTimeout(timer));
-    }
-  }, [conversationId, user?.id, markConversationAsRead, setActiveConversationId, refreshUnreadCounts, forceResetUnreadCount]);
-
   useEffect(() => {
     if (!user || !conversationId) return;
-
-    // Set this as the active conversation
-    setActiveConversationId(conversationId);
 
     const loadConversation = async () => {
       try {
@@ -99,8 +65,17 @@ const ChatPage = () => {
             throw messagesError;
           }
 
-          // Use the hook function to mark messages as read (this will update both DB and local state)
-          await markConversationAsRead(conversationId);
+          // Mark messages as read
+          const { error: readError } = await supabase
+            .from('messages')
+            .update({ is_read: true })
+            .eq('conversation_id', conversationId)
+            .eq('recipient_id', user.id)
+            .eq('is_read', false);
+
+          if (readError) {
+            console.error('Error marking messages as read:', readError);
+          }
 
           setConversation({
             id: conversationId,
@@ -121,12 +96,7 @@ const ChatPage = () => {
     };
 
     loadConversation();
-
-    // Cleanup function - clear active conversation when unmounting
-    return () => {
-      setActiveConversationId(null);
-    };
-  }, [user, conversationId, markConversationAsRead, setActiveConversationId]);
+  }, [user, conversationId]);
 
   if (!user) {
     return (
