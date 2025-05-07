@@ -10,7 +10,8 @@ import { supabase } from '@/lib/supabase';
 import { ChatHeader } from './ChatHeader';
 import { Textarea } from '../ui/textarea';
 import { ScrollArea } from '../ui/scroll-area';
-import { Card, CardContent } from '../ui/card';
+// Import Card by destructuring from module directly
+import { Card, CardContent } from '@/components/ui/card';
 import { toast } from '@/components/ui/use-toast';
 import { handleImageLoadError, isLikelyBlockedUrl } from '@/utils/imageUtils';
 import { VoiceRecorder } from './VoiceRecorder'; // Imported VoiceRecorder component
