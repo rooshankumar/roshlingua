@@ -1,0 +1,56 @@
+messages
+main.tsx:22 Chat connection status: SUBSCRIBED
+main.tsx:22 Chat connection is healthy
+chunk-276SZO74.js?v=0fed25b6:521 Warning: React does not recognize the `fetchPriority` prop on a DOM element. If you intentionally want it to appear in the DOM as a custom attribute, spell it as lowercase `fetchpriority` instead. If you accidentally passed it from a parent component, remove it from the DOM element.
+    at img
+    at a
+    at div
+    at div
+    at div
+    at div
+    at div
+    at div
+    at div
+    at div
+    at https://fc0a7c56-22d1-4a62-9ddb-6c58052252f2-00-1n6jtz3qblrnx.pike.replit.dev:5173/node_modules/.vite/deps/chunk-O6P3XUGN.js?v=0fed25b6:41:13
+    at https://fc0a7c56-22d1-4a62-9ddb-6c58052252f2-00-1n6jtz3qblrnx.pike.replit.dev:5173/node_modules/.vite/deps/@radix-ui_react-scroll-area.js?v=df4f3ea6:114:13
+    at div
+    at https://fc0a7c56-22d1-4a62-9ddb-6c58052252f2-00-1n6jtz3qblrnx.pike.replit.dev:5173/node_modules/.vite/deps/chunk-O6P3XUGN.js?v=0fed25b6:41:13
+    at Provider (https://fc0a7c56-22d1-4a62-9ddb-6c58052252f2-00-1n6jtz3qblrnx.pike.replit.dev:5173/node_modules/.vite/deps/chunk-C3PQM2IK.js?v=0fed25b6:38:15)
+    at https://fc0a7c56-22d1-4a62-9ddb-6c58052252f2-00-1n6jtz3qblrnx.pike.replit.dev:5173/node_modules/.vite/deps/@radix-ui_react-scroll-area.js?v=df4f3ea6:52:7
+    at _c (https://fc0a7c56-22d1-4a62-9ddb-6c58052252f2-00-1n6jtz3qblrnx.pike.replit.dev:5173/src/components/ui/scroll-area.tsx:13:59)
+    at div
+    at _c (https://fc0a7c56-22d1-4a62-9ddb-6c58052252f2-00-1n6jtz3qblrnx.pike.replit.dev:5173/src/components/ui/card.tsx:12:53)
+    at ChatScreen (https://fc0a7c56-22d1-4a62-9ddb-6c58052252f2-00-1n6jtz3qblrnx.pike.replit.dev:5173/src/components/chat/ChatScreen.tsx?t=1746624045753:47:30)
+    at div
+    at ChatPage (https://fc0a7c56-22d1-4a62-9ddb-6c58052252f2-00-1n6jtz3qblrnx.pike.replit.dev:5173/src/pages/Chat.tsx?t=1746624045753:21:32)
+    at main
+    at div
+    at AppLayout (https://fc0a7c56-22d1-4a62-9ddb-6c58052252f2-00-1n6jtz3qblrnx.pike.replit.dev:5173/src/components/layouts/AppLayout.tsx?t=1746624045753:84:22)
+    at ProtectedRoute (https://fc0a7c56-22d1-4a62-9ddb-6c58052252f2-00-1n6jtz3qblrnx.pike.replit.dev:5173/src/components/auth/ProtectedRoute.tsx?t=1746624045753:15:27)
+    at RenderedRoute (https://fc0a7c56-22d1-4a62-9ddb-6c58052252f2-00-1n6jtz3qblrnx.pike.replit.dev:5173/node_modules/.vite/deps/react-router-dom.js?v=88cf1a1c:4069:5)
+    at Routes (https://fc0a7c56-22d1-4a62-9ddb-6c58052252f2-00-1n6jtz3qblrnx.pike.replit.dev:5173/node_modules/.vite/deps/react-router-dom.js?v=88cf1a1c:4508:5)
+    at AppRoutes (https://fc0a7c56-22d1-4a62-9ddb-6c58052252f2-00-1n6jtz3qblrnx.pike.replit.dev:5173/src/App.tsx?t=1746624045753:40:33)
+    at AuthProvider (https://fc0a7c56-22d1-4a62-9ddb-6c58052252f2-00-1n6jtz3qblrnx.pike.replit.dev:5173/src/providers/AuthProvider.tsx?t=1746624045753:24:32)
+    at Router (https://fc0a7c56-22d1-4a62-9ddb-6c58052252f2-00-1n6jtz3qblrnx.pike.replit.dev:5173/node_modules/.vite/deps/react-router-dom.js?v=88cf1a1c:4451:15)
+    at BrowserRouter (https://fc0a7c56-22d1-4a62-9ddb-6c58052252f2-00-1n6jtz3qblrnx.pike.replit.dev:5173/node_modules/.vite/deps/react-router-dom.js?v=88cf1a1c:5196:5)
+    at ThemeProvider (https://fc0a7c56-22d1-4a62-9ddb-6c58052252f2-00-1n6jtz3qblrnx.pike.replit.dev:5173/src/components/theme-provider.tsx:17:33)
+    at QueryClientProvider (https://fc0a7c56-22d1-4a62-9ddb-6c58052252f2-00-1n6jtz3qblrnx.pike.replit.dev:5173/node_modules/.vite/deps/@tanstack_react-query.js?v=85cd21cc:2794:3)
+    at App
+printWarning @ chunk-276SZO74.js?v=0fed25b6:521
+error @ chunk-276SZO74.js?v=0fed25b6:505
+validateProperty$1 @ chunk-276SZO74.js?v=0fed25b6:3427
+warnUnknownProperties @ chunk-276SZO74.js?v=0fed25b6:3459
+validateProperties$2 @ chunk-276SZO74.js?v=0fed25b6:3478
+validatePropertiesInDevelopment @ chunk-276SZO74.js?v=0fed25b6:7346
+setInitialProperties @ chunk-276SZO74.js?v=0fed25b6:7535
+finalizeInitialChildren @ chunk-276SZO74.js?v=0fed25b6:8345
+completeWork @ chunk-276SZO74.js?v=0fed25b6:16293
+completeUnitOfWork @ chunk-276SZO74.js?v=0fed25b6:19224
+performUnitOfWork @ chunk-276SZO74.js?v=0fed25b6:19206
+workLoopSync @ chunk-276SZO74.js?v=0fed25b6:19137
+renderRootSync @ chunk-276SZO74.js?v=0fed25b6:19116
+performConcurrentWorkOnRoot @ chunk-276SZO74.js?v=0fed25b6:18678
+workLoop @ chunk-276SZO74.js?v=0fed25b6:197
+flushWork @ chunk-276SZO74.js?v=0fed25b6:176
+performWorkUntilDeadline @ chunk-276SZO74.js?v=0fed25b6:384Understand this error
