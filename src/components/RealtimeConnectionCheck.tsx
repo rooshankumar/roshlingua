@@ -19,6 +19,7 @@ export default function RealtimeConnectionCheck() {
   const [isCheckingConnection, setIsCheckingConnection] = useState(false);
   const [connectionHealthy, setConnectionHealthy] = useState(true);
   const [connectionStatus, setConnectionStatus] = useState('Connected');
+  const [connectionError, setConnectionError] = useState<string | null>(null); // Added state for connection errors
 
 
   // Handle offline/online status changes
@@ -181,6 +182,41 @@ export default function RealtimeConnectionCheck() {
         setIsCheckingConnection(false);
       });
   }, [user?.id, refreshAllConnections]);
+
+
+  useEffect(() => {
+    const checkConnection = () => {
+      try {
+        const channel = supabase.channel('connection_test');
+
+        channel.subscribe((status) => {
+          setConnectionStatus(status);
+          if (status === 'SUBSCRIBED') {
+            console.log('Realtime connection is healthy');
+            setConnectionError(null);
+          } else {
+            console.warn('Realtime connection issue:', status);
+            setConnectionError('Connection issue detected');
+          }
+        });
+
+        const channelRef = channel;
+
+        setTimeout(() => {
+          try {
+            channelRef.unsubscribe();
+          } catch (err) {
+            console.error('Error unsubscribing from test channel:', err);
+          }
+        }, 5000);
+      } catch (error) {
+        console.error('Error checking realtime connection:', error);
+        setConnectionError(`Connection error: ${error.message || 'Unknown error'}`);
+      }
+    };
+
+    checkConnection();
+  }, []);
 
 
   // This component doesn't render anything visible

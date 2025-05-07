@@ -42,7 +42,12 @@ class SubscriptionManager {
     if (subscription) {
       try {
         console.log('[SubscriptionManager]', `Unsubscribing from ${key}`);
-        subscription.channel.unsubscribe();
+        // Check if the subscription has the unsubscribe method
+        if (typeof subscription.unsubscribe === 'function') {
+          subscription.unsubscribe();
+        } else if (subscription.channel && typeof subscription.channel.unsubscribe === 'function') {
+          subscription.channel.unsubscribe();
+        }
         this.subscriptions.delete(key);
       } catch (error) {
         console.error('[SubscriptionManager]', `Error unsubscribing from ${key}:`, error);
