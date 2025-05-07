@@ -132,7 +132,7 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
             case 1:
                 return !!values.full_name && !!values.gender;
             case 2:
-                return !!values.nativeLanguage && !!values.learningLanguage && !!values.proficiencyLevel;
+                return !!values.native_language && !!values.learning_language && !!values.proficiency_level;
             case 3:
                 return !!values.bio; // Changed from learningGoal
             default:
@@ -183,14 +183,14 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
                 .from('profiles')
                 .upsert({
                     id: user.id,
-                    user_id: user.id,
+                    email: user.email,
                     gender: formData.gender,
                     date_of_birth: formData.date_of_birth ? new Date(formData.date_of_birth).toISOString().split('T')[0] : null,
-                    native_language: formData.nativeLanguage,
-                    learning_language: formData.learningLanguage,
-                    proficiency_level: formData.proficiencyLevel,
+                    native_language: formData.native_language,
+                    learning_language: formData.learning_language,
+                    proficiency_level: formData.proficiency_level,
                     bio: formData.bio,
-                    avatar_url: formData.avatarUrl,
+                    avatar_url: formData.avatar_url,
                     full_name: formData.full_name,
                     onboarding_completed: true,
                     updated_at: new Date().toISOString()
@@ -253,7 +253,7 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
                 .from('avatars')
                 .getPublicUrl(filePath);
 
-            form.setValue("avatarUrl", publicUrl);
+            form.setValue("avatar_url", publicUrl);
 
             toast({
                 title: "Avatar uploaded",
@@ -374,7 +374,7 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
                                 <div className="space-y-4">
                                     <FormField
                                         control={form.control}
-                                        name="nativeLanguage"
+                                        name="native_language"
                                         render={({ field }) => (
                                             <FormItem className="flex flex-col">
                                                 <FormLabel>Native Language</FormLabel>
@@ -460,7 +460,7 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
 
                                     <FormField
                                         control={form.control}
-                                        name="learningLanguage"
+                                        name="learning_language"
                                         render={({ field }) => (
                                             <FormItem className="flex flex-col">
                                                 <FormLabel>Language You Want to Learn</FormLabel>
@@ -548,7 +548,7 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
 
                                     <FormField
                                         control={form.control}
-                                        name="proficiencyLevel"
+                                        name="proficiency_level"
                                         render={({ field }) => (
                                             <FormItem>
                                                 <FormLabel>Proficiency Level</FormLabel>
@@ -607,9 +607,9 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
                                     <div className="flex flex-col items-center space-y-4">
                                         <div className="relative">
                                             <div className="w-24 h-24 rounded-full overflow-hidden bg-muted flex items-center justify-center border-2 border-border">
-                                                {form.getValues("avatarUrl") ? (
+                                                {form.getValues("avatar_url") ? (
                                                     <img
-                                                        src={form.getValues("avatarUrl")}
+                                                        src={form.getValues("avatar_url")}
                                                         alt="Avatar"
                                                         className="w-full h-full object-cover"
                                                     />
@@ -674,15 +674,15 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
                                             </div>
                                             <div>
                                                 <p className="text-muted-foreground">Native Language</p>
-                                                <p className="font-medium">{form.getValues("nativeLanguage")}</p>
+                                                <p className="font-medium">{form.getValues("native_language")}</p>
                                             </div>
                                             <div>
                                                 <p className="text-muted-foreground">Learning</p>
-                                                <p className="font-medium">{form.getValues("learningLanguage")}</p>
+                                                <p className="font-medium">{form.getValues("learning_language")}</p>
                                             </div>
                                             <div>
                                                 <p className="text-muted-foreground">Level</p>
-                                                <p className="font-medium">{form.getValues("proficiencyLevel")}</p>
+                                                <p className="font-medium">{form.getValues("proficiency_level")}</p>
                                             </div>
                                         </div>
 

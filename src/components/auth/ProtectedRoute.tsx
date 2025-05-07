@@ -17,10 +17,12 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
   useEffect(() => {
     const checkOnboardingStatus = async () => {
       if (!user) {
+        console.log("No user available, skipping onboarding check");
         setIsCheckingOnboarding(false);
         return;
       }
 
+      console.log("Checking onboarding status for user:", user.id);
       try {
         const { data: profileData, error: profileError } = await supabase
           .from('profiles')
@@ -28,14 +30,36 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
           .eq('id', user.id)
           .single();
 
-        if (profileError && profileError.code !== 'PGRST116') {
+        if (profileError) {
           console.error("Error checking onboarding status:", profileError);
+          
+          // If profile not found, create a default one
+          if (profileError.code === 'PGRST116') {
+            console.log("Profile not found, creating a new profile");
+            const { error: createError } = await supabase
+              .from('profiles')
+              .insert({
+                id: user.id,
+                email: user.email,
+                onboarding_completed: false,
+                created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString()
+              });
+              
+            if (createError) {
+              console.error("Error creating profile:", createError);
+            }
+          }
+          
+          setHasCompletedOnboarding(false);
+        } else {
+          const isCompleted = profileData?.onboarding_completed || false;
+          console.log("Onboarding status:", isCompleted ? "Completed" : "Not completed");
+          setHasCompletedOnboarding(isCompleted);
         }
-
-        const isCompleted = profileData?.onboarding_completed || false;
-        setHasCompletedOnboarding(isCompleted);
       } catch (error) {
         console.error("Error in onboarding check:", error);
+        setHasCompletedOnboarding(false);
       } finally {
         setIsCheckingOnboarding(false);
       }
@@ -43,6 +67,8 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
 
     if (user) {
       checkOnboardingStatus();
+    } else {
+      setIsCheckingOnboarding(false);
     }
   }, [user]);
 
