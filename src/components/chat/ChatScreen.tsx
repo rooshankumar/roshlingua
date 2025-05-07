@@ -654,7 +654,7 @@ export const ChatScreen = ({ conversation }: Props) => {
                                 onError={(e) => handleImageLoadError(e, message.attachment_url as string)}
                                 loading="eager"
                                 referrerPolicy="no-referrer"
-                                fetchPriority="high"
+                                fetchPriority="low"  {/* Changed to lowercase */}
                                 onClick={() => {
                                   setImagePreview({ url: message.attachment_url, name: message.attachment_name });
                                   setShowImagePreview(true);
@@ -811,7 +811,7 @@ export const ChatScreen = ({ conversation }: Props) => {
                 onClick={() => handleSend(newMessage)}
                 disabled={!newMessage.trim() || isSending || !user}
                 size="icon"
-                className="h-[45px] w-[45px] rounded-2xl bg-primary hover:bg-primary/90 transition-all duration-200 hover:scale-105 active:scale-95"
+                className="h-[45px] w-[45px] rounded-2xl bg-primary hover:bg-primary/90 transition-all duration-200 hover:scale105 active:scale-95"
               >
                 {isSending ? (
                   <Loader2 className="h-5 w-5 animate-spin" />
