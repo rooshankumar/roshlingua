@@ -322,9 +322,52 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     
     refreshSubscriptionTimer.current = setTimeout(() => {
       subscriptionManager.refreshAll();
+      
+      // Also update the user's online status when refreshing
+      try {
+        supabase
+          .from('profiles')
+          .update({ 
+            is_online: true,
+            last_seen: new Date().toISOString() 
+          })
+          .eq('id', user.id)
+          .then(({ error }) => {
+            if (error) {
+              console.error('Error updating online status during refresh:', error);
+            }
+          });
+      } catch (err) {
+        console.error('Failed to update online status during refresh:', err);
+      }
+      
       refreshSubscriptionTimer.current = null;
     }, 300);
   };
+  
+  // Setup session refresh to handle auth token expiration
+  useEffect(() => {
+    if (!user) return;
+    
+    // Set up a periodic session refresh to prevent token expiration
+    const sessionRefreshInterval = setInterval(async () => {
+      try {
+        // Attempt to refresh the session
+        const { error } = await supabase.auth.refreshSession();
+        if (error) {
+          console.error('Session refresh error:', error);
+        } else {
+          console.log('Session refreshed successfully');
+        }
+      } catch (err) {
+        console.error('Error in session refresh:', err);
+      }
+    }, 30 * 60 * 1000); // Refresh every 30 minutes
+    
+    return () => {
+      clearInterval(sessionRefreshInterval);
+    };
+  }, [user]);
   
   // Add a ref to store the timer
   const refreshSubscriptionTimer = useRef<NodeJS.Timeout | null>(null);

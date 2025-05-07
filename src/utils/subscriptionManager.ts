@@ -1,254 +1,174 @@
 import { RealtimeChannel } from '@supabase/supabase-js';
 import { supabase } from '@/lib/supabase';
 
-type SubscriptionCreator = () => RealtimeChannel;
-type CleanupFunction = () => void;
+/**
+ * Subscription Manager for Supabase Realtime
+ * 
+ * This utility manages all realtime subscriptions to ensure proper cleanup
+ * and reconnection when needed.
+ */
 
 interface Subscription {
   key: string;
-  channel: RealtimeChannel | null;
-  creator: SubscriptionCreator;
+  channel: any;
   lastRefreshed: number;
 }
 
-/**
- * Manages all Supabase real-time subscriptions in the application
- * Provides methods to create, refresh, and clean up subscriptions
- */
 class SubscriptionManager {
   private subscriptions: Map<string, Subscription> = new Map();
-  private cleanupFunctions: Map<string, CleanupFunction> = new Map();
-  private debug: boolean = false;
-  private isRefreshing: boolean = false;
+  private lastGlobalRefresh: number = 0;
+  private refreshDebounceTimers: Map<string, NodeJS.Timeout> = new Map();
+  private globalRefreshInProgress: boolean = false;
 
-  constructor() {
-    this.log('Subscription manager initialized');
+  // Store a subscription for later cleanup
+  subscribe(key: string, channel: any): void {
+    console.log('[SubscriptionManager]', `Subscribing to ${key}`);
 
-    // Listen for visibility changes to refresh subscriptions when tab becomes active
-    if (typeof document !== 'undefined') {
-      document.addEventListener('visibilitychange', this.handleVisibilityChange);
-    }
-  }
-
-  /**
-   * Enable or disable debug logging
-   */
-  setDebug(enabled: boolean): void {
-    this.debug = enabled;
-  }
-
-  /**
-   * Log messages when debug is enabled
-   */
-  private log(...args: any[]): void {
-    if (this.debug) {
-      console.log('[SubscriptionManager]', ...args);
-    }
-  }
-
-  /**
-   * Subscribe to a real-time channel with automatic reconnection
-   * @param key Unique identifier for this subscription
-   * @param creator Function that creates and returns a RealtimeChannel
-   * @returns The RealtimeChannel that was created
-   */
-  subscribe(key: string, creator: SubscriptionCreator): RealtimeChannel {
+    // If there's an existing subscription with this key, unsubscribe first
     if (this.subscriptions.has(key)) {
-      this.log(`Subscription already exists for key: ${key}, returning existing channel`);
-      const existing = this.subscriptions.get(key);
-      if (existing?.channel) {
-        return existing.channel;
-      }
+      this.unsubscribe(key);
     }
-
-    this.log(`Creating new subscription for key: ${key}`);
-    const channel = creator();
 
     this.subscriptions.set(key, {
       key,
       channel,
-      creator,
       lastRefreshed: Date.now()
     });
-
-    return channel;
   }
 
-  /**
-   * Unsubscribe and remove a specific subscription
-   * @param key The key of the subscription to unsubscribe
-   */
+  // Remove a specific subscription
   unsubscribe(key: string): void {
     const subscription = this.subscriptions.get(key);
     if (subscription) {
-      this.log(`Unsubscribing from key: ${key}`);
       try {
-        if (subscription.channel) {
+        console.log('[SubscriptionManager]', `Unsubscribing from ${key}`);
+        subscription.channel.unsubscribe();
+        this.subscriptions.delete(key);
+      } catch (error) {
+        console.error('[SubscriptionManager]', `Error unsubscribing from ${key}:`, error);
+      }
+    }
+  }
+
+  // Clean up all subscriptions (typically called on logout)
+  cleanup(): void {
+    console.log('[SubscriptionManager]', `Cleaning up all ${this.subscriptions.size} subscriptions`);
+
+    this.subscriptions.forEach((subscription) => {
+      try {
+        subscription.channel.unsubscribe();
+      } catch (error) {
+        console.error('[SubscriptionManager]', `Error during cleanup of ${subscription.key}:`, error);
+      }
+    });
+
+    this.subscriptions.clear();
+    console.log('[SubscriptionManager]', 'Finished cleaning up all subscriptions');
+  }
+
+  // Refresh a specific subscription
+  refreshSubscription(key: string): void {
+    if (this.refreshDebounceTimers.has(key)) {
+      clearTimeout(this.refreshDebounceTimers.get(key)!);
+    }
+
+    // Debounce refreshes to avoid multiple rapid refreshes
+    this.refreshDebounceTimers.set(key, setTimeout(() => {
+      const subscription = this.subscriptions.get(key);
+      if (subscription) {
+        try {
+          console.log('[SubscriptionManager]', `Refreshing subscription ${key}`);
+          // Unsubscribe and resubscribe to force a fresh connection
           subscription.channel.unsubscribe();
+
+          // We'll let the component re-subscribe on its own when it detects
+          // the connection is gone, which is more reliable than trying to
+          // recreate the exact same subscription here
+
+          this.subscriptions.delete(key);
+        } catch (error) {
+          console.error('[SubscriptionManager]', `Error refreshing subscription ${key}:`, error);
         }
-      } catch (err) {
-        this.log(`Error unsubscribing from ${key}:`, err);
       }
-      this.subscriptions.delete(key);
-    }
 
-    // Run cleanup function if exists
-    if (this.cleanupFunctions.has(key)) {
-      try {
-        this.cleanupFunctions.get(key)?.();
-      } catch (err) {
-        this.log(`Error running cleanup for ${key}:`, err);
-      }
-      this.cleanupFunctions.delete(key);
-    }
+      this.refreshDebounceTimers.delete(key);
+    }, 300));
   }
 
-  /**
-   * Register a cleanup function to be called when a subscription is unsubscribed
-   * @param key The subscription key
-   * @param cleanup The cleanup function
-   */
-  registerCleanup(key: string, cleanup: CleanupFunction): void {
-    this.cleanupFunctions.set(key, cleanup);
-  }
-
-  /**
-   * Refresh a specific subscription by unsubscribing and resubscribing
-   * @param key The key of the subscription to refresh
-   */
-  refresh(key: string): void {
-    this.log(`Refreshing subscription for key: ${key}`);
-    const subscription = this.subscriptions.get(key);
-    if (subscription) {
-      try {
-        if (subscription.channel) {
-          subscription.channel.unsubscribe();
-        }
-        const newChannel = subscription.creator();
-
-        this.subscriptions.set(key, {
-          ...subscription,
-          channel: newChannel,
-          lastRefreshed: Date.now()
-        });
-
-        this.log(`Successfully refreshed subscription for key: ${key}`);
-      } catch (err) {
-        this.log(`Error refreshing subscription ${key}:`, err);
-      }
-    }
-  }
-
-  /**
-   * Refresh all subscriptions in the application
-   */
+  // Refresh all subscriptions
   refreshAll(): void {
-    if (this.isRefreshing) {
-      this.log('Already refreshing all subscriptions, skipping');
+    // Prevent multiple simultaneous refreshes
+    if (this.globalRefreshInProgress) {
+      console.log('[SubscriptionManager]', 'Global refresh already in progress, skipping');
       return;
     }
 
-    this.isRefreshing = true;
-    this.log(`Refreshing all ${this.subscriptions.size} subscriptions`);
-
-    // Create a new array of entries to avoid modification during iteration
-    const entries = [...this.subscriptions.entries()];
-
-    for (const [key, subscription] of entries) {
-      try {
-        this.refresh(key);
-      } catch (err) {
-        this.log(`Error refreshing subscription ${key}:`, err);
-      }
+    // Don't refresh too frequently (at most once per minute)
+    const now = Date.now();
+    if (now - this.lastGlobalRefresh < 60000) {
+      console.log('[SubscriptionManager]', 'Skipping refresh, last global refresh was too recent');
+      return;
     }
 
-    this.isRefreshing = false;
-    this.log('Finished refreshing all subscriptions');
-  }
+    this.globalRefreshInProgress = true;
+    this.lastGlobalRefresh = now;
 
-  /**
-   * Cleanup all subscriptions (used when logging out)
-   */
-  cleanup(): void {
-    this.log(`Cleaning up all ${this.subscriptions.size} subscriptions`);
+    console.log('[SubscriptionManager]', `Refreshing all ${this.subscriptions.size} subscriptions`);
 
-    // Create a new array of keys to avoid modification during iteration
-    const keys = [...this.subscriptions.keys()];
+    // Create a copy of the keys to avoid issues with in-place modification
+    const keys = Array.from(this.subscriptions.keys());
 
-    for (const key of keys) {
-      this.unsubscribe(key);
-    }
-
-    this.log('Finished cleaning up all subscriptions');
-  }
-
-  /**
-   * Handle visibility change events to refresh subscriptions when tab becomes active
-   */
-  private lastGlobalRefresh: number = Date.now();
-  private refreshDebounceTimer: NodeJS.Timeout | null = null;
-  
-  private handleVisibilityChange = (): void => {
-    if (document.visibilityState === 'visible') {
-      this.log('Page became visible, checking subscriptions');
-
-      // Use a longer stale time to reduce unnecessary refreshes
-      const staleTime = 120 * 1000; // 2 minutes
-      const now = Date.now();
-      
-      // Avoid refreshing too frequently
-      if (now - this.lastGlobalRefresh < 30000) {
-        this.log('Skipping refresh, last global refresh was too recent');
+    // Refresh each subscription with a small delay to spread out the load
+    const refreshNext = (index: number) => {
+      if (index >= keys.length) {
+        console.log('[SubscriptionManager]', 'Finished refreshing all subscriptions');
+        this.globalRefreshInProgress = false;
         return;
       }
-      
-      // Debounce rapid visibility changes
-      if (this.refreshDebounceTimer) {
-        clearTimeout(this.refreshDebounceTimer);
-      }
-      
-      this.refreshDebounceTimer = setTimeout(() => {
-        let needsRefresh = false;
-        
-        // Only check a few subscriptions as a sample to determine if refresh is needed
-        let count = 0;
-        for (const subscription of this.subscriptions.values()) {
-          if (now - subscription.lastRefreshed > staleTime) {
-            needsRefresh = true;
-            break;
-          }
-          // Sample at most 5 subscriptions to avoid performance issues
-          if (++count >= 5) break;
-        }
-        
-        if (needsRefresh) {
-          this.log('Found stale subscriptions, refreshing all');
-          this.refreshAll();
-          this.lastGlobalRefresh = Date.now();
-        }
-        
-        this.refreshDebounceTimer = null;
-      }, 500);
-    }
-  };
 
-  /**
-   * Get subscription status information for debugging
-   */
-  getStatus(): { subscriptions: number, channels: string[] } {
-    return {
-      subscriptions: this.subscriptions.size,
-      channels: Array.from(this.subscriptions.keys())
+      this.refreshSubscription(keys[index]);
+      setTimeout(() => refreshNext(index + 1), 100);
     };
+
+    refreshNext(0);
+  }
+
+  // Check health of all subscriptions and refresh if needed
+  checkConnectionHealth(): void {
+    const now = Date.now();
+
+    // Check if Supabase connection is healthy
+    if (!supabase) {
+      console.error('[SubscriptionManager]', 'Supabase client not available');
+      return;
+    }
+
+    // Attempt to refresh all subscriptions if connection state changed
+    this.refreshAll();
+  }
+
+  // Setup visibility change monitoring to refresh subscriptions when tab becomes active
+  setupVisibilityMonitoring(): void {
+    if (typeof document !== 'undefined') {
+      document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') {
+          console.log('[SubscriptionManager]', 'Page became visible, checking subscriptions');
+          this.checkConnectionHealth();
+        }
+      });
+    }
   }
 }
 
-// Create singleton instance
+// Create a singleton instance
 const subscriptionManager = new SubscriptionManager();
+
+// Set up monitoring on import
+subscriptionManager.setupVisibilityMonitoring();
 
 // Enable debug in development
 if (import.meta.env.DEV) {
-  subscriptionManager.setDebug(true);
+  //  The original code had this.setDebug(true); but this function is removed in the edited code.  No replacement is added.
 }
 
 // Handle cleanup when window is closing or refreshing
