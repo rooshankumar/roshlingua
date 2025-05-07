@@ -79,7 +79,9 @@ class SubscriptionManager {
         try {
           console.log('[SubscriptionManager]', `Refreshing subscription ${key}`);
           // Unsubscribe and resubscribe to force a fresh connection
-          subscription.channel.unsubscribe();
+          if (subscription.channel && typeof subscription.channel.unsubscribe === 'function') {
+            subscription.channel.unsubscribe();
+          }
 
           // We'll let the component re-subscribe on its own when it detects
           // the connection is gone, which is more reliable than trying to

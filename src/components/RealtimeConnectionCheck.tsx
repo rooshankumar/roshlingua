@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useLocation } from 'react-router-dom';
 import subscriptionManager from '@/utils/subscriptionManager';
@@ -14,6 +14,12 @@ export default function RealtimeConnectionCheck() {
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const healthCheckTimerRef = useRef<NodeJS.Timeout | null>(null);
   const lastRefreshTimeRef = useRef<number>(0);
+  const [lastSuccessfulConnection, setLastSuccessfulConnection] = useState(0);
+  const [lastRefreshTimestamp, setLastRefreshTimestamp] = useState(0);
+  const [isCheckingConnection, setIsCheckingConnection] = useState(false);
+  const [connectionHealthy, setConnectionHealthy] = useState(true);
+  const [connectionStatus, setConnectionStatus] = useState('Connected');
+
 
   // Handle offline/online status changes
   useEffect(() => {
@@ -135,6 +141,47 @@ export default function RealtimeConnectionCheck() {
       console.error('Error refreshing connections:', err);
     }
   };
+
+  const checkConnectionHealth = useCallback(() => {
+    if (!user?.id) return;
+
+    setIsCheckingConnection(true);
+    console.log('Checking Supabase connection health...');
+
+    // Try to ping Supabase by making a simple query
+    supabase
+      .from('profiles')
+      .select('id')
+      .limit(1)
+      .then(({ data, error }) => {
+        const nowTime = new Date().getTime();
+        setLastSuccessfulConnection(nowTime);
+
+        if (error) {
+          console.error('Connection check failed:', error);
+          setConnectionHealthy(false);
+          refreshAllConnections();
+        } else {
+          setConnectionHealthy(true);
+          setConnectionStatus('Connected');
+          // Only refresh connections if it's been more than 5 minutes since last success
+          if (nowTime - lastRefreshTimestamp > 5 * 60 * 1000) {
+            refreshAllConnections();
+            setLastRefreshTimestamp(nowTime);
+          }
+        }
+      })
+      .catch((error) => {
+        console.error('Connection check failed with exception:', error);
+        setConnectionHealthy(false);
+        setConnectionStatus('Disconnected');
+        refreshAllConnections();
+      })
+      .finally(() => {
+        setIsCheckingConnection(false);
+      });
+  }, [user?.id, refreshAllConnections]);
+
 
   // This component doesn't render anything visible
   return null;

@@ -815,7 +815,8 @@ export const ChatScreen = ({ conversation }: Props) => {
               >
                 {isSending ? (
                   <Loader2 className="h-5 w-5 animate-spin" />
-                ) : (                  <Send className="h-5 w-5" />
+                ) : (
+                  <Send className="h-5 w-5" />
                 )}
               </Button>
             </div>

@@ -54,6 +54,7 @@ interface User {
   age: number | null; // Added age property
   last_seen: string | null;
   gender: string | null; // Added gender property
+  xp: string | number | null; // Added xp property
 }
 
 const Community = () => {
@@ -187,7 +188,8 @@ const Community = () => {
             is_online,
             username,
             last_seen,
-            gender
+            gender,
+            xp
           `)
           .neq('id', currentUser?.id);
 
@@ -211,6 +213,7 @@ const Community = () => {
           likes_count: user.likes_count || 0,
           age: user.date_of_birth ? Math.floor((new Date().getTime() - new Date(user.date_of_birth).getTime()) / (365.25 * 24 * 60 * 60 * 1000)) : null,
           gender: user.gender || null, // Added gender default
+          xp: user.xp || 0, // Added xp default
         }));
 
         // Sort users: online first, then by last seen (most recent first)
@@ -276,6 +279,7 @@ const Community = () => {
                         streak_count: payload.new.streak_count || 1,
                         likes_count: payload.new.likes_count || 0,
                         gender: payload.new.gender || null, // Added gender default for new users
+                        xp: payload.new.xp || 0, // Added xp default for new users
                       };
                       updatedUsers = [...updatedUsers, newUser as User];
                     }
@@ -371,7 +375,8 @@ const Community = () => {
             is_online,
             username,
             last_seen,
-            gender
+            gender,
+            xp
           `)
           .neq('id', currentUser?.id);
 
@@ -395,6 +400,7 @@ const Community = () => {
           likes_count: user.likes_count || 0,
           age: user.date_of_birth ? Math.floor((new Date().getTime() - new Date(user.date_of_birth).getTime()) / (365.25 * 24 * 60 * 60 * 1000)) : null,
           gender: user.gender || null, // Added gender default
+          xp: user.xp || 0, // Added xp default
         }));
 
         // Sort users: online first, then by last seen (most recent first)
@@ -772,7 +778,7 @@ const Community = () => {
                       .from('profiles')
                       .select(`
                         id, full_name, native_language, learning_language, proficiency_level, bio, 
-                        avatar_url, streak_count, likes_count, date_of_birth, age, is_online, username, last_seen, gender
+                        avatar_url, streak_count, likes_count, date_of_birth, age, is_online, username, last_seen, gender, xp
                       `)
                       .neq('id', currentUser?.id);
                     if (error) {
@@ -793,6 +799,7 @@ const Community = () => {
                       likes_count: user.likes_count || 0,
                       age: user.date_of_birth ? Math.floor((new Date().getTime() - new Date(user.date_of_birth).getTime()) / (365.25 * 24 * 60 * 60 * 1000)) : null,
                       gender: user.gender || null, // Added gender default
+                      xp: user.xp || 0, // Added xp default
                     }));
                     // Sort users: online first, then by last seen (most recent first)
                     const sortedUsers = usersWithDefaults.sort((a, b) => {
