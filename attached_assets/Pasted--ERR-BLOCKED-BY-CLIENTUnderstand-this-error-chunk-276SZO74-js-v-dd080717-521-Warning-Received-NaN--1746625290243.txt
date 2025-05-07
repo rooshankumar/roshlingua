@@ -1,0 +1,115 @@
+::ERR_BLOCKED_BY_CLIENTUnderstand this error
+chunk-276SZO74.js?v=dd080717:521 Warning: Received NaN for the `children` attribute. If this is expected, cast the value to a string.
+    at span
+    at div
+    at div
+    at div
+    at div
+    at div
+    at div
+    at div
+    at _c8 (https://fc0a7c56-22d1-4a62-9ddb-6c58052252f2-00-1n6jtz3qblrnx.pike.replit.dev:5173/src/components/ui/card.tsx:56:61)
+    at div
+    at _c (https://fc0a7c56-22d1-4a62-9ddb-6c58052252f2-00-1n6jtz3qblrnx.pike.replit.dev:5173/src/components/ui/card.tsx:12:53)
+    at div
+    at div
+    at Community (https://fc0a7c56-22d1-4a62-9ddb-6c58052252f2-00-1n6jtz3qblrnx.pike.replit.dev:5173/src/pages/Community.tsx:32:31)
+    at main
+    at div
+    at AppLayout (https://fc0a7c56-22d1-4a62-9ddb-6c58052252f2-00-1n6jtz3qblrnx.pike.replit.dev:5173/src/components/layouts/AppLayout.tsx:84:22)
+    at ProtectedRoute (https://fc0a7c56-22d1-4a62-9ddb-6c58052252f2-00-1n6jtz3qblrnx.pike.replit.dev:5173/src/components/auth/ProtectedRoute.tsx:15:27)
+    at RenderedRoute (https://fc0a7c56-22d1-4a62-9ddb-6c58052252f2-00-1n6jtz3qblrnx.pike.replit.dev:5173/node_modules/.vite/deps/react-router-dom.js?v=dd080717:4069:5)
+    at Routes (https://fc0a7c56-22d1-4a62-9ddb-6c58052252f2-00-1n6jtz3qblrnx.pike.replit.dev:5173/node_modules/.vite/deps/react-router-dom.js?v=dd080717:4508:5)
+    at AppRoutes (https://fc0a7c56-22d1-4a62-9ddb-6c58052252f2-00-1n6jtz3qblrnx.pike.replit.dev:5173/src/App.tsx:40:33)
+    at AuthProvider (https://fc0a7c56-22d1-4a62-9ddb-6c58052252f2-00-1n6jtz3qblrnx.pike.replit.dev:5173/src/providers/AuthProvider.tsx:24:32)
+    at Router (https://fc0a7c56-22d1-4a62-9ddb-6c58052252f2-00-1n6jtz3qblrnx.pike.replit.dev:5173/node_modules/.vite/deps/react-router-dom.js?v=dd080717:4451:15)
+    at BrowserRouter (https://fc0a7c56-22d1-4a62-9ddb-6c58052252f2-00-1n6jtz3qblrnx.pike.replit.dev:5173/node_modules/.vite/deps/react-router-dom.js?v=dd080717:5196:5)
+    at ThemeProvider (https://fc0a7c56-22d1-4a62-9ddb-6c58052252f2-00-1n6jtz3qblrnx.pike.replit.dev:5173/src/components/theme-provider.tsx:17:33)
+    at QueryClientProvider (https://fc0a7c56-22d1-4a62-9ddb-6c58052252f2-00-1n6jtz3qblrnx.pike.replit.dev:5173/node_modules/.vite/deps/@tanstack_react-query.js?v=dd080717:2794:3)
+    at App
+printWarning @ chunk-276SZO74.js?v=dd080717:521
+error @ chunk-276SZO74.js?v=dd080717:505
+validateProperty$1 @ chunk-276SZO74.js?v=dd080717:3413
+warnUnknownProperties @ chunk-276SZO74.js?v=dd080717:3459
+validateProperties$2 @ chunk-276SZO74.js?v=dd080717:3478
+validatePropertiesInDevelopment @ chunk-276SZO74.js?v=dd080717:7346
+setInitialProperties @ chunk-276SZO74.js?v=dd080717:7535
+finalizeInitialChildren @ chunk-276SZO74.js?v=dd080717:8345
+completeWork @ chunk-276SZO74.js?v=dd080717:16293
+completeUnitOfWork @ chunk-276SZO74.js?v=dd080717:19224
+performUnitOfWork @ chunk-276SZO74.js?v=dd080717:19206
+workLoopSync @ chunk-276SZO74.js?v=dd080717:19137
+renderRootSync @ chunk-276SZO74.js?v=dd080717:19116
+performConcurrentWorkOnRoot @ chunk-276SZO74.js?v=dd080717:18678
+workLoop @ chunk-276SZO74.js?v=dd080717:197
+flushWork @ chunk-276SZO74.js?v=dd080717:176
+performWorkUntilDeadline @ chunk-276SZO74.js?v=dd080717:384Understand this error
+supabase.ts:110 
+            
+            
+           GET https://wqojeesjtgfcftpnzaet.supabase.co/rest/v1/user_achievements?select=achievement_id%2Ccount%28*%29&order=achievement_id.asc 400 (Bad Request)
+fetch @ supabase.ts:110
+(anonymous) @ @supabase_supabase-js.js?v=dd080717:3900
+(anonymous) @ @supabase_supabase-js.js?v=dd080717:3921
+fulfilled @ @supabase_supabase-js.js?v=dd080717:3873
+Promise.then
+step @ @supabase_supabase-js.js?v=dd080717:3886
+(anonymous) @ @supabase_supabase-js.js?v=dd080717:3888
+__awaiter6 @ @supabase_supabase-js.js?v=dd080717:3870
+(anonymous) @ @supabase_supabase-js.js?v=dd080717:3911
+then @ @supabase_supabase-js.js?v=dd080717:89Understand this error
+subscriptionManager.ts:48 [SubscriptionManager] Error unsubscribing from community_profiles: TypeError: subscription.channel.unsubscribe is not a function
+    at SubscriptionManager.unsubscribe (subscriptionManager.ts:45:30)
+    at Community.tsx:348:27
+    at safelyCallDestroy (chunk-276SZO74.js?v=dd080717:16748:13)
+    at commitHookEffectListUnmount (chunk-276SZO74.js?v=dd080717:16875:19)
+    at commitPassiveUnmountInsideDeletedTreeOnFiber (chunk-276SZO74.js?v=dd080717:18283:17)
+    at commitPassiveUnmountEffectsInsideOfDeletedTree_begin (chunk-276SZO74.js?v=dd080717:18245:13)
+    at commitPassiveUnmountEffects_begin (chunk-276SZO74.js?v=dd080717:18181:19)
+    at commitPassiveUnmountEffects (chunk-276SZO74.js?v=dd080717:18169:11)
+    at flushPassiveEffectsImpl (chunk-276SZO74.js?v=dd080717:19489:11)
+    at flushPassiveEffects (chunk-276SZO74.js?v=dd080717:19447:22)
+unsubscribe @ subscriptionManager.ts:48
+(anonymous) @ Community.tsx:348
+safelyCallDestroy @ chunk-276SZO74.js?v=dd080717:16748
+commitHookEffectListUnmount @ chunk-276SZO74.js?v=dd080717:16875
+commitPassiveUnmountInsideDeletedTreeOnFiber @ chunk-276SZO74.js?v=dd080717:18283
+commitPassiveUnmountEffectsInsideOfDeletedTree_begin @ chunk-276SZO74.js?v=dd080717:18245
+commitPassiveUnmountEffects_begin @ chunk-276SZO74.js?v=dd080717:18181
+commitPassiveUnmountEffects @ chunk-276SZO74.js?v=dd080717:18169
+flushPassiveEffectsImpl @ chunk-276SZO74.js?v=dd080717:19489
+flushPassiveEffects @ chunk-276SZO74.js?v=dd080717:19447
+commitRootImpl @ chunk-276SZO74.js?v=dd080717:19416
+commitRoot @ chunk-276SZO74.js?v=dd080717:19277
+performSyncWorkOnRoot @ chunk-276SZO74.js?v=dd080717:18895
+flushSyncCallbacks @ chunk-276SZO74.js?v=dd080717:9119
+(anonymous) @ chunk-276SZO74.js?v=dd080717:18627Understand this error
+streakUtils.ts:66 Error checking streak achievements: ReferenceError: arguments is not defined
+    at checkStreakAchievements (streakUtils.ts:10:5)
+    at Profile.tsx:108:9
+    at commitHookEffectListMount (chunk-276SZO74.js?v=dd080717:16915:34)
+    at commitPassiveMountOnFiber (chunk-276SZO74.js?v=dd080717:18156:19)
+    at commitPassiveMountEffects_complete (chunk-276SZO74.js?v=dd080717:18129:17)
+    at commitPassiveMountEffects_begin (chunk-276SZO74.js?v=dd080717:18119:15)
+    at commitPassiveMountEffects (chunk-276SZO74.js?v=dd080717:18109:11)
+    at flushPassiveEffectsImpl (chunk-276SZO74.js?v=dd080717:19490:11)
+    at flushPassiveEffects (chunk-276SZO74.js?v=dd080717:19447:22)
+    at performSyncWorkOnRoot (chunk-276SZO74.js?v=dd080717:18868:11)
+checkStreakAchievements @ streakUtils.ts:66
+(anonymous) @ Profile.tsx:108
+commitHookEffectListMount @ chunk-276SZO74.js?v=dd080717:16915
+commitPassiveMountOnFiber @ chunk-276SZO74.js?v=dd080717:18156
+commitPassiveMountEffects_complete @ chunk-276SZO74.js?v=dd080717:18129
+commitPassiveMountEffects_begin @ chunk-276SZO74.js?v=dd080717:18119
+commitPassiveMountEffects @ chunk-276SZO74.js?v=dd080717:18109
+flushPassiveEffectsImpl @ chunk-276SZO74.js?v=dd080717:19490
+flushPassiveEffects @ chunk-276SZO74.js?v=dd080717:19447
+performSyncWorkOnRoot @ chunk-276SZO74.js?v=dd080717:18868
+flushSyncCallbacks @ chunk-276SZO74.js?v=dd080717:9119
+commitRootImpl @ chunk-276SZO74.js?v=dd080717:19432
+commitRoot @ chunk-276SZO74.js?v=dd080717:19277
+finishConcurrentRender @ chunk-276SZO74.js?v=dd080717:18805
+performConcurrentWorkOnRoot @ chunk-276SZO74.js?v=dd080717:18718
+workLoop @ chunk-276SZO74.js?v=dd080717:197
+flushWork @ chunk-276SZO74.js?v=dd080717:176
+performWorkUntilDeadline @ chunk-276SZO74.js?v=dd080717:384Understand this error
