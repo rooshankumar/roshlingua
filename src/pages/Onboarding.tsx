@@ -192,6 +192,7 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
                 .from('profiles')
                 .upsert({
                     id: user.id,
+                    user_id: user.id, // Add user_id field with user's ID
                     email: user.email,
                     gender: formData.gender,
                     date_of_birth: formData.date_of_birth ? new Date(formData.date_of_birth).toISOString().split('T')[0] : null,
