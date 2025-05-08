@@ -76,7 +76,9 @@ export const MessageReactions = ({ messageId, existingReactions = {} }: MessageR
     setIsLoading(true);
 
     try {
-      const userId = user.id;
+      // **POTENTIAL FIX:**  Replace user.id with the correct user ID from your 'profiles' table.  This assumes a field like 'db_user_id' exists in your user object.  Adapt as necessary to your actual data structure.
+
+      const userId = user.db_user_id || user.id; // Use db_user_id if available, fallback to user.id
 
       // Update local state optimistically for immediate feedback
       setReactions(prev => {
