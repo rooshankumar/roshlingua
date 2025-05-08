@@ -279,7 +279,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           })
           .eq('id', user.id);
       }
-      
+
       //Clean up subscriptions before signing out
       subscriptionManager.cleanup();
       const { error } = await supabase.auth.signOut();
@@ -325,16 +325,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       console.log('No user logged in, skipping subscription refresh');
       return;
     }
-    
+
     console.log('Refreshing all real-time subscriptions');
     // Debounce refresh operations to prevent multiple rapid refreshes
     if (refreshSubscriptionTimer.current) {
       clearTimeout(refreshSubscriptionTimer.current);
     }
-    
+
     refreshSubscriptionTimer.current = setTimeout(() => {
       subscriptionManager.refreshAll();
-      
+
       // Also update the user's online status when refreshing
       try {
         supabase
@@ -352,15 +352,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       } catch (err) {
         console.error('Failed to update online status during refresh:', err);
       }
-      
+
       refreshSubscriptionTimer.current = null;
     }, 300);
   };
-  
+
   // Setup session refresh to handle auth token expiration
   useEffect(() => {
     if (!user) return;
-    
+
     // Set up a periodic session refresh to prevent token expiration
     const sessionRefreshInterval = setInterval(async () => {
       try {
@@ -375,12 +375,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         console.error('Error in session refresh:', err);
       }
     }, 30 * 60 * 1000); // Refresh every 30 minutes
-    
+
     return () => {
       clearInterval(sessionRefreshInterval);
     };
   }, [user]);
-  
+
   // Add a ref to store the timer
   const refreshSubscriptionTimer = useRef<NodeJS.Timeout | null>(null);
 
@@ -427,3 +427,20 @@ export function useAuth() {
 
 // Import the actual subscription manager
 import subscriptionManager from '@/utils/subscriptionManager';
+
+const updateProfileOnSignIn = async (user: User) => {
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .upsert({
+          id: user.id,
+          user_id: user.id, // Ensure user_id is set to user.id
+          email: user.email,
+          updated_at: new Date().toISOString(),
+        }, { onConflict: 'id' });
+
+      if (error) throw error;
+    } catch (error) {
+      console.error('Error updating profile on sign in:', error);
+    }
+  };
