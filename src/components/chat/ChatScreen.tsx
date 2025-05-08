@@ -889,7 +889,7 @@ export const ChatScreen = ({ conversation }: Props) => {
               />
               <Button
                 onClick={() => handleSend(newMessage)}
-                disabled={!newMessage.trim() && !attachment || isSending || !user}
+                disabled={(!newMessage.trim() && !replyTo) || isSending || !user}
                 size="icon"
                 className="h-[45px] w-[45px] rounded-2xl bg-primary hover:bg-primary/90 transition-all duration-200 hover:scale-105 active:scale-95"
                 aria-label="Send message"

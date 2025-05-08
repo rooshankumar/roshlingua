@@ -9,112 +9,63 @@ if (!supabaseUrl || !supabaseAnonKey) {
   throw new Error('Supabase environment variables are missing');
 }
 
-// Create a single supabase client for the entire app
-export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
-  auth: {
-    autoRefreshToken: true,
-    persistSession: true,
-    detectSessionInUrl: true,
-    flowType: 'pkce',
-    debug: false, // Disable debug logs
-    storage: window?.localStorage, // Use PKCE flow for more reliable token exchange
-    storageKey: 'sb-auth-token',
-    storage: {
-      getItem: (key) => {
-        try {
-          // Try localStorage first, then sessionStorage as fallback
-          let value = localStorage.getItem(key);
-          if (!value && key.includes('code_verifier')) {
-            // For PKCE verifiers, also check sessionStorage
-            value = sessionStorage.getItem(key);
-          }
-          return value;
-        } catch (error) {
-          console.error('Error getting auth storage item:', error);
-          return null;
-        }
-      },
-      setItem: (key, value) => {
-        try {
-          // For login with different Google accounts, we need to clear all previous auth data
-          if (key === 'sb-auth-token' || key.includes('supabase.auth.token')) {
-            // Clear all known auth token storage locations
-            localStorage.removeItem('sb-auth-token');
-            localStorage.removeItem('supabase.auth.token');
-            sessionStorage.removeItem('supabase.auth.token');
-            localStorage.removeItem('supabase.auth.expires_at');
-            sessionStorage.removeItem('supabase.auth.expires_at');
-
-            // Also clear any PKCE verifiers to ensure clean authentication
-            localStorage.removeItem('supabase.auth.code_verifier');
-            sessionStorage.removeItem('supabase.auth.code_verifier');
-            localStorage.removeItem('supabase.auth.code');
-            sessionStorage.removeItem('supabase.auth.code');
-          }
-
-          // Store PKCE verifiers in both localStorage and sessionStorage for redundancy
-          if (key.includes('code_verifier')) {
-            localStorage.setItem(key, value);
-            sessionStorage.setItem(key, value);
-          } else {
-            localStorage.setItem(key, value);
-          }
-          return;
-        } catch (error) {
-          console.error('Error setting auth storage item:', error);
-        }
-      },
-      removeItem: (key) => {
-        try {
-          localStorage.removeItem(key);
-          sessionStorage.removeItem(key);
-
-          // If clearing main token, clear all related auth data
-          if (key === 'sb-auth-token' || key === 'supabase.auth.token') {
-            // Clear all known auth token locations
-            localStorage.removeItem('sb-auth-token');
-            localStorage.removeItem('supabase.auth.token');
-            sessionStorage.removeItem('supabase.auth.token');
-            localStorage.removeItem('supabase.auth.expires_at');
-            sessionStorage.removeItem('supabase.auth.expires_at');
-            localStorage.removeItem('supabase.auth.code_verifier');
-            sessionStorage.removeItem('supabase.auth.code_verifier');
-            localStorage.removeItem('supabase.auth.code');
-            sessionStorage.removeItem('supabase.auth.code');
-          }
-          return;
-        } catch (error) {
-          console.error('Error removing auth storage item:', error);
-        }
+// Create client with auto-reconnect capabilities
+export const supabase = createClient<Database>(
+  supabaseUrl,
+  supabaseAnonKey,
+  {
+    realtime: {
+      params: {
+        eventsPerSecond: 10
       }
-    }
-  },
-  realtime: {
-    params: {
-      eventsPerSecond: 10
-    }
-  },
-  global: {
-    headers: {
-      'Accept': 'application/json',
-      'Content-Type': 'application/json',
-      'Cache-Control': 'no-cache',
-      'Pragma': 'no-cache',
-      'Expires': '0',
     },
-    fetch: (url, options) => {
-      // Add cache busting for storage URLs
-      if (url.toString().includes('/storage/v1/object/public/')) {
-        const separator = url.toString().includes('?') ? '&' : '?';
-        url = new URL(`${url.toString()}${separator}t=${Date.now()}`);
-      }
-      return fetch(url, {
-        ...options,
-        cache: 'no-store',
-      });
+    auth: {
+      persistSession: true,
+      autoRefreshToken: true,
+      detectSessionInUrl: true
     },
+    global: {
+      headers: {
+        'X-Client-Info': 'chat-app-client',
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Cache-Control': 'no-cache',
+        'Pragma': 'no-cache',
+        'Expires': '0',
+      },
+      fetch: (url, options) => {
+        // Add cache busting for storage URLs
+        if (url.toString().includes('/storage/v1/object/public/')) {
+          const separator = url.toString().includes('?') ? '&' : '?';
+          url = new URL(`${url.toString()}${separator}t=${Date.now()}`);
+        }
+        return fetch(url, {
+          ...options,
+          cache: 'no-store',
+        });
+      },
+    }
   }
+);
+
+// Add connection recovery event listeners
+supabase.realtime.on('disconnected', () => {
+  console.log('Supabase realtime disconnected, attempting to reconnect...');
 });
+
+supabase.realtime.on('connected', () => {
+  console.log('Supabase realtime connected');
+});
+
+// Handle page visibility changes to manage connection
+if (typeof document !== 'undefined') {
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') {
+      // Force reconnect when tab becomes visible again
+      supabase.realtime.connect();
+    }
+  });
+}
 
 // Simple auth helpers
 export const signOut = async () => {
