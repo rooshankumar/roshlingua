@@ -17,7 +17,7 @@ import { VoiceRecorder } from './VoiceRecorder'; // Imported VoiceRecorder compo
 import { MessageReactions, ReactionPicker } from './MessageReactions'; // Import both MessageReactions and ReactionPicker components
 import { Dialog, DialogContent } from '../ui/dialog'; // Import Dialog and DialogContent
 import './ChatScreen.css'; // Import dedicated CSS
-import { useUnreadMessages } from '@/providers/UnreadMessagesProvider'; // Import useUnreadMessages hook
+import { useUnreadMessages } from '@/hooks/useUnreadMessages'; // Import useUnreadMessages hook
 
 
 // Simple subscription manager (replace with a more robust solution)
