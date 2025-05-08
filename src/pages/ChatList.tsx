@@ -9,6 +9,7 @@ import { useAuth } from '@/providers/AuthProvider';
 import { supabase } from '@/lib/supabase';
 import { formatDistanceToNow } from 'date-fns';
 import classNames from 'classnames';
+import { useUnreadMessages } from '@/hooks/useUnreadMessages';
 
 interface ChatPreview {
   id: string;
@@ -47,17 +48,17 @@ const ChatList = () => {
           .eq('recipient_id', user.id)
           .eq('is_read', false)
           .group('conversation_id');
-        
+
         if (messagesError) throw messagesError;
-        
+
         const unreadCountsClientSide: { [key: string]: number } = {};
-        
+
         if (unreadMessagesData) {
           unreadMessagesData.forEach(item => {
             unreadCountsClientSide[item.conversation_id] = parseInt(item.count);
           });
         }
-        
+
         // Make sure to call refreshUnreadCounts to sync the hook state
         refreshUnreadCounts();
 

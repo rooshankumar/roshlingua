@@ -1,15 +1,15 @@
 import { useState, useEffect, useRef } from 'react';
 import { supabase } from '@/lib/supabase';
 
-export function useUnreadMessages(userId: string | undefined) {
+export const useUnreadMessages = (userId: string | undefined) => {
   const [unreadCounts, setUnreadCounts] = useState<Record<string, number>>({});
   const channelRef = useRef<any>(null);
   const isInitialLoadRef = useRef(true);
-  
+
   // Function to fetch initial unread counts
   const fetchInitialUnreadCounts = async () => {
     if (!userId) return;
-    
+
     try {
       // First get accurate counts from the messages table directly
       const { data: unreadMessagesData, error: messagesError } = await supabase
@@ -18,36 +18,36 @@ export function useUnreadMessages(userId: string | undefined) {
         .eq('recipient_id', userId)
         .eq('is_read', false)
         .group('conversation_id');
-        
+
       if (messagesError) throw messagesError;
-      
+
       // Then get the conversation participant records to ensure we have all conversations
       const { data: participantData, error: participantError } = await supabase
         .from('conversation_participants')
         .select('conversation_id, unread_count')
         .eq('user_id', userId);
-        
+
       if (participantError) throw participantError;
-      
+
       // Create initial counts from participant data
       const initialCounts = participantData.reduce((acc, item) => {
         // Only use this value if we couldn't get a direct message count
         acc[item.conversation_id] = 0;
         return acc;
       }, {} as Record<string, number>);
-      
+
       // Override with accurate counts from messages
       if (unreadMessagesData) {
         unreadMessagesData.forEach(item => {
           initialCounts[item.conversation_id] = parseInt(item.count);
         });
       }
-      
+
       if (isInitialLoadRef.current) {
         console.log('Setting initial unread counts:', initialCounts);
         isInitialLoadRef.current = false;
       }
-      
+
       setUnreadCounts(initialCounts);
     } catch (error) {
       console.error('Error fetching unread counts:', error);
@@ -57,10 +57,10 @@ export function useUnreadMessages(userId: string | undefined) {
   // Function to mark messages as read for a conversation
   const markConversationAsRead = async (conversationId: string) => {
     if (!userId || !conversationId) return;
-    
+
     try {
       console.log(`Marking conversation ${conversationId} as read for user ${userId}`);
-      
+
       // Update messages as read
       const { error: updateError } = await supabase
         .from('messages')
@@ -68,24 +68,24 @@ export function useUnreadMessages(userId: string | undefined) {
         .eq('recipient_id', userId)
         .eq('conversation_id', conversationId)
         .eq('is_read', false);
-      
+
       if (updateError) throw updateError;
-      
+
       // Update conversation participant record
       const { error: participantError } = await supabase
         .from('conversation_participants')
         .update({ unread_count: 0 })
         .eq('user_id', userId)
         .eq('conversation_id', conversationId);
-      
+
       if (participantError) throw participantError;
-      
+
       // Immediately update local state
       setUnreadCounts(prev => ({
         ...prev,
         [conversationId]: 0
       }));
-      
+
       console.log(`Conversation ${conversationId} marked as read`);
     } catch (error) {
       console.error('Error marking conversation as read:', error);
@@ -94,7 +94,7 @@ export function useUnreadMessages(userId: string | undefined) {
 
   useEffect(() => {
     if (!userId) return;
-    
+
     // Fetch initial unread counts
     fetchInitialUnreadCounts();
 
@@ -134,7 +134,7 @@ export function useUnreadMessages(userId: string | undefined) {
         }
       })
       .subscribe();
-    
+
     channelRef.current = channel;
 
     return () => {
