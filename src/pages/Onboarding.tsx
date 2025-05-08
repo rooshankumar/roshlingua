@@ -1,6 +1,8 @@
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
 import { format } from "date-fns";
 import { Calendar as CalendarIcon, Check, Upload, Search, ChevronsUpDown } from "lucide-react";
 import { SUPPORTED_LANGUAGES } from "@/utils/languageUtils";
@@ -80,6 +82,18 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
             document.removeEventListener("mousedown", handleClickOutside);
         };
     }, []);
+    // Define schema for form validation
+    const formSchema = z.object({
+        full_name: z.string().min(1, "Name is required"),
+        gender: z.string().min(1, "Gender is required"),
+        native_language: z.string().min(1, "Native language is required"),
+        learning_language: z.string().min(1, "Learning language is required"),
+        proficiency_level: z.string().min(1, "Proficiency level is required"),
+        bio: z.string().optional(),
+        avatar_url: z.string().optional(),
+        date_of_birth: z.date().optional()
+    });
+
     const form = useForm<OnboardingFormData>({
         defaultValues: {
             full_name: "",
@@ -91,12 +105,7 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
             avatar_url: "",
             date_of_birth: undefined as Date | undefined,
         },
-        async validate(values) {
-            const errors: Record<string, string> = {};
-            if (!values.full_name) errors.full_name = "Name is required";
-            if (!values.gender) errors.gender = "Gender is required";
-            return errors;
-        }
+        resolver: zodResolver(formSchema)
     });
 
     const navigate = useNavigate();
@@ -216,11 +225,13 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
 
             localStorage.setItem("onboarding_completed", "true");
             
-            // Force reload to ensure proper redirection
+            // Call onComplete first, then navigate
+            onComplete();
+            
+            // Navigate after a short delay to ensure state updates
             setTimeout(() => {
-              onComplete();
-              window.location.href = "/dashboard";
-            }, 200);
+                navigate("/dashboard", { replace: true });
+            }, 300);
         } catch (error) {
             console.error("Onboarding error:", error);
             toast({
