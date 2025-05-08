@@ -24,7 +24,7 @@ export const MessageReactions = ({ messageId, existingReactions = {} }: MessageR
       try {
         const { data, error } = await supabase
           .from('message_reactions')
-          .select('emoji, user_id')
+          .select('reaction, user_id')
           .eq('message_id', messageId);
           
         if (error) throw error;
@@ -33,10 +33,10 @@ export const MessageReactions = ({ messageId, existingReactions = {} }: MessageR
           // Transform the data into our format
           const formattedReactions: Record<string, string[]> = {};
           data.forEach(reaction => {
-            if (!formattedReactions[reaction.emoji]) {
-              formattedReactions[reaction.emoji] = [];
+            if (!formattedReactions[reaction.reaction]) {
+              formattedReactions[reaction.reaction] = [];
             }
-            formattedReactions[reaction.emoji].push(reaction.user_id);
+            formattedReactions[reaction.reaction].push(reaction.user_id);
           });
           
           setReactions(formattedReactions);
@@ -102,7 +102,7 @@ export const MessageReactions = ({ messageId, existingReactions = {} }: MessageR
         .select('*')
         .eq('message_id', messageId)
         .eq('user_id', userId)
-        .eq('emoji', emoji)
+        .eq('reaction', emoji)
         .maybeSingle();
 
       if (existingReaction) {
@@ -112,7 +112,7 @@ export const MessageReactions = ({ messageId, existingReactions = {} }: MessageR
           .delete()
           .eq('message_id', messageId)
           .eq('user_id', userId)
-          .eq('emoji', emoji);
+          .eq('reaction', emoji);
       } else {
         // Insert a new reaction
         await supabase
@@ -120,7 +120,7 @@ export const MessageReactions = ({ messageId, existingReactions = {} }: MessageR
           .insert({
             message_id: messageId,
             user_id: userId,
-            emoji: emoji,
+            reaction: emoji,
             created_at: new Date().toISOString()
           });
       }

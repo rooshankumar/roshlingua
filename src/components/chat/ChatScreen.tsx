@@ -328,7 +328,7 @@ export const ChatScreen = ({ conversation }: Props) => {
         .select('*')
         .eq('message_id', messageId)
         .eq('user_id', userId)
-        .eq('emoji', emoji)
+        .eq('reaction', emoji)
         .maybeSingle();
 
       if (existingReaction) {
@@ -338,7 +338,7 @@ export const ChatScreen = ({ conversation }: Props) => {
           .delete()
           .eq('message_id', messageId)
           .eq('user_id', userId)
-          .eq('emoji', emoji);
+          .eq('reaction', emoji);
           
         console.log('Reaction removed:', emoji);
       } else {
@@ -348,7 +348,7 @@ export const ChatScreen = ({ conversation }: Props) => {
           .insert({
             message_id: messageId,
             user_id: userId,
-            emoji: emoji,
+            reaction: emoji,
             created_at: new Date().toISOString()
           });
           
