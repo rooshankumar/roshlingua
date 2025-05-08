@@ -1,0 +1,78 @@
+et::ERR_BLOCKED_BY_CLIENTUnderstand this error
+RealtimeConnectionCheck.tsx:130 Failed to update online status: TypeError: Cannot read properties of undefined (reading 'id')
+    at updateUserOnlineStatus (RealtimeConnectionCheck.tsx:124:28)
+    at checkConnectionHealth (RealtimeConnectionCheck.tsx:57:7)
+    at RealtimeConnectionCheck.tsx:72:5
+    at commitHookEffectListMount (chunk-276SZO74.js?v=c1d2f58b:16915:34)
+    at commitPassiveMountOnFiber (chunk-276SZO74.js?v=c1d2f58b:18156:19)
+    at commitPassiveMountEffects_complete (chunk-276SZO74.js?v=c1d2f58b:18129:17)
+    at commitPassiveMountEffects_begin (chunk-276SZO74.js?v=c1d2f58b:18119:15)
+    at commitPassiveMountEffects (chunk-276SZO74.js?v=c1d2f58b:18109:11)
+    at flushPassiveEffectsImpl (chunk-276SZO74.js?v=c1d2f58b:19490:11)
+    at flushPassiveEffects (chunk-276SZO74.js?v=c1d2f58b:19447:22)
+updateUserOnlineStatus @ RealtimeConnectionCheck.tsx:130
+checkConnectionHealth @ RealtimeConnectionCheck.tsx:57
+(anonymous) @ RealtimeConnectionCheck.tsx:72
+commitHookEffectListMount @ chunk-276SZO74.js?v=c1d2f58b:16915
+commitPassiveMountOnFiber @ chunk-276SZO74.js?v=c1d2f58b:18156
+commitPassiveMountEffects_complete @ chunk-276SZO74.js?v=c1d2f58b:18129
+commitPassiveMountEffects_begin @ chunk-276SZO74.js?v=c1d2f58b:18119
+commitPassiveMountEffects @ chunk-276SZO74.js?v=c1d2f58b:18109
+flushPassiveEffectsImpl @ chunk-276SZO74.js?v=c1d2f58b:19490
+flushPassiveEffects @ chunk-276SZO74.js?v=c1d2f58b:19447
+(anonymous) @ chunk-276SZO74.js?v=c1d2f58b:19328
+workLoop @ chunk-276SZO74.js?v=c1d2f58b:197
+flushWork @ chunk-276SZO74.js?v=c1d2f58b:176
+performWorkUntilDeadline @ chunk-276SZO74.js?v=c1d2f58b:384Understand this error
+ChatScreen.tsx:582 [Intervention] Blocked call to navigator.vibrate because user hasn't tapped on the frame or any embedded frame yet: https://www.chromestatus.com/feature/5644273861001216.
+onTouchStart @ ChatScreen.tsx:582
+callCallback2 @ chunk-276SZO74.js?v=c1d2f58b:3674
+invokeGuardedCallbackDev @ chunk-276SZO74.js?v=c1d2f58b:3699
+invokeGuardedCallback @ chunk-276SZO74.js?v=c1d2f58b:3733
+invokeGuardedCallbackAndCatchFirstError @ chunk-276SZO74.js?v=c1d2f58b:3736
+executeDispatch @ chunk-276SZO74.js?v=c1d2f58b:7014
+processDispatchQueueItemsInOrder @ chunk-276SZO74.js?v=c1d2f58b:7034
+processDispatchQueue @ chunk-276SZO74.js?v=c1d2f58b:7043
+dispatchEventsForPlugins @ chunk-276SZO74.js?v=c1d2f58b:7051
+(anonymous) @ chunk-276SZO74.js?v=c1d2f58b:7174
+batchedUpdates$1 @ chunk-276SZO74.js?v=c1d2f58b:18913
+batchedUpdates @ chunk-276SZO74.js?v=c1d2f58b:3579
+dispatchEventForPluginEventSystem @ chunk-276SZO74.js?v=c1d2f58b:7173
+dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay @ chunk-276SZO74.js?v=c1d2f58b:5478
+dispatchEvent @ chunk-276SZO74.js?v=c1d2f58b:5472
+dispatchDiscreteEvent @ chunk-276SZO74.js?v=c1d2f58b:5449Understand this error
+2RealtimeConnectionCheck.tsx:130 Failed to update online status: TypeError: Cannot read properties of undefined (reading 'id')
+    at updateUserOnlineStatus (RealtimeConnectionCheck.tsx:124:28)
+    at HTMLDocument.handleVisibilityChange (RealtimeConnectionCheck.tsx:99:7)
+updateUserOnlineStatus @ RealtimeConnectionCheck.tsx:130
+handleVisibilityChange @ RealtimeConnectionCheck.tsx:99Understand this error
+RealtimeConnectionCheck.tsx:130 Failed to update online status: TypeError: Cannot read properties of undefined (reading 'id')
+    at updateUserOnlineStatus (RealtimeConnectionCheck.tsx:124:28)
+    at checkConnectionHealth (RealtimeConnectionCheck.tsx:57:7)
+    at RealtimeConnectionCheck.tsx:72:5
+    at commitHookEffectListMount (chunk-276SZO74.js?v=c1d2f58b:16915:34)
+    at commitPassiveMountOnFiber (chunk-276SZO74.js?v=c1d2f58b:18156:19)
+    at commitPassiveMountEffects_complete (chunk-276SZO74.js?v=c1d2f58b:18129:17)
+    at commitPassiveMountEffects_begin (chunk-276SZO74.js?v=c1d2f58b:18119:15)
+    at commitPassiveMountEffects (chunk-276SZO74.js?v=c1d2f58b:18109:11)
+    at flushPassiveEffectsImpl (chunk-276SZO74.js?v=c1d2f58b:19490:11)
+    at flushPassiveEffects (chunk-276SZO74.js?v=c1d2f58b:19447:22)
+updateUserOnlineStatus @ RealtimeConnectionCheck.tsx:130
+checkConnectionHealth @ RealtimeConnectionCheck.tsx:57
+(anonymous) @ RealtimeConnectionCheck.tsx:72
+commitHookEffectListMount @ chunk-276SZO74.js?v=c1d2f58b:16915
+commitPassiveMountOnFiber @ chunk-276SZO74.js?v=c1d2f58b:18156
+commitPassiveMountEffects_complete @ chunk-276SZO74.js?v=c1d2f58b:18129
+commitPassiveMountEffects_begin @ chunk-276SZO74.js?v=c1d2f58b:18119
+commitPassiveMountEffects @ chunk-276SZO74.js?v=c1d2f58b:18109
+flushPassiveEffectsImpl @ chunk-276SZO74.js?v=c1d2f58b:19490
+flushPassiveEffects @ chunk-276SZO74.js?v=c1d2f58b:19447
+performSyncWorkOnRoot @ chunk-276SZO74.js?v=c1d2f58b:18868
+flushSyncCallbacks @ chunk-276SZO74.js?v=c1d2f58b:9119
+commitRootImpl @ chunk-276SZO74.js?v=c1d2f58b:19432
+commitRoot @ chunk-276SZO74.js?v=c1d2f58b:19277
+finishConcurrentRender @ chunk-276SZO74.js?v=c1d2f58b:18805
+performConcurrentWorkOnRoot @ chunk-276SZO74.js?v=c1d2f58b:18718
+workLoop @ chunk-276SZO74.js?v=c1d2f58b:197
+flushWork @ chunk-276SZO74.js?v=c1d2f58b:176
+performWorkUntilDeadline @ chunk-276SZO74.js?v=c1d2f58b:384Understand this error
