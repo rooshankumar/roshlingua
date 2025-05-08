@@ -49,13 +49,20 @@ export const supabase = createClient<Database>(
 );
 
 // Add connection recovery event listeners
-supabase.realtime.on('disconnected', () => {
-  console.log('Supabase realtime disconnected, attempting to reconnect...');
-});
+// Use channel-based approach for realtime events
+const statusChannel = supabase.channel('connection-status');
 
-supabase.realtime.on('connected', () => {
-  console.log('Supabase realtime connected');
-});
+statusChannel
+  .on('system', { event: 'disconnect' }, () => {
+    console.log('Supabase realtime disconnected, attempting to reconnect...');
+  })
+  .on('system', { event: 'reconnect' }, () => {
+    console.log('Supabase realtime reconnecting...');
+  })
+  .on('system', { event: 'connected' }, () => {
+    console.log('Supabase realtime connected');
+  })
+  .subscribe();
 
 // Handle page visibility changes to manage connection
 if (typeof document !== 'undefined') {
