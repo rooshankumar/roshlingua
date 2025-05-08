@@ -96,7 +96,7 @@ export const MessageReactions = ({
     setIsLoading(true);
 
     try {
-      const userId = user.db_user_id || user.id; // Use db_user_id if available, fallback to user.id
+      const userId = user.db_user_id || user.id || ''; // Use db_user_id if available, fallback to user.id with empty string fallback
 
       // Check if user has already reacted with this emoji
       const hasReacted = userReactions.includes(emoji);

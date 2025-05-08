@@ -14,7 +14,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from '@/components/ui/use-toast';
 import { handleImageLoadError, isLikelyBlockedUrl } from '@/utils/imageUtils';
 import { VoiceRecorder } from './VoiceRecorder'; // Imported VoiceRecorder component
-import { MessageReactions, ReactionPicker } from './MessageReactions'; // Import both MessageReactions and ReactionPicker
+import { MessageReactions, ReactionPicker } from './MessageReactions'; // Import both MessageReactions and ReactionPicker components
 import { Dialog, DialogContent } from '../ui/dialog'; // Import Dialog and DialogContent
 
 
@@ -710,10 +710,10 @@ export const ChatScreen = ({ conversation }: Props) => {
                       className={`p-3 break-words shadow-sm transition-all duration-300 message-bubble`}
                       data-sender={message.sender_id === user?.id ? 'self' : 'other'}
                     >
-                      <p className="leading-relaxed whitespace-pre-wrap text-[15px]">{message.content}</p>
+                      <p className="leading-relaxed whitespace-pre-wrap text-[15px]">{message.content || ''}</p>
                       
                       {/* Facebook Messenger-style reactions attached to message */}
-                      <MessageReactions messageId={message.id} existingReactions={message.reactions} />
+                      <MessageReactions messageId={message.id} existingReactions={message.reactions || {}} />
                       {message.attachment_url && (
                         <div className="mt-1 rounded-lg overflow-hidden">
                           {message.attachment_url?.match(/\.(jpg|jpeg|png|gif|webp|avif)$/i) ? (
