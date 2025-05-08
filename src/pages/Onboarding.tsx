@@ -403,6 +403,12 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
                                                                     setNativeLanguageSearch(searchTerm);
                                                                 }}
                                                                 onClick={() => setNativeLanguageOpen(true)}
+                                                                onKeyDown={(e) => {
+                                                                    if (e.key === 'Enter') {
+                                                                        field.onChange(field.value);
+                                                                        setNativeLanguageOpen(false);
+                                                                    }
+                                                                }}
                                                             />
                                                             <Button
                                                                 type="button"
@@ -455,8 +461,15 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
                                                                     lang.label.toLowerCase().includes(nativeLanguageSearch) || 
                                                                     lang.value.toLowerCase().includes(nativeLanguageSearch)
                                                                 ).length === 0 && (
-                                                                    <div className="text-center py-2 text-sm text-muted-foreground">
-                                                                        No languages found
+                                                                    <div 
+                                                                        className="flex items-center justify-between px-2 py-2 cursor-pointer rounded-sm hover:bg-accent"
+                                                                        onClick={() => {
+                                                                            field.onChange(nativeLanguageSearch);
+                                                                            setNativeLanguageOpen(false);
+                                                                        }}
+                                                                    >
+                                                                        <span>Use "{nativeLanguageSearch}"</span>
+                                                                        <Check className="h-4 w-4" />
                                                                     </div>
                                                                 )}
                                                             </div>
@@ -489,6 +502,12 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
                                                                     setLearningLanguageSearch(searchTerm);
                                                                 }}
                                                                 onClick={() => setLearningLanguageOpen(true)}
+                                                                onKeyDown={(e) => {
+                                                                    if (e.key === 'Enter') {
+                                                                        field.onChange(field.value);
+                                                                        setLearningLanguageOpen(false);
+                                                                    }
+                                                                }}
                                                             />
                                                             <Button
                                                                 type="button"
@@ -516,7 +535,7 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
                                                             <div className="mt-1">
                                                                 {languageOptions
                                                                     .filter((lang) => 
-                                                                        lang.value !== form.getValues("nativeLanguage") &&
+                                                                        lang.value !== form.getValues("native_language") &&
                                                                         (lang.label.toLowerCase().includes(learningLanguageSearch) || 
                                                                         lang.value.toLowerCase().includes(learningLanguageSearch))
                                                                     )
@@ -539,12 +558,19 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
                                                                         </div>
                                                                     ))}
                                                                 {languageOptions.filter((lang) => 
-                                                                    lang.value !== form.getValues("nativeLanguage") &&
+                                                                    lang.value !== form.getValues("native_language") &&
                                                                     (lang.label.toLowerCase().includes(learningLanguageSearch) || 
                                                                     lang.value.toLowerCase().includes(learningLanguageSearch))
                                                                 ).length === 0 && (
-                                                                    <div className="text-center py-2 text-sm text-muted-foreground">
-                                                                        No languages found
+                                                                    <div 
+                                                                        className="flex items-center justify-between px-2 py-2 cursor-pointer rounded-sm hover:bg-accent"
+                                                                        onClick={() => {
+                                                                            field.onChange(learningLanguageSearch);
+                                                                            setLearningLanguageOpen(false);
+                                                                        }}
+                                                                    >
+                                                                        <span>Use "{learningLanguageSearch}"</span>
+                                                                        <Check className="h-4 w-4" />
                                                                     </div>
                                                                 )}
                                                             </div>
