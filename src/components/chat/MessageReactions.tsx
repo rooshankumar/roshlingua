@@ -1,34 +1,32 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/providers/AuthProvider';
 
-// Common emojis that are frequently used
-const commonEmojis = ['👍', '❤️', '😂', '🎉', '🙏', '👏', '🔥', '✅'];
+// Messenger-style emoji set
+const messengerEmojis = ['👍', '❤️', '😂', '😮', '😢', '😡'];
 
 interface MessageReactionsProps {
   messageId: string;
   existingReactions?: Record<string, string[]>;
   onClose?: () => void;
   isReactionPicker?: boolean;
+  position?: 'top' | 'bottom';
 }
 
 export const MessageReactions = ({ 
   messageId, 
   existingReactions = {}, 
   onClose,
-  isReactionPicker = false
+  isReactionPicker = false,
+  position = 'top'
 }: MessageReactionsProps) => {
   const { user } = useAuth();
   const [reactions, setReactions] = useState<Record<string, string[]>>(existingReactions);
   const [isLoading, setIsLoading] = useState(false);
   const [userReactions, setUserReactions] = useState<string[]>([]);
-
-  // Emoji set for the reaction picker - more limited for Instagram-like feel
-  const reactionEmojis = isReactionPicker 
-    ? ['❤️', '😂', '😢', '👍', '👎', '😡'] 
-    : commonEmojis;
+  const containerRef = useRef<HTMLDivElement>(null);
 
   // Fetch existing reactions when component mounts
   useEffect(() => {
@@ -191,54 +189,68 @@ export const MessageReactions = ({
     }
   };
 
-  // If there are no reactions and this is not a picker, don't render anything
-  if (Object.keys(reactions).length === 0 && !isReactionPicker) {
-    return null;
-  }
-
-  return (
-    <div className={`flex flex-wrap items-center gap-1 ${isReactionPicker ? 'p-2 bg-background/95 backdrop-blur-md rounded-full shadow-lg' : 'mt-1'}`}>
-      {isReactionPicker ? (
-        // Reaction picker mode
-        reactionEmojis.map((emoji) => (
+  if (isReactionPicker) {
+    return (
+      <div 
+        ref={containerRef}
+        className="messenger-reaction-picker flex items-center px-2 py-1 rounded-full bg-background/95 shadow-lg border border-border/50 backdrop-blur-md animate-scale-in"
+        style={{
+          position: 'absolute',
+          [position === 'top' ? 'bottom' : 'top']: '100%',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          zIndex: 50
+        }}
+      >
+        {messengerEmojis.map((emoji) => (
           <Button
             key={emoji}
             variant="ghost" 
             size="sm"
-            className={`h-8 w-8 p-0 rounded-full hover:bg-muted/50 transition-all ${userReactions.includes(emoji) ? 'bg-muted/40 ring-1 ring-primary' : ''}`}
+            className="h-9 w-9 p-0 rounded-full hover:bg-muted transition-all active:scale-110"
             onClick={() => handleReact(emoji)}
             disabled={isLoading}
           >
-            <span className="text-base">{emoji}</span>
+            <span className="text-xl">{emoji}</span>
           </Button>
-        ))
-      ) : (
-        // Display existing reactions
-        Object.entries(reactions).map(([emoji, users]) => (
-          <Button
+        ))}
+      </div>
+    );
+  }
+
+  // If there are no reactions, don't render anything
+  if (Object.keys(reactions).length === 0) {
+    return null;
+  }
+
+  // Display existing reactions
+  return (
+    <div className="messenger-reactions-display">
+      <div className="flex -space-x-1 items-center">
+        {Object.entries(reactions).map(([emoji, users]) => (
+          <div
             key={emoji}
-            variant="outline"
-            size="sm"
-            className={`h-6 px-1.5 py-0 rounded-full bg-muted/30 hover:bg-muted/50 transition-all active:scale-95 ${userReactions.includes(emoji) ? 'ring-1 ring-primary' : ''}`}
+            className={`messenger-reaction flex items-center justify-center h-5 min-w-5 px-1 rounded-full text-xs 
+              ${userReactions.includes(emoji) ? 'bg-primary text-primary-foreground' : 'bg-muted hover:bg-muted/80'} 
+              cursor-pointer active:scale-95 transition-all shadow-sm`}
             onClick={() => handleReact(emoji)}
-            disabled={isLoading}
           >
-            <span className="mr-1 text-xs">{emoji}</span>
-            <span className="text-xs font-medium">{users.length}</span>
-          </Button>
-        ))
-      )}
+            <span className="mr-[1px]">{emoji}</span>
+            {users.length > 1 && <span className="text-[10px] font-medium">{users.length}</span>}
+          </div>
+        ))}
+      </div>
     </div>
   );
 };
 
-// Export a standalone picker component for convenience
-export const ReactionPicker = ({ messageId, onClose }: { messageId: string, onClose?: () => void }) => {
+export const ReactionPicker = ({ messageId, onClose, position = 'top' }: { messageId: string, onClose?: () => void, position?: 'top' | 'bottom' }) => {
   return (
     <MessageReactions
       messageId={messageId}
       isReactionPicker={true}
       onClose={onClose}
+      position={position}
     />
   );
 };

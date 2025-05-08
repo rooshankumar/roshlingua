@@ -126,49 +126,50 @@
   .message-reaction-btn {
     height: 26px !important;
 
-/* Instagram-like message reactions */
-.message-reactions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px;
-  max-width: 100%;
-  overflow-x: auto;
-  margin-top: 4px;
-  padding: 2px;
-  position: relative;
+/* Facebook Messenger-style reactions */
+.messenger-reactions-display {
+  position: absolute;
+  bottom: -10px;
+  left: 6px;
   z-index: 5;
+  transform: translateY(50%);
 }
 
 /* Reaction picker styling */
-.reaction-picker {
-  position: absolute;
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(8px);
-  border-radius: 24px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+.messenger-reaction-picker {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   z-index: 100;
-  padding: 6px;
-  display: flex;
-  gap: 4px;
   transform-origin: center bottom;
-  animation: scaleIn 0.15s ease-out;
-  border: 1px solid rgba(0, 0, 0, 0.08);
+  animation: fb-scale-in 0.2s ease-out;
 }
 
-/* Reaction animations */
-@keyframes scaleIn {
-  from { transform: scale(0.8); opacity: 0; }
-  to { transform: scale(1); opacity: 1; }
+/* Messenger-style animations */
+@keyframes fb-scale-in {
+  from { transform: translateX(-50%) scale(0.8); opacity: 0; }
+  to { transform: translateX(-50%) scale(1); opacity: 1; }
 }
 
-@keyframes pulse {
+@keyframes fb-pop {
   0% { transform: scale(1); }
-  50% { transform: scale(1.15); }
+  50% { transform: scale(1.2); }
   100% { transform: scale(1); }
 }
 
-.reaction-added {
-  animation: pulse 0.3s ease-in-out;
+@keyframes fb-float-in {
+  0% { transform: translateY(10px); opacity: 0; }
+  100% { transform: translateY(0); opacity: 1; }
+}
+
+.animate-scale-in {
+  animation: fb-scale-in 0.2s ease-out;
+}
+
+.messenger-reaction {
+  animation: fb-float-in 0.2s ease-out;
+}
+
+.messenger-reaction:hover {
+  animation: fb-pop 0.3s ease-in-out;
 }
 
 /* Ensure the reaction menu stays inside the chat view */
@@ -258,13 +259,44 @@
   }
 }
 
-
-/* iOS-like chat animations */
+/* Facebook Messenger chat animations */
 .message-bubble {
-  animation: ios-message-pop 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+  animation: fb-message-pop 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+  border-radius: 18px !important;
 }
 
-@keyframes ios-message-pop {
+/* Make message bubbles more rounded like Messenger */
+.message-bubble[data-sender="self"] {
+  border-bottom-right-radius: 4px !important;
+  background-color: #0084ff !important;
+  color: white !important;
+}
+
+.message-bubble[data-sender="other"] {
+  border-bottom-left-radius: 4px !important;
+  background-color: #f0f0f0 !important;
+  color: #000 !important;
+}
+
+/* Custom Messenger-style scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+@keyframes fb-message-pop {
 
 /* Notification styles for better touch areas */
 .mobile-touch-target {

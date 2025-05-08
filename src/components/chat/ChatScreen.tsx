@@ -683,62 +683,22 @@ export const ChatScreen = ({ conversation }: Props) => {
                 }}
               >
                 <div className={`flex flex-col gap-2 max-w-[85%] sm:max-w-[70%] group transition-all duration-300 relative`}>
-                  {/* Instagram-style reaction picker */}
+                  {/* Facebook Messenger-style reaction picker */}
                   <div 
                     id={`message-actions-${message.id}`}
-                    className="message-actions-menu absolute top-0 opacity-0 pointer-events-none transition-opacity duration-200 flex flex-col items-center gap-2 z-50"
+                    className="message-actions-menu absolute top-0 opacity-0 pointer-events-none transition-opacity duration-200 z-50"
                     onClick={(e) => e.stopPropagation()}
                   >
-                    {/* Emoji Reactions Bar */}
-                    <div className="reaction-picker bg-background/95 dark:bg-muted/90 backdrop-blur-md">
-                      {['❤️', '👍', '👎', '😂', '😢', '😡'].map(emoji => (
-                        <button 
-                          key={emoji}
-                          className="p-2 hover:bg-muted/50 rounded-full text-lg transition-transform active:scale-90 mobile-touch-target"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleReact(message.id, emoji);
-                            // Provide haptic feedback
-                            if ('vibrate' in navigator) {
-                              navigator.vibrate(25);
-                            }
-                            // Close reaction menu after selecting
-                            setTimeout(() => {
-                              const messageActions = document.getElementById(`message-actions-${message.id}`);
-                              if (messageActions) {
-                                messageActions.classList.add('opacity-0', 'pointer-events-none');
-                              }
-                            }, 200);
-                          }}
-                        >
-                          {emoji}
-                        </button>
-                      ))}
-                      
-                      {/* Reply button - separated with divider for clarity */}
-                      <div className="h-full w-px bg-border/30 mx-1"></div>
-                      <button 
-                        className="p-2 hover:bg-muted/50 rounded-full mobile-touch-target" 
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setReplyTo(message);
-                          document.querySelector('textarea')?.focus();
-                          const messageActions = document.getElementById(`message-actions-${message.id}`);
-                          if (messageActions) {
-                            messageActions.classList.add('opacity-0', 'pointer-events-none');
-                          }
-                          // Provide haptic feedback
-                          if ('vibrate' in navigator) {
-                            navigator.vibrate(25);
-                          }
-                        }}
-                      >
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                          <polyline points="9 17 4 12 9 7"></polyline>
-                          <path d="M20 18v-2a4 4 0 0 0-4-4H4"></path>
-                        </svg>
-                      </button>
-                    </div>
+                    <ReactionPicker 
+                      messageId={message.id} 
+                      onClose={() => {
+                        const messageActions = document.getElementById(`message-actions-${message.id}`);
+                        if (messageActions) {
+                          messageActions.classList.add('opacity-0', 'pointer-events-none');
+                        }
+                      }}
+                      position="top"
+                    />
                   </div>
                   {message.sender_id !== user?.id && (
                     <span className="text-xs text-muted-foreground ml-1">
@@ -747,16 +707,13 @@ export const ChatScreen = ({ conversation }: Props) => {
                   )}
                   <div className="flex items-end gap-2">
                     <div
-                      className={`rounded-[22px] p-4 break-words shadow-sm transition-all duration-300 message-bubble ${
-                        message.sender_id === user?.id
-                          ? 'bg-primary text-primary-foreground rounded-br-md'
-                          : 'bg-muted/90 backdrop-blur-sm rounded-bl-md'
-                      }`}
+                      className={`p-4 break-words shadow-sm transition-all duration-300 message-bubble`}
+                      data-sender={message.sender_id === user?.id ? 'self' : 'other'}
                     >
                       <p className="leading-relaxed">{message.content}</p>
                       
-                      {/* Instagram-style reactions attached to message */}
-                      <div className="message-reactions">
+                      {/* Facebook Messenger-style reactions attached to message */}
+                      <div className="relative">
                         <MessageReactions messageId={message.id} existingReactions={message.reactions} />
                       </div>
                       {message.attachment_url && (
