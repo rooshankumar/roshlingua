@@ -76,22 +76,20 @@ export const MessageReactions = ({ messageId, existingReactions = {} }: MessageR
   };
 
   return (
-    <div className="flex items-center gap-1 mt-1" data-message-reactions={messageId}>
+    <div className="flex flex-wrap items-center gap-1.5 mt-1.5" data-message-reactions={messageId}>
       {Object.entries(reactions).map(([emoji, users]) => (
         <Button
           key={emoji}
           variant="outline"
           size="sm"
-          className="h-7 px-2 rounded-full bg-muted/30 hover:bg-muted/50"
+          className="h-7 px-2 rounded-full bg-muted/30 hover:bg-muted/50 transition-all active:scale-95"
           onClick={() => handleReact(emoji)}
           disabled={isLoading}
         >
           <span className="mr-1">{emoji}</span>
-          <span className="text-xs">{users.length}</span>
+          <span className="text-xs font-medium">{users.length}</span>
         </Button>
       ))}
-
-      {/* Removed the permanent smile icon - reactions now only available via long press */}
     </div>
   );
 };

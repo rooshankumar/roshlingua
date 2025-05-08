@@ -706,7 +706,7 @@ html {
   border-radius: 9999px;
 }
 
-/* Fix for mobile emoji handling */
+/* Message interaction styles for mobile */
 @media (hover: none) {
   .message-actions-menu {
     opacity: 0;
@@ -717,6 +717,45 @@ html {
   .message-actions-menu.active {
     opacity: 1;
     pointer-events: auto;
+  }
+  
+  /* Swipe to reply animation */
+  .swiping-to-reply {
+    transition: transform 0.1s ease-out;
+    position: relative;
+  }
+  
+  .reply-indicator {
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: var(--primary);
+    color: var(--primary-foreground);
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: pulse 1s infinite;
+    z-index: 10;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+  
+  @keyframes pulse {
+    0% { transform: translateY(-50%) scale(1); }
+    50% { transform: translateY(-50%) scale(1.1); }
+    100% { transform: translateY(-50%) scale(1); }
+  }
+  
+  /* Message action styles improved */
+  .message-long-press {
+    transform: scale(0.98);
+    opacity: 0.95;
+    transition: transform 0.2s, opacity 0.2s;
+  }
+}
 
 /* Community card mobile optimizations */
 @media (max-width: 640px) {
@@ -727,8 +766,5 @@ html {
     margin-left: -1rem;
     margin-right: -1rem;
     width: calc(100% + 2rem);
-  }
-}
-
   }
 }

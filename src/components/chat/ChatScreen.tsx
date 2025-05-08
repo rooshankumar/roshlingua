@@ -556,62 +556,149 @@ export const ChatScreen = ({ conversation }: Props) => {
                   }
                 }}
                 onTouchStart={(e) => {
-                  // Set up long press handler
+                  // Set up long press handler and swipe detection
                   const element = e.currentTarget;
                   const messageId = message.id;
+                  const touchX = e.touches[0].clientX;
+                  
+                  // Store the starting X position for swipe detection
+                  element.setAttribute('data-touch-start-x', touchX.toString());
 
                   // Add visual feedback
                   element.classList.add('message-long-press');
 
-                  const longPressTimer = setTimeout(() => {
-                    // Show message actions on long press
-                    const messageActions = document.getElementById(`message-actions-${messageId}`);
-                    if (messageActions) {
-                      // Add haptic feedback if supported
-                      if ('vibrate' in navigator) {
-                        navigator.vibrate(50);
-                      }
-                      messageActions.classList.remove('opacity-0');
-                      messageActions.classList.remove('pointer-events-none');
-                      messageActions.classList.add('active');
+                  // Show message actions immediately on tap for better UX
+                  const messageActions = document.getElementById(`message-actions-${messageId}`);
+                  if (messageActions) {
+                    // Add haptic feedback if supported
+                    if ('vibrate' in navigator) {
+                      navigator.vibrate(25); // lighter vibration for tap
                     }
-                  }, 400); // 400ms for long press - slightly faster for better responsiveness
+                    messageActions.classList.remove('opacity-0');
+                    messageActions.classList.remove('pointer-events-none');
+                    messageActions.classList.add('active');
+                  }
+
+                  const longPressTimer = setTimeout(() => {
+                    // For longer press, keep the menu open longer
+                    if ('vibrate' in navigator) {
+                      navigator.vibrate([25, 50, 25]); // pattern for stronger feedback
+                    }
+                  }, 400);
 
                   // Store the timer ID to clear it on touchend
                   element.setAttribute('data-long-press-timer', longPressTimer.toString());
                 }}
+                onTouchMove={(e) => {
+                  // Handle swipe to reply
+                  const element = e.currentTarget;
+                  const startX = parseInt(element.getAttribute('data-touch-start-x') || '0');
+                  const currentX = e.touches[0].clientX;
+                  const deltaX = currentX - startX;
+                  
+                  // If swiped right far enough (for swipe-to-reply) - 50px threshold
+                  if (deltaX > 50 && !element.classList.contains('swiping-to-reply')) {
+                    element.classList.add('swiping-to-reply');
+                    // Add visual indication of swipe-to-reply
+                    element.style.transform = `translateX(${Math.min(deltaX, 100)}px)`;
+                    element.style.opacity = '0.8';
+                    
+                    // Show reply icon
+                    const replyIndicator = document.createElement('div');
+                    replyIndicator.className = 'reply-indicator';
+                    replyIndicator.innerHTML = `
+                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <polyline points="9 17 4 12 9 7"></polyline>
+                        <path d="M20 18v-2a4 4 0 0 0-4-4H4"></path>
+                      </svg>
+                    `;
+                    
+                    if (!element.querySelector('.reply-indicator')) {
+                      element.appendChild(replyIndicator);
+                    }
+                    
+                    // Clear long press timer if swiping
+                    const timerId = element.getAttribute('data-long-press-timer');
+                    if (timerId) {
+                      clearTimeout(parseInt(timerId));
+                      element.removeAttribute('data-long-press-timer');
+                    }
+                  }
+                }}
                 onTouchEnd={(e) => {
-                  // Clear the long press timer on touch end
+                  // Handle end of touch
                   const element = e.currentTarget;
                   const timerId = element.getAttribute('data-long-press-timer');
                   if (timerId) {
                     clearTimeout(parseInt(timerId));
                     element.removeAttribute('data-long-press-timer');
+                  }
+                  
+                  // Check if this was a swipe-to-reply
+                  if (element.classList.contains('swiping-to-reply')) {
+                    // Reset visual state
+                    element.style.transform = '';
+                    element.style.opacity = '';
+                    element.classList.remove('swiping-to-reply');
+                    
+                    // Remove reply indicator
+                    const indicator = element.querySelector('.reply-indicator');
+                    if (indicator) element.removeChild(indicator);
+                    
+                    // Set reply to this message
+                    setReplyTo(message);
+                    document.querySelector('textarea')?.focus();
+                    
+                    // Haptic feedback for completing the swipe
+                    if ('vibrate' in navigator) {
+                      navigator.vibrate([40, 30, 40]);
+                    }
                   }
 
                   // Remove visual feedback
                   element.classList.remove('message-long-press');
                 }}
-                onTouchMove={(e) => {
-                  // Clear the long press timer on touch move (user is scrolling)
-                  const element = e.currentTarget;
-                  const timerId = element.getAttribute('data-long-press-timer');
-                  if (timerId) {
-                    clearTimeout(parseInt(timerId));
-                    element.removeAttribute('data-long-press-timer');
-                  }
-                }}
               >
                 <div className={`flex flex-col gap-2 max-w-[85%] sm:max-w-[70%] group transition-all duration-300 relative`}>
-                  {/* Message actions */}
+                  {/* Message actions - now showing emoji reactions first by default */}
                   <div 
                     id={`message-actions-${message.id}`}
-                    className="message-actions-menu absolute -top-14 left-0 right-0 opacity-0 pointer-events-none transition-opacity duration-200 flex justify-center gap-2 z-10 touch:z-50"
+                    className="message-actions-menu absolute -top-16 left-0 right-0 opacity-0 pointer-events-none transition-opacity duration-200 flex flex-col items-center gap-2 z-10 touch:z-50"
                     onClick={(e) => e.stopPropagation()}
                   >
-                    <div className="bg-muted/90 backdrop-blur-sm rounded-full p-1.5 shadow-md flex items-center gap-2 border border-border/30">
+                    {/* Quick Emoji Reactions - Shown First */}
+                    <div className="bg-muted/95 backdrop-blur-md rounded-full p-1.5 shadow-lg flex items-center gap-2 border border-border/40">
+                      {['👍', '❤️', '😂', '😮', '😢'].map(emoji => (
+                        <button 
+                          key={emoji}
+                          className="p-2 hover:bg-background/40 rounded-full text-lg mobile-touch-target transition-transform active:scale-90"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleReact(message.id, emoji);
+                            if ('vibrate' in navigator) {
+                              navigator.vibrate(25);
+                            }
+                          }}
+                        >
+                          {emoji}
+                        </button>
+                      ))}
                       <button 
-                        className="p-2 hover:bg-background/30 rounded-full mobile-touch-target" 
+                        className="p-2 hover:bg-background/40 rounded-full mobile-touch-target"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          const moreEmojis = document.getElementById(`more-emojis-${message.id}`);
+                          if (moreEmojis) {
+                            moreEmojis.classList.toggle('hidden');
+                          }
+                        }}
+                      >
+                        <span className="text-lg">+</span>
+                      </button>
+                      
+                      {/* Reply button */}
+                      <button 
+                        className="p-2 hover:bg-background/40 rounded-full mobile-touch-target border-l border-border/30 ml-1 pl-3" 
                         onClick={(e) => {
                           e.stopPropagation();
                           setReplyTo(message);
@@ -631,40 +718,22 @@ export const ChatScreen = ({ conversation }: Props) => {
                           <path d="M20 18v-2a4 4 0 0 0-4-4H4"></path>
                         </svg>
                       </button>
-                      <button 
-                        className="p-2 hover:bg-background/30 rounded-full mobile-touch-target"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          const emojiPicker = document.getElementById(`emoji-picker-${message.id}`);
-                          if (emojiPicker) {
-                            emojiPicker.classList.toggle('hidden');
-                          }
-                        }}
-                      >
-                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                          <circle cx="12" cy="12" r="10"></circle>
-                          <path d="M8 14s1.5 2 4 2 4-2 4-2"></path>
-                          <line x1="9" y1="9" x2="9.01" y2="9"></line>
-                          <line x1="15" y1="9" x2="15.01" y2="9"></line>
-                        </svg>
-                      </button>
                     </div>
 
-                    {/* Emoji picker */}
+                    {/* More Emoji picker - hidden by default */}
                     <div 
-                      id={`emoji-picker-${message.id}`}
-                      className="absolute -top-12 left-1/2 transform -translate-x-1/2 bg-muted/90 backdrop-blur-sm rounded-full p-1 shadow-md hidden"
+                      id={`more-emojis-${message.id}`}
+                      className="bg-muted/95 backdrop-blur-md rounded-xl p-2 shadow-lg hidden"
                     >
-                      <div className="flex items-center gap-1">
-                        {['👍', '❤️', '😂', '😮', '😢', '👏'].map(emoji => (
+                      <div className="grid grid-cols-6 gap-2">
+                        {['👍', '❤️', '😂', '😮', '😢', '👏', '🔥', '🎉', '🙏', '😍', '👌', '🤔', '🥺', '😭', '😱', '😴', '🤗', '🤫', '🤯', '🥰', '💯', '✅', '❌'].map(emoji => (
                           <button 
                             key={emoji}
-                            className="p-1 hover:bg-background/30 rounded-full text-lg"
+                            className="p-2 hover:bg-background/40 rounded-lg text-xl"
                             onClick={(e) => {
                               e.stopPropagation();
                               handleReact(message.id, emoji);
-                              document.getElementById(`emoji-picker-${message.id}`)?.classList.add('hidden');
-                              document.getElementById(`message-actions-${message.id}`)?.classList.add('opacity-0', 'pointer-events-none');
+                              document.getElementById(`more-emojis-${message.id}`)?.classList.add('hidden');
                             }}
                           >
                             {emoji}
