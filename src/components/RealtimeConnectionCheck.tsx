@@ -121,7 +121,7 @@ export default function RealtimeConnectionCheck() {
           is_online: isOnline,
           last_seen: new Date().toISOString() 
         })
-        .eq('id', user.id);
+        .eq('id', user.idr.id);
 
       if (error) {
         console.error('Error updating online status:', error);

@@ -216,8 +216,24 @@ const Community = () => {
           xp: user.xp || 0, // Added xp default
         }));
 
+        // Check for actual online status - consider a user offline if last_seen is more than 5 minutes ago
+        const now = new Date().getTime();
+        const FIVE_MINUTES = 5 * 60 * 1000; // 5 minutes in milliseconds
+
+        const usersWithCorrectStatus = usersWithDefaults.map(user => {
+          // If a user has last_seen time and it's more than 5 minutes ago, mark them as offline
+          // regardless of what is_online says in the database
+          if (user.last_seen) {
+            const lastSeenTime = new Date(user.last_seen).getTime();
+            if (now - lastSeenTime > FIVE_MINUTES) {
+              return { ...user, is_online: false };
+            }
+          }
+          return user;
+        });
+
         // Sort users: online first, then by last seen (most recent first)
-        const sortedUsers = usersWithDefaults.sort((a, b) => {
+        const sortedUsers = usersWithCorrectStatus.sort((a, b) => {
           // First by online status
           if (a.is_online && !b.is_online) return -1;
           if (!a.is_online && b.is_online) return 1;
@@ -403,8 +419,24 @@ const Community = () => {
           xp: user.xp || 0, // Added xp default
         }));
 
+        // Check for actual online status - consider a user offline if last_seen is more than 5 minutes ago
+        const now = new Date().getTime();
+        const FIVE_MINUTES = 5 * 60 * 1000; // 5 minutes in milliseconds
+
+        const usersWithCorrectStatus = usersWithDefaults.map(user => {
+          // If a user has last_seen time and it's more than 5 minutes ago, mark them as offline
+          // regardless of what is_online says in the database
+          if (user.last_seen) {
+            const lastSeenTime = new Date(user.last_seen).getTime();
+            if (now - lastSeenTime > FIVE_MINUTES) {
+              return { ...user, is_online: false };
+            }
+          }
+          return user;
+        });
+
         // Sort users: online first, then by last seen (most recent first)
-        const sortedUsers = usersWithDefaults.sort((a, b) => {
+        const sortedUsers = usersWithCorrectStatus.sort((a, b) => {
           // First by online status
           if (a.is_online && !b.is_online) return -1;
           if (!a.is_online && b.is_online) return 1;
@@ -801,10 +833,27 @@ const Community = () => {
                       gender: user.gender || null, // Added gender default
                       xp: user.xp || 0, // Added xp default
                     }));
+                    // Check for actual online status - consider a user offline if last_seen is more than 5 minutes ago
+                    const now = new Date().getTime();
+                    const FIVE_MINUTES = 5 * 60 * 1000; // 5 minutes in milliseconds
+
+                    const usersWithCorrectStatus = usersWithDefaults.map(user => {
+                      // If a user has last_seen time and it's more than 5 minutes ago, mark them as offline
+                      // regardless of what is_online says in the database
+                      if (user.last_seen) {
+                        const lastSeenTime = new Date(user.last_seen).getTime();
+                        if (now - lastSeenTime > FIVE_MINUTES) {
+                          return { ...user, is_online: false };
+                        }
+                      }
+                      return user;
+                    });
+
                     // Sort users: online first, then by last seen (most recent first)
-                    const sortedUsers = usersWithDefaults.sort((a, b) => {
+                    const sortedUsers = usersWithCorrectStatus.sort((a, b) => {
                       if (a.is_online && !b.is_online) return -1;
-                      if (!a.is_online && b.is_online) return 1;  const aLastSeen = a.last_seen ? new Date(a.last_seen).getTime() : 0;
+                      if (!a.is_online && b.is_online) return 1;
+                      const aLastSeen = a.last_seen ? new Date(a.last_seen).getTime() : 0;
                       const bLastSeen = b.last_seen ? new Date(b.last_seen).getTime() : 0;
                       return bLastSeen - aLastSeen;
                     });
@@ -814,7 +863,7 @@ const Community = () => {
                       title: "Refreshed",
                       description: "Community profiles updated",
                     });
-                  }                  catch (error) {
+                  } catch (error) {
                     console.error("Error refreshing users:", error);
                     toast({
                       title: "Error",

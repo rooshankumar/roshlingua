@@ -7,7 +7,19 @@ interface UserStatusProps {
 }
 
 export function UserStatus({ isOnline, lastSeen }: UserStatusProps) {
-  if (isOnline) {
+  // Consider a user offline if last seen time is more than 5 minutes ago,
+  // regardless of their is_online status
+  const isActuallyOnline = (): boolean => {
+    if (!isOnline) return false;
+    if (!lastSeen) return isOnline;
+    
+    const lastSeenDate = new Date(lastSeen);
+    const now = new Date();
+    const FIVE_MINUTES = 5 * 60 * 1000; // 5 minutes in milliseconds
+    return now.getTime() - lastSeenDate.getTime() < FIVE_MINUTES;
+  };
+  
+  if (isActuallyOnline()) {
     return (
       <div className="flex items-center text-sm">
         <div className="w-3 h-3 rounded-full bg-green-500 ring-2 ring-background mr-2" />
