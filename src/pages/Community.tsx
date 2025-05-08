@@ -804,7 +804,7 @@ const Community = () => {
                     // Sort users: online first, then by last seen (most recent first)
                     const sortedUsers = usersWithDefaults.sort((a, b) => {
                       if (a.is_online && !b.is_online) return -1;
-                      if (!a.is_online && b.is_online) return 1;  const aLastSeen = a.last_seen ?? new Date(a.last_seen).getTime() : 0;
+                      if (!a.is_online && b.is_online) return 1;  const aLastSeen = a.last_seen ? new Date(a.last_seen).getTime() : 0;
                       const bLastSeen = b.last_seen ? new Date(b.last_seen).getTime() : 0;
                       return bLastSeen - aLastSeen;
                     });
