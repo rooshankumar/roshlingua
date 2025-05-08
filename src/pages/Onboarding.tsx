@@ -371,7 +371,7 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
                                             name="date_of_birth"
                                             render={({ field }) => (
                                                 <FormItem>
-                                                    <FormLabel>Date of Birth (Optional)</FormLabel>
+                                                    <FormLabel>Date of Birth (Optional</FormLabel>
                                                     <FormControl>
                                                         <Input
                                                             type="date"
