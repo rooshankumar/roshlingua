@@ -70,18 +70,18 @@ export const ChatScreen = ({ conversation }: Props) => {
 
       // Use immediate auto scroll first to get to bottom quickly
       chatContainer.scrollTo({
-        top: 999999, // Large value to ensure we reach the bottom
+        top: chatContainer.scrollHeight + 10000, // Extra buffer to ensure we reach the bottom
         behavior: 'auto'
       });
 
       // Then follow with a smooth scroll if requested (for visual polish)
       if (smooth) {
-        requestAnimationFrame(() => {
+        setTimeout(() => {
           chatContainer.scrollTo({
-            top: chatContainer.scrollHeight,
+            top: chatContainer.scrollHeight + 10000,
             behavior: 'smooth'
           });
-        });
+        }, 50);
       }
     }
   };
@@ -89,7 +89,7 @@ export const ChatScreen = ({ conversation }: Props) => {
   // Force scroll to bottom when user enters chat view
   useEffect(() => {
     // When component mounts, force scroll to bottom with higher priority and multiple attempts
-    const scrollAttempts = [100, 300, 600, 1000]; // Multiple attempts with increasing delays
+    const scrollAttempts = [100, 300, 600, 1000, 1500, 2000]; // Multiple attempts with increasing delays
     scrollAttempts.forEach(delay => {
       setTimeout(() => scrollToLatestMessage(false), delay);
     });
@@ -98,10 +98,29 @@ export const ChatScreen = ({ conversation }: Props) => {
     const handleResize = () => scrollToLatestMessage(false);
     window.addEventListener('resize', handleResize);
     window.addEventListener('orientationchange', handleResize);
+    
+    // Set up an intersection observer to detect when the message container is visible
+    // This helps ensure scrolling works even if the chat tab becomes visible after being hidden
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          scrollToLatestMessage(false);
+        }
+      });
+    }, { threshold: 0.1 });
+    
+    const chatContainer = document.querySelector('[data-scrollbar]');
+    if (chatContainer) {
+      observer.observe(chatContainer);
+    }
 
     return () => {
       window.removeEventListener('resize', handleResize);
       window.removeEventListener('orientationchange', handleResize);
+      if (chatContainer) {
+        observer.unobserve(chatContainer);
+      }
+      observer.disconnect();
     };
   }, []);
 
@@ -202,8 +221,10 @@ export const ChatScreen = ({ conversation }: Props) => {
               };
 
               const updatedMessages = [...prev, messageWithAttachment];
-              // Force a scroll after a small delay to ensure state update
-              setTimeout(() => scrollToLatestMessage(), 100);
+              // Multiple scroll attempts with increasing delays for reliability
+              [50, 150, 300, 500].forEach(delay => {
+                setTimeout(() => scrollToLatestMessage(delay > 100), delay);
+              });
               return updatedMessages;
             });
           }
@@ -265,19 +286,34 @@ export const ChatScreen = ({ conversation }: Props) => {
   // Auto-scroll when messages change or component mounts
   useEffect(() => {
     if (messages.length > 0) {
-      scrollToLatestMessage();
+      // Use a sequence of scroll attempts with increasing delays
+      [10, 50, 150, 300, 500].forEach(delay => {
+        setTimeout(() => scrollToLatestMessage(delay > 100), delay);
+      });
     }
   }, [messages]);
 
   // Always scroll to bottom when chat is first loaded and messages are fetched
   useEffect(() => {
     if (!isLoading && messages.length > 0) {
-      // Use multiple timeouts with increasing delays to ensure scrolling happens
-      [50, 150, 300].forEach(delay => {
+      // More aggressive scroll attempts to handle initial load
+      [10, 50, 150, 300, 500, 800, 1200].forEach(delay => {
         setTimeout(() => scrollToLatestMessage(false), delay);
       });
     }
   }, [isLoading, messages.length]);
+
+  // Force scroll on window resize events
+  useEffect(() => {
+    const handleResize = () => {
+      if (messages.length > 0) {
+        scrollToLatestMessage(false);
+      }
+    };
+    
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [messages.length]);
 
   const handleReact = async (messageId: string, emoji: string) => {
     if (!user?.id) return;
@@ -375,7 +411,11 @@ export const ChatScreen = ({ conversation }: Props) => {
 
     setMessages(prev => [...prev, optimisticMessage]);
     setNewMessage('');
-    scrollToBottom();
+    
+    // Multiple scroll attempts to ensure we catch up with DOM updates
+    setTimeout(() => scrollToLatestMessage(false), 10);
+    setTimeout(() => scrollToLatestMessage(true), 100);
+    setTimeout(() => scrollToLatestMessage(true), 300);
 
     try {
       const { error } = await supabase
