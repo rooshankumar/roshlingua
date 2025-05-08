@@ -126,13 +126,60 @@
   .message-reaction-btn {
     height: 26px !important;
 
+/* Instagram-like message reactions */
+.message-reactions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  max-width: 100%;
+  overflow-x: auto;
+  margin-top: 4px;
+  padding: 2px;
+  position: relative;
+  z-index: 5;
+}
+
+/* Reaction picker styling */
+.reaction-picker {
+  position: absolute;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(8px);
+  border-radius: 24px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  z-index: 100;
+  padding: 6px;
+  display: flex;
+  gap: 4px;
+  transform-origin: center bottom;
+  animation: scaleIn 0.15s ease-out;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+/* Reaction animations */
+@keyframes scaleIn {
+  from { transform: scale(0.8); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.15); }
+  100% { transform: scale(1); }
+}
+
+.reaction-added {
+  animation: pulse 0.3s ease-in-out;
+}
+
 /* Ensure the reaction menu stays inside the chat view */
 .message-actions-menu {
   position: absolute;
   max-width: 90%;
-  left: 5%;
-  right: auto;
+  left: 0;
+  right: 0;
+  margin: 0 auto;
   z-index: 50;
+  transform: translateY(-110%);
 }
 
 /* Emoji menu (more options) styling */
@@ -154,6 +201,22 @@
   .emoji-reaction-menu {
     max-width: 200px;
   }
+  
+  .reaction-picker {
+    padding: 4px;
+  }
+}
+
+/* For long-press and touch devices */
+.message-bubble {
+  touch-action: manipulation;
+  position: relative;
+}
+
+.message-long-press {
+  opacity: 0.9;
+  transform: scale(0.98);
+  transition: all 0.2s ease;
 }
 
     padding: 0 6px !important;

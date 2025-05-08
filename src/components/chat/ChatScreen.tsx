@@ -554,12 +554,24 @@ export const ChatScreen = ({ conversation }: Props) => {
                 style={{
                   animationDelay: `${index * 0.1}s`
                 }}
-                onClick={() => {
-                  // Show message actions on click
+                onClick={(e) => {
+                  // Different behavior for desktop (click) vs mobile (tap)
+                  if (window.matchMedia('(min-width: 768px)').matches) {
+                    // On desktop, toggle the reaction menu on click
+                    const messageActions = document.getElementById(`message-actions-${message.id}`);
+                    if (messageActions) {
+                      messageActions.classList.toggle('opacity-0');
+                      messageActions.classList.toggle('pointer-events-none');
+                    }
+                  }
+                }}
+                onContextMenu={(e) => {
+                  // Right-click for desktop
+                  e.preventDefault();
                   const messageActions = document.getElementById(`message-actions-${message.id}`);
                   if (messageActions) {
-                    messageActions.classList.toggle('opacity-0');
-                    messageActions.classList.toggle('pointer-events-none');
+                    messageActions.classList.remove('opacity-0');
+                    messageActions.classList.remove('pointer-events-none');
                   }
                 }}
                 onTouchStart={(e) => {
@@ -567,31 +579,35 @@ export const ChatScreen = ({ conversation }: Props) => {
                   const element = e.currentTarget;
                   const messageId = message.id;
                   const touchX = e.touches[0].clientX;
+                  const touchY = e.touches[0].clientY;
                   
-                  // Store the starting X position for swipe detection
+                  // Store the starting position for gesture detection
                   element.setAttribute('data-touch-start-x', touchX.toString());
+                  element.setAttribute('data-touch-start-y', touchY.toString());
 
                   // Add visual feedback
                   element.classList.add('message-long-press');
 
-                  // Show message actions immediately on tap for better UX
-                  const messageActions = document.getElementById(`message-actions-${messageId}`);
-                  if (messageActions) {
-                    // Add haptic feedback if supported
-                    if ('vibrate' in navigator) {
-                      navigator.vibrate(25); // lighter vibration for tap
-                    }
-                    messageActions.classList.remove('opacity-0');
-                    messageActions.classList.remove('pointer-events-none');
-                    messageActions.classList.add('active');
-                  }
-
+                  // Set up a long press timer
                   const longPressTimer = setTimeout(() => {
-                    // For longer press, keep the menu open longer
-                    if ('vibrate' in navigator) {
-                      navigator.vibrate([25, 50, 25]); // pattern for stronger feedback
+                    // Show reaction picker on long press
+                    const messageActions = document.getElementById(`message-actions-${messageId}`);
+                    if (messageActions) {
+                      // Add haptic feedback for long press
+                      if ('vibrate' in navigator) {
+                        navigator.vibrate([40, 60, 40]); // stronger pattern for long press
+                      }
+                      
+                      // Position the reaction menu above the message
+                      const rect = element.getBoundingClientRect();
+                      messageActions.style.top = `${-40}px`; // Position above message
+                      
+                      // Show the reaction menu
+                      messageActions.classList.remove('opacity-0');
+                      messageActions.classList.remove('pointer-events-none');
+                      messageActions.classList.add('active');
                     }
-                  }, 400);
+                  }, 500); // 500ms for long press
 
                   // Store the timer ID to clear it on touchend
                   element.setAttribute('data-long-press-timer', longPressTimer.toString());
@@ -667,22 +683,22 @@ export const ChatScreen = ({ conversation }: Props) => {
                 }}
               >
                 <div className={`flex flex-col gap-2 max-w-[85%] sm:max-w-[70%] group transition-all duration-300 relative`}>
-                  {/* Message actions - now showing emoji reactions first by default */}
+                  {/* Instagram-style reaction picker */}
                   <div 
                     id={`message-actions-${message.id}`}
-                    className="message-actions-menu absolute top-0 left-0 right-0 opacity-0 pointer-events-none transition-opacity duration-200 flex flex-col items-center gap-2 z-10 touch:z-50 transform -translate-y-[100%]"
+                    className="message-actions-menu absolute top-0 opacity-0 pointer-events-none transition-opacity duration-200 flex flex-col items-center gap-2 z-50"
                     onClick={(e) => e.stopPropagation()}
-                    style={{ maxWidth: '100%', width: '100%', overflow: 'visible' }}
                   >
-                    {/* Quick Emoji Reactions - Shown First */}
-                    <div className="bg-muted/95 backdrop-blur-md rounded-full p-1 shadow-lg flex items-center gap-1 border border-border/40 max-w-full overflow-x-auto">
-                      {['👍', '❤️', '😂', '😮', '😢'].map(emoji => (
+                    {/* Emoji Reactions Bar */}
+                    <div className="reaction-picker bg-background/95 dark:bg-muted/90 backdrop-blur-md">
+                      {['❤️', '👍', '👎', '😂', '😢', '😡'].map(emoji => (
                         <button 
                           key={emoji}
-                          className="p-1.5 hover:bg-background/40 rounded-full text-sm mobile-touch-target transition-transform active:scale-90 flex-shrink-0"
+                          className="p-2 hover:bg-muted/50 rounded-full text-lg transition-transform active:scale-90 mobile-touch-target"
                           onClick={(e) => {
                             e.stopPropagation();
                             handleReact(message.id, emoji);
+                            // Provide haptic feedback
                             if ('vibrate' in navigator) {
                               navigator.vibrate(25);
                             }
@@ -692,28 +708,17 @@ export const ChatScreen = ({ conversation }: Props) => {
                               if (messageActions) {
                                 messageActions.classList.add('opacity-0', 'pointer-events-none');
                               }
-                            }, 300);
+                            }, 200);
                           }}
                         >
                           {emoji}
                         </button>
                       ))}
-                      <button 
-                        className="p-1.5 hover:bg-background/40 rounded-full text-sm mobile-touch-target flex-shrink-0"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          const moreEmojis = document.getElementById(`more-emojis-${message.id}`);
-                          if (moreEmojis) {
-                            moreEmojis.classList.toggle('hidden');
-                          }
-                        }}
-                      >
-                        <span>+</span>
-                      </button>
                       
-                      {/* Reply button */}
+                      {/* Reply button - separated with divider for clarity */}
+                      <div className="h-full w-px bg-border/30 mx-1"></div>
                       <button 
-                        className="p-2 hover:bg-background/40 rounded-full mobile-touch-target border-l border-border/30 ml-1 pl-3 flex-shrink-0" 
+                        className="p-2 hover:bg-muted/50 rounded-full mobile-touch-target" 
                         onClick={(e) => {
                           e.stopPropagation();
                           setReplyTo(message);
@@ -734,40 +739,6 @@ export const ChatScreen = ({ conversation }: Props) => {
                         </svg>
                       </button>
                     </div>
-
-                    {/* More Emoji picker - hidden by default */}
-                    <div 
-                      id={`more-emojis-${message.id}`}
-                      className="bg-muted/95 backdrop-blur-md rounded-xl p-1.5 shadow-lg hidden emoji-reaction-menu max-w-full"
-                      style={{ maxHeight: '200px', overflowY: 'auto' }}
-                    >
-                      <div className="grid grid-cols-5 gap-1">
-                        {['👍', '❤️', '😂', '😮', '😢', '👏', '🔥', '🎉', '🙏', '😍', '👌', '🤔', '🥺', '😭', '😱', '😴', '🤗', '🤫', '🤯', '🥰', '💯', '✅', '❌'].map(emoji => (
-                          <button 
-                            key={emoji}
-                            className="p-1.5 hover:bg-background/40 rounded-lg text-sm"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleReact(message.id, emoji);
-                              document.getElementById(`more-emojis-${message.id}`)?.classList.add('hidden');
-                              // Close reaction menu after selecting
-                              setTimeout(() => {
-                                const messageActions = document.getElementById(`message-actions-${message.id}`);
-                                if (messageActions) {
-                                  messageActions.classList.add('opacity-0', 'pointer-events-none');
-                                }
-                              }, 300);
-                              // Provide haptic feedback
-                              if ('vibrate' in navigator) {
-                                navigator.vibrate(25);
-                              }
-                            }}
-                          >
-                            {emoji}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
                   </div>
                   {message.sender_id !== user?.id && (
                     <span className="text-xs text-muted-foreground ml-1">
@@ -776,14 +747,18 @@ export const ChatScreen = ({ conversation }: Props) => {
                   )}
                   <div className="flex items-end gap-2">
                     <div
-                      className={`rounded-[22px] p-4 break-words shadow-sm transition-all duration-300 ${
+                      className={`rounded-[22px] p-4 break-words shadow-sm transition-all duration-300 message-bubble ${
                         message.sender_id === user?.id
                           ? 'bg-primary text-primary-foreground rounded-br-md'
                           : 'bg-muted/90 backdrop-blur-sm rounded-bl-md'
                       }`}
                     >
-                      <p className="leading-relaxed mb-2">{message.content}</p>
-                      <MessageReactions messageId={message.id} existingReactions={message.reactions} /> {/* Added MessageReactions component */}
+                      <p className="leading-relaxed">{message.content}</p>
+                      
+                      {/* Instagram-style reactions attached to message */}
+                      <div className="message-reactions">
+                        <MessageReactions messageId={message.id} existingReactions={message.reactions} />
+                      </div>
                       {message.attachment_url && (
                         <div className="mt-1 rounded-lg overflow-hidden">
                           {message.attachment_url?.match(/\.(jpg|jpeg|png|gif|webp|avif)$/i) ? (

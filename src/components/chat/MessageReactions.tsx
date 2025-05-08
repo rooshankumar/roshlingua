@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/lib/supabase';
@@ -9,13 +10,25 @@ const commonEmojis = ['👍', '❤️', '😂', '🎉', '🙏', '👏', '🔥', 
 interface MessageReactionsProps {
   messageId: string;
   existingReactions?: Record<string, string[]>;
+  onClose?: () => void;
+  isReactionPicker?: boolean;
 }
 
-export const MessageReactions = ({ messageId, existingReactions = {} }: MessageReactionsProps) => {
+export const MessageReactions = ({ 
+  messageId, 
+  existingReactions = {}, 
+  onClose,
+  isReactionPicker = false
+}: MessageReactionsProps) => {
   const { user } = useAuth();
   const [reactions, setReactions] = useState<Record<string, string[]>>(existingReactions);
   const [isLoading, setIsLoading] = useState(false);
   const [userReactions, setUserReactions] = useState<string[]>([]);
+
+  // Emoji set for the reaction picker - more limited for Instagram-like feel
+  const reactionEmojis = isReactionPicker 
+    ? ['❤️', '😂', '😢', '👍', '👎', '😡'] 
+    : commonEmojis;
 
   // Fetch existing reactions when component mounts
   useEffect(() => {
@@ -118,6 +131,11 @@ export const MessageReactions = ({ messageId, existingReactions = {} }: MessageR
         }
       });
 
+      // If this is a picker, close it after selection
+      if (isReactionPicker && onClose) {
+        setTimeout(() => onClose(), 200);
+      }
+
       try {
         if (hasReacted) {
           // Delete the reaction if it exists
@@ -173,21 +191,54 @@ export const MessageReactions = ({ messageId, existingReactions = {} }: MessageR
     }
   };
 
+  // If there are no reactions and this is not a picker, don't render anything
+  if (Object.keys(reactions).length === 0 && !isReactionPicker) {
+    return null;
+  }
+
   return (
-    <div className="flex flex-wrap items-center gap-1 mt-1 max-w-full overflow-hidden" data-message-reactions={messageId}>
-      {Object.entries(reactions).map(([emoji, users]) => (
-        <Button
-          key={emoji}
-          variant="outline"
-          size="sm"
-          className={`h-6 px-1.5 py-0 rounded-full bg-muted/30 hover:bg-muted/50 transition-all active:scale-95 ${userReactions.includes(emoji) ? 'ring-1 ring-primary' : ''}`}
-          onClick={() => handleReact(emoji)}
-          disabled={isLoading}
-        >
-          <span className="mr-1 text-xs">{emoji}</span>
-          <span className="text-xs font-medium">{users.length}</span>
-        </Button>
-      ))}
+    <div className={`flex flex-wrap items-center gap-1 ${isReactionPicker ? 'p-2 bg-background/95 backdrop-blur-md rounded-full shadow-lg' : 'mt-1'}`}>
+      {isReactionPicker ? (
+        // Reaction picker mode
+        reactionEmojis.map((emoji) => (
+          <Button
+            key={emoji}
+            variant="ghost" 
+            size="sm"
+            className={`h-8 w-8 p-0 rounded-full hover:bg-muted/50 transition-all ${userReactions.includes(emoji) ? 'bg-muted/40 ring-1 ring-primary' : ''}`}
+            onClick={() => handleReact(emoji)}
+            disabled={isLoading}
+          >
+            <span className="text-base">{emoji}</span>
+          </Button>
+        ))
+      ) : (
+        // Display existing reactions
+        Object.entries(reactions).map(([emoji, users]) => (
+          <Button
+            key={emoji}
+            variant="outline"
+            size="sm"
+            className={`h-6 px-1.5 py-0 rounded-full bg-muted/30 hover:bg-muted/50 transition-all active:scale-95 ${userReactions.includes(emoji) ? 'ring-1 ring-primary' : ''}`}
+            onClick={() => handleReact(emoji)}
+            disabled={isLoading}
+          >
+            <span className="mr-1 text-xs">{emoji}</span>
+            <span className="text-xs font-medium">{users.length}</span>
+          </Button>
+        ))
+      )}
     </div>
+  );
+};
+
+// Export a standalone picker component for convenience
+export const ReactionPicker = ({ messageId, onClose }: { messageId: string, onClose?: () => void }) => {
+  return (
+    <MessageReactions
+      messageId={messageId}
+      isReactionPicker={true}
+      onClose={onClose}
+    />
   );
 };
