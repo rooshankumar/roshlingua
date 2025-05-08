@@ -33,24 +33,33 @@ const ChatList = () => {
   const [conversations, setConversations] = useState<ChatPreview[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+  const { unreadCounts, refreshUnreadCounts } = useUnreadMessages(user?.id);
 
   useEffect(() => {
     if (!user) return;
     setIsLoading(true);
     const fetchConversations = async () => {
       try {
-        // Fetch all unread messages for the current user
-        const { data: unreadMessages, error: unreadError } = await supabase
-          .from('conversation_participants')
-          .select('conversation_id, unread_count')
-          .eq('user_id', user?.id);
-
-        if (unreadError) throw unreadError;
-
-        const unreadCountsClientSide: { [key: string]: number } = unreadMessages?.reduce((acc, message) => {
-          acc[message.conversation_id] = (acc[message.conversation_id] || 0) + 1;
-          return acc;
-        }, {}) || {};
+        // Get actual unread counts from the messages table
+        const { data: unreadMessagesData, error: messagesError } = await supabase
+          .from('messages')
+          .select('conversation_id, count(*)')
+          .eq('recipient_id', user.id)
+          .eq('is_read', false)
+          .group('conversation_id');
+        
+        if (messagesError) throw messagesError;
+        
+        const unreadCountsClientSide: { [key: string]: number } = {};
+        
+        if (unreadMessagesData) {
+          unreadMessagesData.forEach(item => {
+            unreadCountsClientSide[item.conversation_id] = parseInt(item.count);
+          });
+        }
+        
+        // Make sure to call refreshUnreadCounts to sync the hook state
+        refreshUnreadCounts();
 
         // Get all conversations where the current user is a participant
         const { data: conversationsData, error: participantsError } = await supabase
@@ -218,9 +227,9 @@ const ChatList = () => {
                         {conversation.participant?.full_name?.substring(0, 2).toUpperCase() || 'AB'}
                       </AvatarFallback>
                     </Avatar>
-                    {conversation.unreadCount > 0 && (
+                    {(unreadCounts[conversation.id] ?? 0) > 0 && (
                       <div className="absolute -top-1 -right-1 bg-destructive text-destructive-foreground rounded-full min-w-[20px] h-5 flex items-center justify-center text-xs font-medium px-1">
-                        {conversation.unreadCount}
+                        {unreadCounts[conversation.id]}
                       </div>
                     )}
                     <span className={classNames(

@@ -17,6 +17,7 @@ import { VoiceRecorder } from './VoiceRecorder'; // Imported VoiceRecorder compo
 import { MessageReactions, ReactionPicker } from './MessageReactions'; // Import both MessageReactions and ReactionPicker components
 import { Dialog, DialogContent } from '../ui/dialog'; // Import Dialog and DialogContent
 import './ChatScreen.css'; // Import dedicated CSS
+import { useUnreadMessages } from '@/providers/UnreadMessagesProvider'; // Import useUnreadMessages hook
 
 
 // Simple subscription manager (replace with a more robust solution)
@@ -62,6 +63,8 @@ export const ChatScreen = ({ conversation }: Props) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
+  const { markConversationAsRead } = useUnreadMessages(user?.id);
+
 
   const scrollToLatestMessage = (smooth = true) => {
     // Try both selector methods to ensure we find the right element
@@ -100,7 +103,7 @@ export const ChatScreen = ({ conversation }: Props) => {
     const handleResize = () => scrollToLatestMessage(false);
     window.addEventListener('resize', handleResize);
     window.addEventListener('orientationchange', handleResize);
-    
+
     // Set up an intersection observer to detect when the message container is visible
     // This helps ensure scrolling works even if the chat tab becomes visible after being hidden
     const observer = new IntersectionObserver((entries) => {
@@ -110,7 +113,7 @@ export const ChatScreen = ({ conversation }: Props) => {
         }
       });
     }, { threshold: 0.1 });
-    
+
     const chatContainer = document.querySelector('[data-scrollbar]');
     if (chatContainer) {
       observer.observe(chatContainer);
@@ -162,6 +165,10 @@ export const ChatScreen = ({ conversation }: Props) => {
         if (!loadMore) {
           // Use a small timeout to ensure DOM is updated
           setTimeout(() => scrollToLatestMessage(false), 150);
+        }
+        // Mark conversation as read when messages are loaded
+        if (conversation && conversation.id) {
+          markConversationAsRead(conversation.id);
         }
       } catch (error) {
         console.error('Error fetching messages:', error);
@@ -249,7 +256,7 @@ export const ChatScreen = ({ conversation }: Props) => {
       console.log(`Cleaning up chat subscription for ${subscriptionKey}`);
       channel.unsubscribe();
     };
-  }, [conversation?.id, page]);
+  }, [conversation?.id, page, markConversationAsRead]);
 
   // Add a connection status checker and reconnect mechanism
   useEffect(() => {
@@ -312,7 +319,7 @@ export const ChatScreen = ({ conversation }: Props) => {
         scrollToLatestMessage(false);
       }
     };
-    
+
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, [messages.length]);
@@ -336,7 +343,7 @@ export const ChatScreen = ({ conversation }: Props) => {
         console.error('Error checking for existing reaction:', checkError);
         return;
       }
-      
+
       if (existingReaction) {
         // Delete the reaction if it exists
         console.log('Removing existing reaction:', emoji, messageId);
@@ -346,7 +353,7 @@ export const ChatScreen = ({ conversation }: Props) => {
           .eq('message_id', messageId)
           .eq('user_id', userId)
           .eq('reaction', emoji);
-          
+
         if (deleteError) {
           console.error('Error removing reaction:', deleteError);
           return;
@@ -363,13 +370,13 @@ export const ChatScreen = ({ conversation }: Props) => {
             reaction: emoji,
             created_at: new Date().toISOString()
           });
-          
+
         if (insertError) {
           console.error('Error adding reaction:', insertError);
           return;
         }
         console.log('Reaction added:', emoji);
-        
+
         // Provide haptic feedback
         if ('vibrate' in navigator) {
           navigator.vibrate(25);
@@ -420,7 +427,7 @@ export const ChatScreen = ({ conversation }: Props) => {
 
     setMessages(prev => [...prev, optimisticMessage]);
     setNewMessage('');
-    
+
     // Multiple scroll attempts to ensure we catch up with DOM updates
     setTimeout(() => scrollToLatestMessage(false), 10);
     setTimeout(() => scrollToLatestMessage(true), 100);
@@ -469,27 +476,27 @@ export const ChatScreen = ({ conversation }: Props) => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
-  // Function to mark messages as read
-  const markMessagesAsRead = async (conversationId: string) => {
-    try {
-      // Mark messages as read in database
-      await supabase
-        .from('messages')
-        .update({ is_read: true })
-        .eq('conversation_id', conversationId)
-        .eq('is_read', false);
+  // Function to mark messages as read - this is now handled by useUnreadMessages
+  // const markMessagesAsRead = async (conversationId: string) => {
+  //   try {
+  //     // Mark messages as read in database
+  //     await supabase
+  //       .from('messages')
+  //       .update({ is_read: true })
+  //       .eq('conversation_id', conversationId)
+  //       .eq('is_read', false);
 
 
-    } catch (error) {
-      console.error('Error marking messages as read:', error);
-    }
-  };
+  //   } catch (error) {
+  //     console.error('Error marking messages as read:', error);
+  //   }
+  // };
 
-  useEffect(() => {
-    if (conversation?.id) {
-      markMessagesAsRead(conversation.id);
-    }
-  }, [conversation?.id]);
+  // useEffect(() => {
+  //   if (conversation?.id) {
+  //     markMessagesAsRead(conversation.id);
+  //   }
+  // }, [conversation?.id]);
 
   const handleImageLoadError = (e: React.SyntheticEvent<HTMLImageElement>, originalUrl?: string) => {
     const imgSrc = originalUrl || e.currentTarget.src;
@@ -581,7 +588,7 @@ export const ChatScreen = ({ conversation }: Props) => {
                   const messageId = message.id;
                   const touchX = e.touches[0].clientX;
                   const touchY = e.touches[0].clientY;
-                  
+
                   // Store the starting position for gesture detection
                   element.setAttribute('data-touch-start-x', touchX.toString());
                   element.setAttribute('data-touch-start-y', touchY.toString());
@@ -598,11 +605,11 @@ export const ChatScreen = ({ conversation }: Props) => {
                       if ('vibrate' in navigator) {
                         navigator.vibrate([40, 60, 40]); // stronger pattern for long press
                       }
-                      
+
                       // Position the reaction menu above the message
                       const rect = element.getBoundingClientRect();
                       messageActions.style.top = `${-40}px`; // Position above message
-                      
+
                       // Show the reaction menu
                       messageActions.classList.remove('opacity-0');
                       messageActions.classList.remove('pointer-events-none');
@@ -619,14 +626,14 @@ export const ChatScreen = ({ conversation }: Props) => {
                   const startX = parseInt(element.getAttribute('data-touch-start-x') || '0');
                   const currentX = e.touches[0].clientX;
                   const deltaX = currentX - startX;
-                  
+
                   // If swiped right far enough (for swipe-to-reply) - 50px threshold
                   if (deltaX > 50 && !element.classList.contains('swiping-to-reply')) {
                     element.classList.add('swiping-to-reply');
                     // Add visual indication of swipe-to-reply
                     element.style.transform = `translateX(${Math.min(deltaX, 100)}px)`;
                     element.style.opacity = '0.8';
-                    
+
                     // Show reply icon
                     const replyIndicator = document.createElement('div');
                     replyIndicator.className = 'reply-indicator';
@@ -636,11 +643,11 @@ export const ChatScreen = ({ conversation }: Props) => {
                         <path d="M20 18v-2a4 4 0 0 0-4-4H4"></path>
                       </svg>
                     `;
-                    
+
                     if (!element.querySelector('.reply-indicator')) {
                       element.appendChild(replyIndicator);
                     }
-                    
+
                     // Clear long press timer if swiping
                     const timerId = element.getAttribute('data-long-press-timer');
                     if (timerId) {
@@ -657,22 +664,22 @@ export const ChatScreen = ({ conversation }: Props) => {
                     clearTimeout(parseInt(timerId));
                     element.removeAttribute('data-long-press-timer');
                   }
-                  
+
                   // Check if this was a swipe-to-reply
                   if (element.classList.contains('swiping-to-reply')) {
                     // Reset visual state
                     element.style.transform = '';
                     element.style.opacity = '';
                     element.classList.remove('swiping-to-reply');
-                    
+
                     // Remove reply indicator
                     const indicator = element.querySelector('.reply-indicator');
                     if (indicator) element.removeChild(indicator);
-                    
+
                     // Set reply to this message
                     setReplyTo(message);
                     document.querySelector('textarea')?.focus();
-                    
+
                     // Haptic feedback for completing the swipe
                     if ('vibrate' in navigator) {
                       navigator.vibrate([40, 30, 40]);
@@ -713,7 +720,7 @@ export const ChatScreen = ({ conversation }: Props) => {
                       style={{marginLeft: message.sender_id === user?.id ? 'auto' : '0'}}
                     >
                       <p className="leading-relaxed whitespace-pre-wrap text-[15px]">{message.content || ''}</p>
-                      
+
                       {/* Facebook Messenger-style reactions attached to message */}
                       <MessageReactions messageId={message.id} existingReactions={message.reactions || {}} />
                       {message.attachment_url && (

@@ -12,6 +12,7 @@ const ChatPage = () => {
   const { user } = useAuth();
   const [isLoading, setIsLoading] = useState(true);
   const [conversation, setConversation] = useState<any>(null);
+  const [unreadCount, setUnreadCount] = useState(0); // Added state for unread count
   const { deviceSize } = useResponsive();
   const isMobile = deviceSize === 'xs' || deviceSize === 'sm';
 
@@ -67,6 +68,10 @@ const ChatPage = () => {
             console.error('Error fetching messages:', messagesError);
             throw messagesError;
           }
+
+          // Count unread messages before marking as read.
+          const unreadMessages = messages.filter(msg => !msg.is_read && msg.recipient_id === user.id);
+          setUnreadCount(unreadMessages.length);
 
           // Mark messages as read
           const { error: readError } = await supabase
@@ -157,7 +162,7 @@ const ChatPage = () => {
 
   return (
     <div className={isMobile ? "fixed inset-0 z-50 bg-background" : "min-h-screen md:bg-muted/30 max-w-full overflow-hidden"}>
-      <ChatScreen conversation={conversation} />
+      <ChatScreen conversation={conversation} unreadCount={unreadCount} /> {/* Pass unreadCount to ChatScreen */}
     </div>
   );
 };
