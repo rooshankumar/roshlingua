@@ -670,28 +670,36 @@ export const ChatScreen = ({ conversation }: Props) => {
                   {/* Message actions - now showing emoji reactions first by default */}
                   <div 
                     id={`message-actions-${message.id}`}
-                    className="message-actions-menu absolute -top-16 left-0 right-0 opacity-0 pointer-events-none transition-opacity duration-200 flex flex-col items-center gap-2 z-10 touch:z-50"
+                    className="message-actions-menu absolute top-0 left-0 right-0 opacity-0 pointer-events-none transition-opacity duration-200 flex flex-col items-center gap-2 z-10 touch:z-50 transform -translate-y-[100%]"
                     onClick={(e) => e.stopPropagation()}
+                    style={{ maxWidth: '100%', width: '100%', overflow: 'visible' }}
                   >
                     {/* Quick Emoji Reactions - Shown First */}
-                    <div className="bg-muted/95 backdrop-blur-md rounded-full p-1 shadow-lg flex items-center gap-1 border border-border/40">
+                    <div className="bg-muted/95 backdrop-blur-md rounded-full p-1 shadow-lg flex items-center gap-1 border border-border/40 max-w-full overflow-x-auto">
                       {['👍', '❤️', '😂', '😮', '😢'].map(emoji => (
                         <button 
                           key={emoji}
-                          className="p-1.5 hover:bg-background/40 rounded-full text-sm mobile-touch-target transition-transform active:scale-90"
+                          className="p-1.5 hover:bg-background/40 rounded-full text-sm mobile-touch-target transition-transform active:scale-90 flex-shrink-0"
                           onClick={(e) => {
                             e.stopPropagation();
                             handleReact(message.id, emoji);
                             if ('vibrate' in navigator) {
                               navigator.vibrate(25);
                             }
+                            // Close reaction menu after selecting
+                            setTimeout(() => {
+                              const messageActions = document.getElementById(`message-actions-${message.id}`);
+                              if (messageActions) {
+                                messageActions.classList.add('opacity-0', 'pointer-events-none');
+                              }
+                            }, 300);
                           }}
                         >
                           {emoji}
                         </button>
                       ))}
                       <button 
-                        className="p-1.5 hover:bg-background/40 rounded-full text-sm mobile-touch-target"
+                        className="p-1.5 hover:bg-background/40 rounded-full text-sm mobile-touch-target flex-shrink-0"
                         onClick={(e) => {
                           e.stopPropagation();
                           const moreEmojis = document.getElementById(`more-emojis-${message.id}`);
@@ -705,7 +713,7 @@ export const ChatScreen = ({ conversation }: Props) => {
                       
                       {/* Reply button */}
                       <button 
-                        className="p-2 hover:bg-background/40 rounded-full mobile-touch-target border-l border-border/30 ml-1 pl-3" 
+                        className="p-2 hover:bg-background/40 rounded-full mobile-touch-target border-l border-border/30 ml-1 pl-3 flex-shrink-0" 
                         onClick={(e) => {
                           e.stopPropagation();
                           setReplyTo(message);
@@ -730,9 +738,10 @@ export const ChatScreen = ({ conversation }: Props) => {
                     {/* More Emoji picker - hidden by default */}
                     <div 
                       id={`more-emojis-${message.id}`}
-                      className="bg-muted/95 backdrop-blur-md rounded-xl p-1.5 shadow-lg hidden emoji-reaction-menu"
+                      className="bg-muted/95 backdrop-blur-md rounded-xl p-1.5 shadow-lg hidden emoji-reaction-menu max-w-full"
+                      style={{ maxHeight: '200px', overflowY: 'auto' }}
                     >
-                      <div className="grid grid-cols-6 gap-1">
+                      <div className="grid grid-cols-5 gap-1">
                         {['👍', '❤️', '😂', '😮', '😢', '👏', '🔥', '🎉', '🙏', '😍', '👌', '🤔', '🥺', '😭', '😱', '😴', '🤗', '🤫', '🤯', '🥰', '💯', '✅', '❌'].map(emoji => (
                           <button 
                             key={emoji}
@@ -741,6 +750,13 @@ export const ChatScreen = ({ conversation }: Props) => {
                               e.stopPropagation();
                               handleReact(message.id, emoji);
                               document.getElementById(`more-emojis-${message.id}`)?.classList.add('hidden');
+                              // Close reaction menu after selecting
+                              setTimeout(() => {
+                                const messageActions = document.getElementById(`message-actions-${message.id}`);
+                                if (messageActions) {
+                                  messageActions.classList.add('opacity-0', 'pointer-events-none');
+                                }
+                              }, 300);
                               // Provide haptic feedback
                               if ('vibrate' in navigator) {
                                 navigator.vibrate(25);

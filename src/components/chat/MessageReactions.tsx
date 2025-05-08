@@ -15,6 +15,7 @@ export const MessageReactions = ({ messageId, existingReactions = {} }: MessageR
   const { user } = useAuth();
   const [reactions, setReactions] = useState<Record<string, string[]>>(existingReactions);
   const [isLoading, setIsLoading] = useState(false);
+  const [userReactions, setUserReactions] = useState<string[]>([]);
 
   // Fetch existing reactions when component mounts
   useEffect(() => {
@@ -32,14 +33,23 @@ export const MessageReactions = ({ messageId, existingReactions = {} }: MessageR
         if (data && data.length > 0) {
           // Transform the data into our format
           const formattedReactions: Record<string, string[]> = {};
+          const currentUserReactions: string[] = [];
+          const userId = user?.db_user_id || user?.id;
+
           data.forEach(reaction => {
             if (!formattedReactions[reaction.reaction]) {
               formattedReactions[reaction.reaction] = [];
             }
             formattedReactions[reaction.reaction].push(reaction.user_id);
+            
+            // Track which reactions the current user has already added
+            if (reaction.user_id === userId) {
+              currentUserReactions.push(reaction.reaction);
+            }
           });
 
           setReactions(formattedReactions);
+          setUserReactions(currentUserReactions);
         }
       } catch (error) {
         console.error('Error fetching message reactions:', error);
@@ -68,7 +78,7 @@ export const MessageReactions = ({ messageId, existingReactions = {} }: MessageR
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [messageId]);
+  }, [messageId, user?.id, user?.db_user_id]);
 
   const handleReact = async (emoji: string) => {
     if (!user?.id || isLoading) return;
@@ -76,9 +86,10 @@ export const MessageReactions = ({ messageId, existingReactions = {} }: MessageR
     setIsLoading(true);
 
     try {
-      // **POTENTIAL FIX:**  Replace user.id with the correct user ID from your 'profiles' table.  This assumes a field like 'db_user_id' exists in your user object.  Adapt as necessary to your actual data structure.
-
       const userId = user.db_user_id || user.id; // Use db_user_id if available, fallback to user.id
+
+      // Check if user has already reacted with this emoji
+      const hasReacted = userReactions.includes(emoji);
 
       // Update local state optimistically for immediate feedback
       setReactions(prev => {
@@ -98,23 +109,17 @@ export const MessageReactions = ({ messageId, existingReactions = {} }: MessageR
         return updatedReactions;
       });
 
-      // Check if the reaction already exists
-      try {
-        console.log(`Checking for existing reaction: messageId=${messageId}, userId=${userId}, emoji=${emoji}`);
-        const { data: existingReaction, error: checkError } = await supabase
-          .from('message_reactions')
-          .select('*')
-          .eq('message_id', messageId)
-          .eq('user_id', userId)
-          .eq('reaction', emoji)
-          .maybeSingle();
-        if (checkError) {
-          console.error("Error checking for existing reaction:", checkError);
-          // Handle the error appropriately, e.g., revert optimistic update, show error message
-          throw checkError;
+      // Update user reactions tracking
+      setUserReactions(prev => {
+        if (hasReacted) {
+          return prev.filter(e => e !== emoji);
+        } else {
+          return [...prev, emoji];
         }
+      });
 
-        if (existingReaction) {
+      try {
+        if (hasReacted) {
           // Delete the reaction if it exists
           await supabase
             .from('message_reactions')
@@ -134,7 +139,7 @@ export const MessageReactions = ({ messageId, existingReactions = {} }: MessageR
             });
         }
       } catch (error) {
-        console.error('Error adding/removing reaction:', error);
+        console.error('Error managing reaction:', error);
 
         // Revert optimistic update if there was an error
         const { data } = await supabase
@@ -144,16 +149,22 @@ export const MessageReactions = ({ messageId, existingReactions = {} }: MessageR
 
         if (data) {
           const revertedReactions: Record<string, string[]> = {};
+          const revertedUserReactions: string[] = [];
+          
           data.forEach(reaction => {
             if (!revertedReactions[reaction.reaction]) {
               revertedReactions[reaction.reaction] = [];
             }
             revertedReactions[reaction.reaction].push(reaction.user_id);
+            
+            if (reaction.user_id === userId) {
+              revertedUserReactions.push(reaction.reaction);
+            }
           });
 
           setReactions(revertedReactions);
+          setUserReactions(revertedUserReactions);
         }
-        throw error; // Re-throw the error to be handled at a higher level if needed.
       }
     } catch (error) {
       console.error('Error in handleReact:', error);
@@ -163,17 +174,17 @@ export const MessageReactions = ({ messageId, existingReactions = {} }: MessageR
   };
 
   return (
-    <div className="flex flex-wrap items-center gap-1 mt-1" data-message-reactions={messageId}>
+    <div className="flex flex-wrap items-center gap-1 mt-1 max-w-full overflow-hidden" data-message-reactions={messageId}>
       {Object.entries(reactions).map(([emoji, users]) => (
         <Button
           key={emoji}
           variant="outline"
           size="sm"
-          className="h-6 px-1.5 py-0 rounded-full bg-muted/30 hover:bg-muted/50 transition-all active:scale-95"
+          className={`h-6 px-1.5 py-0 rounded-full bg-muted/30 hover:bg-muted/50 transition-all active:scale-95 ${userReactions.includes(emoji) ? 'ring-1 ring-primary' : ''}`}
           onClick={() => handleReact(emoji)}
           disabled={isLoading}
         >
-          <span className="mr-1 text-sm">{emoji}</span>
+          <span className="mr-1 text-xs">{emoji}</span>
           <span className="text-xs font-medium">{users.length}</span>
         </Button>
       ))}

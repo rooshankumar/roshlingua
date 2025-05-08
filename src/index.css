@@ -125,6 +125,37 @@
   /* Message reactions sizing */
   .message-reaction-btn {
     height: 26px !important;
+
+/* Ensure the reaction menu stays inside the chat view */
+.message-actions-menu {
+  position: absolute;
+  max-width: 90%;
+  left: 5%;
+  right: auto;
+  z-index: 50;
+}
+
+/* Emoji menu (more options) styling */
+.emoji-reaction-menu {
+  max-width: 250px;
+  max-height: 180px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  z-index: 60;
+}
+
+/* Make emojis slightly smaller on mobile */
+@media (max-width: 640px) {
+  .message-actions-menu button {
+    padding: 0.25rem;
+    font-size: 0.8rem;
+  }
+  
+  .emoji-reaction-menu {
+    max-width: 200px;
+  }
+}
+
     padding: 0 6px !important;
     font-size: 12px !important;
   }
