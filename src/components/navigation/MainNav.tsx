@@ -72,8 +72,8 @@ export function MainNav() {
             mobile ? 'py-3' : ''
           } ${
             isActive(route.path) 
-              ? "bg-primary/10 text-primary translate-x-2" 
-              : "hover:bg-secondary hover:translate-x-1"
+              ? "bg-white/20 text-white translate-x-2" 
+              : "text-white/80 hover:bg-white/10 hover:text-white hover:translate-x-1"
           }`}
         >
           <div className="relative">
@@ -105,22 +105,22 @@ export function MainNav() {
   const isChatDetailRoute = location.pathname.match(/^\/chat\/[0-9a-f-]+$/);
 
   return (
-    <nav className="hidden lg:flex sticky top-0 flex-col space-y-2 p-4 min-h-screen bg-background/80 backdrop-blur-lg border-r">
+    <nav className="hidden lg:flex sticky top-0 flex-col space-y-2 p-4 min-h-screen bg-primary text-white backdrop-blur-lg border-r">
       <div className="mb-8">
         <h2 
-          className="font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent"
+          className="font-bold text-white"
           style={{ fontSize: responsive.fontSize.heading }}
         >
           {t('navigation.menu')}
         </h2>
       </div>
       <NavigationItems />
-      <div className="mt-auto pt-4 border-t">
+      <div className="mt-auto pt-4 border-t border-white/20">
         <div className="flex items-center justify-between px-3 py-2">
           <div className="flex items-center space-x-2">
-            <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"/>
+            <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse"/>
             <span 
-              className="text-muted-foreground"
+              className="text-white/80"
               style={{ fontSize: responsive.fontSize.small }}
             >
               {t('navigation.online')}

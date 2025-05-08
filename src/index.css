@@ -108,20 +108,20 @@
     min-height: 36px;
     min-width: 36px;
   }
-  
+
   /* Smaller emoji reaction menu for mobile */
   .emoji-reaction-menu {
     transform: scale(0.9);
     transform-origin: center top;
   }
-  
+
   /* Ensure iOS-like overscroll behavior */
   .chat-content-area {
     overscroll-behavior-y: contain;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
   }
-  
+
   /* Message reactions sizing */
   .message-reaction-btn {
     height: 26px !important;
@@ -212,11 +212,11 @@
     padding: 0.25rem;
     font-size: 0.8rem;
   }
-  
+
   .emoji-reaction-menu {
     max-width: 200px;
   }
-  
+
   .reaction-picker {
     padding: 4px;
   }
@@ -348,7 +348,7 @@
     background-color: rgba(0, 0, 0, 0.05);
     border-radius: 9999px;
   }
-  
+
   /* On touch devices, we'll handle emoji via the long-press menu */
   .message-reactions .emoji-button {
     display: none;
@@ -883,18 +883,18 @@ html {
     pointer-events: none;
     transition: opacity 0.2s ease-out;
   }
-  
+
   .message-actions-menu.active {
     opacity: 1;
     pointer-events: auto;
   }
-  
+
   /* Swipe to reply animation */
   .swiping-to-reply {
     transition: transform 0.1s ease-out;
     position: relative;
   }
-  
+
   .reply-indicator {
     position: absolute;
     left: 0;
@@ -912,13 +912,13 @@ html {
     z-index: 10;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   }
-  
+
   @keyframes pulse {
     0% { transform: translateY(-50%) scale(1); }
     50% { transform: translateY(-50%) scale(1.1); }
     100% { transform: translateY(-50%) scale(1); }
   }
-  
+
   /* Message action styles improved */
   .message-long-press {
     transform: scale(0.98);
@@ -937,4 +937,9 @@ html {
     margin-right: -1rem;
     width: calc(100% + 2rem);
   }
+}
+
+.nav-link.active {
+  background-color: rgba(255, 255, 255, 0.2);
+  border-radius: 9999px;
 }
