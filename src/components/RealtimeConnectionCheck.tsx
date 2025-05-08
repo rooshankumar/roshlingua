@@ -130,6 +130,28 @@ export default function RealtimeConnectionCheck() {
       console.error('Failed to update online status:', err);
     }
   };
+  
+  // Set up handlers for page unload/close to mark user as offline
+  useEffect(() => {
+    if (!user) return;
+    
+    const handleBeforeUnload = () => {
+      // Use a synchronous approach for beforeunload since async might not complete
+      const formData = new FormData();
+      formData.append('is_online', 'false');
+      
+      navigator.sendBeacon(
+        `${import.meta.env.VITE_SUPABASE_URL}/rest/v1/profiles?id=eq.${user.id}`, 
+        formData
+      );
+    };
+    
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, [user]);
 
   // Refresh all connections
   const refreshAllConnections = () => {

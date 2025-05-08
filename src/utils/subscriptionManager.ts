@@ -181,6 +181,26 @@ if (import.meta.env.DEV) {
 // Handle cleanup when window is closing or refreshing
 if (typeof window !== 'undefined') {
   window.addEventListener('beforeunload', () => {
+    // Attempt to set user offline before page unload
+    try {
+      const auth = supabase.auth.getSession();
+      auth.then(({ data }) => {
+        const userId = data?.session?.user?.id;
+        if (userId) {
+          // Use navigator.sendBeacon for reliable delivery during page unload
+          const formData = new FormData();
+          formData.append('is_online', 'false');
+          
+          navigator.sendBeacon(
+            `${import.meta.env.VITE_SUPABASE_URL}/rest/v1/profiles?id=eq.${userId}`, 
+            formData
+          );
+        }
+      });
+    } catch (e) {
+      console.error('Error during cleanup status update:', e);
+    }
+    
     subscriptionManager.cleanup();
   });
 }

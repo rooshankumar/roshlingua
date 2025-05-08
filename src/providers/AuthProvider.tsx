@@ -268,7 +268,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signOut = async () => {
     try {
-      //Clean up subscriptions before signing out.  This is a placeholder.  A real implementation would require a subscription manager.
+      // Set user's online status to false before signing out
+      if (user?.id) {
+        console.log("Setting user offline status before logout");
+        await supabase
+          .from('profiles')
+          .update({ 
+            is_online: false,
+            last_seen: new Date().toISOString() 
+          })
+          .eq('id', user.id);
+      }
+      
+      //Clean up subscriptions before signing out
       subscriptionManager.cleanup();
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
