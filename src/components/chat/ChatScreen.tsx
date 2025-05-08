@@ -710,7 +710,7 @@ export const ChatScreen = ({ conversation }: Props) => {
                       className={`p-4 break-words shadow-sm transition-all duration-300 message-bubble`}
                       data-sender={message.sender_id === user?.id ? 'self' : 'other'}
                     >
-                      <p className="leading-relaxed">{message.content}</p>
+                      <p className="leading-relaxed whitespace-pre-wrap">{message.content}</p>
                       
                       {/* Facebook Messenger-style reactions attached to message */}
                       <div className="relative">
