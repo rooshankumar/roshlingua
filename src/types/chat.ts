@@ -31,6 +31,7 @@ export interface Message {
     last_seen?: string;
   };
   is_delivered?: boolean;
+  reactions?: Record<string, string[]>; // Map of emoji to array of user IDs
 }
 
 export interface Conversation {

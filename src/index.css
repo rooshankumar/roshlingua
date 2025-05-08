@@ -105,8 +105,14 @@
 /* Larger touch targets on mobile */
 @media (max-width: 768px) {
   .message-actions-menu button {
-    min-height: 44px;
-    min-width: 44px;
+    min-height: 36px;
+    min-width: 36px;
+  }
+  
+  /* Smaller emoji reaction menu for mobile */
+  .emoji-reaction-menu {
+    transform: scale(0.9);
+    transform-origin: center top;
   }
   
   /* Ensure iOS-like overscroll behavior */
@@ -114,6 +120,13 @@
     overscroll-behavior-y: contain;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
+  }
+  
+  /* Message reactions sizing */
+  .message-reaction-btn {
+    height: 26px !important;
+    padding: 0 6px !important;
+    font-size: 12px !important;
   }
 }
 

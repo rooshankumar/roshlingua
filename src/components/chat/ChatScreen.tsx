@@ -320,55 +320,47 @@ export const ChatScreen = ({ conversation }: Props) => {
     if (!user?.id) return;
 
     try {
-      // Find existing message reactions component and tell it to add this reaction
-      const messageReactions = document.querySelector(`[data-message-reactions="${messageId}"]`) as any;
-      if (messageReactions && messageReactions.__reactProps$) {
-        // Call onReact function if available through React props
-        if (messageReactions.__reactProps$.onReact) {
-          messageReactions.__reactProps$.onReact(emoji);
-        } else {
-          // Fallback: Create new MessageReactions component and manually trigger reaction
-          const reactionComponent = new MessageReactions({ 
-            messageId, 
-            existingReactions: {} 
-          });
-          await reactionComponent.handleReact(emoji);
-        }
-      } else {
-        // Direct API call if component not found
-        const userId = user.id;
+      const userId = user.id;
 
-        // Check if reaction exists
-        const { data: existingReaction } = await supabase
+      // Direct API call to handle reactions
+      const { data: existingReaction } = await supabase
+        .from('message_reactions')
+        .select('*')
+        .eq('message_id', messageId)
+        .eq('user_id', userId)
+        .eq('emoji', emoji)
+        .maybeSingle();
+
+      if (existingReaction) {
+        // Delete the reaction if it exists
+        await supabase
           .from('message_reactions')
-          .select('*')
+          .delete()
           .eq('message_id', messageId)
           .eq('user_id', userId)
-          .eq('emoji', emoji)
-          .maybeSingle();
-
-        if (existingReaction) {
-          // Delete the reaction if it exists
-          await supabase
-            .from('message_reactions')
-            .delete()
-            .eq('message_id', messageId)
-            .eq('user_id', userId)
-            .eq('emoji', emoji);
-        } else {
-          // Insert a new reaction
-          await supabase
-            .from('message_reactions')
-            .insert({
-              message_id: messageId,
-              user_id: userId,
-              emoji: emoji,
-              created_at: new Date().toISOString()
-            });
+          .eq('emoji', emoji);
+          
+        console.log('Reaction removed:', emoji);
+      } else {
+        // Insert a new reaction
+        await supabase
+          .from('message_reactions')
+          .insert({
+            message_id: messageId,
+            user_id: userId,
+            emoji: emoji,
+            created_at: new Date().toISOString()
+          });
+          
+        console.log('Reaction added:', emoji);
+        
+        // Provide haptic feedback
+        if ('vibrate' in navigator) {
+          navigator.vibrate(25);
         }
       }
     } catch (error) {
-      console.error('Error adding reaction:', error);
+      console.error('Error managing reaction:', error);
     }
   };
 
@@ -667,11 +659,11 @@ export const ChatScreen = ({ conversation }: Props) => {
                     onClick={(e) => e.stopPropagation()}
                   >
                     {/* Quick Emoji Reactions - Shown First */}
-                    <div className="bg-muted/95 backdrop-blur-md rounded-full p-1.5 shadow-lg flex items-center gap-2 border border-border/40">
+                    <div className="bg-muted/95 backdrop-blur-md rounded-full p-1 shadow-lg flex items-center gap-1 border border-border/40">
                       {['👍', '❤️', '😂', '😮', '😢'].map(emoji => (
                         <button 
                           key={emoji}
-                          className="p-2 hover:bg-background/40 rounded-full text-lg mobile-touch-target transition-transform active:scale-90"
+                          className="p-1.5 hover:bg-background/40 rounded-full text-sm mobile-touch-target transition-transform active:scale-90"
                           onClick={(e) => {
                             e.stopPropagation();
                             handleReact(message.id, emoji);
@@ -684,7 +676,7 @@ export const ChatScreen = ({ conversation }: Props) => {
                         </button>
                       ))}
                       <button 
-                        className="p-2 hover:bg-background/40 rounded-full mobile-touch-target"
+                        className="p-1.5 hover:bg-background/40 rounded-full text-sm mobile-touch-target"
                         onClick={(e) => {
                           e.stopPropagation();
                           const moreEmojis = document.getElementById(`more-emojis-${message.id}`);
@@ -693,7 +685,7 @@ export const ChatScreen = ({ conversation }: Props) => {
                           }
                         }}
                       >
-                        <span className="text-lg">+</span>
+                        <span>+</span>
                       </button>
                       
                       {/* Reply button */}
@@ -723,17 +715,21 @@ export const ChatScreen = ({ conversation }: Props) => {
                     {/* More Emoji picker - hidden by default */}
                     <div 
                       id={`more-emojis-${message.id}`}
-                      className="bg-muted/95 backdrop-blur-md rounded-xl p-2 shadow-lg hidden"
+                      className="bg-muted/95 backdrop-blur-md rounded-xl p-1.5 shadow-lg hidden emoji-reaction-menu"
                     >
-                      <div className="grid grid-cols-6 gap-2">
+                      <div className="grid grid-cols-6 gap-1">
                         {['👍', '❤️', '😂', '😮', '😢', '👏', '🔥', '🎉', '🙏', '😍', '👌', '🤔', '🥺', '😭', '😱', '😴', '🤗', '🤫', '🤯', '🥰', '💯', '✅', '❌'].map(emoji => (
                           <button 
                             key={emoji}
-                            className="p-2 hover:bg-background/40 rounded-lg text-xl"
+                            className="p-1.5 hover:bg-background/40 rounded-lg text-sm"
                             onClick={(e) => {
                               e.stopPropagation();
                               handleReact(message.id, emoji);
                               document.getElementById(`more-emojis-${message.id}`)?.classList.add('hidden');
+                              // Provide haptic feedback
+                              if ('vibrate' in navigator) {
+                                navigator.vibrate(25);
+                              }
                             }}
                           >
                             {emoji}
