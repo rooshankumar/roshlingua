@@ -175,7 +175,7 @@
 /* Fix reaction container positioning to prevent expanding message borders */
 .messenger-reactions-display {
   position: absolute !important;
-  bottom: -8px !important;
+  bottom: -10px !important;
   left: 8px !important;
   z-index: 10 !important;
   pointer-events: auto !important;
@@ -184,6 +184,9 @@
   transform: translateY(50%) !important;
   background: transparent !important;
   border: none !important;
+  max-width: 100% !important;
+  overflow: visible !important;
+  height: 22px !important; /* Fixed height to prevent layout shifts */
 }
 
 /* Ensure the reaction menu stays inside the chat view */
@@ -289,6 +292,9 @@
   overflow-wrap: break-word !important;
   display: inline-block !important;
   width: auto !important;
+  margin-bottom: 4px !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1) !important;
+  transition: transform 0.2s ease !important;
 }
 
 .message-bubble[data-sender="other"] {
@@ -300,6 +306,15 @@
   overflow-wrap: break-word !important;
   display: inline-block !important;
   width: auto !important;
+  margin-bottom: 4px !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1) !important;
+  transition: transform 0.2s ease !important;
+}
+
+.message-bubble[data-sender="self"]:hover,
+.message-bubble[data-sender="other"]:hover {
+  transform: translateY(-1px) !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15) !important;
 }
 
 @media (max-width: 640px) {

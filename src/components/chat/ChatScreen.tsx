@@ -546,13 +546,13 @@ export const ChatScreen = ({ conversation }: Props) => {
           <div className="space-y-6">
             {messages.map((message, index) => (
               <div
-                id={`message-${message.id}`} // Added ID for scroll navigation
+                id={`message-${message.id}`}
                 key={message.id}
-                className={`flex items-start gap-3 animate-slide-up ${
+                className={`flex items-start gap-3 animate-slide-up mb-2 ${
                   message.sender_id === user?.id ? 'flex-row-reverse' : 'flex-row'
                 }`}
                 style={{
-                  animationDelay: `${index * 0.1}s`
+                  animationDelay: `${Math.min(index * 0.05, 0.5)}s` // Faster animation with a max delay
                 }}
                 onClick={(e) => {
                   // Different behavior for desktop (click) vs mobile (tap)
@@ -707,10 +707,10 @@ export const ChatScreen = ({ conversation }: Props) => {
                   )}
                   <div className="flex items-end gap-2">
                     <div
-                      className={`p-4 break-words shadow-sm transition-all duration-300 message-bubble`}
+                      className={`p-3 break-words shadow-sm transition-all duration-300 message-bubble`}
                       data-sender={message.sender_id === user?.id ? 'self' : 'other'}
                     >
-                      <p className="leading-relaxed whitespace-pre-wrap">{message.content}</p>
+                      <p className="leading-relaxed whitespace-pre-wrap text-[15px]">{message.content}</p>
                       
                       {/* Facebook Messenger-style reactions attached to message */}
                       <MessageReactions messageId={message.id} existingReactions={message.reactions} />
@@ -721,12 +721,16 @@ export const ChatScreen = ({ conversation }: Props) => {
                               <img 
                                 src={message.attachment_url} 
                                 alt={message.attachment_name || "Image"}
-                                className="max-w-[300px] max-h-[300px] object-contain rounded-lg hover:scale-105 transition-transform duration-200 cursor-pointer"
+                                className="max-w-[300px] max-h-[300px] object-contain rounded-lg hover:scale-105 transition-transform duration-200 cursor-pointer shadow-sm hover:shadow-md"
                                 onError={(e) => handleImageLoadError(e, message.attachment_url as string)}
                                 loading="eager"
                                 referrerPolicy="no-referrer"
                                 fetchpriority="low"
                                 onClick={() => {
+                                  // Provide haptic feedback on mobile
+                                  if ('vibrate' in navigator) {
+                                    navigator.vibrate(10);
+                                  }
                                   setImagePreview({ url: message.attachment_url, name: message.attachment_name });
                                   setShowImagePreview(true);
                                 }}
@@ -867,22 +871,28 @@ export const ChatScreen = ({ conversation }: Props) => {
                 </button>
               </div>
             )}
-            <div className="flex items-end gap-3">
-              <VoiceRecorder onRecord={(url, filename) => handleSend(null, {url, filename})} /> {/* Added VoiceRecorder */}
-              <ChatAttachment onAttach={(url, filename) => handleSend(newMessage, { url, filename })} />
+            <div className="flex items-end gap-2">
+              <div className="flex gap-1">
+                <VoiceRecorder onRecord={(url, filename) => handleSend(null, {url, filename})} />
+                <ChatAttachment onAttach={(url, filename) => handleSend(newMessage, { url, filename })} />
+              </div>
               <Textarea
                 value={newMessage}
                 onChange={(e) => setNewMessage(e.target.value)}
                 onKeyDown={handleKeyPress}
                 placeholder="Type a message..."
-                className="flex-1 min-h-[45px] max-h-[90px] rounded-2xl bg-muted/50 backdrop-blur-sm focus:bg-background transition-colors duration-200"
+                className="flex-1 min-h-[45px] max-h-[90px] rounded-2xl bg-muted/50 backdrop-blur-sm focus:bg-background transition-colors duration-200 text-base px-4"
                 rows={1}
+                autoComplete="off"
+                autoCorrect="on"
+                autoFocus
               />
               <Button
                 onClick={() => handleSend(newMessage)}
-                disabled={!newMessage.trim() || isSending || !user}
+                disabled={!newMessage.trim() && !attachment || isSending || !user}
                 size="icon"
                 className="h-[45px] w-[45px] rounded-2xl bg-primary hover:bg-primary/90 transition-all duration-200 hover:scale-105 active:scale-95"
+                aria-label="Send message"
               >
                 {isSending ? (
                   <Loader2 className="h-5 w-5 animate-spin" />

@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/lib/supabase';
@@ -52,7 +51,7 @@ export const MessageReactions = ({
               formattedReactions[reaction.reaction] = [];
             }
             formattedReactions[reaction.reaction].push(reaction.user_id);
-            
+
             // Track which reactions the current user has already added
             if (reaction.user_id === userId) {
               currentUserReactions.push(reaction.reaction);
@@ -166,13 +165,13 @@ export const MessageReactions = ({
         if (data) {
           const revertedReactions: Record<string, string[]> = {};
           const revertedUserReactions: string[] = [];
-          
+
           data.forEach(reaction => {
             if (!revertedReactions[reaction.reaction]) {
               revertedReactions[reaction.reaction] = [];
             }
             revertedReactions[reaction.reaction].push(reaction.user_id);
-            
+
             if (reaction.user_id === userId) {
               revertedUserReactions.push(reaction.reaction);
             }
