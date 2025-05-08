@@ -56,6 +56,7 @@ type OnboardingFormData = {
     learning_language: string;
     proficiency_level: string;
     bio: string; // Changed from learning_goal
+    country: string;
     avatar_url: string;
 }
 
@@ -89,6 +90,7 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
         native_language: z.string().min(1, "Native language is required"),
         learning_language: z.string().min(1, "Learning language is required"),
         proficiency_level: z.string().min(1, "Proficiency level is required"),
+        country: z.string().min(1, "Country is required"),
         bio: z.string().optional(),
         avatar_url: z.string().optional(),
         date_of_birth: z.date().optional()
@@ -102,6 +104,7 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
             learning_language: "",
             proficiency_level: "",
             bio: "", // Changed from learning_goal
+            country: "",
             avatar_url: "",
             date_of_birth: undefined as Date | undefined,
         },
@@ -143,7 +146,7 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
             case 2:
                 return !!values.native_language && !!values.learning_language && !!values.proficiency_level;
             case 3:
-                return !!values.bio; // Changed from learningGoal
+                return !!values.country; // Country is required, bio is optional
             default:
                 return true;
         }
@@ -199,6 +202,7 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
                     native_language: formData.native_language,
                     learning_language: formData.learning_language,
                     proficiency_level: formData.proficiency_level,
+                    country: formData.country,
                     bio: formData.bio,
                     avatar_url: formData.avatar_url,
                     full_name: formData.full_name,
@@ -620,6 +624,26 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
                                 <div className="space-y-4">
                                     <FormField
                                         control={form.control}
+                                        name="country"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>Country</FormLabel>
+                                                <FormControl>
+                                                    <Input
+                                                        placeholder="Enter your country"
+                                                        {...field}
+                                                    />
+                                                </FormControl>
+                                                <FormDescription>
+                                                    Your country of residence
+                                                </FormDescription>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+
+                                    <FormField
+                                        control={form.control}
                                         name="bio" // Changed from learningGoal
                                         render={({ field }) => (
                                             <FormItem>
@@ -721,6 +745,10 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
                                             <div>
                                                 <p className="text-muted-foreground">Level</p>
                                                 <p className="font-medium">{form.getValues("proficiency_level")}</p>
+                                            </div>
+                                            <div>
+                                                <p className="text-muted-foreground">Country</p>
+                                                <p className="font-medium">{form.getValues("country")}</p>
                                             </div>
                                         </div>
 
