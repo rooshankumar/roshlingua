@@ -323,7 +323,7 @@ export const ChatScreen = ({ conversation }: Props) => {
       const userId = user.id;
 
       // Direct API call to handle reactions
-      const { data: existingReaction } = await supabase
+      const { data: existingReaction, error: checkError } = await supabase
         .from('message_reactions')
         .select('*')
         .eq('message_id', messageId)
@@ -331,19 +331,30 @@ export const ChatScreen = ({ conversation }: Props) => {
         .eq('reaction', emoji)
         .maybeSingle();
 
+      if (checkError) {
+        console.error('Error checking for existing reaction:', checkError);
+        return;
+      }
+      
       if (existingReaction) {
         // Delete the reaction if it exists
-        await supabase
+        console.log('Removing existing reaction:', emoji, messageId);
+        const { error: deleteError } = await supabase
           .from('message_reactions')
           .delete()
           .eq('message_id', messageId)
           .eq('user_id', userId)
           .eq('reaction', emoji);
           
+        if (deleteError) {
+          console.error('Error removing reaction:', deleteError);
+          return;
+        }
         console.log('Reaction removed:', emoji);
       } else {
         // Insert a new reaction
-        await supabase
+        console.log('Adding new reaction:', emoji, messageId);
+        const { error: insertError } = await supabase
           .from('message_reactions')
           .insert({
             message_id: messageId,
@@ -352,6 +363,10 @@ export const ChatScreen = ({ conversation }: Props) => {
             created_at: new Date().toISOString()
           });
           
+        if (insertError) {
+          console.error('Error adding reaction:', insertError);
+          return;
+        }
         console.log('Reaction added:', emoji);
         
         // Provide haptic feedback
