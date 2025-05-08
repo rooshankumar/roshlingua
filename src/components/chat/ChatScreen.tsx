@@ -713,9 +713,7 @@ export const ChatScreen = ({ conversation }: Props) => {
                       <p className="leading-relaxed whitespace-pre-wrap">{message.content}</p>
                       
                       {/* Facebook Messenger-style reactions attached to message */}
-                      <div className="relative">
-                        <MessageReactions messageId={message.id} existingReactions={message.reactions} />
-                      </div>
+                      <MessageReactions messageId={message.id} existingReactions={message.reactions} />
                       {message.attachment_url && (
                         <div className="mt-1 rounded-lg overflow-hidden">
                           {message.attachment_url?.match(/\.(jpg|jpeg|png|gif|webp|avif)$/i) ? (
