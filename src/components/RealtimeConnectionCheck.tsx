@@ -112,7 +112,10 @@ export default function RealtimeConnectionCheck() {
 
   // Update user's online status in the database
   const updateUserOnlineStatus = async (isOnline: boolean) => {
-    if (!user) return;
+    if (!user || !user.id) {
+      console.log('Cannot update online status: No authenticated user');
+      return;
+    }
 
     try {
       const { error } = await supabase
@@ -121,33 +124,35 @@ export default function RealtimeConnectionCheck() {
           is_online: isOnline,
           last_seen: new Date().toISOString() 
         })
-        .eq('id', user.idr.id);
+        .eq('id', user.id);
 
       if (error) {
         console.error('Error updating online status:', error);
+        throw error;
       }
-    } catch (err) {
-      console.error('Failed to update online status:', err);
+    } catch (error) {
+      console.error('Failed to update online status:', error);
+      throw error;
     }
   };
-  
+
   // Set up handlers for page unload/close to mark user as offline
   useEffect(() => {
     if (!user) return;
-    
+
     const handleBeforeUnload = () => {
       // Use a synchronous approach for beforeunload since async might not complete
       const formData = new FormData();
       formData.append('is_online', 'false');
-      
+
       navigator.sendBeacon(
         `${import.meta.env.VITE_SUPABASE_URL}/rest/v1/profiles?id=eq.${user.id}`, 
         formData
       );
     };
-    
+
     window.addEventListener('beforeunload', handleBeforeUnload);
-    
+
     return () => {
       window.removeEventListener('beforeunload', handleBeforeUnload);
     };
