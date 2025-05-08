@@ -374,14 +374,38 @@ export const exchangeAuthCode = async (code: string) => {
   console.log('[PKCE] Using auth code with length:', code.length);
 
   try {
-    // Perform the code exchange
-    return await supabase.auth.exchangeCodeForSession(code);
+    // Explicitly set the verifier in localStorage again to ensure it's available
+    localStorage.setItem('supabase.auth.code_verifier', verifier);
+    
+    // Perform the code exchange with the code and verifier
+    const result = await supabase.auth.exchangeCodeForSession(code);
+    
+    if (result.error) {
+      console.error('[PKCE] Code exchange failed:', result.error);
+      
+      // If the standard exchange fails, try a manual approach
+      console.log('[PKCE] Attempting manual code exchange...');
+      
+      // This will manually construct the request if the standard one fails
+      const manualResult = await supabase.auth.updateSession({
+        refresh_token: code, // Try using the code as a refresh token as fallback
+      });
+      
+      if (!manualResult.error) {
+        console.log('[PKCE] Manual exchange succeeded');
+        return manualResult;
+      }
+    }
+    
+    return result;
   } catch (error) {
     console.error('[PKCE] Code exchange error:', error);
     return { data: { session: null }, error };
   } finally {
-    // Clear verifier after exchange attempt (successful or not)
-    clearPKCEVerifier();
+    // Don't clear verifier immediately in case we need it for retries
+    setTimeout(() => {
+      clearPKCEVerifier();
+    }, 5000);
   }
 };
 

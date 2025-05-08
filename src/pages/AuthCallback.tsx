@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/lib/supabase';
+import { getPKCEVerifier, exchangeAuthCode } from '@/utils/pkceHelper';
 
 const AuthCallback = () => {
   const navigate = useNavigate();
@@ -42,21 +43,40 @@ const AuthCallback = () => {
         localStorage.removeItem('supabase.auth.token');
         sessionStorage.removeItem('supabase.auth.token');
 
-        // Exchange the code for a session with retry
+        // Ensure we have a PKCE verifier before proceeding
+        const verifier = getPKCEVerifier();
+        
+        if (!verifier) {
+          console.error("Authentication error: Missing PKCE verifier");
+          toast({
+            variant: "destructive",
+            title: "Authentication Error",
+            description: "Security verification failed. Please try logging in again."
+          });
+          navigate('/auth', { replace: true });
+          return;
+        }
+        
+        console.log("Found PKCE verifier, length:", verifier.length);
+        
+        // Exchange the code for a session using our helper with the verifier
         let retries = 2;
         let sessionError = null;
         let data = null;
 
         while (retries > 0) {
           try {
-            const result = await supabase.auth.exchangeCodeForSession(code);
+            // Use the exchangeAuthCode helper which handles the verifier
+            const result = await exchangeAuthCode(code);
             data = result.data;
             sessionError = result.error;
             if (!sessionError) break;
+            console.error("Auth exchange attempt failed:", sessionError);
             retries--;
             await new Promise(r => setTimeout(r, 500)); // Wait before retry
           } catch (e) {
             sessionError = e;
+            console.error("Auth exchange exception:", e);
             retries--;
             await new Promise(r => setTimeout(r, 500));
           }

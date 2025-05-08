@@ -240,12 +240,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         : `${window.location.origin.replace(/\/$/, '')}/auth/callback`;
 
       console.log("Redirect URL for Google auth:", redirectUrl);
-
+      
+      // Import PKCE helper function
+      const { generateVerifier } = await import('@/utils/pkceHelper');
+      
+      // Explicitly generate a verifier before OAuth flow
+      const verifier = generateVerifier();
+      console.log("Generated new PKCE verifier:", verifier.substring(0, 5) + '...');
+      
+      // Store it in localStorage where Supabase expects it
+      localStorage.setItem('supabase.auth.code_verifier', verifier);
+      
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
           redirectTo: redirectUrl,
-          // Skip PKCE when having issues
           skipBrowserRedirect: false,
           queryParams: {
             access_type: 'offline',

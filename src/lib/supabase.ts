@@ -9,7 +9,7 @@ if (!supabaseUrl || !supabaseAnonKey) {
   throw new Error('Supabase environment variables are missing');
 }
 
-// Create client with auto-reconnect capabilities
+// Create client with auto-reconnect capabilities and PKCE flow enabled
 export const supabase = createClient<Database>(
   supabaseUrl,
   supabaseAnonKey,
@@ -20,6 +20,7 @@ export const supabase = createClient<Database>(
       }
     },
     auth: {
+      flowType: 'pkce', // Explicitly enable PKCE flow
       persistSession: true,
       autoRefreshToken: true,
       detectSessionInUrl: true
