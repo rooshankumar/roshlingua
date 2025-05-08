@@ -16,6 +16,7 @@ import { handleImageLoadError, isLikelyBlockedUrl } from '@/utils/imageUtils';
 import { VoiceRecorder } from './VoiceRecorder'; // Imported VoiceRecorder component
 import { MessageReactions, ReactionPicker } from './MessageReactions'; // Import both MessageReactions and ReactionPicker components
 import { Dialog, DialogContent } from '../ui/dialog'; // Import Dialog and DialogContent
+import './ChatScreen.css'; // Import dedicated CSS
 
 
 // Simple subscription manager (replace with a more robust solution)
@@ -682,7 +683,7 @@ export const ChatScreen = ({ conversation }: Props) => {
                   element.classList.remove('message-long-press');
                 }}
               >
-                <div className={`flex flex-col gap-2 max-w-[85%] sm:max-w-[70%] group transition-all duration-300 relative`}>
+                <div className={`flex flex-col gap-2 w-full max-w-[85%] sm:max-w-[70%] group transition-all duration-300 relative`}>
                   {/* Facebook Messenger-style reaction picker */}
                   <div 
                     id={`message-actions-${message.id}`}
@@ -709,6 +710,7 @@ export const ChatScreen = ({ conversation }: Props) => {
                     <div
                       className={`p-3 break-words shadow-sm transition-all duration-300 message-bubble`}
                       data-sender={message.sender_id === user?.id ? 'self' : 'other'}
+                      style={{marginLeft: message.sender_id === user?.id ? 'auto' : '0'}}
                     >
                       <p className="leading-relaxed whitespace-pre-wrap text-[15px]">{message.content || ''}</p>
                       

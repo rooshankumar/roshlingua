@@ -272,6 +272,8 @@
 /* Chat animations and effects */
 .message-bubble {
   animation: slideIn 0.3s ease-out;
+  max-width: 70%;
+  display: inline-block;
 }
 
 @keyframes slideIn {
@@ -289,6 +291,21 @@
 .message-bubble {
   animation: fb-message-pop 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28);
   border-radius: 18px !important;
+}
+
+/* Fix message flow */
+[data-sender="self"] {
+  float: right;
+  clear: both;
+  background-color: var(--primary);
+  color: var(--primary-foreground);
+}
+
+[data-sender="other"] {
+  float: left;
+  clear: both;
+  background-color: var(--muted);
+  color: var(--muted-foreground);
 }
 
 /* Make message bubbles more rounded like Messenger */
