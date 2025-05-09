@@ -17,6 +17,7 @@ import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/hooks/useAuth";
 import { useUserPresence } from "@/hooks/useUserPresence";
+import * as progressUtils from "@/utils/progressUtils";
 import { cn } from "@/lib/utils";
 
 import { useAchievements, ACHIEVEMENTS } from '@/hooks/useAchievements';
@@ -56,18 +57,13 @@ const Dashboard = () => {
   };
 
   const getProgress = async (userId) => {
-    //Implementation for fetching progress from Supabase based on userId
-    try{
-        const { data, error } = await supabase
-          .from('profiles')
-          .select('progress_percentage')
-          .eq('id', userId)
-          .single();
-        if (error) throw error;
-        return data.progress_percentage || 0;
+    try {
+      // Import progress calculation from utils
+      const progress = await progressUtils.getProgress(userId);
+      return progress;
     } catch (error) {
-        console.error("Error fetching progress:", error);
-        return 0;
+      console.error("Error calculating progress:", error);
+      return 0;
     }
   };
 

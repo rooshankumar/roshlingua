@@ -67,8 +67,26 @@ export const getLevel = (xp: number): string => {
 };
 
 export const getProgress = async (userId: string): Promise<number> => {
-  const xp = await getXP(userId);
-  const nextLevel = xp >= 1000 ? 2000 : xp >= 500 ? 1000 : 500;
-  const currentLevelBase = xp >= 1000 ? 1000 : xp >= 500 ? 500 : 0;
-  return Math.min(100, Math.round(((xp - currentLevelBase) / (nextLevel - currentLevelBase)) * 100));
+  const { xp, achievementPoints } = await getXP(userId);
+  const totalXp = xp + achievementPoints;
+  
+  // Define level thresholds
+  const beginnerMax = 500;
+  const intermediateMax = 1000;
+  
+  // Calculate progress based on current level
+  let progress = 0;
+  if (totalXp >= intermediateMax) {
+    // Advanced level (progress within advanced level)
+    const nextMilestone = 2000; // Next major milestone for advanced
+    progress = Math.min(100, Math.round(((totalXp - intermediateMax) / (nextMilestone - intermediateMax)) * 100));
+  } else if (totalXp >= beginnerMax) {
+    // Intermediate level
+    progress = Math.min(100, Math.round(((totalXp - beginnerMax) / (intermediateMax - beginnerMax)) * 100));
+  } else {
+    // Beginner level
+    progress = Math.min(100, Math.round((totalXp / beginnerMax) * 100));
+  }
+  
+  return progress;
 };
