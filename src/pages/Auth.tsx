@@ -18,7 +18,7 @@ const Auth = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showVerificationInfo, setShowVerificationInfo] = useState(false);
-  const [acceptedTerms, setAcceptedTerms] = useState(false);
+  const [acceptedTerms, setAcceptedTerms] = useState(true);
 
   const { toast } = useToast();
   const navigate = useNavigate();
