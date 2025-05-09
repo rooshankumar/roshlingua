@@ -17,7 +17,6 @@ const Auth = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [showVerificationInfo, setShowVerificationInfo] = useState(false);
   const [acceptedTerms, setAcceptedTerms] = useState(true);
 
   const { toast } = useToast();
@@ -167,40 +166,6 @@ const Auth = () => {
 
   return (
     <div className="flex flex-col items-center justify-center w-full max-w-md mx-auto gap-4">
-      <Card className="w-full">
-        <CardHeader className="text-center">
-          <CardTitle className="text-2xl font-bold text-gradient">Languagelandia</CardTitle>
-          <CardDescription>
-            Language learning made social and engaging
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="text-center space-y-2">
-          <p>Connect with language partners around the world</p>
-          <div className="flex justify-center gap-2 mt-2">
-            <Button variant="outline" size="sm" asChild>
-              <Link to="/privacy-policy">Privacy Policy</Link>
-            </Button>
-            <Button variant="outline" size="sm" asChild>
-              <Link to="/terms">Terms of Service</Link>
-            </Button>
-            <Button variant="outline" size="sm" onClick={() => setShowVerificationInfo(!showVerificationInfo)}>
-              App Info
-            </Button>
-          </div>
-          {showVerificationInfo && (
-            <div className="mt-4 p-3 bg-muted rounded-md text-sm text-left">
-              <h4 className="font-medium mb-1">Languagelandia App Information</h4>
-              <p className="mb-2">This application helps language learners connect with native speakers and track their progress.</p>
-              <ul className="list-disc list-inside space-y-1">
-                <li>Google sign-in is used only for authentication</li>
-                <li>We only access your basic profile information</li>
-                <li>Your email is used for account management only</li>
-                <li>No data is shared with third parties</li>
-              </ul>
-            </div>
-          )}
-        </CardContent>
-      </Card>
 
       <Card className="w-full">
         <Tabs value={activeTab} onValueChange={setActiveTab}>
