@@ -250,8 +250,8 @@ const Home = () => {
               <h4 className="font-semibold mb-4">Platform</h4>
               <ul className="space-y-2">
                 <li><Link to="/" className="text-muted-foreground hover:text-foreground transition-colors">Home</Link></li>
-                <li><Link to="/auth?activeTab=signup" className="text-muted-foreground hover:text-foreground transition-colors">Sign Up</Link></li>
-                <li><Link to="/auth?activeTab=login" className="text-muted-foreground hover:text-foreground transition-colors">Sign In</Link></li>
+                <li><Link to="/auth?mode=signup" className="text-muted-foreground hover:text-foreground transition-colors">Sign Up</Link></li>
+                <li><Link to="/auth" className="text-muted-foreground hover:text-foreground transition-colors">Sign In</Link></li>
               </ul>
             </div>
             
@@ -284,26 +284,7 @@ const Home = () => {
           </div>
           
           <div className="mt-8 pt-8 border-t border-border text-center">
-            <p className="text-muted-foreground">© 2025 roshLingua. All rights reserved.</p>
-          </div>2">
-                <li><a href="#" className="text-muted-foreground hover:text-foreground transition-colors">Blog</a></li>
-                <li><a href="#" className="text-muted-foreground hover:text-foreground transition-colors">Language Guides</a></li>
-                <li><a href="#" className="text-muted-foreground hover:text-foreground transition-colors">FAQ</a></li>
-              </ul>
-            </div>
-            
-            <div>
-              <h4 className="font-semibold mb-4">Connect</h4>
-              <ul className="space-y-2">
-                <li><a href="#" className="text-muted-foreground hover:text-foreground transition-colors">Twitter</a></li>
-                <li><a href="#" className="text-muted-foreground hover:text-foreground transition-colors">Instagram</a></li>
-                <li><a href="#" className="text-muted-foreground hover:text-foreground transition-colors">Facebook</a></li>
-              </ul>
-            </div>
-          </div>
-          
-          <div className="mt-12 pt-8 border-t border-border text-center text-muted-foreground">
-            <p>&copy; {new Date().getFullYear()} roshLingua. All rights reserved.</p>
+            <p className="text-muted-foreground">© {new Date().getFullYear()} roshLingua. All rights reserved.</p>
           </div>
         </div>
       </footer>
