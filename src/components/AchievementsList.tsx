@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { Achievement, UserAchievement } from '@/types/achievement';
 import { Card, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
