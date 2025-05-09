@@ -296,8 +296,15 @@ const Dashboard = () => {
     if (user?.id) {
       // Check achievements when dashboard loads
       checkAllAchievements(user.id);
+      
+      // Log XP details for debugging
+      console.log('Dashboard XP breakdown:', {
+        baseXP: userStats.xp,
+        achievementPoints: userStats.achievementPoints,
+        totalXP: userStats.totalXP
+      });
     }
-  }, [user?.id]);
+  }, [user?.id, userStats]);
 
   return (
     <div className="mobile-container pb-8 animate-fade-up"> {/* Added mobile-container class */}

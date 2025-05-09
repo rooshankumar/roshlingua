@@ -31,6 +31,16 @@ export function AchievementsList() {
       return total + (achievement?.points || 0);
     }, 0);
   };
+  
+  // Log achievement points for debugging
+  useEffect(() => {
+    console.log('Achievement points calculation:', getTotalPoints());
+    // Check which achievements are unlocked
+    console.log('Unlocked achievements:', unlockedAchievements.map(ua => {
+      const achievement = achievements.find(a => a.id === ua.achievement_id);
+      return {id: ua.achievement_id, points: achievement?.points || 0, title: achievement?.title};
+    }));
+  }, [unlockedAchievements]);
 
   const getRank = (points: number) => {
     if (points >= 1000) return { title: 'Master', icon: '👑' };
