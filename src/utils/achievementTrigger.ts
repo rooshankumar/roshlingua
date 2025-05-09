@@ -41,7 +41,7 @@ export const checkAllAchievements = async (userId: string) => {
       return;
     }
 
-    // 4. Get existing achievements
+    // 4. Get existing achievements - use count method correctly
     const { data: existingAchievements, error: achievementError } = await supabase
       .from('user_achievements')
       .select('achievement_id')

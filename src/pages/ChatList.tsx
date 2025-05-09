@@ -45,7 +45,7 @@ const ChatList = () => {
         // Using the hook's functionality instead of duplicating the query
         refreshUnreadCounts();
         
-        // If we need unread counts immediately, we can use this safer query
+        // Get unread messages with a safe query that doesn't use group by
         const { data: unreadMessagesData, error: messagesError } = await supabase
           .from('messages')
           .select('conversation_id')

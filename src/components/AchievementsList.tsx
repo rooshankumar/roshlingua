@@ -6,6 +6,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { cn } from '@/lib/utils';
 import type { Variants } from 'framer-motion';
 import { motion } from 'framer-motion';
+import { Button } from '@/components/ui/button';
 
 const LEVEL_COLORS = {
   bronze: 'bg-orange-500/20 text-orange-700 border-orange-500/30',

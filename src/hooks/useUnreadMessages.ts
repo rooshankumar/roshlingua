@@ -12,19 +12,13 @@ export const useUnreadMessages = (userId: string | undefined) => {
 
     try {
       // First get accurate counts from the messages table directly
+      // Using aggregation in a different way that's supported by Supabase JS client
       const { data: unreadMessagesData, error: messagesError } = await supabase
         .from('messages')
-        .select('conversation_id, count(*)', { count: 'exact', head: false })
+        .select('conversation_id, count')
         .eq('recipient_id', userId)
-        .eq('is_read', false) 
-        .group('conversation_id')
-        .then(response => ({
-          data: response.data?.map(item => ({
-            conversation_id: item.conversation_id,
-            count: parseInt(item.count)
-          })) || [],
-          error: response.error
-        }));
+        .eq('is_read', false)
+        .order('conversation_id', { ascending: true });
 
       if (messagesError) throw messagesError;
 

@@ -100,13 +100,22 @@ export function useAchievements(userId: string) {
 
   const loadUserAchievements = async () => {
     if (!userId) return; // Added null check for userId
-    const { data } = await supabase
-      .from('user_achievements')
-      .select('*')
-      .eq('user_id', userId);
+    try {
+      const { data, error } = await supabase
+        .from('user_achievements')
+        .select('*')
+        .eq('user_id', userId);
 
-    if (data) {
-      setUnlockedAchievements(data);
+      if (error) {
+        console.error('Error loading achievements:', error);
+        return;
+      }
+
+      if (data) {
+        setUnlockedAchievements(data);
+      }
+    } catch (err) {
+      console.error('Exception loading achievements:', err);
     }
   };
 
