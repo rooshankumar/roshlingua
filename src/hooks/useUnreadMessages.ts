@@ -14,10 +14,10 @@ export const useUnreadMessages = (userId: string | undefined) => {
       // First get accurate counts from the messages table directly
       const { data: unreadMessagesData, error: messagesError } = await supabase
         .from('messages')
-        .select('conversation_id, count')
+        .select('conversation_id, count(*)', { count: 'exact', head: false })
         .eq('recipient_id', userId)
-        .eq('is_read', false)
-        .select('conversation_id, count(*)', { count: 'exact' })
+        .eq('is_read', false) 
+        .group('conversation_id')
         .then(response => ({
           data: response.data?.map(item => ({
             conversation_id: item.conversation_id,

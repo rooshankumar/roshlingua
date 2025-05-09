@@ -42,13 +42,15 @@ const ChatList = () => {
     setIsLoading(true);
     const fetchConversations = async () => {
       try {
-        // Get actual unread counts from the messages table
+        // Using the hook's functionality instead of duplicating the query
+        refreshUnreadCounts();
+        
+        // If we need unread counts immediately, we can use this safer query
         const { data: unreadMessagesData, error: messagesError } = await supabase
           .from('messages')
-          .select('conversation_id, count(*)')
+          .select('conversation_id')
           .eq('recipient_id', user.id)
-          .eq('is_read', false)
-          .group('conversation_id');
+          .eq('is_read', false);
 
         if (messagesError) throw messagesError;
 

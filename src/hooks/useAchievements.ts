@@ -168,7 +168,7 @@ export function useAchievements(userId: string) {
       const isUnlocked = unlockedAchievements.some(ua => ua.achievement_id === achievement.id);
       if (!isUnlocked) {
         let statValue;
-        
+
         if (achievement.condition.type === 'xp') {
           statValue = currentXP;
         } else if (achievement.condition.type === 'streak') {
@@ -178,7 +178,7 @@ export function useAchievements(userId: string) {
         }
 
         console.log(`Checking achievement ${achievement.id}: ${statValue} >= ${achievement.condition.threshold}`);
-        
+
         if (statValue >= achievement.condition.threshold) {
           await unlockAchievement(achievement.id);
         }
@@ -214,9 +214,9 @@ export function useAchievements(userId: string) {
         user_id: userId,
         action_type: source
       });
-      
+
       if (error) throw error;
-      
+
       console.log(`Added ${amount} XP from ${source}`);
       return data;
     } catch (error) {

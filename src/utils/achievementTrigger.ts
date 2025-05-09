@@ -1,4 +1,3 @@
-
 import { supabase } from '@/lib/supabase';
 import { ACHIEVEMENTS } from '@/hooks/useAchievements';
 
@@ -14,7 +13,7 @@ export const checkAllAchievements = async (userId: string) => {
       .select('streak_count, xp_points')
       .eq('id', userId)
       .single();
-      
+
     if (profileError) {
       console.error('Error fetching profile data:', profileError);
       return;
@@ -25,7 +24,7 @@ export const checkAllAchievements = async (userId: string) => {
       .from('conversation_participants')
       .select('*', { count: 'exact', head: true })
       .eq('user_id', userId);
-      
+
     if (convError) {
       console.error('Error counting conversations:', convError);
       return;
@@ -36,7 +35,7 @@ export const checkAllAchievements = async (userId: string) => {
       .from('messages')
       .select('*', { count: 'exact', head: true })
       .eq('sender_id', userId);
-      
+
     if (msgError) {
       console.error('Error counting messages:', msgError);
       return;
@@ -47,7 +46,7 @@ export const checkAllAchievements = async (userId: string) => {
       .from('user_achievements')
       .select('achievement_id')
       .eq('user_id', userId);
-      
+
     if (achievementError) {
       console.error('Error fetching existing achievements:', achievementError);
       return;
@@ -62,12 +61,12 @@ export const checkAllAchievements = async (userId: string) => {
     });
     console.log('Current unlocked achievements:', unlockedIds);
 
-    // 5. Check each achievement
+    // Check each achievement
     for (const achievement of ACHIEVEMENTS) {
       if (unlockedIds.includes(achievement.id)) continue;
 
       let shouldUnlock = false;
-      
+
       switch (achievement.condition.type) {
         case 'streak':
           shouldUnlock = (profileData.streak_count || 0) >= achievement.condition.threshold;
@@ -82,12 +81,13 @@ export const checkAllAchievements = async (userId: string) => {
           shouldUnlock = (messageCount || 0) >= achievement.condition.threshold;
           break;
       }
-      
+
       if (shouldUnlock) {
         console.log(`Unlocking achievement: ${achievement.id}`);
         await unlockAchievement(userId, achievement.id);
       }
     }
+    console.log("Finished checking achievements");
   } catch (error) {
     console.error('Error in checkAllAchievements:', error);
   }
@@ -118,7 +118,7 @@ export const unlockAchievement = async (userId: string, achievementId: string) =
       user_id: userId,
       action_type: 'achievement_unlock'
     });
-    
+
     console.log(`Achievement unlocked: ${achievement.title} (+${achievement.points} XP)`);
   } catch (error) {
     console.error('Error in unlockAchievement:', error);
