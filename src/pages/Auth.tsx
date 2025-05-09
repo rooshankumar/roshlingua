@@ -167,7 +167,7 @@ const Auth = () => {
   return (
     <div className="flex flex-col items-center justify-center w-full max-w-md mx-auto gap-4">
 
-      <Card className="w-full">
+      <Card className="w-full bg-white/60 dark:bg-black/60 backdrop-blur-md border border-white/20 dark:border-white/10 shadow-lg">
         <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="login">Login</TabsTrigger>
