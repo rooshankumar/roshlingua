@@ -22,9 +22,9 @@ export const checkAllAchievements = async (userId: string) => {
 
     // 2. Get conversation count
     const { count: conversationCount, error: convError } = await supabase
-      .from('conversations')
+      .from('conversation_participants')
       .select('*', { count: 'exact', head: true })
-      .or(`user1_id.eq.${userId},user2_id.eq.${userId}`);
+      .eq('user_id', userId);
       
     if (convError) {
       console.error('Error counting conversations:', convError);

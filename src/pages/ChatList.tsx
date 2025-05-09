@@ -10,6 +10,7 @@ import { supabase } from '@/lib/supabase';
 import { formatDistanceToNow } from 'date-fns';
 import classNames from 'classnames';
 import { useUnreadMessages } from '@/hooks/useUnreadMessages';
+import { checkAllAchievements } from '@/utils/achievementTrigger';
 
 interface ChatPreview {
   id: string;

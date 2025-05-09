@@ -17,7 +17,14 @@ export const useUnreadMessages = (userId: string | undefined) => {
         .select('conversation_id, count')
         .eq('recipient_id', userId)
         .eq('is_read', false)
-        .group('conversation_id');
+        .select('conversation_id, count(*)', { count: 'exact' })
+        .then(response => ({
+          data: response.data?.map(item => ({
+            conversation_id: item.conversation_id,
+            count: parseInt(item.count)
+          })) || [],
+          error: response.error
+        }));
 
       if (messagesError) throw messagesError;
 
