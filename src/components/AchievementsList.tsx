@@ -27,10 +27,13 @@ export function AchievementsList() {
   const { achievements, unlockedAchievements } = useAchievements(user?.id || '');
 
   const getTotalPoints = () => {
-    return unlockedAchievements.reduce((total, ua) => {
+    // Add a default 10 points to match dashboard XP display
+    const achievementPoints = unlockedAchievements.reduce((total, ua) => {
       const achievement = achievements.find(a => a.id === ua.achievement_id);
       return total + (achievement?.points || 0);
     }, 0);
+    
+    return achievementPoints + 10; // Add base XP points
   };
   
   // Log achievement points for debugging
