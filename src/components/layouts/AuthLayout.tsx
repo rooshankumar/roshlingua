@@ -12,9 +12,10 @@ const AuthLayout = ({ children }: AuthLayoutProps) => {
       <div className="absolute inset-0 z-0">
         <video 
           autoPlay 
-          loop 
+          loop={true}
           muted 
           playsInline
+          preload="auto"
           className="absolute inset-0 w-full h-full object-cover"
         >
           <source src="/videos/277318_tiny.mp4" type="video/mp4" />
