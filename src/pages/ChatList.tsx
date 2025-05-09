@@ -57,8 +57,9 @@ const ChatList = () => {
         const unreadCountsClientSide: { [key: string]: number } = {};
 
         if (unreadMessagesData) {
+          // Count occurrences of each conversation_id
           unreadMessagesData.forEach(item => {
-            unreadCountsClientSide[item.conversation_id] = parseInt(item.count);
+            unreadCountsClientSide[item.conversation_id] = (unreadCountsClientSide[item.conversation_id] || 0) + 1;
           });
         }
 

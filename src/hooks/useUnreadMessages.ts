@@ -12,13 +12,20 @@ export const useUnreadMessages = (userId: string | undefined) => {
 
     try {
       // First get accurate counts from the messages table directly
-      // Using aggregation in a different way that's supported by Supabase JS client
+      // Get all unread messages and calculate counts client-side
       const { data: unreadMessagesData, error: messagesError } = await supabase
         .from('messages')
-        .select('conversation_id, count')
+        .select('conversation_id')
         .eq('recipient_id', userId)
-        .eq('is_read', false)
-        .order('conversation_id', { ascending: true });
+        .eq('is_read', false);
+      
+      // Manual count by conversation_id
+      const conversationCounts: Record<string, number> = {};
+      if (unreadMessagesData) {
+        unreadMessagesData.forEach(msg => {
+          conversationCounts[msg.conversation_id] = (conversationCounts[msg.conversation_id] || 0) + 1;
+        });
+      }
 
       if (messagesError) throw messagesError;
 
@@ -37,12 +44,10 @@ export const useUnreadMessages = (userId: string | undefined) => {
         return acc;
       }, {} as Record<string, number>);
 
-      // Override with accurate counts from messages
-      if (unreadMessagesData) {
-        unreadMessagesData.forEach(item => {
-          initialCounts[item.conversation_id] = parseInt(item.count);
-        });
-      }
+      // Override with accurate counts we've calculated client-side
+      Object.keys(conversationCounts).forEach(convId => {
+        initialCounts[convId] = conversationCounts[convId];
+      });
 
       if (isInitialLoadRef.current) {
         console.log('Setting initial unread counts:', initialCounts);
