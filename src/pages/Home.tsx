@@ -250,8 +250,8 @@ const Home = () => {
               <h4 className="font-semibold mb-4">Platform</h4>
               <ul className="space-y-2">
                 <li><Link to="/" className="text-muted-foreground hover:text-foreground transition-colors">Home</Link></li>
-                <li><Link to="/auth?mode=signup" className="text-muted-foreground hover:text-foreground transition-colors">Sign Up</Link></li>
-                <li><Link to="/auth" className="text-muted-foreground hover:text-foreground transition-colors">Sign In</Link></li>
+                <li><Link to="/auth?activeTab=signup" className="text-muted-foreground hover:text-foreground transition-colors">Sign Up</Link></li>
+                <li><Link to="/auth?activeTab=login" className="text-muted-foreground hover:text-foreground transition-colors">Sign In</Link></li>
               </ul>
             </div>
             
@@ -267,6 +267,25 @@ const Home = () => {
             <div>
               <h4 className="font-semibold mb-4">Resources</h4>
               <ul className="space-y-2">
+                <li><Link to="/blog" className="text-muted-foreground hover:text-foreground transition-colors">Blog</Link></li>
+                <li><Link to="/language-guides" className="text-muted-foreground hover:text-foreground transition-colors">Language Guides</Link></li>
+                <li><Link to="/faq" className="text-muted-foreground hover:text-foreground transition-colors">FAQ</Link></li>
+              </ul>
+            </div>
+            
+            <div>
+              <h4 className="font-semibold mb-4">Connect</h4>
+              <ul className="space-y-2">
+                <li><a href="https://twitter.com/roshLingua" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground transition-colors">Twitter</a></li>
+                <li><a href="https://instagram.com/roshLingua" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground transition-colors">Instagram</a></li>
+                <li><a href="https://facebook.com/roshLingua" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground transition-colors">Facebook</a></li>
+              </ul>
+            </div>
+          </div>
+          
+          <div className="mt-8 pt-8 border-t border-border text-center">
+            <p className="text-muted-foreground">© 2025 roshLingua. All rights reserved.</p>
+          </div>2">
                 <li><a href="#" className="text-muted-foreground hover:text-foreground transition-colors">Blog</a></li>
                 <li><a href="#" className="text-muted-foreground hover:text-foreground transition-colors">Language Guides</a></li>
                 <li><a href="#" className="text-muted-foreground hover:text-foreground transition-colors">FAQ</a></li>

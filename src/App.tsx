@@ -20,6 +20,12 @@ import Community from "./pages/Community";
 import Chat from "./pages/Chat";
 import Settings from "./pages/Settings";
 import ChatList from "./pages/ChatList";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import Terms from "./pages/Terms";
+import Contact from "./pages/Contact";
+import Blog from "./pages/Blog";
+import LanguageGuides from "./pages/LanguageGuides";
+import FAQ from "./pages/FAQ";
 
 // Components
 import ProtectedRoute from "./components/auth/ProtectedRoute";
@@ -127,6 +133,16 @@ const AppRoutes = () => {
         } />
 
 
+        {/* Legal pages */}
+        <Route path="/privacy-policy" element={<AuthLayout><PrivacyPolicy /></AuthLayout>} />
+        <Route path="/terms" element={<AuthLayout><Terms /></AuthLayout>} />
+        <Route path="/contact" element={<AuthLayout><Contact /></AuthLayout>} />
+        
+        {/* Resources */}
+        <Route path="/blog" element={<AuthLayout><Blog /></AuthLayout>} />
+        <Route path="/language-guides" element={<AuthLayout><LanguageGuides /></AuthLayout>} />
+        <Route path="/faq" element={<AuthLayout><FAQ /></AuthLayout>} />
+        
         {/* Catch all for 404 */}
         <Route path="*" element={<NotFound />} />
       </Routes>

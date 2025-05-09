@@ -1,102 +1,117 @@
 
-import { Link } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { ArrowLeft } from "lucide-react";
+import React from "react";
+import { Card, CardContent } from "@/components/ui/card";
 
 const PrivacyPolicy = () => {
   return (
-    <div className="min-h-screen bg-background">
-      <header className="w-full py-4 px-6 border-b border-border sticky top-0 bg-background/80 backdrop-blur-sm z-50">
-        <div className="max-w-7xl mx-auto flex justify-between items-center">
-          <Link to="/" className="text-2xl font-bold text-gradient">
-            Languagelandia
-          </Link>
-          
-          <div className="flex items-center space-x-4">
-            <Button asChild variant="outline">
-              <Link to="/">
-                <ArrowLeft className="h-4 w-4 mr-2" />
-                Back to Home
-              </Link>
-            </Button>
-          </div>
-        </div>
-      </header>
+    <div className="container mx-auto p-4 py-8 max-w-4xl">
+      <h1 className="text-3xl font-bold mb-8 text-center">Privacy Policy</h1>
       
-      <main className="py-12 px-6">
-        <div className="max-w-3xl mx-auto">
-          <h1 className="text-3xl font-bold mb-8">Privacy Policy</h1>
+      <Card>
+        <CardContent className="p-6 space-y-6">
+          <section>
+            <h2 className="text-2xl font-semibold mb-4">Introduction</h2>
+            <p>
+              At roshLingua, we take your privacy seriously. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our language learning platform.
+            </p>
+          </section>
           
-          <div className="prose prose-lg dark:prose-invert max-w-none">
-            <p>Last updated: {new Date().toLocaleDateString()}</p>
-            
-            <h2>1. Introduction</h2>
-            <p>
-              Welcome to Languagelandia. We respect your privacy and are committed to protecting your personal data. This privacy policy will inform you about how we look after your personal data when you visit our website and tell you about your privacy rights and how the law protects you.
-            </p>
-            
-            <h2>2. Data We Collect</h2>
-            <p>
-              We may collect, use, store and transfer different kinds of personal data about you which we have grouped together as follows:
-            </p>
-            <ul>
-              <li><strong>Identity Data</strong> includes first name, last name, username or similar identifier, date of birth, and gender.</li>
-              <li><strong>Contact Data</strong> includes email address and telephone numbers.</li>
-              <li><strong>Technical Data</strong> includes internet protocol (IP) address, your login data, browser type and version, time zone setting and location, browser plug-in types and versions, operating system and platform, and other technology on the devices you use to access this website.</li>
-              <li><strong>Profile Data</strong> includes your username and password, your interests, preferences, feedback, and survey responses.</li>
-              <li><strong>Usage Data</strong> includes information about how you use our website, products, and services.</li>
+          <section>
+            <h2 className="text-2xl font-semibold mb-4">Information We Collect</h2>
+            <div className="space-y-4">
+              <div>
+                <h3 className="text-xl font-medium mb-2">Personal Information</h3>
+                <p>
+                  We may collect personal information that you voluntarily provide when creating an account, such as your name, email address, profile picture, and language preferences.
+                </p>
+              </div>
+              
+              <div>
+                <h3 className="text-xl font-medium mb-2">Usage Data</h3>
+                <p>
+                  We automatically collect certain information about how you interact with our platform, including your learning activities, achievements, chat conversations, and usage patterns.
+                </p>
+              </div>
+              
+              <div>
+                <h3 className="text-xl font-medium mb-2">Device Information</h3>
+                <p>
+                  We may collect information about the device you use to access our platform, including device type, operating system, browser type, and IP address.
+                </p>
+              </div>
+            </div>
+          </section>
+          
+          <section>
+            <h2 className="text-2xl font-semibold mb-4">How We Use Your Information</h2>
+            <ul className="list-disc pl-6 space-y-2">
+              <li>To provide and maintain our language learning platform</li>
+              <li>To personalize your learning experience</li>
+              <li>To match you with appropriate language exchange partners</li>
+              <li>To track your progress and provide feedback</li>
+              <li>To communicate with you about updates, features, and offers</li>
+              <li>To improve our platform and develop new features</li>
+              <li>To detect, prevent, and address technical issues or abuse</li>
             </ul>
-            
-            <h2>3. How We Use Your Data</h2>
+          </section>
+          
+          <section>
+            <h2 className="text-2xl font-semibold mb-4">Information Sharing</h2>
             <p>
-              We will only use your personal data when the law allows us to. Most commonly, we will use your personal data in the following circumstances:
+              We do not sell, trade, or rent your personal information to third parties. We may share your information in the following circumstances:
             </p>
-            <ul>
-              <li>Where we need to perform the contract we are about to enter into or have entered into with you.</li>
-              <li>Where it is necessary for our legitimate interests (or those of a third party) and your interests and fundamental rights do not override those interests.</li>
-              <li>Where we need to comply with a legal obligation.</li>
+            <ul className="list-disc pl-6 space-y-2 mt-2">
+              <li>With other users, as necessary for the language exchange functionality</li>
+              <li>With service providers who assist us in operating our platform</li>
+              <li>To comply with legal obligations</li>
+              <li>With your consent or at your direction</li>
             </ul>
-            
-            <h2>4. Data Security</h2>
+          </section>
+          
+          <section>
+            <h2 className="text-2xl font-semibold mb-4">Data Security</h2>
             <p>
-              We have put in place appropriate security measures to prevent your personal data from being accidentally lost, used, or accessed in an unauthorized way, altered, or disclosed. In addition, we limit access to your personal data to those employees, agents, contractors, and other third parties who have a business need to know.
+              We implement appropriate technical and organizational measures to protect your personal information. However, no method of transmission over the Internet or electronic storage is 100% secure, so we cannot guarantee absolute security.
             </p>
-            
-            <h2>5. Your Legal Rights</h2>
+          </section>
+          
+          <section>
+            <h2 className="text-2xl font-semibold mb-4">Your Privacy Rights</h2>
             <p>
-              Under certain circumstances, you have rights under data protection laws in relation to your personal data, including the right to:
+              Depending on your location, you may have certain rights regarding your personal information, including:
             </p>
-            <ul>
-              <li>Request access to your personal data.</li>
-              <li>Request correction of your personal data.</li>
-              <li>Request erasure of your personal data.</li>
-              <li>Object to processing of your personal data.</li>
-              <li>Request restriction of processing your personal data.</li>
-              <li>Request transfer of your personal data.</li>
-              <li>Right to withdraw consent.</li>
+            <ul className="list-disc pl-6 space-y-2 mt-2">
+              <li>Right to access and receive a copy of your personal information</li>
+              <li>Right to correct inaccurate information</li>
+              <li>Right to delete your personal information</li>
+              <li>Right to restrict or object to processing</li>
+              <li>Right to data portability</li>
             </ul>
-            
-            <h2>6. Third-Party Links</h2>
+          </section>
+          
+          <section>
+            <h2 className="text-2xl font-semibold mb-4">Changes to This Privacy Policy</h2>
             <p>
-              This website may include links to third-party websites, plug-ins, and applications. Clicking on those links or enabling those connections may allow third parties to collect or share data about you. We do not control these third-party websites and are not responsible for their privacy statements.
+              We may update our Privacy Policy from time to time. We will notify you of any changes by posting the new Privacy Policy on this page and updating the "Last updated" date.
             </p>
-            
-            <h2>7. Cookies</h2>
+          </section>
+          
+          <section>
+            <h2 className="text-2xl font-semibold mb-4">Contact Us</h2>
             <p>
-              We use cookies and similar tracking technologies to track the activity on our Service and hold certain information. Cookies are files with a small amount of data which may include an anonymous unique identifier.
+              If you have any questions about this Privacy Policy, please contact us at:
             </p>
-            
-            <h2>8. Contact Us</h2>
-            <p>
-              If you have any questions about this Privacy Policy, You can contact us:
+            <p className="mt-2">
+              Email: privacy@roshlingua.com<br />
+              Address: 123 Language Ave, Suite 456, New York, NY 10001
             </p>
-            <ul>
-              <li>By email: privacy@languagelandia.com</li>
-              <li>By visiting our contact page: <Link to="/contact" className="text-primary hover:underline">Contact Us</Link></li>
-            </ul>
+          </section>
+          
+          <div className="text-right text-sm text-muted-foreground mt-8">
+            Last updated: May 1, 2025
           </div>
-        </div>
-      </main>
+        </CardContent>
+      </Card>
     </div>
   );
 };
