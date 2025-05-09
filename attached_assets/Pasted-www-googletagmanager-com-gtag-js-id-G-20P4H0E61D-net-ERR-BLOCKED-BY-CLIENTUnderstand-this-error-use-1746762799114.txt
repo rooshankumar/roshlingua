@@ -1,0 +1,156 @@
+www.googletagmanager.com/gtag/js?id=G-20P4H0E61D net::ERR_BLOCKED_BY_CLIENTUnderstand this error
+useUnreadMessages.ts:60 Error fetching unread counts: TypeError: supabase.from(...).select(...).eq(...).eq(...).group is not a function
+    at fetchInitialUnreadCounts (useUnreadMessages.ts:20:10)
+    at useUnreadMessages.ts:106:5
+    at commitHookEffectListMount (chunk-276SZO74.js?v=12562e5c:16915:34)
+    at commitPassiveMountOnFiber (chunk-276SZO74.js?v=12562e5c:18156:19)
+    at commitPassiveMountEffects_complete (chunk-276SZO74.js?v=12562e5c:18129:17)
+    at commitPassiveMountEffects_begin (chunk-276SZO74.js?v=12562e5c:18119:15)
+    at commitPassiveMountEffects (chunk-276SZO74.js?v=12562e5c:18109:11)
+    at flushPassiveEffectsImpl (chunk-276SZO74.js?v=12562e5c:19490:11)
+    at flushPassiveEffects (chunk-276SZO74.js?v=12562e5c:19447:22)
+    at chunk-276SZO74.js?v=12562e5c:19328:17
+fetchInitialUnreadCounts @ useUnreadMessages.ts:60
+(anonymous) @ useUnreadMessages.ts:106
+commitHookEffectListMount @ chunk-276SZO74.js?v=12562e5c:16915
+commitPassiveMountOnFiber @ chunk-276SZO74.js?v=12562e5c:18156
+commitPassiveMountEffects_complete @ chunk-276SZO74.js?v=12562e5c:18129
+commitPassiveMountEffects_begin @ chunk-276SZO74.js?v=12562e5c:18119
+commitPassiveMountEffects @ chunk-276SZO74.js?v=12562e5c:18109
+flushPassiveEffectsImpl @ chunk-276SZO74.js?v=12562e5c:19490
+flushPassiveEffects @ chunk-276SZO74.js?v=12562e5c:19447
+(anonymous) @ chunk-276SZO74.js?v=12562e5c:19328
+workLoop @ chunk-276SZO74.js?v=12562e5c:197
+flushWork @ chunk-276SZO74.js?v=12562e5c:176
+performWorkUntilDeadline @ chunk-276SZO74.js?v=12562e5c:384Understand this error
+supabase.ts:43 
+            
+            
+           GET https://wqojeesjtgfcftpnzaet.supabase.co/rest/v1/user_achievements?select=achievement_id%2Ccount%28*%29&order=achievement_id.asc 400 (Bad Request)
+fetch @ supabase.ts:43
+(anonymous) @ @supabase_supabase-js.js?v=12562e5c:3900
+(anonymous) @ @supabase_supabase-js.js?v=12562e5c:3921
+fulfilled @ @supabase_supabase-js.js?v=12562e5c:3873
+Promise.then
+step @ @supabase_supabase-js.js?v=12562e5c:3886
+(anonymous) @ @supabase_supabase-js.js?v=12562e5c:3888
+__awaiter6 @ @supabase_supabase-js.js?v=12562e5c:3870
+(anonymous) @ @supabase_supabase-js.js?v=12562e5c:3911
+then @ @supabase_supabase-js.js?v=12562e5c:89Understand this error
+AchievementsList.tsx:91 Uncaught ReferenceError: Button is not defined
+    at AchievementsList.tsx:91:22
+    at Array.map (<anonymous>)
+    at AchievementsList (AchievementsList.tsx:71:23)
+    at renderWithHooks (chunk-276SZO74.js?v=12562e5c:11548:26)
+    at updateFunctionComponent (chunk-276SZO74.js?v=12562e5c:14582:28)
+    at beginWork (chunk-276SZO74.js?v=12562e5c:15924:22)
+    at HTMLUnknownElement.callCallback2 (chunk-276SZO74.js?v=12562e5c:3674:22)
+    at Object.invokeGuardedCallbackDev (chunk-276SZO74.js?v=12562e5c:3699:24)
+    at invokeGuardedCallback (chunk-276SZO74.js?v=12562e5c:3733:39)
+    at beginWork$1 (chunk-276SZO74.js?v=12562e5c:19765:15)
+(anonymous) @ AchievementsList.tsx:91
+AchievementsList @ AchievementsList.tsx:71
+renderWithHooks @ chunk-276SZO74.js?v=12562e5c:11548
+updateFunctionComponent @ chunk-276SZO74.js?v=12562e5c:14582
+beginWork @ chunk-276SZO74.js?v=12562e5c:15924
+callCallback2 @ chunk-276SZO74.js?v=12562e5c:3674
+invokeGuardedCallbackDev @ chunk-276SZO74.js?v=12562e5c:3699
+invokeGuardedCallback @ chunk-276SZO74.js?v=12562e5c:3733
+beginWork$1 @ chunk-276SZO74.js?v=12562e5c:19765
+performUnitOfWork @ chunk-276SZO74.js?v=12562e5c:19198
+workLoopSync @ chunk-276SZO74.js?v=12562e5c:19137
+renderRootSync @ chunk-276SZO74.js?v=12562e5c:19116
+performConcurrentWorkOnRoot @ chunk-276SZO74.js?v=12562e5c:18678
+workLoop @ chunk-276SZO74.js?v=12562e5c:197
+flushWork @ chunk-276SZO74.js?v=12562e5c:176
+performWorkUntilDeadline @ chunk-276SZO74.js?v=12562e5c:384Understand this error
+AchievementsList.tsx:91 Uncaught ReferenceError: Button is not defined
+    at AchievementsList.tsx:91:22
+    at Array.map (<anonymous>)
+    at AchievementsList (AchievementsList.tsx:71:23)
+    at renderWithHooks (chunk-276SZO74.js?v=12562e5c:11548:26)
+    at updateFunctionComponent (chunk-276SZO74.js?v=12562e5c:14582:28)
+    at beginWork (chunk-276SZO74.js?v=12562e5c:15924:22)
+    at HTMLUnknownElement.callCallback2 (chunk-276SZO74.js?v=12562e5c:3674:22)
+    at Object.invokeGuardedCallbackDev (chunk-276SZO74.js?v=12562e5c:3699:24)
+    at invokeGuardedCallback (chunk-276SZO74.js?v=12562e5c:3733:39)
+    at beginWork$1 (chunk-276SZO74.js?v=12562e5c:19765:15)
+(anonymous) @ AchievementsList.tsx:91
+AchievementsList @ AchievementsList.tsx:71
+renderWithHooks @ chunk-276SZO74.js?v=12562e5c:11548
+updateFunctionComponent @ chunk-276SZO74.js?v=12562e5c:14582
+beginWork @ chunk-276SZO74.js?v=12562e5c:15924
+callCallback2 @ chunk-276SZO74.js?v=12562e5c:3674
+invokeGuardedCallbackDev @ chunk-276SZO74.js?v=12562e5c:3699
+invokeGuardedCallback @ chunk-276SZO74.js?v=12562e5c:3733
+beginWork$1 @ chunk-276SZO74.js?v=12562e5c:19765
+performUnitOfWork @ chunk-276SZO74.js?v=12562e5c:19198
+workLoopSync @ chunk-276SZO74.js?v=12562e5c:19137
+renderRootSync @ chunk-276SZO74.js?v=12562e5c:19116
+recoverFromConcurrentError @ chunk-276SZO74.js?v=12562e5c:18736
+performConcurrentWorkOnRoot @ chunk-276SZO74.js?v=12562e5c:18684
+workLoop @ chunk-276SZO74.js?v=12562e5c:197
+flushWork @ chunk-276SZO74.js?v=12562e5c:176
+performWorkUntilDeadline @ chunk-276SZO74.js?v=12562e5c:384Understand this error
+chunk-276SZO74.js?v=12562e5c:14032 The above error occurred in the <AchievementsList> component:
+
+    at AchievementsList (https://35fce089-6543-44c9-b834-3c6ca7ccc9a2-00-3udxp8qwtvz3l.pike.replit.dev:5173/src/components/AchievementsList.tsx?t=1746762623734:30:22)
+    at div
+    at div
+    at Dashboard (https://35fce089-6543-44c9-b834-3c6ca7ccc9a2-00-3udxp8qwtvz3l.pike.replit.dev:5173/src/pages/Dashboard.tsx?t=1746762623734:25:22)
+    at main
+    at div
+    at AppLayout (https://35fce089-6543-44c9-b834-3c6ca7ccc9a2-00-3udxp8qwtvz3l.pike.replit.dev:5173/src/components/layouts/AppLayout.tsx?t=1746762622475:84:22)
+    at ProtectedRoute (https://35fce089-6543-44c9-b834-3c6ca7ccc9a2-00-3udxp8qwtvz3l.pike.replit.dev:5173/src/components/auth/ProtectedRoute.tsx:15:27)
+    at RenderedRoute (https://35fce089-6543-44c9-b834-3c6ca7ccc9a2-00-3udxp8qwtvz3l.pike.replit.dev:5173/node_modules/.vite/deps/react-router-dom.js?v=12562e5c:4069:5)
+    at Routes (https://35fce089-6543-44c9-b834-3c6ca7ccc9a2-00-3udxp8qwtvz3l.pike.replit.dev:5173/node_modules/.vite/deps/react-router-dom.js?v=12562e5c:4508:5)
+    at AppRoutes (https://35fce089-6543-44c9-b834-3c6ca7ccc9a2-00-3udxp8qwtvz3l.pike.replit.dev:5173/src/App.tsx?t=1746762624628:40:33)
+    at AuthProvider (https://35fce089-6543-44c9-b834-3c6ca7ccc9a2-00-3udxp8qwtvz3l.pike.replit.dev:5173/src/providers/AuthProvider.tsx:24:32)
+    at Router (https://35fce089-6543-44c9-b834-3c6ca7ccc9a2-00-3udxp8qwtvz3l.pike.replit.dev:5173/node_modules/.vite/deps/react-router-dom.js?v=12562e5c:4451:15)
+    at BrowserRouter (https://35fce089-6543-44c9-b834-3c6ca7ccc9a2-00-3udxp8qwtvz3l.pike.replit.dev:5173/node_modules/.vite/deps/react-router-dom.js?v=12562e5c:5196:5)
+    at ThemeProvider (https://35fce089-6543-44c9-b834-3c6ca7ccc9a2-00-3udxp8qwtvz3l.pike.replit.dev:5173/src/components/theme-provider.tsx:17:33)
+    at QueryClientProvider (https://35fce089-6543-44c9-b834-3c6ca7ccc9a2-00-3udxp8qwtvz3l.pike.replit.dev:5173/node_modules/.vite/deps/@tanstack_react-query.js?v=12562e5c:2794:3)
+    at App
+
+Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://reactjs.org/link/error-boundaries to learn more about error boundaries.
+logCapturedError @ chunk-276SZO74.js?v=12562e5c:14032
+update.callback @ chunk-276SZO74.js?v=12562e5c:14052
+callCallback @ chunk-276SZO74.js?v=12562e5c:11248
+commitUpdateQueue @ chunk-276SZO74.js?v=12562e5c:11265
+commitLayoutEffectOnFiber @ chunk-276SZO74.js?v=12562e5c:17093
+commitLayoutMountEffects_complete @ chunk-276SZO74.js?v=12562e5c:17980
+commitLayoutEffects_begin @ chunk-276SZO74.js?v=12562e5c:17969
+commitLayoutEffects @ chunk-276SZO74.js?v=12562e5c:17920
+commitRootImpl @ chunk-276SZO74.js?v=12562e5c:19353
+commitRoot @ chunk-276SZO74.js?v=12562e5c:19277
+finishConcurrentRender @ chunk-276SZO74.js?v=12562e5c:18760
+performConcurrentWorkOnRoot @ chunk-276SZO74.js?v=12562e5c:18718
+workLoop @ chunk-276SZO74.js?v=12562e5c:197
+flushWork @ chunk-276SZO74.js?v=12562e5c:176
+performWorkUntilDeadline @ chunk-276SZO74.js?v=12562e5c:384Understand this error
+chunk-276SZO74.js?v=12562e5c:19413 Uncaught ReferenceError: Button is not defined
+    at AchievementsList.tsx:91:22
+    at Array.map (<anonymous>)
+    at AchievementsList (AchievementsList.tsx:71:23)
+    at renderWithHooks (chunk-276SZO74.js?v=12562e5c:11548:26)
+    at updateFunctionComponent (chunk-276SZO74.js?v=12562e5c:14582:28)
+    at beginWork (chunk-276SZO74.js?v=12562e5c:15924:22)
+    at beginWork$1 (chunk-276SZO74.js?v=12562e5c:19753:22)
+    at performUnitOfWork (chunk-276SZO74.js?v=12562e5c:19198:20)
+    at workLoopSync (chunk-276SZO74.js?v=12562e5c:19137:13)
+    at renderRootSync (chunk-276SZO74.js?v=12562e5c:19116:15)
+(anonymous) @ AchievementsList.tsx:91
+AchievementsList @ AchievementsList.tsx:71
+renderWithHooks @ chunk-276SZO74.js?v=12562e5c:11548
+updateFunctionComponent @ chunk-276SZO74.js?v=12562e5c:14582
+beginWork @ chunk-276SZO74.js?v=12562e5c:15924
+beginWork$1 @ chunk-276SZO74.js?v=12562e5c:19753
+performUnitOfWork @ chunk-276SZO74.js?v=12562e5c:19198
+workLoopSync @ chunk-276SZO74.js?v=12562e5c:19137
+renderRootSync @ chunk-276SZO74.js?v=12562e5c:19116
+recoverFromConcurrentError @ chunk-276SZO74.js?v=12562e5c:18736
+performConcurrentWorkOnRoot @ chunk-276SZO74.js?v=12562e5c:18684
+workLoop @ chunk-276SZO74.js?v=12562e5c:197
+flushWork @ chunk-276SZO74.js?v=12562e5c:176
+performWorkUntilDeadline @ chunk-276SZO74.js?v=12562e5c:384Understand this error
