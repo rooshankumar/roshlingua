@@ -18,6 +18,7 @@ const Auth = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showVerificationInfo, setShowVerificationInfo] = useState(false);
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
 
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -253,9 +254,23 @@ const Auth = () => {
                   </Button>
                 </div>
               </div>
+              <div className="flex items-center space-x-2">
+                <input
+                  type="checkbox"
+                  id="terms-login"
+                  className="h-4 w-4 rounded border-gray-300"
+                  checked={acceptedTerms}
+                  onChange={(e) => setAcceptedTerms(e.target.checked)}
+                  required
+                />
+                <label htmlFor="terms-login" className="text-sm text-muted-foreground">
+                  I accept the <Link to="/terms" className="underline" target="_blank">Terms of Service</Link> and{" "}
+                  <Link to="/privacy-policy" className="underline" target="_blank">Privacy Policy</Link>
+                </label>
+              </div>
             </CardContent>
             <CardFooter className="flex flex-col gap-4">
-              <Button type="submit" className="w-full" disabled={isLoading}>
+              <Button type="submit" className="w-full" disabled={isLoading || !acceptedTerms}>
                 {isLoading ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -354,9 +369,23 @@ const Auth = () => {
                   required
                 />
               </div>
+              <div className="flex items-center space-x-2">
+                <input
+                  type="checkbox"
+                  id="terms-login"
+                  className="h-4 w-4 rounded border-gray-300"
+                  checked={acceptedTerms}
+                  onChange={(e) => setAcceptedTerms(e.target.checked)}
+                  required
+                />
+                <label htmlFor="terms-login" className="text-sm text-muted-foreground">
+                  I accept the <Link to="/terms" className="underline" target="_blank">Terms of Service</Link> and{" "}
+                  <Link to="/privacy-policy" className="underline" target="_blank">Privacy Policy</Link>
+                </label>
+              </div>
             </CardContent>
             <CardFooter className="flex flex-col gap-4">
-              <Button type="submit" className="w-full" disabled={isLoading}>
+              <Button type="submit" className="w-full" disabled={isLoading || !acceptedTerms}>
                 {isLoading ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
