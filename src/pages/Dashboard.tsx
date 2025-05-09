@@ -21,6 +21,7 @@ import { cn } from "@/lib/utils";
 
 import { useAchievements, ACHIEVEMENTS } from '@/hooks/useAchievements';
 import { AchievementsList } from '@/components/AchievementsList';
+import { checkAllAchievements } from '@/utils/achievementTrigger';
 
 const Dashboard = () => {
   const { user } = useAuth();
@@ -290,6 +291,13 @@ const Dashboard = () => {
       if (achievementsSubscription) achievementsSubscription.unsubscribe();
     };
   }, [user?.id]); // Only re-run when user ID changes
+
+  useEffect(() => {
+    if (user?.id) {
+      // Check achievements when dashboard loads
+      checkAllAchievements(user.id);
+    }
+  }, [user?.id]);
 
   return (
     <div className="mobile-container pb-8 animate-fade-up"> {/* Added mobile-container class */}

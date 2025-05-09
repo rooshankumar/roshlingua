@@ -150,6 +150,8 @@ const ChatList = () => {
     };
 
     fetchConversations();
+      // Check for social achievements when chat list loads
+      checkAllAchievements(user.id);
 
     return () => {
       setConversations([]);
