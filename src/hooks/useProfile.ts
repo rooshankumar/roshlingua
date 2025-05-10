@@ -30,7 +30,8 @@ export function useProfile(userId: string) {
             likes_count,
             date_of_birth::text,
             xp_points,
-            created_at
+            created_at,
+            country
           `)
           .eq('id', userId)
           .single();
