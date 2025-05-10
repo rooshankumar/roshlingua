@@ -47,7 +47,19 @@ const Settings = () => {
   const [learningLanguageSearch, setLearningLanguageSearch] = useState("");
   const nativeLanguageRef = useRef<HTMLDivElement>(null);
   const learningLanguageRef = useRef<HTMLDivElement>(null);
-  const languageOptions = getLanguageOptions();
+  const [languageOptions, setLanguageOptions] = useState<any[]>([]);
+  
+  // Initialize language options safely
+  useEffect(() => {
+    try {
+      const options = getLanguageOptions();
+      console.log('Language options loaded:', options?.length || 0);
+      setLanguageOptions(options || []);
+    } catch (error) {
+      console.error('Error loading language options:', error);
+      setLanguageOptions([]);
+    }
+  }, []);
 
   const languages = [
     "English", "Spanish", "French", "German", "Italian",
@@ -307,15 +319,25 @@ const Settings = () => {
   const formattedDate = localProfile?.date_of_birth ? new Date(localProfile.date_of_birth).toISOString().split('T')[0] : null;
 
   const handleNativeLanguageChange = (language: string) => {
+    if (!language) {
+      console.warn('Attempted to set empty native language');
+      return;
+    }
     setNativeLanguageInput(language);
     handleProfileChange("native_language", language);
     setShowNativeLanguages(false);
+    setNativeLanguageSearch("");
   };
 
   const handleLearningLanguageChange = (language: string) => {
+    if (!language) {
+      console.warn('Attempted to set empty learning language');
+      return;
+    }
     setLearningLanguageInput(language);
     handleProfileChange("learning_language", language);
     setShowLearningLanguages(false);
+    setLearningLanguageSearch("");
   };
 
   const loadUserProfile = async () => {
@@ -542,29 +564,31 @@ const Settings = () => {
                       />
                       {showNativeLanguages && (
                         <div className="absolute top-[calc(100%+0.5rem)] left-0 w-full bg-white border border-gray-200 rounded-md shadow-md z-10 max-h-60 overflow-y-auto">
-                          {(languageOptions || [])
-                            .filter((lang) => {
-                              // If search is empty, show all options
-                              if (!nativeLanguageSearch) return true;
-                              
-                              // Make sure lang and its properties exist
-                              if (!lang || !lang.name) return false;
-                              
-                              const search = nativeLanguageSearch.toLowerCase();
-                              const name = lang.name.toLowerCase();
-                              const code = lang.code ? lang.code.toLowerCase() : '';
-                              
-                              return name.includes(search) || code.includes(search);
-                            })
-                            .map((lang) => (
-                              <div
-                                key={lang.code}
-                                className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
-                                onClick={() => handleNativeLanguageChange(lang.name)}
-                              >
-                                {lang.name}
-                              </div>
-                            ))}
+                          {Array.isArray(languageOptions) && languageOptions.length > 0 ? (
+                            languageOptions
+                              .filter((lang) => {
+                                if (!lang) return false;
+                                if (!nativeLanguageSearch) return true;
+                                
+                                const search = nativeLanguageSearch.toLowerCase();
+                                const name = lang.value ? lang.value.toLowerCase() : '';
+                                const label = lang.label ? lang.label.toLowerCase() : '';
+                                const code = lang.code ? lang.code.toLowerCase() : '';
+                                
+                                return name.includes(search) || label.includes(search) || code.includes(search);
+                              })
+                              .map((lang) => (
+                                <div
+                                  key={lang.code || Math.random().toString()}
+                                  className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                                  onClick={() => handleNativeLanguageChange(lang.value)}
+                                >
+                                  {lang.label || lang.value}
+                                </div>
+                              ))
+                          ) : (
+                            <div className="p-3 text-center text-gray-500">No language options available</div>
+                          )}
                         </div>
                       )}
                       <button
@@ -598,29 +622,31 @@ const Settings = () => {
                       />
                       {showLearningLanguages && (
                         <div className="absolute top-[calc(100%+0.5rem)] left-0 w-full bg-white border border-gray-200 rounded-md shadow-md z-10 max-h-60 overflow-y-auto">
-                          {(languageOptions || [])
-                            .filter((lang) => {
-                              // If search is empty, show all options
-                              if (!learningLanguageSearch) return true;
-                              
-                              // Make sure lang and its properties exist
-                              if (!lang || !lang.name) return false;
-                              
-                              const search = learningLanguageSearch.toLowerCase();
-                              const name = lang.name.toLowerCase();
-                              const code = lang.code ? lang.code.toLowerCase() : '';
-                              
-                              return name.includes(search) || code.includes(search);
-                            })
-                            .map((lang) => (
-                              <div
-                                key={lang.code}
-                                className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
-                                onClick={() => handleLearningLanguageChange(lang.name)}
-                              >
-                                {lang.name}
-                              </div>
-                            ))}
+                          {Array.isArray(languageOptions) && languageOptions.length > 0 ? (
+                            languageOptions
+                              .filter((lang) => {
+                                if (!lang) return false;
+                                if (!learningLanguageSearch) return true;
+                                
+                                const search = learningLanguageSearch.toLowerCase();
+                                const name = lang.value ? lang.value.toLowerCase() : '';
+                                const label = lang.label ? lang.label.toLowerCase() : '';
+                                const code = lang.code ? lang.code.toLowerCase() : '';
+                                
+                                return name.includes(search) || label.includes(search) || code.includes(search);
+                              })
+                              .map((lang) => (
+                                <div
+                                  key={lang.code || Math.random().toString()}
+                                  className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                                  onClick={() => handleLearningLanguageChange(lang.value)}
+                                >
+                                  {lang.label || lang.value}
+                                </div>
+                              ))
+                          ) : (
+                            <div className="p-3 text-center text-gray-500">No language options available</div>
+                          )}
                         </div>
                       )}
                       <button

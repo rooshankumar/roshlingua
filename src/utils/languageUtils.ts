@@ -187,12 +187,22 @@ export const getLanguageNameByCode = (code: string): string => {
 // Convert language list to display format (for Select components)
 export const getLanguageOptions = () => {
   if (!SUPPORTED_LANGUAGES || !Array.isArray(SUPPORTED_LANGUAGES)) {
+    console.warn('SUPPORTED_LANGUAGES is not available or not an array');
     return [];
   }
 
-  return SUPPORTED_LANGUAGES.map(lang => ({
-    value: lang.name,
-    label: `${lang.flag} ${lang.name}`,
-    code: lang.code
-  }));
+  try {
+    return SUPPORTED_LANGUAGES.map(lang => {
+      if (!lang) return null;
+      
+      return {
+        value: lang.name || '',
+        label: lang.flag ? `${lang.flag} ${lang.name || ''}` : lang.name || '',
+        code: lang.code || ''
+      };
+    }).filter(Boolean); // Remove any null entries
+  } catch (error) {
+    console.error('Error generating language options:', error);
+    return [];
+  }
 };
