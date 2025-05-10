@@ -1,13 +1,10 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { AchievementStats } from "@/components/AchievementStats";
 import { 
   Activity, Award, Flame, 
-  MessageSquare, Bell,
+  MessageSquare,
   TrendingUp, Target, Book
 } from "lucide-react";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { useNotifications } from "@/hooks/useNotifications";
 import { 
   Card, CardContent, CardDescription, 
   CardHeader, CardTitle 
@@ -387,45 +384,7 @@ const Dashboard = () => {
 
 
       <div className="mt-8 space-y-8">
-        {/* Notifications section */}
-        <div className="mb-6">
-          <h2 className="text-xl font-semibold mb-4 flex items-center">
-            <Bell className="mr-2 h-5 w-5 text-primary" />
-            Notifications
-          </h2>
-          <Card>
-            <CardContent className="p-0">
-              <ScrollArea className="h-[300px]">
-                {useNotifications().notifications.length === 0 ? (
-                  <div className="flex flex-col items-center justify-center h-[200px] text-muted-foreground">
-                    <Bell className="h-10 w-10 mb-2 text-muted-foreground/50" />
-                    <p>No notifications yet</p>
-                  </div>
-                ) : (
-                  <div className="p-4 space-y-3">
-                    {useNotifications().notifications.map((notification) => (
-                      <div 
-                        key={notification.id} 
-                        className={`p-4 rounded-lg border ${!notification.is_read ? 'bg-primary/5 border-primary/20' : 'bg-muted/30'} relative`}
-                      >
-                        <p className="text-sm mb-1">{notification.content}</p>
-                        <span className="text-xs text-muted-foreground">
-                          {new Date(notification.created_at).toLocaleString()}
-                        </span>
-                        {!notification.is_read && (
-                          <span className="absolute top-2 right-2 h-2 w-2 rounded-full bg-primary/80"></span>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </ScrollArea>
-            </CardContent>
-          </Card>
-        </div>
-        
         <AchievementsList />
-        <AchievementStats />
       </div>
     </div>
   );
