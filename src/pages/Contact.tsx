@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -7,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { Send } from "lucide-react";
 import PageHeader from "@/components/ui/page-header";
+import { Link } from "react-router-dom";
 
 const Contact = () => {
   const [formData, setFormData] = useState({
@@ -146,89 +146,7 @@ const Contact = () => {
           </CardContent>
         </Card>
       </div>
-    </div>
-  );
-};
 
-export default Contact;
-import React from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Card } from "@/components/ui/card";
-import { Link } from "react-router-dom";
-
-const Contact = () => {
-  return (
-    <div className="container mx-auto py-12 px-4">
-      <h1 className="text-3xl font-bold mb-6">Contact Us</h1>
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <div>
-          <p className="text-lg mb-4">
-            Have questions or feedback? We'd love to hear from you. Fill out the form and we'll get back to you as soon as possible.
-          </p>
-          
-          <div className="mt-6">
-            <h3 className="text-xl font-semibold mb-3">Our Information</h3>
-            <p className="mb-2">Email: contact@example.com</p>
-            <p className="mb-2">Phone: +1 (555) 123-4567</p>
-            <p className="mb-2">Address: 123 Language Street, Learning City</p>
-          </div>
-          
-          <div className="mt-6">
-            <h3 className="text-xl font-semibold mb-3">Connect With Us</h3>
-            <div className="flex space-x-4">
-              <Button variant="outline" size="icon">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-facebook"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
-              </Button>
-              <Button variant="outline" size="icon">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-twitter"><path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z"/></svg>
-              </Button>
-              <Button variant="outline" size="icon">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-instagram"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></svg>
-              </Button>
-            </div>
-          </div>
-        </div>
-        
-        <Card className="p-6">
-          <form className="space-y-4">
-            <div>
-              <label htmlFor="name" className="block text-sm font-medium mb-1">
-                Name
-              </label>
-              <Input id="name" placeholder="Your name" />
-            </div>
-            
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium mb-1">
-                Email
-              </label>
-              <Input id="email" type="email" placeholder="your.email@example.com" />
-            </div>
-            
-            <div>
-              <label htmlFor="subject" className="block text-sm font-medium mb-1">
-                Subject
-              </label>
-              <Input id="subject" placeholder="How can we help?" />
-            </div>
-            
-            <div>
-              <label htmlFor="message" className="block text-sm font-medium mb-1">
-                Message
-              </label>
-              <Textarea id="message" placeholder="Your message here..." rows={5} />
-            </div>
-            
-            <Button type="submit" className="w-full">
-              Send Message
-            </Button>
-          </form>
-        </Card>
-      </div>
-      
       <div className="mt-8">
         <Button asChild variant="outline">
           <Link to="/">Return to Home</Link>

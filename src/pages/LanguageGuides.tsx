@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -11,14 +10,14 @@ const LanguageGuides = () => {
         title="Language Learning Guides" 
         description="Comprehensive resources to help you master new languages at any level"
       />
-      
+
       <Tabs defaultValue="beginner" className="w-full">
         <TabsList className="grid w-full grid-cols-3 mb-8">
           <TabsTrigger value="beginner">Beginner</TabsTrigger>
           <TabsTrigger value="intermediate">Intermediate</TabsTrigger>
           <TabsTrigger value="advanced">Advanced</TabsTrigger>
         </TabsList>
-        
+
         <TabsContent value="beginner">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <Card className="shadow-md hover:shadow-lg transition-shadow duration-300">
@@ -30,7 +29,7 @@ const LanguageGuides = () => {
                 <a href="#" className="text-primary hover:underline mt-4 inline-block">Read guide</a>
               </CardContent>
             </Card>
-            
+
             <Card className="shadow-md hover:shadow-lg transition-shadow duration-300">
               <CardHeader>
                 <CardTitle>French Basics</CardTitle>
@@ -42,7 +41,7 @@ const LanguageGuides = () => {
             </Card>
           </div>
         </TabsContent>
-        
+
         <TabsContent value="intermediate">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <Card className="shadow-md hover:shadow-lg transition-shadow duration-300">
@@ -54,7 +53,7 @@ const LanguageGuides = () => {
                 <a href="#" className="text-primary hover:underline mt-4 inline-block">Read guide</a>
               </CardContent>
             </Card>
-            
+
             <Card className="shadow-md hover:shadow-lg transition-shadow duration-300">
               <CardHeader>
                 <CardTitle>Italian Grammar Deep Dive</CardTitle>
@@ -66,7 +65,7 @@ const LanguageGuides = () => {
             </Card>
           </div>
         </TabsContent>
-        
+
         <TabsContent value="advanced">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <Card className="shadow-md hover:shadow-lg transition-shadow duration-300">
@@ -78,7 +77,7 @@ const LanguageGuides = () => {
                 <a href="#" className="text-primary hover:underline mt-4 inline-block">Read guide</a>
               </CardContent>
             </Card>
-            
+
             <Card className="shadow-md hover:shadow-lg transition-shadow duration-300">
               <CardHeader>
                 <CardTitle>Mandarin Literature Analysis</CardTitle>
@@ -96,7 +95,6 @@ const LanguageGuides = () => {
 };
 
 export default LanguageGuides;
-import React from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -106,7 +104,7 @@ import { SUPPORTED_LANGUAGES, getLanguageFlag } from '@/utils/languageUtils';
 const LanguageGuides = () => {
   // Filter to show only the most common languages
   const popularLanguages = ["en", "es", "fr", "de", "it", "pt", "ru", "zh", "ja", "ko"];
-  
+
   // Filter the supported languages to get only popular ones
   const languages = SUPPORTED_LANGUAGES.filter(lang => 
     popularLanguages.includes(lang.code)
@@ -115,14 +113,14 @@ const LanguageGuides = () => {
   return (
     <div className="container mx-auto py-12 px-4">
       <h1 className="text-3xl font-bold mb-6">Language Learning Guides</h1>
-      
+
       <Tabs defaultValue="beginner" className="w-full max-w-4xl mx-auto mb-10">
         <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="beginner">Beginner</TabsTrigger>
           <TabsTrigger value="intermediate">Intermediate</TabsTrigger>
           <TabsTrigger value="advanced">Advanced</TabsTrigger>
         </TabsList>
-        
+
         <TabsContent value="beginner" className="mt-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <Card>
@@ -140,7 +138,7 @@ const LanguageGuides = () => {
                 <Button variant="outline">Read Guide</Button>
               </CardFooter>
             </Card>
-            
+
             <Card>
               <CardHeader>
                 <CardTitle>Daily Practice Routines</CardTitle>
@@ -158,7 +156,7 @@ const LanguageGuides = () => {
             </Card>
           </div>
         </TabsContent>
-        
+
         <TabsContent value="intermediate" className="mt-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <Card>
@@ -176,7 +174,7 @@ const LanguageGuides = () => {
                 <Button variant="outline">Read Guide</Button>
               </CardFooter>
             </Card>
-            
+
             <Card>
               <CardHeader>
                 <CardTitle>Expanding Your Vocabulary</CardTitle>
@@ -194,7 +192,7 @@ const LanguageGuides = () => {
             </Card>
           </div>
         </TabsContent>
-        
+
         <TabsContent value="advanced" className="mt-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <Card>
@@ -212,7 +210,7 @@ const LanguageGuides = () => {
                 <Button variant="outline">Read Guide</Button>
               </CardFooter>
             </Card>
-            
+
             <Card>
               <CardHeader>
                 <CardTitle>Language Maintenance</CardTitle>
@@ -231,10 +229,10 @@ const LanguageGuides = () => {
           </div>
         </TabsContent>
       </Tabs>
-      
+
       <div className="mt-12">
         <h2 className="text-2xl font-semibold mb-6">Language-Specific Guides</h2>
-        
+
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
           {languages.map((language) => (
             <Card key={language.code} className="flex flex-col items-center text-center p-4 hover:shadow-md transition-shadow duration-200">
@@ -250,7 +248,7 @@ const LanguageGuides = () => {
           ))}
         </div>
       </div>
-      
+
       <div className="mt-12 text-center">
         <Button asChild variant="outline">
           <Link to="/">Return to Home</Link>

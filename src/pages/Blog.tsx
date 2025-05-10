@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import PageHeader from "@/components/ui/page-header";
@@ -10,7 +9,7 @@ const Blog = () => {
         title="roshLingua Blog" 
         description="Tips, insights, and stories to enhance your language learning journey"
       />
-      
+
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <Card className="shadow-md hover:shadow-lg transition-shadow duration-300">
           <CardHeader>
@@ -24,7 +23,7 @@ const Blog = () => {
             <a href="#" className="text-primary hover:underline">Read more</a>
           </CardContent>
         </Card>
-        
+
         <Card className="shadow-md hover:shadow-lg transition-shadow duration-300">
           <CardHeader>
             <CardTitle>5 Tips for Consistent Practice</CardTitle>
@@ -37,7 +36,7 @@ const Blog = () => {
             <a href="#" className="text-primary hover:underline">Read more</a>
           </CardContent>
         </Card>
-        
+
         <Card className="shadow-md hover:shadow-lg transition-shadow duration-300">
           <CardHeader>
             <CardTitle>The Benefits of Language Exchange</CardTitle>
@@ -56,7 +55,6 @@ const Blog = () => {
 };
 
 export default Blog;
-import React from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Link } from "react-router-dom";
@@ -110,7 +108,7 @@ const Blog = () => {
           Discover expert tips, learning strategies, and inspiring stories to enhance your language learning journey.
         </p>
       </header>
-      
+
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {blogPosts.map((post) => (
           <Card key={post.id} className="h-full flex flex-col hover:shadow-md transition-shadow duration-200">
@@ -136,7 +134,7 @@ const Blog = () => {
           </Card>
         ))}
       </div>
-      
+
       <div className="mt-12 text-center">
         <Button asChild variant="outline" className="mr-4">
           <Link to="/language-guides">Language Guides</Link>
