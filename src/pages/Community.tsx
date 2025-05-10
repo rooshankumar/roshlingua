@@ -585,21 +585,6 @@ const Community = () => {
       const likeButton = document.querySelector(`button[data-user-id="${userId}"]`) as HTMLButtonElement;
       if (likeButton) {
         likeButton.click();
-        // Update the user's likes_count after liking
-        const { data: updatedProfile, error: updateError } = await supabase
-          .from('profiles')
-          .update({ likes_count: profile.likes_count + 1 })
-          .eq('id', userId);
-
-        if (updateError) {
-          console.error('Error updating likes count:', updateError);
-          toast({
-            title: "Error",
-            description: "Failed to update likes count",
-            variant: "destructive",
-          });
-          return;
-        }
       }
     } catch (error) {
       console.error('Error handling like:', error);
@@ -1040,21 +1025,29 @@ const Community = () => {
                     </div>
                   </div>
 
-                  {/* Language info in second row */}
-                  <div className="flex items-center gap-2 sm:gap-3">
-                    <div className="flex items-center gap-1 sm:gap-2" title={`Native: ${user.native_language}`}>
-                      <span className="text-lg sm:text-xl" aria-label={`Native language: ${user.native_language}`}>
-                        {getLanguageFlag(user.native_language)}
-                      </span>
-                      <span className="inline-block text-xs sm:text-sm text-muted-foreground">{user.native_language}</span>
+                  {/* Language info and like button in second row */}
+                  <div className="flex items-center justify-between gap-2 sm:gap-3">
+                    <div className="flex items-center gap-2 sm:gap-3">
+                      <div className="flex items-center gap-1 sm:gap-2" title={`Native: ${user.native_language}`}>
+                        <span className="text-lg sm:text-xl" aria-label={`Native language: ${user.native_language}`}>
+                          {getLanguageFlag(user.native_language)}
+                        </span>
+                        <span className="inline-block text-xs sm:text-sm text-muted-foreground">{user.native_language}</span>
+                      </div>
+                      <ArrowRight className="h-3 w-3 sm:h-4 sm:w-4 text-primary shrink-0" />
+                      <div className="flex items-center gap-1 sm:gap-2" title={`Learning: ${user.learning_language}`}>
+                        <span className="text-lg sm:text-xl" aria-label={`Learning language: ${user.learning_language}`}>
+                          {getLanguageFlag(user.learning_language)}
+                        </span>
+                        <span className="inline-block text-xs sm:text-sm text-muted-foreground">{user.learning_language}</span>
+                      </div>
                     </div>
-                    <ArrowRight className="h-3 w-3 sm:h-4 sm:w-4 text-primary shrink-0" />
-                    <div className="flex items-center gap-1 sm:gap-2" title={`Learning: ${user.learning_language}`}>
-                      <span className="text-lg sm:text-xl" aria-label={`Learning language: ${user.learning_language}`}>
-                        {getLanguageFlag(user.learning_language)}
-                      </span>
-                      <span className="inline-block text-xs sm:text-sm text-muted-foreground">{user.learning_language}</span>
-                    </div>
+                    <LikeButton 
+                      targetUserId={user.id} 
+                      currentUserId={user?.id} 
+                      className="p-0 h-auto"
+                      data-user-id={user.id}
+                    />
                   </div>
                 </div>
               </CardContent>
