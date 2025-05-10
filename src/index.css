@@ -845,7 +845,14 @@
   }
 
   .mobile-container {
-    @apply container mx-auto px-2 sm:px-4 md:px-6 py-4 sm:py-6;
+    @apply container mx-auto px-2 sm:px-4 md:px-6 py-2 md:py-4 sm:py-6;
+  }
+  
+  /* Adjust spacing when headers are hidden on mobile */
+  @media (max-width: 768px) {
+    .mobile-container {
+      @apply pt-1;
+    }
   }
 
   .button-hover {

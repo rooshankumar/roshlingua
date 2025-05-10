@@ -304,12 +304,12 @@ const Dashboard = () => {
 
   return (
     <div className="mobile-container pb-8 animate-fade-up"> {/* Added mobile-container class */}
-      <div className="relative space-y-2 mb-8 p-4 rounded-xl bg-gradient-to-r from-primary/10 via-primary/5 to-background"> {/* Reduced p-8 to p-4 */}
+      <div className="relative space-y-2 mb-8 p-4 rounded-xl bg-gradient-to-r from-primary/10 via-primary/5 to-background hidden md:block"> {/* Hidden on mobile */}
         <div className="absolute inset-0 bg-grid-white/5 [mask-image:linear-gradient(0deg,white,rgba(255,255,255,0.5))] rounded-xl" />
-        <h1 className="text-3xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/60"> {/* Reduced text-4xl to text-3xl */}
+        <h1 className="text-3xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/60">
           Welcome Back!
         </h1>
-        <p className="text-muted-foreground text-base"> {/* Reduced text-lg to text-base */}
+        <p className="text-muted-foreground text-base">
           Track your progress and connect with language partners
         </p>
       </div>

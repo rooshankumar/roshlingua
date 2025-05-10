@@ -44,7 +44,7 @@ const ChatList = () => {
       try {
         // Using the hook's functionality instead of duplicating the query
         refreshUnreadCounts();
-        
+
         // Get unread messages with a safe query that doesn't use group by
         const { data: unreadMessagesData, error: messagesError } = await supabase
           .from('messages')
@@ -178,7 +178,7 @@ const ChatList = () => {
   return (
     <div className="container max-w-4xl mx-auto py-6 px-4 space-y-6">
       <div className="flex items-center justify-between">
-        <div>
+        <div className="flex flex-col space-y-1 mb-6 hidden md:block">
           <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-primary-foreground bg-clip-text text-transparent">Messages</h1>
           <p className="text-muted-foreground mt-1">Stay connected with your language partners</p>
         </div>
