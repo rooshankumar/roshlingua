@@ -676,7 +676,7 @@ const Community = () => {
                   )}
                 </Button>
               </DialogTrigger>
-              <DialogContent className="sm:max-w-[500px] md:max-w-[450px] lg:max-w-[480px] w-[90%] p-0 overflow-hidden rounded-xl">
+              <DialogContent className="sm:max-w-[400px] md:max-w-[350px] lg:max-w-[40%] w-[90%] p-0 overflow-hidden rounded-xl">
                 <div className="bg-gradient-to-r from-primary/10 to-secondary/10 p-4">
                   <DialogHeader>
                     <DialogTitle className="text-xl">Find Your Perfect Language Partners</DialogTitle>

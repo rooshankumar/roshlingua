@@ -126,6 +126,12 @@
   }
 }
 
+@media (min-width: 1024px) {
+  .DialogContent {
+    max-width: 40% !important;
+  }
+}
+
 /* Make inner content of filter scroll on small screens */
 @media (max-height: 700px) {
   .filter-dialog-content {
