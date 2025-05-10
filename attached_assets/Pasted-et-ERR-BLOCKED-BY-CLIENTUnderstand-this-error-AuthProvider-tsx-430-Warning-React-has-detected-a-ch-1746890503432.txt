@@ -1,0 +1,128 @@
+et::ERR_BLOCKED_BY_CLIENTUnderstand this error
+AuthProvider.tsx:430 Warning: React has detected a change in the order of Hooks called by Community. This will lead to bugs and errors if not fixed. For more information, read the Rules of Hooks: https://reactjs.org/link/rules-of-hooks
+
+   Previous render            Next render
+   ------------------------------------------------------
+1. useState                   useState
+2. useState                   useState
+3. useState                   useState
+4. useState                   useState
+5. useState                   useState
+6. useState                   useState
+7. useState                   useState
+8. useState                   useState
+9. useState                   useState
+10. useState                  useState
+11. useState                  useState
+12. useContext                useContext
+13. useContext                useContext
+14. useContext                useContext
+15. useContext                useContext
+16. useContext                useContext
+17. useContext                useContext
+18. useContext                useContext
+19. useRef                    useRef
+20. useContext                useContext
+21. useLayoutEffect           useLayoutEffect
+22. useCallback               useCallback
+23. useContext                useContext
+24. useContext                useContext
+25. useContext                useContext
+26. useEffect                 useEffect
+27. useEffect                 useEffect
+28. useEffect                 useEffect
+29. useEffect                 useEffect
+30. undefined                 useContext
+   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+    at Community (https://f4f1b860-57de-4042-a2f0-a48bea67ec64-00-hza8t5hqxak3.sisko.replit.dev:5173/src/pages/Community.tsx?t=1746890474336:34:31)
+    at Suspense
+    at div
+    at MotionComponent (https://f4f1b860-57de-4042-a2f0-a48bea67ec64-00-hza8t5hqxak3.sisko.replit.dev:5173/node_modules/.vite/deps/framer-motion.js?v=9f7988b3:4619:40)
+    at PageTransition (https://f4f1b860-57de-4042-a2f0-a48bea67ec64-00-hza8t5hqxak3.sisko.replit.dev:5173/src/components/PageTransition.tsx?t=1746889288377:11:27)
+    at main
+    at div
+    at AppLayout (https://f4f1b860-57de-4042-a2f0-a48bea67ec64-00-hza8t5hqxak3.sisko.replit.dev:5173/src/components/layouts/AppLayout.tsx?t=1746889757156:84:22)
+    at ProtectedRoute (https://f4f1b860-57de-4042-a2f0-a48bea67ec64-00-hza8t5hqxak3.sisko.replit.dev:5173/src/components/auth/ProtectedRoute.tsx?t=1746889721494:15:27)
+    at RenderedRoute (https://f4f1b860-57de-4042-a2f0-a48bea67ec64-00-hza8t5hqxak3.sisko.replit.dev:5173/node_modules/.vite/deps/react-router-dom.js?v=9f7988b3:4069:5)
+    at Routes (https://f4f1b860-57de-4042-a2f0-a48bea67ec64-00-hza8t5hqxak3.sisko.replit.dev:5173/node_modules/.vite/deps/react-router-dom.js?v=9f7988b3:4508:5)
+    at PresenceChild (https://f4f1b860-57de-4042-a2f0-a48bea67ec64-00-hza8t5hqxak3.sisko.replit.dev:5173/node_modules/.vite/deps/framer-motion.js?v=9f7988b3:137:24)
+    at AnimatePresence (https://f4f1b860-57de-4042-a2f0-a48bea67ec64-00-hza8t5hqxak3.sisko.replit.dev:5173/node_modules/.vite/deps/framer-motion.js?v=9f7988b3:216:26)
+    at AppRoutes (https://f4f1b860-57de-4042-a2f0-a48bea67ec64-00-hza8t5hqxak3.sisko.replit.dev:5173/src/App.tsx?t=1746890474336:63:33)
+    at AuthProvider (https://f4f1b860-57de-4042-a2f0-a48bea67ec64-00-hza8t5hqxak3.sisko.replit.dev:5173/src/providers/AuthProvider.tsx?t=1746889721494:24:32)
+    at Router (https://f4f1b860-57de-4042-a2f0-a48bea67ec64-00-hza8t5hqxak3.sisko.replit.dev:5173/node_modules/.vite/deps/react-router-dom.js?v=9f7988b3:4451:15)
+    at BrowserRouter (https://f4f1b860-57de-4042-a2f0-a48bea67ec64-00-hza8t5hqxak3.sisko.replit.dev:5173/node_modules/.vite/deps/react-router-dom.js?v=9f7988b3:5196:5)
+    at ThemeProvider (https://f4f1b860-57de-4042-a2f0-a48bea67ec64-00-hza8t5hqxak3.sisko.replit.dev:5173/src/components/theme-provider.tsx:17:33)
+    at QueryClientProvider (https://f4f1b860-57de-4042-a2f0-a48bea67ec64-00-hza8t5hqxak3.sisko.replit.dev:5173/node_modules/.vite/deps/@tanstack_react-query.js?v=9f7988b3:2794:3)
+    at App
+printWarning @ chunk-276SZO74.js?v=9f7988b3:521
+error @ chunk-276SZO74.js?v=9f7988b3:505
+warnOnHookMismatchInDev @ chunk-276SZO74.js?v=9f7988b3:11495
+updateHookTypesDev @ chunk-276SZO74.js?v=9f7988b3:11465
+useContext @ chunk-276SZO74.js?v=9f7988b3:12697
+useContext @ chunk-ZMLY2J2T.js?v=9f7988b3:1062
+useAuth @ AuthProvider.tsx:430
+(anonymous) @ Community.tsx:1069
+Community @ Community.tsx:954
+renderWithHooks @ chunk-276SZO74.js?v=9f7988b3:11548
+updateFunctionComponent @ chunk-276SZO74.js?v=9f7988b3:14582
+beginWork @ chunk-276SZO74.js?v=9f7988b3:15924
+beginWork$1 @ chunk-276SZO74.js?v=9f7988b3:19753
+performUnitOfWork @ chunk-276SZO74.js?v=9f7988b3:19198
+workLoopSync @ chunk-276SZO74.js?v=9f7988b3:19137
+renderRootSync @ chunk-276SZO74.js?v=9f7988b3:19116
+performConcurrentWorkOnRoot @ chunk-276SZO74.js?v=9f7988b3:18678
+workLoop @ chunk-276SZO74.js?v=9f7988b3:197
+flushWork @ chunk-276SZO74.js?v=9f7988b3:176
+performWorkUntilDeadline @ chunk-276SZO74.js?v=9f7988b3:384Understand this error
+chunk-276SZO74.js?v=9f7988b3:521 Warning: Received NaN for the `children` attribute. If this is expected, cast the value to a string.
+    at span
+    at div
+    at div
+    at div
+    at div
+    at div
+    at div
+    at div
+    at _c8 (https://f4f1b860-57de-4042-a2f0-a48bea67ec64-00-hza8t5hqxak3.sisko.replit.dev:5173/src/components/ui/card.tsx:56:61)
+    at div
+    at _c (https://f4f1b860-57de-4042-a2f0-a48bea67ec64-00-hza8t5hqxak3.sisko.replit.dev:5173/src/components/ui/card.tsx:12:53)
+    at div
+    at div
+    at Community (https://f4f1b860-57de-4042-a2f0-a48bea67ec64-00-hza8t5hqxak3.sisko.replit.dev:5173/src/pages/Community.tsx?t=1746890474336:34:31)
+    at Suspense
+    at div
+    at MotionComponent (https://f4f1b860-57de-4042-a2f0-a48bea67ec64-00-hza8t5hqxak3.sisko.replit.dev:5173/node_modules/.vite/deps/framer-motion.js?v=9f7988b3:4619:40)
+    at PageTransition (https://f4f1b860-57de-4042-a2f0-a48bea67ec64-00-hza8t5hqxak3.sisko.replit.dev:5173/src/components/PageTransition.tsx?t=1746889288377:11:27)
+    at main
+    at div
+    at AppLayout (https://f4f1b860-57de-4042-a2f0-a48bea67ec64-00-hza8t5hqxak3.sisko.replit.dev:5173/src/components/layouts/AppLayout.tsx?t=1746889757156:84:22)
+    at ProtectedRoute (https://f4f1b860-57de-4042-a2f0-a48bea67ec64-00-hza8t5hqxak3.sisko.replit.dev:5173/src/components/auth/ProtectedRoute.tsx?t=1746889721494:15:27)
+    at RenderedRoute (https://f4f1b860-57de-4042-a2f0-a48bea67ec64-00-hza8t5hqxak3.sisko.replit.dev:5173/node_modules/.vite/deps/react-router-dom.js?v=9f7988b3:4069:5)
+    at Routes (https://f4f1b860-57de-4042-a2f0-a48bea67ec64-00-hza8t5hqxak3.sisko.replit.dev:5173/node_modules/.vite/deps/react-router-dom.js?v=9f7988b3:4508:5)
+    at PresenceChild (https://f4f1b860-57de-4042-a2f0-a48bea67ec64-00-hza8t5hqxak3.sisko.replit.dev:5173/node_modules/.vite/deps/framer-motion.js?v=9f7988b3:137:24)
+    at AnimatePresence (https://f4f1b860-57de-4042-a2f0-a48bea67ec64-00-hza8t5hqxak3.sisko.replit.dev:5173/node_modules/.vite/deps/framer-motion.js?v=9f7988b3:216:26)
+    at AppRoutes (https://f4f1b860-57de-4042-a2f0-a48bea67ec64-00-hza8t5hqxak3.sisko.replit.dev:5173/src/App.tsx?t=1746890474336:63:33)
+    at AuthProvider (https://f4f1b860-57de-4042-a2f0-a48bea67ec64-00-hza8t5hqxak3.sisko.replit.dev:5173/src/providers/AuthProvider.tsx?t=1746889721494:24:32)
+    at Router (https://f4f1b860-57de-4042-a2f0-a48bea67ec64-00-hza8t5hqxak3.sisko.replit.dev:5173/node_modules/.vite/deps/react-router-dom.js?v=9f7988b3:4451:15)
+    at BrowserRouter (https://f4f1b860-57de-4042-a2f0-a48bea67ec64-00-hza8t5hqxak3.sisko.replit.dev:5173/node_modules/.vite/deps/react-router-dom.js?v=9f7988b3:5196:5)
+    at ThemeProvider (https://f4f1b860-57de-4042-a2f0-a48bea67ec64-00-hza8t5hqxak3.sisko.replit.dev:5173/src/components/theme-provider.tsx:17:33)
+    at QueryClientProvider (https://f4f1b860-57de-4042-a2f0-a48bea67ec64-00-hza8t5hqxak3.sisko.replit.dev:5173/node_modules/.vite/deps/@tanstack_react-query.js?v=9f7988b3:2794:3)
+    at App
+printWarning @ chunk-276SZO74.js?v=9f7988b3:521
+error @ chunk-276SZO74.js?v=9f7988b3:505
+validateProperty$1 @ chunk-276SZO74.js?v=9f7988b3:3413
+warnUnknownProperties @ chunk-276SZO74.js?v=9f7988b3:3459
+validateProperties$2 @ chunk-276SZO74.js?v=9f7988b3:3478
+validatePropertiesInDevelopment @ chunk-276SZO74.js?v=9f7988b3:7346
+setInitialProperties @ chunk-276SZO74.js?v=9f7988b3:7535
+finalizeInitialChildren @ chunk-276SZO74.js?v=9f7988b3:8345
+completeWork @ chunk-276SZO74.js?v=9f7988b3:16293
+completeUnitOfWork @ chunk-276SZO74.js?v=9f7988b3:19224
+performUnitOfWork @ chunk-276SZO74.js?v=9f7988b3:19206
+workLoopSync @ chunk-276SZO74.js?v=9f7988b3:19137
+renderRootSync @ chunk-276SZO74.js?v=9f7988b3:19116
+performConcurrentWorkOnRoot @ chunk-276SZO74.js?v=9f7988b3:18678
+workLoop @ chunk-276SZO74.js?v=9f7988b3:197
+flushWork @ chunk-276SZO74.js?v=9f7988b3:176
+performWorkUntilDeadline @ chunk-276SZO74.js?v=9f7988b3:384Understand this error
