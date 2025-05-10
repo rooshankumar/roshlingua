@@ -229,7 +229,16 @@ const ChatList = () => {
                 <CardContent className="flex items-center p-4">
                   <div className="relative">
                     <Avatar className="h-16 w-16">
-                      <AvatarImage src={conversation.participant?.avatar_url || '/placeholder.svg'} />
+                      <AvatarImage 
+                        src={conversation.participant?.avatar_url || '/placeholder.svg'} 
+                        onError={(e) => {
+                          console.log('Avatar failed to load for:', conversation.participant?.full_name);
+                          // Set a direct path to placeholder and prevent infinite error loop
+                          if (e.currentTarget.src !== '/placeholder.svg') {
+                            e.currentTarget.src = '/placeholder.svg';
+                          }
+                        }}
+                      />
                       <AvatarFallback>
                         {conversation.participant?.full_name?.substring(0, 2).toUpperCase() || 'AB'}
                       </AvatarFallback>

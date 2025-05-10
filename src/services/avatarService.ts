@@ -18,9 +18,15 @@ export async function uploadAvatar(file: File, userId: string) {
     if (uploadError) throw uploadError;
 
     // Get public URL
-    const { data: { publicUrl } } = supabase.storage
+    const { data: urlData } = supabase.storage
       .from('avatars')
       .getPublicUrl(fileName);
+    
+    const publicUrl = urlData?.publicUrl;
+    
+    if (!publicUrl) {
+      throw new Error('Failed to get public URL for uploaded avatar');
+    }
 
     // Update profile
     const { error: updateError } = await supabase
