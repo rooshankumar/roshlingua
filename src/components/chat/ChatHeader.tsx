@@ -55,11 +55,11 @@ export const ChatHeader = ({ conversation, messages = [], onScrollToMessage }: P
             <ChevronLeft className="h-5 w-5" />
           </Button>
           <div className="relative">
-            <Avatar className="h-8 w-8 md:h-10 md:w-10">
+            <Avatar className="h-10 w-10 md:h-12 md:w-12">
               <AvatarImage src={participant?.avatar_url || '/placeholder.svg'} alt={participant?.full_name || 'User'} />
               <AvatarFallback>{participant?.full_name?.substring(0, 2).toUpperCase() || '?'}</AvatarFallback>
             </Avatar>
-            <span className={`absolute bottom-0 right-0 w-2 h-2 md:w-3 md:h-3 rounded-full ring-2 ring-background ${participant?.is_online ? "bg-green-500" : "bg-gray-400"}`} />
+            <span className={`absolute bottom-0 right-0 w-2.5 h-2.5 md:w-3.5 md:h-3.5 rounded-full ring-2 ring-background ${participant?.is_online ? "bg-green-500" : "bg-gray-400"}`} />
           </div>
           <div>
             <h2 className="font-semibold text-sm md:text-base text-foreground truncate max-w-[150px] md:max-w-none">

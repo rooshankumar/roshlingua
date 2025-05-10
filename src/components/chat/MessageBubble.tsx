@@ -63,7 +63,7 @@ export const MessageBubble = ({ message, isCurrentUser, isRead = false, onReacti
   return (
     <div className={`group flex items-end gap-2 ${isCurrentUser ? 'justify-end' : 'justify-start'}`}>
       {!isCurrentUser && (
-        <Avatar className="h-8 w-8">
+        <Avatar className="h-10 w-10">
           <AvatarImage src={message.sender?.avatar_url || "/placeholder.svg"} alt={message.sender?.full_name || "User"} />
           <AvatarFallback>
             {message.sender?.full_name?.charAt(0) || message.sender?.email?.charAt(0) || "U"}
