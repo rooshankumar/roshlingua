@@ -971,7 +971,14 @@ const Community = () => {
             <Card 
               key={user.id} 
               className="responsive-card cursor-pointer group hover:border-primary/40 w-full mx-auto"
-              onClick={() => navigate(`/profile/${user.id}`)}
+              onClick={(e) => {
+                // If the like button is clicked, don't navigate to profile
+                if ((e.target as HTMLElement).closest('.like-button-area')) {
+                  e.stopPropagation();
+                  return;
+                }
+                navigate(`/profile/${user.id}`);
+              }}
             >              
               <CardContent className="p-4 sm:p-6">
                 <div className="flex flex-col space-y-4">
@@ -1040,7 +1047,32 @@ const Community = () => {
                     </div>
                   </div>
 
-                  {/* Language info in second row */}
+                  {/* User details row - Country, Likes */}
+                  <div className="flex items-center justify-between mt-1">
+                    <div className="flex items-center gap-2">
+                      <div className="text-xs text-muted-foreground">
+                        {getLanguageFlag(user.native_language)}
+                        <span className="ml-1 text-xs">{user.native_language}</span>
+                      </div>
+                    </div>
+                    <div className="like-button-area flex items-center gap-1">
+                      <LikeButton 
+                        targetType="profile" 
+                        targetId={user.id} 
+                        initialLikes={user.likes_count || 0}
+                        showText={false}
+                        size="sm"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleLike(user.id);
+                        }}
+                        data-user-id={user.id}
+                      />
+                      <span className="text-xs text-muted-foreground">{user.likes_count || 0}</span>
+                    </div>
+                  </div>
+
+                  {/* Language info in third row */}
                   <div className="flex items-center gap-2 sm:gap-3">
                     <div className="flex items-center gap-1 sm:gap-2" title={`Native: ${user.native_language}`}>
                       <span className="text-lg sm:text-xl" aria-label={`Native language: ${user.native_language}`}>
