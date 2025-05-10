@@ -104,3 +104,71 @@ const Terms = () => {
 };
 
 export default Terms;
+import React from "react";
+import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
+
+const Terms = () => {
+  return (
+    <div className="container mx-auto py-12 px-4">
+      <h1 className="text-3xl font-bold mb-6">Terms of Service</h1>
+
+      <div className="prose prose-sm md:prose-base lg:prose-lg max-w-none">
+        <p className="mb-4">Last updated: May 15, 2025</p>
+
+        <section className="mb-8">
+          <h2 className="text-2xl font-semibold mb-4">1. Acceptance of Terms</h2>
+          <p>
+            By accessing or using our language learning platform, you agree to be bound by these
+            Terms of Service. If you do not agree to these terms, please do not use our platform.
+          </p>
+        </section>
+
+        <section className="mb-8">
+          <h2 className="text-2xl font-semibold mb-4">2. User Accounts</h2>
+          <p>
+            When you create an account with us, you must provide accurate and complete information.
+            You are responsible for maintaining the security of your account and password.
+            We cannot and will not be liable for any loss or damage from your failure to comply with this security obligation.
+          </p>
+        </section>
+
+        <section className="mb-8">
+          <h2 className="text-2xl font-semibold mb-4">3. Acceptable Use</h2>
+          <p>You agree not to use our platform to:</p>
+          <ul className="list-disc pl-6 mt-2 mb-4">
+            <li>Violate any laws or regulations</li>
+            <li>Post or share inappropriate, offensive, or harmful content</li>
+            <li>Harass, bully, or intimidate other users</li>
+            <li>Distribute malware or engage in hacking activities</li>
+            <li>Collect user data without permission</li>
+          </ul>
+        </section>
+
+        <section className="mb-8">
+          <h2 className="text-2xl font-semibold mb-4">4. Intellectual Property</h2>
+          <p>
+            All content on our platform, including text, graphics, logos, and software, is owned by us
+            or our licensors and is protected by copyright and other intellectual property laws.
+          </p>
+        </section>
+
+        <section className="mb-8">
+          <h2 className="text-2xl font-semibold mb-4">5. Termination</h2>
+          <p>
+            We reserve the right to terminate or suspend access to our platform at our sole discretion,
+            without notice, for conduct that we believe violates these Terms or is harmful to other users.
+          </p>
+        </section>
+      </div>
+
+      <div className="mt-8">
+        <Button asChild>
+          <Link to="/">Return to Home</Link>
+        </Button>
+      </div>
+    </div>
+  );
+};
+
+export default Terms;
