@@ -2,11 +2,15 @@
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import PageHeader from "@/components/ui/page-header";
 
 const LanguageGuides = () => {
   return (
     <div className="container mx-auto p-4 py-8">
-      <h1 className="text-3xl font-bold mb-8 text-center">Language Learning Guides</h1>
+      <PageHeader 
+        title="Language Learning Guides" 
+        description="Comprehensive resources to help you master new languages at any level"
+      />
       
       <Tabs defaultValue="beginner" className="w-full">
         <TabsList className="grid w-full grid-cols-3 mb-8">
@@ -17,7 +21,7 @@ const LanguageGuides = () => {
         
         <TabsContent value="beginner">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <Card>
+            <Card className="shadow-md hover:shadow-lg transition-shadow duration-300">
               <CardHeader>
                 <CardTitle>Spanish for Beginners</CardTitle>
               </CardHeader>
@@ -27,7 +31,7 @@ const LanguageGuides = () => {
               </CardContent>
             </Card>
             
-            <Card>
+            <Card className="shadow-md hover:shadow-lg transition-shadow duration-300">
               <CardHeader>
                 <CardTitle>French Basics</CardTitle>
               </CardHeader>
@@ -41,7 +45,7 @@ const LanguageGuides = () => {
         
         <TabsContent value="intermediate">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <Card>
+            <Card className="shadow-md hover:shadow-lg transition-shadow duration-300">
               <CardHeader>
                 <CardTitle>Conversational German</CardTitle>
               </CardHeader>
@@ -51,7 +55,7 @@ const LanguageGuides = () => {
               </CardContent>
             </Card>
             
-            <Card>
+            <Card className="shadow-md hover:shadow-lg transition-shadow duration-300">
               <CardHeader>
                 <CardTitle>Italian Grammar Deep Dive</CardTitle>
               </CardHeader>
@@ -65,7 +69,7 @@ const LanguageGuides = () => {
         
         <TabsContent value="advanced">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <Card>
+            <Card className="shadow-md hover:shadow-lg transition-shadow duration-300">
               <CardHeader>
                 <CardTitle>Japanese Business Language</CardTitle>
               </CardHeader>
@@ -75,7 +79,7 @@ const LanguageGuides = () => {
               </CardContent>
             </Card>
             
-            <Card>
+            <Card className="shadow-md hover:shadow-lg transition-shadow duration-300">
               <CardHeader>
                 <CardTitle>Mandarin Literature Analysis</CardTitle>
               </CardHeader>

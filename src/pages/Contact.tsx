@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -5,6 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { Send } from "lucide-react";
+import PageHeader from "@/components/ui/page-header";
 
 const Contact = () => {
   const [formData, setFormData] = useState({
@@ -44,10 +46,13 @@ const Contact = () => {
 
   return (
     <div className="container mx-auto p-4 py-8 max-w-3xl">
-      <h1 className="text-3xl font-bold mb-8 text-center">Contact Us</h1>
+      <PageHeader 
+        title="Contact Us" 
+        description="We'd love to hear from you. Send us a message and we'll respond as soon as possible."
+      />
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-        <Card className="md:col-span-2">
+        <Card className="md:col-span-2 shadow-md">
           <CardHeader>
             <CardTitle>Send a Message</CardTitle>
             <CardDescription>We'll get back to you as soon as possible</CardDescription>
@@ -115,7 +120,7 @@ const Contact = () => {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="shadow-md">
           <CardHeader>
             <CardTitle>Contact Information</CardTitle>
           </CardHeader>

@@ -1,14 +1,18 @@
 
 import React from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import PageHeader from "@/components/ui/page-header";
 
 const Blog = () => {
   return (
     <div className="container mx-auto p-4 py-8">
-      <h1 className="text-3xl font-bold mb-8 text-center">roshLingua Blog</h1>
+      <PageHeader 
+        title="roshLingua Blog" 
+        description="Tips, insights, and stories to enhance your language learning journey"
+      />
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <Card>
+        <Card className="shadow-md hover:shadow-lg transition-shadow duration-300">
           <CardHeader>
             <CardTitle>Getting Started with Language Learning</CardTitle>
             <CardDescription>Published on May 8, 2025</CardDescription>
@@ -21,7 +25,7 @@ const Blog = () => {
           </CardContent>
         </Card>
         
-        <Card>
+        <Card className="shadow-md hover:shadow-lg transition-shadow duration-300">
           <CardHeader>
             <CardTitle>5 Tips for Consistent Practice</CardTitle>
             <CardDescription>Published on April 22, 2025</CardDescription>
@@ -34,7 +38,7 @@ const Blog = () => {
           </CardContent>
         </Card>
         
-        <Card>
+        <Card className="shadow-md hover:shadow-lg transition-shadow duration-300">
           <CardHeader>
             <CardTitle>The Benefits of Language Exchange</CardTitle>
             <CardDescription>Published on March 15, 2025</CardDescription>

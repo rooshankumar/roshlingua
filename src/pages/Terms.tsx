@@ -1,12 +1,17 @@
+
 import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
+import PageHeader from "@/components/ui/page-header";
 
 const Terms = () => {
   return (
     <div className="container mx-auto p-4 py-8 max-w-4xl">
-      <h1 className="text-3xl font-bold mb-8 text-center">Terms of Service</h1>
+      <PageHeader 
+        title="Terms of Service" 
+        description="Please read our terms of service carefully"
+      />
 
-      <Card>
+      <Card className="shadow-md">
         <CardContent className="p-6 space-y-6">
           <section>
             <h2 className="text-2xl font-semibold mb-4">Agreement to Terms</h2>
