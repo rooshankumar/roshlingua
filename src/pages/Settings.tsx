@@ -544,7 +544,8 @@ const Settings = () => {
                         <div className="absolute top-[calc(100%+0.5rem)] left-0 w-full bg-white border border-gray-200 rounded-md shadow-md z-10 max-h-60 overflow-y-auto">
                           {languageOptions
                             .filter((lang) =>
-                              lang.name.toLowerCase().includes(nativeLanguageSearch.toLowerCase())
+                              lang.name.toLowerCase().includes(nativeLanguageSearch.toLowerCase()) ||
+                              lang.code.toLowerCase().includes(nativeLanguageSearch.toLowerCase())
                             )
                             .map((lang) => (
                               <div
@@ -590,7 +591,8 @@ const Settings = () => {
                         <div className="absolute top-[calc(100%+0.5rem)] left-0 w-full bg-white border border-gray-200 rounded-md shadow-md z-10 max-h-60 overflow-y-auto">
                           {languageOptions
                             .filter((lang) =>
-                              lang.name.toLowerCase().includes(learningLanguageSearch.toLowerCase())
+                              lang.name.toLowerCase().includes(learningLanguageSearch.toLowerCase()) ||
+                              lang.code.toLowerCase().includes(learningLanguageSearch.toLowerCase())
                             )
                             .map((lang) => (
                               <div

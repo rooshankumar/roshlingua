@@ -440,8 +440,9 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
                                                             <div className="mt-1">
                                                                 {languageOptions
                                                                     .filter((lang) => 
-                                                                        lang.label.toLowerCase().includes(nativeLanguageSearch) || 
-                                                                        lang.value.toLowerCase().includes(nativeLanguageSearch)
+                                                                        lang.label.toLowerCase().includes(nativeLanguageSearch.toLowerCase()) || 
+                                                                        lang.value.toLowerCase().includes(nativeLanguageSearch.toLowerCase()) ||
+                                                                        lang.code.toLowerCase().includes(nativeLanguageSearch.toLowerCase())
                                                                     )
                                                                     .map((lang) => (
                                                                         <div

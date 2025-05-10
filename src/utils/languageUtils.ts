@@ -159,6 +159,17 @@ export const getLanguageInfo = (code: string): LanguageOption => {
   );
 };
 
+// Function to filter languages by search query
+export const filterLanguages = (query: string, languages = SUPPORTED_LANGUAGES): LanguageOption[] => {
+  if (!query) return languages;
+  
+  const searchTerm = query.toLowerCase();
+  return languages.filter(lang => 
+    lang.name.toLowerCase().includes(searchTerm) || 
+    lang.code.toLowerCase().includes(searchTerm)
+  );
+};
+
 export const getProficiencyLabel = (level: string): string => {
   const labels = {
     beginner: 'A1-A2',
