@@ -853,6 +853,10 @@
     .mobile-container {
       @apply pt-1;
     }
+    
+    .responsive-card {
+      @apply mx-4;
+    }
   }
 
   .button-hover {
