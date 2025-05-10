@@ -37,7 +37,7 @@ localPort = 8081
 externalPort = 8081
 
 [workflows]
-runButton = "Development Server"
+runButton = "Dev Server"
 
 [[workflows.workflow]]
 name = "Dev Server"
