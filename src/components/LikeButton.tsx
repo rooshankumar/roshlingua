@@ -9,9 +9,10 @@ interface LikeButtonProps {
   currentUserId?: string | null;
   className?: string;
   onClick?: (e: React.MouseEvent) => void;
+  [key: `data-${string}`]: string | boolean; // Allow any data-* attributes
 }
 
-export function LikeButton({ targetUserId, currentUserId, className, onClick }: LikeButtonProps) {
+export function LikeButton({ targetUserId, currentUserId, className, onClick, ...props }: LikeButtonProps) {
   const { likeCount, isLiked, isLoading, toggleLike } = useLikes(targetUserId, currentUserId);
 
   const disabled = isLoading || !currentUserId || currentUserId === targetUserId;
@@ -38,6 +39,7 @@ export function LikeButton({ targetUserId, currentUserId, className, onClick }: 
         currentUserId === targetUserId ? "You cannot like your own profile" :
         isLiked ? "Unlike profile" : "Like profile"
       }
+      {...props}
     >
       <Heart className={cn(
         "h-5 w-5 transition-all",
