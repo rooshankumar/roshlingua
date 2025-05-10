@@ -7,7 +7,6 @@ import subscriptionManager from "@/utils/subscriptionManager";
 import { useAuth } from '@/providers/AuthProvider';
 import RealtimeConnectionCheck from "../RealtimeConnectionCheck";
 import PageTransition from "../PageTransition";
-import PageTransition from "../PageTransition";
 
 // Custom SVG Icon component
 const CustomIcon = ({ src, size = 24, className = "" }) => {
