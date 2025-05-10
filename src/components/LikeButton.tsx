@@ -25,6 +25,8 @@ export function LikeButton({ targetUserId, currentUserId, className, onClick, ..
       onClick={(e) => {
         e.preventDefault();
         e.stopPropagation();
+        // Add an explicit attribute to mark this element as clicked
+        e.currentTarget.setAttribute('data-just-clicked', 'true');
         toggleLike();
         if (onClick) onClick(e);
       }}

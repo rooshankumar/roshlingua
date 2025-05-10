@@ -957,9 +957,16 @@ const Community = () => {
               className="responsive-card cursor-pointer group hover:border-primary/40 w-full mx-auto"
               onClick={(e) => {
                   // Check if the click originated from LikeButton or its children
-                  if (e.target instanceof Element && 
-                      (e.target.closest('[data-like-button="true"]') || 
-                       e.target.closest('button[data-user-id]'))) {
+                  // Use a more robust method to detect the like button
+                  const target = e.target as Element;
+                  const clickedElement = target.closest('button');
+                  
+                  // If the clicked element is a button with data-user-id attribute or has Heart icon inside
+                  if (clickedElement && 
+                      (clickedElement.hasAttribute('data-user-id') || 
+                       clickedElement.querySelector('.lucide-heart') || 
+                       target.closest('.lucide-heart'))) {
+                    e.stopPropagation();
                     return; // Don't navigate if clicking like button
                   }
                   navigate(`/profile/${user.id}`);
@@ -1054,6 +1061,7 @@ const Community = () => {
                       currentUserId={user?.id} 
                       className="p-0 h-auto"
                       data-user-id={user.id}
+                      data-like-button="true"
                       onClick={(e) => {
                         e.preventDefault();
                         e.stopPropagation();
