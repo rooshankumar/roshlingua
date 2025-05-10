@@ -981,14 +981,6 @@ const Community = () => {
                         <AvatarImage 
                           src={user.avatar_url || '/placeholder.svg'} 
                           alt={user.full_name || 'User'} 
-                          className="object-cover" 
-                          onError={(e) => {
-                            console.log('Avatar failed to load for:', user.full_name);
-                            // Set a direct path to placeholder and prevent infinite error loop
-                            if (e.currentTarget.src !== '/placeholder.svg') {
-                              e.currentTarget.src = '/placeholder.svg';
-                            }
-                          }}
                         />
                         <AvatarFallback>{user.full_name?.charAt(0) || '?'}</AvatarFallback>
                       </Avatar>

@@ -10,7 +10,7 @@ const Avatar = React.forwardRef<
   <AvatarPrimitive.Root
     ref={ref}
     className={cn(
-      "relative flex h-12 w-12 shrink-0 overflow-hidden rounded-full",
+      "relative flex h-10 w-10 shrink-0 overflow-hidden rounded-full",
       className
     )}
     {...props}
@@ -20,23 +20,27 @@ Avatar.displayName = AvatarPrimitive.Root.displayName
 
 const AvatarImage = React.forwardRef<
   React.ElementRef<typeof AvatarPrimitive.Image>,
-  React.ComponentPropsWithoutRef<typeof AvatarPrimitive.Image>
->(({ className, src, alt, ...props }, ref) => (
-  <AvatarPrimitive.Image
-    ref={ref}
-    {...props}
-  >
-    <img
-        src={src}
-        alt={alt}
-        loading="lazy"
-        className={cn(
-          'aspect-square h-full w-full object-cover',
-          className
-        )}
-      />
-  </AvatarPrimitive.Image>
-))
+  React.ComponentPropsWithoutRef<typeof AvatarPrimitive.Image> & { onError?: React.ReactEventHandler<HTMLImageElement> }
+>(({ className, onError, ...props }, ref) => {
+  const handleError = React.useCallback((e: React.SyntheticEvent<HTMLImageElement>) => {
+    console.log('Avatar image failed to load:', props.src);
+    if (e.currentTarget.src !== '/placeholder.svg') {
+      e.currentTarget.src = '/placeholder.svg';
+    }
+    if (onError) {
+      onError(e);
+    }
+  }, [onError, props.src]);
+
+  return (
+    <AvatarPrimitive.Image
+      ref={ref}
+      className={cn("aspect-square h-full w-full object-cover", className)}
+      onError={handleError}
+      {...props}
+    />
+  );
+})
 AvatarImage.displayName = AvatarPrimitive.Image.displayName
 
 const AvatarFallback = React.forwardRef<

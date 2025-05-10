@@ -257,3 +257,42 @@ export const getFileThumbnailUrl = async (file: File): Promise<string> => {
   // This could be extended with more file type icons
   return '/placeholder.svg';
 };
+import { supabase } from '@/lib/supabase';
+
+/**
+ * Utility function to check if a URL is a valid image
+ * @param url The image URL to check
+ * @returns A Promise that resolves to a valid URL or a placeholder
+ */
+export function validateImageUrl(url: string | null | undefined): Promise<string> {
+  return new Promise((resolve) => {
+    if (!url) {
+      resolve('/placeholder.svg');
+      return;
+    }
+
+    // If it's a Supabase storage URL, check if it exists
+    if (url.includes('supabase')) {
+      const img = new Image();
+      img.onload = () => resolve(url);
+      img.onerror = () => resolve('/placeholder.svg');
+      img.src = url;
+    } else {
+      // For external URLs
+      resolve(url);
+    }
+  });
+}
+
+/**
+ * Generates a URL for a Supabase storage file
+ */
+export async function getPublicUrl(bucket: string, path: string): Promise<string> {
+  try {
+    const { data } = supabase.storage.from(bucket).getPublicUrl(path);
+    return data.publicUrl;
+  } catch (error) {
+    console.error('Error getting public URL:', error);
+    return '/placeholder.svg';
+  }
+}

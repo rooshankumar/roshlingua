@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState, useRef } from "react";
+import { createContext, useCallback, useContext, useEffect, useState, useRef } from "react";
 import { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/lib/supabase";
 import { useToast } from "@/hooks/use-toast";
@@ -240,17 +240,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         : `${window.location.origin.replace(/\/$/, '')}/auth/callback`;
 
       console.log("Redirect URL for Google auth:", redirectUrl);
-      
+
       // Import PKCE helper function
       const { generateVerifier } = await import('@/utils/pkceHelper');
-      
+
       // Explicitly generate a verifier before OAuth flow
       const verifier = generateVerifier();
       console.log("Generated new PKCE verifier:", verifier.substring(0, 5) + '...');
-      
+
       // Store it in localStorage where Supabase expects it
       localStorage.setItem('supabase.auth.code_verifier', verifier);
-      
+
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
@@ -392,6 +392,50 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   // Add a ref to store the timer
   const refreshSubscriptionTimer = useRef<NodeJS.Timeout | null>(null);
+
+  // Handle auth state changes
+  // const handleAuthStateChange = useCallback(
+  //     async (event: AuthChangeEvent, session: Session | null) => {
+  //         console.log('Auth state changed:', event, session ? 'User logged in' : 'No session');
+
+  //         if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+  //             if (session?.user) {
+  //                 setUser(session.user);
+  //                 setLoading(false);
+  //             }
+  //         } else if (event === 'SIGNED_OUT') {
+  //             setUser(null);
+  //             setLoading(false);
+  //         } else if (event === 'USER_UPDATED') {
+  //             if (session?.user) {
+  //                 setUser(session.user);
+  //             }
+  //         }
+  //     },
+  //     []
+  // );
+  const handleAuthStateChange = useCallback(
+    async (event: any, session: Session | null) => {
+      console.log('Auth state changed:', event, session ? 'User logged in' : 'No session');
+
+      if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+        if (session?.user) {
+          setUser(session.user);
+          setIsLoading(false);
+        }
+      } else if (event === 'SIGNED_OUT') {
+        setUser(null);
+        setIsLoading(false);
+      } else if (event === 'USER_UPDATED') {
+        if (session?.user) {
+          setUser(session.user);
+        }
+      } else if (event === 'INITIAL_SESSION') {
+        setIsLoading(false);
+      }
+    },
+    []
+  );
 
 
   const value: AuthContextType = {

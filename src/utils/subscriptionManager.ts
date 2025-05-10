@@ -133,7 +133,7 @@ class SubscriptionManager {
       // Just refresh the most important ones, based on priority
       // For now, let's just refresh a subset (first 5)
       const keys = Array.from(this.subscriptions.keys()).slice(0, 5);
-      
+
       Promise.all(keys.map(key => {
         return new Promise(resolve => {
           this.refreshSubscription(key);
@@ -146,7 +146,7 @@ class SubscriptionManager {
     } else {
       // For smaller numbers, refresh all with small delays
       const keys = Array.from(this.subscriptions.keys());
-      
+
       // Refresh each subscription with a small delay to spread out the load
       const refreshNext = (index: number) => {
         if (index >= keys.length) {
@@ -154,11 +154,11 @@ class SubscriptionManager {
           this.globalRefreshInProgress = false;
           return;
         }
-  
+
         this.refreshSubscription(keys[index]);
         setTimeout(() => refreshNext(index + 1), 200); // Increased delay to reduce load
       };
-  
+
       refreshNext(0);
     }
   }
@@ -213,7 +213,7 @@ if (typeof window !== 'undefined') {
           // Use navigator.sendBeacon for reliable delivery during page unload
           const formData = new FormData();
           formData.append('is_online', 'false');
-          
+
           navigator.sendBeacon(
             `${import.meta.env.VITE_SUPABASE_URL}/rest/v1/profiles?id=eq.${userId}`, 
             formData
@@ -223,9 +223,35 @@ if (typeof window !== 'undefined') {
     } catch (e) {
       console.error('Error during cleanup status update:', e);
     }
-    
+
     subscriptionManager.cleanup();
   });
 }
 
 export default subscriptionManager;
+
+// Time when the last global refresh happened
+let lastGlobalRefresh = 0;
+const GLOBAL_REFRESH_TIMEOUT = 10000; // 10 seconds
+
+// Called on components mount to clean and check all current subscriptions
+export const checkAllSubscriptions = () => {
+  const now = new Date().getTime();
+
+  // Check if we refreshed everything recently
+  if (now - lastGlobalRefresh < GLOBAL_REFRESH_TIMEOUT) {
+    console.log(`[SubscriptionManager] Skipping refresh, last global refresh was too recent (${now - lastGlobalRefresh}ms ago)`);
+    return;
+  }
+
+  // Refresh subs that are older than the refresh interval
+  Object.entries(subscriptions).forEach(([key, sub]) => {
+    const age = now - sub.lastRefreshed;
+    if (age > REFRESH_INTERVAL) {
+      console.log(`[SubscriptionManager] Auto-refreshing old subscription: ${key} (age: ${age}ms)`);
+      refreshSubscription(key);
+    }
+  });
+
+  lastGlobalRefresh = now;
+};
