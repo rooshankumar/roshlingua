@@ -1,0 +1,118 @@
+ERR_BLOCKED_BY_CLIENTUnderstand this error
+AuthProvider.tsx:430 Warning: React has detected a change in the order of Hooks called by Community. This will lead to bugs and errors if not fixed. For more information, read the Rules of Hooks: https://reactjs.org/link/rules-of-hooks
+
+   Previous render            Next render
+   ------------------------------------------------------
+1. useState                   useState
+2. useState                   useState
+3. useState                   useState
+4. useState                   useState
+5. useState                   useState
+6. useState                   useState
+7. useState                   useState
+8. useState                   useState
+9. useState                   useState
+10. useState                  useState
+11. useState                  useState
+12. useContext                useContext
+13. useContext                useContext
+14. useContext                useContext
+15. useContext                useContext
+16. useContext                useContext
+17. useContext                useContext
+18. useContext                useContext
+19. useRef                    useRef
+20. useContext                useContext
+21. useLayoutEffect           useLayoutEffect
+22. useCallback               useCallback
+23. useContext                useContext
+24. useContext                useContext
+25. useContext                useContext
+26. useEffect                 useEffect
+27. useEffect                 useEffect
+28. useEffect                 useEffect
+29. useEffect                 useEffect
+30. undefined                 useContext
+   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+    at Community (https://f4f1b860-57de-4042-a2f0-a48bea67ec64-00-hza8t5hqxak3.sisko.replit.dev:5173/src/pages/Community.tsx:34:31)
+    at Suspense
+    at main
+    at div
+    at AppLayout (https://f4f1b860-57de-4042-a2f0-a48bea67ec64-00-hza8t5hqxak3.sisko.replit.dev:5173/src/components/layouts/AppLayout.tsx:83:22)
+    at ProtectedRoute (https://f4f1b860-57de-4042-a2f0-a48bea67ec64-00-hza8t5hqxak3.sisko.replit.dev:5173/src/components/auth/ProtectedRoute.tsx:15:27)
+    at RenderedRoute (https://f4f1b860-57de-4042-a2f0-a48bea67ec64-00-hza8t5hqxak3.sisko.replit.dev:5173/node_modules/.vite/deps/react-router-dom.js?v=d0834c5c:4069:5)
+    at Routes (https://f4f1b860-57de-4042-a2f0-a48bea67ec64-00-hza8t5hqxak3.sisko.replit.dev:5173/node_modules/.vite/deps/react-router-dom.js?v=d0834c5c:4508:5)
+    at AppRoutes (https://f4f1b860-57de-4042-a2f0-a48bea67ec64-00-hza8t5hqxak3.sisko.replit.dev:5173/src/App.tsx?t=1746888972751:56:33)
+    at AuthProvider (https://f4f1b860-57de-4042-a2f0-a48bea67ec64-00-hza8t5hqxak3.sisko.replit.dev:5173/src/providers/AuthProvider.tsx:24:32)
+    at Router (https://f4f1b860-57de-4042-a2f0-a48bea67ec64-00-hza8t5hqxak3.sisko.replit.dev:5173/node_modules/.vite/deps/react-router-dom.js?v=d0834c5c:4451:15)
+    at BrowserRouter (https://f4f1b860-57de-4042-a2f0-a48bea67ec64-00-hza8t5hqxak3.sisko.replit.dev:5173/node_modules/.vite/deps/react-router-dom.js?v=d0834c5c:5196:5)
+    at ThemeProvider (https://f4f1b860-57de-4042-a2f0-a48bea67ec64-00-hza8t5hqxak3.sisko.replit.dev:5173/src/components/theme-provider.tsx:17:33)
+    at QueryClientProvider (https://f4f1b860-57de-4042-a2f0-a48bea67ec64-00-hza8t5hqxak3.sisko.replit.dev:5173/node_modules/.vite/deps/@tanstack_react-query.js?v=d0834c5c:2794:3)
+    at App
+printWarning @ chunk-UPELNCPK.js?v=d0834c5c:521
+error @ chunk-UPELNCPK.js?v=d0834c5c:505
+warnOnHookMismatchInDev @ chunk-UPELNCPK.js?v=d0834c5c:11495
+updateHookTypesDev @ chunk-UPELNCPK.js?v=d0834c5c:11465
+useContext @ chunk-UPELNCPK.js?v=d0834c5c:12697
+useContext @ chunk-BG45W2ER.js?v=d0834c5c:1062
+useAuth @ AuthProvider.tsx:430
+(anonymous) @ Community.tsx:1060
+Community @ Community.tsx:954
+renderWithHooks @ chunk-UPELNCPK.js?v=d0834c5c:11548
+updateFunctionComponent @ chunk-UPELNCPK.js?v=d0834c5c:14582
+beginWork @ chunk-UPELNCPK.js?v=d0834c5c:15924
+beginWork$1 @ chunk-UPELNCPK.js?v=d0834c5c:19753
+performUnitOfWork @ chunk-UPELNCPK.js?v=d0834c5c:19198
+workLoopSync @ chunk-UPELNCPK.js?v=d0834c5c:19137
+renderRootSync @ chunk-UPELNCPK.js?v=d0834c5c:19116
+performConcurrentWorkOnRoot @ chunk-UPELNCPK.js?v=d0834c5c:18678
+workLoop @ chunk-UPELNCPK.js?v=d0834c5c:197
+flushWork @ chunk-UPELNCPK.js?v=d0834c5c:176
+performWorkUntilDeadline @ chunk-UPELNCPK.js?v=d0834c5c:384Understand this error
+chunk-UPELNCPK.js?v=d0834c5c:521 Warning: Received NaN for the `children` attribute. If this is expected, cast the value to a string.
+    at span
+    at div
+    at div
+    at div
+    at div
+    at div
+    at div
+    at div
+    at _c8 (https://f4f1b860-57de-4042-a2f0-a48bea67ec64-00-hza8t5hqxak3.sisko.replit.dev:5173/src/components/ui/card.tsx:56:61)
+    at div
+    at _c (https://f4f1b860-57de-4042-a2f0-a48bea67ec64-00-hza8t5hqxak3.sisko.replit.dev:5173/src/components/ui/card.tsx:12:53)
+    at div
+    at div
+    at Community (https://f4f1b860-57de-4042-a2f0-a48bea67ec64-00-hza8t5hqxak3.sisko.replit.dev:5173/src/pages/Community.tsx:34:31)
+    at Suspense
+    at main
+    at div
+    at AppLayout (https://f4f1b860-57de-4042-a2f0-a48bea67ec64-00-hza8t5hqxak3.sisko.replit.dev:5173/src/components/layouts/AppLayout.tsx:83:22)
+    at ProtectedRoute (https://f4f1b860-57de-4042-a2f0-a48bea67ec64-00-hza8t5hqxak3.sisko.replit.dev:5173/src/components/auth/ProtectedRoute.tsx:15:27)
+    at RenderedRoute (https://f4f1b860-57de-4042-a2f0-a48bea67ec64-00-hza8t5hqxak3.sisko.replit.dev:5173/node_modules/.vite/deps/react-router-dom.js?v=d0834c5c:4069:5)
+    at Routes (https://f4f1b860-57de-4042-a2f0-a48bea67ec64-00-hza8t5hqxak3.sisko.replit.dev:5173/node_modules/.vite/deps/react-router-dom.js?v=d0834c5c:4508:5)
+    at AppRoutes (https://f4f1b860-57de-4042-a2f0-a48bea67ec64-00-hza8t5hqxak3.sisko.replit.dev:5173/src/App.tsx?t=1746888972751:56:33)
+    at AuthProvider (https://f4f1b860-57de-4042-a2f0-a48bea67ec64-00-hza8t5hqxak3.sisko.replit.dev:5173/src/providers/AuthProvider.tsx:24:32)
+    at Router (https://f4f1b860-57de-4042-a2f0-a48bea67ec64-00-hza8t5hqxak3.sisko.replit.dev:5173/node_modules/.vite/deps/react-router-dom.js?v=d0834c5c:4451:15)
+    at BrowserRouter (https://f4f1b860-57de-4042-a2f0-a48bea67ec64-00-hza8t5hqxak3.sisko.replit.dev:5173/node_modules/.vite/deps/react-router-dom.js?v=d0834c5c:5196:5)
+    at ThemeProvider (https://f4f1b860-57de-4042-a2f0-a48bea67ec64-00-hza8t5hqxak3.sisko.replit.dev:5173/src/components/theme-provider.tsx:17:33)
+    at QueryClientProvider (https://f4f1b860-57de-4042-a2f0-a48bea67ec64-00-hza8t5hqxak3.sisko.replit.dev:5173/node_modules/.vite/deps/@tanstack_react-query.js?v=d0834c5c:2794:3)
+    at App
+printWarning @ chunk-UPELNCPK.js?v=d0834c5c:521
+error @ chunk-UPELNCPK.js?v=d0834c5c:505
+validateProperty$1 @ chunk-UPELNCPK.js?v=d0834c5c:3413
+warnUnknownProperties @ chunk-UPELNCPK.js?v=d0834c5c:3459
+validateProperties$2 @ chunk-UPELNCPK.js?v=d0834c5c:3478
+validatePropertiesInDevelopment @ chunk-UPELNCPK.js?v=d0834c5c:7346
+setInitialProperties @ chunk-UPELNCPK.js?v=d0834c5c:7535
+finalizeInitialChildren @ chunk-UPELNCPK.js?v=d0834c5c:8345
+completeWork @ chunk-UPELNCPK.js?v=d0834c5c:16293
+completeUnitOfWork @ chunk-UPELNCPK.js?v=d0834c5c:19224
+performUnitOfWork @ chunk-UPELNCPK.js?v=d0834c5c:19206
+workLoopSync @ chunk-UPELNCPK.js?v=d0834c5c:19137
+renderRootSync @ chunk-UPELNCPK.js?v=d0834c5c:19116
+performConcurrentWorkOnRoot @ chunk-UPELNCPK.js?v=d0834c5c:18678
+workLoop @ chunk-UPELNCPK.js?v=d0834c5c:197
+flushWork @ chunk-UPELNCPK.js?v=d0834c5c:176
+performWorkUntilDeadline @ chunk-UPELNCPK.js?v=d0834c5c:384Understand this error
