@@ -37,6 +37,7 @@ localPort = 8081
 externalPort = 8081
 
 [workflows]
+runButton = "Development Server"
 
 [[workflows.workflow]]
 name = "Dev Server"
@@ -55,3 +56,12 @@ mode = "sequential"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "npm run dev -- --host 0.0.0.0"
+
+[[workflows.workflow]]
+name = "Development Server"
+author = 42516001
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm install && npm run dev -- --host 0.0.0.0"
