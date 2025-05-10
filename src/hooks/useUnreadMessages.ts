@@ -121,10 +121,26 @@ export const useUnreadMessages = (userId: string | undefined) => {
         const message = payload.new as any;
         if (!message.is_read && message.sender_id !== userId) {
           console.log(`New unread message in conversation ${message.conversation_id}`);
-          setUnreadCounts(prev => ({
-            ...prev,
-            [message.conversation_id]: (prev[message.conversation_id] || 0) + 1
-          }));
+          // Force update the unread counts immediately
+          setUnreadCounts(prev => {
+            const newCounts = {
+              ...prev,
+              [message.conversation_id]: (prev[message.conversation_id] || 0) + 1
+            };
+            console.log('Updated unread counts:', newCounts);
+            return newCounts;
+          });
+          
+          // Add visual notification if needed (e.g. playing sound or showing toast)
+          // This helps with notification feedback when the app is already open
+          try {
+            // Optionally add a notification sound
+            const audio = new Audio('/notification.mp3');
+            audio.volume = 0.5;
+            audio.play().catch(e => console.log('Could not play notification sound:', e));
+          } catch (e) {
+            console.log('Notification effect error:', e);
+          }
         }
       })
       .on('postgres_changes', {

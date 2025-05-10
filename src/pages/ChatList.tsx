@@ -225,7 +225,7 @@ const ChatList = () => {
               to={`/chat/${conversation.id}`}
               className="block"
             >
-              <Card className="hover:bg-muted/50 transition-all duration-200 hover:scale-[1.01] hover:shadow-lg">
+              <Card className={`hover:bg-muted/50 transition-all duration-200 hover:scale-[1.01] hover:shadow-lg ${(unreadCounts[conversation.id] ?? 0) > 0 ? 'border-destructive/30 new-message-highlight' : ''}`}>
                 <CardContent className="flex items-center p-4">
                   <div className="relative">
                     <Avatar className="h-16 w-16">
@@ -235,7 +235,7 @@ const ChatList = () => {
                       </AvatarFallback>
                     </Avatar>
                     {(unreadCounts[conversation.id] ?? 0) > 0 && (
-                      <div className="absolute -top-1 -right-1 bg-destructive text-destructive-foreground rounded-full min-w-[20px] h-5 flex items-center justify-center text-xs font-medium px-1 animate-pulse shadow-md">
+                      <div className="absolute -top-1 -right-1 bg-destructive text-destructive-foreground rounded-full min-w-[20px] h-5 flex items-center justify-center text-xs font-medium px-1 animate-pulse shadow-md border border-background">
                         {unreadCounts[conversation.id]}
                       </div>
                     )}
