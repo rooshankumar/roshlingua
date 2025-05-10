@@ -102,7 +102,7 @@ class SubscriptionManager {
     }, 300));
   }
 
-  // Refresh all subscriptions
+  // Refresh all subscriptions with optimized logic
   refreshAll(): void {
     // Prevent multiple simultaneous refreshes
     if (this.globalRefreshInProgress) {
@@ -110,9 +110,15 @@ class SubscriptionManager {
       return;
     }
 
-    // Don't refresh too frequently (at most once per minute)
+    // Only refresh if there are subscriptions
+    if (this.subscriptions.size === 0) {
+      console.log('[SubscriptionManager]', 'No subscriptions to refresh');
+      return;
+    }
+
+    // Don't refresh too frequently (at most once per 2 minutes for better performance)
     const now = Date.now();
-    if (now - this.lastGlobalRefresh < 60000) {
+    if (now - this.lastGlobalRefresh < 120000) {
       console.log('[SubscriptionManager]', 'Skipping refresh, last global refresh was too recent');
       return;
     }
@@ -122,22 +128,39 @@ class SubscriptionManager {
 
     console.log('[SubscriptionManager]', `Refreshing all ${this.subscriptions.size} subscriptions`);
 
-    // Create a copy of the keys to avoid issues with in-place modification
-    const keys = Array.from(this.subscriptions.keys());
-
-    // Refresh each subscription with a small delay to spread out the load
-    const refreshNext = (index: number) => {
-      if (index >= keys.length) {
-        console.log('[SubscriptionManager]', 'Finished refreshing all subscriptions');
+    // Use a more efficient approach for large numbers of subscriptions
+    if (this.subscriptions.size > 10) {
+      // Just refresh the most important ones, based on priority
+      // For now, let's just refresh a subset (first 5)
+      const keys = Array.from(this.subscriptions.keys()).slice(0, 5);
+      
+      Promise.all(keys.map(key => {
+        return new Promise(resolve => {
+          this.refreshSubscription(key);
+          resolve(key);
+        });
+      })).then(() => {
+        console.log('[SubscriptionManager]', 'Finished refreshing essential subscriptions');
         this.globalRefreshInProgress = false;
-        return;
-      }
-
-      this.refreshSubscription(keys[index]);
-      setTimeout(() => refreshNext(index + 1), 100);
-    };
-
-    refreshNext(0);
+      });
+    } else {
+      // For smaller numbers, refresh all with small delays
+      const keys = Array.from(this.subscriptions.keys());
+      
+      // Refresh each subscription with a small delay to spread out the load
+      const refreshNext = (index: number) => {
+        if (index >= keys.length) {
+          console.log('[SubscriptionManager]', 'Finished refreshing all subscriptions');
+          this.globalRefreshInProgress = false;
+          return;
+        }
+  
+        this.refreshSubscription(keys[index]);
+        setTimeout(() => refreshNext(index + 1), 200); // Increased delay to reduce load
+      };
+  
+      refreshNext(0);
+    }
   }
 
   // Check health of all subscriptions and refresh if needed

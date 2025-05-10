@@ -1,10 +1,11 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { supabase } from '@/lib/supabase';
 
 export const useUnreadMessages = (userId: string | undefined) => {
   const [unreadCounts, setUnreadCounts] = useState<Record<string, number>>({});
   const channelRef = useRef<any>(null);
   const isInitialLoadRef = useRef(true);
+  const refreshTimeRef = useRef<number | null>(null);
 
   // Function to fetch initial unread counts
   const fetchInitialUnreadCounts = async () => {
@@ -18,7 +19,7 @@ export const useUnreadMessages = (userId: string | undefined) => {
         .select('conversation_id, id')
         .eq('recipient_id', userId)
         .eq('is_read', false);
-      
+
       // Manual count by conversation_id
       const conversationCounts: Record<string, number> = {};
       if (unreadMessagesData) {
@@ -47,7 +48,7 @@ export const useUnreadMessages = (userId: string | undefined) => {
       // Override with accurate counts we've calculated client-side
       Object.keys(conversationCounts).forEach(convId => {
         initialCounts[convId] = conversationCounts[convId];
-        
+
         // Also update the DB unread_count for consistency
         if (conversationCounts[convId] > 0) {
           supabase
@@ -63,7 +64,7 @@ export const useUnreadMessages = (userId: string | undefined) => {
 
       console.log('Setting initial unread counts:', initialCounts);
       isInitialLoadRef.current = false;
-      
+
       setUnreadCounts(initialCounts);
     } catch (error) {
       console.error('Error fetching unread counts:', error);
@@ -140,7 +141,7 @@ export const useUnreadMessages = (userId: string | undefined) => {
             console.log('Updated unread counts:', newCounts);
             return newCounts;
           });
-          
+
           // Add visual notification if needed (e.g. playing sound or showing toast)
           // This helps with notification feedback when the app is already open
           try {
@@ -149,22 +150,22 @@ export const useUnreadMessages = (userId: string | undefined) => {
             const oscillator = audioContext.createOscillator();
             oscillator.type = 'sine';
             oscillator.frequency.setValueAtTime(800, audioContext.currentTime); // Higher frequency for alert
-            
+
             const gainNode = audioContext.createGain();
             gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
             gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.5);
-            
+
             oscillator.connect(gainNode);
             gainNode.connect(audioContext.destination);
-            
+
             oscillator.start();
             oscillator.stop(audioContext.currentTime + 0.2);
-            
+
             // Also try the notification sound as backup
             const audio = new Audio('/notification.mp3');
             audio.volume = 0.6;
             audio.play().catch(e => console.log('Using oscillator instead due to error:', e));
-            
+
             // Display visual toast notification
             if (typeof window !== 'undefined' && window.toast) {
               window.toast({
@@ -201,6 +202,46 @@ export const useUnreadMessages = (userId: string | undefined) => {
       }
     };
   }, [userId]);
+
+    // Debounce the refresh function to prevent multiple rapid calls
+  const refreshUnreadCounts = async () => {
+    if (!userId) return;
+
+    // Use a ref to track the last refresh time
+    const now = Date.now();
+    const lastRefreshTime = refreshTimeRef.current;
+
+    // Don't refresh more than once every 5 seconds
+    if (lastRefreshTime && now - lastRefreshTime < 5000) {
+      console.log('Skipping unread message refresh, too soon since last refresh');
+      return;
+    }
+
+    refreshTimeRef.current = now;
+
+    try {
+      const { data, error } = await supabase
+        .from('messages')
+        .select('conversation_id, count(*)')
+        .eq('recipient_id', userId)
+        .eq('is_read', false)
+        .group_by('conversation_id');
+
+      if (error) {
+        console.error('Error fetching unread counts:', error);
+        return;
+      }
+
+      const newUnreadCounts: Record<string, number> = {};
+      data.forEach(item => {
+        newUnreadCounts[item.conversation_id] = parseInt(item.count);
+      });
+
+      setUnreadCounts(newUnreadCounts);
+    } catch (err) {
+      console.error('Error in refreshUnreadCounts:', err);
+    }
+  };
 
   return { unreadCounts, markConversationAsRead, refreshUnreadCounts: fetchInitialUnreadCounts };
 }

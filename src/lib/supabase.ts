@@ -9,7 +9,7 @@ if (!supabaseUrl || !supabaseAnonKey) {
   throw new Error('Supabase environment variables are missing');
 }
 
-// Create client with auto-reconnect capabilities and PKCE flow enabled
+// Configure client with optimized settings
 export const supabase = createClient<Database>(
   supabaseUrl,
   supabaseAnonKey,
@@ -40,11 +40,24 @@ export const supabase = createClient<Database>(
           const separator = url.toString().includes('?') ? '&' : '?';
           url = new URL(`${url.toString()}${separator}t=${Date.now()}`);
         }
+        // Enforcing a timeout on fetch requests
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+
         return fetch(url, {
           ...options,
           cache: 'no-store',
+          signal: controller.signal
+        }).finally(() => {
+          clearTimeout(timeoutId);
         });
       },
+    },
+    realtime: {
+      timeout: 10000, // Faster timeout for realtime connections
+      params: {
+        eventsPerSecond: 5 // Limit realtime events rate
+      }
     }
   }
 );

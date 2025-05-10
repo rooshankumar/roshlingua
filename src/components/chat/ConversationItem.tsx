@@ -3,15 +3,9 @@ import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { formatLastSeen, formatMessageTime } from "@/utils/chatUtils";
 import { getOtherParticipant } from "@/utils/chatUtils";
+import React from 'react';
 
-interface ConversationItemProps {
-  conversation: ChatConversation;
-  currentUserId: string;
-  isActive: boolean;
-  onClick: () => void;
-}
-
-export const ConversationItem = ({
+export const ConversationItem = React.memo(({
   conversation,
   currentUserId,
   isActive,
@@ -48,7 +42,7 @@ export const ConversationItem = ({
           "absolute bottom-0 right-0 block h-3 w-3 rounded-full ring-2 ring-background",
           otherParticipant.isOnline ? "bg-green-500" : "bg-gray-400"
         )} />
-        
+
         {/* Unread notification dot - show in top right only if has unread messages */}
         {hasUnread && (
           <span className="absolute -top-2 -right-2 bg-destructive text-destructive-foreground rounded-full min-w-[20px] h-6 flex items-center justify-center text-xs font-bold px-2 animate-pulse shadow-md border-2 border-background z-10">

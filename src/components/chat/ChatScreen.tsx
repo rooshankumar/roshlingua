@@ -135,8 +135,17 @@ export const ChatScreen = ({ conversation }: Props) => {
     let isActive = true;
     const subscriptionKey = `messages:${conversation.id}`;
 
+    // Show loading state only for initial load
+    const isInitialLoad = messages.length === 0;
+    if (isInitialLoad) {
+      setIsLoading(true);
+    }
+
     const fetchMessages = async (loadMore = false) => {
       try {
+        // Use a smaller page size for initial load to improve perceived performance
+        const pageSize = isInitialLoad ? 10 : MESSAGES_PER_PAGE;
+
         const { data, error } = await supabase
           .from('messages')
           .select(`
@@ -151,29 +160,53 @@ export const ChatScreen = ({ conversation }: Props) => {
           `)
           .eq('conversation_id', conversation.id)
           .order('created_at', { ascending: true })
-          .range((page - 1) * MESSAGES_PER_PAGE, page * MESSAGES_PER_PAGE - 1);
+          .range((page - 1) * pageSize, page * pageSize - 1);
 
-        if (error) throw error;
-
-        setHasMore(data.length === MESSAGES_PER_PAGE);
-        setMessages(prev => {
-          const newMessages = loadMore ? [...prev, ...data] : data;
-          return newMessages;
-        });
-
-        // Always scroll to latest messages when fetching initial messages
-        if (!loadMore) {
-          // Use a small timeout to ensure DOM is updated
-          setTimeout(() => scrollToLatestMessage(false), 150);
+        if (error) {
+          console.error('Error fetching messages:', error);
+          return;
         }
-        // Mark conversation as read when messages are loaded
-        if (conversation && conversation.id) {
-          markConversationAsRead(conversation.id);
+
+        if (isActive) {
+          if (loadMore) {
+            setMessages(prev => [...data, ...prev]);
+          } else {
+            setMessages(data || []);
+          }
+          setIsLoading(false);
+
+          // Optimize read status updates by batching
+          const unreadMessages = data
+            ?.filter(msg => !msg.is_read && msg.sender_id !== user?.id)
+            .map(msg => msg.id) || [];
+
+          if (unreadMessages.length > 0) {
+            // Update the UI optimistically for better user experience
+            setMessages(prev => 
+              prev.map(msg => 
+                unreadMessages.includes(msg.id) 
+                  ? { ...msg, is_read: true } 
+                  : msg
+              )
+            );
+
+            // Then update the database in the background
+            await supabase
+              .from('messages')
+              .update({ is_read: true })
+              .in('id', unreadMessages);
+
+            // Refresh counts, but only if essential (debounced)
+            if (refreshUnreadCounts) {
+              refreshUnreadCounts();
+            }
+          }
         }
-      } catch (error) {
-        console.error('Error fetching messages:', error);
-      } finally {
-        setIsLoading(false);
+      } catch (err) {
+        console.error('Error fetching messages:', err);
+        if (isActive) {
+          setIsLoading(false);
+        }
       }
     };
 

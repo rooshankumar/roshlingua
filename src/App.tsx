@@ -6,26 +6,22 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from '@vercel/speed-insights/react';
 import HMRHandler from '@/components/HMRHandler';
+import React, { Suspense, lazy } from "react";
 
 
 // Pages
 import Home from "./pages/Home";
 import Auth from "./pages/Auth";
 import AuthCallback from "./pages/AuthCallback";
-import Dashboard from "./pages/Dashboard";
-import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
-import Onboarding from "./pages/Onboarding";
-import Community from "./pages/Community";
-import Chat from "./pages/Chat";
-import Settings from "./pages/Settings";
-import ChatList from "./pages/ChatList";
-import PrivacyPolicy from "./pages/PrivacyPolicy";
-import Terms from "./pages/Terms";
-import Contact from "./pages/Contact";
-import Blog from "./pages/Blog";
-import LanguageGuides from "./pages/LanguageGuides";
-import FAQ from "./pages/FAQ";
+// Lazy-loaded pages (load on demand)
+const Dashboard = lazy(() => import("./pages/Dashboard"));
+const Profile = lazy(() => import("./pages/Profile"));
+const Onboarding = lazy(() => import("./pages/Onboarding"));
+const Community = lazy(() => import("./pages/Community"));
+const Chat = lazy(() => import("./pages/Chat"));
+const Settings = lazy(() => import("./pages/Settings"));
+const ChatList = lazy(() => import("./pages/ChatList"));
 
 // Components
 import ProtectedRoute from "./components/auth/ProtectedRoute";
@@ -74,17 +70,21 @@ const AppRoutes = () => {
         {/* Protected routes with AppLayout */}
         <Route path="/onboarding" element={
           <ProtectedRoute>
-            <Onboarding onComplete={() => {
-              localStorage.setItem("onboarding_completed", "true");
-              window.location.href = "/dashboard";
-            }} />
+            <Suspense fallback={<div className="flex items-center justify-center h-screen">Loading...</div>}>
+              <Onboarding onComplete={() => {
+                localStorage.setItem("onboarding_completed", "true");
+                window.location.href = "/dashboard";
+              }} />
+            </Suspense>
           </ProtectedRoute>
         } />
 
         <Route path="/dashboard" element={
           <ProtectedRoute>
             <AppLayout>
-              <Dashboard />
+              <Suspense fallback={<div className="flex items-center justify-center h-screen">Loading...</div>}>
+                <Dashboard />
+              </Suspense>
             </AppLayout>
           </ProtectedRoute>
         } />
@@ -92,42 +92,54 @@ const AppRoutes = () => {
         <Route path="/profile" element={
           <ProtectedRoute>
             <AppLayout>
-              <Profile />
+              <Suspense fallback={<div className="flex items-center justify-center h-screen">Loading...</div>}>
+                <Profile />
+              </Suspense>
             </AppLayout>
           </ProtectedRoute>
         } />
         <Route path="/profile/:id" element={
           <ProtectedRoute>
             <AppLayout>
-              <Profile />
+              <Suspense fallback={<div className="flex items-center justify-center h-screen">Loading...</div>}>
+                <Profile />
+              </Suspense>
             </AppLayout>
           </ProtectedRoute>
         } />
         <Route path="/community" element={
           <ProtectedRoute>
             <AppLayout>
-              <Community />
+              <Suspense fallback={<div className="flex items-center justify-center h-screen">Loading...</div>}>
+                <Community />
+              </Suspense>
             </AppLayout>
           </ProtectedRoute>
         } />
         <Route path="/chat" element={
           <ProtectedRoute>
             <AppLayout>
-              <ChatList />
+              <Suspense fallback={<div className="flex items-center justify-center h-screen">Loading...</div>}>
+                <ChatList />
+              </Suspense>
             </AppLayout>
           </ProtectedRoute>
         } />
         <Route path="/chat/:conversationId" element={
           <ProtectedRoute>
             <AppLayout>
-              <Chat />
+              <Suspense fallback={<div className="flex items-center justify-center h-screen">Loading...</div>}>
+                <Chat />
+              </Suspense>
             </AppLayout>
           </ProtectedRoute>
         } />
         <Route path="/settings" element={
           <ProtectedRoute>
             <AppLayout>
-              <Settings />
+              <Suspense fallback={<div className="flex items-center justify-center h-screen">Loading...</div>}>
+                <Settings />
+              </Suspense>
             </AppLayout>
           </ProtectedRoute>
         } />
@@ -137,12 +149,12 @@ const AppRoutes = () => {
         <Route path="/privacy-policy" element={<AuthLayout><PrivacyPolicy /></AuthLayout>} />
         <Route path="/terms" element={<AuthLayout><Terms /></AuthLayout>} />
         <Route path="/contact" element={<AuthLayout><Contact /></AuthLayout>} />
-        
+
         {/* Resources */}
         <Route path="/blog" element={<AuthLayout><Blog /></AuthLayout>} />
         <Route path="/language-guides" element={<AuthLayout><LanguageGuides /></AuthLayout>} />
         <Route path="/faq" element={<AuthLayout><FAQ /></AuthLayout>} />
-        
+
         {/* Catch all for 404 */}
         <Route path="*" element={<NotFound />} />
       </Routes>
