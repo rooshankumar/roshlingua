@@ -1,0 +1,32 @@
+i18next: initialized {debug: true, initAsync: true, ns: Array(1), defaultNS: Array(1), fallbackLng: Array(1), …}
+main.tsx:22 Setting initial session: Session exists
+main.tsx:22 Checking profile for user: ed1c374e-3823-4ea2-aa28-3999c21d1140
+main.tsx:22 Updating last_seen for user: ed1c374e-3823-4ea2-aa28-3999c21d1140
+chunk-276SZO74.js?v=f22874d0:14032 The above error occurred in the <AppRoutes> component:
+
+    at AppRoutes (https://f0f289c9-bdc2-45d6-bbe1-480fe6b045d6-00-2n9lmjcstbcnv.sisko.replit.dev:5173/src/App.tsx?t=1746861622435:51:33)
+    at AuthProvider (https://f0f289c9-bdc2-45d6-bbe1-480fe6b045d6-00-2n9lmjcstbcnv.sisko.replit.dev:5173/src/providers/AuthProvider.tsx?t=1746861548072:24:32)
+    at Router (https://f0f289c9-bdc2-45d6-bbe1-480fe6b045d6-00-2n9lmjcstbcnv.sisko.replit.dev:5173/node_modules/.vite/deps/react-router-dom.js?v=f22874d0:4451:15)
+    at BrowserRouter (https://f0f289c9-bdc2-45d6-bbe1-480fe6b045d6-00-2n9lmjcstbcnv.sisko.replit.dev:5173/node_modules/.vite/deps/react-router-dom.js?v=f22874d0:5196:5)
+    at ThemeProvider (https://f0f289c9-bdc2-45d6-bbe1-480fe6b045d6-00-2n9lmjcstbcnv.sisko.replit.dev:5173/src/components/theme-provider.tsx:17:33)
+    at QueryClientProvider (https://f0f289c9-bdc2-45d6-bbe1-480fe6b045d6-00-2n9lmjcstbcnv.sisko.replit.dev:5173/node_modules/.vite/deps/@tanstack_react-query.js?v=f22874d0:2794:3)
+    at App
+
+Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://reactjs.org/link/error-boundaries to learn more about error boundaries.
+logCapturedError @ chunk-276SZO74.js?v=f22874d0:14032
+update.callback @ chunk-276SZO74.js?v=f22874d0:14052
+callCallback @ chunk-276SZO74.js?v=f22874d0:11248
+commitUpdateQueue @ chunk-276SZO74.js?v=f22874d0:11265
+commitLayoutEffectOnFiber @ chunk-276SZO74.js?v=f22874d0:17093
+commitLayoutMountEffects_complete @ chunk-276SZO74.js?v=f22874d0:17980
+commitLayoutEffects_begin @ chunk-276SZO74.js?v=f22874d0:17969
+commitLayoutEffects @ chunk-276SZO74.js?v=f22874d0:17920
+commitRootImpl @ chunk-276SZO74.js?v=f22874d0:19353
+commitRoot @ chunk-276SZO74.js?v=f22874d0:19277
+finishConcurrentRender @ chunk-276SZO74.js?v=f22874d0:18760
+performConcurrentWorkOnRoot @ chunk-276SZO74.js?v=f22874d0:18718
+workLoop @ chunk-276SZO74.js?v=f22874d0:197
+flushWork @ chunk-276SZO74.js?v=f22874d0:176
+performWorkUntilDeadline @ chunk-276SZO74.js?v=f22874d0:384Understand this error
+main.tsx:22 Auth state changed: INITIAL_SESSION Session exists
