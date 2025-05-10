@@ -1,0 +1,36 @@
+::ERR_BLOCKED_BY_CLIENTUnderstand this error
+2App.tsx:149 Uncaught ReferenceError: PrivacyPolicy is not defined
+    at AppRoutes (App.tsx:149:61)
+    at renderWithHooks (chunk-276SZO74.js?v=f22874d0:11548:26)
+    at updateFunctionComponent (chunk-276SZO74.js?v=f22874d0:14582:28)
+    at beginWork (chunk-276SZO74.js?v=f22874d0:15924:22)
+    at HTMLUnknownElement.callCallback2 (chunk-276SZO74.js?v=f22874d0:3674:22)
+    at Object.invokeGuardedCallbackDev (chunk-276SZO74.js?v=f22874d0:3699:24)
+    at invokeGuardedCallback (chunk-276SZO74.js?v=f22874d0:3733:39)
+    at beginWork$1 (chunk-276SZO74.js?v=f22874d0:19765:15)
+    at performUnitOfWork (chunk-276SZO74.js?v=f22874d0:19198:20)
+    at workLoopSync (chunk-276SZO74.js?v=f22874d0:19137:13)Understand this error
+chunk-276SZO74.js?v=f22874d0:14032 The above error occurred in the <AppRoutes> component:
+
+    at AppRoutes (https://f0f289c9-bdc2-45d6-bbe1-480fe6b045d6-00-2n9lmjcstbcnv.sisko.replit.dev:5173/src/App.tsx?t=1746861548072:49:33)
+    at AuthProvider (https://f0f289c9-bdc2-45d6-bbe1-480fe6b045d6-00-2n9lmjcstbcnv.sisko.replit.dev:5173/src/providers/AuthProvider.tsx?t=1746861548072:24:32)
+    at Router (https://f0f289c9-bdc2-45d6-bbe1-480fe6b045d6-00-2n9lmjcstbcnv.sisko.replit.dev:5173/node_modules/.vite/deps/react-router-dom.js?v=f22874d0:4451:15)
+    at BrowserRouter (https://f0f289c9-bdc2-45d6-bbe1-480fe6b045d6-00-2n9lmjcstbcnv.sisko.replit.dev:5173/node_modules/.vite/deps/react-router-dom.js?v=f22874d0:5196:5)
+    at ThemeProvider (https://f0f289c9-bdc2-45d6-bbe1-480fe6b045d6-00-2n9lmjcstbcnv.sisko.replit.dev:5173/src/components/theme-provider.tsx:17:33)
+    at QueryClientProvider (https://f0f289c9-bdc2-45d6-bbe1-480fe6b045d6-00-2n9lmjcstbcnv.sisko.replit.dev:5173/node_modules/.vite/deps/@tanstack_react-query.js?v=f22874d0:2794:3)
+    at App
+
+Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://reactjs.org/link/error-boundaries to learn more about error boundaries.
+logCapturedError @ chunk-276SZO74.js?v=f22874d0:14032Understand this error
+chunk-276SZO74.js?v=f22874d0:19413 Uncaught ReferenceError: PrivacyPolicy is not defined
+    at AppRoutes (App.tsx:149:61)
+    at renderWithHooks (chunk-276SZO74.js?v=f22874d0:11548:26)
+    at updateFunctionComponent (chunk-276SZO74.js?v=f22874d0:14582:28)
+    at beginWork (chunk-276SZO74.js?v=f22874d0:15924:22)
+    at beginWork$1 (chunk-276SZO74.js?v=f22874d0:19753:22)
+    at performUnitOfWork (chunk-276SZO74.js?v=f22874d0:19198:20)
+    at workLoopSync (chunk-276SZO74.js?v=f22874d0:19137:13)
+    at renderRootSync (chunk-276SZO74.js?v=f22874d0:19116:15)
+    at recoverFromConcurrentError (chunk-276SZO74.js?v=f22874d0:18736:28)
+    at performConcurrentWorkOnRoot (chunk-276SZO74.js?v=f22874d0:18684:30)Understand this error
