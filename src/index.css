@@ -128,15 +128,16 @@
 
 @media (min-width: 1024px) {
   .DialogContent {
-    max-width: 30% !important;
+    max-width: 400px !important;
   }
 }
 
-/* Filter dialog with 3:2 aspect ratio (height:width) */
+/* Filter dialog with more balanced aspect ratio */
 .filter-dialog {
-  aspect-ratio: 2/3;
+  aspect-ratio: 4/5;
   height: auto !important;
-  max-height: 70vh !important;
+  max-height: 600px !important;
+  min-height: 400px !important;
 }
 
 /* Make inner content of filter scroll on small screens */

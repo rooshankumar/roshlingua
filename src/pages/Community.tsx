@@ -676,17 +676,17 @@ const Community = () => {
                   )}
                 </Button>
               </DialogTrigger>
-              <DialogContent className="filter-dialog sm:max-w-[300px] md:max-w-[320px] lg:max-w-[30%] w-[90%] p-0 overflow-hidden rounded-xl">
-                <div className="bg-gradient-to-r from-primary/10 to-secondary/10 p-3">
-                  <DialogHeader className="space-y-0.5">
-                    <DialogTitle className="text-lg">Find Language Partners</DialogTitle>
+              <DialogContent className="filter-dialog sm:max-w-[350px] md:max-w-[380px] lg:max-w-[400px] w-[90%] p-0 overflow-hidden rounded-xl">
+                <div className="bg-gradient-to-r from-primary/10 to-secondary/10 p-4">
+                  <DialogHeader className="space-y-1">
+                    <DialogTitle className="text-base">Find Language Partners</DialogTitle>
                     <DialogDescription className="text-xs">
                       Filter to find the right connections
                     </DialogDescription>
                   </DialogHeader>
                 </div>
 
-                <div className="grid gap-4 p-4 filter-dialog-content">
+                <div className="grid gap-3 p-4 filter-dialog-content">
                   <div className="space-y-3">
                     <div className="flex items-center">
                       <Globe className="mr-2 h-5 w-5 text-primary" />
@@ -860,17 +860,17 @@ const Community = () => {
                 </div>
 
                 <div className="border-t">
-                  <div className="p-3 flex justify-between items-center">
+                  <div className="p-4 flex justify-between items-center">
                     <Button 
                       variant="ghost" 
                       size="sm"
                       onClick={resetFilters}
-                      className="text-muted-foreground hover:text-foreground text-xs h-8"
+                      className="text-muted-foreground hover:text-foreground h-9"
                     >
                       Reset
                     </Button>
                     <DialogClose asChild>
-                      <Button size="sm" className="px-4 h-8">Apply</Button>
+                      <Button size="sm" className="px-6 h-9">Apply</Button>
                     </DialogClose>
                   </div>
                 </div>
