@@ -1057,7 +1057,7 @@ const Community = () => {
                     <div onClick={e => e.stopPropagation()}>
                       <LikeButton 
                         targetUserId={user.id} 
-                        currentUserId={useAuth().user?.id} 
+                        currentUserId={user?.id} 
                         className="p-0 h-auto"
                         data-user-id={user.id}
                         data-like-button="true"
