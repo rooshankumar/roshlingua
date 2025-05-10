@@ -52,7 +52,8 @@ export function MainNav() {
   const [open, setOpen] = React.useState(false);
   const { user } = useAuth();
   const { unreadCounts } = useUnreadMessages(user?.id);
-  const totalUnread = unreadCounts ? Object.values(unreadCounts).reduce((sum, count) => sum + count, 0) : 0;
+  // Calculate total unread by counting conversations with unread messages
+  const totalUnread = unreadCounts ? Object.keys(unreadCounts).filter(convId => unreadCounts[convId] > 0).length : 0;
   const { t } = useTranslation();
   const responsive = useResponsive();
 
@@ -85,7 +86,7 @@ export function MainNav() {
               size={mobile ? responsive.iconSize.base : responsive.iconSize.small}
             />
             {route.notificationCount && route.path === '/chat' && totalUnread > 0 && (
-              <span className="absolute -top-2 -right-2 bg-destructive text-destructive-foreground text-xs rounded-full h-5 w-5 flex items-center justify-center animate-pulse">
+              <span className="absolute -top-2 -right-2 bg-destructive text-destructive-foreground text-xs rounded-full h-5 w-5 flex items-center justify-center animate-pulse shadow-md">
                 {totalUnread}
               </span>
             )}
