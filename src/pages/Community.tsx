@@ -977,11 +977,12 @@ const Community = () => {
                     <div className="relative shrink-0">
                       <Avatar className="h-14 w-14 sm:h-16 sm:w-16">
                         <AvatarImage 
-                          src={user.avatar_url || '/placeholder.svg'} 
+                          src={user.avatar_url} 
                           alt={user.full_name || 'User'} 
                           className="object-cover" 
                           onError={(e) => {
-                            console.log('Avatar failed to load:', user.full_name);
+                            console.log('Avatar failed to load for:', user.full_name);
+                            // Set a direct path to placeholder
                             e.currentTarget.src = '/placeholder.svg';
                           }}
                         />
