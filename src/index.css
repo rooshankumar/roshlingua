@@ -857,6 +857,11 @@
     .responsive-card {
       @apply mx-4;
     }
+    
+    /* Ensure equal padding on both sides of the container */
+    .container {
+      @apply px-4;
+    }
   }
 
   .button-hover {

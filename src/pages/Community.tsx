@@ -970,7 +970,7 @@ const Community = () => {
           {filteredUsers.slice(0, 9).map((user) => (
             <Card 
               key={user.id} 
-              className="responsive-card cursor-pointer group hover:border-primary/40 w-full mx-auto sm:mx-0"
+              className="responsive-card cursor-pointer group hover:border-primary/40 w-full mx-auto"
               onClick={() => navigate(`/profile/${user.id}`)}
             >              
               <CardContent className="p-4 sm:p-6">
