@@ -76,6 +76,7 @@ export const ConversationItem = ({
             {lastMessage.content}
           </p>
         )}
+        {/* Last seen information removed */}
       </div>
     </div>
   );

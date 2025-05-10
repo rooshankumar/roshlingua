@@ -258,11 +258,7 @@ const ChatList = () => {
                         {conversation.lastMessage.content}
                       </p>
                     )}
-                    {conversation.participant?.last_seen && !conversation.participant?.is_online && (
-                      <p className="text-xs text-muted-foreground mt-1">
-                        Last seen {formatDistanceToNow(new Date(conversation.participant.last_seen))} ago
-                      </p>
-                    )}
+                    {/* Last seen information removed */}
                   </div>
                 </CardContent>
               </Card>
