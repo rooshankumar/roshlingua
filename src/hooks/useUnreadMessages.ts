@@ -15,7 +15,7 @@ export const useUnreadMessages = (userId: string | undefined) => {
       // Get all unread messages and calculate counts client-side
       const { data: unreadMessagesData, error: messagesError } = await supabase
         .from('messages')
-        .select('conversation_id')
+        .select('conversation_id, id')
         .eq('recipient_id', userId)
         .eq('is_read', false);
       
@@ -39,21 +39,31 @@ export const useUnreadMessages = (userId: string | undefined) => {
 
       // Create initial counts from participant data
       const initialCounts = participantData.reduce((acc, item) => {
-        // Only use this value if we couldn't get a direct message count
-        acc[item.conversation_id] = 0;
+        // Initialize all conversations with either their count or 0
+        acc[item.conversation_id] = item.unread_count || 0;
         return acc;
       }, {} as Record<string, number>);
 
       // Override with accurate counts we've calculated client-side
       Object.keys(conversationCounts).forEach(convId => {
         initialCounts[convId] = conversationCounts[convId];
+        
+        // Also update the DB unread_count for consistency
+        if (conversationCounts[convId] > 0) {
+          supabase
+            .from('conversation_participants')
+            .update({ unread_count: conversationCounts[convId] })
+            .eq('user_id', userId)
+            .eq('conversation_id', convId)
+            .then(({ error }) => {
+              if (error) console.error('Error updating conversation unread count:', error);
+            });
+        }
       });
 
-      if (isInitialLoadRef.current) {
-        console.log('Setting initial unread counts:', initialCounts);
-        isInitialLoadRef.current = false;
-      }
-
+      console.log('Setting initial unread counts:', initialCounts);
+      isInitialLoadRef.current = false;
+      
       setUnreadCounts(initialCounts);
     } catch (error) {
       console.error('Error fetching unread counts:', error);
@@ -134,10 +144,35 @@ export const useUnreadMessages = (userId: string | undefined) => {
           // Add visual notification if needed (e.g. playing sound or showing toast)
           // This helps with notification feedback when the app is already open
           try {
-            // Optionally add a notification sound
+            // For better audio notification reliability
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioContext.createOscillator();
+            oscillator.type = 'sine';
+            oscillator.frequency.setValueAtTime(800, audioContext.currentTime); // Higher frequency for alert
+            
+            const gainNode = audioContext.createGain();
+            gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.5);
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            oscillator.start();
+            oscillator.stop(audioContext.currentTime + 0.2);
+            
+            // Also try the notification sound as backup
             const audio = new Audio('/notification.mp3');
-            audio.volume = 0.5;
-            audio.play().catch(e => console.log('Could not play notification sound:', e));
+            audio.volume = 0.6;
+            audio.play().catch(e => console.log('Using oscillator instead due to error:', e));
+            
+            // Display visual toast notification
+            if (typeof window !== 'undefined' && window.toast) {
+              window.toast({
+                title: 'New Message',
+                description: 'You have a new message',
+                variant: 'destructive',
+              });
+            }
           } catch (e) {
             console.log('Notification effect error:', e);
           }

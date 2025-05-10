@@ -86,7 +86,7 @@ export function MainNav() {
               size={mobile ? responsive.iconSize.base : responsive.iconSize.small}
             />
             {route.notificationCount && route.path === '/chat' && totalUnread > 0 && (
-              <span className="absolute -top-2 -right-2 bg-destructive text-destructive-foreground text-xs rounded-full h-5 w-5 flex items-center justify-center animate-pulse shadow-md border border-background">
+              <span className="absolute -top-2 -right-2 bg-destructive text-destructive-foreground text-xs rounded-full h-6 w-6 flex items-center justify-center animate-pulse shadow-md border-2 border-background font-bold">
                 {totalUnread}
               </span>
             )}

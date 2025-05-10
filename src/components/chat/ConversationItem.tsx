@@ -51,7 +51,7 @@ export const ConversationItem = ({
         
         {/* Unread notification dot - show in top right only if has unread messages */}
         {hasUnread && (
-          <span className="absolute -top-1 -right-1 bg-destructive text-destructive-foreground rounded-full min-w-[18px] h-5 flex items-center justify-center text-xs font-medium px-1.5 animate-pulse shadow-md border border-background">
+          <span className="absolute -top-2 -right-2 bg-destructive text-destructive-foreground rounded-full min-w-[20px] h-6 flex items-center justify-center text-xs font-bold px-2 animate-pulse shadow-md border-2 border-background z-10">
             {conversation.unreadCount}
           </span>
         )}
