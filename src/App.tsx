@@ -36,6 +36,9 @@ const queryClient = new QueryClient();
 // The AuthCodeHandler component is imported and handles OAuth code parameters
 import AuthCodeHandler from "./components/auth/AuthCodeHandler";
 
+//Import PrivacyPolicy component
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+
 
 const AppRoutes = () => {
   const { user, isLoading } = useAuth();
