@@ -23,6 +23,14 @@ const Chat = lazy(() => import("./pages/Chat"));
 const Settings = lazy(() => import("./pages/Settings"));
 const ChatList = lazy(() => import("./pages/ChatList"));
 
+// Import static content pages
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import Terms from "./pages/Terms";
+import Contact from "./pages/Contact";
+import Blog from "./pages/Blog";
+import FAQ from "./pages/FAQ";
+import LanguageGuides from "./pages/LanguageGuides";
+
 // Components
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import AppLayout from "./components/layouts/AppLayout";
@@ -35,9 +43,6 @@ const queryClient = new QueryClient();
 
 // The AuthCodeHandler component is imported and handles OAuth code parameters
 import AuthCodeHandler from "./components/auth/AuthCodeHandler";
-
-//Import PrivacyPolicy component
-import PrivacyPolicy from "./pages/PrivacyPolicy";
 
 
 const AppRoutes = () => {
