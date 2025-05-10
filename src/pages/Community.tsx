@@ -84,7 +84,7 @@ const Community = () => {
     if (minAgeFilter !== null || maxAgeFilter !== null) count++;
     if (genderFilter && genderFilter !== "any") count++;
     if (onlineOnly) count++;
-    return count > 0 ? count : '';
+    return count > 0 ? count.toString() : '';
   };
 
   // Reset all filters to default values
@@ -554,10 +554,12 @@ const Community = () => {
     setFilteredUsers(result);
   }, [users, searchQuery, nativeLanguageFilter, learningLanguageFilter, minAgeFilter, maxAgeFilter, genderFilter, onlineOnly]);
 
+  // Get auth context once at the top level to maintain hook order
+  const { user: authUser } = useAuth();
+  
   const handleLike = async (userId: string) => {
     try {
-      const currentUser = (await supabase.auth.getUser()).data.user;
-      if (!currentUser) {
+      if (!authUser) {
         toast({
           title: "Error",
           description: "You must be logged in to like users",
@@ -1035,7 +1037,7 @@ const Community = () => {
                             )}
                             <span className="text-xs">{user.gender?.charAt(0).toUpperCase() + user.gender?.slice(1)}</span>
                           </div>
-                          <span className="text-xs text-muted-foreground whitespace-nowrap"><span className="font-bold">{user.age ? user.age : '–'}</span> y.o.</span>
+                          <span className="text-xs text-muted-foreground whitespace-nowrap"><span className="font-bold">{user.age ? String(user.age) : '–'}</span> y.o.</span>
                         </div>
                       </div>
                       <p className="text-xs text-muted-foreground mt-0.5">
@@ -1066,7 +1068,7 @@ const Community = () => {
                     <div onClick={e => e.stopPropagation()}>
                       <LikeButton 
                         targetUserId={user.id} 
-                        currentUserId={useAuth().user?.id} 
+                        currentUserId={authUser?.id} 
                         className="p-0 h-auto"
                         data-user-id={user.id}
                         data-like-button="true"
