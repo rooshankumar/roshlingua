@@ -5,6 +5,7 @@ import { LikeButton } from "@/components/LikeButton";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useAuth } from "@/providers/AuthProvider";
+import { useLikes } from "@/hooks/useLikes";
 import {
   Select,
   SelectContent,
@@ -75,6 +76,7 @@ const Community = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { user } = useAuth();
+  const { likes, like, unlike, isLoading: isLikeLoading } = useLikes();
 
   // Get the count of active filters for the badge
   const getFilterCount = () => {
