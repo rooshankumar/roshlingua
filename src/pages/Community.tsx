@@ -956,19 +956,17 @@ const Community = () => {
               key={user.id} 
               className="responsive-card cursor-pointer group hover:border-primary/40 w-full mx-auto"
               onClick={(e) => {
-                  // Check if the click originated from LikeButton or its children
-                  // Use a more robust method to detect the like button
-                  const target = e.target as Element;
-                  const clickedElement = target.closest('button');
-                  
-                  // If the clicked element is a button with data-user-id attribute or has Heart icon inside
-                  if (clickedElement && 
-                      (clickedElement.hasAttribute('data-user-id') || 
-                       clickedElement.querySelector('.lucide-heart') || 
-                       target.closest('.lucide-heart'))) {
-                    e.stopPropagation();
-                    return; // Don't navigate if clicking like button
+                  // Stop navigation if the event has our marker attribute
+                  if ((e.target as any).__isLikeButtonClick) {
+                    return;
                   }
+                  
+                  // Check if click is on or inside the like button
+                  const target = e.target as Element;
+                  if (target.closest('[data-like-button="true"]')) {
+                    return;
+                  }
+                  
                   navigate(`/profile/${user.id}`);
                 }}
               >              
@@ -1056,17 +1054,15 @@ const Community = () => {
                         <span className="inline-block text-xs sm:text-sm text-muted-foreground">{user.learning_language}</span>
                       </div>
                     </div>
-                    <LikeButton 
-                      targetUserId={user.id} 
-                      currentUserId={user?.id} 
-                      className="p-0 h-auto"
-                      data-user-id={user.id}
-                      data-like-button="true"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                      }}
-                    />
+                    <div onClick={e => e.stopPropagation()}>
+                      <LikeButton 
+                        targetUserId={user.id} 
+                        currentUserId={user?.id} 
+                        className="p-0 h-auto"
+                        data-user-id={user.id}
+                        data-like-button="true"
+                      />
+                    </div>
                   </div>
                 </div>
               </CardContent>

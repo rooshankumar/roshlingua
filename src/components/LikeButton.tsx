@@ -23,10 +23,14 @@ export function LikeButton({ targetUserId, currentUserId, className, onClick, ..
       size="sm"
       disabled={disabled}
       onClick={(e) => {
+        // Mark the event target to prevent navigation
+        (e.target as any).__isLikeButtonClick = true;
+        
+        // Stop event propagation
         e.preventDefault();
         e.stopPropagation();
-        // Add an explicit attribute to mark this element as clicked
-        e.currentTarget.setAttribute('data-just-clicked', 'true');
+        
+        // Process the like action
         toggleLike();
         if (onClick) onClick(e);
       }}
