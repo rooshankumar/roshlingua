@@ -39,7 +39,7 @@ export const ConversationItem = ({
       onClick={onClick}
     >
       <div className="relative">
-        <Avatar className="h-12 w-12">
+        <Avatar className="h-16 w-16">
           <AvatarImage src={otherParticipant.avatar} alt={otherParticipant.name} />
           <AvatarFallback>{getInitials(otherParticipant.name)}</AvatarFallback>
         </Avatar>

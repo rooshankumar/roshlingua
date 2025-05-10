@@ -228,7 +228,7 @@ const ChatList = () => {
               <Card className="hover:bg-muted/50 transition-all duration-200 hover:scale-[1.01] hover:shadow-lg">
                 <CardContent className="flex items-center p-4">
                   <div className="relative">
-                    <Avatar className="h-12 w-12">
+                    <Avatar className="h-16 w-16">
                       <AvatarImage src={conversation.participant?.avatar_url || '/placeholder.svg'} />
                       <AvatarFallback>
                         {conversation.participant?.full_name?.substring(0, 2).toUpperCase() || 'AB'}
