@@ -17,7 +17,9 @@ import {
   Mail,
   ArrowLeft,
   ArrowRight,
-  X
+  X,
+  Clock,
+  Globe
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -101,13 +103,13 @@ const Profile = () => {
   useEffect(() => {
     if (profile) {
       console.log("Profile loaded with streak:", profile.streak_count);
-      
+
       // Check for achievements regardless of whose profile it is
       // This helps ensure achievements are updated even when viewing other profiles
       if (profile.id && profile.streak_count && profile.streak_count >= 3) {
         checkStreakAchievements(profile.id);
       }
-      
+
       // Also run the regular achievements check for the current user
       if (user?.id && profile.id === user.id) {
         checkAchievements({ 
@@ -212,6 +214,15 @@ const Profile = () => {
     if (xp >= 500) return { name: "Intermediate", progress: 50 };
     if (xp >= 250) return { name: "Beginner Plus", progress: 25 };
     return { name: "Beginner", progress: 10 };
+  };
+
+  const formatDate = (dateString: string) => {
+    if (!dateString) return "Unknown";
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', { 
+      year: 'numeric', 
+      month: 'long'
+    });
   };
 
   if (loading) {
@@ -364,6 +375,14 @@ const Profile = () => {
                 <Badge variant="outline" className="bg-primary/10 text-primary px-2 py-1">
                   {profile.proficiency_level?.charAt(0).toUpperCase() + profile.proficiency_level?.slice(1) || "Beginner"} Level
                 </Badge>
+              </div>
+            )}
+
+            {/* Country Information */}
+            {profile.country && (
+              <div className="flex items-center mb-4 text-sm text-muted-foreground">
+                <Globe className="h-4 w-4 mr-2" />
+                {profile.country}
               </div>
             )}
 
