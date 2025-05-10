@@ -1026,7 +1026,7 @@ const Community = () => {
                             )}
                             <span className="text-xs">{user.gender?.charAt(0).toUpperCase() + user.gender?.slice(1)}</span>
                           </div>
-                          <span className="text-xs text-muted-foreground whitespace-nowrap"><span className="font-bold">{user.age || '–'}</span> y.o.</span>
+                          <span className="text-xs text-muted-foreground whitespace-nowrap"><span className="font-bold">{user.age ? user.age : '–'}</span> y.o.</span>
                         </div>
                       </div>
                       <p className="text-xs text-muted-foreground mt-0.5">

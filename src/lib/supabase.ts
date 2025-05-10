@@ -52,12 +52,6 @@ export const supabase = createClient<Database>(
           clearTimeout(timeoutId);
         });
       },
-    },
-    realtime: {
-      timeout: 10000, // Faster timeout for realtime connections
-      params: {
-        eventsPerSecond: 5 // Limit realtime events rate
-      }
     }
   }
 );
@@ -81,6 +75,22 @@ supabase.rest.fetchWithAuth = async (url, options) => {
 
 // Add connection recovery event listeners
 // Use channel-based approach for realtime events
+// Add API key headers to all Supabase REST API requests
+const originalFetch = supabase.rest.fetchWithAuth;
+supabase.rest.fetchWithAuth = async (url, options = {}) => {
+  // Ensure headers object exists
+  if (!options.headers) {
+    options.headers = {};
+  }
+  
+  // Add the required headers for all requests
+  options.headers['apikey'] = supabase.supabaseKey;
+  options.headers['Accept'] = 'application/json';
+  options.headers['Content-Type'] = 'application/json';
+  
+  return originalFetch(url, options);
+};
+
 const statusChannel = supabase.channel('connection-status');
 
 statusChannel
