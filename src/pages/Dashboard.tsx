@@ -303,8 +303,8 @@ const Dashboard = () => {
   }, [user?.id, userStats]);
 
   return (
-    <div className="mobile-container pb-8 animate-fade-up"> {/* Added mobile-container class */}
-      <div className="relative space-y-2 mb-8 p-4 rounded-xl bg-gradient-to-r from-primary/10 via-primary/5 to-background hidden md:block"> {/* Hidden on mobile */}
+    <div className="mobile-container pb-8 animate-fade-up">
+      <div className="relative space-y-2 mb-8 p-4 rounded-xl bg-gradient-to-r from-primary/10 via-primary/5 to-background">
         <div className="absolute inset-0 bg-grid-white/5 [mask-image:linear-gradient(0deg,white,rgba(255,255,255,0.5))] rounded-xl" />
         <h1 className="text-3xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/60">
           Welcome Back!
