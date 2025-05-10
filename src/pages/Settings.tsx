@@ -24,7 +24,6 @@ import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { useResponsive } from "@/hooks/use-mobile";
 import { SUPPORTED_LANGUAGES, getLanguageOptions } from "@/utils/languageUtils";
 import { Search, ChevronsUpDown, Check } from "lucide-react";
-import { RefreshCw } from "lucide-react";
 
 
 const Settings = () => {
@@ -522,18 +521,19 @@ const Settings = () => {
                           handleProfileChange("date_of_birth", date?.toISOString().split('T')[0] || '');
                         }}
                         className="h-12"
+                        placeholder="DD-MM-YYYY"
                       />
                     </div>
                     
                     <div className="space-y-2">
-                      <Label htmlFor="country" className="text-base">Country</Label>
+                      <Label htmlFor="country" className="text-base">Country of Residence</Label>
                       <Input
                         id="country"
                         type="text"
                         value={localProfile?.country || ""}
                         onChange={(e) => handleProfileChange("country", e.target.value)}
                         className="h-12"
-                        placeholder="Enter your country"
+                        placeholder="Enter your country of residence"
                       />
                     </div>
 
@@ -703,12 +703,6 @@ const Settings = () => {
                 <Save className="h-5 w-5 mr-2" />
                 {isLoading ? "Saving..." : "Save Changes"}
               </Button>
-              <CardFooter>
-                  <Button variant="outline" onClick={() => loadUserProfile()} className="w-full sm:w-auto">
-                    <RefreshCw className="h-4 w-4 mr-2" />
-                    Refresh Profile Data
-                  </Button>
-                </CardFooter>
             </CardFooter>
           </Card>
         </TabsContent>
