@@ -540,14 +540,14 @@ export const ChatScreen = ({ conversation }: Props) => {
 
 
   return (
-    <Card className="fixed inset-0 flex flex-col w-full h-full md:static md:h-screen md:max-w-4xl md:mx-auto md:rounded-2xl border-none shadow-2xl overflow-hidden bg-gradient-to-b from-background/95 to-background/90 backdrop-blur-lg">
-      <div className="fixed top-0 left-0 right-0 z-40 bg-background/95 backdrop-blur-xl border-b">
+    <Card className="fixed inset-0 flex flex-col w-full h-full md:static md:h-[calc(100vh-2rem)] md:max-w-4xl md:mx-auto md:rounded-2xl border-none shadow-2xl overflow-hidden bg-gradient-to-b from-background/95 to-background/90 backdrop-blur-lg">
+      <div className="fixed top-0 left-0 right-0 z-40 bg-background/95 backdrop-blur-xl border-b md:static md:z-10">
         <ChatHeader conversation={conversation} />
       </div>
 
       {user?.id ? (
         <ScrollArea 
-          className="flex-1 px-4 md:px-6 py-4 overflow-y-auto pr-6 mt-[72px] mb-[80px] md:mt-[60px] md:mb-[70px]" 
+          className="flex-1 px-4 md:px-6 py-4 overflow-y-auto pr-6 mt-[72px] mb-[80px] md:mt-0 md:mb-0" 
           data-scrollbar
           ref={messagesContainerRef}
         >
@@ -860,7 +860,7 @@ export const ChatScreen = ({ conversation }: Props) => {
       )}
 
       {user?.id && (
-        <div className="fixed bottom-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-xl border-t border-border/50 mobile-safe-bottom">
+        <div className="fixed bottom-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-xl border-t border-border/50 mobile-safe-bottom md:static md:z-10">
           <CardContent className="p-4 max-w-4xl mx-auto">
             {replyTo && (
               <div className="mb-2 px-3 py-2 bg-muted/30 rounded-lg border-l-4 border-primary flex items-center justify-between">

@@ -120,7 +120,7 @@
     max-height: 80vh !important;
     margin: 0 auto !important;
   }
-  
+
   .DialogOverlay {
     background-color: rgba(0, 0, 0, 0.6) !important;
   }
@@ -705,8 +705,40 @@
   }
 
   .mobile-content-area {
-    @apply pt-[60px] pb-[80px] md:pt-0 md:pb-0;
+  @apply pt-[60px] pb-[80px] md:pt-0 md:pb-0;
+}
+
+/* Desktop chat container improvements */
+@media (min-width: 768px) {
+  .chat-container {
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 2rem);
+    max-height: calc(100vh - 2rem);
+    margin: 1rem auto;
+    border-radius: 1rem;
+    overflow: hidden;
   }
+
+  .chat-header {
+    position: relative;
+    flex-shrink: 0;
+  }
+
+  .chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    position: relative;
+  }
+
+  .chat-input-container {
+    position: relative;
+    flex-shrink: 0;
+    border-top: 1px solid hsl(var(--border));
+    background: hsl(var(--background) / 95%);
+    backdrop-filter: blur(12px);
+  }
+}
 
   /* Optimize inputs for mobile */
   input, textarea, select, button {
@@ -861,17 +893,17 @@
   .mobile-container {
     @apply container mx-auto px-2 sm:px-4 md:px-6 py-2 md:py-4 sm:py-6;
   }
-  
+
   /* Adjust spacing when headers are hidden on mobile */
   @media (max-width: 768px) {
     .mobile-container {
       @apply pt-1;
     }
-    
+
     .responsive-card {
       @apply mx-4;
     }
-    
+
     /* Ensure equal padding on both sides of the container */
     .container {
       @apply px-4;

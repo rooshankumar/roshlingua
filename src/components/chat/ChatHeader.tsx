@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { ChevronLeft, MoreVertical, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { supabase } from '@/lib/supabase';
 import { ChatSearch } from './ChatSearch';
+import { useResponsive } from '@/hooks/use-mobile';
 
 interface Props {
   conversation: {
