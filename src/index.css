@@ -128,21 +128,44 @@
 
 @media (min-width: 1024px) {
   .DialogContent {
-    max-width: 40% !important;
+    max-width: 30% !important;
   }
 }
 
+/* Filter dialog with 3:2 aspect ratio (height:width) */
+.filter-dialog {
+  aspect-ratio: 2/3;
+  height: auto !important;
+  max-height: 70vh !important;
+}
+
 /* Make inner content of filter scroll on small screens */
-@media (max-height: 700px) {
-  .filter-dialog-content {
-    max-height: 60vh;
-    overflow-y: auto;
-    padding-right: 4px;
-  }
-  
-  .filter-dialog-content::-webkit-scrollbar {
-    width: 4px;
-  }
+.filter-dialog-content {
+  max-height: calc(100% - 120px);
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.filter-dialog-content::-webkit-scrollbar {
+  width: 4px;
+}
+
+/* Compact filter dialog elements */
+.filter-dialog .space-y-3 {
+  margin-bottom: 0.75rem;
+}
+
+.filter-dialog label, 
+.filter-dialog .text-sm {
+  font-size: 0.75rem;
+}
+
+.filter-dialog h3 {
+  font-size: 0.875rem;
+}
+
+.filter-dialog-content > div:not(:last-child) {
+  padding-bottom: 0.5rem;
 }
 
     transform-origin: center top;
