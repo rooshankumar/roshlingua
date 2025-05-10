@@ -542,12 +542,20 @@ const Settings = () => {
                       />
                       {showNativeLanguages && (
                         <div className="absolute top-[calc(100%+0.5rem)] left-0 w-full bg-white border border-gray-200 rounded-md shadow-md z-10 max-h-60 overflow-y-auto">
-                          {languageOptions
-                            .filter((lang) =>
-                              lang && lang.name && nativeLanguageSearch ? 
-                              (lang.name.toLowerCase().includes(nativeLanguageSearch.toLowerCase()) ||
-                              (lang.code && lang.code.toLowerCase().includes(nativeLanguageSearch.toLowerCase()))) : true
-                            )
+                          {(languageOptions || [])
+                            .filter((lang) => {
+                              // If search is empty, show all options
+                              if (!nativeLanguageSearch) return true;
+                              
+                              // Make sure lang and its properties exist
+                              if (!lang || !lang.name) return false;
+                              
+                              const search = nativeLanguageSearch.toLowerCase();
+                              const name = lang.name.toLowerCase();
+                              const code = lang.code ? lang.code.toLowerCase() : '';
+                              
+                              return name.includes(search) || code.includes(search);
+                            })
                             .map((lang) => (
                               <div
                                 key={lang.code}
@@ -590,12 +598,20 @@ const Settings = () => {
                       />
                       {showLearningLanguages && (
                         <div className="absolute top-[calc(100%+0.5rem)] left-0 w-full bg-white border border-gray-200 rounded-md shadow-md z-10 max-h-60 overflow-y-auto">
-                          {languageOptions
-                            .filter((lang) =>
-                              lang && lang.name && learningLanguageSearch ? 
-                              (lang.name.toLowerCase().includes(learningLanguageSearch.toLowerCase()) ||
-                              (lang.code && lang.code.toLowerCase().includes(learningLanguageSearch.toLowerCase()))) : true
-                            )
+                          {(languageOptions || [])
+                            .filter((lang) => {
+                              // If search is empty, show all options
+                              if (!learningLanguageSearch) return true;
+                              
+                              // Make sure lang and its properties exist
+                              if (!lang || !lang.name) return false;
+                              
+                              const search = learningLanguageSearch.toLowerCase();
+                              const name = lang.name.toLowerCase();
+                              const code = lang.code ? lang.code.toLowerCase() : '';
+                              
+                              return name.includes(search) || code.includes(search);
+                            })
                             .map((lang) => (
                               <div
                                 key={lang.code}

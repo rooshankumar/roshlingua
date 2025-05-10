@@ -1,4 +1,3 @@
-
 interface LanguageOption {
   code: string;
   name: string;
@@ -162,7 +161,7 @@ export const getLanguageInfo = (code: string): LanguageOption => {
 // Function to filter languages by search query
 export const filterLanguages = (query: string, languages = SUPPORTED_LANGUAGES): LanguageOption[] => {
   if (!query) return languages;
-  
+
   const searchTerm = query.toLowerCase();
   return languages.filter(lang => 
     lang.name.toLowerCase().includes(searchTerm) || 
@@ -187,6 +186,10 @@ export const getLanguageNameByCode = (code: string): string => {
 
 // Convert language list to display format (for Select components)
 export const getLanguageOptions = () => {
+  if (!SUPPORTED_LANGUAGES || !Array.isArray(SUPPORTED_LANGUAGES)) {
+    return [];
+  }
+
   return SUPPORTED_LANGUAGES.map(lang => ({
     value: lang.name,
     label: `${lang.flag} ${lang.name}`,
