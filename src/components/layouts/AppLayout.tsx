@@ -97,7 +97,7 @@ const AppLayout = ({ children }: AppLayoutProps) => {
     <div className="min-h-screen flex flex-col md:flex-row">
       {!location.pathname.includes('/chat') && !location.pathname.includes('/settings') && (
         <div className="absolute top-2 right-3 z-40 md:hidden">
-          <NotificationDropdown className="mobile-touch-target" />
+          {/* Notification dropdown removed */}
         </div>
       )}
 
