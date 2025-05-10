@@ -68,6 +68,7 @@ const Community = () => {
   const [learningLanguageFilter, setLearningLanguageFilter] = useState("any");
   const [minAgeFilter, setMinAgeFilter] = useState<number | null>(null);
   const [maxAgeFilter, setMaxAgeFilter] = useState<number | null>(null);
+  const [genderFilter, setGenderFilter] = useState("any");
   const [onlineOnly, setOnlineOnly] = useState(false);
   const [showScrollTop, setShowScrollTop] = useState(false); // Added state for scroll button
 
@@ -81,6 +82,7 @@ const Community = () => {
     if (nativeLanguageFilter && nativeLanguageFilter !== "any") count++;
     if (learningLanguageFilter && learningLanguageFilter !== "any") count++;
     if (minAgeFilter !== null || maxAgeFilter !== null) count++;
+    if (genderFilter && genderFilter !== "any") count++;
     if (onlineOnly) count++;
     return count > 0 ? count : '';
   };
@@ -93,6 +95,7 @@ const Community = () => {
     setLearningLanguageFilter("any");
     setMinAgeFilter(null);
     setMaxAgeFilter(null);
+    setGenderFilter("any");
     setOnlineOnly(false);
   };
 
@@ -143,6 +146,34 @@ const Community = () => {
         >
           <User className="h-3 w-3 mr-1" />
           <span>Age: {minAgeFilter || '18'}—{maxAgeFilter || '100'}</span>
+          <X className="h-3 w-3 ml-1 group-hover:scale-110 transition-transform" />
+        </Badge>
+      );
+    }
+
+    if (genderFilter && genderFilter !== "any") {
+      badges.push(
+        <Badge 
+          key="gender" 
+          variant="secondary" 
+          className="flex items-center gap-1 pl-2 pr-1 py-1 shadow-sm hover:bg-secondary/30 transition-colors cursor-pointer group"
+          onClick={() => setGenderFilter("any")}
+        >
+          {genderFilter === 'male' && (
+            <img 
+              src="/icons/male.png.png" 
+              alt="Male" 
+              className="h-4 w-4 object-contain mr-1" 
+            />
+          )}
+          {genderFilter === 'female' && (
+            <img 
+              src="/icons/female.png.png" 
+              alt="Female" 
+              className="h-4 w-4 object-contain mr-1" 
+            />
+          )}
+          <span>Gender: {genderFilter.charAt(0).toUpperCase() + genderFilter.slice(1)}</span>
           <X className="h-3 w-3 ml-1 group-hover:scale-110 transition-transform" />
         </Badge>
       );
@@ -508,13 +539,20 @@ const Community = () => {
       );
     }
 
+    // Apply gender filter
+    if (genderFilter && genderFilter !== "any") {
+      result = result.filter(user => 
+        user.gender === genderFilter
+      );
+    }
+
     // Apply online status filter
     if (onlineOnly) {
       result = result.filter(user => Boolean(user.is_online));
     }
 
     setFilteredUsers(result);
-  }, [users, searchQuery, nativeLanguageFilter, learningLanguageFilter, minAgeFilter, maxAgeFilter, onlineOnly]);
+  }, [users, searchQuery, nativeLanguageFilter, learningLanguageFilter, minAgeFilter, maxAgeFilter, genderFilter, onlineOnly]);
 
   const handleLike = async (userId: string) => {
     try {
@@ -754,6 +792,51 @@ const Community = () => {
                             placeholder="100"
                             className="h-8 text-sm"
                           />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="space-y-3">
+                    <div className="flex items-center">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2 h-5 w-5 text-primary">
+                        <path d="M12 12a6 6 0 0 0 6-6 6 6 0 0 0-6-6 6 6 0 0 0-6 6 6 6 0 0 0 6 6Z" />
+                        <path d="M15.5 17.5 16 22l-4-1-4 1 .5-4.5" />
+                        <path d="M8.5 13.5A14 14 0 0 0 3 17l.8 1.2a3 3 0 0 0 2.2 1l4.5.8" />
+                        <path d="M15.5 13.5a14 14 0 0 1 5.5 3.5l-.8 1.2a3 3 0 0 1-2.2 1l-4.5.8" />
+                      </svg>
+                      <h3 className="text-base font-medium">Gender Preference</h3>
+                    </div>
+                    <div className="bg-background/50 p-4 rounded-lg border border-border/50">
+                      <div className="grid grid-cols-3 gap-2">
+                        <div 
+                          className={`flex flex-col items-center justify-center p-3 rounded-lg border ${genderFilter === 'any' ? 'border-primary bg-primary/10' : 'border-border hover:border-primary/50'} cursor-pointer transition-colors`}
+                          onClick={() => setGenderFilter('any')}
+                        >
+                          <span className="text-xl mb-1">👥</span>
+                          <span className="text-sm font-medium">Any</span>
+                        </div>
+                        <div 
+                          className={`flex flex-col items-center justify-center p-3 rounded-lg border ${genderFilter === 'male' ? 'border-primary bg-primary/10' : 'border-border hover:border-primary/50'} cursor-pointer transition-colors`}
+                          onClick={() => setGenderFilter('male')}
+                        >
+                          <img 
+                            src="/icons/male.png.png" 
+                            alt="Male" 
+                            className="h-6 w-6 object-contain mb-1" 
+                          />
+                          <span className="text-sm font-medium">Male</span>
+                        </div>
+                        <div 
+                          className={`flex flex-col items-center justify-center p-3 rounded-lg border ${genderFilter === 'female' ? 'border-primary bg-primary/10' : 'border-border hover:border-primary/50'} cursor-pointer transition-colors`}
+                          onClick={() => setGenderFilter('female')}
+                        >
+                          <img 
+                            src="/icons/female.png.png" 
+                            alt="Female" 
+                            className="h-6 w-6 object-contain mb-1" 
+                          />
+                          <span className="text-sm font-medium">Female</span>
                         </div>
                       </div>
                     </div>
