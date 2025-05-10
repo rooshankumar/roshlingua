@@ -123,6 +123,7 @@ const Settings = () => {
         full_name: localProfile.full_name || '',
         gender: localProfile.gender?.toLowerCase() || 'rather not say',
         date_of_birth: localProfile.date_of_birth || null,
+        country: localProfile.country || '',
         learning_language: localProfile.learning_language,
         native_language: localProfile.native_language,
         proficiency_level: localProfile.proficiency_level,
@@ -154,6 +155,7 @@ const Settings = () => {
         p_bio: profileData.bio,
         p_gender: profileData.gender,
         p_date_of_birth: profileData.date_of_birth,
+        p_country: profileData.country,
         p_native_language: profileData.native_language,
         p_learning_language: profileData.learning_language,
         p_proficiency_level: profileData.proficiency_level,
@@ -520,6 +522,18 @@ const Settings = () => {
                           handleProfileChange("date_of_birth", date?.toISOString().split('T')[0] || '');
                         }}
                         className="h-12"
+                      />
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label htmlFor="country" className="text-base">Country</Label>
+                      <Input
+                        id="country"
+                        type="text"
+                        value={localProfile?.country || ""}
+                        onChange={(e) => handleProfileChange("country", e.target.value)}
+                        className="h-12"
+                        placeholder="Enter your country"
                       />
                     </div>
 
