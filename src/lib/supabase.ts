@@ -56,38 +56,19 @@ export const supabase = createClient<Database>(
   }
 );
 
-// Add connection recovery event listeners
-  // Use channel-based approach for realtime events
-
 // Add global fetch interceptor to add API key header for all requests
-const originalFetch = supabase.rest.fetchWithAuth;
-supabase.rest.fetchWithAuth = async (url, options) => {
-  if (!options.headers) {
-    options.headers = {};
-  }
-
-  // Add the apikey header to all requests
-  options.headers['apikey'] = supabase.supabaseKey;
-  options.headers['Accept'] = 'application/json';
-
-  return originalFetch(url, options);
-};
-
-// Add connection recovery event listeners
-// Use channel-based approach for realtime events
-// Add API key headers to all Supabase REST API requests
 const originalFetch = supabase.rest.fetchWithAuth;
 supabase.rest.fetchWithAuth = async (url, options = {}) => {
   // Ensure headers object exists
   if (!options.headers) {
     options.headers = {};
   }
-  
+
   // Add the required headers for all requests
   options.headers['apikey'] = supabase.supabaseKey;
   options.headers['Accept'] = 'application/json';
   options.headers['Content-Type'] = 'application/json';
-  
+
   return originalFetch(url, options);
 };
 
