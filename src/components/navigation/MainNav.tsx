@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useTranslation } from 'react-i18next';
 import { useResponsive } from "@/hooks/use-mobile";
-import { NotificationDropdown } from "@/components/notifications/NotificationDropdown";
 
 // Custom SVG Icon component
 const CustomIcon = ({ src, size = 24, className = "" }) => {
@@ -127,7 +126,7 @@ export function MainNav() {
             </span>
           </div>
           {!location.pathname.includes('/chat') && !location.pathname.includes('/settings') && (
-            <NotificationDropdown />
+            null
           )}
         </div>
       </div>
