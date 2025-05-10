@@ -27,5 +27,7 @@ export default defineConfig({
     },
     // Increase timeout for slow connections
     hmrTimeout: 5000,
+    // Allow all hosts for Replit environment
+    allowedHosts: ['all', 'ef3a7725-3799-42ee-a16a-f60466df8abf-00-1jovl1scnr51o.pike.replit.dev'],
   },
 })
