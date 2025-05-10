@@ -1,5 +1,8 @@
-
 import { ReactNode } from "react";
+import { Link } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { useAuth } from "@/providers/AuthProvider";
+import PageTransition from "@/components/PageTransition";
 
 interface AuthLayoutProps {
   children: ReactNode;
@@ -22,10 +25,12 @@ const AuthLayout = ({ children }: AuthLayoutProps) => {
         </video>
         <div className="absolute inset-0 bg-black/30 backdrop-blur-sm"></div>
       </div>
-      
+
       {/* Content */}
       <div className="w-full max-w-md relative z-10">
-        {children}
+        <PageTransition>
+          {children}
+        </PageTransition>
       </div>
     </div>
   );

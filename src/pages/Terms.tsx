@@ -1,5 +1,4 @@
 
-import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import PageHeader from "@/components/ui/page-header";
 

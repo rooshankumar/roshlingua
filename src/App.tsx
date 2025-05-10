@@ -6,7 +6,9 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from '@vercel/speed-insights/react';
 import HMRHandler from '@/components/HMRHandler';
-import React, { Suspense, lazy } from "react";
+import React, { Suspense, lazy, useEffect } from "react";
+import { AnimatePresence } from 'framer-motion';
+import PageTransition from "@/components/PageTransition";
 
 
 // Pages
@@ -14,7 +16,7 @@ import Home from "./pages/Home";
 import Auth from "./pages/Auth";
 import AuthCallback from "./pages/AuthCallback";
 import NotFound from "./pages/NotFound";
-// Lazy-loaded pages (load on demand)
+// Lazy-load all pages for better performance and smoother transitions
 const Dashboard = lazy(() => import("./pages/Dashboard"));
 const Profile = lazy(() => import("./pages/Profile"));
 const Onboarding = lazy(() => import("./pages/Onboarding"));
@@ -22,14 +24,12 @@ const Community = lazy(() => import("./pages/Community"));
 const Chat = lazy(() => import("./pages/Chat"));
 const Settings = lazy(() => import("./pages/Settings"));
 const ChatList = lazy(() => import("./pages/ChatList"));
-
-// Import static content pages
-import PrivacyPolicy from "./pages/PrivacyPolicy";
-import Terms from "./pages/Terms";
-import Contact from "./pages/Contact";
-import Blog from "./pages/Blog";
-import FAQ from "./pages/FAQ";
-import LanguageGuides from "./pages/LanguageGuides";
+const PrivacyPolicy = lazy(() => import("./pages/PrivacyPolicy"));
+const Terms = lazy(() => import("./pages/Terms"));
+const Contact = lazy(() => import("./pages/Contact"));
+const Blog = lazy(() => import("./pages/Blog"));
+const FAQ = lazy(() => import("./pages/FAQ"));
+const LanguageGuides = lazy(() => import("./pages/LanguageGuides"));
 
 // Components
 import ProtectedRoute from "./components/auth/ProtectedRoute";
@@ -47,6 +47,7 @@ import AuthCodeHandler from "./components/auth/AuthCodeHandler";
 
 const AppRoutes = () => {
   const { user, isLoading } = useAuth();
+  const location = useLocation();
 
   if (isLoading) {
     return (
@@ -62,9 +63,10 @@ const AppRoutes = () => {
   return (
     <>
       <AuthCodeHandler />
-      <Routes>
+      <AnimatePresence mode="wait">
+        <Routes location={location} key={location.pathname}>
         {/* Public routes */}
-        <Route path="/" element={<Home />} />
+        <Route path="/" element={<PageTransition><Home /></PageTransition>} />
         <Route path="/auth" element={
           <AuthLayout>
             {user ? <Navigate to="/dashboard" replace /> : <Auth />}
@@ -154,18 +156,55 @@ const AppRoutes = () => {
 
 
         {/* Legal pages */}
-        <Route path="/privacy-policy" element={<AuthLayout><PrivacyPolicy /></AuthLayout>} />
-        <Route path="/terms" element={<AuthLayout><Terms /></AuthLayout>} />
-        <Route path="/contact" element={<AuthLayout><Contact /></AuthLayout>} />
+        <Route path="/privacy-policy" element={
+          <AuthLayout>
+            <Suspense fallback={<div className="flex items-center justify-center h-screen">Loading...</div>}>
+              <PrivacyPolicy />
+            </Suspense>
+          </AuthLayout>
+        } />
+        <Route path="/terms" element={
+          <AuthLayout>
+            <Suspense fallback={<div className="flex items-center justify-center h-screen">Loading...</div>}>
+              <Terms />
+            </Suspense>
+          </AuthLayout>
+        } />
+        <Route path="/contact" element={
+          <AuthLayout>
+            <Suspense fallback={<div className="flex items-center justify-center h-screen">Loading...</div>}>
+              <Contact />
+            </Suspense>
+          </AuthLayout>
+        } />
 
         {/* Resources */}
-        <Route path="/blog" element={<AuthLayout><Blog /></AuthLayout>} />
-        <Route path="/language-guides" element={<AuthLayout><LanguageGuides /></AuthLayout>} />
-        <Route path="/faq" element={<AuthLayout><FAQ /></AuthLayout>} />
+        <Route path="/blog" element={
+          <AuthLayout>
+            <Suspense fallback={<div className="flex items-center justify-center h-screen">Loading...</div>}>
+              <Blog />
+            </Suspense>
+          </AuthLayout>
+        } />
+        <Route path="/language-guides" element={
+          <AuthLayout>
+            <Suspense fallback={<div className="flex items-center justify-center h-screen">Loading...</div>}>
+              <LanguageGuides />
+            </Suspense>
+          </AuthLayout>
+        } />
+        <Route path="/faq" element={
+          <AuthLayout>
+            <Suspense fallback={<div className="flex items-center justify-center h-screen">Loading...</div>}>
+              <FAQ />
+            </Suspense>
+          </AuthLayout>
+        } />
 
         {/* Catch all for 404 */}
         <Route path="*" element={<NotFound />} />
       </Routes>
+      </AnimatePresence>
     </>
   );
 };

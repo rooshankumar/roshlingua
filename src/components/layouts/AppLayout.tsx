@@ -104,7 +104,9 @@ const AppLayout = ({ children }: AppLayoutProps) => {
       <div className="md:block">
         <MainNav />
       </div>
-      <main className={`flex-1 pb-24 md:pb-4 pt-2 sm:pt-4 px-0 sm:px-3 md:px-6 overflow-x-hidden ${location.pathname.includes('/chat/') ? 'md:p-0' : ''}`}>{children}</main>
+      <main className={`flex-1 pb-24 md:pb-4 pt-2 sm:pt-4 px-0 sm:px-3 md:px-6 overflow-x-hidden ${location.pathname.includes('/chat/') ? 'md:p-0' : ''}`}>
+        <PageTransition>{children}</PageTransition>
+      </main>
 
       {!isChatDetailRoute && (
         <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-background/90 backdrop-blur-xl border-t flex justify-around p-2 z-50 shadow-lg safe-area-bottom">
