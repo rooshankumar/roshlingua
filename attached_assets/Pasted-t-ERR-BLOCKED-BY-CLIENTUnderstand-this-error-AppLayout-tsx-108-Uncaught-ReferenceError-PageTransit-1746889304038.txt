@@ -1,0 +1,111 @@
+t::ERR_BLOCKED_BY_CLIENTUnderstand this error
+AppLayout.tsx:108 Uncaught ReferenceError: PageTransition is not defined
+    at AppLayout (AppLayout.tsx:108:10)
+    at renderWithHooks (chunk-UPELNCPK.js?v=d0834c5c:11548:26)
+    at mountIndeterminateComponent (chunk-UPELNCPK.js?v=d0834c5c:14926:21)
+    at beginWork (chunk-UPELNCPK.js?v=d0834c5c:15914:22)
+    at HTMLUnknownElement.callCallback2 (chunk-UPELNCPK.js?v=d0834c5c:3674:22)
+    at Object.invokeGuardedCallbackDev (chunk-UPELNCPK.js?v=d0834c5c:3699:24)
+    at invokeGuardedCallback (chunk-UPELNCPK.js?v=d0834c5c:3733:39)
+    at beginWork$1 (chunk-UPELNCPK.js?v=d0834c5c:19765:15)
+    at performUnitOfWork (chunk-UPELNCPK.js?v=d0834c5c:19198:20)
+    at workLoopSync (chunk-UPELNCPK.js?v=d0834c5c:19137:13)
+AppLayout @ AppLayout.tsx:108
+renderWithHooks @ chunk-UPELNCPK.js?v=d0834c5c:11548
+mountIndeterminateComponent @ chunk-UPELNCPK.js?v=d0834c5c:14926
+beginWork @ chunk-UPELNCPK.js?v=d0834c5c:15914
+callCallback2 @ chunk-UPELNCPK.js?v=d0834c5c:3674
+invokeGuardedCallbackDev @ chunk-UPELNCPK.js?v=d0834c5c:3699
+invokeGuardedCallback @ chunk-UPELNCPK.js?v=d0834c5c:3733
+beginWork$1 @ chunk-UPELNCPK.js?v=d0834c5c:19765
+performUnitOfWork @ chunk-UPELNCPK.js?v=d0834c5c:19198
+workLoopSync @ chunk-UPELNCPK.js?v=d0834c5c:19137
+renderRootSync @ chunk-UPELNCPK.js?v=d0834c5c:19116
+performConcurrentWorkOnRoot @ chunk-UPELNCPK.js?v=d0834c5c:18678
+workLoop @ chunk-UPELNCPK.js?v=d0834c5c:197
+flushWork @ chunk-UPELNCPK.js?v=d0834c5c:176
+performWorkUntilDeadline @ chunk-UPELNCPK.js?v=d0834c5c:384Understand this error
+AppLayout.tsx:108 Uncaught ReferenceError: PageTransition is not defined
+    at AppLayout (AppLayout.tsx:108:10)
+    at renderWithHooks (chunk-UPELNCPK.js?v=d0834c5c:11548:26)
+    at mountIndeterminateComponent (chunk-UPELNCPK.js?v=d0834c5c:14926:21)
+    at beginWork (chunk-UPELNCPK.js?v=d0834c5c:15914:22)
+    at HTMLUnknownElement.callCallback2 (chunk-UPELNCPK.js?v=d0834c5c:3674:22)
+    at Object.invokeGuardedCallbackDev (chunk-UPELNCPK.js?v=d0834c5c:3699:24)
+    at invokeGuardedCallback (chunk-UPELNCPK.js?v=d0834c5c:3733:39)
+    at beginWork$1 (chunk-UPELNCPK.js?v=d0834c5c:19765:15)
+    at performUnitOfWork (chunk-UPELNCPK.js?v=d0834c5c:19198:20)
+    at workLoopSync (chunk-UPELNCPK.js?v=d0834c5c:19137:13)
+AppLayout @ AppLayout.tsx:108
+renderWithHooks @ chunk-UPELNCPK.js?v=d0834c5c:11548
+mountIndeterminateComponent @ chunk-UPELNCPK.js?v=d0834c5c:14926
+beginWork @ chunk-UPELNCPK.js?v=d0834c5c:15914
+callCallback2 @ chunk-UPELNCPK.js?v=d0834c5c:3674
+invokeGuardedCallbackDev @ chunk-UPELNCPK.js?v=d0834c5c:3699
+invokeGuardedCallback @ chunk-UPELNCPK.js?v=d0834c5c:3733
+beginWork$1 @ chunk-UPELNCPK.js?v=d0834c5c:19765
+performUnitOfWork @ chunk-UPELNCPK.js?v=d0834c5c:19198
+workLoopSync @ chunk-UPELNCPK.js?v=d0834c5c:19137
+renderRootSync @ chunk-UPELNCPK.js?v=d0834c5c:19116
+recoverFromConcurrentError @ chunk-UPELNCPK.js?v=d0834c5c:18736
+performConcurrentWorkOnRoot @ chunk-UPELNCPK.js?v=d0834c5c:18684
+workLoop @ chunk-UPELNCPK.js?v=d0834c5c:197
+flushWork @ chunk-UPELNCPK.js?v=d0834c5c:176
+performWorkUntilDeadline @ chunk-UPELNCPK.js?v=d0834c5c:384Understand this error
+chunk-UPELNCPK.js?v=d0834c5c:14032 The above error occurred in the <AppLayout> component:
+
+    at AppLayout (https://f4f1b860-57de-4042-a2f0-a48bea67ec64-00-hza8t5hqxak3.sisko.replit.dev:5173/src/components/layouts/AppLayout.tsx?t=1746889288485:83:22)
+    at ProtectedRoute (https://f4f1b860-57de-4042-a2f0-a48bea67ec64-00-hza8t5hqxak3.sisko.replit.dev:5173/src/components/auth/ProtectedRoute.tsx:15:27)
+    at RenderedRoute (https://f4f1b860-57de-4042-a2f0-a48bea67ec64-00-hza8t5hqxak3.sisko.replit.dev:5173/node_modules/.vite/deps/react-router-dom.js?v=d0834c5c:4069:5)
+    at Routes (https://f4f1b860-57de-4042-a2f0-a48bea67ec64-00-hza8t5hqxak3.sisko.replit.dev:5173/node_modules/.vite/deps/react-router-dom.js?v=d0834c5c:4508:5)
+    at PresenceChild (https://f4f1b860-57de-4042-a2f0-a48bea67ec64-00-hza8t5hqxak3.sisko.replit.dev:5173/node_modules/.vite/deps/framer-motion.js?v=d0834c5c:135:24)
+    at AnimatePresence (https://f4f1b860-57de-4042-a2f0-a48bea67ec64-00-hza8t5hqxak3.sisko.replit.dev:5173/node_modules/.vite/deps/framer-motion.js?v=d0834c5c:214:26)
+    at AppRoutes (https://f4f1b860-57de-4042-a2f0-a48bea67ec64-00-hza8t5hqxak3.sisko.replit.dev:5173/src/App.tsx?t=1746889289194:63:33)
+    at AuthProvider (https://f4f1b860-57de-4042-a2f0-a48bea67ec64-00-hza8t5hqxak3.sisko.replit.dev:5173/src/providers/AuthProvider.tsx:24:32)
+    at Router (https://f4f1b860-57de-4042-a2f0-a48bea67ec64-00-hza8t5hqxak3.sisko.replit.dev:5173/node_modules/.vite/deps/react-router-dom.js?v=d0834c5c:4451:15)
+    at BrowserRouter (https://f4f1b860-57de-4042-a2f0-a48bea67ec64-00-hza8t5hqxak3.sisko.replit.dev:5173/node_modules/.vite/deps/react-router-dom.js?v=d0834c5c:5196:5)
+    at ThemeProvider (https://f4f1b860-57de-4042-a2f0-a48bea67ec64-00-hza8t5hqxak3.sisko.replit.dev:5173/src/components/theme-provider.tsx:17:33)
+    at QueryClientProvider (https://f4f1b860-57de-4042-a2f0-a48bea67ec64-00-hza8t5hqxak3.sisko.replit.dev:5173/node_modules/.vite/deps/@tanstack_react-query.js?v=d0834c5c:2794:3)
+    at App
+
+Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://reactjs.org/link/error-boundaries to learn more about error boundaries.
+logCapturedError @ chunk-UPELNCPK.js?v=d0834c5c:14032
+update.callback @ chunk-UPELNCPK.js?v=d0834c5c:14052
+callCallback @ chunk-UPELNCPK.js?v=d0834c5c:11248
+commitUpdateQueue @ chunk-UPELNCPK.js?v=d0834c5c:11265
+commitLayoutEffectOnFiber @ chunk-UPELNCPK.js?v=d0834c5c:17093
+commitLayoutMountEffects_complete @ chunk-UPELNCPK.js?v=d0834c5c:17980
+commitLayoutEffects_begin @ chunk-UPELNCPK.js?v=d0834c5c:17969
+commitLayoutEffects @ chunk-UPELNCPK.js?v=d0834c5c:17920
+commitRootImpl @ chunk-UPELNCPK.js?v=d0834c5c:19353
+commitRoot @ chunk-UPELNCPK.js?v=d0834c5c:19277
+finishConcurrentRender @ chunk-UPELNCPK.js?v=d0834c5c:18760
+performConcurrentWorkOnRoot @ chunk-UPELNCPK.js?v=d0834c5c:18718
+workLoop @ chunk-UPELNCPK.js?v=d0834c5c:197
+flushWork @ chunk-UPELNCPK.js?v=d0834c5c:176
+performWorkUntilDeadline @ chunk-UPELNCPK.js?v=d0834c5c:384Understand this error
+chunk-UPELNCPK.js?v=d0834c5c:19413 Uncaught ReferenceError: PageTransition is not defined
+    at AppLayout (AppLayout.tsx:108:10)
+    at renderWithHooks (chunk-UPELNCPK.js?v=d0834c5c:11548:26)
+    at mountIndeterminateComponent (chunk-UPELNCPK.js?v=d0834c5c:14926:21)
+    at beginWork (chunk-UPELNCPK.js?v=d0834c5c:15914:22)
+    at beginWork$1 (chunk-UPELNCPK.js?v=d0834c5c:19753:22)
+    at performUnitOfWork (chunk-UPELNCPK.js?v=d0834c5c:19198:20)
+    at workLoopSync (chunk-UPELNCPK.js?v=d0834c5c:19137:13)
+    at renderRootSync (chunk-UPELNCPK.js?v=d0834c5c:19116:15)
+    at recoverFromConcurrentError (chunk-UPELNCPK.js?v=d0834c5c:18736:28)
+    at performConcurrentWorkOnRoot (chunk-UPELNCPK.js?v=d0834c5c:18684:30)
+AppLayout @ AppLayout.tsx:108
+renderWithHooks @ chunk-UPELNCPK.js?v=d0834c5c:11548
+mountIndeterminateComponent @ chunk-UPELNCPK.js?v=d0834c5c:14926
+beginWork @ chunk-UPELNCPK.js?v=d0834c5c:15914
+beginWork$1 @ chunk-UPELNCPK.js?v=d0834c5c:19753
+performUnitOfWork @ chunk-UPELNCPK.js?v=d0834c5c:19198
+workLoopSync @ chunk-UPELNCPK.js?v=d0834c5c:19137
+renderRootSync @ chunk-UPELNCPK.js?v=d0834c5c:19116
+recoverFromConcurrentError @ chunk-UPELNCPK.js?v=d0834c5c:18736
+performConcurrentWorkOnRoot @ chunk-UPELNCPK.js?v=d0834c5c:18684
+workLoop @ chunk-UPELNCPK.js?v=d0834c5c:197
+flushWork @ chunk-UPELNCPK.js?v=d0834c5c:176
+performWorkUntilDeadline @ chunk-UPELNCPK.js?v=d0834c5c:384Understand this error
