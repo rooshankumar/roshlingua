@@ -556,7 +556,7 @@ const Community = () => {
 
   // Get auth context once at the top level to maintain hook order
   const { user: authUser } = useAuth();
-  
+
   const handleLike = async (userId: string) => {
     try {
       if (!authUser) {
@@ -790,7 +790,7 @@ const Community = () => {
                         <path d="M12 12a6 6 0 0 0 6-6 6 6 0 0 0-6-6 6 6 0 0 0-6 6 6 6 0 0 0 6 6Z" />
                         <path d="M15.5 17.5 16 22l-4-1-4 1 .5-4.5" />
                         <path d="M8.5 13.5A14 14 0 0 0 3 17l.8 1.2a3 3 0 0 0 2.2 1l4.5.8" />
-                        <path d="M15.5 13.5a14 14 0 0 1 5.5 3.5l-.8 1.2a3 3 0 0 1-2.2 1l-4.5.8" /></svg>
+                        <path d="M15.5 13.5a14 14 0 0 1 5.5 3.5l-.8 1.2a3 3 0 0 1-2.2 1l-4.5.8"/></svg>
                       <h3 className="text-base font-medium">Gender Preference</h3>
                     </div>
                     <div className="bg-background/50 p-4 rounded-lg border border-border/50">
