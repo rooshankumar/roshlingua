@@ -976,8 +976,15 @@ const Community = () => {
                   <div className="flex items-center space-x-3">
                     <div className="relative shrink-0">
                       <Avatar className="h-14 w-14 sm:h-16 sm:w-16">
-                        <AvatarImage src={user.avatar_url} alt={user.full_name} className="object-cover" />
-                        <AvatarFallback>{user.full_name?.charAt(0)}</AvatarFallback>
+                        <AvatarImage 
+                          src={user.avatar_url} 
+                          alt={user.full_name} 
+                          className="object-cover" 
+                          onError={(e) => {
+                            e.currentTarget.src = '/placeholder.svg';
+                          }}
+                        />
+                        <AvatarFallback>{user.full_name?.charAt(0) || '?'}</AvatarFallback>
                       </Avatar>
                       <span 
                         className={cn(
