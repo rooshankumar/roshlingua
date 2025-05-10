@@ -676,7 +676,7 @@ const Community = () => {
                   )}
                 </Button>
               </DialogTrigger>
-              <DialogContent className="sm:max-w-[500px] p-0 overflow-hidden rounded-xl">
+              <DialogContent className="sm:max-w-[500px] md:max-w-[450px] lg:max-w-[480px] w-[90%] p-0 overflow-hidden rounded-xl">
                 <div className="bg-gradient-to-r from-primary/10 to-secondary/10 p-4">
                   <DialogHeader>
                     <DialogTitle className="text-xl">Find Your Perfect Language Partners</DialogTitle>
@@ -686,7 +686,7 @@ const Community = () => {
                   </DialogHeader>
                 </div>
 
-                <div className="grid gap-6 p-6">
+                <div className="grid gap-6 p-6 filter-dialog-content">
                   <div className="space-y-3">
                     <div className="flex items-center">
                       <Globe className="mr-2 h-5 w-5 text-primary" />

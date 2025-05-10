@@ -112,6 +112,33 @@
   /* Smaller emoji reaction menu for mobile */
   .emoji-reaction-menu {
     transform: scale(0.9);
+
+/* Filter dialog responsive styles */
+@media (max-width: 640px) {
+  .DialogContent {
+    width: 90% !important;
+    max-height: 80vh !important;
+    margin: 0 auto !important;
+  }
+  
+  .DialogOverlay {
+    background-color: rgba(0, 0, 0, 0.6) !important;
+  }
+}
+
+/* Make inner content of filter scroll on small screens */
+@media (max-height: 700px) {
+  .filter-dialog-content {
+    max-height: 60vh;
+    overflow-y: auto;
+    padding-right: 4px;
+  }
+  
+  .filter-dialog-content::-webkit-scrollbar {
+    width: 4px;
+  }
+}
+
     transform-origin: center top;
   }
 
