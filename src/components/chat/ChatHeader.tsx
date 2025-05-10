@@ -55,7 +55,7 @@ export const ChatHeader = ({ conversation, messages = [], onScrollToMessage }: P
             <ChevronLeft className="h-5 w-5" />
           </Button>
           <div className="relative">
-            <Avatar className="h-10 w-10 md:h-12 md:w-12">
+            <Avatar className="h-10 w-10 md:h-12 md:w-12 ring-2 ring-primary">
               <AvatarImage src={participant?.avatar_url || '/placeholder.svg'} alt={participant?.full_name || 'User'} />
               <AvatarFallback>{participant?.full_name?.substring(0, 2).toUpperCase() || '?'}</AvatarFallback>
             </Avatar>
