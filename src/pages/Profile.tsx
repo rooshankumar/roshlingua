@@ -382,7 +382,7 @@ const Profile = () => {
             {profile.country && (
               <div className="flex items-center mb-4 text-sm text-muted-foreground">
                 <Globe className="h-4 w-4 mr-2" />
-                {profile.country}
+                Country of Residence - {profile.country}
               </div>
             )}
 
