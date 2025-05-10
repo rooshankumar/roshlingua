@@ -8,9 +8,10 @@ interface LikeButtonProps {
   targetUserId: string;
   currentUserId?: string | null;
   className?: string;
+  onClick?: (e: React.MouseEvent) => void;
 }
 
-export function LikeButton({ targetUserId, currentUserId, className }: LikeButtonProps) {
+export function LikeButton({ targetUserId, currentUserId, className, onClick }: LikeButtonProps) {
   const { likeCount, isLiked, isLoading, toggleLike } = useLikes(targetUserId, currentUserId);
 
   const disabled = isLoading || !currentUserId || currentUserId === targetUserId;
@@ -24,6 +25,7 @@ export function LikeButton({ targetUserId, currentUserId, className }: LikeButto
         e.preventDefault();
         e.stopPropagation();
         toggleLike();
+        if (onClick) onClick(e);
       }}
       className={cn(
         "gap-2 transition-colors",

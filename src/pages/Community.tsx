@@ -1047,6 +1047,10 @@ const Community = () => {
                       currentUserId={user?.id} 
                       className="p-0 h-auto"
                       data-user-id={user.id}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                      }}
                     />
                   </div>
                 </div>
