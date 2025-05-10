@@ -960,13 +960,13 @@ const Community = () => {
                   if ((e.target as any).__isLikeButtonClick) {
                     return;
                   }
-                  
+
                   // Check if click is on or inside the like button
                   const target = e.target as Element;
                   if (target.closest('[data-like-button="true"]')) {
                     return;
                   }
-                  
+
                   navigate(`/profile/${user.id}`);
                 }}
               >              
