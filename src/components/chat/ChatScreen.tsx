@@ -597,33 +597,21 @@ export const ChatScreen = ({ conversation }: Props) => {
                   animationDelay: `${Math.min(index * 0.05, 0.5)}s` // Faster animation with a max delay
                 }}
                 onClick={(e) => {
-                    // Different behavior for desktop (click) vs mobile (tap)
-                    if (window.matchMedia('(min-width: 768px)').matches) {
-                      // Close any other open reaction menu
-                      if (activeReactionMenu && activeReactionMenu !== message.id) {
-                        const prevMenu = document.getElementById(`message-actions-${activeReactionMenu}`);
-                        if (prevMenu) {
-                          prevMenu.classList.add('opacity-0', 'pointer-events-none');
-                          prevMenu.classList.remove('active');
-                        }
-                      }
-                      // Toggle current reaction menu
-                      const messageActions = document.getElementById(`message-actions-${message.id}`);
-                      if (messageActions) {
-                        messageActions.classList.toggle('opacity-0');
-                        messageActions.classList.toggle('pointer-events-none');
-                        messageActions.classList.toggle('active');
-                        setActiveReactionMenu(messageActions.classList.contains('active') ? message.id : null);
-                      }
+                  // Close any other open reaction menu
+                  if (activeReactionMenu && activeReactionMenu !== message.id) {
+                    const prevMenu = document.getElementById(`message-actions-${activeReactionMenu}`);
+                    if (prevMenu) {
+                      prevMenu.classList.add('opacity-0', 'pointer-events-none');
+                      prevMenu.classList.remove('active');
                     }
-                  }}
-                onContextMenu={(e) => {
-                  // Right-click for desktop
-                  e.preventDefault();
+                  }
+                  // Toggle current reaction menu
                   const messageActions = document.getElementById(`message-actions-${message.id}`);
                   if (messageActions) {
-                    messageActions.classList.remove('opacity-0');
-                    messageActions.classList.remove('pointer-events-none');
+                    messageActions.classList.toggle('opacity-0');
+                    messageActions.classList.toggle('pointer-events-none');
+                    messageActions.classList.toggle('active');
+                    setActiveReactionMenu(messageActions.classList.contains('active') ? message.id : null);
                   }
                 }}
                 onTouchStart={(e) => {
