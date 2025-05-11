@@ -226,17 +226,14 @@ export const MessageReactions = ({
   // Display existing reactions
   return (
     <div className="messenger-reactions-display">
-      <div className="flex -space-x-1 items-center shadow-sm">
+      <div className="flex items-center gap-[2px]">
         {Object.entries(reactions).map(([emoji, users]) => (
           <div
             key={emoji}
-            className={`messenger-reaction flex items-center justify-center h-5 min-w-5 px-1 rounded-full text-xs 
-              ${userReactions.includes(emoji) ? 'bg-primary text-primary-foreground' : 'bg-muted hover:bg-muted/80'} 
-              cursor-pointer active:scale-95 transition-all`}
+            className={`messenger-reaction flex items-center text-sm cursor-pointer hover:scale-110 transition-transform`}
             onClick={() => handleReact(emoji)}
           >
-            <span className="mr-[1px]">{emoji}</span>
-            {users.length > 1 && <span className="text-[10px] font-medium">{users.length}</span>}
+            <span>{emoji}</span>
           </div>
         ))}
       </div>

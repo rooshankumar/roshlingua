@@ -183,13 +183,30 @@
   .message-reaction-btn {
     height: 26px !important;
 
-/* Facebook Messenger-style reactions */
+/* WhatsApp-style reactions */
 .messenger-reactions-display {
   position: absolute;
-  bottom: -10px;
-  left: 6px;
+  bottom: -8px;
   z-index: 5;
-  transform: translateY(50%);
+  background: #fff;
+  padding: 2px 4px;
+  border-radius: 10px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  min-width: 24px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+[data-sender="self"] .messenger-reactions-display {
+  left: -8px;
+  transform: translateX(-50%);
+}
+
+[data-sender="other"] .messenger-reactions-display {
+  right: -8px;
+  transform: translateX(50%);
 }
 
 /* Reaction picker styling */
