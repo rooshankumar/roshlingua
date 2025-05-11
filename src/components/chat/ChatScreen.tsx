@@ -759,32 +759,24 @@ export const ChatScreen = ({ conversation }: Props) => {
                       {/* Facebook Messenger-style reactions attached to message */}
                       <MessageReactions messageId={message.id} existingReactions={message.reactions || {}} />
                       {message.attachment_url && (
-                        <div className="mt-1 rounded-lg overflow-hidden">
+                        <div className="mt-1 rounded-lg overflow-hidden w-full max-w-full">
                           {message.attachment_url?.match(/\.(jpg|jpeg|png|gif|webp|avif)$/i) ? (
-                            <a href={message.attachment_url} target="_blank" rel="noopener noreferrer" className="block"> 
+                            <div className="relative w-full">
                               <img 
                                 src={message.attachment_url} 
                                 alt={message.attachment_name || "Image"}
-                                className="max-w-[300px] max-h-[300px] object-contain rounded-lg hover:scale-105 transition-transform duration-200 cursor-pointer shadow-sm hover:shadow-md"
+                                className="w-full max-w-[600px] object-contain rounded-lg shadow-sm"
                                 onError={(e) => handleImageLoadError(e, message.attachment_url as string)}
                                 loading="eager"
                                 referrerPolicy="no-referrer"
                                 fetchpriority="low"
-                                onClick={() => {
-                                  // Provide haptic feedback on mobile
-                                  if ('vibrate' in navigator) {
-                                    navigator.vibrate(10);
-                                  }
-                                  setImagePreview({ url: message.attachment_url, name: message.attachment_name });
-                                  setShowImagePreview(true);
-                                }}
                               />
-                            </a>
+                            </div>
                           ) : message.attachment_url?.match(/\.(mp4|webm|ogg)$/i) ? (
                             <video 
                               src={`${message.attachment_url}${message.attachment_url.includes('?') ? '&' : '?'}t=${Date.now()}`}
                               controls
-                              className="max-w-[300px] rounded-lg"
+                              className="w-full max-w-[600px] rounded-lg"
                               preload="auto"
                               onError={() => {
                                 console.error("Video failed to load:", message.attachment_url);
@@ -794,30 +786,22 @@ export const ChatScreen = ({ conversation }: Props) => {
                             <audio 
                               src={message.attachment_url}
                               controls
-                              className="max-w-[300px]"
+                              className="w-full max-w-[600px]"
                               preload="auto"
                               onError={() => {
                                 console.error("Audio failed to load:", message.attachment_url);
                               }}
                             />
                           ) : message.attachment_url?.match(/\.(pdf)$/i) ? (
-                            <div className="flex flex-col items-center">
+                            <div className="w-full">
                               <iframe
                                 src={message.attachment_url}
-                                className="w-[300px] h-[400px] rounded-lg border border-border"
+                                className="w-full max-w-[600px] h-[600px] rounded-lg border border-border"
                                 onLoad={() => console.log("PDF loaded successfully")}
                                 onError={() => {
                                   console.error("PDF failed to load:", message.attachment_url);
                                 }}
                               />
-                              <a 
-                                href={message.attachment_url}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="text-sm mt-1 hover:underline"
-                              >
-                                View Full PDF
-                              </a>
                             </div>
                           ) : message.attachment_url ? (
                             <div className="flex items-center gap-3 p-3 rounded-lg">
