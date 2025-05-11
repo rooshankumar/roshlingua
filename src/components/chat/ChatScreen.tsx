@@ -885,10 +885,20 @@ export const ChatScreen = ({ conversation }: Props) => {
           </div>
         </ScrollArea>
       ) : (
-        <div className="flex-1 flex items-center justify-center">
-          <div className="text-center space-y-2 animate-fade-up">
-            <Loader2 className="h-8 w-8 animate-spin text-primary mx-auto" />
-            <p className="text-muted-foreground">Loading chat...</p>
+        <div className="flex-1 flex items-center justify-center bg-gradient-to-b from-background/50 to-background">
+          <div className="text-center space-y-6 animate-fade-up p-8 rounded-xl backdrop-blur-sm">
+            <div className="relative">
+              <div className="absolute inset-0 rounded-full blur-xl bg-primary/20 animate-pulse"></div>
+              <Loader2 className="h-12 w-12 animate-spin text-primary mx-auto relative" />
+            </div>
+            <div className="space-y-2">
+              <h3 className="font-semibold text-lg animate-pulse">Loading Your Chat</h3>
+              <div className="flex items-center justify-center gap-1">
+                <span className="w-2 h-2 rounded-full bg-primary/60 animate-bounce" style={{ animationDelay: '0ms' }}></span>
+                <span className="w-2 h-2 rounded-full bg-primary/60 animate-bounce" style={{ animationDelay: '150ms' }}></span>
+                <span className="w-2 h-2 rounded-full bg-primary/60 animate-bounce" style={{ animationDelay: '300ms' }}></span>
+              </div>
+            </div>
           </div>
         </div>
       )}
