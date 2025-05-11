@@ -63,8 +63,8 @@ const AppRoutes = () => {
   return (
     <>
       <AuthCodeHandler />
-      <AnimatePresence mode="wait">
-        <Routes location={location} key={location.pathname}>
+      <AnimatePresence mode="wait" initial={false}>
+        <Routes>
         {/* Public routes */}
         <Route path="/" element={<PageTransition><Home /></PageTransition>} />
         <Route path="/auth" element={
