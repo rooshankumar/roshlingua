@@ -258,12 +258,15 @@
 /* Ensure the reaction menu stays inside the chat view */
 .message-actions-menu {
   position: absolute;
-  max-width: 90%;
-  left: 0;
-  right: 0;
-  margin: 0 auto;
+  max-width: 240px;
+  left: 50%;
+  transform: translateX(-50%) translateY(-110%) scale(0.85);
   z-index: 50;
-  transform: translateY(-110%);
+  transition: all 0.2s ease;
+}
+
+.message-actions-menu.active {
+  transform: translateX(-50%) translateY(-110%) scale(1);
 }
 
 /* Emoji menu (more options) styling */
