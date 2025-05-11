@@ -52,7 +52,7 @@ export const ChatScreen = ({ conversation }: Props) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const [isLoading, setIsLoading] = useState(true);
-  const [isSending, setIsSending] = useState(isSending);
+  const [isSending, setIsSending] = useState(false);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [replyTo, setReplyTo] = useState<Message | null>(null);
