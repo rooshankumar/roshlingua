@@ -761,7 +761,7 @@ export const ChatScreen = ({ conversation }: Props) => {
                       {message.attachment_url && (
                         <div className="mt-1 rounded-lg overflow-hidden w-full max-w-full">
                           {message.attachment_url?.match(/\.(jpg|jpeg|png|gif|webp|avif)$/i) ? (
-                            <div className="relative w-full">
+                            <div className="relative w-full group">
                               <img 
                                 src={message.attachment_url} 
                                 alt={message.attachment_name || "Image"}
@@ -771,6 +771,21 @@ export const ChatScreen = ({ conversation }: Props) => {
                                 referrerPolicy="no-referrer"
                                 fetchpriority="low"
                               />
+                              <div 
+                                className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  const messageActions = document.getElementById(`message-actions-${message.id}`);
+                                  if (messageActions) {
+                                    messageActions.classList.toggle('opacity-0');
+                                    messageActions.classList.toggle('pointer-events-none');
+                                    messageActions.classList.toggle('active');
+                                    setActiveReactionMenu(messageActions.classList.contains('active') ? message.id : null);
+                                  }
+                                }}
+                              >
+                                <MessageReactions messageId={message.id} existingReactions={message.reactions || {}} />
+                              </div>
                             </div>
                           ) : message.attachment_url?.match(/\.(mp4|webm|ogg)$/i) ? (
                             <video 
