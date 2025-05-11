@@ -92,6 +92,7 @@ export const MessageReactions = ({
 
   const handleReact = async (emoji: string) => {
     if (!user?.id || isLoading) return;
+    if (onClose) onClose();
 
     setIsLoading(true);
 

@@ -259,14 +259,27 @@
 .message-actions-menu {
   position: absolute;
   max-width: 240px;
-  left: 50%;
-  transform: translateX(-50%) translateY(-110%) scale(0.85);
   z-index: 50;
   transition: all 0.2s ease;
+  top: -45px;
 }
 
-.message-actions-menu.active {
-  transform: translateX(-50%) translateY(-110%) scale(1);
+.message-actions-menu[data-sender="self"] {
+  right: 100%;
+  transform: translateX(10px) scale(0.85);
+}
+
+.message-actions-menu[data-sender="other"] {
+  left: 100%;
+  transform: translateX(-10px) scale(0.85);
+}
+
+.message-actions-menu.active[data-sender="self"] {
+  transform: translateX(10px) scale(1);
+}
+
+.message-actions-menu.active[data-sender="other"] {
+  transform: translateX(-10px) scale(1);
 }
 
 /* Emoji menu (more options) styling */

@@ -738,7 +738,8 @@ export const ChatScreen = ({ conversation }: Props) => {
                   {/* Facebook Messenger-style reaction picker */}
                   <div 
                     id={`message-actions-${message.id}`}
-                    className="message-actions-menu absolute top-0 opacity-0 pointer-events-none transition-opacity duration-200 z-50"
+                    className="message-actions-menu opacity-0 pointer-events-none transition-opacity duration-200 z-50"
+                    data-sender={message.sender_id === user?.id ? 'self' : 'other'}
                     onClick={(e) => e.stopPropagation()}
                   >
                     <ReactionPicker 
@@ -747,6 +748,8 @@ export const ChatScreen = ({ conversation }: Props) => {
                         const messageActions = document.getElementById(`message-actions-${message.id}`);
                         if (messageActions) {
                           messageActions.classList.add('opacity-0', 'pointer-events-none');
+                          messageActions.classList.remove('active');
+                          setActiveReactionMenu(null);
                         }
                       }}
                       position="top"
