@@ -296,8 +296,9 @@ const Callback = () => {
 
   return (
     <div className="h-screen w-full flex items-center justify-center">
-      <div className="flex flex-col items-center gap-4">
-        <LoadingSpinner size="md" />
+      <div className="animate-pulse flex flex-col items-center gap-4">
+        <div className="h-12 w-12 rounded-full bg-primary/20"></div>
+        <div className="h-2 w-24 rounded-full bg-primary/20"></div>
         <p className="text-muted-foreground">
           {isProcessing ? "Completing authentication..." : "Redirecting..."}
         </p>
