@@ -2,7 +2,7 @@
 .chat-content-area {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 2px; /* Reduced from 8px to 2px for tighter message grouping */
 }
 
 .message-bubble {
@@ -10,6 +10,7 @@
   max-width: 70%;
   word-break: break-word;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  margin-bottom: 1px; /* Add minimal spacing between bubbles */
 }
 
 .message-bubble[data-sender="self"] {

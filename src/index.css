@@ -437,7 +437,7 @@
   overflow-wrap: break-word !important;
   display: inline-block !important;
   width: auto !important;
-  margin-bottom: 4px !important; 
+  margin-bottom: 1px !important; /* Reduced from 4px to 1px */
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1) !important;
   transition: transform 0.2s ease !important;
   position: relative !important;
@@ -456,11 +456,24 @@
   overflow-wrap: break-word !important;
   display: inline-block !important;
   width: auto !important;
-  margin-bottom: 4px !important;
+  margin-bottom: 1px !important; /* Reduced from 4px to 1px */
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1) !important;
   transition: transform 0.2s ease !important;
   position: relative !important;
   padding-bottom: 8px !important;
+}
+
+/* Special styling for grouped messages (consecutive from same sender) */
+.message-group-same-sender .message-bubble[data-sender="self"] {
+  border-top-right-radius: 10px !important;
+  border-bottom-right-radius: 4px !important;
+  margin-top: 1px !important;
+}
+
+.message-group-same-sender .message-bubble[data-sender="other"] {
+  border-top-left-radius: 10px !important;
+  border-bottom-left-radius: 4px !important;
+  margin-top: 1px !important;
 }
 
 .message-bubble[data-sender="self"]:hover,
