@@ -709,7 +709,7 @@ export const ChatScreen = ({ conversation }: Props) => {
                 } ${index > 0 && messages[index - 1]?.sender_id === message.sender_id ? 'mt-0 consecutive-group' : 'mt-2'}`}
                 style={{
                   animationDelay: `${Math.min(index * 0.05, 0.5)}s`, // Faster animation with a max delay
-                  marginBottom: index > 0 && messages[index - 1]?.sender_id === message.sender_id ? '0' : '2px'
+                  marginBottom: index > 0 && messages[index - 1]?.sender_id === message.sender_id ? '2px' : '3px'
                 }}
                 onClick={(e) => {
                   // Close any other open reaction menu
