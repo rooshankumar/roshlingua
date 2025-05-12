@@ -211,43 +211,71 @@ export default function RealtimeConnectionCheck() {
   }, [user?.id, refreshAllConnections]);
 
   const [isConnected, setIsConnected] = useState(false);
+  const connectionCheckRef = useRef<any>(null);
 
   useEffect(() => {
     let connectionTimeout: number;
+    let checkInterval: number;
 
     const checkConnection = () => {
       try {
-        // Create a test channel to check connection status
-        const channel = supabase.channel('connection-check')
-          .subscribe((status) => {
-            if (status === 'SUBSCRIBED') {
-              console.log('Realtime connection is healthy');
-              setIsConnected(true);
-              setConnectionStatus('CONNECTED');
-            } else {
-              console.log('Realtime connection issue:', status);
-              setIsConnected(false);
-              setConnectionStatus(status || 'DISCONNECTED');
+        // Clean up previous connection check if it exists
+        if (connectionCheckRef.current) {
+          try {
+            connectionCheckRef.current.unsubscribe();
+            connectionCheckRef.current = null;
+          } catch (e) {
+            console.log('Error cleaning up previous connection check:', e);
+          }
+        }
 
-              // Try to reconnect after a delay
-              connectionTimeout = window.setTimeout(() => {
-                if (channel) {
-                  try {
-                    channel.unsubscribe();
-                  } catch (e) {
-                    console.log('Error unsubscribing from channel', e);
-                  }
-                  checkConnection(); // Try again
-                }
-              }, 5000);
+        // Create a test channel to check connection status
+        const channel = supabase.channel('connection-check', {
+          config: { 
+            broadcast: { self: true },
+            presence: { key: 'online' }
+          }
+        });
+        
+        connectionCheckRef.current = channel;
+        
+        channel.subscribe((status) => {
+          if (status === 'SUBSCRIBED') {
+            console.log('Realtime connection is healthy');
+            setIsConnected(true);
+            setConnectionStatus('CONNECTED');
+            
+            // Refresh all subscriptions after a successful connection
+            if (!isConnected) {
+              subscriptionManager.refreshAll();
             }
-          });
+          } else {
+            console.log('Realtime connection issue:', status);
+            setIsConnected(false);
+            setConnectionStatus(status || 'DISCONNECTED');
+
+            // Try to reconnect after a delay
+            window.clearTimeout(connectionTimeout);
+            connectionTimeout = window.setTimeout(() => {
+              if (channel) {
+                try {
+                  channel.unsubscribe();
+                  connectionCheckRef.current = null;
+                } catch (e) {
+                  console.log('Error unsubscribing from channel', e);
+                }
+                checkConnection(); // Try again
+              }
+            }, 5000);
+          }
+        });
       } catch (error) {
         console.error('Error checking connection:', error);
         setIsConnected(false);
         setConnectionStatus('ERROR');
 
         // Try again after a delay
+        window.clearTimeout(connectionTimeout);
         connectionTimeout = window.setTimeout(checkConnection, 5000);
       }
     };
@@ -255,15 +283,30 @@ export default function RealtimeConnectionCheck() {
     checkConnection();
 
     // Set up an interval to periodically check the connection
-    const interval = setInterval(() => {
-      checkConnection();
-    }, 30000); // Check every 30 seconds
+    checkInterval = window.setInterval(() => {
+      // Only check if we think we're disconnected or periodically (every 5 minutes)
+      const shouldForceCheck = !isConnected || 
+        (Date.now() - lastRefreshTimestamp) > 5 * 60 * 1000;
+        
+      if (shouldForceCheck) {
+        checkConnection();
+      }
+    }, 60000); // Check every minute instead of 30 seconds
 
     return () => {
-      clearInterval(interval);
+      window.clearInterval(checkInterval);
       window.clearTimeout(connectionTimeout);
+      
+      if (connectionCheckRef.current) {
+        try {
+          connectionCheckRef.current.unsubscribe();
+          connectionCheckRef.current = null;
+        } catch (e) {
+          console.log('Error cleaning up connection check on unmount:', e);
+        }
+      }
     };
-  }, []);
+  }, [isConnected]);
 
 
   // This component doesn't render anything visible

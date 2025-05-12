@@ -134,6 +134,7 @@ export const ChatScreen = ({ conversation }: Props) => {
     if (!conversation?.id) return;
 
     let isActive = true;
+    let channelRef = null;
     const subscriptionKey = `messages:${conversation.id}`;
 
     // Show loading state only for initial load
@@ -143,6 +144,8 @@ export const ChatScreen = ({ conversation }: Props) => {
     }
 
     const fetchMessages = async (loadMore = false) => {
+      if (!isActive) return;
+      
       try {
         // Use a smaller page size for initial load to improve perceived performance
         const pageSize = isInitialLoad ? 10 : MESSAGES_PER_PAGE;
@@ -211,84 +214,112 @@ export const ChatScreen = ({ conversation }: Props) => {
       }
     };
 
-    fetchMessages();
+    const setupRealtimeSubscription = () => {
+      // Clean up any existing subscription before creating a new one
+      if (channelRef) {
+        try {
+          channelRef.unsubscribe();
+        } catch (err) {
+          console.error('Error unsubscribing from previous channel:', err);
+        }
+      }
 
-    // Set up real-time subscription for new messages
-    const channel = supabase
-      .channel(subscriptionKey)
-      .on('postgres_changes', 
-        {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'messages',
-          filter: `conversation_id=eq.${conversation.id}`
-        }, 
-        async (payload) => {
-          console.log('Real-time: New message received:', payload);
+      // Set up real-time subscription for new messages
+      channelRef = supabase
+        .channel(subscriptionKey)
+        .on('postgres_changes', 
+          {
+            event: 'INSERT',
+            schema: 'public',
+            table: 'messages',
+            filter: `conversation_id=eq.${conversation.id}`
+          }, 
+          async (payload) => {
+            if (!isActive) return;
+            console.log('Real-time: New message received:', payload);
 
-          // Fetch the complete message with sender info
-          const { data: newMessage } = await supabase
-            .from('messages')
-            .select(`
-              *,
-              sender:profiles!messages_sender_id_fkey(
-                id,
-                user_id,
-                full_name,
-                avatar_url,
-                last_seen
-              )
-            `)
-            .eq('id', payload.new.id)
-            .single();
+            // Fetch the complete message with sender info
+            const { data: newMessage } = await supabase
+              .from('messages')
+              .select(`
+                *,
+                sender:profiles!messages_sender_id_fkey(
+                  id,
+                  user_id,
+                  full_name,
+                  avatar_url,
+                  last_seen
+                )
+              `)
+              .eq('id', payload.new.id)
+              .single();
 
-          if (newMessage) {
-            console.log('Fetched new message with sender:', newMessage);
-            console.log('Message has attachment:', newMessage.attachment_url);
+            if (newMessage && isActive) {
+              console.log('Fetched new message with sender:', newMessage);
+              console.log('Message has attachment:', newMessage.attachment_url);
 
-            setMessages(prev => {
-              const exists = prev.some(msg => msg.id === newMessage.id);
-              if (exists) return prev;
+              setMessages(prev => {
+                const exists = prev.some(msg => msg.id === newMessage.id);
+                if (exists) return prev;
 
-              // Ensure attachment properties are properly included and log them
-              console.log('Processing message with attachment:', 
-                newMessage.id, 
-                'URL:', newMessage.attachment_url,
-                'Name:', newMessage.attachment_name);
+                // Ensure attachment properties are properly included and log them
+                console.log('Processing message with attachment:', 
+                  newMessage.id, 
+                  'URL:', newMessage.attachment_url,
+                  'Name:', newMessage.attachment_name);
 
-              const messageWithAttachment = {
-                ...newMessage,
-                attachment_url: newMessage.attachment_url || null,
-                attachment_name: newMessage.attachment_name || null,
-                attachment_thumbnail: newMessage.attachment_thumbnail || null // Added thumbnail handling
-              };
+                const messageWithAttachment = {
+                  ...newMessage,
+                  attachment_url: newMessage.attachment_url || null,
+                  attachment_name: newMessage.attachment_name || null,
+                  attachment_thumbnail: newMessage.attachment_thumbnail || null // Added thumbnail handling
+                };
 
-              const updatedMessages = [...prev, messageWithAttachment];
-              // Multiple scroll attempts with increasing delays for reliability
-              [50, 150, 300, 500].forEach(delay => {
-                setTimeout(() => scrollToLatestMessage(delay > 100), delay);
+                const updatedMessages = [...prev, messageWithAttachment];
+                // Multiple scroll attempts with increasing delays for reliability
+                [50, 150, 300, 500].forEach(delay => {
+                  setTimeout(() => scrollToLatestMessage(delay > 100), delay);
+                });
+                return updatedMessages;
               });
-              return updatedMessages;
-            });
+            }
           }
-        }
-      )
-      .subscribe((status) => {
-        console.log(`Chat subscription status for ${subscriptionKey}:`, status);
-        if (status === 'SUBSCRIBED') {
-          console.log('Successfully subscribed to chat messages');
-        } else if (status !== 'SUBSCRIBED') {
-          console.warn('Chat subscription issue:', status);
-          // If connection lost, retry fetching messages after a short delay
-          setTimeout(() => fetchMessages(), 3000);
-        }
-      });
+        )
+        .subscribe((status) => {
+          if (!isActive) return;
+          
+          console.log(`Chat subscription status for ${subscriptionKey}:`, status);
+          if (status === 'SUBSCRIBED') {
+            console.log('Successfully subscribed to chat messages');
+          } else if (status !== 'SUBSCRIBED') {
+            console.warn('Chat subscription issue:', status);
+            // If connection lost, retry fetching messages after a short delay
+            if (isActive) {
+              setTimeout(() => fetchMessages(), 3000);
+            }
+          }
+        });
 
+      return channelRef;
+    };
+
+    // Initial fetch and subscription setup
+    fetchMessages();
+    channelRef = setupRealtimeSubscription();
+
+    // Cleanup function
     return () => {
-      if (!isActive) return;
-      isActive = false;
       console.log(`Cleaning up chat subscription for ${subscriptionKey}`);
-      channel.unsubscribe();
+      isActive = false;
+      
+      if (channelRef) {
+        try {
+          channelRef.unsubscribe();
+          channelRef = null;
+        } catch (err) {
+          console.error('Error during channel cleanup:', err);
+        }
+      }
     };
   }, [conversation?.id, page, markConversationAsRead]);
 
