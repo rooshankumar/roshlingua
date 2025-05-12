@@ -34,7 +34,17 @@
 
 /* Fix spacing for consecutive messages */
 .animate-slide-up + .animate-slide-up {
-  margin-top: 8px;
+  margin-top: 2px;
+}
+
+/* Special handling for consecutive messages from same sender */
+.animate-slide-up.mt-0 {
+  margin-top: 0 !important;
+}
+
+.consecutive-message {
+  margin-top: 1px !important;
+  margin-bottom: 0 !important;
 }
 
 /* Chat Screen Styles */

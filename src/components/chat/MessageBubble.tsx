@@ -13,9 +13,10 @@ interface MessageBubbleProps {
   isRead?: boolean;
   onReaction?: (emoji: string) => void;
   isLast?: boolean;
+  isConsecutive?: boolean;
 }
 
-export const MessageBubble = ({ message, isCurrentUser, isRead = false, onReaction, isLast = false }: MessageBubbleProps) => {
+export const MessageBubble = ({ message, isCurrentUser, isRead = false, onReaction, isLast = false, isConsecutive = false }: MessageBubbleProps) => {
   const [showReactionPicker, setShowReactionPicker] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
   const [isPreloading, setIsPreloading] = useState(true);
@@ -73,7 +74,7 @@ export const MessageBubble = ({ message, isCurrentUser, isRead = false, onReacti
 
       <div className={`flex flex-col ${isCurrentUser ? 'items-end' : 'items-start'}`}>
         <div 
-          className={`message-bubble ${isCurrentUser ? 'sent bg-primary text-primary-foreground' : 'received bg-muted text-muted-foreground'} rounded-2xl shadow-sm ${message.attachment_url ? 'overflow-hidden' : 'p-3'}`}
+          className={`message-bubble ${isCurrentUser ? 'sent bg-primary text-primary-foreground' : 'received bg-muted text-muted-foreground'} rounded-2xl shadow-sm ${message.attachment_url ? 'overflow-hidden' : 'p-3'} ${isConsecutive ? 'consecutive-message' : ''}`}
         >
           {/* Image attachment */}
           {isImageAttachment && (

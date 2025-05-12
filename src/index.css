@@ -465,7 +465,8 @@
 
 /* Special styling for grouped messages (consecutive from same sender) */
 .message-group-same-sender .message-bubble[data-sender="self"],
-.mt-0 .message-bubble[data-sender="self"] {
+.mt-0 .message-bubble[data-sender="self"],
+.consecutive-message[data-sender="self"] {
   border-top-right-radius: 10px !important;
   border-bottom-right-radius: 4px !important;
   margin-top: 0 !important;
@@ -473,11 +474,25 @@
 }
 
 .message-group-same-sender .message-bubble[data-sender="other"],
-.mt-0 .message-bubble[data-sender="other"] {
+.mt-0 .message-bubble[data-sender="other"],
+.consecutive-message[data-sender="other"] {
   border-top-left-radius: 10px !important;
   border-bottom-left-radius: 4px !important;
   margin-top: 0 !important;
   margin-bottom: 0 !important;
+}
+
+/* For consecutive messages, adjust border radius to make them appear more connected */
+.mt-0 + .mt-0 .message-bubble[data-sender="self"],
+.consecutive-message + .consecutive-message[data-sender="self"] {
+  border-top-right-radius: 4px !important;
+  border-top-left-radius: 10px !important;
+}
+
+.mt-0 + .mt-0 .message-bubble[data-sender="other"],
+.consecutive-message + .consecutive-message[data-sender="other"] {
+  border-top-left-radius: 4px !important;
+  border-top-right-radius: 10px !important;
 }
 
 .message-bubble[data-sender="self"]:hover,
