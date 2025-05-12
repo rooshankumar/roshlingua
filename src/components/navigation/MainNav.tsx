@@ -72,8 +72,8 @@ export function MainNav() {
             mobile ? 'py-3' : ''
           } ${
             isActive(route.path) 
-              ? "bg-white/20 text-white translate-x-2" 
-              : "text-white/80 hover:bg-white/10 hover:text-white hover:translate-x-1"
+              ? "bg-accent text-accent-foreground translate-x-2" 
+              : "text-muted-foreground hover:bg-accent hover:text-accent-foreground hover:translate-x-1"
           }`}
         >
           <div className="relative">
@@ -105,7 +105,7 @@ export function MainNav() {
   const isChatDetailRoute = location.pathname.match(/^\/chat\/[0-9a-f-]+$/);
 
   return (
-    <nav className="hidden lg:flex sticky top-0 flex-col space-y-2 p-4 min-h-screen bg-primary text-white backdrop-blur-lg border-r">
+    <nav className="hidden lg:flex sticky top-0 flex-col space-y-2 p-4 min-h-screen bg-background text-foreground backdrop-blur-lg border-r">
       <div className="mb-8">
         <h2 
           className="font-bold text-white"
