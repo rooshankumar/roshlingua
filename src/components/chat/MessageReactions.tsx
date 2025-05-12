@@ -228,7 +228,7 @@ export const MessageReactions = ({
   // Display existing reactions
   return (
     <div className="messenger-reactions-display">
-      <div className="flex items-center gap-[2px]">
+      <div className="flex items-center gap-[2px] bg-white dark:bg-black rounded-full shadow-sm px-1.5 py-0.5 border border-gray-200 dark:border-gray-800">
         {Object.entries(reactions).map(([emoji, users]) => (
           <div
             key={emoji}

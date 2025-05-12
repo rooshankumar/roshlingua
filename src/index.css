@@ -246,22 +246,31 @@
   animation: fb-pop 0.3s ease-in-out;
 }
 
-/* Fix reaction container positioning to prevent expanding message borders */
+/* Position reactions to hang outside message bubbles */
 .messenger-reactions-display {
   position: absolute !important;
   bottom: -8px !important;
-  left: 8px !important;
   z-index: 10 !important;
   pointer-events: auto !important;
   margin: 0 !important;
   padding: 0 !important;
   transform: translateY(50%) !important;
-  background: transparent !important;
-  border: none !important;
   max-width: 100% !important;
   overflow: visible !important;
   height: 22px !important; /* Fixed height to prevent layout shifts */
   white-space: nowrap !important;
+}
+
+/* For sender's messages (right side) */
+[data-sender="self"] .messenger-reactions-display {
+  right: -5px !important;
+  left: auto !important;
+}
+
+/* For receiver's messages (left side) */
+[data-sender="other"] .messenger-reactions-display {
+  left: -5px !important;
+  right: auto !important;
 }
 
 /* Ensure emoji reaction containers don't cause wrapping */

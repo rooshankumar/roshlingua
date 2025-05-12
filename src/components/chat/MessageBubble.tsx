@@ -75,6 +75,7 @@ export const MessageBubble = ({ message, isCurrentUser, isRead = false, onReacti
       <div className={`flex flex-col ${isCurrentUser ? 'items-end' : 'items-start'}`}>
         <div 
           className={`message-bubble ${isCurrentUser ? 'sent bg-primary text-primary-foreground' : 'received bg-muted text-muted-foreground'} rounded-2xl shadow-sm ${message.attachment_url ? 'overflow-hidden' : 'p-1 px-2'} ${isConsecutive ? 'consecutive-message' : ''} inline-block max-w-fit`}
+          data-sender={isCurrentUser ? 'self' : 'other'}
         >
           {/* Image attachment */}
           {isImageAttachment && (
