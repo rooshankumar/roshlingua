@@ -857,7 +857,9 @@ export const ChatScreen = ({ conversation }: Props) => {
                       position="top"
                     />
                   </div>
-                  {message.sender_id !== user?.id && (
+                  {/* Only show sender name if this is the first message from this sender or after a different sender */}
+                  {message.sender_id !== user?.id && 
+                   (index === 0 || messages[index - 1]?.sender_id !== message.sender_id) && (
                     <span className="text-xs text-muted-foreground ml-1">
                       {message.sender?.full_name}
                     </span>
