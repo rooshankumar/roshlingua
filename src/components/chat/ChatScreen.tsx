@@ -704,9 +704,9 @@ export const ChatScreen = ({ conversation }: Props) => {
               <div
                 id={`message-${message.id}`}
                 key={message.id}
-                className={`flex items-start gap-3 animate-slide-up mb-2 ${
+                className={`flex items-start gap-3 animate-slide-up ${
                   message.sender_id === user?.id ? 'flex-row-reverse' : 'flex-row'
-                }`}
+                } ${index > 0 && messages[index - 1]?.sender_id === message.sender_id ? 'mt-0' : 'mt-2'}`}
                 style={{
                   animationDelay: `${Math.min(index * 0.05, 0.5)}s` // Faster animation with a max delay
                 }}
@@ -836,7 +836,7 @@ export const ChatScreen = ({ conversation }: Props) => {
                   element.classList.remove('message-long-press');
                 }}
               >
-                <div className={`flex flex-col gap-2 w-full max-w-[85%] sm:max-w-[70%] group transition-all duration-300 relative`}>
+                <div className={`flex flex-col ${index > 0 && messages[index - 1]?.sender_id === message.sender_id ? 'gap-0' : 'gap-2'} w-full max-w-[85%] sm:max-w-[70%] group transition-all duration-300 relative`}>
                   {/* Facebook Messenger-style reaction picker */}
                   <div 
                     id={`message-actions-${message.id}`}
