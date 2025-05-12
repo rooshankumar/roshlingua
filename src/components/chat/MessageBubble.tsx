@@ -199,13 +199,14 @@ export const MessageBubble = ({ message, isCurrentUser, isRead = false, onReacti
         </div>
       </div>
 
-      {/* Reactions */}
+      {/* Reactions - Using emoji button similar to the reference */}
       <div className="message-actions flex items-center">
         <button
           onClick={toggleReactionPicker}
-          className="text-muted-foreground/50 hover:text-muted-foreground p-1 rounded-full"
+          className="text-muted-foreground/70 hover:text-muted-foreground p-1 rounded-full"
+          aria-label="React to message"
         >
-          <Smile className="h-4 w-4" />
+          <span className="text-lg">😊</span>
         </button>
       </div>
 

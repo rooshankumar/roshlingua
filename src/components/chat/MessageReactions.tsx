@@ -195,12 +195,13 @@ export const MessageReactions = ({
     return (
       <div 
         ref={containerRef}
-        className="messenger-reaction-picker flex items-center px-2 py-1 rounded-full bg-background/95 shadow-lg border border-border/50 backdrop-blur-md animate-scale-in"
+        className="messenger-reaction-picker flex items-center px-2 py-1 rounded-full bg-white dark:bg-gray-800 shadow-lg border border-gray-200 dark:border-gray-700 backdrop-blur-md animate-scale-in"
         style={{
           position: 'absolute',
-          [position === 'top' ? 'bottom' : 'top']: '100%',
+          bottom: '100%',
           left: '50%',
           transform: 'translateX(-50%)',
+          marginBottom: '8px',
           zIndex: 50
         }}
       >
@@ -209,11 +210,11 @@ export const MessageReactions = ({
             key={emoji}
             variant="ghost" 
             size="sm"
-            className="h-9 w-9 p-0 rounded-full hover:bg-muted transition-all active:scale-110"
+            className="h-8 w-8 p-0 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-all active:scale-110"
             onClick={() => handleReact(emoji)}
             disabled={isLoading}
           >
-            <span className="text-xl">{emoji}</span>
+            <span className="text-lg">{emoji}</span>
           </Button>
         ))}
       </div>
@@ -228,14 +229,14 @@ export const MessageReactions = ({
   // Display existing reactions
   return (
     <div className="messenger-reactions-display">
-      <div className="flex items-center gap-[2px] bg-white dark:bg-black rounded-full shadow-sm px-1.5 py-0.5 border border-gray-200 dark:border-gray-800">
+      <div className="reaction-bubble">
         {Object.entries(reactions).map(([emoji, users]) => (
           <div
             key={emoji}
-            className={`messenger-reaction flex items-center text-sm cursor-pointer hover:scale-110 transition-transform`}
+            className={`messenger-reaction cursor-pointer hover:scale-110 transition-transform`}
             onClick={() => handleReact(emoji)}
           >
-            <span>{emoji}</span>
+            <span className="text-base">{emoji}</span>
           </div>
         ))}
       </div>
