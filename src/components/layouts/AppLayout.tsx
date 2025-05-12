@@ -119,10 +119,10 @@ const AppLayout = ({ children }: AppLayoutProps) => {
                 key={route.path}
                 to={route.path}
                 className={
-                  `flex flex-col items-center p-2 rounded-lg transition-all duration-200 ${
+                  `flex flex-col items-center p-2 rounded-lg transition-colors duration-200 ${
                     isActive 
-                      ? "text-primary scale-110 bg-primary/10" 
-                      : "text-muted-foreground hover:text-primary hover:bg-primary/5 active:scale-95"
+                      ? "text-primary bg-primary/10" 
+                      : "text-muted-foreground hover:text-primary hover:bg-primary/5"
                   }`
                 }
               >
