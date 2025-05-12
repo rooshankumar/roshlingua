@@ -1,0 +1,987 @@
+etting initial session: Session exists
+disableSupabaseLogs.ts:23 Checking profile for user: b875a86f-c582-4283-b43c-8b11036ceaf6
+disableSupabaseLogs.ts:23 Updating last_seen for user: b875a86f-c582-4283-b43c-8b11036ceaf6
+disableSupabaseLogs.ts:23 Checking onboarding status for user: b875a86f-c582-4283-b43c-8b11036ceaf6
+disableSupabaseLogs.ts:23 Auth state changed: INITIAL_SESSION Session exists
+disableSupabaseLogs.ts:23 Checking onboarding status for user: b875a86f-c582-4283-b43c-8b11036ceaf6
+2disableSupabaseLogs.ts:23 Onboarding status: Completed
+disableSupabaseLogs.ts:23 Performing periodic refresh of all subscriptions
+disableSupabaseLogs.ts:23 [SubscriptionManager] No subscriptions to refresh
+disableSupabaseLogs.ts:23 Refreshing all real-time subscriptions
+disableSupabaseLogs.ts:23 Navigation detected, checking connection health
+disableSupabaseLogs.ts:23 [SubscriptionManager] No subscriptions to refresh
+disableSupabaseLogs.ts:23 [SubscriptionManager] Subscribing to app_connection_monitor
+disableSupabaseLogs.ts:23 Route changed to: /chat/6f238592-0477-4248-871e-2d15baa18ad2
+disableSupabaseLogs.ts:23 Refreshing subscriptions after page change
+disableSupabaseLogs.ts:23 Refreshing all real-time subscriptions
+disableSupabaseLogs.ts:23 Realtime connection is healthy
+disableSupabaseLogs.ts:23 [SubscriptionManager] Refreshing all 1 subscriptions
+disableSupabaseLogs.ts:23 [SubscriptionManager] Finished refreshing all subscriptions
+disableSupabaseLogs.ts:23 [SubscriptionManager] Refreshing subscription app_connection_monitor
+disableSupabaseLogs.ts:23 Setting initial unread counts: {6f238592-0477-4248-871e-2d15baa18ad2: 0, 39785a05-e2e5-4708-9c29-5b99ebfcd238: 0, 103796d8-264d-4cd9-beb9-54f30c61139f: 0, c6f61cd2-6faf-4e85-a779-087eca9d4c8c: 0, 12f807f9-efce-4ca2-afad-d3ee1e84876b: 0, …}
+disableSupabaseLogs.ts:23 Chat subscription status for messages:6f238592-0477-4248-871e-2d15baa18ad2: SUBSCRIBED
+disableSupabaseLogs.ts:23 Successfully subscribed to chat messages
+disableSupabaseLogs.ts:23 Chat connection status: SUBSCRIBED
+disableSupabaseLogs.ts:23 Chat connection is healthy
+disableSupabaseLogs.ts:23 Cleaning up chat subscription for messages:6f238592-0477-4248-871e-2d15baa18ad2
+disableSupabaseLogs.ts:23 Chat subscription status for messages:6f238592-0477-4248-871e-2d15baa18ad2: CLOSED
+ChatScreen.tsx:281 Chat subscription issue: CLOSED
+(anonymous) @ ChatScreen.tsx:281
+(anonymous) @ RealtimeChannel.js:102
+(anonymous) @ RealtimeChannel.js:381
+_trigger @ RealtimeChannel.js:366
+n @ RealtimeChannel.js:257
+(anonymous) @ RealtimeChannel.js:266
+(anonymous) @ push.js:95
+_matchReceive @ push.js:95
+t @ push.js:67
+(anonymous) @ RealtimeChannel.js:381
+_trigger @ RealtimeChannel.js:366
+trigger @ push.js:76
+(anonymous) @ RealtimeChannel.js:278
+unsubscribe @ RealtimeChannel.js:262
+(anonymous) @ ChatScreen.tsx:291
+kd @ react-dom.production.min.js:239
+ki @ react-dom.production.min.js:243
+Ss @ react-dom.production.min.js:284
+rg @ react-dom.production.min.js:272
+sr @ react-dom.production.min.js:127
+WP @ react-dom.production.min.js:282
+fr @ react-dom.production.min.js:280
+rx @ react-dom.production.min.js:269
+_ @ scheduler.production.min.js:13
+L @ scheduler.production.min.js:14Understand this warning
+disableSupabaseLogs.ts:23 Chat subscription status for messages:6f238592-0477-4248-871e-2d15baa18ad2: SUBSCRIBED
+disableSupabaseLogs.ts:23 Successfully subscribed to chat messages
+disableSupabaseLogs.ts:23 Setting initial unread counts: {6f238592-0477-4248-871e-2d15baa18ad2: 0, 39785a05-e2e5-4708-9c29-5b99ebfcd238: 0, 103796d8-264d-4cd9-beb9-54f30c61139f: 0, c6f61cd2-6faf-4e85-a779-087eca9d4c8c: 0, 12f807f9-efce-4ca2-afad-d3ee1e84876b: 0, …}
+disableSupabaseLogs.ts:23 Cleaning up chat subscription for messages:6f238592-0477-4248-871e-2d15baa18ad2
+disableSupabaseLogs.ts:23 Chat subscription status for messages:6f238592-0477-4248-871e-2d15baa18ad2: CLOSED
+ChatScreen.tsx:281 Chat subscription issue: CLOSED
+(anonymous) @ ChatScreen.tsx:281
+(anonymous) @ RealtimeChannel.js:102
+(anonymous) @ RealtimeChannel.js:381
+_trigger @ RealtimeChannel.js:366
+n @ RealtimeChannel.js:257
+(anonymous) @ RealtimeChannel.js:266
+(anonymous) @ push.js:95
+_matchReceive @ push.js:95
+t @ push.js:67
+(anonymous) @ RealtimeChannel.js:381
+_trigger @ RealtimeChannel.js:366
+trigger @ push.js:76
+(anonymous) @ RealtimeChannel.js:278
+unsubscribe @ RealtimeChannel.js:262
+(anonymous) @ ChatScreen.tsx:291
+kd @ react-dom.production.min.js:239
+ki @ react-dom.production.min.js:243
+Ss @ react-dom.production.min.js:284
+rg @ react-dom.production.min.js:272
+sr @ react-dom.production.min.js:127
+WP @ react-dom.production.min.js:282
+fr @ react-dom.production.min.js:280
+rx @ react-dom.production.min.js:269
+_ @ scheduler.production.min.js:13
+L @ scheduler.production.min.js:14Understand this warning
+disableSupabaseLogs.ts:23 Chat subscription status for messages:6f238592-0477-4248-871e-2d15baa18ad2: SUBSCRIBED
+disableSupabaseLogs.ts:23 Successfully subscribed to chat messages
+disableSupabaseLogs.ts:23 Cleaning up chat subscription for messages:6f238592-0477-4248-871e-2d15baa18ad2
+disableSupabaseLogs.ts:23 Chat subscription status for messages:6f238592-0477-4248-871e-2d15baa18ad2: CLOSED
+ChatScreen.tsx:281 Chat subscription issue: CLOSED
+(anonymous) @ ChatScreen.tsx:281
+(anonymous) @ RealtimeChannel.js:102
+(anonymous) @ RealtimeChannel.js:381
+_trigger @ RealtimeChannel.js:366
+n @ RealtimeChannel.js:257
+(anonymous) @ RealtimeChannel.js:266
+(anonymous) @ push.js:95
+_matchReceive @ push.js:95
+t @ push.js:67
+(anonymous) @ RealtimeChannel.js:381
+_trigger @ RealtimeChannel.js:366
+trigger @ push.js:76
+(anonymous) @ RealtimeChannel.js:278
+unsubscribe @ RealtimeChannel.js:262
+(anonymous) @ ChatScreen.tsx:291
+kd @ react-dom.production.min.js:239
+ki @ react-dom.production.min.js:243
+Ss @ react-dom.production.min.js:284
+rg @ react-dom.production.min.js:272
+sr @ react-dom.production.min.js:127
+WP @ react-dom.production.min.js:282
+fr @ react-dom.production.min.js:280
+rx @ react-dom.production.min.js:269
+_ @ scheduler.production.min.js:13
+L @ scheduler.production.min.js:14Understand this warning
+disableSupabaseLogs.ts:23 Chat subscription status for messages:6f238592-0477-4248-871e-2d15baa18ad2: SUBSCRIBED
+disableSupabaseLogs.ts:23 Successfully subscribed to chat messages
+disableSupabaseLogs.ts:23 Cleaning up chat subscription for messages:6f238592-0477-4248-871e-2d15baa18ad2
+disableSupabaseLogs.ts:23 Chat subscription status for messages:6f238592-0477-4248-871e-2d15baa18ad2: CLOSED
+ChatScreen.tsx:281 Chat subscription issue: CLOSED
+(anonymous) @ ChatScreen.tsx:281
+(anonymous) @ RealtimeChannel.js:102
+(anonymous) @ RealtimeChannel.js:381
+_trigger @ RealtimeChannel.js:366
+n @ RealtimeChannel.js:257
+(anonymous) @ RealtimeChannel.js:266
+(anonymous) @ push.js:95
+_matchReceive @ push.js:95
+t @ push.js:67
+(anonymous) @ RealtimeChannel.js:381
+_trigger @ RealtimeChannel.js:366
+trigger @ push.js:76
+(anonymous) @ RealtimeChannel.js:278
+unsubscribe @ RealtimeChannel.js:262
+(anonymous) @ ChatScreen.tsx:291
+kd @ react-dom.production.min.js:239
+ki @ react-dom.production.min.js:243
+Ss @ react-dom.production.min.js:284
+rg @ react-dom.production.min.js:272
+sr @ react-dom.production.min.js:127
+WP @ react-dom.production.min.js:282
+fr @ react-dom.production.min.js:280
+rx @ react-dom.production.min.js:269
+_ @ scheduler.production.min.js:13
+L @ scheduler.production.min.js:14Understand this warning
+disableSupabaseLogs.ts:23 Chat subscription status for messages:6f238592-0477-4248-871e-2d15baa18ad2: SUBSCRIBED
+disableSupabaseLogs.ts:23 Successfully subscribed to chat messages
+disableSupabaseLogs.ts:23 Cleaning up chat subscription for messages:6f238592-0477-4248-871e-2d15baa18ad2
+disableSupabaseLogs.ts:23 Chat subscription status for messages:6f238592-0477-4248-871e-2d15baa18ad2: CLOSED
+ChatScreen.tsx:281 Chat subscription issue: CLOSED
+(anonymous) @ ChatScreen.tsx:281
+(anonymous) @ RealtimeChannel.js:102
+(anonymous) @ RealtimeChannel.js:381
+_trigger @ RealtimeChannel.js:366
+n @ RealtimeChannel.js:257
+(anonymous) @ RealtimeChannel.js:266
+(anonymous) @ push.js:95
+_matchReceive @ push.js:95
+t @ push.js:67
+(anonymous) @ RealtimeChannel.js:381
+_trigger @ RealtimeChannel.js:366
+trigger @ push.js:76
+(anonymous) @ RealtimeChannel.js:278
+unsubscribe @ RealtimeChannel.js:262
+(anonymous) @ ChatScreen.tsx:291
+kd @ react-dom.production.min.js:239
+ki @ react-dom.production.min.js:243
+Ss @ react-dom.production.min.js:284
+rg @ react-dom.production.min.js:272
+sr @ react-dom.production.min.js:127
+WP @ react-dom.production.min.js:282
+fr @ react-dom.production.min.js:280
+rx @ react-dom.production.min.js:269
+_ @ scheduler.production.min.js:13
+L @ scheduler.production.min.js:14Understand this warning
+disableSupabaseLogs.ts:23 Chat subscription status for messages:6f238592-0477-4248-871e-2d15baa18ad2: SUBSCRIBED
+disableSupabaseLogs.ts:23 Successfully subscribed to chat messages
+disableSupabaseLogs.ts:23 Cleaning up chat subscription for messages:6f238592-0477-4248-871e-2d15baa18ad2
+disableSupabaseLogs.ts:23 Chat subscription status for messages:6f238592-0477-4248-871e-2d15baa18ad2: CLOSED
+ChatScreen.tsx:281 Chat subscription issue: CLOSED
+(anonymous) @ ChatScreen.tsx:281
+(anonymous) @ RealtimeChannel.js:102
+(anonymous) @ RealtimeChannel.js:381
+_trigger @ RealtimeChannel.js:366
+n @ RealtimeChannel.js:257
+(anonymous) @ RealtimeChannel.js:266
+(anonymous) @ push.js:95
+_matchReceive @ push.js:95
+t @ push.js:67
+(anonymous) @ RealtimeChannel.js:381
+_trigger @ RealtimeChannel.js:366
+trigger @ push.js:76
+(anonymous) @ RealtimeChannel.js:278
+unsubscribe @ RealtimeChannel.js:262
+(anonymous) @ ChatScreen.tsx:291
+kd @ react-dom.production.min.js:239
+ki @ react-dom.production.min.js:243
+Ss @ react-dom.production.min.js:284
+rg @ react-dom.production.min.js:272
+sr @ react-dom.production.min.js:127
+WP @ react-dom.production.min.js:282
+fr @ react-dom.production.min.js:280
+rx @ react-dom.production.min.js:269
+_ @ scheduler.production.min.js:13
+L @ scheduler.production.min.js:14Understand this warning
+disableSupabaseLogs.ts:23 Chat subscription status for messages:6f238592-0477-4248-871e-2d15baa18ad2: SUBSCRIBED
+disableSupabaseLogs.ts:23 Successfully subscribed to chat messages
+disableSupabaseLogs.ts:23 Cleaning up chat subscription for messages:6f238592-0477-4248-871e-2d15baa18ad2
+disableSupabaseLogs.ts:23 Chat subscription status for messages:6f238592-0477-4248-871e-2d15baa18ad2: CLOSED
+ChatScreen.tsx:281 Chat subscription issue: CLOSED
+(anonymous) @ ChatScreen.tsx:281
+(anonymous) @ RealtimeChannel.js:102
+(anonymous) @ RealtimeChannel.js:381
+_trigger @ RealtimeChannel.js:366
+n @ RealtimeChannel.js:257
+(anonymous) @ RealtimeChannel.js:266
+(anonymous) @ push.js:95
+_matchReceive @ push.js:95
+t @ push.js:67
+(anonymous) @ RealtimeChannel.js:381
+_trigger @ RealtimeChannel.js:366
+trigger @ push.js:76
+(anonymous) @ RealtimeChannel.js:278
+unsubscribe @ RealtimeChannel.js:262
+(anonymous) @ ChatScreen.tsx:291
+kd @ react-dom.production.min.js:239
+ki @ react-dom.production.min.js:243
+Ss @ react-dom.production.min.js:284
+rg @ react-dom.production.min.js:272
+sr @ react-dom.production.min.js:127
+WP @ react-dom.production.min.js:282
+fr @ react-dom.production.min.js:280
+rx @ react-dom.production.min.js:269
+_ @ scheduler.production.min.js:13
+L @ scheduler.production.min.js:14Understand this warning
+disableSupabaseLogs.ts:23 Chat subscription status for messages:6f238592-0477-4248-871e-2d15baa18ad2: SUBSCRIBED
+disableSupabaseLogs.ts:23 Successfully subscribed to chat messages
+disableSupabaseLogs.ts:23 Cleaning up chat subscription for messages:6f238592-0477-4248-871e-2d15baa18ad2
+disableSupabaseLogs.ts:23 Chat subscription status for messages:6f238592-0477-4248-871e-2d15baa18ad2: CLOSED
+ChatScreen.tsx:281 Chat subscription issue: CLOSED
+(anonymous) @ ChatScreen.tsx:281
+(anonymous) @ RealtimeChannel.js:102
+(anonymous) @ RealtimeChannel.js:381
+_trigger @ RealtimeChannel.js:366
+n @ RealtimeChannel.js:257
+(anonymous) @ RealtimeChannel.js:266
+(anonymous) @ push.js:95
+_matchReceive @ push.js:95
+t @ push.js:67
+(anonymous) @ RealtimeChannel.js:381
+_trigger @ RealtimeChannel.js:366
+trigger @ push.js:76
+(anonymous) @ RealtimeChannel.js:278
+unsubscribe @ RealtimeChannel.js:262
+(anonymous) @ ChatScreen.tsx:291
+kd @ react-dom.production.min.js:239
+ki @ react-dom.production.min.js:243
+Ss @ react-dom.production.min.js:284
+rg @ react-dom.production.min.js:272
+sr @ react-dom.production.min.js:127
+WP @ react-dom.production.min.js:282
+fr @ react-dom.production.min.js:280
+rx @ react-dom.production.min.js:269
+_ @ scheduler.production.min.js:13
+L @ scheduler.production.min.js:14Understand this warning
+disableSupabaseLogs.ts:23 Chat subscription status for messages:6f238592-0477-4248-871e-2d15baa18ad2: SUBSCRIBED
+disableSupabaseLogs.ts:23 Successfully subscribed to chat messages
+disableSupabaseLogs.ts:23 Cleaning up chat subscription for messages:6f238592-0477-4248-871e-2d15baa18ad2
+disableSupabaseLogs.ts:23 Chat subscription status for messages:6f238592-0477-4248-871e-2d15baa18ad2: CLOSED
+ChatScreen.tsx:281 Chat subscription issue: CLOSED
+(anonymous) @ ChatScreen.tsx:281
+(anonymous) @ RealtimeChannel.js:102
+(anonymous) @ RealtimeChannel.js:381
+_trigger @ RealtimeChannel.js:366
+n @ RealtimeChannel.js:257
+(anonymous) @ RealtimeChannel.js:266
+(anonymous) @ push.js:95
+_matchReceive @ push.js:95
+t @ push.js:67
+(anonymous) @ RealtimeChannel.js:381
+_trigger @ RealtimeChannel.js:366
+trigger @ push.js:76
+(anonymous) @ RealtimeChannel.js:278
+unsubscribe @ RealtimeChannel.js:262
+(anonymous) @ ChatScreen.tsx:291
+kd @ react-dom.production.min.js:239
+ki @ react-dom.production.min.js:243
+Ss @ react-dom.production.min.js:284
+rg @ react-dom.production.min.js:272
+sr @ react-dom.production.min.js:127
+WP @ react-dom.production.min.js:282
+fr @ react-dom.production.min.js:280
+rx @ react-dom.production.min.js:269
+_ @ scheduler.production.min.js:13
+L @ scheduler.production.min.js:14Understand this warning
+disableSupabaseLogs.ts:23 Chat subscription status for messages:6f238592-0477-4248-871e-2d15baa18ad2: SUBSCRIBED
+disableSupabaseLogs.ts:23 Successfully subscribed to chat messages
+disableSupabaseLogs.ts:23 Cleaning up chat subscription for messages:6f238592-0477-4248-871e-2d15baa18ad2
+disableSupabaseLogs.ts:23 Chat subscription status for messages:6f238592-0477-4248-871e-2d15baa18ad2: CLOSED
+ChatScreen.tsx:281 Chat subscription issue: CLOSED
+(anonymous) @ ChatScreen.tsx:281
+(anonymous) @ RealtimeChannel.js:102
+(anonymous) @ RealtimeChannel.js:381
+_trigger @ RealtimeChannel.js:366
+n @ RealtimeChannel.js:257
+(anonymous) @ RealtimeChannel.js:266
+(anonymous) @ push.js:95
+_matchReceive @ push.js:95
+t @ push.js:67
+(anonymous) @ RealtimeChannel.js:381
+_trigger @ RealtimeChannel.js:366
+trigger @ push.js:76
+(anonymous) @ RealtimeChannel.js:278
+unsubscribe @ RealtimeChannel.js:262
+(anonymous) @ ChatScreen.tsx:291
+kd @ react-dom.production.min.js:239
+ki @ react-dom.production.min.js:243
+Ss @ react-dom.production.min.js:284
+rg @ react-dom.production.min.js:272
+sr @ react-dom.production.min.js:127
+WP @ react-dom.production.min.js:282
+fr @ react-dom.production.min.js:280
+rx @ react-dom.production.min.js:269
+_ @ scheduler.production.min.js:13
+L @ scheduler.production.min.js:14Understand this warning
+disableSupabaseLogs.ts:23 Chat subscription status for messages:6f238592-0477-4248-871e-2d15baa18ad2: SUBSCRIBED
+disableSupabaseLogs.ts:23 Successfully subscribed to chat messages
+disableSupabaseLogs.ts:23 Cleaning up chat subscription for messages:6f238592-0477-4248-871e-2d15baa18ad2
+disableSupabaseLogs.ts:23 Chat subscription status for messages:6f238592-0477-4248-871e-2d15baa18ad2: CLOSED
+ChatScreen.tsx:281 Chat subscription issue: CLOSED
+(anonymous) @ ChatScreen.tsx:281
+(anonymous) @ RealtimeChannel.js:102
+(anonymous) @ RealtimeChannel.js:381
+_trigger @ RealtimeChannel.js:366
+n @ RealtimeChannel.js:257
+(anonymous) @ RealtimeChannel.js:266
+(anonymous) @ push.js:95
+_matchReceive @ push.js:95
+t @ push.js:67
+(anonymous) @ RealtimeChannel.js:381
+_trigger @ RealtimeChannel.js:366
+trigger @ push.js:76
+(anonymous) @ RealtimeChannel.js:278
+unsubscribe @ RealtimeChannel.js:262
+(anonymous) @ ChatScreen.tsx:291
+kd @ react-dom.production.min.js:239
+ki @ react-dom.production.min.js:243
+Ss @ react-dom.production.min.js:284
+rg @ react-dom.production.min.js:272
+sr @ react-dom.production.min.js:127
+WP @ react-dom.production.min.js:282
+fr @ react-dom.production.min.js:280
+rx @ react-dom.production.min.js:269
+_ @ scheduler.production.min.js:13
+L @ scheduler.production.min.js:14Understand this warning
+disableSupabaseLogs.ts:23 Chat subscription status for messages:6f238592-0477-4248-871e-2d15baa18ad2: SUBSCRIBED
+disableSupabaseLogs.ts:23 Successfully subscribed to chat messages
+disableSupabaseLogs.ts:23 Cleaning up chat subscription for messages:6f238592-0477-4248-871e-2d15baa18ad2
+disableSupabaseLogs.ts:23 Chat subscription status for messages:6f238592-0477-4248-871e-2d15baa18ad2: CLOSED
+ChatScreen.tsx:281 Chat subscription issue: CLOSED
+(anonymous) @ ChatScreen.tsx:281
+(anonymous) @ RealtimeChannel.js:102
+(anonymous) @ RealtimeChannel.js:381
+_trigger @ RealtimeChannel.js:366
+n @ RealtimeChannel.js:257
+(anonymous) @ RealtimeChannel.js:266
+(anonymous) @ push.js:95
+_matchReceive @ push.js:95
+t @ push.js:67
+(anonymous) @ RealtimeChannel.js:381
+_trigger @ RealtimeChannel.js:366
+trigger @ push.js:76
+(anonymous) @ RealtimeChannel.js:278
+unsubscribe @ RealtimeChannel.js:262
+(anonymous) @ ChatScreen.tsx:291
+kd @ react-dom.production.min.js:239
+ki @ react-dom.production.min.js:243
+Ss @ react-dom.production.min.js:284
+rg @ react-dom.production.min.js:272
+sr @ react-dom.production.min.js:127
+WP @ react-dom.production.min.js:282
+fr @ react-dom.production.min.js:280
+rx @ react-dom.production.min.js:269
+_ @ scheduler.production.min.js:13
+L @ scheduler.production.min.js:14Understand this warning
+disableSupabaseLogs.ts:23 Chat subscription status for messages:6f238592-0477-4248-871e-2d15baa18ad2: SUBSCRIBED
+disableSupabaseLogs.ts:23 Successfully subscribed to chat messages
+disableSupabaseLogs.ts:23 Cleaning up chat subscription for messages:6f238592-0477-4248-871e-2d15baa18ad2
+disableSupabaseLogs.ts:23 Chat subscription status for messages:6f238592-0477-4248-871e-2d15baa18ad2: CLOSED
+ChatScreen.tsx:281 Chat subscription issue: CLOSED
+(anonymous) @ ChatScreen.tsx:281
+(anonymous) @ RealtimeChannel.js:102
+(anonymous) @ RealtimeChannel.js:381
+_trigger @ RealtimeChannel.js:366
+n @ RealtimeChannel.js:257
+(anonymous) @ RealtimeChannel.js:266
+(anonymous) @ push.js:95
+_matchReceive @ push.js:95
+t @ push.js:67
+(anonymous) @ RealtimeChannel.js:381
+_trigger @ RealtimeChannel.js:366
+trigger @ push.js:76
+(anonymous) @ RealtimeChannel.js:278
+unsubscribe @ RealtimeChannel.js:262
+(anonymous) @ ChatScreen.tsx:291
+kd @ react-dom.production.min.js:239
+ki @ react-dom.production.min.js:243
+Ss @ react-dom.production.min.js:284
+rg @ react-dom.production.min.js:272
+sr @ react-dom.production.min.js:127
+WP @ react-dom.production.min.js:282
+fr @ react-dom.production.min.js:280
+rx @ react-dom.production.min.js:269
+_ @ scheduler.production.min.js:13
+L @ scheduler.production.min.js:14Understand this warning
+disableSupabaseLogs.ts:23 Chat subscription status for messages:6f238592-0477-4248-871e-2d15baa18ad2: SUBSCRIBED
+disableSupabaseLogs.ts:23 Successfully subscribed to chat messages
+disableSupabaseLogs.ts:23 Cleaning up chat subscription for messages:6f238592-0477-4248-871e-2d15baa18ad2
+disableSupabaseLogs.ts:23 Chat subscription status for messages:6f238592-0477-4248-871e-2d15baa18ad2: CLOSED
+ChatScreen.tsx:281 Chat subscription issue: CLOSED
+(anonymous) @ ChatScreen.tsx:281
+(anonymous) @ RealtimeChannel.js:102
+(anonymous) @ RealtimeChannel.js:381
+_trigger @ RealtimeChannel.js:366
+n @ RealtimeChannel.js:257
+(anonymous) @ RealtimeChannel.js:266
+(anonymous) @ push.js:95
+_matchReceive @ push.js:95
+t @ push.js:67
+(anonymous) @ RealtimeChannel.js:381
+_trigger @ RealtimeChannel.js:366
+trigger @ push.js:76
+(anonymous) @ RealtimeChannel.js:278
+unsubscribe @ RealtimeChannel.js:262
+(anonymous) @ ChatScreen.tsx:291
+kd @ react-dom.production.min.js:239
+ki @ react-dom.production.min.js:243
+Ss @ react-dom.production.min.js:284
+rg @ react-dom.production.min.js:272
+sr @ react-dom.production.min.js:127
+WP @ react-dom.production.min.js:282
+fr @ react-dom.production.min.js:280
+rx @ react-dom.production.min.js:269
+_ @ scheduler.production.min.js:13
+L @ scheduler.production.min.js:14Understand this warning
+disableSupabaseLogs.ts:23 Chat subscription status for messages:6f238592-0477-4248-871e-2d15baa18ad2: SUBSCRIBED
+disableSupabaseLogs.ts:23 Successfully subscribed to chat messages
+disableSupabaseLogs.ts:23 Cleaning up chat subscription for messages:6f238592-0477-4248-871e-2d15baa18ad2
+disableSupabaseLogs.ts:23 Chat subscription status for messages:6f238592-0477-4248-871e-2d15baa18ad2: CLOSED
+ChatScreen.tsx:281 Chat subscription issue: CLOSED
+(anonymous) @ ChatScreen.tsx:281
+(anonymous) @ RealtimeChannel.js:102
+(anonymous) @ RealtimeChannel.js:381
+_trigger @ RealtimeChannel.js:366
+n @ RealtimeChannel.js:257
+(anonymous) @ RealtimeChannel.js:266
+(anonymous) @ push.js:95
+_matchReceive @ push.js:95
+t @ push.js:67
+(anonymous) @ RealtimeChannel.js:381
+_trigger @ RealtimeChannel.js:366
+trigger @ push.js:76
+(anonymous) @ RealtimeChannel.js:278
+unsubscribe @ RealtimeChannel.js:262
+(anonymous) @ ChatScreen.tsx:291
+kd @ react-dom.production.min.js:239
+ki @ react-dom.production.min.js:243
+Ss @ react-dom.production.min.js:284
+rg @ react-dom.production.min.js:272
+sr @ react-dom.production.min.js:127
+WP @ react-dom.production.min.js:282
+fr @ react-dom.production.min.js:280
+rx @ react-dom.production.min.js:269
+_ @ scheduler.production.min.js:13
+L @ scheduler.production.min.js:14Understand this warning
+disableSupabaseLogs.ts:23 Chat subscription status for messages:6f238592-0477-4248-871e-2d15baa18ad2: SUBSCRIBED
+disableSupabaseLogs.ts:23 Successfully subscribed to chat messages
+disableSupabaseLogs.ts:23 Cleaning up chat subscription for messages:6f238592-0477-4248-871e-2d15baa18ad2
+disableSupabaseLogs.ts:23 Chat subscription status for messages:6f238592-0477-4248-871e-2d15baa18ad2: CLOSED
+ChatScreen.tsx:281 Chat subscription issue: CLOSED
+(anonymous) @ ChatScreen.tsx:281
+(anonymous) @ RealtimeChannel.js:102
+(anonymous) @ RealtimeChannel.js:381
+_trigger @ RealtimeChannel.js:366
+n @ RealtimeChannel.js:257
+(anonymous) @ RealtimeChannel.js:266
+(anonymous) @ push.js:95
+_matchReceive @ push.js:95
+t @ push.js:67
+(anonymous) @ RealtimeChannel.js:381
+_trigger @ RealtimeChannel.js:366
+trigger @ push.js:76
+(anonymous) @ RealtimeChannel.js:278
+unsubscribe @ RealtimeChannel.js:262
+(anonymous) @ ChatScreen.tsx:291
+kd @ react-dom.production.min.js:239
+ki @ react-dom.production.min.js:243
+Ss @ react-dom.production.min.js:284
+rg @ react-dom.production.min.js:272
+sr @ react-dom.production.min.js:127
+WP @ react-dom.production.min.js:282
+fr @ react-dom.production.min.js:280
+rx @ react-dom.production.min.js:269
+_ @ scheduler.production.min.js:13
+L @ scheduler.production.min.js:14Understand this warning
+disableSupabaseLogs.ts:23 Chat subscription status for messages:6f238592-0477-4248-871e-2d15baa18ad2: SUBSCRIBED
+disableSupabaseLogs.ts:23 Successfully subscribed to chat messages
+disableSupabaseLogs.ts:23 Cleaning up chat subscription for messages:6f238592-0477-4248-871e-2d15baa18ad2
+disableSupabaseLogs.ts:23 Chat subscription status for messages:6f238592-0477-4248-871e-2d15baa18ad2: CLOSED
+ChatScreen.tsx:281 Chat subscription issue: CLOSED
+(anonymous) @ ChatScreen.tsx:281
+(anonymous) @ RealtimeChannel.js:102
+(anonymous) @ RealtimeChannel.js:381
+_trigger @ RealtimeChannel.js:366
+n @ RealtimeChannel.js:257
+(anonymous) @ RealtimeChannel.js:266
+(anonymous) @ push.js:95
+_matchReceive @ push.js:95
+t @ push.js:67
+(anonymous) @ RealtimeChannel.js:381
+_trigger @ RealtimeChannel.js:366
+trigger @ push.js:76
+(anonymous) @ RealtimeChannel.js:278
+unsubscribe @ RealtimeChannel.js:262
+(anonymous) @ ChatScreen.tsx:291
+kd @ react-dom.production.min.js:239
+ki @ react-dom.production.min.js:243
+Ss @ react-dom.production.min.js:284
+rg @ react-dom.production.min.js:272
+sr @ react-dom.production.min.js:127
+WP @ react-dom.production.min.js:282
+fr @ react-dom.production.min.js:280
+rx @ react-dom.production.min.js:269
+_ @ scheduler.production.min.js:13
+L @ scheduler.production.min.js:14Understand this warning
+disableSupabaseLogs.ts:23 Chat subscription status for messages:6f238592-0477-4248-871e-2d15baa18ad2: SUBSCRIBED
+disableSupabaseLogs.ts:23 Successfully subscribed to chat messages
+disableSupabaseLogs.ts:23 Cleaning up chat subscription for messages:6f238592-0477-4248-871e-2d15baa18ad2
+disableSupabaseLogs.ts:23 Chat subscription status for messages:6f238592-0477-4248-871e-2d15baa18ad2: CLOSED
+ChatScreen.tsx:281 Chat subscription issue: CLOSED
+(anonymous) @ ChatScreen.tsx:281
+(anonymous) @ RealtimeChannel.js:102
+(anonymous) @ RealtimeChannel.js:381
+_trigger @ RealtimeChannel.js:366
+n @ RealtimeChannel.js:257
+(anonymous) @ RealtimeChannel.js:266
+(anonymous) @ push.js:95
+_matchReceive @ push.js:95
+t @ push.js:67
+(anonymous) @ RealtimeChannel.js:381
+_trigger @ RealtimeChannel.js:366
+trigger @ push.js:76
+(anonymous) @ RealtimeChannel.js:278
+unsubscribe @ RealtimeChannel.js:262
+(anonymous) @ ChatScreen.tsx:291
+kd @ react-dom.production.min.js:239
+ki @ react-dom.production.min.js:243
+Ss @ react-dom.production.min.js:284
+rg @ react-dom.production.min.js:272
+sr @ react-dom.production.min.js:127
+WP @ react-dom.production.min.js:282
+fr @ react-dom.production.min.js:280
+rx @ react-dom.production.min.js:269
+_ @ scheduler.production.min.js:13
+L @ scheduler.production.min.js:14Understand this warning
+disableSupabaseLogs.ts:23 Chat subscription status for messages:6f238592-0477-4248-871e-2d15baa18ad2: SUBSCRIBED
+disableSupabaseLogs.ts:23 Successfully subscribed to chat messages
+disableSupabaseLogs.ts:23 Cleaning up chat subscription for messages:6f238592-0477-4248-871e-2d15baa18ad2
+disableSupabaseLogs.ts:23 Chat subscription status for messages:6f238592-0477-4248-871e-2d15baa18ad2: CLOSED
+ChatScreen.tsx:281 Chat subscription issue: CLOSED
+(anonymous) @ ChatScreen.tsx:281
+(anonymous) @ RealtimeChannel.js:102
+(anonymous) @ RealtimeChannel.js:381
+_trigger @ RealtimeChannel.js:366
+n @ RealtimeChannel.js:257
+(anonymous) @ RealtimeChannel.js:266
+(anonymous) @ push.js:95
+_matchReceive @ push.js:95
+t @ push.js:67
+(anonymous) @ RealtimeChannel.js:381
+_trigger @ RealtimeChannel.js:366
+trigger @ push.js:76
+(anonymous) @ RealtimeChannel.js:278
+unsubscribe @ RealtimeChannel.js:262
+(anonymous) @ ChatScreen.tsx:291
+kd @ react-dom.production.min.js:239
+ki @ react-dom.production.min.js:243
+Ss @ react-dom.production.min.js:284
+rg @ react-dom.production.min.js:272
+sr @ react-dom.production.min.js:127
+WP @ react-dom.production.min.js:282
+fr @ react-dom.production.min.js:280
+rx @ react-dom.production.min.js:269
+_ @ scheduler.production.min.js:13
+L @ scheduler.production.min.js:14Understand this warning
+disableSupabaseLogs.ts:23 Chat subscription status for messages:6f238592-0477-4248-871e-2d15baa18ad2: SUBSCRIBED
+disableSupabaseLogs.ts:23 Successfully subscribed to chat messages
+disableSupabaseLogs.ts:23 Cleaning up chat subscription for messages:6f238592-0477-4248-871e-2d15baa18ad2
+disableSupabaseLogs.ts:23 Chat subscription status for messages:6f238592-0477-4248-871e-2d15baa18ad2: CLOSED
+ChatScreen.tsx:281 Chat subscription issue: CLOSED
+(anonymous) @ ChatScreen.tsx:281
+(anonymous) @ RealtimeChannel.js:102
+(anonymous) @ RealtimeChannel.js:381
+_trigger @ RealtimeChannel.js:366
+n @ RealtimeChannel.js:257
+(anonymous) @ RealtimeChannel.js:266
+(anonymous) @ push.js:95
+_matchReceive @ push.js:95
+t @ push.js:67
+(anonymous) @ RealtimeChannel.js:381
+_trigger @ RealtimeChannel.js:366
+trigger @ push.js:76
+(anonymous) @ RealtimeChannel.js:278
+unsubscribe @ RealtimeChannel.js:262
+(anonymous) @ ChatScreen.tsx:291
+kd @ react-dom.production.min.js:239
+ki @ react-dom.production.min.js:243
+Ss @ react-dom.production.min.js:284
+rg @ react-dom.production.min.js:272
+sr @ react-dom.production.min.js:127
+WP @ react-dom.production.min.js:282
+fr @ react-dom.production.min.js:280
+rx @ react-dom.production.min.js:269
+_ @ scheduler.production.min.js:13
+L @ scheduler.production.min.js:14Understand this warning
+disableSupabaseLogs.ts:23 Chat subscription status for messages:6f238592-0477-4248-871e-2d15baa18ad2: SUBSCRIBED
+disableSupabaseLogs.ts:23 Successfully subscribed to chat messages
+disableSupabaseLogs.ts:23 Cleaning up chat subscription for messages:6f238592-0477-4248-871e-2d15baa18ad2
+disableSupabaseLogs.ts:23 Chat subscription status for messages:6f238592-0477-4248-871e-2d15baa18ad2: CLOSED
+ChatScreen.tsx:281 Chat subscription issue: CLOSED
+(anonymous) @ ChatScreen.tsx:281
+(anonymous) @ RealtimeChannel.js:102
+(anonymous) @ RealtimeChannel.js:381
+_trigger @ RealtimeChannel.js:366
+n @ RealtimeChannel.js:257
+(anonymous) @ RealtimeChannel.js:266
+(anonymous) @ push.js:95
+_matchReceive @ push.js:95
+t @ push.js:67
+(anonymous) @ RealtimeChannel.js:381
+_trigger @ RealtimeChannel.js:366
+trigger @ push.js:76
+(anonymous) @ RealtimeChannel.js:278
+unsubscribe @ RealtimeChannel.js:262
+(anonymous) @ ChatScreen.tsx:291
+kd @ react-dom.production.min.js:239
+ki @ react-dom.production.min.js:243
+Ss @ react-dom.production.min.js:284
+rg @ react-dom.production.min.js:272
+sr @ react-dom.production.min.js:127
+WP @ react-dom.production.min.js:282
+fr @ react-dom.production.min.js:280
+rx @ react-dom.production.min.js:269
+_ @ scheduler.production.min.js:13
+L @ scheduler.production.min.js:14Understand this warning
+disableSupabaseLogs.ts:23 Chat subscription status for messages:6f238592-0477-4248-871e-2d15baa18ad2: SUBSCRIBED
+disableSupabaseLogs.ts:23 Successfully subscribed to chat messages
+disableSupabaseLogs.ts:23 Cleaning up chat subscription for messages:6f238592-0477-4248-871e-2d15baa18ad2
+disableSupabaseLogs.ts:23 Chat subscription status for messages:6f238592-0477-4248-871e-2d15baa18ad2: CLOSED
+ChatScreen.tsx:281 Chat subscription issue: CLOSED
+(anonymous) @ ChatScreen.tsx:281
+(anonymous) @ RealtimeChannel.js:102
+(anonymous) @ RealtimeChannel.js:381
+_trigger @ RealtimeChannel.js:366
+n @ RealtimeChannel.js:257
+(anonymous) @ RealtimeChannel.js:266
+(anonymous) @ push.js:95
+_matchReceive @ push.js:95
+t @ push.js:67
+(anonymous) @ RealtimeChannel.js:381
+_trigger @ RealtimeChannel.js:366
+trigger @ push.js:76
+(anonymous) @ RealtimeChannel.js:278
+unsubscribe @ RealtimeChannel.js:262
+(anonymous) @ ChatScreen.tsx:291
+kd @ react-dom.production.min.js:239
+ki @ react-dom.production.min.js:243
+Ss @ react-dom.production.min.js:284
+rg @ react-dom.production.min.js:272
+sr @ react-dom.production.min.js:127
+WP @ react-dom.production.min.js:282
+fr @ react-dom.production.min.js:280
+rx @ react-dom.production.min.js:269
+_ @ scheduler.production.min.js:13
+L @ scheduler.production.min.js:14Understand this warning
+disableSupabaseLogs.ts:23 Chat subscription status for messages:6f238592-0477-4248-871e-2d15baa18ad2: SUBSCRIBED
+disableSupabaseLogs.ts:23 Successfully subscribed to chat messages
+disableSupabaseLogs.ts:23 Cleaning up chat subscription for messages:6f238592-0477-4248-871e-2d15baa18ad2
+disableSupabaseLogs.ts:23 Chat subscription status for messages:6f238592-0477-4248-871e-2d15baa18ad2: CLOSED
+ChatScreen.tsx:281 Chat subscription issue: CLOSED
+(anonymous) @ ChatScreen.tsx:281
+(anonymous) @ RealtimeChannel.js:102
+(anonymous) @ RealtimeChannel.js:381
+_trigger @ RealtimeChannel.js:366
+n @ RealtimeChannel.js:257
+(anonymous) @ RealtimeChannel.js:266
+(anonymous) @ push.js:95
+_matchReceive @ push.js:95
+t @ push.js:67
+(anonymous) @ RealtimeChannel.js:381
+_trigger @ RealtimeChannel.js:366
+trigger @ push.js:76
+(anonymous) @ RealtimeChannel.js:278
+unsubscribe @ RealtimeChannel.js:262
+(anonymous) @ ChatScreen.tsx:291
+kd @ react-dom.production.min.js:239
+ki @ react-dom.production.min.js:243
+Ss @ react-dom.production.min.js:284
+rg @ react-dom.production.min.js:272
+sr @ react-dom.production.min.js:127
+WP @ react-dom.production.min.js:282
+fr @ react-dom.production.min.js:280
+rx @ react-dom.production.min.js:269
+_ @ scheduler.production.min.js:13
+L @ scheduler.production.min.js:14Understand this warning
+disableSupabaseLogs.ts:23 Chat subscription status for messages:6f238592-0477-4248-871e-2d15baa18ad2: SUBSCRIBED
+disableSupabaseLogs.ts:23 Successfully subscribed to chat messages
+disableSupabaseLogs.ts:23 Cleaning up chat subscription for messages:6f238592-0477-4248-871e-2d15baa18ad2
+disableSupabaseLogs.ts:23 Chat subscription status for messages:6f238592-0477-4248-871e-2d15baa18ad2: CLOSED
+ChatScreen.tsx:281 Chat subscription issue: CLOSED
+(anonymous) @ ChatScreen.tsx:281
+(anonymous) @ RealtimeChannel.js:102
+(anonymous) @ RealtimeChannel.js:381
+_trigger @ RealtimeChannel.js:366
+n @ RealtimeChannel.js:257
+(anonymous) @ RealtimeChannel.js:266
+(anonymous) @ push.js:95
+_matchReceive @ push.js:95
+t @ push.js:67
+(anonymous) @ RealtimeChannel.js:381
+_trigger @ RealtimeChannel.js:366
+trigger @ push.js:76
+(anonymous) @ RealtimeChannel.js:278
+unsubscribe @ RealtimeChannel.js:262
+(anonymous) @ ChatScreen.tsx:291
+kd @ react-dom.production.min.js:239
+ki @ react-dom.production.min.js:243
+Ss @ react-dom.production.min.js:284
+rg @ react-dom.production.min.js:272
+sr @ react-dom.production.min.js:127
+WP @ react-dom.production.min.js:282
+fr @ react-dom.production.min.js:280
+rx @ react-dom.production.min.js:269
+_ @ scheduler.production.min.js:13
+L @ scheduler.production.min.js:14Understand this warning
+disableSupabaseLogs.ts:23 Chat subscription status for messages:6f238592-0477-4248-871e-2d15baa18ad2: SUBSCRIBED
+disableSupabaseLogs.ts:23 Successfully subscribed to chat messages
+disableSupabaseLogs.ts:23 Cleaning up chat subscription for messages:6f238592-0477-4248-871e-2d15baa18ad2
+disableSupabaseLogs.ts:23 Chat subscription status for messages:6f238592-0477-4248-871e-2d15baa18ad2: CLOSED
+ChatScreen.tsx:281 Chat subscription issue: CLOSED
+(anonymous) @ ChatScreen.tsx:281
+(anonymous) @ RealtimeChannel.js:102
+(anonymous) @ RealtimeChannel.js:381
+_trigger @ RealtimeChannel.js:366
+n @ RealtimeChannel.js:257
+(anonymous) @ RealtimeChannel.js:266
+(anonymous) @ push.js:95
+_matchReceive @ push.js:95
+t @ push.js:67
+(anonymous) @ RealtimeChannel.js:381
+_trigger @ RealtimeChannel.js:366
+trigger @ push.js:76
+(anonymous) @ RealtimeChannel.js:278
+unsubscribe @ RealtimeChannel.js:262
+(anonymous) @ ChatScreen.tsx:291
+kd @ react-dom.production.min.js:239
+ki @ react-dom.production.min.js:243
+Ss @ react-dom.production.min.js:284
+rg @ react-dom.production.min.js:272
+sr @ react-dom.production.min.js:127
+WP @ react-dom.production.min.js:282
+fr @ react-dom.production.min.js:280
+rx @ react-dom.production.min.js:269
+_ @ scheduler.production.min.js:13
+L @ scheduler.production.min.js:14Understand this warning
+disableSupabaseLogs.ts:23 Chat subscription status for messages:6f238592-0477-4248-871e-2d15baa18ad2: SUBSCRIBED
+disableSupabaseLogs.ts:23 Successfully subscribed to chat messages
+disableSupabaseLogs.ts:23 Cleaning up chat subscription for messages:6f238592-0477-4248-871e-2d15baa18ad2
+disableSupabaseLogs.ts:23 Chat subscription status for messages:6f238592-0477-4248-871e-2d15baa18ad2: CLOSED
+ChatScreen.tsx:281 Chat subscription issue: CLOSED
+(anonymous) @ ChatScreen.tsx:281
+(anonymous) @ RealtimeChannel.js:102
+(anonymous) @ RealtimeChannel.js:381
+_trigger @ RealtimeChannel.js:366
+n @ RealtimeChannel.js:257
+(anonymous) @ RealtimeChannel.js:266
+(anonymous) @ push.js:95
+_matchReceive @ push.js:95
+t @ push.js:67
+(anonymous) @ RealtimeChannel.js:381
+_trigger @ RealtimeChannel.js:366
+trigger @ push.js:76
+(anonymous) @ RealtimeChannel.js:278
+unsubscribe @ RealtimeChannel.js:262
+(anonymous) @ ChatScreen.tsx:291
+kd @ react-dom.production.min.js:239
+ki @ react-dom.production.min.js:243
+Ss @ react-dom.production.min.js:284
+rg @ react-dom.production.min.js:272
+sr @ react-dom.production.min.js:127
+WP @ react-dom.production.min.js:282
+fr @ react-dom.production.min.js:280
+rx @ react-dom.production.min.js:269
+_ @ scheduler.production.min.js:13
+L @ scheduler.production.min.js:14Understand this warning
+disableSupabaseLogs.ts:23 Chat subscription status for messages:6f238592-0477-4248-871e-2d15baa18ad2: SUBSCRIBED
+disableSupabaseLogs.ts:23 Successfully subscribed to chat messages
+disableSupabaseLogs.ts:23 Cleaning up chat subscription for messages:6f238592-0477-4248-871e-2d15baa18ad2
+disableSupabaseLogs.ts:23 Chat subscription status for messages:6f238592-0477-4248-871e-2d15baa18ad2: CLOSED
+ChatScreen.tsx:281 Chat subscription issue: CLOSED
+(anonymous) @ ChatScreen.tsx:281
+(anonymous) @ RealtimeChannel.js:102
+(anonymous) @ RealtimeChannel.js:381
+_trigger @ RealtimeChannel.js:366
+n @ RealtimeChannel.js:257
+(anonymous) @ RealtimeChannel.js:266
+(anonymous) @ push.js:95
+_matchReceive @ push.js:95
+t @ push.js:67
+(anonymous) @ RealtimeChannel.js:381
+_trigger @ RealtimeChannel.js:366
+trigger @ push.js:76
+(anonymous) @ RealtimeChannel.js:278
+unsubscribe @ RealtimeChannel.js:262
+(anonymous) @ ChatScreen.tsx:291
+kd @ react-dom.production.min.js:239
+ki @ react-dom.production.min.js:243
+Ss @ react-dom.production.min.js:284
+rg @ react-dom.production.min.js:272
+sr @ react-dom.production.min.js:127
+WP @ react-dom.production.min.js:282
+fr @ react-dom.production.min.js:280
+rx @ react-dom.production.min.js:269
+_ @ scheduler.production.min.js:13
+L @ scheduler.production.min.js:14Understand this warning
+disableSupabaseLogs.ts:23 Chat subscription status for messages:6f238592-0477-4248-871e-2d15baa18ad2: SUBSCRIBED
+disableSupabaseLogs.ts:23 Successfully subscribed to chat messages
+disableSupabaseLogs.ts:23 Cleaning up chat subscription for messages:6f238592-0477-4248-871e-2d15baa18ad2
+disableSupabaseLogs.ts:23 Chat subscription status for messages:6f238592-0477-4248-871e-2d15baa18ad2: CLOSED
+ChatScreen.tsx:281 Chat subscription issue: CLOSED
+(anonymous) @ ChatScreen.tsx:281
+(anonymous) @ RealtimeChannel.js:102
+(anonymous) @ RealtimeChannel.js:381
+_trigger @ RealtimeChannel.js:366
+n @ RealtimeChannel.js:257
+(anonymous) @ RealtimeChannel.js:266
+(anonymous) @ push.js:95
+_matchReceive @ push.js:95
+t @ push.js:67
+(anonymous) @ RealtimeChannel.js:381
+_trigger @ RealtimeChannel.js:366
+trigger @ push.js:76
+(anonymous) @ RealtimeChannel.js:278
+unsubscribe @ RealtimeChannel.js:262
+(anonymous) @ ChatScreen.tsx:291
+kd @ react-dom.production.min.js:239
+ki @ react-dom.production.min.js:243
+Ss @ react-dom.production.min.js:284
+rg @ react-dom.production.min.js:272
+sr @ react-dom.production.min.js:127
+WP @ react-dom.production.min.js:282
+fr @ react-dom.production.min.js:280
+rx @ react-dom.production.min.js:269
+_ @ scheduler.production.min.js:13
+L @ scheduler.production.min.js:14Understand this warning
+disableSupabaseLogs.ts:23 Chat subscription status for messages:6f238592-0477-4248-871e-2d15baa18ad2: SUBSCRIBED
+disableSupabaseLogs.ts:23 Successfully subscribed to chat messages
+disableSupabaseLogs.ts:23 Cleaning up chat subscription for messages:6f238592-0477-4248-871e-2d15baa18ad2
+disableSupabaseLogs.ts:23 Chat subscription status for messages:6f238592-0477-4248-871e-2d15baa18ad2: CLOSED
+ChatScreen.tsx:281 Chat subscription issue: CLOSED
+(anonymous) @ ChatScreen.tsx:281
+(anonymous) @ RealtimeChannel.js:102
+(anonymous) @ RealtimeChannel.js:381
+_trigger @ RealtimeChannel.js:366
+n @ RealtimeChannel.js:257
+(anonymous) @ RealtimeChannel.js:266
+(anonymous) @ push.js:95
+_matchReceive @ push.js:95
+t @ push.js:67
+(anonymous) @ RealtimeChannel.js:381
+_trigger @ RealtimeChannel.js:366
+trigger @ push.js:76
+(anonymous) @ RealtimeChannel.js:278
+unsubscribe @ RealtimeChannel.js:262
+(anonymous) @ ChatScreen.tsx:291
+kd @ react-dom.production.min.js:239
+ki @ react-dom.production.min.js:243
+Ss @ react-dom.production.min.js:284
+rg @ react-dom.production.min.js:272
+sr @ react-dom.production.min.js:127
+WP @ react-dom.production.min.js:282
+fr @ react-dom.production.min.js:280
+rx @ react-dom.production.min.js:269
+_ @ scheduler.production.min.js:13
+L @ scheduler.production.min.js:14Understand this warning
+disableSupabaseLogs.ts:23 Chat subscription status for messages:6f238592-0477-4248-871e-2d15baa18ad2: SUBSCRIBED
+disableSupabaseLogs.ts:23 Successfully subscribed to chat messages
+disableSupabaseLogs.ts:23 Cleaning up chat subscription for messages:6f238592-0477-4248-871e-2d15baa18ad2
+disableSupabaseLogs.ts:23 Chat subscription status for messages:6f238592-0477-4248-871e-2d15baa18ad2: CLOSED
+ChatScreen.tsx:281 Chat subscription issue: CLOSED
+(anonymous) @ ChatScreen.tsx:281
+(anonymous) @ RealtimeChannel.js:102
+(anonymous) @ RealtimeChannel.js:381
+_trigger @ RealtimeChannel.js:366
+n @ RealtimeChannel.js:257
+(anonymous) @ RealtimeChannel.js:266
+(anonymous) @ push.js:95
+_matchReceive @ push.js:95
+t @ push.js:67
+(anonymous) @ RealtimeChannel.js:381
+_trigger @ RealtimeChannel.js:366
+trigger @ push.js:76
+(anonymous) @ RealtimeChannel.js:278
+unsubscribe @ RealtimeChannel.js:262
+(anonymous) @ ChatScreen.tsx:291
+kd @ react-dom.production.min.js:239
+ki @ react-dom.production.min.js:243
+Ss @ react-dom.production.min.js:284
+rg @ react-dom.production.min.js:272
+sr @ react-dom.production.min.js:127
+WP @ react-dom.production.min.js:282
+fr @ react-dom.production.min.js:280
+rx @ react-dom.production.min.js:269
+_ @ scheduler.production.min.js:13
+L @ scheduler.production.min.js:14Understand this warning
+disableSupabaseLogs.ts:23 Chat subscription status for messages:6f238592-0477-4248-871e-2d15baa18ad2: SUBSCRIBED
+disableSupabaseLogs.ts:23 Successfully subscribed to chat messages
+disableSupabaseLogs.ts:23 Cleaning up chat subscription for messages:6f238592-0477-4248-871e-2d15baa18ad2
+disableSupabaseLogs.ts:23 Chat subscription status for messages:6f238592-0477-4248-871e-2d15baa18ad2: CLOSED
+ChatScreen.tsx:281 Chat subscription issue: CLOSED
+(anonymous) @ ChatScreen.tsx:281
+(anonymous) @ RealtimeChannel.js:102
+(anonymous) @ RealtimeChannel.js:381
+_trigger @ RealtimeChannel.js:366
+n @ RealtimeChannel.js:257
+(anonymous) @ RealtimeChannel.js:266
+(anonymous) @ push.js:95
+_matchReceive @ push.js:95
+t @ push.js:67
+(anonymous) @ RealtimeChannel.js:381
+_trigger @ RealtimeChannel.js:366
+trigger @ push.js:76
+(anonymous) @ RealtimeChannel.js:278
+unsubscribe @ RealtimeChannel.js:262
+(anonymous) @ ChatScreen.tsx:291
+kd @ react-dom.production.min.js:239
+ki @ react-dom.production.min.js:243
+Ss @ react-dom.production.min.js:284
+rg @ react-dom.production.min.js:272
+sr @ react-dom.production.min.js:127
+WP @ react-dom.production.min.js:282
+fr @ react-dom.production.min.js:280
+rx @ react-dom.production.min.js:269
+_ @ scheduler.production.min.js:13
+L @ scheduler.production.min.js:14Understand this warning
+disableSupabaseLogs.ts:23 Chat subscription status for messages:6f238592-0477-4248-871e-2d15baa18ad2: SUBSCRIBED
+disableSupabaseLogs.ts:23 Successfully subscribed to chat messages
+disableSupabaseLogs.ts:23 Cleaning up chat subscription for messages:6f238592-0477-4248-871e-2d15baa18ad2
+disableSupabaseLogs.ts:23 Chat subscription status for messages:6f238592-0477-4248-871e-2d15baa18ad2: CLOSED
+ChatScreen.tsx:281 Chat subscription issue: CLOSED
+(anonymous) @ ChatScreen.tsx:281
+(anonymous) @ RealtimeChannel.js:102
+(anonymous) @ RealtimeChannel.js:381
+_trigger @ RealtimeChannel.js:366
+n @ RealtimeChannel.js:257
+(anonymous) @ RealtimeChannel.js:266
+(anonymous) @ push.js:95
+_matchReceive @ push.js:95
+t @ push.js:67
+(anonymous) @ RealtimeChannel.js:381
+_trigger @ RealtimeChannel.js:366
+trigger @ push.js:76
+(anonymous) @ RealtimeChannel.js:278
+unsubscribe @ RealtimeChannel.js:262
+(anonymous) @ ChatScreen.tsx:291
+kd @ react-dom.production.min.js:239
+ki @ react-dom.production.min.js:243
+Ss @ react-dom.production.min.js:284
+rg @ react-dom.production.min.js:272
+sr @ react-dom.production.min.js:127
+WP @ react-dom.production.min.js:282
+fr @ react-dom.production.min.js:280
+rx @ react-dom.production.min.js:269
+_ @ scheduler.production.min.js:13
+L @ scheduler.production.min.js:14Understand this warning
+disableSupabaseLogs.ts:23 Chat subscription status for messages:6f238592-0477-4248-871e-2d15baa18ad2: SUBSCRIBED
+disableSupabaseLogs.ts:23 Successfully subscribed to chat messages
+disableSupabaseLogs.ts:23 Cleaning up cha
