@@ -77,6 +77,39 @@
 
 .fixed-chat-header {
   position: fixed;
+
+/* Reply reference styling */
+.reply-reference {
+  position: relative;
+  margin-bottom: 4px;
+  padding-left: 8px;
+  max-width: 100%;
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
+  transition: all 0.2s ease;
+}
+
+.reply-reference:hover {
+  opacity: 0.9;
+}
+
+.has-reply .message-bubble {
+  margin-top: 0;
+}
+
+.message-bubble .reply-reference {
+  font-size: 0.8rem;
+  line-height: 1.2;
+}
+
+.message-bubble[data-sender="self"] .reply-reference {
+  opacity: 0.8;
+}
+
+.message-bubble[data-sender="other"] .reply-reference {
+  opacity: 0.9;
+}
+
   top: 0;
   left: 0;
   right: 0;

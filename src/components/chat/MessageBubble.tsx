@@ -14,6 +14,7 @@ interface MessageBubbleProps {
   onReaction?: (emoji: string) => void;
   isLast?: boolean;
   isConsecutive?: boolean;
+  replyToMessage?: Message | null;
 }
 
 export const MessageBubble = ({ message, isCurrentUser, isRead = false, onReaction, isLast = false, isConsecutive = false }: MessageBubbleProps) => {
@@ -77,6 +78,20 @@ export const MessageBubble = ({ message, isCurrentUser, isRead = false, onReacti
           className={`message-bubble ${isCurrentUser ? 'sent bg-primary text-primary-foreground' : 'received bg-muted text-muted-foreground'} rounded-2xl shadow-sm ${message.attachment_url ? 'overflow-hidden' : 'p-1 px-2'} ${isConsecutive ? 'consecutive-message' : ''} inline-block max-w-fit`}
           data-sender={isCurrentUser ? 'self' : 'other'}
         >
+          {/* Reply reference UI */}
+          {message.reply_to_id && (
+            <div className={`reply-reference ${isCurrentUser ? 'bg-primary-foreground/20' : 'bg-background/50'} p-1.5 mb-1 rounded-lg text-xs border-l-2 ${isCurrentUser ? 'border-primary-foreground/50' : 'border-primary/50'}`}>
+              <div className="flex items-center gap-1">
+                <MessageCircle className="h-3 w-3" />
+                <span className="font-medium">
+                  {message.reply_to?.sender?.full_name || "User"}
+                </span>
+              </div>
+              <div className="truncate max-w-[200px]">
+                {message.reply_to?.content || "Original message"}
+              </div>
+            </div>
+          )}
           {/* Image attachment */}
           {isImageAttachment && (
             <div className="relative">

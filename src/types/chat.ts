@@ -12,26 +12,25 @@ export interface User {
 
 export interface Message {
   id: string;
+  content: string;
   conversation_id: string;
   sender_id: string;
-  recipient_id: string;
-  content: string;
-  translation?: string;
-  created_at: string;
-  is_read: boolean;
-  language: string;
-  attachment_url?: string | null;
-  attachment_name?: string | null;
-  attachment_thumbnail?: string | null;
   sender?: {
     id: string;
-    email: string;
-    full_name: string;
+    email?: string;
+    full_name?: string;
     avatar_url?: string;
     last_seen?: string;
   };
+  is_read: boolean;
   is_delivered?: boolean;
-  reactions?: Record<string, string[]>; // Map of emoji to array of user IDs
+  attachment_url?: string | null;
+  attachment_name?: string | null;
+  attachment_thumbnail?: string | null;
+  created_at: string;
+  reactions?: Record<string, string[]>;
+  reply_to_id?: string | null;
+  reply_to?: Message | null;
 }
 
 export interface Conversation {
