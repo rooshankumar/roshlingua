@@ -7,6 +7,7 @@ import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from '@vercel/speed-insights/react';
 import HMRHandler from '@/components/HMRHandler';
 import React, { Suspense, lazy, useEffect } from "react";
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { AnimatePresence } from 'framer-motion';
 import PageTransition from "@/components/PageTransition";
 
