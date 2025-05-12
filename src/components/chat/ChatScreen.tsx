@@ -865,11 +865,14 @@ export const ChatScreen = ({ conversation }: Props) => {
                       {message.sender?.full_name}
                     </span>
                   )}
-                  <div className="flex items-end gap-2">
+                  <div className="flex items-end gap-2 w-full">
                     <div
-                      className={`p-3 break-words shadow-sm transition-all duration-300 message-bubble`}
+                      className={`break-words shadow-sm transition-all duration-300 message-bubble`}
                       data-sender={message.sender_id === user?.id ? 'self' : 'other'}
-                      style={{marginLeft: message.sender_id === user?.id ? 'auto' : '0'}}
+                      style={{
+                        marginLeft: message.sender_id === user?.id ? 'auto' : '0',
+                        maxWidth: message.content?.length < 20 ? 'fit-content' : '85%'
+                      }}
                     >
                       <p className="leading-relaxed whitespace-pre-wrap text-[15px]">{message.content || ''}</p>
 

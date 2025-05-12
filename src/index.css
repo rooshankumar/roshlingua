@@ -433,6 +433,7 @@
   background-color: #0084ff !important;
   color: white !important;
   max-width: 85% !important;
+  min-width: 40px !important;
   word-wrap: break-word !important;
   overflow-wrap: break-word !important;
   display: inline-block !important;
@@ -441,7 +442,7 @@
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1) !important;
   transition: transform 0.2s ease !important;
   position: relative !important;
-  padding-bottom: 8px !important;
+  padding: 6px 10px !important;
 }
 
 .message-bubble[data-sender="other"] {
@@ -452,6 +453,7 @@
   background-color: #f0f0f0 !important;
   color: #000 !important;
   max-width: 85% !important;
+  min-width: 40px !important;
   word-wrap: break-word !important;
   overflow-wrap: break-word !important;
   display: inline-block !important;
@@ -460,7 +462,7 @@
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1) !important;
   transition: transform 0.2s ease !important;
   position: relative !important;
-  padding-bottom: 8px !important;
+  padding: 6px 10px !important;
 }
 
 /* Special styling for grouped messages (consecutive from same sender) */

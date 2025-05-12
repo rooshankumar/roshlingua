@@ -8,9 +8,11 @@
 .message-bubble {
   border-radius: 16px;
   max-width: 70%;
+  width: auto;
   word-break: break-word;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
   margin-bottom: 0; /* No spacing between consecutive bubbles */
+  display: inline-block;
 }
 
 .message-bubble[data-sender="self"] {
