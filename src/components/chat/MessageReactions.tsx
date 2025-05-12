@@ -12,6 +12,7 @@ interface MessageReactionsProps {
   onClose?: () => void;
   isReactionPicker?: boolean;
   position?: 'top' | 'bottom';
+  hideSenderName?: boolean;
 }
 
 export const MessageReactions = ({ 
@@ -19,7 +20,8 @@ export const MessageReactions = ({
   existingReactions = {}, 
   onClose,
   isReactionPicker = false,
-  position = 'top'
+  position = 'top',
+  hideSenderName = false
 }: MessageReactionsProps) => {
   const { user } = useAuth();
   const [reactions, setReactions] = useState<Record<string, string[]>>(existingReactions);
