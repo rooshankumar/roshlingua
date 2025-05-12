@@ -110,7 +110,7 @@ const AppLayout = ({ children }: AppLayoutProps) => {
       </main>
 
       {!isChatDetailRoute && (
-        <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-background/90 backdrop-blur-xl border-t flex justify-around p-2 z-50 shadow-lg safe-area-bottom">
+        <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-background/90 backdrop-blur-xl border-t flex justify-around items-center p-2 z-50 shadow-lg safe-area-bottom">
           {routes.map((route) => {
             const isActive = location.pathname === route.path;
 
@@ -126,7 +126,7 @@ const AppLayout = ({ children }: AppLayoutProps) => {
                   }`
                 }
               >
-                <route.icon size={20} className={`${isActive ? 'animate-pulse' : ''}`} />
+                <route.icon size={20} />
                 <span className="text-xs mt-1 font-medium">{route.label}</span>
               </NavLink>
             );
