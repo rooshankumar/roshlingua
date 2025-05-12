@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useLocation } from 'react-router-dom';
-import subscriptionManager from '@/utils/subscriptionManager';
+import subscriptionManager, { checkAllSubscriptions } from '@/utils/subscriptionManager';
 import { useAuth } from '@/providers/AuthProvider';
 
 /**

@@ -18,6 +18,7 @@ import { MessageReactions, ReactionPicker } from './MessageReactions'; // Import
 import { Dialog, DialogContent } from '../ui/dialog'; // Import Dialog and DialogContent
 import './ChatScreen.css'; // Import dedicated CSS
 import { useUnreadMessages } from '@/hooks/useUnreadMessages'; // Import useUnreadMessages hook
+import { RealtimeChannel } from '@supabase/supabase-js';
 
 
 // Simple subscription manager (replace with a more robust solution)
@@ -65,6 +66,7 @@ export const ChatScreen = ({ conversation }: Props) => {
   const navigate = useNavigate();
   const { markConversationAsRead } = useUnreadMessages(user?.id);
   const [activeReactionMenu, setActiveReactionMenu] = useState<string | null>(null);
+  const [chatConnection, setChatConnection] = useState<RealtimeChannel | null>(null);
 
 
   const scrollToLatestMessage = (smooth = true) => {
@@ -145,7 +147,7 @@ export const ChatScreen = ({ conversation }: Props) => {
 
     const fetchMessages = async (loadMore = false) => {
       if (!isActive) return;
-      
+
       try {
         // Use a smaller page size for initial load to improve perceived performance
         const pageSize = isInitialLoad ? 10 : MESSAGES_PER_PAGE;
@@ -287,7 +289,7 @@ export const ChatScreen = ({ conversation }: Props) => {
         )
         .subscribe((status) => {
           if (!isActive) return;
-          
+
           console.log(`Chat subscription status for ${subscriptionKey}:`, status);
           if (status === 'SUBSCRIBED') {
             console.log('Successfully subscribed to chat messages');
@@ -311,7 +313,7 @@ export const ChatScreen = ({ conversation }: Props) => {
     return () => {
       console.log(`Cleaning up chat subscription for ${subscriptionKey}`);
       isActive = false;
-      
+
       if (channelRef) {
         try {
           channelRef.unsubscribe();
@@ -602,6 +604,87 @@ export const ChatScreen = ({ conversation }: Props) => {
       e.currentTarget.parentNode?.appendChild(fallbackElement);
     }
   };
+
+  useEffect(() => {
+    // Subscribe to new messages in this chat
+    if (conversation?.id) {
+      let channel: RealtimeChannel | null = null;
+
+      try {
+        channel = supabase
+          .channel(`messages:${conversation?.id}`)
+          .on(
+            'postgres_changes',
+            {
+              event: 'INSERT',
+              schema: 'public',
+              table: 'messages',
+              filter: `conversation_id=eq.${conversation?.id}`
+            },
+            async (payload) => {
+              console.log('Received message:', payload);
+              // Handle different types of changes
+              if (payload.eventType === 'INSERT') {
+                const newMessage = payload.new as Message;
+                setMessages((prev) => {
+                  // Check if the message is already in the array to prevent duplicates
+                  if (prev.some(msg => msg.id === newMessage.id)) {
+                    return prev;
+                  }
+                  return [...prev, newMessage];
+                });
+              } else if (payload.eventType === 'UPDATE') {
+                const updatedMessage = payload.new as Message;
+                setMessages((prev) =>
+                  prev.map((msg) =>
+                    msg.id === updatedMessage.id ? updatedMessage : msg
+                  )
+                );
+              } else if (payload.eventType === 'DELETE') {
+                const deletedMessageId = payload.old.id;
+                setMessages((prev) =>
+                  prev.filter((msg) => msg.id !== deletedMessageId)
+                );
+              }
+            }
+          )
+          .subscribe((status) => {
+            console.log('Chat subscription status:', status);
+            if (status === 'SUBSCRIBED') {
+              console.log('Successfully subscribed to chat messages');
+            } else if (status === 'CLOSED' || status === 'CHANNEL_ERROR') {
+              console.error('Chat subscription issue:', status);
+
+              // Attempt to re-subscribe if closed unexpectedly
+              if (status === 'CLOSED') {
+                setTimeout(() => {
+                  if (channel) {
+                    console.log('Attempting to resubscribe to chat...');
+                    channel.subscribe();
+                  }
+                }, 2000);
+              }
+            }
+          });
+
+        // Register with subscription manager
+        if (channel) {
+          subscriptionManager.subscribe(`messages:${conversation?.id}`, channel);
+          setChatConnection(channel);
+        }
+      } catch (error) {
+        console.error('Error setting up chat subscription:', error);
+      }
+
+      return () => {
+        console.log('Cleaning up chat subscription for', `messages:${conversation?.id}`);
+        if (channel) {
+          // Unsubscribe through subscription manager
+          subscriptionManager.unsubscribe(`messages:${conversation?.id}`);
+        }
+      };
+    }
+  }, [conversation?.id]);
 
 
   return (
