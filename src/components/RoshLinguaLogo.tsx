@@ -40,13 +40,14 @@ const RoshLinguaLogo: React.FC<RoshLinguaLogoProps> = ({
             alt="RoshLingua Bird"
             width={logoSize}
             height={logoSize}
-            className="object-contain"
+            className="object-contain drop-shadow-sm"
+            style={{ filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.1))' }}
           />
         </div>
       )}
       <div className={cn("font-bold flex items-center", fontSizeClass)}>
-        <span className="text-blue-600">ROSH</span>
-        <span className="text-red-500">LINGUA</span>
+        <span className="text-blue-600 drop-shadow-sm">ROSH</span>
+        <span className="text-red-500 drop-shadow-sm">LINGUA</span>
       </div>
     </div>
   );

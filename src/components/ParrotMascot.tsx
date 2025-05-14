@@ -28,7 +28,8 @@ const ParrotMascot: React.FC<ParrotMascotProps> = ({
       <img 
         src="/images/roshlingua-bird.png" 
         alt="RoshLingua Bird"
-        className="w-full h-full object-contain"
+        className="w-full h-full object-contain drop-shadow-sm"
+        style={{ filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.1))' }}
       />
     </div>
   );
