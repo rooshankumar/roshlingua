@@ -1,4 +1,3 @@
-
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ModeToggle } from "@/components/mode-toggle";
@@ -12,7 +11,7 @@ import {
 } from "lucide-react";
 
 import RoshLinguaLogo from "@/components/RoshLinguaLogo";
-import FoxMascot from "@/components/FoxMascot";
+import ParrotMascot from "@/components/ParrotMascot";
 
 const Home = () => {
   return (
@@ -23,7 +22,7 @@ const Home = () => {
           <Link to="/" className="font-bold">
             <RoshLinguaLogo size="md" />
           </Link>
-          
+
           <div className="flex items-center space-x-4">
             <nav className="hidden md:flex space-x-6">
               <Link to="/" className="text-foreground hover:text-primary transition-colors">
@@ -39,9 +38,9 @@ const Home = () => {
                 Contact
               </Link>
             </nav>
-            
+
             <ModeToggle />
-            
+
             <div className="flex space-x-2">
               <Button asChild variant="ghost">
                 <Link to="/auth">
@@ -57,7 +56,7 @@ const Home = () => {
           </div>
         </div>
       </header>
-      
+
       {/* Hero section */}
       <section className="py-20 px-6">
         <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-12 items-center">
@@ -85,7 +84,7 @@ const Home = () => {
               </Button>
             </div>
           </div>
-          
+
           <div className="glass-card rounded-2xl p-6 relative">
             <div className="aspect-video bg-gradient-to-br from-primary/20 to-secondary rounded-lg flex items-center justify-center">
               <div className="text-4xl animate-pulse-slow">🌍</div>
@@ -93,7 +92,7 @@ const Home = () => {
           </div>
         </div>
       </section>
-      
+
       {/* Features */}
       <section className="py-20 px-6 bg-secondary/50">
         <div className="max-w-7xl mx-auto">
@@ -103,7 +102,7 @@ const Home = () => {
               Our platform combines social networking with proven language learning techniques to help you achieve fluency faster.
             </p>
           </div>
-          
+
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             <div className="glass-card p-6 rounded-xl card-hover">
               <div className="w-12 h-12 bg-primary/20 text-primary rounded-full flex items-center justify-center mb-4">
@@ -114,7 +113,7 @@ const Home = () => {
                 Connect with language learners and native speakers from around the world.
               </p>
             </div>
-            
+
             <div className="glass-card p-6 rounded-xl card-hover">
               <div className="w-12 h-12 bg-primary/20 text-primary rounded-full flex items-center justify-center mb-4">
                 <MessageSquare className="h-6 w-6" />
@@ -124,7 +123,7 @@ const Home = () => {
                 Practice your speaking and writing skills in authentic conversations.
               </p>
             </div>
-            
+
             <div className="glass-card p-6 rounded-xl card-hover">
               <div className="w-12 h-12 bg-primary/20 text-primary rounded-full flex items-center justify-center mb-4">
                 <Users className="h-6 w-6" />
@@ -134,7 +133,7 @@ const Home = () => {
                 Find the perfect language exchange partner based on your goals.
               </p>
             </div>
-            
+
             <div className="glass-card p-6 rounded-xl card-hover">
               <div className="w-12 h-12 bg-primary/20 text-primary rounded-full flex items-center justify-center mb-4">
                 <TrendingUp className="h-6 w-6" />
@@ -147,7 +146,7 @@ const Home = () => {
           </div>
         </div>
       </section>
-      
+
       {/* Testimonials */}
       <section className="py-20 px-6">
         <div className="max-w-7xl mx-auto">
@@ -157,7 +156,7 @@ const Home = () => {
               See how roshLingua has helped people achieve their language learning goals.
             </p>
           </div>
-          
+
           <div className="grid md:grid-cols-3 gap-8">
             <div className="glass-card p-6 rounded-xl">
               <div className="flex items-center mb-4">
@@ -173,7 +172,7 @@ const Home = () => {
                 "I've tried many language apps, but nothing compares to practicing with native speakers. After 3 months, I can hold real conversations in Spanish!"
               </p>
             </div>
-            
+
             <div className="glass-card p-6 rounded-xl">
               <div className="flex items-center mb-4">
                 <div className="w-12 h-12 rounded-full bg-secondary flex items-center justify-center mr-4">
@@ -188,7 +187,7 @@ const Home = () => {
                 "The daily streak feature keeps me motivated. I've maintained a 64-day streak and my Japanese has improved dramatically!"
               </p>
             </div>
-            
+
             <div className="glass-card p-6 rounded-xl">
               <div className="flex items-center mb-4">
                 <div className="w-12 h-12 rounded-full bg-secondary flex items-center justify-center mr-4">
@@ -206,16 +205,16 @@ const Home = () => {
           </div>
         </div>
       </section>
-      
+
       {/* CTA */}
       <section className="py-20 px-6 bg-primary/5">
         <div className="max-w-7xl mx-auto text-center flex flex-col items-center">
-          <FoxMascot size="xl" animate className="mb-6" />r">
+          <ParrotMascot size="xl" className="mx-auto mb-8" animate />r">
           <h2 className="text-3xl font-bold mb-4">Start Your Language Journey Today</h2>
           <p className="text-muted-foreground max-w-2xl mx-auto mb-8">
             Join thousands of successful language learners on roshLingua. Set up your profile in minutes and start connecting with native speakers.
           </p>
-          
+
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button asChild size="lg" className="button-hover">
               <Link to="/auth?mode=signup">
@@ -228,7 +227,7 @@ const Home = () => {
               </Link>
             </Button>
           </div>
-          
+
           <div className="mt-8 flex flex-col sm:flex-row justify-center gap-6">
             <div className="flex items-center">
               <Check className="text-primary mr-2 h-5 w-5" />
@@ -245,7 +244,7 @@ const Home = () => {
           </div>
         </div>
       </section>
-      
+
       {/* Footer */}
       <footer className="py-12 px-6 border-t border-border">
         <div className="max-w-7xl mx-auto">
@@ -258,7 +257,7 @@ const Home = () => {
                 <li><Link to="/auth" className="text-muted-foreground hover:text-foreground transition-colors">Sign In</Link></li>
               </ul>
             </div>
-            
+
             <div>
               <h4 className="font-semibold mb-4">Legal</h4>
               <ul className="space-y-2">
@@ -267,7 +266,7 @@ const Home = () => {
                 <li><Link to="/contact" className="text-muted-foreground hover:text-foreground transition-colors">Contact Us</Link></li>
               </ul>
             </div>
-            
+
             <div>
               <h4 className="font-semibold mb-4">Resources</h4>
               <ul className="space-y-2">
@@ -276,7 +275,7 @@ const Home = () => {
                 <li><Link to="/faq" className="text-muted-foreground hover:text-foreground transition-colors">FAQ</Link></li>
               </ul>
             </div>
-            
+
             <div>
               <h4 className="font-semibold mb-4">Connect</h4>
               <ul className="space-y-2">
@@ -286,7 +285,7 @@ const Home = () => {
               </ul>
             </div>
           </div>
-          
+
           <div className="mt-8 pt-8 border-t border-border text-center">
             <p className="text-muted-foreground">© {new Date().getFullYear()} roshLingua. All rights reserved.</p>
           </div>
