@@ -1,6 +1,6 @@
 
 import React from "react";
-import FoxMascot from "./FoxMascot";
+import ParrotMascot from "./ParrotMascot";
 import { cn } from "@/lib/utils";
 
 interface RoshLinguaLogoProps {
@@ -29,7 +29,7 @@ const RoshLinguaLogo: React.FC<RoshLinguaLogoProps> = ({
     <div className={cn("flex items-center gap-2", className)}>
       {!textOnly && (
         <div className="relative">
-          <FoxMascot 
+          <ParrotMascot 
             size={size === "sm" ? "sm" : size === "md" ? "md" : "lg"} 
           />
         </div>
