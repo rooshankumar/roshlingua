@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -10,17 +11,17 @@ export default {
 	],
 	prefix: "",
 	theme: {
-    extend: {
-      colors: {
-        'chat-primary': '#0084FF',
-        'chat-dark': '#0070D8',
-        'chat-unread': '#E5F1FF',
-        'nav-bg': '#0084FF',  
-        'nav-text': '#FFFFFF',
-        'nav-hover': 'rgba(255, 255, 255, 0.1)',
-        'nav-active': 'rgba(255, 255, 255, 0.2)',
-      },
-    },
+		extend: {
+			colors: {
+				'chat-primary': '#FF6B1A', // Changed to orange brand color
+				'chat-dark': '#E55A09', // Darker shade of orange
+				'chat-unread': '#FFF1E7', // Light orange background for unread
+				'nav-bg': '#FF6B1A',
+				'nav-text': '#FFFFFF',
+				'nav-hover': 'rgba(255, 255, 255, 0.1)',
+				'nav-active': 'rgba(255, 255, 255, 0.2)',
+			},
+		},
 		container: {
 			center: true,
 			padding: '2rem',

@@ -485,7 +485,7 @@
   border-top-right-radius: 18px !important;
   border-top-left-radius: 18px !important;
   border-bottom-left-radius: 18px !important;
-  background-color: #0084ff !important;
+  background-color: #FF6B1A !important; /* Orange brand color */
   color: white !important;
   max-width: 85% !important;
   min-width: 40px !important;
@@ -505,8 +505,8 @@
   border-top-right-radius: 18px !important;
   border-top-left-radius: 18px !important;
   border-bottom-right-radius: 18px !important;
-  background-color: #f0f0f0 !important;
-  color: #000 !important;
+  background-color: #f0f0f0 !important; /* Light gray background */
+  color: #1a1a1a !important; /* Dark text for contrast */
   max-width: 85% !important;
   min-width: 40px !important;
   word-wrap: break-word !important;
@@ -518,6 +518,12 @@
   transition: transform 0.2s ease !important;
   position: relative !important;
   padding: 4px 8px !important;
+}
+
+/* Dark mode adjustments */
+.dark .message-bubble[data-sender="other"] {
+  background-color: #333 !important; /* Darker background for dark mode */
+  color: #f0f0f0 !important; /* Lighter text for dark mode */
 }
 
 /* Special styling for grouped messages (consecutive from same sender) */
@@ -694,65 +700,65 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 0 0% 0%;
+    --background: 0 0% 98%; /* Light gray background */
+    --foreground: 0 0% 15%; /* Dark gray text */
 
-    --card: 0 0% 100%;
-    --card-foreground: 0 0% 0%;
+    --card: 0 0% 100%; /* White cards */
+    --card-foreground: 0 0% 15%; /* Dark gray text */
 
     --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 0%;
+    --popover-foreground: 0 0% 15%;
 
-    --primary: 24 100% 54%;
+    --primary: 24 100% 55%; /* Orange-500: #FF6B1A */
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 24 30% 95%;
-    --secondary-foreground: 0 0% 0%;
+    --secondary: 0 0% 100%; /* White with gray border */
+    --secondary-foreground: 0 0% 15%;
 
-    --muted: 24 20% 95%;
+    --muted: 0 0% 95%; /* Light gray */
     --muted-foreground: 0 0% 45%;
 
-    --accent: 24 30% 95%;
-    --accent-foreground: 0 0% 0%;
+    --accent: 265 89% 78%; /* Light purple for gradient */
+    --accent-foreground: 0 0% 15%;
 
-    --destructive: 0 70% 50%;
+    --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 24 30% 90%;
-    --input: 24 30% 90%;
-    --ring: 24 100% 54%;
+    --border: 0 0% 90%; /* Light gray border */
+    --input: 0 0% 90%;
+    --ring: 24 100% 55%; /* Orange for focus rings */
 
     --radius: 0.75rem;
   }
 
   .dark {
-    --background: 0 0% 10%;
-    --foreground: 0 0% 100%;
+    --background: 0 0% 10%; /* Very dark gray */
+    --foreground: 0 0% 90%; /* Light gray text */
 
-    --card: 0 0% 15%;
-    --card-foreground: 0 0% 100%;
+    --card: 0 0% 15%; /* Dark cards */
+    --card-foreground: 0 0% 90%;
 
     --popover: 0 0% 15%;
-    --popover-foreground: 0 0% 100%;
+    --popover-foreground: 0 0% 90%;
 
-    --primary: 24 100% 54%;
+    --primary: 24 100% 55%; /* Same orange, works well in dark mode too */
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 24 30% 15%;
+    --secondary: 0 0% 15%;
     --secondary-foreground: 0 0% 90%;
 
     --muted: 0 0% 20%;
     --muted-foreground: 0 0% 70%;
 
-    --accent: 24 30% 15%;
+    --accent: 265 89% 78%; /* Same accent for gradient */
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 24 30% 15%;
-    --input: 24 30% 15%;
-    --ring: 24 100% 54%;
+    --border: 0 0% 20%; /* Dark borders */
+    --input: 0 0% 20%;
+    --ring: 24 100% 65%; /* Slightly lighter orange ring for dark mode */
   }
 }
 
