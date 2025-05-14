@@ -45,8 +45,8 @@ const RoshLinguaLogo: React.FC<RoshLinguaLogoProps> = ({
         </div>
       )}
       <div className={cn("font-bold flex items-center", fontSizeClass)}>
-        <span className="text-blue-600">rosh</span>
-        <span className="text-red-500">Lingua</span>
+        <span className="text-blue-600">ROSH</span>
+        <span className="text-red-500">LINGUA</span>
       </div>
     </div>
   );

@@ -27,7 +27,7 @@ const ParrotMascot: React.FC<ParrotMascotProps> = ({
     <div className={`relative ${sizeClass} ${animationClass} ${className}`}>
       <img 
         src="/images/roshlingua-bird.png" 
-        alt="RoshLingua Parrot"
+        alt="RoshLingua Bird"
         className="w-full h-full object-contain"
       />
     </div>
