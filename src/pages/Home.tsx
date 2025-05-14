@@ -209,7 +209,7 @@ const Home = () => {
       {/* CTA */}
       <section className="py-20 px-6 bg-primary/5">
         <div className="max-w-7xl mx-auto text-center flex flex-col items-center">
-          <ParrotMascot size="xl" className="mx-auto mb-8" animate />r">
+          <ParrotMascot size="xl" className="mx-auto mb-8" animate />
           <h2 className="text-3xl font-bold mb-4">Start Your Language Journey Today</h2>
           <p className="text-muted-foreground max-w-2xl mx-auto mb-8">
             Join thousands of successful language learners on roshLingua. Set up your profile in minutes and start connecting with native speakers.
