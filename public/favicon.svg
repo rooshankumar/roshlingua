@@ -1,25 +1,38 @@
 
-<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+<svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
   <!-- Body -->
-  <ellipse cx="55" cy="55" rx="25" ry="30" fill="#0CA789" />
+  <path d="M256 380 Q360 380 390 320 Q420 260 370 220 Q340 190 300 200 Z" fill="#1EB8B8" />
   
   <!-- Wing -->
-  <path d="M50,45 Q80,55 75,85 Q65,75 50,65 Z" fill="#08856D" />
+  <path d="M320 290 Q350 260 320 220 Q290 180 260 200 Z" fill="#00635D" />
   
   <!-- Head -->
-  <circle cx="45" cy="35" r="20" fill="#F92F60" />
+  <circle cx="240" cy="200" r="120" fill="#FF3355" />
   
   <!-- Beak -->
-  <path d="M30,35 L15,40 L30,45 Z" fill="#FFCC00" />
+  <path d="M170 210 L120 220 L170 240 Z" fill="#FF7722" />
   
   <!-- Eye -->
-  <circle cx="38" cy="33" r="3" fill="#FFFFFF" />
-  <circle cx="38" cy="33" r="1.5" fill="#000000" />
+  <circle cx="200" cy="190" r="30" fill="#FFFFFF" />
+  <circle cx="200" cy="190" r="15" fill="#003344" />
   
-  <!-- Tail feathers -->
-  <path d="M75,60 Q95,50 90,70 Q85,75 75,70 Z" fill="#F7A400" />
-  <path d="M75,65 Q95,75 85,85 Q80,80 75,75 Z" fill="#5840F5" />
+  <!-- Hat -->
+  <path d="M230 110 Q240 80 280 80 Q320 80 330 110 Q340 140 290 140 Q230 140 230 110 Z" fill="#1D65E0" />
+  <circle cx="280" cy="65" r="25" fill="#1D65E0" />
   
-  <!-- Chest -->
-  <path d="M40,45 Q50,65 35,80 Q25,70 30,45 Z" fill="#FFD700" />
+  <!-- Hat Text -->
+  <path d="M220 125 Q270 125 320 125 Q350 125 350 115 Q350 105 320 105 Q270 105 220 105 Q190 105 190 115 Q190 125 220 125 Z" fill="#1D65E0" />
+  
+  <!-- Scarf -->
+  <path d="M210 260 Q240 280 280 270 Q320 260 340 240 Q360 240 380 260 Q390 280 380 300 Q360 320 330 310 Z" fill="#FFBB00" />
+  
+  <!-- Feet -->
+  <path d="M260 380 L240 410 L260 410 Z" fill="#FF7722" />
+  <path d="M300 380 L320 410 L300 410 Z" fill="#FF7722" />
+
+  <!-- Speech bubble -->
+  <circle cx="420" cy="170" r="70" fill="#FFF6E5" opacity="0.8" />
+  <circle cx="400" cy="170" r="7" fill="#003344" />
+  <circle cx="430" cy="170" r="7" fill="#003344" />
+  <circle cx="460" cy="170" r="7" fill="#003344" />
 </svg>

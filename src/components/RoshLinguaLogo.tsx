@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 
 interface RoshLinguaLogoProps {
   className?: string;
-  size?: "sm" | "md" | "lg";
+  size?: "sm" | "md" | "lg" | "xl";
   textOnly?: boolean;
   darkMode?: boolean;
   rightAligned?: boolean;
@@ -16,12 +16,13 @@ const RoshLinguaLogo: React.FC<RoshLinguaLogoProps> = ({
   size = "md",
   textOnly = false,
   darkMode = false,
-  rightAligned = true,
+  rightAligned = false,
 }) => {
   const sizeMap = {
     sm: "text-lg",
     md: "text-2xl",
     lg: "text-4xl",
+    xl: "text-5xl",
   };
 
   const fontSizeClass = sizeMap[size];
@@ -36,14 +37,23 @@ const RoshLinguaLogo: React.FC<RoshLinguaLogoProps> = ({
       {!textOnly && (
         <div className={`relative ${rightAligned ? "ml-1" : "mr-1"}`}>
           <ParrotMascot 
-            size={size === "sm" ? "sm" : size === "md" ? "md" : "lg"} 
-            className="animate-pulse-slow" 
+            size={size} 
+            className="animate-pulse-slow"
+            withSpeechBubble={false}
           />
         </div>
       )}
       <div className={cn("font-bold flex items-center", fontSizeClass)}>
-        <span className="text-orange-500 font-extrabold tracking-tight">rosh</span>
-        <span className="bg-gradient-to-r from-orange-500 via-amber-500 to-yellow-500 bg-clip-text text-transparent font-extrabold tracking-tight">Lingua</span>
+        {size === "lg" || size === "xl" ? (
+          <span className="bg-gradient-to-r from-[#FF3355] via-[#1D65E0] to-[#1EB8B8] bg-clip-text text-transparent font-extrabold tracking-tight">
+            roshLingua
+          </span>
+        ) : (
+          <>
+            <span className="text-[#FF3355] font-extrabold tracking-tight">rosh</span>
+            <span className="text-[#1D65E0] font-extrabold tracking-tight">Lingua</span>
+          </>
+        )}
       </div>
     </div>
   );
