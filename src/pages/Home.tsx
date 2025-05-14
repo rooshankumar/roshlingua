@@ -11,14 +11,17 @@ import {
   ChevronRight 
 } from "lucide-react";
 
+import RoshLinguaLogo from "@/components/RoshLinguaLogo";
+import FoxMascot from "@/components/FoxMascot";
+
 const Home = () => {
   return (
     <div className="min-h-screen flex flex-col">
       {/* Header */}
       <header className="w-full py-4 px-6 border-b border-border sticky top-0 bg-background/80 backdrop-blur-sm z-50">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
-          <Link to="/" className="text-2xl font-bold text-gradient">
-            roshLingua
+          <Link to="/" className="font-bold">
+            <RoshLinguaLogo size="md" />
           </Link>
           
           <div className="flex items-center space-x-4">
@@ -206,7 +209,8 @@ const Home = () => {
       
       {/* CTA */}
       <section className="py-20 px-6 bg-primary/5">
-        <div className="max-w-7xl mx-auto text-center">
+        <div className="max-w-7xl mx-auto text-center flex flex-col items-center">
+          <FoxMascot size="xl" animate className="mb-6" />r">
           <h2 className="text-3xl font-bold mb-4">Start Your Language Journey Today</h2>
           <p className="text-muted-foreground max-w-2xl mx-auto mb-8">
             Join thousands of successful language learners on roshLingua. Set up your profile in minutes and start connecting with native speakers.
