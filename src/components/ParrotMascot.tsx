@@ -2,64 +2,61 @@
 import React from "react";
 
 interface ParrotMascotProps {
+  size?: "sm" | "md" | "lg";
   className?: string;
-  size?: "sm" | "md" | "lg" | "xl";
-  animate?: boolean;
 }
 
 const ParrotMascot: React.FC<ParrotMascotProps> = ({ 
-  className = "", 
   size = "md", 
-  animate = false 
+  className = "" 
 }) => {
-  // Size mapping
+  // Size mapping for the SVG dimensions
   const sizeMap = {
-    sm: "w-8 h-8",
-    md: "w-16 h-16",
-    lg: "w-24 h-24",
-    xl: "w-36 h-36"
+    sm: { width: 36, height: 36 },
+    md: { width: 48, height: 48 },
+    lg: { width: 64, height: 64 },
   };
 
-  const sizeClass = sizeMap[size];
-  const animationClass = animate ? "animate-bounce" : "";
+  const { width, height } = sizeMap[size];
 
   return (
-    <div className={`relative ${sizeClass} ${animationClass} ${className}`}>
-      {/* Parrot SVG */}
+    <div className={`relative ${className}`} style={{ width, height }}>
       <svg 
-        viewBox="0 0 100 100" 
+        width={width} 
+        height={height} 
+        viewBox="0 0 120 120" 
+        fill="none" 
         xmlns="http://www.w3.org/2000/svg"
-        className="w-full h-full"
+        className="drop-shadow-lg transition-transform duration-300 hover:scale-105"
       >
         {/* Body */}
-        <ellipse cx="55" cy="55" rx="25" ry="30" fill="#0CA789" />
+        <path d="M60 110C75 110 95 95 95 65C95 40 80 25 60 25C40 25 25 40 25 65C25 95 45 110 60 110Z" fill="#FF6B1A" />
+        
+        {/* Shadow/highlight on body */}
+        <path d="M60 110C75 110 95 95 95 65C95 40 85 30 75 27.5C65 25 55 45 50 65C45 85 45 110 60 110Z" fill="#FF8C44" />
         
         {/* Wing */}
-        <path d="M50,45 Q80,55 75,85 Q65,75 50,65 Z" fill="#08856D" />
-        
-        {/* Head */}
-        <circle cx="45" cy="35" r="20" fill="#F92F60" />
-        
-        {/* Beak */}
-        <path d="M30,35 L15,40 L30,45 Z" fill="#FFCC00" />
-        
-        {/* Eye */}
-        <circle cx="38" cy="33" r="3" fill="#FFFFFF" />
-        <circle cx="38" cy="33" r="1.5" fill="#000000" />
+        <path d="M30 70C25 60 25 50 30 40C35 30 35 50 35 60C35 70 35 80 30 70Z" fill="#1A1E23" />
         
         {/* Tail feathers */}
-        <path d="M75,60 Q95,50 90,70 Q85,75 75,70 Z" fill="#F7A400" />
-        <path d="M75,65 Q95,75 85,85 Q80,80 75,75 Z" fill="#5840F5" />
+        <path d="M70 100C80 105 90 100 95 90C100 80 85 95 80 95C75 95 70 95 70 100Z" fill="#1A1E23" />
         
-        {/* Chest */}
-        <path d="M40,45 Q50,65 35,80 Q25,70 30,45 Z" fill="#FFD700" />
+        {/* Beak */}
+        <path d="M75 50C85 50 90 55 85 60C80 65 70 60 75 50Z" fill="#1A1E23" />
+        
+        {/* Face mask */}
+        <path d="M50 35C45 40 45 60 55 60C65 60 70 45 65 35C60 25 55 30 50 35Z" fill="#FFFFFF" />
+        
+        {/* Eye */}
+        <circle cx="57.5" cy="45" r="7.5" fill="#1A1E23" />
+        <circle cx="55" cy="42.5" r="2.5" fill="#FFFFFF" />
         
         {/* Feet */}
-        <path d="M45,85 L50,95 L55,85" stroke="#FFCC00" strokeWidth="2" fill="none" />
-        <path d="M60,85 L65,95 L70,85" stroke="#FFCC00" strokeWidth="2" fill="none" />
+        <path d="M50 105C45 105 45 110 50 110C55 110 55 105 50 105Z" fill="#1A1E23" />
+        <path d="M70 105C65 105 65 110 70 110C75 110 75 105 70 105Z" fill="#1A1E23" />
         
-        {/* Head detail */}
-        <path d="M45,20 Q55,15 60,25" stroke="#E01E5A" strokeWidth="2" fill="none" />
+        {/* Shine/Highlight effect */}
+        <path d="M50 35C55 30 65 40 60 45C55 50 45 40 50 35Z" fill="#FFFFFF" fillOpacity="0.6" />
       </svg>
     </div>
   );

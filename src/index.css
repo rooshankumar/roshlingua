@@ -251,6 +251,25 @@
 }
 
 /* Messenger-style animations */
+
+/* Custom animations */
+@keyframes pulse-slow {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+.animate-pulse-slow {
+  animation: pulse-slow 3s ease-in-out infinite;
+}
+
+.logo-shadow {
+  filter: drop-shadow(0px 4px 8px rgba(0, 0, 0, 0.2));
+}
+
 @keyframes fb-scale-in {
   from { transform: translateX(-50%) scale(0.8); opacity: 0; }
   to { transform: translateX(-50%) scale(1); opacity: 1; }
