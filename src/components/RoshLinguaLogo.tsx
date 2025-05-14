@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 
 interface RoshLinguaLogoProps {
   className?: string;
-  size?: "sm" | "md" | "lg" | "xl";
+  size?: "sm" | "md" | "lg";
   textOnly?: boolean;
   darkMode?: boolean;
   rightAligned?: boolean;
@@ -22,7 +22,6 @@ const RoshLinguaLogo: React.FC<RoshLinguaLogoProps> = ({
     sm: "text-lg",
     md: "text-2xl",
     lg: "text-4xl",
-    xl: "text-5xl",
   };
 
   const fontSizeClass = sizeMap[size];

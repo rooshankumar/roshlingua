@@ -2,7 +2,7 @@
 import React from "react";
 
 interface ParrotMascotProps {
-  size?: "sm" | "md" | "lg" | "xl";
+  size?: "sm" | "md" | "lg";
   className?: string;
 }
 
@@ -15,12 +15,9 @@ const ParrotMascot: React.FC<ParrotMascotProps> = ({
     sm: { width: 36, height: 36 },
     md: { width: 48, height: 48 },
     lg: { width: 64, height: 64 },
-    xl: { width: 80, height: 80 },
   };
 
-  // Ensure we use a valid size key or default to md
-  const validSize = (sizeMap[size] ? size : "md") as keyof typeof sizeMap;
-  const { width, height } = sizeMap[validSize];
+  const { width, height } = sizeMap[size];
 
   return (
     <div className={`relative ${className}`} style={{ width, height }}>
