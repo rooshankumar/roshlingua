@@ -7,7 +7,7 @@ interface ParrotMascotProps {
   showSpeechBubble?: boolean;
 }
 
-export const ParrotMascot = ({ 
+const ParrotMascot = ({ 
   className, 
   width = 200, 
   height = 200,
@@ -25,3 +25,5 @@ export const ParrotMascot = ({
     </div>
   );
 };
+
+export default ParrotMascot;

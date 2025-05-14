@@ -11,8 +11,8 @@ import {
   ChevronRight 
 } from "lucide-react";
 
-import RoshLinguaLogo from "@/components/RoshLinguaLogo";
-import ParrotMascot from "@/components/ParrotMascot";
+import { RoshLinguaLogo } from "@/components/RoshLinguaLogo";
+import { ParrotMascot } from "@/components/ParrotMascot";
 
 const Home = () => {
   return (
