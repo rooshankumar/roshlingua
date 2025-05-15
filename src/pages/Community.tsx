@@ -109,12 +109,12 @@ const Community = () => {
         <Badge 
           key="native" 
           variant="secondary" 
-          className="flex items-center gap-1 pl-2 pr-1 py-1 shadow-sm hover:bg-secondary/30 transition-colors cursor-pointer group"
+          className="flex items-center gap-1 pl-1 pr-1 py-0.5 sm:py-1 sm:pl-2 text-xs sm:text-sm shadow-sm hover:bg-secondary/30 transition-colors cursor-pointer group"
           onClick={() => setNativeLanguageFilter("any")}
         >
-          <span className="mr-1">{getLanguageFlag(nativeLanguageFilter)}</span>
+          <span className="mr-0.5 sm:mr-1">{getLanguageFlag(nativeLanguageFilter)}</span>
           <span>Native: {nativeLanguageFilter}</span>
-          <X className="h-3 w-3 ml-1 group-hover:scale-110 transition-transform" />
+          <X className="h-2.5 w-2.5 sm:h-3 sm:w-3 ml-0.5 sm:ml-1 group-hover:scale-110 transition-transform" />
         </Badge>
       );
     }
@@ -124,12 +124,12 @@ const Community = () => {
         <Badge 
           key="learning" 
           variant="secondary" 
-          className="flex items-center gap-1 pl-2 pr-1 py-1 shadow-sm hover:bg-secondary/30 transition-colors cursor-pointer group"
+          className="flex items-center gap-1 pl-1 pr-1 py-0.5 sm:py-1 sm:pl-2 text-xs sm:text-sm shadow-sm hover:bg-secondary/30 transition-colors cursor-pointer group"
           onClick={() => setLearningLanguageFilter("any")}
         >
-          <span className="mr-1">{getLanguageFlag(learningLanguageFilter)}</span>
+          <span className="mr-0.5 sm:mr-1">{getLanguageFlag(learningLanguageFilter)}</span>
           <span>Learning: {learningLanguageFilter}</span>
-          <X className="h-3 w-3 ml-1 group-hover:scale-110 transition-transform" />
+          <X className="h-2.5 w-2.5 sm:h-3 sm:w-3 ml-0.5 sm:ml-1 group-hover:scale-110 transition-transform" />
         </Badge>
       );
     }
@@ -139,15 +139,15 @@ const Community = () => {
         <Badge 
           key="age" 
           variant="secondary" 
-          className="flex items-center gap-1 pl-2 pr-1 py-1 shadow-sm hover:bg-secondary/30 transition-colors cursor-pointer group"
+          className="flex items-center gap-1 pl-1 pr-1 py-0.5 sm:py-1 sm:pl-2 text-xs sm:text-sm shadow-sm hover:bg-secondary/30 transition-colors cursor-pointer group"
           onClick={() => {
             setMinAgeFilter(null);
             setMaxAgeFilter(null);
           }}
         >
-          <User className="h-3 w-3 mr-1" />
+          <User className="h-2.5 w-2.5 sm:h-3 sm:w-3 mr-0.5 sm:mr-1" />
           <span>Age: {minAgeFilter || '18'}—{maxAgeFilter || '100'}</span>
-          <X className="h-3 w-3 ml-1 group-hover:scale-110 transition-transform" />
+          <X className="h-2.5 w-2.5 sm:h-3 sm:w-3 ml-0.5 sm:ml-1 group-hover:scale-110 transition-transform" />
         </Badge>
       );
     }
@@ -157,25 +157,25 @@ const Community = () => {
         <Badge 
           key="gender" 
           variant="secondary" 
-          className="flex items-center gap-1 pl-2 pr-1 py-1 shadow-sm hover:bg-secondary/30 transition-colors cursor-pointer group"
+          className="flex items-center gap-1 pl-1 pr-1 py-0.5 sm:py-1 sm:pl-2 text-xs sm:text-sm shadow-sm hover:bg-secondary/30 transition-colors cursor-pointer group"
           onClick={() => setGenderFilter("any")}
         >
           {genderFilter === 'male' && (
             <img 
               src="/icons/male.png.png" 
               alt="Male" 
-              className="h-4 w-4 object-contain mr-1" 
+              className="h-3 w-3 sm:h-4 sm:w-4 object-contain mr-0.5 sm:mr-1" 
             />
           )}
           {genderFilter === 'female' && (
             <img 
               src="/icons/female.png.png" 
               alt="Female" 
-              className="h-4 w-4 object-contain mr-1" 
+              className="h-3 w-3 sm:h-4 sm:w-4 object-contain mr-0.5 sm:mr-1" 
             />
           )}
           <span>Gender: {genderFilter.charAt(0).toUpperCase() + genderFilter.slice(1)}</span>
-          <X className="h-3 w-3 ml-1 group-hover:scale-110 transition-transform" />
+          <X className="h-2.5 w-2.5 sm:h-3 sm:w-3 ml-0.5 sm:ml-1 group-hover:scale-110 transition-transform" />
         </Badge>
       );
     }
@@ -185,12 +185,12 @@ const Community = () => {
         <Badge 
           key="online" 
           variant="outline" 
-          className="flex items-center gap-1 pl-2 pr-1 py-1 border-green-500/30 bg-green-500/10 text-green-700 dark:text-green-400 shadow-sm hover:bg-green-500/20 transition-colors cursor-pointer group"
+          className="flex items-center gap-1 pl-1 pr-1 py-0.5 sm:py-1 sm:pl-2 text-xs sm:text-sm border-green-500/30 bg-green-500/10 text-green-700 dark:text-green-400 shadow-sm hover:bg-green-500/20 transition-colors cursor-pointer group"
           onClick={() => setOnlineOnly(false)}
         >
-          <span className="h-2 w-2 rounded-full bg-green-500 inline-block mr-1"></span>
+          <span className="h-1.5 w-1.5 sm:h-2 sm:w-2 rounded-full bg-green-500 inline-block mr-0.5 sm:mr-1"></span>
           <span>Online only</span>
-          <X className="h-3 w-3 ml-1 group-hover:scale-110 transition-transform" />
+          <X className="h-2.5 w-2.5 sm:h-3 sm:w-3 ml-0.5 sm:ml-1 group-hover:scale-110 transition-transform" />
         </Badge>
       );
     }
@@ -631,37 +631,37 @@ const Community = () => {
         </p>
       </div>
 
-      <div className="bg-gradient-to-r from-primary/5 to-secondary/5 backdrop-blur-sm border rounded-xl p-2 sm:p-6 mb-2 sm:mb-8 shadow-md">
-        <div className="flex flex-col md:flex-row gap-4 items-start md:items-center">
+      <div className="bg-gradient-to-r from-primary/5 to-secondary/5 backdrop-blur-sm border rounded-xl p-1 sm:p-6 mb-1 sm:mb-8 shadow-md">
+        <div className="flex flex-col md:flex-row gap-2 sm:gap-4 items-start md:items-center">
           <div className="flex-1 relative w-full group">
             <div className="absolute inset-0 bg-primary/5 rounded-md -z-10 opacity-0 group-focus-within:opacity-100 transition-opacity"></div>
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-primary/50 group-focus-within:text-primary transition-colors" />
+            <Search className="absolute left-2 sm:left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 sm:h-5 sm:w-5 text-primary/50 group-focus-within:text-primary transition-colors" />
             <Input
               placeholder="Search by name or language..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 bg-background/50 backdrop-blur-sm border-primary/20 focus:border-primary/50 transition-all"
+              className="w-full pl-8 sm:pl-10 py-1 h-8 sm:h-10 min-h-[32px] text-xs sm:text-base bg-background/50 backdrop-blur-sm border-primary/20 focus:border-primary/50 transition-all"
             />
             {searchQuery && (
               <Button 
                 variant="ghost" 
                 size="icon" 
-                className="absolute right-2 top-1/2 transform -translate-y-1/2 h-6 w-6 text-muted-foreground hover:text-foreground"
+                className="absolute right-1 sm:right-2 top-1/2 transform -translate-y-1/2 h-5 w-5 sm:h-6 sm:w-6 min-h-0 text-muted-foreground hover:text-foreground"
                 onClick={() => setSearchQuery("")}
               >
-                <X className="h-4 w-4" />
+                <X className="h-3 w-3 sm:h-4 sm:w-4" />
               </Button>
             )}
           </div>
 
-          <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
+          <div className="flex flex-wrap items-center gap-1 sm:gap-3 w-full md:w-auto">
             <Dialog>
               <DialogTrigger asChild>
-                <Button variant="outline" className="gap-2 border-primary/20 hover:border-primary/50 bg-background/50 backdrop-blur-sm hover:bg-background/80">
-                  <Filter className="h-4 w-4 text-primary" />
+                <Button variant="outline" className="gap-1 sm:gap-2 h-8 min-h-0 px-2 sm:px-4 py-1 text-xs sm:text-sm border-primary/20 hover:border-primary/50 bg-background/50 backdrop-blur-sm hover:bg-background/80">
+                  <Filter className="h-3 w-3 sm:h-4 sm:w-4 text-primary" />
                   <span>Filters</span>
                   {getFilterCount() && (
-                    <Badge variant="secondary" className="h-5 w-5 p-0 ml-1 flex items-center justify-center rounded-full bg-primary text-primary-foreground">
+                    <Badge variant="secondary" className="h-4 w-4 sm:h-5 sm:w-5 p-0 ml-1 flex items-center justify-center rounded-full bg-primary text-primary-foreground text-[10px] sm:text-xs">
                       {getFilterCount()}
                     </Badge>
                   )}
@@ -874,7 +874,7 @@ const Community = () => {
             <Button 
               variant="outline" 
               size="icon"
-              className="ml-auto"
+              className="ml-auto h-8 w-8 sm:h-10 sm:w-10 min-h-0"
               onClick={() => {
                 console.log('Manually refreshing community data');
                 const fetchUsers = async () => {
