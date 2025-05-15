@@ -976,7 +976,7 @@ const Community = () => {
                   navigate(`/profile/${user.id}`);
                 }}
               >              
-              <CardContent className="p-4 sm:p-6">
+              <CardContent className="p-4 px-0 sm:px-4 sm:p-6">
                 <div className="flex flex-col space-y-4">
                   {/* Avatar and name in one row */}
                   <div className="flex items-center space-x-3">
