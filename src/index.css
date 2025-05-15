@@ -1285,6 +1285,15 @@ html {
     margin-right: -1rem;
     width: calc(100% + 2rem);
   }
+
+  /* Fix for community page card width */
+  .container .responsive-card {
+    width: 100vw;
+    margin-left: calc(-50vw + 50%);
+    margin-right: calc(-50vw + 50%);
+    border-left: none;
+    border-right: none;
+  }
 }
 
 .nav-link.active {
