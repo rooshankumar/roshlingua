@@ -1290,9 +1290,9 @@ html {
     width: 100%;
     max-width: 100%;
     border-radius: 0;
-    margin-left: -1rem;
-    margin-right: -1rem;
-    width: calc(100% + 2rem);
+    margin-left: 0;
+    margin-right: 0;
+    width: 100%;
   }
 
   /* Fix for community page card width - make it consistent with filter card */
