@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useTranslation } from 'react-i18next';
 import { useResponsive } from "@/hooks/use-mobile";
+import RoshLinguaLogo from "@/components/RoshLinguaLogo";
 
 // Custom SVG Icon component
 const CustomIcon = ({ src, size = 24, className = "" }) => {
@@ -106,13 +107,12 @@ export function MainNav() {
 
   return (
     <nav className="hidden lg:flex sticky top-0 flex-col space-y-2 p-4 min-h-screen bg-background text-foreground backdrop-blur-lg border-r">
-      <div className="mb-8">
-        <h2 
-          className="font-bold text-white"
-          style={{ fontSize: responsive.fontSize.heading }}
-        >
-          {t('navigation.menu')}
-        </h2>
+      <div className="mb-8 px-3">
+        <RoshLinguaLogo 
+          size="md" 
+          darkMode={true}
+          className="mt-2"
+        />
       </div>
       <NavigationItems />
       <div className="mt-auto pt-4 border-t border-white/20">
