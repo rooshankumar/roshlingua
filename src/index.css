@@ -1285,13 +1285,13 @@ html {
     margin-right: -1rem;
     width: calc(100% + 2rem);
   }
-  
+
   /* Remove container padding on mobile for Community page */
   .container.mx-auto.py-2.space-y-2.px-0 {
     padding-left: 0 !important;
     padding-right: 0 !important;
   }
-  
+
   /* Ensure grid takes full width */
   .grid.grid-cols-1.md\:grid-cols-2.lg\:grid-cols-3.gap-4.w-full.container.mx-auto.px-4 {
     padding-left: 0 !important;
@@ -1300,7 +1300,6 @@ html {
     max-width: 100vw !important;
   }
 }
-</old_str>
 
 .nav-link.active {
   background-color: rgba(255, 255, 255, 0.2);
