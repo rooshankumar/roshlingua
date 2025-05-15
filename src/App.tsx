@@ -114,10 +114,12 @@ const AppRoutes = () => {
             <Route path="/onboarding" element={
               <ProtectedRoute>
                 <Suspense fallback={<div className="flex items-center justify-center h-screen">Loading...</div>}>
-                  <Onboarding onComplete={() => {
-                    localStorage.setItem("onboarding_completed", "true");
-                    window.location.href = "/dashboard";
-                  }} />
+                  <ErrorBoundary>
+                    <Onboarding onComplete={() => {
+                      localStorage.setItem("onboarding_completed", "true");
+                      window.location.href = "/dashboard";
+                    }} />
+                  </ErrorBoundary>
                 </Suspense>
               </ProtectedRoute>
             } />
@@ -125,9 +127,11 @@ const AppRoutes = () => {
             <Route path="/dashboard" element={
               <ProtectedRoute>
                 <AppLayout>
-                  <Suspense fallback={<div className="flex items-center justify-center h-screen">Loading...</div>}>
-                    <Dashboard />
-                  </Suspense>
+                  <ErrorBoundary>
+                    <Suspense fallback={<div className="flex items-center justify-center h-screen">Loading...</div>}>
+                      <Dashboard />
+                    </Suspense>
+                  </ErrorBoundary>
                 </AppLayout>
               </ProtectedRoute>
             } />
@@ -135,54 +139,66 @@ const AppRoutes = () => {
             <Route path="/profile" element={
               <ProtectedRoute>
                 <AppLayout>
-                  <Suspense fallback={<div className="flex items-center justify-center h-screen">Loading...</div>}>
-                    <Profile />
-                  </Suspense>
+                  <ErrorBoundary>
+                    <Suspense fallback={<div className="flex items-center justify-center h-screen">Loading...</div>}>
+                      <Profile />
+                    </Suspense>
+                  </ErrorBoundary>
                 </AppLayout>
               </ProtectedRoute>
             } />
             <Route path="/profile/:id" element={
               <ProtectedRoute>
                 <AppLayout>
-                  <Suspense fallback={<div className="flex items-center justify-center h-screen">Loading...</div>}>
-                    <Profile />
-                  </Suspense>
+                  <ErrorBoundary>
+                    <Suspense fallback={<div className="flex items-center justify-center h-screen">Loading...</div>}>
+                      <Profile />
+                    </Suspense>
+                  </ErrorBoundary>
                 </AppLayout>
               </ProtectedRoute>
             } />
             <Route path="/community" element={
               <ProtectedRoute>
                 <AppLayout>
-                  <Suspense fallback={<div className="flex items-center justify-center h-screen">Loading...</div>}>
-                    <Community />
-                  </Suspense>
+                  <ErrorBoundary>
+                    <Suspense fallback={<div className="flex items-center justify-center h-screen">Loading...</div>}>
+                      <Community />
+                    </Suspense>
+                  </ErrorBoundary>
                 </AppLayout>
               </ProtectedRoute>
             } />
             <Route path="/chat" element={
               <ProtectedRoute>
                 <AppLayout>
-                  <Suspense fallback={<div className="flex items-center justify-center h-screen">Loading...</div>}>
-                    <ChatList />
-                  </Suspense>
+                  <ErrorBoundary>
+                    <Suspense fallback={<div className="flex items-center justify-center h-screen">Loading...</div>}>
+                      <ChatList />
+                    </Suspense>
+                  </ErrorBoundary>
                 </AppLayout>
               </ProtectedRoute>
             } />
             <Route path="/chat/:conversationId" element={
               <ProtectedRoute>
                 <AppLayout>
-                  <Suspense fallback={<div className="flex items-center justify-center h-screen">Loading...</div>}>
-                    <Chat />
-                  </Suspense>
+                  <ErrorBoundary>
+                    <Suspense fallback={<div className="flex items-center justify-center h-screen">Loading...</div>}>
+                      <Chat />
+                    </Suspense>
+                  </ErrorBoundary>
                 </AppLayout>
               </ProtectedRoute>
             } />
             <Route path="/settings" element={
               <ProtectedRoute>
                 <AppLayout>
-                  <Suspense fallback={<div className="flex items-center justify-center h-screen">Loading...</div>}>
-                    <Settings />
-                  </Suspense>
+                  <ErrorBoundary>
+                    <Suspense fallback={<div className="flex items-center justify-center h-screen">Loading...</div>}>
+                      <Settings />
+                    </Suspense>
+                  </ErrorBoundary>
                 </AppLayout>
               </ProtectedRoute>
             } />
@@ -192,21 +208,27 @@ const AppRoutes = () => {
             <Route path="/privacy-policy" element={
               <AuthLayout>
                 <Suspense fallback={<div className="flex items-center justify-center h-screen">Loading...</div>}>
-                  <PrivacyPolicy />
+                  <ErrorBoundary>
+                    <PrivacyPolicy />
+                  </ErrorBoundary>
                 </Suspense>
               </AuthLayout>
             } />
             <Route path="/terms" element={
               <AuthLayout>
                 <Suspense fallback={<div className="flex items-center justify-center h-screen">Loading...</div>}>
-                  <Terms />
+                  <ErrorBoundary>
+                    <Terms />
+                  </ErrorBoundary>
                 </Suspense>
               </AuthLayout>
             } />
             <Route path="/contact" element={
               <AuthLayout>
                 <Suspense fallback={<div className="flex items-center justify-center h-screen">Loading...</div>}>
-                  <Contact />
+                  <ErrorBoundary>
+                    <Contact />
+                  </ErrorBoundary>
                 </Suspense>
               </AuthLayout>
             } />
@@ -215,21 +237,27 @@ const AppRoutes = () => {
             <Route path="/blog" element={
               <AuthLayout>
                 <Suspense fallback={<div className="flex items-center justify-center h-screen">Loading...</div>}>
-                  <Blog />
+                  <ErrorBoundary>
+                    <Blog />
+                  </ErrorBoundary>
                 </Suspense>
               </AuthLayout>
             } />
             <Route path="/language-guides" element={
               <AuthLayout>
                 <Suspense fallback={<div className="flex items-center justify-center h-screen">Loading...</div>}>
-                  <LanguageGuides />
+                  <ErrorBoundary>
+                    <LanguageGuides />
+                  </ErrorBoundary>
                 </Suspense>
               </AuthLayout>
             } />
             <Route path="/faq" element={
               <AuthLayout>
                 <Suspense fallback={<div className="flex items-center justify-center h-screen">Loading...</div>}>
-                  <FAQ />
+                  <ErrorBoundary>
+                    <FAQ />
+                  </ErrorBoundary>
                 </Suspense>
               </AuthLayout>
             } />
