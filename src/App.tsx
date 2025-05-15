@@ -6,7 +6,8 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from '@vercel/speed-insights/react';
 import HMRHandler from '@/components/HMRHandler';
-import React, { Suspense, lazy, useEffect } from "react";
+import React, { Suspense, lazy, useEffect } from 'react';
+// Make sure all lazy components are properly imported
 import { AnimatePresence } from 'framer-motion';
 import PageTransition from "@/components/PageTransition";
 
@@ -44,6 +45,37 @@ const queryClient = new QueryClient();
 // The AuthCodeHandler component is imported and handles OAuth code parameters
 import AuthCodeHandler from "./components/auth/AuthCodeHandler";
 
+// Define ErrorBoundary component
+class ErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError(error) {
+    // Update state so the next render will show the fallback UI.
+    return { hasError: true };
+  }
+
+  componentDidCatch(error, errorInfo) {
+    // You can also log the error to an error reporting service
+    console.error(error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      // You can render any custom fallback UI
+      return (
+        <div className="flex items-center justify-center h-screen">
+          <h1 className="text-red-500">Something went wrong.</h1>
+        </div>
+      );
+    }
+
+    return this.props.children;
+  }
+}
+
 
 const AppRoutes = () => {
   const { user, isLoading } = useAuth();
@@ -64,146 +96,148 @@ const AppRoutes = () => {
     <>
       <AuthCodeHandler />
       <AnimatePresence mode="wait" initial={false}>
-        <Routes>
-        {/* Public routes */}
-        <Route path="/" element={<PageTransition><Home /></PageTransition>} />
-        <Route path="/auth" element={
-          <AuthLayout>
-            {user ? <Navigate to="/dashboard" replace /> : <Auth />}
-          </AuthLayout>
-        } />
+        <ErrorBoundary>
+          <Routes location={location} key={location.pathname}>
+            {/* Public routes */}
+            <Route path="/" element={<PageTransition><Home /></PageTransition>} />
+            <Route path="/auth" element={
+              <AuthLayout>
+                {user ? <Navigate to="/dashboard" replace /> : <Auth />}
+              </AuthLayout>
+            } />
 
-        {/* Auth callback routes for OAuth - support both paths for compatibility */}
-        <Route path="/auth/callback" element={<AuthCallback />} />
-        <Route path="/callback" element={<AuthCallback />} />
+            {/* Auth callback routes for OAuth - support both paths for compatibility */}
+            <Route path="/auth/callback" element={<AuthCallback />} />
+            <Route path="/callback" element={<AuthCallback />} />
 
-        {/* Protected routes with AppLayout */}
-        <Route path="/onboarding" element={
-          <ProtectedRoute>
-            <Suspense fallback={<div className="flex items-center justify-center h-screen">Loading...</div>}>
-              <Onboarding onComplete={() => {
-                localStorage.setItem("onboarding_completed", "true");
-                window.location.href = "/dashboard";
-              }} />
-            </Suspense>
-          </ProtectedRoute>
-        } />
+            {/* Protected routes with AppLayout */}
+            <Route path="/onboarding" element={
+              <ProtectedRoute>
+                <Suspense fallback={<div className="flex items-center justify-center h-screen">Loading...</div>}>
+                  <Onboarding onComplete={() => {
+                    localStorage.setItem("onboarding_completed", "true");
+                    window.location.href = "/dashboard";
+                  }} />
+                </Suspense>
+              </ProtectedRoute>
+            } />
 
-        <Route path="/dashboard" element={
-          <ProtectedRoute>
-            <AppLayout>
-              <Suspense fallback={<div className="flex items-center justify-center h-screen">Loading...</div>}>
-                <Dashboard />
-              </Suspense>
-            </AppLayout>
-          </ProtectedRoute>
-        } />
+            <Route path="/dashboard" element={
+              <ProtectedRoute>
+                <AppLayout>
+                  <Suspense fallback={<div className="flex items-center justify-center h-screen">Loading...</div>}>
+                    <Dashboard />
+                  </Suspense>
+                </AppLayout>
+              </ProtectedRoute>
+            } />
 
-        <Route path="/profile" element={
-          <ProtectedRoute>
-            <AppLayout>
-              <Suspense fallback={<div className="flex items-center justify-center h-screen">Loading...</div>}>
-                <Profile />
-              </Suspense>
-            </AppLayout>
-          </ProtectedRoute>
-        } />
-        <Route path="/profile/:id" element={
-          <ProtectedRoute>
-            <AppLayout>
-              <Suspense fallback={<div className="flex items-center justify-center h-screen">Loading...</div>}>
-                <Profile />
-              </Suspense>
-            </AppLayout>
-          </ProtectedRoute>
-        } />
-        <Route path="/community" element={
-          <ProtectedRoute>
-            <AppLayout>
-              <Suspense fallback={<div className="flex items-center justify-center h-screen">Loading...</div>}>
-                <Community />
-              </Suspense>
-            </AppLayout>
-          </ProtectedRoute>
-        } />
-        <Route path="/chat" element={
-          <ProtectedRoute>
-            <AppLayout>
-              <Suspense fallback={<div className="flex items-center justify-center h-screen">Loading...</div>}>
-                <ChatList />
-              </Suspense>
-            </AppLayout>
-          </ProtectedRoute>
-        } />
-        <Route path="/chat/:conversationId" element={
-          <ProtectedRoute>
-            <AppLayout>
-              <Suspense fallback={<div className="flex items-center justify-center h-screen">Loading...</div>}>
-                <Chat />
-              </Suspense>
-            </AppLayout>
-          </ProtectedRoute>
-        } />
-        <Route path="/settings" element={
-          <ProtectedRoute>
-            <AppLayout>
-              <Suspense fallback={<div className="flex items-center justify-center h-screen">Loading...</div>}>
-                <Settings />
-              </Suspense>
-            </AppLayout>
-          </ProtectedRoute>
-        } />
+            <Route path="/profile" element={
+              <ProtectedRoute>
+                <AppLayout>
+                  <Suspense fallback={<div className="flex items-center justify-center h-screen">Loading...</div>}>
+                    <Profile />
+                  </Suspense>
+                </AppLayout>
+              </ProtectedRoute>
+            } />
+            <Route path="/profile/:id" element={
+              <ProtectedRoute>
+                <AppLayout>
+                  <Suspense fallback={<div className="flex items-center justify-center h-screen">Loading...</div>}>
+                    <Profile />
+                  </Suspense>
+                </AppLayout>
+              </ProtectedRoute>
+            } />
+            <Route path="/community" element={
+              <ProtectedRoute>
+                <AppLayout>
+                  <Suspense fallback={<div className="flex items-center justify-center h-screen">Loading...</div>}>
+                    <Community />
+                  </Suspense>
+                </AppLayout>
+              </ProtectedRoute>
+            } />
+            <Route path="/chat" element={
+              <ProtectedRoute>
+                <AppLayout>
+                  <Suspense fallback={<div className="flex items-center justify-center h-screen">Loading...</div>}>
+                    <ChatList />
+                  </Suspense>
+                </AppLayout>
+              </ProtectedRoute>
+            } />
+            <Route path="/chat/:conversationId" element={
+              <ProtectedRoute>
+                <AppLayout>
+                  <Suspense fallback={<div className="flex items-center justify-center h-screen">Loading...</div>}>
+                    <Chat />
+                  </Suspense>
+                </AppLayout>
+              </ProtectedRoute>
+            } />
+            <Route path="/settings" element={
+              <ProtectedRoute>
+                <AppLayout>
+                  <Suspense fallback={<div className="flex items-center justify-center h-screen">Loading...</div>}>
+                    <Settings />
+                  </Suspense>
+                </AppLayout>
+              </ProtectedRoute>
+            } />
 
 
-        {/* Legal pages */}
-        <Route path="/privacy-policy" element={
-          <AuthLayout>
-            <Suspense fallback={<div className="flex items-center justify-center h-screen">Loading...</div>}>
-              <PrivacyPolicy />
-            </Suspense>
-          </AuthLayout>
-        } />
-        <Route path="/terms" element={
-          <AuthLayout>
-            <Suspense fallback={<div className="flex items-center justify-center h-screen">Loading...</div>}>
-              <Terms />
-            </Suspense>
-          </AuthLayout>
-        } />
-        <Route path="/contact" element={
-          <AuthLayout>
-            <Suspense fallback={<div className="flex items-center justify-center h-screen">Loading...</div>}>
-              <Contact />
-            </Suspense>
-          </AuthLayout>
-        } />
+            {/* Legal pages */}
+            <Route path="/privacy-policy" element={
+              <AuthLayout>
+                <Suspense fallback={<div className="flex items-center justify-center h-screen">Loading...</div>}>
+                  <PrivacyPolicy />
+                </Suspense>
+              </AuthLayout>
+            } />
+            <Route path="/terms" element={
+              <AuthLayout>
+                <Suspense fallback={<div className="flex items-center justify-center h-screen">Loading...</div>}>
+                  <Terms />
+                </Suspense>
+              </AuthLayout>
+            } />
+            <Route path="/contact" element={
+              <AuthLayout>
+                <Suspense fallback={<div className="flex items-center justify-center h-screen">Loading...</div>}>
+                  <Contact />
+                </Suspense>
+              </AuthLayout>
+            } />
 
-        {/* Resources */}
-        <Route path="/blog" element={
-          <AuthLayout>
-            <Suspense fallback={<div className="flex items-center justify-center h-screen">Loading...</div>}>
-              <Blog />
-            </Suspense>
-          </AuthLayout>
-        } />
-        <Route path="/language-guides" element={
-          <AuthLayout>
-            <Suspense fallback={<div className="flex items-center justify-center h-screen">Loading...</div>}>
-              <LanguageGuides />
-            </Suspense>
-          </AuthLayout>
-        } />
-        <Route path="/faq" element={
-          <AuthLayout>
-            <Suspense fallback={<div className="flex items-center justify-center h-screen">Loading...</div>}>
-              <FAQ />
-            </Suspense>
-          </AuthLayout>
-        } />
+            {/* Resources */}
+            <Route path="/blog" element={
+              <AuthLayout>
+                <Suspense fallback={<div className="flex items-center justify-center h-screen">Loading...</div>}>
+                  <Blog />
+                </Suspense>
+              </AuthLayout>
+            } />
+            <Route path="/language-guides" element={
+              <AuthLayout>
+                <Suspense fallback={<div className="flex items-center justify-center h-screen">Loading...</div>}>
+                  <LanguageGuides />
+                </Suspense>
+              </AuthLayout>
+            } />
+            <Route path="/faq" element={
+              <AuthLayout>
+                <Suspense fallback={<div className="flex items-center justify-center h-screen">Loading...</div>}>
+                  <FAQ />
+                </Suspense>
+              </AuthLayout>
+            } />
 
-        {/* Catch all for 404 */}
-        <Route path="*" element={<NotFound />} />
-      </Routes>
+            {/* Catch all for 404 */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </ErrorBoundary>
       </AnimatePresence>
     </>
   );
