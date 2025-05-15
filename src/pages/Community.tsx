@@ -956,7 +956,7 @@ const Community = () => {
       </div>
 
       {filteredUsers.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 w-full mx-auto px-0 overflow-hidden sm:px-4 lg:gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 w-full mx-auto px-1 overflow-hidden sm:px-4 lg:gap-6">
           {filteredUsers.slice(0, 9).map((user) => (
             <Card 
               key={user.id} 
@@ -976,7 +976,7 @@ const Community = () => {
                   navigate(`/profile/${user.id}`);
                 }}
               >              
-              <CardContent className="p-4 px-0 sm:px-4 sm:p-6">
+              <CardContent className="p-4 px-2 sm:px-4 sm:p-6">
                 <div className="flex flex-col space-y-4">
                   {/* Avatar and name in one row */}
                   <div className="flex items-center space-x-3">

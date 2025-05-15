@@ -996,7 +996,7 @@
   }
 
   .responsive-card {
-    @apply border-x-0 sm:border-x border-t-0 first:border-t border-b sm:rounded-lg transition-all hover:border-primary/30 hover:shadow-lg bg-card/50 backdrop-blur-sm overflow-hidden;
+    @apply border-x-0 sm:border-x border-t-0 first:border-t border-b sm:rounded-lg transition-all hover:border-primary/30 hover:shadow-lg bg-card/50 backdrop-blur-sm overflow-hidden w-[calc(100vw-0.5rem)] sm:w-auto mx-auto sm:mx-0;
   }
 
   .responsive-card h3 {
