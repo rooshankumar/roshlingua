@@ -587,9 +587,10 @@
   }
 }
 
-/* Custom Messenger-style scrollbar */
+/* Hide scrollbar but keep functionality */
 ::-webkit-scrollbar {
-  width: 10px;
+  width: 0px;
+  background: transparent;
 }
 
 ::-webkit-scrollbar-track {
@@ -597,12 +598,11 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(0, 0, 0, 0.2);
-  border-radius: 10px;
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(0, 0, 0, 0.3);
+  background: transparent;
 }
 
 @keyframes fb-message-pop {
