@@ -5,6 +5,7 @@ import {
   MessageSquare,
   TrendingUp, Target, Book
 } from "lucide-react";
+import RoshLinguaLogo from "@/components/RoshLinguaLogo";
 import { 
   Card, CardContent, CardDescription, 
   CardHeader, CardTitle 
@@ -305,6 +306,9 @@ const Dashboard = () => {
     <div className="mobile-container pb-8 animate-fade-up">
       <div className="relative space-y-2 mb-8 p-4 rounded-xl bg-gradient-to-r from-primary/10 via-primary/5 to-background">
         <div className="absolute inset-0 bg-grid-white/5 [mask-image:linear-gradient(0deg,white,rgba(255,255,255,0.5))] rounded-xl" />
+        <div className="flex items-center gap-2 mb-1">
+          <RoshLinguaLogo size="sm" />
+        </div>
         <h1 className="text-3xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/60">
           Welcome Back{user?.user_metadata?.full_name ? `, ${user.user_metadata.full_name.split(' ')[0]}` : ''}!
         </h1>

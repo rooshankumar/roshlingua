@@ -35,6 +35,7 @@ import classNames from 'classnames';
 import { cn } from "@/lib/utils";
 import { ChevronUp } from 'lucide-react'; // Added import for ChevronUp icon
 import subscriptionManager from '@/utils/subscriptionManager';
+import RoshLinguaLogo from "@/components/RoshLinguaLogo";
 
 import { SUPPORTED_LANGUAGES, getLanguageFlag } from '@/utils/languageUtils';
 
@@ -621,6 +622,9 @@ const Community = () => {
   return (
     <div className="container mx-auto py-6 space-y-4 px-0 sm:px-4">
       <div className="flex flex-col space-y-1 mb-6 hidden md:block">
+        <div className="flex items-center gap-3 mb-2">
+          <RoshLinguaLogo size="sm" />
+        </div>
         <h1 className="text-2xl font-bold">Community</h1>
         <p className="text-muted-foreground">
           Find language partners who match your learning goals

@@ -24,6 +24,7 @@ import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { useResponsive } from "@/hooks/use-mobile";
 import { SUPPORTED_LANGUAGES, getLanguageOptions } from "@/utils/languageUtils";
 import { Search, ChevronsUpDown, Check } from "lucide-react";
+import RoshLinguaLogo from "@/components/RoshLinguaLogo";
 
 
 const Settings = () => {
@@ -404,6 +405,9 @@ const Settings = () => {
   return (
     <div className="mobile-container max-w-6xl pb-12 animate-fade-in">
       <div className="space-y-2 mb-8 hidden md:block">
+        <div className="flex items-center gap-3 mb-2">
+          <RoshLinguaLogo size="md" />
+        </div>
         <h1 className="text-4xl font-bold tracking-tight bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
           {t('settings.title')}
         </h1>
