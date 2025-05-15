@@ -620,8 +620,8 @@ const Community = () => {
 
 
   return (
-    <div className="container mx-auto py-6 space-y-4 px-0 sm:px-4">
-      <div className="flex flex-col space-y-1 mb-6 hidden md:block">
+    <div className="container mx-auto py-4 space-y-2 px-0 sm:py-6 sm:space-y-4 sm:px-4">
+      <div className="flex flex-col space-y-1 mb-4 hidden md:block">
         <div className="flex items-center gap-3 mb-2">
           <RoshLinguaLogo size="sm" />
         </div>
@@ -631,7 +631,7 @@ const Community = () => {
         </p>
       </div>
 
-      <div className="bg-gradient-to-r from-primary/5 to-secondary/5 backdrop-blur-sm border rounded-xl p-6 mb-8 shadow-md">
+      <div className="bg-gradient-to-r from-primary/5 to-secondary/5 backdrop-blur-sm border rounded-xl p-4 sm:p-6 mb-4 sm:mb-8 shadow-md">
         <div className="flex flex-col md:flex-row gap-4 items-start md:items-center">
           <div className="flex-1 relative w-full group">
             <div className="absolute inset-0 bg-primary/5 rounded-md -z-10 opacity-0 group-focus-within:opacity-100 transition-opacity"></div>
