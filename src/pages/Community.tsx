@@ -956,7 +956,7 @@ const Community = () => {
       </div>
 
       {filteredUsers.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 w-full container mx-auto px-0 sm:px-4 lg:gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 w-full container mx-auto px-4 lg:gap-6">
           {filteredUsers.slice(0, 9).map((user) => (
             <Card 
               key={user.id} 
