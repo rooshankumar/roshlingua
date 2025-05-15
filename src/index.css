@@ -588,21 +588,30 @@
 }
 
 /* Hide scrollbar but keep functionality */
-::-webkit-scrollbar {
-  width: 0px;
-  background: transparent;
+* {
+  scrollbar-width: none; /* Firefox */
 }
 
-::-webkit-scrollbar-track {
-  background: transparent;
+*::-webkit-scrollbar {
+  width: 0 !important;
+  height: 0 !important;
+  background: transparent !important;
+  display: none !important;
 }
 
-::-webkit-scrollbar-thumb {
-  background: transparent;
+*::-webkit-scrollbar-track {
+  background: transparent !important;
+  display: none !important;
 }
 
-::-webkit-scrollbar-thumb:hover {
-  background: transparent;
+*::-webkit-scrollbar-thumb {
+  background: transparent !important;
+  display: none !important;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: transparent !important;
+  display: none !important;
 }
 
 @keyframes fb-message-pop {
