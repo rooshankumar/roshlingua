@@ -288,3 +288,134 @@
   transform: scale(0.9);
   opacity: 0.8;
 }
+
+/* Chat styling */
+.message-bubble {
+  position: relative;
+  padding: 10px 14px;
+  border-radius: 18px;
+  max-width: 75%;
+}
+
+.message-bubble[data-sender="self"] {
+  background-color: hsl(var(--primary));
+  color: hsl(var(--primary-foreground));
+  border-bottom-right-radius: 4px;
+  margin-left: auto;
+}
+
+.message-bubble[data-sender="other"] {
+  background-color: hsl(var(--muted));
+  color: hsl(var(--muted-foreground));
+  border-bottom-left-radius: 4px;
+}
+
+/* Message reactions */
+.message-reactions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  margin-top: 2px;
+}
+
+.message-reaction {
+  display: inline-flex;
+  align-items: center;
+  background-color: hsl(var(--muted));
+  padding: 2px 5px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.2s ease;
+}
+
+.message-reaction[data-active="true"] {
+  background-color: hsl(var(--primary) / 0.2);
+}
+
+.message-reaction:hover {
+  transform: scale(1.05);
+}
+
+.message-reaction span {
+  margin-right: 4px;
+}
+
+/* Reaction picker styling */
+.reaction-picker {
+  display: flex;
+  background-color: hsl(var(--background));
+  border: 1px solid hsl(var(--border));
+  border-radius: 20px;
+  padding: 8px;
+  gap: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  z-index: 50;
+}
+
+.reaction-picker button {
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+  padding: 5px;
+  border-radius: 50%;
+}
+
+.reaction-picker button:hover {
+  transform: scale(1.2);
+  background-color: hsl(var(--accent) / 0.1);
+}
+
+/* Message actions menu positioning */
+.message-actions-menu {
+  position: absolute;
+  top: -50px;
+  transform: translateY(-100%);
+  z-index: 50;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+/* Consecutive Messages */
+.consecutive-group {
+  margin-top: 2px !important;
+}
+
+.consecutive-message {
+  margin-top: 2px;
+}
+
+/* Image attachment styling */
+.attachment-container {
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.attachment-container.expanded-image {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  padding: 20px;
+}
+
+.attachment-container.expanded-image img {
+  max-height: 90vh;
+  max-width: 90vw;
+  object-fit: contain;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+}
+
+img.expanded {
+  cursor: zoom-out;
+  transform: scale(1);
+  transition: transform 0.3s ease;
+}

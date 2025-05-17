@@ -1023,7 +1023,7 @@ export const ChatScreen = ({ conversation }: Props) => {
                               <MessageReactions messageId={message.id} existingReactions={message.reactions || {}} />
                       {message.attachment_url && (
                         <div className="mt-1 rounded-lg overflow-hidden w-full max-w-full">
-                          {message.attachment_url?.match(/\.(jpg|jpeg|png|gif|webp|avif)$/i) ? (
+                          {message.attachment_url?.match(/\.(jpg|jpeg|png|gif|bmp|webp)$/i) ? (
                             <div className="relative w-full group attachment-container">
                               <img 
                                 src={message.attachment_url} 
@@ -1056,30 +1056,6 @@ export const ChatScreen = ({ conversation }: Props) => {
                                 referrerPolicy="no-referrer"
                                 fetchpriority="high"
                               />
-                              <div className="absolute bottom-2 right-2 flex gap-2">
-                                <button className="bg-black/50 text-white rounded-full p-1.5 opacity-70 hover:opacity-100 transition-opacity cursor-pointer"
-                                  onClick={() => {
-                                    // Download image
-                                    const a = document.createElement('a');
-                                    a.href = message.attachment_url || '';
-                                    a.download = message.attachment_name || 'image';
-                                    document.body.appendChild(a);
-                                    a.click();
-                                    document.body.removeChild(a);
-                                  }}>
-                                  <Download className="h-4 w-4" />
-                                </button>
-                                <button className="bg-black/50 text-white rounded-full p-1.5 opacity-70 hover:opacity-100 transition-opacity cursor-pointer"
-                                  onClick={() => {
-                                    setImagePreview({
-                                      url: message.attachment_url || '',
-                                      name: message.attachment_name || ''
-                                    });
-                                    setShowImagePreview(true);
-                                  }}>
-                                  <Image className="h-4 w-4" />
-                                </button>
-                              </div>
                               <div 
                                 className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
                                 onClick={(e) => {
