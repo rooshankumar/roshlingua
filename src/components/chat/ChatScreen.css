@@ -391,6 +391,13 @@
 .attachment-container {
   position: relative;
   transition: all 0.3s ease;
+  border-radius: 0.75rem;
+  overflow: hidden;
+  background-color: rgba(0, 0, 0, 0.03);
+}
+
+.dark .attachment-container {
+  background-color: rgba(255, 255, 255, 0.03);
 }
 
 .attachment-container.expanded-image {

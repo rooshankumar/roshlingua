@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Send, Loader2, FileText, Check, Image, X, Download } from 'lucide-react';
+import { Send, Loader2, FileText, Check, Image, X, Download, Video, FileAudio } from 'lucide-react';
 import { updateUserPresence } from '@/utils/testAuth';
 import { ChatAttachment } from './ChatAttachment';
 import { Button } from '@/components/ui/button';
@@ -78,10 +78,10 @@ export const ChatScreen = ({ conversation }: Props) => {
       void chatContainer.getBoundingClientRect();
 
       // For mobile reliability, use multiple scroll approaches
-      
+
       // 1. Direct scrollTop assignment (most reliable but no animation)
       chatContainer.scrollTop = chatContainer.scrollHeight + 20000;
-      
+
       // 2. Use immediate auto scroll to get to bottom quickly
       chatContainer.scrollTo({
         top: chatContainer.scrollHeight + 20000, // Extra buffer to ensure we reach the bottom
@@ -100,7 +100,7 @@ export const ChatScreen = ({ conversation }: Props) => {
             top: chatContainer.scrollHeight + 20000,
             behavior: 'smooth'
           });
-          
+
           if (messagesEndRef.current) {
             messagesEndRef.current.scrollIntoView({ behavior: 'smooth', block: 'end' });
           }
@@ -245,10 +245,10 @@ export const ChatScreen = ({ conversation }: Props) => {
           console.error('Error unsubscribing from channel:', error);
         }
       }
-      
+
       // Create a unique channel ID to prevent duplicate subscriptions
       const uniqueSubscriptionKey = `messages:${conversation.id}:${Date.now()}`;
-      
+
       try {
         // Set up real-time subscription for new messages
         channelRef = supabase
@@ -317,7 +317,7 @@ export const ChatScreen = ({ conversation }: Props) => {
               }
             }
           );
-          
+
         // Subscribe only if not already subscribed
         channelRef.subscribe((status) => {
           if (!isActive) return;
@@ -325,7 +325,7 @@ export const ChatScreen = ({ conversation }: Props) => {
           console.log(`Chat subscription status for ${uniqueSubscriptionKey}:`, status);
           if (status === 'SUBSCRIBED') {
             console.log('Successfully subscribed to chat messages');
-            
+
             // Update user presence when subscribed
             if (user?.id) {
               // Track presence in the channel
@@ -334,10 +334,10 @@ export const ChatScreen = ({ conversation }: Props) => {
                 online_at: new Date().toISOString(),
                 conversation_id: conversation.id
               });
-              
+
               // Update database status
               updateUserPresence(user.id, true);
-              
+
               // Set up visibility change listener for this specific channel
               const handleVisibilityChange = () => {
                 if (document.visibilityState === 'visible') {
@@ -353,7 +353,7 @@ export const ChatScreen = ({ conversation }: Props) => {
                   updateUserPresence(user.id, false);
                 }
               };
-              
+
               document.addEventListener('visibilitychange', handleVisibilityChange);
             }
           } else if (status === 'CLOSED' || status === 'CHANNEL_ERROR') {
@@ -365,7 +365,7 @@ export const ChatScreen = ({ conversation }: Props) => {
             }
           }
         });
-        
+
         return channelRef;
       } catch (error) {
         console.error('Error setting up realtime subscription:', error);
@@ -393,7 +393,7 @@ export const ChatScreen = ({ conversation }: Props) => {
           if (user?.id) {
             channelRef.untrack();
           }
-          
+
           // Unsubscribe from channel
           channelRef.unsubscribe();
           channelRef = null;
@@ -449,7 +449,7 @@ export const ChatScreen = ({ conversation }: Props) => {
       });
     }
   }, [messages]);
-  
+
   // Special effect that runs specifically when new messages are added
   const messagesCountRef = useRef(messages.length);
   useEffect(() => {
@@ -633,7 +633,7 @@ export const ChatScreen = ({ conversation }: Props) => {
       });
       return updatedMessages;
     });
-    
+
     setNewMessage('');
 
     // Multiple scroll attempts to ensure we catch up with DOM updates
@@ -1033,7 +1033,7 @@ export const ChatScreen = ({ conversation }: Props) => {
                                   // Expand image inline instead of opening dialog
                                   const img = e.currentTarget;
                                   const container = img.parentElement;
-                                  
+
                                   if (container?.classList.contains('expanded-image')) {
                                     // If already expanded, collapse it
                                     container.classList.remove('expanded-image');
@@ -1044,7 +1044,7 @@ export const ChatScreen = ({ conversation }: Props) => {
                                     container?.classList.add('expanded-image');
                                     img.classList.add('expanded');
                                     container.style.zIndex = '50';
-                                    
+
                                     // Add haptic feedback if available
                                     if ('vibrate' in navigator) {
                                       navigator.vibrate(30);
@@ -1072,244 +1072,3 @@ export const ChatScreen = ({ conversation }: Props) => {
                                 <MessageReactions messageId={message.id} existingReactions={message.reactions || {}} />
                               </div>
                             </div>
-                          ) : message.attachment_url?.match(/\.(mp4|webm|ogg)$/i) ? (
-                            <div className="relative group max-w-[270px]">
-                              <video 
-                                src={`${message.attachment_url}${message.attachment_url.includes('?') ? '&' : '?'}t=${Date.now()}`}
-                                controls
-                                className="w-full rounded-lg max-h-[270px]"
-                                preload="metadata"
-                                playsInline
-                                onError={() => {
-                                  console.error("Video failed to load:", message.attachment_url);
-                                }}
-                              />
-                              <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                                <Video className="h-10 w-10 text-white/80" />
-                              </div>
-                            </div>
-                          ) : message.attachment_url?.match(/\.(mp3|wav|aac)$/i) ? (
-                            <div className="max-w-[270px] bg-muted/20 p-3 rounded-lg">
-                              <div className="flex items-center gap-2 mb-2">
-                                <FileAudio className="h-5 w-5" />
-                                <span className="text-sm font-medium truncate">{message.attachment_name || 'Audio'}</span>
-                              </div>
-                              <audio 
-                                src={message.attachment_url}
-                                controls
-                                className="w-full"
-                                preload="none"
-                                onError={() => {
-                                  console.error("Audio failed to load:", message.attachment_url);
-                                }}
-                              />
-                            </div>
-                          ) : message.attachment_url?.match(/\.(pdf)$/i) ? (
-                            <div className="max-w-[270px] bg-muted/20 p-3 rounded-lg">
-                              <div className="flex items-center gap-2 mb-2">
-                                <FileText className="h-5 w-5" />
-                                <span className="text-sm font-medium truncate">{message.attachment_name || 'PDF Document'}</span>
-                              </div>
-                              <div className="relative w-full h-64 rounded-lg overflow-hidden mb-2">
-                                <iframe 
-                                  src={`${message.attachment_url}#toolbar=0&navpanes=0`} 
-                                  className="w-full h-full border-0" 
-                                  title={message.attachment_name || "PDF Preview"}
-                                />
-                                <div className="absolute inset-0 bg-transparent" 
-                                  onClick={() => window.open(message.attachment_url, '_blank')}></div>
-                              </div>
-                              <div className="flex gap-2">
-                                <Button
-                                  size="sm"
-                                  variant="outline"
-                                  className="flex-1"
-                                  onClick={() => window.open(message.attachment_url, '_blank')}
-                                >
-                                  <FileText className="h-4 w-4 mr-2" /> 
-                                  View
-                                </Button>
-                                <Button
-                                  size="sm"
-                                  variant="outline"
-                                  className="flex-1"
-                                  onClick={() => {
-                                    const a = document.createElement('a');
-                                    a.href = message.attachment_url || '';
-                                    a.download = message.attachment_name || 'document.pdf';
-                                    document.body.appendChild(a);
-                                    a.click();
-                                    document.body.removeChild(a);
-                                  }}
-                                >
-                                  <Download className="h-4 w-4 mr-2" /> 
-                                  Download
-                                </Button>
-                              </div>
-                            </div>
-                          ) : message.attachment_url ? (
-                            <div className="max-w-[270px] bg-muted/20 p-3 rounded-lg flex flex-col">
-                              <div className="flex items-center gap-2 mb-2">
-                                <FileText className="h-5 w-5" />
-                                <span className="text-sm font-medium truncate">{message.attachment_name || 'File'}</span>
-                              </div>
-                              <div className="flex gap-2">
-                                <Button
-                                  size="sm"
-                                  variant="outline"
-                                  className="flex-1"
-                                  onClick={() => {
-                                    const a = document.createElement('a');
-                                    a.href = message.attachment_url || '';
-                                    a.download = message.attachment_name || 'file';
-                                    document.body.appendChild(a);
-                                    a.click();
-                                    document.body.removeChild(a);
-                                  }}
-                                >
-                                  <Download className="h-4 w-4 mr-2" /> 
-                                  Download
-                                </Button>
-                                <Button
-                                  size="sm"
-                                  variant="outline"
-                                  className="flex-1"
-                                  onClick={() => window.open(message.attachment_url, '_blank')}
-                                >
-                                  <FileText className="h-4 w-4 mr-2" /> 
-                                  View
-                                </Button>
-                              </div>
-                            </div>
-                          ) : null}
-                        </div>
-                      )}
-                    </div>
-                    {message.sender_id === user?.id && (
-                      <div 
-                        className="flex items-center h-3 gap-1 opacity-0 cursor-pointer transition-opacity duration-200"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          e.currentTarget.classList.toggle('opacity-100');
-                        }}
-                      >
-                        {message.is_read ? (
-                          <Avatar className="h-3 w-3">
-                            <AvatarImage src={message.sender?.avatar_url || '/placeholder.svg'} alt={message.sender?.full_name || 'User'} />
-                            <AvatarFallback className="text-[8px]">
-                              {message.sender?.full_name?.charAt(0).toUpperCase() || '?'}
-                            </AvatarFallback>
-                          </Avatar>
-                        ) : (
-                          <Check className={`h-3 w-3 ${message.is_delivered ? '' : 'opacity-50'}`} />
-                        )}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-            ))}
-            <div ref={messagesEndRef} />
-
-            {/* Full Image Preview Dialog */}
-            <Dialog open={showImagePreview} onOpenChange={setShowImagePreview}>
-              <DialogContent className="sm:max-w-[90vw] max-h-[90vh] overflow-auto p-0">
-                <div className="relative w-full h-full flex items-center justify-center bg-black">
-                  <Button
-                    onClick={() => setShowImagePreview(false)}
-                    variant="ghost"
-                    size="icon"
-                    className="absolute top-2 right-2 text-white hover:bg-white/20 z-50"
-                  >
-                    <X className="h-5 w-5" />
-                  </Button>
-                  {imagePreview && (
-                    <img 
-                      src={imagePreview.url} 
-                      alt={imagePreview.name || "Image preview"} 
-                      className="max-w-full max-h-[85vh] object-contain" 
-                    />
-                  )}
-                </div>
-              </DialogContent>
-            </Dialog>
-          </div>
-        </ScrollArea>
-      ) : (
-        <div className="flex-1 flex items-center justify-center bg-gradient-to-b from-background/50 to-background">
-          <div className="text-center space-y-6 animate-fade-up p-8 rounded-xl backdrop-blur-sm">
-            <div className="relative">
-              <div className="absolute inset-0 rounded-full blur-xl bg-primary/20 animate-pulse"></div>
-              <Loader2 className="h-12 w-12 animate-spin text-primary mx-auto relative" />
-            </div>
-            <div className="space-y-2">
-              <h3 className="font-semibold text-lg animate-pulse">Loading Your Chat</h3>
-              <div className="flex items-center justify-center gap-1">
-                <span className="w-2 h-2 rounded-full bg-primary/60 animate-bounce" style={{ animationDelay: '0ms' }}></span>
-                <span className="w-2 h-2 rounded-full bg-primary/60 animate-bounce" style={{ animationDelay: '150ms' }}></span>
-                <span className="w-2 h-2 rounded-full bg-primary/60 animate-bounce" style={{ animationDelay: '300ms' }}></span>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {user?.id && (
-        <div className="fixed bottom-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-xl border-t border-border/50 mobile-safe-bottom md:static md:z-10">
-          <CardContent className="p-4 max-w-4xl mx-auto">
-            {replyTo && (
-              <div className="mb-2 px-3 py-2 bg-muted/30 rounded-lg border-l-4 border-primary flex items-center justify-between">
-                <div className="flex flex-col">
-                  <span className="text-xs font-medium text-primary">
-                    Replying to {replyTo.sender?.full_name || 'User'}
-                  </span>
-                  <span className="text-sm text-muted-foreground truncate max-w-[300px]">
-                    {replyTo.content}
-                  </span>
-                </div>
-                <button 
-                  className="text-muted-foreground hover:text-foreground"
-                  onClick={() => setReplyTo(null)}
-                >
-                  <X className="h-4 w-4" />
-                </button>
-              </div>
-            )}
-            <div className="flex items-end gap-2">
-              <div className="flex gap-1">
-                <VoiceRecorder onRecord={(url, filename) => handleSend(null, {url, filename})} />
-                <ChatAttachment onAttach={(url, filename) => handleSend(newMessage, { url, filename })} />
-              </div>
-              <Textarea
-                value={newMessage}
-                onChange={(e) => setNewMessage(e.target.value)}
-                onKeyDown={handleKeyPress}
-                placeholder="Type a message..."
-                className="flex-1 min-h-[45px] max-h-[90px] rounded-2xl bg-muted/50 backdrop-blur-sm focus:bg-background transition-colors duration-200 text-base px-4"
-                rows={1}
-                autoComplete="off"
-                autoCorrect="on"
-                autoFocus
-              />
-              <Button
-                onClick={() => handleSend(newMessage)}
-                disabled={(!newMessage.trim() && !replyTo) || isSending || !user}
-                size="icon"
-                className="h-[45px] w-[45px] rounded-2xl bg-primary hover:bg-primary/90 transition-all duration-200 hover:scale-105 active:scale-95"
-                aria-label="Send message"
-              >
-                {isSending ? (
-                  <Loader2 className="h-5 w-5 animate-spin" />
-                ) : (
-                  <Send className="h-5 w-5" />
-                )}
-              </Button>
-            </div>
-          </CardContent>
-        </div>
-      )}
-    </Card>
-  );
-};
-
-export default ChatScreen;
