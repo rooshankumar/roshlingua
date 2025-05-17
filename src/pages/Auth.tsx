@@ -138,39 +138,45 @@ const Auth = () => {
   const handleGoogleLogin = async () => {
     try {
       setIsLoading(true);
-
-      // Clear any previous auth data to ensure clean login
-      localStorage.removeItem('sb-auth-token');
-      localStorage.removeItem('supabase.auth.token');
-      sessionStorage.removeItem('supabase.auth.token');
-      localStorage.removeItem('supabase.auth.expires_at');
-      sessionStorage.removeItem('supabase.auth.expires_at');
-      localStorage.removeItem('supabase.auth.code_verifier');
-      sessionStorage.removeItem('supabase.auth.code_verifier');
-      localStorage.removeItem('supabase.auth.code');
-      sessionStorage.removeItem('supabase.auth.code');
-
-      // Use production URL for redirects
-      const redirectUrl = window.location.hostname.includes('localhost') || window.location.hostname.includes('replit')
-        ? `${window.location.origin}/auth/callback`
-        : `${window.location.origin.replace(/\/$/, '')}/auth/callback`;
-
+      
+      // Generate PKCE verifier
+      const { generateVerifier } = await import('@/utils/pkceHelper');
+      const verifier = generateVerifier();
+      
+      // Store verifier in localStorage
+      localStorage.setItem('supabase.auth.code_verifier', verifier);
+      
+      const redirectUrl = `${window.location.origin}/auth/callback`;
       console.log("Redirect URL:", redirectUrl);
 
-      const { error } = await supabase.auth.signInWithOAuth({
+      const { data, error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
           redirectTo: redirectUrl,
           skipBrowserRedirect: false,
           queryParams: {
             access_type: 'offline',
-            prompt: 'select_account consent', // Force account selection dialog
-            include_granted_scopes: 'true'
+            prompt: 'consent',
+            code_challenge_method: 'S256',
+            code_challenge: verifier
           }
         }
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error("Google OAuth error:", error);
+        toast({
+          variant: "destructive",
+          title: "Authentication failed",
+          description: error.message
+        });
+        throw error;
+      }
+
+      if (!data) {
+        console.error("No data returned from OAuth");
+        throw new Error("Authentication failed - no data returned");
+      }
 
       // The redirect happens automatically
     } catch (error: any) {
