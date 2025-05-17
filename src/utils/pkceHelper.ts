@@ -300,6 +300,17 @@ export const getPKCEVerifier = () => {
 };
 
 // Clear PKCE verifier from all storage locations
+export const exchangeAuthCodeForSession = async (supabase, code) => {
+  try {
+    const { data, error } = await supabase.auth.exchangeCodeForSession(code);
+    if (error) throw error;
+    return { data, error: null };
+  } catch (error) {
+    console.error('[PKCE] Code exchange failed:', error);
+    return { data: null, error };
+  }
+};
+
 export const clearPKCEVerifier = () => {
   console.log('[PKCE] Clearing all verifiers');
 
