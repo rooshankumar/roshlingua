@@ -378,7 +378,7 @@ export const exchangeAuthCode = async (code: string) => {
     localStorage.setItem('supabase.auth.code_verifier', verifier);
 
     // Perform the code exchange with the code and verifier
-    const result = await supabase.auth.exchangeCodeForSession(code);
+    const result = await supabase.auth.exchangeCodeForSession(code, verifier); // ADD THE VERIFIER HERE
 
     if (result.error) {
       console.error('[PKCE] Code exchange failed:', result.error);
