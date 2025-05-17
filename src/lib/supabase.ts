@@ -2,8 +2,11 @@ import { createClient } from '@supabase/supabase-js';
 import type { Database } from '@/types/supabase';
 
 // Get environment variables
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string;
+let supabaseUrl = import.meta.env.VITE_SUPABASE_URL || "https://wqojeesjtgfcftpnzaet.supabase.co";
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY as string;
+
+// Using environment variable with fallback
+console.log('Using Supabase URL:', supabaseUrl);
 
 if (!supabaseUrl || !supabaseAnonKey) {
   throw new Error('Supabase environment variables are missing');
