@@ -1,0 +1,66 @@
+et::ERR_BLOCKED_BY_CLIENTUnderstand this error
+Chat.tsx:17 
+            
+            
+           GET https://324f497a-93fe-48e5-8a86-02fece80d757-00-8mqzwjnwkar1.pike.replit.dev/src/components/chat/ChatScreen.tsx?t=1747489908492 net::ERR_ABORTED 500 (Internal Server Error)Understand this error
+3chunk-ZMLY2J2T.js?v=3e87da9d:903 Uncaught TypeError: Failed to fetch dynamically imported module: https://324f497a-93fe-48e5-8a86-02fece80d757-00-8mqzwjnwkar1.pike.replit.dev/src/pages/Chat.tsx?t=1747489908718Understand this error
+chunk-276SZO74.js?v=3e87da9d:14032 The above error occurred in one of your React components:
+
+    at Lazy
+    at Suspense
+    at div
+    at MotionComponent (https://324f497a-93fe-48e5-8a86-02fece80d757-00-8mqzwjnwkar1.pike.replit.dev/node_modules/.vite/deps/framer-motion.js?v=3e87da9d:4619:40)
+    at PageTransition (https://324f497a-93fe-48e5-8a86-02fece80d757-00-8mqzwjnwkar1.pike.replit.dev/src/components/PageTransition.tsx:12:27)
+    at main
+    at div
+    at AppLayout (https://324f497a-93fe-48e5-8a86-02fece80d757-00-8mqzwjnwkar1.pike.replit.dev/src/components/layouts/AppLayout.tsx:85:22)
+    at ProtectedRoute (https://324f497a-93fe-48e5-8a86-02fece80d757-00-8mqzwjnwkar1.pike.replit.dev/src/components/auth/ProtectedRoute.tsx:15:27)
+    at RenderedRoute (https://324f497a-93fe-48e5-8a86-02fece80d757-00-8mqzwjnwkar1.pike.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=3e87da9d:4069:5)
+    at Routes (https://324f497a-93fe-48e5-8a86-02fece80d757-00-8mqzwjnwkar1.pike.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=3e87da9d:4508:5)
+    at PresenceChild (https://324f497a-93fe-48e5-8a86-02fece80d757-00-8mqzwjnwkar1.pike.replit.dev/node_modules/.vite/deps/framer-motion.js?v=3e87da9d:137:24)
+    at AnimatePresence (https://324f497a-93fe-48e5-8a86-02fece80d757-00-8mqzwjnwkar1.pike.replit.dev/node_modules/.vite/deps/framer-motion.js?v=3e87da9d:216:26)
+    at AppRoutes (https://324f497a-93fe-48e5-8a86-02fece80d757-00-8mqzwjnwkar1.pike.replit.dev/src/App.tsx?t=1747489908718:64:33)
+    at AuthProvider (https://324f497a-93fe-48e5-8a86-02fece80d757-00-8mqzwjnwkar1.pike.replit.dev/src/providers/AuthProvider.tsx:24:32)
+    at Router (https://324f497a-93fe-48e5-8a86-02fece80d757-00-8mqzwjnwkar1.pike.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=3e87da9d:4451:15)
+    at BrowserRouter (https://324f497a-93fe-48e5-8a86-02fece80d757-00-8mqzwjnwkar1.pike.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=3e87da9d:5196:5)
+    at ThemeProvider (https://324f497a-93fe-48e5-8a86-02fece80d757-00-8mqzwjnwkar1.pike.replit.dev/src/components/theme-provider.tsx:17:33)
+    at QueryClientProvider (https://324f497a-93fe-48e5-8a86-02fece80d757-00-8mqzwjnwkar1.pike.replit.dev/node_modules/.vite/deps/@tanstack_react-query.js?v=3e87da9d:2794:3)
+    at App (https://324f497a-93fe-48e5-8a86-02fece80d757-00-8mqzwjnwkar1.pike.replit.dev/src/App.tsx?t=1747489908718:707:45)
+
+Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://reactjs.org/link/error-boundaries to learn more about error boundaries.
+logCapturedError @ chunk-276SZO74.js?v=3e87da9d:14032
+update.callback @ chunk-276SZO74.js?v=3e87da9d:14052
+callCallback @ chunk-276SZO74.js?v=3e87da9d:11248
+commitUpdateQueue @ chunk-276SZO74.js?v=3e87da9d:11265
+commitLayoutEffectOnFiber @ chunk-276SZO74.js?v=3e87da9d:17093
+commitLayoutMountEffects_complete @ chunk-276SZO74.js?v=3e87da9d:17980
+commitLayoutEffects_begin @ chunk-276SZO74.js?v=3e87da9d:17969
+commitLayoutEffects @ chunk-276SZO74.js?v=3e87da9d:17920
+commitRootImpl @ chunk-276SZO74.js?v=3e87da9d:19353
+commitRoot @ chunk-276SZO74.js?v=3e87da9d:19277
+finishConcurrentRender @ chunk-276SZO74.js?v=3e87da9d:18760
+performConcurrentWorkOnRoot @ chunk-276SZO74.js?v=3e87da9d:18718
+workLoop @ chunk-276SZO74.js?v=3e87da9d:197
+flushWork @ chunk-276SZO74.js?v=3e87da9d:176
+performWorkUntilDeadline @ chunk-276SZO74.js?v=3e87da9d:384Understand this error
+chunk-276SZO74.js?v=3e87da9d:19413 Uncaught TypeError: Failed to fetch dynamically imported module: https://324f497a-93fe-48e5-8a86-02fece80d757-00-8mqzwjnwkar1.pike.replit.dev/src/pages/Chat.tsx?t=1747489908718Understand this error
+client:698 [vite] Internal Server Error
+  × Unexpected token `Card`. Expected jsx identifier
+     ╭─[/home/runner/workspace/src/components/chat/ChatScreen.tsx:840:1]
+ 837 │ 
+ 838 │ 
+ 839 │   return (
+ 840 │     <Card className="fixed inset-0 flex flex-col w-full h-full md:static md:h-[calc(100vh-2rem)] md:max-w-4xl md:mx-auto md:rounded-2xl border-none shadow-2xl overflow-hidden bg-gradient-to-b from-background/95 to-background/90 backdrop-blur-lg">
+     ·      ────
+ 841 │       <div className="fixed top-0 left-0 right-0 z-40 bg-background/95 backdrop-blur-xl border-b md:relative">
+ 842 │         <ChatHeader conversation={conversation} />
+ 843 │       </div>
+     ╰────
+
+
+Caused by:
+    Syntax Error
+
+handleMessage @ client:698
+(anonymous) @ client:546Understand this error
