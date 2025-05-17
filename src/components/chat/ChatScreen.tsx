@@ -952,7 +952,7 @@ export const ChatScreen = ({ conversation }: Props) => {
                               <img 
                                 src={message.attachment_url} 
                                 alt={message.attachment_name || "Image"}
-                                className="w-full max-w-[600px] object-contain rounded-lg shadow-sm"
+                                className="max-w-full w-auto max-h-[300px] mx-auto object-contain rounded-lg shadow-sm"
                                 onError={(e) => handleImageLoadError(e, message.attachment_url as string)}
                                 loading="eager"
                                 referrerPolicy="no-referrer"

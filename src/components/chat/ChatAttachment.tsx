@@ -189,6 +189,7 @@ export const ChatAttachment = ({ onAttach }: ChatAttachmentProps) => {
 
   return (
     <div className="relative">
+      {previewUrl && <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40" onClick={cancelUpload}></div>}
       <input
         type="file"
         id="fileUpload"
@@ -198,37 +199,64 @@ export const ChatAttachment = ({ onAttach }: ChatAttachmentProps) => {
       />
 
       {previewUrl && (
-        <div className="absolute bottom-full mb-2 right-0 border rounded-lg p-2 shadow-md animate-in fade-in-0 zoom-in-95 duration-200 w-[200px]">
-          <div className="flex justify-between items-center mb-1">
-            <span className="text-xs font-medium truncate max-w-[150px]">{fileName}</span>
+        <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 border rounded-lg p-3 shadow-xl animate-in fade-in-0 zoom-in-95 duration-200 w-[90%] max-w-[400px] z-50 bg-background">
+          <div className="flex justify-between items-center mb-2">
+            <span className="text-sm font-medium truncate max-w-[250px]">{fileName}</span>
             <Button 
               variant="ghost" 
               size="icon" 
-              className="h-5 w-5 p-0" 
+              className="h-7 w-7 p-0" 
               onClick={cancelUpload}
             >
-              <X className="h-3 w-3" />
+              <X className="h-4 w-4" />
             </Button>
           </div>
 
           {fileType.startsWith('image/') && (
-            <img src={previewUrl} alt="Preview" className="w-full h-24 object-contain rounded cursor-pointer" onClick={() => setShowFullPreview(true)} />
+            <div className="flex justify-center">
+              <img 
+                src={previewUrl} 
+                alt="Preview" 
+                className="max-w-full max-h-[250px] object-contain rounded cursor-pointer" 
+                onClick={() => setShowFullPreview(true)}
+              />
+            </div>
           )}
 
           {!fileType.startsWith('image/') && (
-            <div className="h-16 flex items-center justify-center rounded">
+            <div className="h-24 flex items-center justify-center rounded">
               {getFileIcon()}
+              <span className="ml-2 text-sm">{fileType.split('/')[1].toUpperCase()}</span>
             </div>
           )}
 
-          {uploading && (
-            <div className="mt-2">
-              <Progress value={uploadProgress} className="h-1" />
-              <span className="text-xs text-muted-foreground mt-1 block">
-                {uploadProgress < 100 ? 'Uploading...' : 'Complete!'}
-              </span>
-            </div>
-          )}
+          <div className="mt-3">
+            {uploading && (
+              <>
+                <Progress value={uploadProgress} className="h-2" />
+                <span className="text-xs text-muted-foreground mt-2 block text-center">
+                  {uploadProgress < 100 ? 'Uploading...' : 'Complete!'}
+                </span>
+              </>
+            )}
+            {!uploading && (
+              <div className="flex justify-end gap-2 mt-2">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={cancelUpload}
+                >
+                  Cancel
+                </Button>
+                <Button 
+                  size="sm" 
+                  onClick={() => document.getElementById('fileUpload')?.click()}
+                >
+                  Change
+                </Button>
+              </div>
+            )}
+          </div>
         </div>
       )}
 
