@@ -233,9 +233,6 @@ export const ChatScreen = ({ conversation }: Props) => {
       }
       
       // Create a unique channel ID to prevent duplicate subscriptions
-      const uniqueSubscriptionKey = `messages:${conversation.id}:${Date.now()}`;
-      
-      // Create a unique channel ID to prevent duplicate subscriptions
       const uniqueSubscriptionKey = createUniqueChannelId(`messages:${conversation.id}`);
       
       try {
