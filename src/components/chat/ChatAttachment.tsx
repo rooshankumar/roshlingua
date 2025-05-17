@@ -199,16 +199,16 @@ export const ChatAttachment = ({ onAttach }: ChatAttachmentProps) => {
       />
 
       {previewUrl && (
-        <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 border rounded-lg p-3 shadow-xl animate-in fade-in-0 zoom-in-95 duration-200 w-[90%] max-w-[400px] z-50 bg-background">
-          <div className="flex justify-between items-center mb-2">
-            <span className="text-sm font-medium truncate max-w-[250px]">{fileName}</span>
+        <div className="fixed bottom-[80px] left-0 right-0 mx-auto border rounded-lg p-2 shadow-xl animate-in fade-in-0 zoom-in-95 duration-200 w-[95%] max-w-[400px] z-50 bg-background">
+          <div className="flex justify-between items-center mb-1">
+            <span className="text-xs font-medium truncate max-w-[250px]">{fileName}</span>
             <Button 
               variant="ghost" 
               size="icon" 
-              className="h-7 w-7 p-0" 
+              className="h-6 w-6 p-0" 
               onClick={cancelUpload}
             >
-              <X className="h-4 w-4" />
+              <X className="h-3 w-3" />
             </Button>
           </div>
 
@@ -217,16 +217,16 @@ export const ChatAttachment = ({ onAttach }: ChatAttachmentProps) => {
               <img 
                 src={previewUrl} 
                 alt="Preview" 
-                className="max-w-full max-h-[250px] object-contain rounded cursor-pointer" 
+                className="max-w-full max-h-[150px] object-contain rounded cursor-pointer" 
                 onClick={() => setShowFullPreview(true)}
               />
             </div>
           )}
 
           {!fileType.startsWith('image/') && (
-            <div className="h-24 flex items-center justify-center rounded">
+            <div className="h-16 flex items-center justify-center rounded">
               {getFileIcon()}
-              <span className="ml-2 text-sm">{fileType.split('/')[1].toUpperCase()}</span>
+              <span className="ml-2 text-xs">{fileType.split('/')[1].toUpperCase()}</span>
             </div>
           )}
 

@@ -1061,15 +1061,33 @@ export const ChatScreen = ({ conversation }: Props) => {
                                 <FileText className="h-5 w-5" />
                                 <span className="text-sm font-medium truncate">{message.attachment_name || 'PDF Document'}</span>
                               </div>
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                className="w-full"
-                                onClick={() => window.open(message.attachment_url, '_blank')}
-                              >
-                                <FileText className="h-4 w-4 mr-2" /> 
-                                View Document
-                              </Button>
+                              <div className="flex gap-2">
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  className="flex-1"
+                                  onClick={() => window.open(message.attachment_url, '_blank')}
+                                >
+                                  <FileText className="h-4 w-4 mr-2" /> 
+                                  View
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  className="flex-1"
+                                  onClick={() => {
+                                    const a = document.createElement('a');
+                                    a.href = message.attachment_url || '';
+                                    a.download = message.attachment_name || 'document.pdf';
+                                    document.body.appendChild(a);
+                                    a.click();
+                                    document.body.removeChild(a);
+                                  }}
+                                >
+                                  <Download className="h-4 w-4 mr-2" /> 
+                                  Download
+                                </Button>
+                              </div>
                             </div>
                           ) : message.attachment_url ? (
                             <div className="max-w-[270px] bg-muted/20 p-3 rounded-lg flex flex-col">
@@ -1083,8 +1101,8 @@ export const ChatScreen = ({ conversation }: Props) => {
                                 className="w-full"
                                 onClick={() => window.open(message.attachment_url, '_blank')}
                               >
-                                <Download className="h-4 w-4 mr-2" /> 
-                                Download
+                                <FileText className="h-4 w-4 mr-2" /> 
+                                View File
                               </Button>
                             </div>
                           ) : null}
