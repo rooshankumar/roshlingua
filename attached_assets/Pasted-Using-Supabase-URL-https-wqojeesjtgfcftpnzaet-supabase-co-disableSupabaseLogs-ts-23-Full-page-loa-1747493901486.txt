@@ -1,0 +1,137 @@
+Using Supabase URL: https://wqojeesjtgfcftpnzaet.supabase.co
+disableSupabaseLogs.ts:23 Full page load detected
+disableSupabaseLogs.ts:23 Initializing auth state...
+disableSupabaseLogs.ts:23 App initialized
+disableSupabaseLogs.ts:23 Checking storage buckets...
+disableSupabaseLogs.ts:23 Checking existing storage buckets...
+disableSupabaseLogs.ts:23 Setting initial session: No session
+disableSupabaseLogs.ts:23 New authentication data detected, clearing old auth state
+disableSupabaseLogs.ts:23 Processing authentication callback...
+disableSupabaseLogs.ts:23 [PKCE] Searching for PKCE verifier in all storage locations...
+disableSupabaseLogs.ts:23 [PKCE] Found verifier in localStorage: U8diGEYw... length: 43
+disableSupabaseLogs.ts:23 [PKCE] Storing verifier: U8diGEYw... length: 43
+disableSupabaseLogs.ts:23 [PKCE] Verifier stored in multiple locations successfully
+disableSupabaseLogs.ts:23 Found PKCE verifier, length: 43
+disableSupabaseLogs.ts:23 [PKCE] Exchanging auth code for session, code: 40c79303-d096-456c-ae3f-82ad92548c98
+disableSupabaseLogs.ts:23 [PKCE] Searching for PKCE verifier in all storage locations...
+disableSupabaseLogs.ts:23 [PKCE] Found verifier in localStorage: U8diGEYw... length: 43
+disableSupabaseLogs.ts:23 [PKCE] Storing verifier: U8diGEYw... length: 43
+disableSupabaseLogs.ts:23 [PKCE] Verifier stored in multiple locations successfully
+disableSupabaseLogs.ts:23 [PKCE] Using verifier with length: 43 Verifier: U8diGEYwol...
+disableSupabaseLogs.ts:23 Auth state changed: INITIAL_SESSION No session
+pkceHelper.ts:384 [PKCE] Code exchange failed: AuthApiError: invalid request: both auth code and code verifier should be non-empty
+    at Pg (fetch.js:66:11)
+    at async oj (fetch.js:109:9)
+    at async Q (fetch.js:91:18)
+    at async wj._exchangeCodeForSession (GoTrueClient.js:417:37)
+gE @ pkceHelper.ts:384
+await in gE
+(anonymous) @ AuthCallback.tsx:70
+(anonymous) @ AuthCallback.tsx:192
+Xl @ react-dom.production.min.js:243
+Ss @ react-dom.production.min.js:285
+(anonymous) @ react-dom.production.min.js:281
+_ @ scheduler.production.min.js:13
+L @ scheduler.production.min.js:14Understand this error
+disableSupabaseLogs.ts:23 [PKCE] Attempting manual code exchange...
+pkceHelper.ts:402 [PKCE] Code exchange error: TypeError: D.auth.updateSession is not a function
+    at gE (pkceHelper.ts:390:48)
+    at async AuthCallback.tsx:70:28
+gE @ pkceHelper.ts:402
+await in gE
+(anonymous) @ AuthCallback.tsx:70
+(anonymous) @ AuthCallback.tsx:192
+Xl @ react-dom.production.min.js:243
+Ss @ react-dom.production.min.js:285
+(anonymous) @ react-dom.production.min.js:281
+_ @ scheduler.production.min.js:13
+L @ scheduler.production.min.js:14Understand this error
+AuthCallback.tsx:74 Auth exchange attempt failed: TypeError: D.auth.updateSession is not a function
+    at gE (pkceHelper.ts:390:48)
+    at async AuthCallback.tsx:70:28
+(anonymous) @ AuthCallback.tsx:74
+await in (anonymous)
+(anonymous) @ AuthCallback.tsx:192
+Xl @ react-dom.production.min.js:243
+Ss @ react-dom.production.min.js:285
+(anonymous) @ react-dom.production.min.js:281
+_ @ scheduler.production.min.js:13
+L @ scheduler.production.min.js:14Understand this error
+disableSupabaseLogs.ts:23 No existing buckets found, which is unusual.
+disableSupabaseLogs.ts:23 Storage buckets verified successfully
+disableSupabaseLogs.ts:23 [PKCE] Exchanging auth code for session, code: 40c79303-d096-456c-ae3f-82ad92548c98
+disableSupabaseLogs.ts:23 [PKCE] Searching for PKCE verifier in all storage locations...
+disableSupabaseLogs.ts:23 [PKCE] Found verifier in localStorage: U8diGEYw... length: 43
+disableSupabaseLogs.ts:23 [PKCE] Storing verifier: U8diGEYw... length: 43
+disableSupabaseLogs.ts:23 [PKCE] Verifier stored in multiple locations successfully
+disableSupabaseLogs.ts:23 [PKCE] Using verifier with length: 43 Verifier: U8diGEYwol...
+pkceHelper.ts:384 [PKCE] Code exchange failed: AuthApiError: invalid request: both auth code and code verifier should be non-empty
+    at Pg (fetch.js:66:11)
+    at async oj (fetch.js:109:9)
+    at async Q (fetch.js:91:18)
+    at async wj._exchangeCodeForSession (GoTrueClient.js:417:37)
+gE @ pkceHelper.ts:384
+await in gE
+(anonymous) @ AuthCallback.tsx:70
+await in (anonymous)
+(anonymous) @ AuthCallback.tsx:192
+Xl @ react-dom.production.min.js:243
+Ss @ react-dom.production.min.js:285
+(anonymous) @ react-dom.production.min.js:281
+_ @ scheduler.production.min.js:13
+L @ scheduler.production.min.js:14Understand this error
+disableSupabaseLogs.ts:23 [PKCE] Attempting manual code exchange...
+pkceHelper.ts:402 [PKCE] Code exchange error: TypeError: D.auth.updateSession is not a function
+    at gE (pkceHelper.ts:390:48)
+    at async AuthCallback.tsx:70:28
+gE @ pkceHelper.ts:402
+await in gE
+(anonymous) @ AuthCallback.tsx:70
+await in (anonymous)
+(anonymous) @ AuthCallback.tsx:192
+Xl @ react-dom.production.min.js:243
+Ss @ react-dom.production.min.js:285
+(anonymous) @ react-dom.production.min.js:281
+_ @ scheduler.production.min.js:13
+L @ scheduler.production.min.js:14Understand this error
+AuthCallback.tsx:74 Auth exchange attempt failed: TypeError: D.auth.updateSession is not a function
+    at gE (pkceHelper.ts:390:48)
+    at async AuthCallback.tsx:70:28
+(anonymous) @ AuthCallback.tsx:74
+await in (anonymous)
+(anonymous) @ AuthCallback.tsx:192
+Xl @ react-dom.production.min.js:243
+Ss @ react-dom.production.min.js:285
+(anonymous) @ react-dom.production.min.js:281
+_ @ scheduler.production.min.js:13
+L @ scheduler.production.min.js:14Understand this error
+AuthCallback.tsx:86 Authentication error: TypeError: D.auth.updateSession is not a function
+    at gE (pkceHelper.ts:390:48)
+    at async AuthCallback.tsx:70:28
+(anonymous) @ AuthCallback.tsx:86
+await in (anonymous)
+(anonymous) @ AuthCallback.tsx:192
+Xl @ react-dom.production.min.js:243
+Ss @ react-dom.production.min.js:285
+(anonymous) @ react-dom.production.min.js:281
+_ @ scheduler.production.min.js:13
+L @ scheduler.production.min.js:14Understand this error
+AuthCallback.tsx:183 Authentication callback error: TypeError: D.auth.updateSession is not a function
+    at gE (pkceHelper.ts:390:48)
+    at async AuthCallback.tsx:70:28
+(anonymous) @ AuthCallback.tsx:183
+await in (anonymous)
+(anonymous) @ AuthCallback.tsx:192
+Xl @ react-dom.production.min.js:243
+Ss @ react-dom.production.min.js:285
+(anonymous) @ react-dom.production.min.js:281
+_ @ scheduler.production.min.js:13
+L @ scheduler.production.min.js:14Understand this error
+disableSupabaseLogs.ts:23 [PKCE] Clearing all verifiers
+disableSupabaseLogs.ts:23 [PKCE] All verifiers cleared
+disableSupabaseLogs.ts:23 [PKCE] Clearing all verifiers
+disableSupabaseLogs.ts:23 [PKCE] All verifiers cleared
+disableSupabaseLogs.ts:23 [SubscriptionManager] Page became visible, checking subscriptions
+disableSupabaseLogs.ts:23 [SubscriptionManager] No subscriptions to refresh
+disableSupabaseLogs.ts:23 [SubscriptionManager] Page became visible, checking subscriptions
+disableSupabaseLogs.ts:23 [SubscriptionManager] No subscriptions to refresh
