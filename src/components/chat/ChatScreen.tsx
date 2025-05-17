@@ -77,19 +77,33 @@ export const ChatScreen = ({ conversation }: Props) => {
       // Force layout recalculation to get accurate scroll height
       void chatContainer.getBoundingClientRect();
 
-      // Use immediate auto scroll first to get to bottom quickly
+      // For mobile reliability, use multiple scroll approaches
+      
+      // 1. Direct scrollTop assignment (most reliable but no animation)
+      chatContainer.scrollTop = chatContainer.scrollHeight + 20000;
+      
+      // 2. Use immediate auto scroll to get to bottom quickly
       chatContainer.scrollTo({
-        top: chatContainer.scrollHeight + 10000, // Extra buffer to ensure we reach the bottom
+        top: chatContainer.scrollHeight + 20000, // Extra buffer to ensure we reach the bottom
         behavior: 'auto'
       });
+
+      // 3. Try scrollIntoView if there's a messages end ref
+      if (messagesEndRef.current) {
+        messagesEndRef.current.scrollIntoView({ behavior: 'auto', block: 'end' });
+      }
 
       // Then follow with a smooth scroll if requested (for visual polish)
       if (smooth) {
         setTimeout(() => {
           chatContainer.scrollTo({
-            top: chatContainer.scrollHeight + 10000,
+            top: chatContainer.scrollHeight + 20000,
             behavior: 'smooth'
           });
+          
+          if (messagesEndRef.current) {
+            messagesEndRef.current.scrollIntoView({ behavior: 'smooth', block: 'end' });
+          }
         }, 50);
       }
     }
@@ -429,11 +443,27 @@ export const ChatScreen = ({ conversation }: Props) => {
   useEffect(() => {
     if (messages.length > 0) {
       // Use a sequence of scroll attempts with increasing delays
-      [10, 50, 150, 300, 500].forEach(delay => {
+      // More aggressive scrolling for new messages
+      [0, 10, 50, 150, 300, 500, 700].forEach(delay => {
         setTimeout(() => scrollToLatestMessage(delay > 100), delay);
       });
     }
   }, [messages]);
+  
+  // Special effect that runs specifically when new messages are added
+  const messagesCountRef = useRef(messages.length);
+  useEffect(() => {
+    // Only scroll if messages increased (new message added)
+    if (messages.length > messagesCountRef.current) {
+      // Force immediate and more aggressive scrolling for new messages
+      setTimeout(() => scrollToLatestMessage(false), 0);
+      setTimeout(() => scrollToLatestMessage(false), 50);
+      setTimeout(() => scrollToLatestMessage(false), 100);
+      setTimeout(() => scrollToLatestMessage(true), 200);
+    }
+    // Update the reference count
+    messagesCountRef.current = messages.length;
+  }, [messages.length]);
 
   // Always scroll to bottom when chat is first loaded and messages are fetched
   useEffect(() => {
@@ -558,13 +588,25 @@ export const ChatScreen = ({ conversation }: Props) => {
       reactions: [] // Initialize reactions array
     };
 
-    setMessages(prev => [...prev, optimisticMessage]);
+    // Add optimistic message and ensure we scroll to the latest
+    setMessages(prev => {
+      const updatedMessages = [...prev, optimisticMessage];
+      // Ensure we scroll to bottom immediately after state update
+      requestAnimationFrame(() => {
+        scrollToLatestMessage(false);
+        // Then do another smooth scroll after a short delay
+        setTimeout(() => scrollToLatestMessage(true), 100);
+      });
+      return updatedMessages;
+    });
+    
     setNewMessage('');
 
     // Multiple scroll attempts to ensure we catch up with DOM updates
     setTimeout(() => scrollToLatestMessage(false), 10);
     setTimeout(() => scrollToLatestMessage(true), 100);
     setTimeout(() => scrollToLatestMessage(true), 300);
+    setTimeout(() => scrollToLatestMessage(true), 500);
 
     try {
       const { error } = await supabase
