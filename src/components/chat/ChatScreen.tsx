@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Send, Loader2, FileText, Check, Image, X } from 'lucide-react';
+import { updateUserPresence } from '@/utils/testAuth';
 import { ChatAttachment } from './ChatAttachment';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
@@ -217,14 +218,22 @@ export const ChatScreen = ({ conversation }: Props) => {
     };
 
     const setupRealtimeSubscription = () => {
-      // Import helper functions from testAuth utility
-      const { safeUnsubscribe, createUniqueChannelId } = require('@/utils/testAuth');
-      
+      // Use imported helper functions from testAuth utility
       // Clean up any existing subscription before creating a new one
       if (channelRef) {
-        safeUnsubscribe(channelRef);
-        channelRef = null;
+        try {
+          if (channelRef.unsubscribe) {
+            channelRef.unsubscribe();
+          }
+          channelRef = null;
+          console.log('Successfully unsubscribed from previous channel');
+        } catch (error) {
+          console.error('Error unsubscribing from channel:', error);
+        }
       }
+      
+      // Create a unique channel ID to prevent duplicate subscriptions
+      const uniqueSubscriptionKey = `messages:${conversation.id}:${Date.now()}`;
       
       // Create a unique channel ID to prevent duplicate subscriptions
       const uniqueSubscriptionKey = createUniqueChannelId(`messages:${conversation.id}`);
@@ -232,7 +241,13 @@ export const ChatScreen = ({ conversation }: Props) => {
       try {
         // Set up real-time subscription for new messages
         channelRef = supabase
-          .channel(uniqueSubscriptionKey)
+          .channel(uniqueSubscriptionKey, {
+            config: {
+              presence: {
+                key: 'chat_presence',
+              },
+            },
+          })
           .on('postgres_changes', 
             {
               event: 'INSERT',
@@ -299,6 +314,35 @@ export const ChatScreen = ({ conversation }: Props) => {
           console.log(`Chat subscription status for ${uniqueSubscriptionKey}:`, status);
           if (status === 'SUBSCRIBED') {
             console.log('Successfully subscribed to chat messages');
+            
+            // Update user presence when subscribed
+            if (user?.id) {
+              // Track presence in the channel
+              channelRef.track({
+                user_id: user.id,
+                online_at: new Date().toISOString(),
+                conversation_id: conversation.id
+              });
+              
+              // Update database status
+              updateUserPresence(user.id, true);
+              
+              // Set up visibility change listener for this specific channel
+              const handleVisibilityChange = () => {
+                if (document.visibilityState === 'visible') {
+                  updateUserPresence(user.id, true);
+                  channelRef.track({
+                    user_id: user.id,
+                    online_at: new Date().toISOString(),
+                    conversation_id: conversation.id
+                  });
+                } else {
+                  updateUserPresence(user.id, false);
+                }
+              };
+              
+              document.addEventListener('visibilitychange', handleVisibilityChange);
+            }
           } else if (status === 'CLOSED' || status === 'CHANNEL_ERROR') {
             console.warn('Chat subscription issue:', status);
             // If connection lost, retry fetching messages after a short delay
@@ -322,13 +366,25 @@ export const ChatScreen = ({ conversation }: Props) => {
 
     // Cleanup function
     return () => {
-      console.log(`Cleaning up chat subscription for ${subscriptionKey}`);
+      console.log(`Cleaning up chat subscription for conversation ${conversation?.id}`);
       isActive = false;
+
+      // Set user as offline when leaving the chat
+      if (user?.id) {
+        updateUserPresence(user.id, false);
+      }
 
       if (channelRef) {
         try {
+          // Untrack presence before unsubscribing
+          if (user?.id) {
+            channelRef.untrack();
+          }
+          
+          // Unsubscribe from channel
           channelRef.unsubscribe();
           channelRef = null;
+          console.log('Successfully unsubscribed from chat channel');
         } catch (err) {
           console.error('Error during channel cleanup:', err);
         }
