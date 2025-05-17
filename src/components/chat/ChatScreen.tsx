@@ -328,11 +328,13 @@ export const ChatScreen = ({ conversation }: Props) => {
               const handleVisibilityChange = () => {
                 if (document.visibilityState === 'visible') {
                   updateUserPresence(user.id, true);
-                  channelRef.track({
-                    user_id: user.id,
-                    online_at: new Date().toISOString(),
-                    conversation_id: conversation.id
-                  });
+                  if (channelRef) {
+                    channelRef.track({
+                      user_id: user.id,
+                      online_at: new Date().toISOString(),
+                      conversation_id: conversation.id
+                    });
+                  }
                 } else {
                   updateUserPresence(user.id, false);
                 }
