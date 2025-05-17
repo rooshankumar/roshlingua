@@ -146,8 +146,12 @@ const Auth = () => {
       // Store verifier in localStorage
       localStorage.setItem('supabase.auth.code_verifier', verifier);
       
-      const redirectUrl = `${window.location.origin}/auth/callback`;
-      console.log("Redirect URL:", redirectUrl);
+      // Determine correct callback URL based on environment
+      const redirectUrl = window.location.hostname.includes('vercel.app') 
+        ? 'https://roshlingua.vercel.app/auth/callback'
+        : `${window.location.origin}/auth/callback`;
+      
+      console.log("Using redirect URL:", redirectUrl);
 
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: "google",
