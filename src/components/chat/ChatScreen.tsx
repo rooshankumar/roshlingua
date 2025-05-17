@@ -1024,51 +1024,58 @@ export const ChatScreen = ({ conversation }: Props) => {
                       {message.attachment_url && (
                         <div className="mt-1 rounded-lg overflow-hidden w-full max-w-full">
                           {message.attachment_url?.match(/\.(jpg|jpeg|png|gif|bmp|webp)$/i) ? (
-                            <div className="relative w-full group attachment-container">
-                              <img 
-                                src={message.attachment_url} 
-                                alt={message.attachment_name || "Image"}
-                                className="w-full max-h-[270px] object-contain rounded-lg shadow-sm cursor-pointer transition-transform duration-200 hover:scale-[1.02]"
-                                onClick={(e) => {
-                                  // Expand image inline instead of opening dialog
-                                  const img = e.currentTarget;
-                                  const container = img.parentElement;
+                            <>
+                              <div className="relative w-full group attachment-container">
+                                <img 
+                                  src={message.attachment_url} 
+                                  alt={message.attachment_name || "Image"}
+                                  className="w-full max-h-[270px] object-contain rounded-lg shadow-sm cursor-pointer transition-transform duration-200 hover:scale-[1.02]"
+                                  onClick={(e) => {
+                                    // Expand image inline instead of opening dialog
+                                    const img = e.currentTarget;
+                                    const container = img.parentElement;
 
-                                  if (container?.classList.contains('expanded-image')) {
-                                    // If already expanded, collapse it
-                                    container.classList.remove('expanded-image');
-                                    img.classList.remove('expanded');
-                                    container.style.zIndex = '';
-                                  } else {
-                                    // Expand the image
-                                    container?.classList.add('expanded-image');
-                                    img.classList.add('expanded');
-                                    container.style.zIndex = '50';
+                                    if (container?.classList.contains('expanded-image')) {
+                                      // If already expanded, collapse it
+                                      container.classList.remove('expanded-image');
+                                      img.classList.remove('expanded');
+                                      container.style.zIndex = '';
+                                    } else {
+                                      // Expand the image
+                                      container?.classList.add('expanded-image');
+                                      img.classList.add('expanded');
+                                      container.style.zIndex = '50';
 
-                                    // Add haptic feedback if available
-                                    if ('vibrate' in navigator) {
-                                      navigator.vibrate(30);
+                                      // Add haptic feedback if available
+                                      if ('vibrate' in navigator) {
+                                        navigator.vibrate(30);
+                                      }
                                     }
-                                  }
-                                }}
-                                onError={(e) => handleImageLoadError(e, message.attachment_url as string)}
-                                loading="eager"
-                                referrerPolicy="no-referrer"
-                                fetchpriority="high"
-                              />
-                              <div 
-                                className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  const messageActions = document.getElementById(`message-actions-${message.id}`);
-                                  if (messageActions) {
-                                    messageActions.classList.toggle('opacity-0');
-                                    messageActions.classList.toggle('pointer-events-none');
-                                    messageActions.classList.toggle('active');
-                                    setActiveReactionMenu(messageActions.classList.contains('active') ? message.id : null);
-                                  }
-                                }}
-                              >
-                                <MessageReactions messageId={message.id} existingReactions={message.reactions || {}} />
+                                  }}
+                                  onError={(e) => handleImageLoadError(e, message.attachment_url as string)}
+                                  loading="eager"
+                                  referrerPolicy="no-referrer"
+                                  fetchpriority="high"
+                                />
+                                {message.attachment_name && (
+                                  <div className="text-xs mt-1 text-muted-foreground">
+                                    {message.attachment_name}
+                                  </div>
+                                )}
+                                <div 
+                                  className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    const messageActions = document.getElementById(`message-actions-${message.id}`);
+                                    if (messageActions) {
+                                      messageActions.classList.toggle('opacity-0');
+                                      messageActions.classList.toggle('pointer-events-none');
+                                      messageActions.classList.toggle('active');
+                                      setActiveReactionMenu(messageActions.classList.contains('active') ? message.id : null);
+                                    }
+                                  }}
+                                >
+                                  <MessageReactions messageId={message.id} existingReactions={message.reactions || {}} />
+                                </div>
                               </div>
-                            </div>
+                            </>

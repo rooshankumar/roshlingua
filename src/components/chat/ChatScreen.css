@@ -1,3 +1,73 @@
+
+/* Chat message styling */
+.message-bubble {
+  padding: 0.75rem 1rem;
+  border-radius: 1.25rem;
+  max-width: 100%;
+  position: relative;
+}
+
+.message-bubble[data-sender="self"] {
+  background-color: rgb(var(--primary) / 0.9);
+  color: white;
+  border-bottom-right-radius: 0.5rem;
+}
+
+.message-bubble[data-sender="other"] {
+  background-color: hsl(var(--muted));
+  color: hsl(var(--foreground));
+  border-bottom-left-radius: 0.5rem;
+}
+
+/* Expanded image styles */
+.expanded-image {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+}
+
+.expanded-image img.expanded {
+  max-width: 90vw;
+  max-height: 80vh;
+  object-fit: contain;
+  transform: scale(1);
+  border-radius: 8px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+}
+
+/* Attachment styling */
+.attachment-container {
+  transition: all 0.3s ease;
+}
+
+/* Message actions menu */
+.message-actions-menu {
+  position: absolute;
+  top: -45px;
+  background-color: hsl(var(--background));
+  border-radius: 12px;
+  padding: 4px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border: 1px solid hsl(var(--border));
+  z-index: 50;
+  transition: all 0.2s ease;
+}
+
+.message-actions-menu[data-sender="self"] {
+  right: 0;
+}
+
+.message-actions-menu[data-sender="other"] {
+  left: 0;
+}
+
 /* Chat message layout fixes */
 .chat-content-area {
   display: flex;
