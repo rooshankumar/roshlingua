@@ -91,86 +91,47 @@ export const ChatAttachment = ({ onAttach }: ChatAttachmentProps) => {
 
       console.log("Uploading file:", fileName, "Size:", (file.size / 1024).toFixed(2) + "KB");
 
-      // Improved error handling with retries
-      console.log("Uploading to bucket 'attachments' with path:", filePath);
-      
-      // Try to upload with retries
-      let uploadError = null;
-      let retryCount = 0;
-      const maxRetries = 3;
-      
-      while (retryCount < maxRetries) {
-        try {
-          console.log(`Upload attempt ${retryCount + 1} of ${maxRetries}`);
-          
-          // Upload with content-type header to ensure proper MIME type
-          const { error } = await supabase.storage
-            .from('attachments')
-            .upload(filePath, file, {
-              contentType: file.type, // Specify the correct MIME type
-              cacheControl: '3600', // 1 hour cache
-              upsert: true // Overwrite if exists
-            });
-            
-          if (error) {
-            console.error(`Attempt ${retryCount + 1} upload error:`, error);
-            uploadError = error;
-            retryCount++;
-            
-            // Wait before retrying (exponential backoff)
-            await new Promise(resolve => setTimeout(resolve, 1000 * Math.pow(2, retryCount)));
-          } else {
-            // Success - clear error and break loop
-            uploadError = null;
-            break;
-          }
-        } catch (error) {
-          console.error(`Attempt ${retryCount + 1} unexpected error:`, error);
-          uploadError = error;
-          retryCount++;
-          
-          // Wait before retrying
-          await new Promise(resolve => setTimeout(resolve, 1000 * Math.pow(2, retryCount)));
-        }
+      try {
+        // Skip bucket listing - we know attachments bucket exists
+        const attachmentsBucket = 'attachments';
+
+        // We know the attachments bucket exists based on your JSON data
+        console.log('Using existing attachments bucket');
+      } catch (bucketError) {
+        console.error("Bucket setup error:", bucketError);
+        // Continue with upload attempt anyway
       }
-      
+
+      console.log("Uploading to bucket 'attachments' with path:", filePath);
+
+      // Upload with content-type header to ensure proper MIME type
+      const { error: uploadError } = await supabase.storage
+        .from('attachments')
+        .upload(filePath, file, {
+          contentType: file.type, // Specify the correct MIME type
+          cacheControl: '3600', // 1 hour cache
+          upsert: true // Overwrite if exists
+        });
+
+      if (uploadError) {
+        console.error("Upload error:", uploadError);
+      }
+
       if (uploadError) {
         throw uploadError;
       }
 
-      // Get file's public URL with retry logic
-      let publicUrlData = null;
-      let publicUrlRetryCount = 0;
-      const maxPublicUrlRetries = 3;
-      
-      while (publicUrlRetryCount < maxPublicUrlRetries) {
-        try {
-          console.log(`Getting public URL, attempt ${publicUrlRetryCount + 1}`);
-          const { data } = await supabase.storage
-            .from('attachments')
-            .getPublicUrl(filePath);
-            
-          if (data && data.publicUrl) {
-            publicUrlData = data;
-            break;
-          } else {
-            publicUrlRetryCount++;
-            await new Promise(resolve => setTimeout(resolve, 800 * publicUrlRetryCount));
-          }
-        } catch (error) {
-          console.error(`Error getting public URL (attempt ${publicUrlRetryCount + 1}):`, error);
-          publicUrlRetryCount++;
-          await new Promise(resolve => setTimeout(resolve, 800 * publicUrlRetryCount));
-        }
-      }
-      
-      if (!publicUrlData || !publicUrlData.publicUrl) {
-        throw new Error("Failed to get public URL for uploaded file after multiple attempts");
+      // Get file's public URL
+      const { data } = await supabase.storage
+        .from('attachments')
+        .getPublicUrl(filePath);
+
+      if (!data || !data.publicUrl) {
+        throw new Error("Failed to get public URL for uploaded file");
       }
 
       // Append a timestamp and cache control to the URL to prevent caching issues
-      const publicUrl = `${publicUrlData.publicUrl}?t=${timestamp}&cache=no-store`;
-      console.log("Successfully generated public URL:", publicUrl);
+      const publicUrl = `${data.publicUrl}?t=${timestamp}&cache=no-store`;
 
       console.log("File uploaded successfully:", publicUrl);
 

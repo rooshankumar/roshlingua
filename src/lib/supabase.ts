@@ -2,17 +2,12 @@ import { createClient } from '@supabase/supabase-js';
 import type { Database } from '@/types/supabase';
 
 // Get environment variables
-let supabaseUrl = "https://wqojeesjtgfcftpnzaet.supabase.co";
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY as string;
-
-// URL is now hardcoded to prevent DNS resolution issues
-console.log('Using Supabase URL:', supabaseUrl);
 
 if (!supabaseUrl || !supabaseAnonKey) {
   throw new Error('Supabase environment variables are missing');
 }
-
-console.log('Supabase URL:', supabaseUrl); // Log for debugging
 
 // Configure client with optimized settings
 export const supabase = createClient<Database>(
