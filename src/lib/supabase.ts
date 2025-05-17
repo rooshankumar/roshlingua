@@ -2,13 +2,11 @@ import { createClient } from '@supabase/supabase-js';
 import type { Database } from '@/types/supabase';
 
 // Get environment variables
-let supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string;
+let supabaseUrl = "https://wqojeesjtgfcftpnzaet.supabase.co";
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY as string;
 
-// Ensure URL is properly formatted with https
-if (supabaseUrl && !supabaseUrl.startsWith('https://')) {
-  supabaseUrl = `https://${supabaseUrl}`;
-}
+// URL is now hardcoded to prevent DNS resolution issues
+console.log('Using Supabase URL:', supabaseUrl);
 
 if (!supabaseUrl || !supabaseAnonKey) {
   throw new Error('Supabase environment variables are missing');
