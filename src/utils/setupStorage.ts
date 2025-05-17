@@ -1,68 +1,99 @@
 
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/lib/supabase';
 
-export async function verifyStorageBuckets() {
-  console.log('Checking Supabase storage buckets...');
-  
+/**
+ * Verifies that required storage buckets exist and creates them if needed
+ */
+export const verifyStorageBuckets = async () => {
   try {
-    // List all buckets
+    // Get a list of existing buckets
     const { data: buckets, error } = await supabase.storage.listBuckets();
     
     if (error) {
       console.error('Error listing buckets:', error);
-      return false;
+      return { success: false, error };
     }
     
-    // Check/create attachments bucket
-    await ensureBucket('attachments');
+    // Required bucket names
+    const requiredBuckets = ['avatars', 'attachments', 'public'];
+    const existingBucketNames = buckets?.map(bucket => bucket.name) || [];
     
-    // Check/create avatars bucket
-    await ensureBucket('avatars');
+    // Create each missing bucket with public access
+    for (const bucketName of requiredBuckets) {
+      if (!existingBucketNames.includes(bucketName)) {
+        try {
+          console.log(`Creating missing bucket: ${bucketName}`);
+          const { error: createError } = await supabase.storage.createBucket(bucketName, {
+            public: true,
+            fileSizeLimit: 52428800, // 50MB
+          });
+          
+          if (createError) {
+            console.error(`Error creating bucket ${bucketName}:`, createError);
+          } else {
+            console.log(`Successfully created bucket: ${bucketName}`);
+            
+            // Set up public bucket policy
+            const { error: policyError } = await supabase.storage.from(bucketName).createPolicy('public-read', {
+              name: 'public-read',
+              definition: {
+                in_allowed: ['*'],
+                out_allowed: ['*'],
+              },
+            });
+            
+            if (policyError) {
+              console.error(`Error setting policy for ${bucketName}:`, policyError);
+            }
+          }
+        } catch (e) {
+          console.error(`Exception when creating bucket ${bucketName}:`, e);
+        }
+      }
+    }
     
-    return true;
+    return { success: true };
   } catch (err) {
-    console.error('Storage verification failed:', err);
-    return false;
+    // Handle network errors gracefully
+    console.error('Error in storage bucket verification:', err);
+    return { 
+      success: false, 
+      error: err instanceof Error ? err : new Error('Unknown error in storage setup') 
+    };
   }
-}
+};
 
-async function ensureBucket(bucketName: string) {
+/**
+ * Updates RLS policies for storage buckets
+ */
+export const setupStoragePolicies = async () => {
   try {
-    // Check if bucket exists
-    const { data: buckets, error } = await supabase.storage.listBuckets();
+    const buckets = ['avatars', 'attachments'];
     
-    if (error) throw error;
-    
-    const bucketExists = buckets?.some(b => b.name === bucketName);
-    
-    if (bucketExists) {
-      console.log(`✅ '${bucketName}' bucket already exists`);
-      
-      // Make sure bucket is public
-      const { error: updateError } = await supabase.storage.updateBucket(bucketName, {
-        public: true
-      });
-      
-      if (updateError) {
-        console.error(`Failed to update '${bucketName}' bucket settings:`, updateError);
+    for (const bucket of buckets) {
+      // Try to ensure public read access
+      try {
+        const { error } = await supabase.storage.from(bucket).createPolicy('public-read', {
+          name: 'public-read',
+          definition: {
+            in_allowed: ['*'],
+            out_allowed: ['*'],
+          },
+        });
+        
+        if (error && !error.message.includes('already exists')) {
+          console.error(`Error setting public read policy for ${bucket}:`, error);
+        }
+      } catch (e) {
+        console.warn(`Could not set policy for ${bucket}, may already exist:`, e);
       }
-    } else {
-      console.log(`'${bucketName}' bucket doesn't exist, creating now...`);
-      
-      // Create the bucket
-      const { error: createError } = await supabase.storage.createBucket(bucketName, {
-        public: true, 
-        fileSizeLimit: 10485760 // 10MB limit
-      });
-      
-      if (createError) {
-        throw createError;
-      }
-      
-      console.log(`✅ Successfully created '${bucketName}' bucket`);
     }
-  } catch (error) {
-    console.error(`Error setting up '${bucketName}' bucket:`, error);
-    throw error;
+    
+    return { success: true };
+  } catch (err) {
+    console.error('Error setting storage policies:', err);
+    return { success: false, error: err };
   }
-}
+};
+
+export default verifyStorageBuckets;

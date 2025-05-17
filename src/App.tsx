@@ -231,6 +231,28 @@ const App = () => {
     // Optional: Any other app-level initializations can go here
   }, []);
 
+  // useEffect(() => {
+  //   // Initialize storage buckets for attachments and avatars with better error handling
+  //   const initStorage = async () => {
+  //     try {
+  //       const result = await verifyStorageBuckets();
+  //       if (!result.success) {
+  //         console.error('Failed to verify storage buckets:', result.error);
+
+  //         // Continue app initialization despite storage issues
+  //         console.log('App will continue without storage features');
+  //       } else {
+  //         console.log('Storage buckets initialized successfully');
+  //       }
+  //     } catch (err) {
+  //       console.error('Storage initialization error:', err);
+  //     }
+  //   };
+
+  //   // Execute but don't block app rendering
+  //   initStorage();
+  // }, []);
+
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider defaultTheme="dark" storageKey="ui-theme">
