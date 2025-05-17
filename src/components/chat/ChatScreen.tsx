@@ -18,7 +18,7 @@ import {
   CardTitle,
   CardFooter,
   CardDescription
-} from '@/components/ui/card';
+} from '../ui/card';
 import { toast } from '../ui/use-toast';
 import { handleImageLoadError, isLikelyBlockedUrl } from '@/utils/imageUtils';
 import { VoiceRecorder } from './VoiceRecorder'; // Imported VoiceRecorder component
