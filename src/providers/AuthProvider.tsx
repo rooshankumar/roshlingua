@@ -482,18 +482,23 @@ export function useAuth() {
 import subscriptionManager from '@/utils/subscriptionManager';
 
 const updateProfileOnSignIn = async (user: User) => {
-    try {
-      const { error } = await supabase
-        .from('profiles')
-        .upsert({
-          id: user.id,
-          user_id: user.id, // Ensure user_id is set to user.id
-          email: user.email,
-          updated_at: new Date().toISOString(),
-        }, { onConflict: 'id' });
+  // Create or update the profile with basic user info
+  try {
+    const { data: profile, error } = await supabase
+      .from('profiles')
+      .upsert({
+        id: user.id,
+        user_id: user.id,
+        email: user.email,
+        full_name: user.user_metadata?.full_name || '',
+        avatar_url: user.user_metadata?.avatar_url || '',
+        learning_language: 'en', // Default to English if not provided
+      }, { onConflict: 'id' });
 
-      if (error) throw error;
-    } catch (error) {
+    if (error) {
       console.error('Error updating profile on sign in:', error);
     }
-  };
+  } catch (error) {
+    console.error('Error updating profile:', error);
+  }
+};
