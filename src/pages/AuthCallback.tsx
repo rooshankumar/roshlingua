@@ -1,8 +1,9 @@
+
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/lib/supabase';
-import { getPKCEVerifier } from '@/utils/pkceHelper';
+import { getPKCEVerifier, clearPKCEVerifier, storePKCEVerifier } from '@/utils/pkceHelper';
 
 const AuthCallback = () => {
   const navigate = useNavigate();
@@ -35,10 +36,12 @@ const AuthCallback = () => {
           return;
         }
 
-        // Get the stored PKCE verifier
+        // Get and validate the PKCE verifier
         const verifier = getPKCEVerifier();
-        if (!verifier) {
-          console.error("Missing PKCE verifier");
+        console.log("Got verifier:", verifier ? "Yes" : "No", "Length:", verifier?.length);
+
+        if (!verifier || verifier.length < 43) {
+          console.error("Invalid PKCE verifier");
           toast({
             variant: "destructive",
             title: "Authentication Error",
@@ -48,14 +51,29 @@ const AuthCallback = () => {
           return;
         }
 
+        // Ensure verifier is properly stored before exchange
+        storePKCEVerifier(verifier);
+
         // Exchange the code for a session
         const { data, error: sessionError } = await supabase.auth.exchangeCodeForSession(code);
 
         if (sessionError) {
+          console.error("Session exchange error:", sessionError);
           throw sessionError;
         }
 
-        // Successful authentication, redirect to dashboard
+        if (!data?.session) {
+          throw new Error("No session returned");
+        }
+
+        // Clear PKCE verifier after successful exchange
+        clearPKCEVerifier();
+
+        // Successful authentication
+        toast({
+          title: "Success",
+          description: "Successfully signed in"
+        });
         navigate('/dashboard', { replace: true });
       } catch (error) {
         console.error("Authentication callback error:", error);
