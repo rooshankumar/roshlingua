@@ -1,0 +1,145 @@
+et::ERR_BLOCKED_BY_CLIENTUnderstand this error
+ChatAttachment.tsx:96 
+            
+            
+           GET https://yekzyvdjjozhhatdefsq.supabase.co/storage/v1/bucket net::ERR_NAME_NOT_RESOLVED
+(anonymous) @ @supabase_supabase-js.js?v=aaa488eb:3900
+(anonymous) @ @supabase_supabase-js.js?v=aaa488eb:3921
+fulfilled @ @supabase_supabase-js.js?v=aaa488eb:3873
+Promise.then
+step @ @supabase_supabase-js.js?v=aaa488eb:3886
+(anonymous) @ @supabase_supabase-js.js?v=aaa488eb:3888
+__awaiter6 @ @supabase_supabase-js.js?v=aaa488eb:3870
+(anonymous) @ @supabase_supabase-js.js?v=aaa488eb:3911
+(anonymous) @ @supabase_supabase-js.js?v=aaa488eb:2987
+(anonymous) @ @supabase_supabase-js.js?v=aaa488eb:3064
+(anonymous) @ @supabase_supabase-js.js?v=aaa488eb:3063
+(anonymous) @ @supabase_supabase-js.js?v=aaa488eb:3034
+__awaiter3 @ @supabase_supabase-js.js?v=aaa488eb:3016
+_handleRequest @ @supabase_supabase-js.js?v=aaa488eb:3062
+(anonymous) @ @supabase_supabase-js.js?v=aaa488eb:3076
+(anonymous) @ @supabase_supabase-js.js?v=aaa488eb:3034
+__awaiter3 @ @supabase_supabase-js.js?v=aaa488eb:3016
+get @ @supabase_supabase-js.js?v=aaa488eb:3075
+(anonymous) @ @supabase_supabase-js.js?v=aaa488eb:3686
+(anonymous) @ @supabase_supabase-js.js?v=aaa488eb:3671
+__awaiter5 @ @supabase_supabase-js.js?v=aaa488eb:3653
+listBuckets @ @supabase_supabase-js.js?v=aaa488eb:3684
+handleFileChange @ ChatAttachment.tsx:96
+await in handleFileChange
+callCallback2 @ chunk-276SZO74.js?v=5526a000:3674
+invokeGuardedCallbackDev @ chunk-276SZO74.js?v=5526a000:3699
+invokeGuardedCallback @ chunk-276SZO74.js?v=5526a000:3733
+invokeGuardedCallbackAndCatchFirstError @ chunk-276SZO74.js?v=5526a000:3736
+executeDispatch @ chunk-276SZO74.js?v=5526a000:7014
+processDispatchQueueItemsInOrder @ chunk-276SZO74.js?v=5526a000:7034
+processDispatchQueue @ chunk-276SZO74.js?v=5526a000:7043
+dispatchEventsForPlugins @ chunk-276SZO74.js?v=5526a000:7051
+(anonymous) @ chunk-276SZO74.js?v=5526a000:7174
+batchedUpdates$1 @ chunk-276SZO74.js?v=5526a000:18913
+batchedUpdates @ chunk-276SZO74.js?v=5526a000:3579
+dispatchEventForPluginEventSystem @ chunk-276SZO74.js?v=5526a000:7173
+dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay @ chunk-276SZO74.js?v=5526a000:5478
+dispatchEvent @ chunk-276SZO74.js?v=5526a000:5472
+dispatchDiscreteEvent @ chunk-276SZO74.js?v=5526a000:5449Understand this error
+ChatAttachment.tsx:99 Error listing buckets: StorageUnknownError: Failed to fetch
+    at @supabase_supabase-js.js?v=aaa488eb:3047:12
+    at Generator.next (<anonymous>)
+    at fulfilled (@supabase_supabase-js.js?v=aaa488eb:3019:24)
+handleFileChange @ ChatAttachment.tsx:99
+await in handleFileChange
+callCallback2 @ chunk-276SZO74.js?v=5526a000:3674
+invokeGuardedCallbackDev @ chunk-276SZO74.js?v=5526a000:3699
+invokeGuardedCallback @ chunk-276SZO74.js?v=5526a000:3733
+invokeGuardedCallbackAndCatchFirstError @ chunk-276SZO74.js?v=5526a000:3736
+executeDispatch @ chunk-276SZO74.js?v=5526a000:7014
+processDispatchQueueItemsInOrder @ chunk-276SZO74.js?v=5526a000:7034
+processDispatchQueue @ chunk-276SZO74.js?v=5526a000:7043
+dispatchEventsForPlugins @ chunk-276SZO74.js?v=5526a000:7051
+(anonymous) @ chunk-276SZO74.js?v=5526a000:7174
+batchedUpdates$1 @ chunk-276SZO74.js?v=5526a000:18913
+batchedUpdates @ chunk-276SZO74.js?v=5526a000:3579
+dispatchEventForPluginEventSystem @ chunk-276SZO74.js?v=5526a000:7173
+dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay @ chunk-276SZO74.js?v=5526a000:5478
+dispatchEvent @ chunk-276SZO74.js?v=5526a000:5472
+dispatchDiscreteEvent @ chunk-276SZO74.js?v=5526a000:5449Understand this error
+ChatAttachment.tsx:130 Bucket setup error: Error: Failed to check for storage buckets: Failed to fetch
+    at handleFileChange (ChatAttachment.tsx:100:17)
+handleFileChange @ ChatAttachment.tsx:130
+await in handleFileChange
+callCallback2 @ chunk-276SZO74.js?v=5526a000:3674
+invokeGuardedCallbackDev @ chunk-276SZO74.js?v=5526a000:3699
+invokeGuardedCallback @ chunk-276SZO74.js?v=5526a000:3733
+invokeGuardedCallbackAndCatchFirstError @ chunk-276SZO74.js?v=5526a000:3736
+executeDispatch @ chunk-276SZO74.js?v=5526a000:7014
+processDispatchQueueItemsInOrder @ chunk-276SZO74.js?v=5526a000:7034
+processDispatchQueue @ chunk-276SZO74.js?v=5526a000:7043
+dispatchEventsForPlugins @ chunk-276SZO74.js?v=5526a000:7051
+(anonymous) @ chunk-276SZO74.js?v=5526a000:7174
+batchedUpdates$1 @ chunk-276SZO74.js?v=5526a000:18913
+batchedUpdates @ chunk-276SZO74.js?v=5526a000:3579
+dispatchEventForPluginEventSystem @ chunk-276SZO74.js?v=5526a000:7173
+dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay @ chunk-276SZO74.js?v=5526a000:5478
+dispatchEvent @ chunk-276SZO74.js?v=5526a000:5472
+dispatchDiscreteEvent @ chunk-276SZO74.js?v=5526a000:5449Understand this error
+ChatAttachment.tsx:139 
+            
+            
+           POST https://yekzyvdjjozhhatdefsq.supabase.co/storage/v1/object/attachments/1747479395784_185131.png net::ERR_NAME_NOT_RESOLVED
+(anonymous) @ @supabase_supabase-js.js?v=aaa488eb:3900
+(anonymous) @ @supabase_supabase-js.js?v=aaa488eb:3921
+fulfilled @ @supabase_supabase-js.js?v=aaa488eb:3873
+Promise.then
+step @ @supabase_supabase-js.js?v=aaa488eb:3886
+(anonymous) @ @supabase_supabase-js.js?v=aaa488eb:3888
+__awaiter6 @ @supabase_supabase-js.js?v=aaa488eb:3870
+(anonymous) @ @supabase_supabase-js.js?v=aaa488eb:3911
+(anonymous) @ @supabase_supabase-js.js?v=aaa488eb:2987
+(anonymous) @ @supabase_supabase-js.js?v=aaa488eb:2987
+(anonymous) @ @supabase_supabase-js.js?v=aaa488eb:3188
+(anonymous) @ @supabase_supabase-js.js?v=aaa488eb:3125
+__awaiter4 @ @supabase_supabase-js.js?v=aaa488eb:3107
+uploadOrUpdate @ @supabase_supabase-js.js?v=aaa488eb:3156
+(anonymous) @ @supabase_supabase-js.js?v=aaa488eb:3215
+(anonymous) @ @supabase_supabase-js.js?v=aaa488eb:3125
+__awaiter4 @ @supabase_supabase-js.js?v=aaa488eb:3107
+upload @ @supabase_supabase-js.js?v=aaa488eb:3214
+handleFileChange @ ChatAttachment.tsx:139
+await in handleFileChange
+callCallback2 @ chunk-276SZO74.js?v=5526a000:3674
+invokeGuardedCallbackDev @ chunk-276SZO74.js?v=5526a000:3699
+invokeGuardedCallback @ chunk-276SZO74.js?v=5526a000:3733
+invokeGuardedCallbackAndCatchFirstError @ chunk-276SZO74.js?v=5526a000:3736
+executeDispatch @ chunk-276SZO74.js?v=5526a000:7014
+processDispatchQueueItemsInOrder @ chunk-276SZO74.js?v=5526a000:7034
+processDispatchQueue @ chunk-276SZO74.js?v=5526a000:7043
+dispatchEventsForPlugins @ chunk-276SZO74.js?v=5526a000:7051
+(anonymous) @ chunk-276SZO74.js?v=5526a000:7174
+batchedUpdates$1 @ chunk-276SZO74.js?v=5526a000:18913
+batchedUpdates @ chunk-276SZO74.js?v=5526a000:3579
+dispatchEventForPluginEventSystem @ chunk-276SZO74.js?v=5526a000:7173
+dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay @ chunk-276SZO74.js?v=5526a000:5478
+dispatchEvent @ chunk-276SZO74.js?v=5526a000:5472
+dispatchDiscreteEvent @ chunk-276SZO74.js?v=5526a000:5449Understand this error
+ChatAttachment.tsx:192 Error uploading file: TypeError: Failed to fetch
+    at @supabase_supabase-js.js?v=aaa488eb:3900:23
+    at @supabase_supabase-js.js?v=aaa488eb:3921:12
+    at Generator.next (<anonymous>)
+    at fulfilled (@supabase_supabase-js.js?v=aaa488eb:3873:24)
+handleFileChange @ ChatAttachment.tsx:192
+await in handleFileChange
+callCallback2 @ chunk-276SZO74.js?v=5526a000:3674
+invokeGuardedCallbackDev @ chunk-276SZO74.js?v=5526a000:3699
+invokeGuardedCallback @ chunk-276SZO74.js?v=5526a000:3733
+invokeGuardedCallbackAndCatchFirstError @ chunk-276SZO74.js?v=5526a000:3736
+executeDispatch @ chunk-276SZO74.js?v=5526a000:7014
+processDispatchQueueItemsInOrder @ chunk-276SZO74.js?v=5526a000:7034
+processDispatchQueue @ chunk-276SZO74.js?v=5526a000:7043
+dispatchEventsForPlugins @ chunk-276SZO74.js?v=5526a000:7051
+(anonymous) @ chunk-276SZO74.js?v=5526a000:7174
+batchedUpdates$1 @ chunk-276SZO74.js?v=5526a000:18913
+batchedUpdates @ chunk-276SZO74.js?v=5526a000:3579
+dispatchEventForPluginEventSystem @ chunk-276SZO74.js?v=5526a000:7173
+dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay @ chunk-276SZO74.js?v=5526a000:5478
+dispatchEvent @ chunk-276SZO74.js?v=5526a000:5472
+dispatchDiscreteEvent @ chunk-276SZO74.js?v=5526a000:5449Understand this error
