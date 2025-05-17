@@ -79,7 +79,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 created_at: new Date().toISOString(),
                 updated_at: new Date().toISOString(),
                 last_seen: new Date().toISOString(),
-                onboarding_completed: false
+                onboarding_completed: false,
+                learning_language: 'en', // Default to English
+                native_language: 'en',   // Default to English
+                proficiency_level: 'beginner' // Default to beginner
               });
             } else {
               // Update last_seen
@@ -111,7 +114,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                     id: currentSession.user.id,
                     email: currentSession.user.email,
                     updated_at: new Date().toISOString(),
-                    last_seen: new Date().toISOString()
+                    last_seen: new Date().toISOString(),
+                    learning_language: 'en', // Default to English
+                    native_language: 'en',   // Default to English
+                    proficiency_level: 'beginner' // Default to beginner
                   }, { onConflict: 'id' });
 
                 if (profileError) {
@@ -175,7 +181,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           .upsert({
             id: data.user.id,
             last_seen: new Date().toISOString(),
-            updated_at: new Date().toISOString()
+            updated_at: new Date().toISOString(),
+            learning_language: 'en', // Default value for required field
+            native_language: 'en',   // Default value for required field
+            proficiency_level: 'beginner' // Default value for required field
           }, { onConflict: 'id' });
 
         if (updateError) {
@@ -348,15 +357,36 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       try {
         supabase
           .from('profiles')
-          .update({ 
-            is_online: true,
-            last_seen: new Date().toISOString() 
-          })
+          .select('learning_language, native_language, proficiency_level')
           .eq('id', user.id)
-          .then(({ error }) => {
-            if (error) {
-              console.error('Error updating online status during refresh:', error);
+          .single()
+          .then(({ data, error: selectError }) => {
+            if (selectError) {
+              console.error('Error getting profile data:', selectError);
+              return;
             }
+            
+            // Use existing values or defaults
+            const learning_language = data?.learning_language || 'en';
+            const native_language = data?.native_language || 'en';
+            const proficiency_level = data?.proficiency_level || 'beginner';
+            
+            // Update with all required fields
+            supabase
+              .from('profiles')
+              .update({ 
+                is_online: true,
+                last_seen: new Date().toISOString(),
+                learning_language,
+                native_language,
+                proficiency_level
+              })
+              .eq('id', user.id)
+              .then(({ error }) => {
+                if (error) {
+                  console.error('Error updating online status during refresh:', error);
+                }
+              });
           });
       } catch (err) {
         console.error('Failed to update online status during refresh:', err);
