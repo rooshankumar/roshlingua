@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Paperclip, Image as ImageIcon, FileText, Video, FileAudio, X } from 'lucide-react';
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@/integrations/supabase/client';
 import { Button } from '../ui/button';
 import { Loader2 } from 'lucide-react';
 import { generateImageThumbnail } from '@/utils/imageUtils';
@@ -91,21 +91,44 @@ export const ChatAttachment = ({ onAttach }: ChatAttachmentProps) => {
 
       console.log("Uploading file:", fileName, "Size:", (file.size / 1024).toFixed(2) + "KB");
 
-      // First, check if the bucket exists, if not create it
-      const { data: buckets } = await supabase.storage.listBuckets();
-      const bucketExists = buckets?.some(bucket => bucket.name === 'attachments');
-
-      if (!bucketExists) {
-        console.log("Bucket 'attachments' doesn't exist, creating it...");
-        const { error: createBucketError } = await supabase.storage.createBucket('attachments', {
-          public: true
-        });
-
-        if (createBucketError) {
-          console.error("Error creating bucket:", createBucketError);
-          throw new Error("Failed to create storage bucket: " + createBucketError.message);
+      try {
+        // First, check if the bucket exists, if not create it
+        const { data: buckets, error: bucketListError } = await supabase.storage.listBuckets();
+        
+        if (bucketListError) {
+          console.error("Error listing buckets:", bucketListError);
+          throw new Error("Failed to check for storage buckets: " + bucketListError.message);
         }
-        console.log("Bucket 'attachments' created successfully");
+        
+        const bucketExists = buckets?.some(bucket => bucket.name === 'attachments');
+
+        if (!bucketExists) {
+          console.log("Bucket 'attachments' doesn't exist, creating it...");
+          const { error: createBucketError } = await supabase.storage.createBucket('attachments', {
+            public: true,
+            fileSizeLimit: 10485760 // 10MB limit
+          });
+
+          if (createBucketError) {
+            console.error("Error creating bucket:", createBucketError);
+            throw new Error("Failed to create storage bucket: " + createBucketError.message);
+          }
+          console.log("Bucket 'attachments' created successfully");
+        } else {
+          console.log("Using existing 'attachments' bucket");
+          
+          // Ensure bucket is public
+          const { error: updateError } = await supabase.storage.updateBucket('attachments', {
+            public: true
+          });
+          
+          if (updateError) {
+            console.error("Failed to update bucket settings:", updateError);
+          }
+        }
+      } catch (bucketError) {
+        console.error("Bucket setup error:", bucketError);
+        // Continue with upload attempt anyway
       }
 
       console.log("Uploading to bucket 'attachments' with path:", filePath);

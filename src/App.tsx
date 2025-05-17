@@ -6,7 +6,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from '@vercel/speed-insights/react';
 import HMRHandler from '@/components/HMRHandler';
-import React, { Suspense, lazy, useEffect } from "react";
+import React, { useEffect, useState } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import PageTransition from "@/components/PageTransition";
 
@@ -210,6 +210,27 @@ const AppRoutes = () => {
 };
 
 const App = () => {
+  const [storageReady, setStorageReady] = useState(false);
+
+  useEffect(() => {
+    console.log('App initialized');
+
+    // Verify storage buckets exist
+    import('./utils/setupStorage').then(module => {
+      module.verifyStorageBuckets()
+        .then(success => {
+          setStorageReady(true);
+          console.log('Storage setup completed:', success ? 'Success' : 'Failed');
+        })
+        .catch(err => {
+          console.error('Storage setup error:', err);
+          setStorageReady(true); // Continue anyway
+        });
+    });
+
+    // Optional: Any other app-level initializations can go here
+  }, []);
+
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider defaultTheme="dark" storageKey="ui-theme">
