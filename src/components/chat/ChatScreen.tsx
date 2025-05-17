@@ -487,6 +487,40 @@ export const ChatScreen = ({ conversation }: Props) => {
     return () => window.removeEventListener('resize', handleResize);
   }, [messages.length]);
 
+  // Handle click outside expanded images to close them
+  useEffect(() => {
+    const handleClickOutsideImage = (e: MouseEvent) => {
+      const expandedContainer = document.querySelector('.expanded-image');
+      if (expandedContainer && !e.target.closest('img')) {
+        expandedContainer.classList.remove('expanded-image');
+        const expandedImg = expandedContainer.querySelector('img.expanded');
+        if (expandedImg) expandedImg.classList.remove('expanded');
+        expandedContainer.style.zIndex = '';
+      }
+    };
+
+    // Handle ESC key to close expanded images
+    const handleEscKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        const expandedContainer = document.querySelector('.expanded-image');
+        if (expandedContainer) {
+          expandedContainer.classList.remove('expanded-image');
+          const expandedImg = expandedContainer.querySelector('img.expanded');
+          if (expandedImg) expandedImg.classList.remove('expanded');
+          expandedContainer.style.zIndex = '';
+        }
+      }
+    };
+
+    document.addEventListener('click', handleClickOutsideImage);
+    document.addEventListener('keydown', handleEscKey);
+
+    return () => {
+      document.removeEventListener('click', handleClickOutsideImage);
+      document.removeEventListener('keydown', handleEscKey);
+    };
+  }, []);
+
   const handleReact = async (messageId: string, emoji: string) => {
     if (!user?.id) return;
 
@@ -990,23 +1024,48 @@ export const ChatScreen = ({ conversation }: Props) => {
                       {message.attachment_url && (
                         <div className="mt-1 rounded-lg overflow-hidden w-full max-w-full">
                           {message.attachment_url?.match(/\.(jpg|jpeg|png|gif|webp|avif)$/i) ? (
-                            <div className="relative w-full group">
+                            <div className="relative w-full group attachment-container">
                               <img 
                                 src={message.attachment_url} 
                                 alt={message.attachment_name || "Image"}
-                                className="max-w-[270px] w-auto max-h-[270px] object-cover rounded-lg shadow-sm cursor-pointer"
-                                onClick={() => {
-                                  setImagePreview({
-                                    url: message.attachment_url || '',
-                                    name: message.attachment_name || ''
-                                  });
-                                  setShowImagePreview(true);
+                                className="w-full max-h-[270px] object-contain rounded-lg shadow-sm cursor-pointer transition-transform duration-200 hover:scale-[1.02]"
+                                onClick={(e) => {
+                                  // Expand image inline instead of opening dialog
+                                  const img = e.currentTarget;
+                                  const container = img.parentElement;
+                                  
+                                  if (container?.classList.contains('expanded-image')) {
+                                    // If already expanded, collapse it
+                                    container.classList.remove('expanded-image');
+                                    img.classList.remove('expanded');
+                                    container.style.zIndex = '';
+                                  } else {
+                                    // Expand the image
+                                    container?.classList.add('expanded-image');
+                                    img.classList.add('expanded');
+                                    container.style.zIndex = '50';
+                                    
+                                    // Add haptic feedback if available
+                                    if ('vibrate' in navigator) {
+                                      navigator.vibrate(30);
+                                    }
+                                  }
                                 }}
                                 onError={(e) => handleImageLoadError(e, message.attachment_url as string)}
                                 loading="eager"
                                 referrerPolicy="no-referrer"
                                 fetchpriority="high"
                               />
+                              <div className="absolute bottom-2 right-2 bg-black/50 text-white rounded-full p-1.5 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+                                onClick={() => {
+                                  setImagePreview({
+                                    url: message.attachment_url || '',
+                                    name: message.attachment_name || ''
+                                  });
+                                  setShowImagePreview(true);
+                                }}>
+                                <Image className="h-4 w-4" />
+                              </div>
                               <div 
                                 className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
                                 onClick={(e) => {
