@@ -132,3 +132,86 @@ const getOverallStatus = (summary: any) => {
 
 // Export as default and named exports for flexibility
 export default testAuth;
+
+/**
+ * Utilities for testing and debugging Supabase authentication and realtime connections
+ */
+
+/**
+ * Safely unsubscribe from a channel and handle any errors
+ * @param channel The channel to unsubscribe from
+ */
+export const safeUnsubscribe = (channel) => {
+  if (!channel) return;
+
+  try {
+    channel.unsubscribe();
+    console.log('Successfully unsubscribed from channel');
+  } catch (error) {
+    console.error('Error unsubscribing from channel:', error);
+  }
+};
+
+/**
+ * Check if a channel is already subscribed
+ * @param channel The channel to check
+ * @returns Boolean indicating if the channel is subscribed
+ */
+export const isChannelSubscribed = (channel) => {
+  if (!channel) return false;
+
+  // Check if the channel has already been subscribed
+  return channel.state === 'SUBSCRIBED';
+};
+
+/**
+ * Create a unique channel ID to prevent duplicate subscriptions
+ * @param baseId The base ID for the channel
+ * @returns A unique channel ID with timestamp
+ */
+export const createUniqueChannelId = (baseId) => {
+  return `${baseId}:${Date.now()}`;
+};
+
+/**
+ * Test user presence by updating the user's online status
+ * @param userId The user ID to update
+ * @param isOnline Whether the user is online or offline
+ */
+export const updateUserPresence = async (userId, isOnline = true) => {
+  if (!userId) return;
+
+  try {
+    const { error } = await supabase
+      .from('profiles')
+      .update({ is_online: isOnline, last_seen: new Date().toISOString() })
+      .eq('id', userId);
+
+    if (error) throw error;
+    console.log(`User presence updated: ${isOnline ? 'online' : 'offline'}`);
+  } catch (err) {
+    console.error('Error updating user presence:', err);
+  }
+};
+
+/**
+ * Register event listeners for page visibility changes
+ * @param userId The user ID to update
+ */
+export const setupPresenceEventListeners = (userId) => {
+  if (!userId) return;
+
+  // Update status when page becomes hidden or visible
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden') {
+      updateUserPresence(userId, false);
+    } else if (document.visibilityState === 'visible') {
+      updateUserPresence(userId, true);
+    }
+  });
+
+  // Update status before page unload
+  window.addEventListener('beforeunload', () => {
+    updateUserPresence(userId, false);
+  });
+};
