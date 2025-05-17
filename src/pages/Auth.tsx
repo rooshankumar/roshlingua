@@ -90,12 +90,32 @@ const Auth = () => {
         email,
         password,
         options: {
-          emailRedirectTo: `${window.location.origin}/auth/callback`
+          emailRedirectTo: `${window.location.origin}/auth/callback`,
+          data: {
+            email: email,
+            updated_at: new Date().toISOString()
+          }
         }
       });
 
       if (signUpError) throw signUpError;
       if (!data?.user) throw new Error("Signup failed - no user returned");
+
+      // Create initial profile
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .insert([
+          {
+            id: data.user.id,
+            email: email,
+            updated_at: new Date().toISOString()
+          }
+        ]);
+
+      if (profileError) {
+        console.error("Profile creation error:", profileError);
+        throw new Error("Failed to create user profile");
+      }
 
       toast({
         title: "Success",
