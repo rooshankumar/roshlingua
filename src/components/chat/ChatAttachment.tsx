@@ -92,40 +92,11 @@ export const ChatAttachment = ({ onAttach }: ChatAttachmentProps) => {
       console.log("Uploading file:", fileName, "Size:", (file.size / 1024).toFixed(2) + "KB");
 
       try {
-        // First, check if the bucket exists, if not create it
-        const { data: buckets, error: bucketListError } = await supabase.storage.listBuckets();
-        
-        if (bucketListError) {
-          console.error("Error listing buckets:", bucketListError);
-          throw new Error("Failed to check for storage buckets: " + bucketListError.message);
-        }
-        
-        const bucketExists = buckets?.some(bucket => bucket.name === 'attachments');
+        // Skip bucket listing - we know attachments bucket exists
+        const attachmentsBucket = 'attachments';
 
-        if (!bucketExists) {
-          console.log("Bucket 'attachments' doesn't exist, creating it...");
-          const { error: createBucketError } = await supabase.storage.createBucket('attachments', {
-            public: true,
-            fileSizeLimit: 10485760 // 10MB limit
-          });
-
-          if (createBucketError) {
-            console.error("Error creating bucket:", createBucketError);
-            throw new Error("Failed to create storage bucket: " + createBucketError.message);
-          }
-          console.log("Bucket 'attachments' created successfully");
-        } else {
-          console.log("Using existing 'attachments' bucket");
-          
-          // Ensure bucket is public
-          const { error: updateError } = await supabase.storage.updateBucket('attachments', {
-            public: true
-          });
-          
-          if (updateError) {
-            console.error("Failed to update bucket settings:", updateError);
-          }
-        }
+        // We know the attachments bucket exists based on your JSON data
+        console.log('Using existing attachments bucket');
       } catch (bucketError) {
         console.error("Bucket setup error:", bucketError);
         // Continue with upload attempt anyway
