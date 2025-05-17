@@ -1,0 +1,27 @@
+ET https://www.googletagmanager.com/gtag/js?id=G-20P4H0E61D net::ERR_BLOCKED_BY_CLIENTUnderstand this error
+supabase.ts:49 
+            
+            
+           POST https://wqojeesjtgfcftpnzaet.supabase.co/rest/v1/profiles?on_conflict=id 400 (Bad Request)
+fetch @ supabase.ts:49
+(anonymous) @ @supabase_supabase-js.js?v=3e87da9d:3900
+(anonymous) @ @supabase_supabase-js.js?v=3e87da9d:3921
+fulfilled @ @supabase_supabase-js.js?v=3e87da9d:3873
+Promise.then
+step @ @supabase_supabase-js.js?v=3e87da9d:3886
+(anonymous) @ @supabase_supabase-js.js?v=3e87da9d:3888
+__awaiter6 @ @supabase_supabase-js.js?v=3e87da9d:3870
+(anonymous) @ @supabase_supabase-js.js?v=3e87da9d:3911
+then @ @supabase_supabase-js.js?v=3e87da9d:89Understand this error
+AuthProvider.tsx:124 Error updating profile on sign in: {code: '23502', details: 'Failing row contains (ed1c374e-3823-4ea2-aa28-3999…ail.com, 2025-05-17 14:07:12.051, 0, 0, 0, null).', hint: null, message: 'null value in column "user_id" of relation "profiles" violates not-null constraint'}
+(anonymous) @ AuthProvider.tsx:124
+await in (anonymous)
+(anonymous) @ @supabase_supabase-js.js?v=3e87da9d:6405
+_notifyAllSubscribers @ @supabase_supabase-js.js?v=3e87da9d:6403
+(anonymous) @ @supabase_supabase-js.js?v=3e87da9d:5103Understand this error
+AuthProvider.tsx:128 Error updating profile: {code: '23502', details: 'Failing row contains (ed1c374e-3823-4ea2-aa28-3999…ail.com, 2025-05-17 14:07:12.051, 0, 0, 0, null).', hint: null, message: 'null value in column "user_id" of relation "profiles" violates not-null constraint'}code: "23502"details: "Failing row contains (ed1c374e-3823-4ea2-aa28-3999c21d1140, null, null, 0, f, 2025-05-17 14:07:12.353254+00, 2025-05-17 14:07:12.051+00, null, null, null, null, en, en, f, beginner, null, null, 0, null, isthisroshan@gmail.com, 2025-05-17 14:07:12.051, 0, 0, 0, null)."hint: nullmessage: "null value in column \"user_id\" of relation \"profiles\" violates not-null constraint"[[Prototype]]: Object
+(anonymous) @ AuthProvider.tsx:128
+await in (anonymous)
+(anonymous) @ @supabase_supabase-js.js?v=3e87da9d:6405
+_notifyAllSubscribers @ @supabase_supabase-js.js?v=3e87da9d:6403
+(anonymous) @ @supabase_supabase-js.js?v=3e87da9d:5103Understand this error
