@@ -994,11 +994,18 @@ export const ChatScreen = ({ conversation }: Props) => {
                               <img 
                                 src={message.attachment_url} 
                                 alt={message.attachment_name || "Image"}
-                                className="max-w-full w-auto max-h-[300px] mx-auto object-contain rounded-lg shadow-sm"
+                                className="max-w-[270px] w-auto max-h-[270px] object-cover rounded-lg shadow-sm cursor-pointer"
+                                onClick={() => {
+                                  setImagePreview({
+                                    url: message.attachment_url || '',
+                                    name: message.attachment_name || ''
+                                  });
+                                  setShowImagePreview(true);
+                                }}
                                 onError={(e) => handleImageLoadError(e, message.attachment_url as string)}
                                 loading="eager"
                                 referrerPolicy="no-referrer"
-                                fetchpriority="low"
+                                fetchpriority="high"
                               />
                               <div 
                                 className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
@@ -1017,47 +1024,68 @@ export const ChatScreen = ({ conversation }: Props) => {
                               </div>
                             </div>
                           ) : message.attachment_url?.match(/\.(mp4|webm|ogg)$/i) ? (
-                            <video 
-                              src={`${message.attachment_url}${message.attachment_url.includes('?') ? '&' : '?'}t=${Date.now()}`}
-                              controls
-                              className="w-full max-w-[600px] rounded-lg"
-                              preload="auto"
-                              onError={() => {
-                                console.error("Video failed to load:", message.attachment_url);
-                              }}
-                            />
-                          ) : message.attachment_url?.match(/\.(mp3|wav|aac)$/i) ? (
-                            <audio 
-                              src={message.attachment_url}
-                              controls
-                              className="w-full max-w-[600px]"
-                              preload="auto"
-                              onError={() => {
-                                console.error("Audio failed to load:", message.attachment_url);
-                              }}
-                            />
-                          ) : message.attachment_url?.match(/\.(pdf)$/i) ? (
-                            <div className="w-full">
-                              <iframe
-                                src={message.attachment_url}
-                                className="w-full max-w-[600px] h-[600px] rounded-lg border border-border"
-                                onLoad={() => console.log("PDF loaded successfully")}
+                            <div className="relative group max-w-[270px]">
+                              <video 
+                                src={`${message.attachment_url}${message.attachment_url.includes('?') ? '&' : '?'}t=${Date.now()}`}
+                                controls
+                                className="w-full rounded-lg max-h-[270px]"
+                                preload="metadata"
+                                playsInline
                                 onError={() => {
-                                  console.error("PDF failed to load:", message.attachment_url);
+                                  console.error("Video failed to load:", message.attachment_url);
+                                }}
+                              />
+                              <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                                <Video className="h-10 w-10 text-white/80" />
+                              </div>
+                            </div>
+                          ) : message.attachment_url?.match(/\.(mp3|wav|aac)$/i) ? (
+                            <div className="max-w-[270px] bg-muted/20 p-3 rounded-lg">
+                              <div className="flex items-center gap-2 mb-2">
+                                <FileAudio className="h-5 w-5" />
+                                <span className="text-sm font-medium truncate">{message.attachment_name || 'Audio'}</span>
+                              </div>
+                              <audio 
+                                src={message.attachment_url}
+                                controls
+                                className="w-full"
+                                preload="none"
+                                onError={() => {
+                                  console.error("Audio failed to load:", message.attachment_url);
                                 }}
                               />
                             </div>
-                          ) : message.attachment_url ? (
-                            <div className="flex items-center gap-3 p-3 rounded-lg">
-                              <FileText className="h-5 w-5" />
-                              <a 
-                                href={message.attachment_url} 
-                                target="_blank" 
-                                rel="noopener noreferrer"
-                                className="text-sm font-medium hover:underline"
+                          ) : message.attachment_url?.match(/\.(pdf)$/i) ? (
+                            <div className="max-w-[270px] bg-muted/20 p-3 rounded-lg">
+                              <div className="flex items-center gap-2 mb-2">
+                                <FileText className="h-5 w-5" />
+                                <span className="text-sm font-medium truncate">{message.attachment_name || 'PDF Document'}</span>
+                              </div>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                className="w-full"
+                                onClick={() => window.open(message.attachment_url, '_blank')}
                               >
-                                {message.attachment_name || 'View attachment'}
-                              </a>
+                                <FileText className="h-4 w-4 mr-2" /> 
+                                View Document
+                              </Button>
+                            </div>
+                          ) : message.attachment_url ? (
+                            <div className="max-w-[270px] bg-muted/20 p-3 rounded-lg flex flex-col">
+                              <div className="flex items-center gap-2 mb-2">
+                                <FileText className="h-5 w-5" />
+                                <span className="text-sm font-medium truncate">{message.attachment_name || 'File'}</span>
+                              </div>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                className="w-full"
+                                onClick={() => window.open(message.attachment_url, '_blank')}
+                              >
+                                <Download className="h-4 w-4 mr-2" /> 
+                                Download
+                              </Button>
                             </div>
                           ) : null}
                         </div>
