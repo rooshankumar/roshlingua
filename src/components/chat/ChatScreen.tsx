@@ -1056,15 +1056,29 @@ export const ChatScreen = ({ conversation }: Props) => {
                                 referrerPolicy="no-referrer"
                                 fetchpriority="high"
                               />
-                              <div className="absolute bottom-2 right-2 bg-black/50 text-white rounded-full p-1.5 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
-                                onClick={() => {
-                                  setImagePreview({
-                                    url: message.attachment_url || '',
-                                    name: message.attachment_name || ''
-                                  });
-                                  setShowImagePreview(true);
-                                }}>
-                                <Image className="h-4 w-4" />
+                              <div className="absolute bottom-2 right-2 flex gap-2">
+                                <button className="bg-black/50 text-white rounded-full p-1.5 opacity-70 hover:opacity-100 transition-opacity cursor-pointer"
+                                  onClick={() => {
+                                    // Download image
+                                    const a = document.createElement('a');
+                                    a.href = message.attachment_url || '';
+                                    a.download = message.attachment_name || 'image';
+                                    document.body.appendChild(a);
+                                    a.click();
+                                    document.body.removeChild(a);
+                                  }}>
+                                  <Download className="h-4 w-4" />
+                                </button>
+                                <button className="bg-black/50 text-white rounded-full p-1.5 opacity-70 hover:opacity-100 transition-opacity cursor-pointer"
+                                  onClick={() => {
+                                    setImagePreview({
+                                      url: message.attachment_url || '',
+                                      name: message.attachment_name || ''
+                                    });
+                                    setShowImagePreview(true);
+                                  }}>
+                                  <Image className="h-4 w-4" />
+                                </button>
                               </div>
                               <div 
                                 className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
@@ -1120,6 +1134,15 @@ export const ChatScreen = ({ conversation }: Props) => {
                                 <FileText className="h-5 w-5" />
                                 <span className="text-sm font-medium truncate">{message.attachment_name || 'PDF Document'}</span>
                               </div>
+                              <div className="relative w-full h-64 rounded-lg overflow-hidden mb-2">
+                                <iframe 
+                                  src={`${message.attachment_url}#toolbar=0&navpanes=0`} 
+                                  className="w-full h-full border-0" 
+                                  title={message.attachment_name || "PDF Preview"}
+                                />
+                                <div className="absolute inset-0 bg-transparent" 
+                                  onClick={() => window.open(message.attachment_url, '_blank')}></div>
+                              </div>
                               <div className="flex gap-2">
                                 <Button
                                   size="sm"
@@ -1154,15 +1177,33 @@ export const ChatScreen = ({ conversation }: Props) => {
                                 <FileText className="h-5 w-5" />
                                 <span className="text-sm font-medium truncate">{message.attachment_name || 'File'}</span>
                               </div>
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                className="w-full"
-                                onClick={() => window.open(message.attachment_url, '_blank')}
-                              >
-                                <FileText className="h-4 w-4 mr-2" /> 
-                                View File
-                              </Button>
+                              <div className="flex gap-2">
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  className="flex-1"
+                                  onClick={() => {
+                                    const a = document.createElement('a');
+                                    a.href = message.attachment_url || '';
+                                    a.download = message.attachment_name || 'file';
+                                    document.body.appendChild(a);
+                                    a.click();
+                                    document.body.removeChild(a);
+                                  }}
+                                >
+                                  <Download className="h-4 w-4 mr-2" /> 
+                                  Download
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  className="flex-1"
+                                  onClick={() => window.open(message.attachment_url, '_blank')}
+                                >
+                                  <FileText className="h-4 w-4 mr-2" /> 
+                                  View
+                                </Button>
+                              </div>
                             </div>
                           ) : null}
                         </div>

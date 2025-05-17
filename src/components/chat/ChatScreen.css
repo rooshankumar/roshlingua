@@ -146,6 +146,8 @@
 .message-bubble img {
   border-radius: 0.75rem;
   transition: transform 0.2s ease;
+  margin: 0;
+  display: block;
 }
 
 .message-bubble img:hover {
@@ -155,11 +157,18 @@
 .message-bubble video {
   border-radius: 0.75rem;
   max-width: 100%;
+  display: block;
 }
 
 .message-bubble audio {
   width: 100%;
   height: 32px;
+}
+
+/* PDF iframe container */
+.message-bubble iframe {
+  border-radius: 0.5rem;
+  background-color: white;
 }
 
 /* Image/media container */

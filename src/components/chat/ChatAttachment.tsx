@@ -152,12 +152,12 @@ export const ChatAttachment = ({ onAttach }: ChatAttachmentProps) => {
       // Reset the input after successful upload
       event.target.value = '';
 
-      // Reset preview after a short delay
+      // Keep the preview visible briefly so user can see success
       setTimeout(() => {
         setPreviewUrl(null);
         setUploadProgress(0);
         setUploading(false);
-      }, 1000);
+      }, 2000);
 
     } catch (error) {
       console.error('Error uploading file:', error);
