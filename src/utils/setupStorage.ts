@@ -2,38 +2,46 @@
 import { supabase } from '@/lib/supabase';
 
 /**
- * Verifies that required storage buckets exist and creates them if needed
+ * Verifies that required storage buckets exist and updates their policies if needed
  */
 export const verifyStorageBuckets = async () => {
   try {
-    // Get a list of existing buckets
-    const { data: buckets, error } = await supabase.storage.listBuckets();
+    console.log('Checking existing storage buckets...');
     
-    if (error) {
-      console.error('Error listing buckets:', error);
-      return { success: false, error };
+    // Get a list of existing buckets
+    const { data: existingBuckets, error: listError } = await supabase.storage.listBuckets();
+    
+    if (listError) {
+      console.error('Error listing buckets:', listError);
+      return { success: false, error: listError };
     }
     
-    // Required bucket names
-    const requiredBuckets = ['avatars', 'attachments', 'public'];
-    const existingBucketNames = buckets?.map(bucket => bucket.name) || [];
+    // Log existing buckets
+    if (existingBuckets && existingBuckets.length > 0) {
+      console.log('Found existing buckets:', existingBuckets.map(b => b.name).join(', '));
+    } else {
+      console.log('No existing buckets found, which is unusual.');
+    }
     
-    // Create each missing bucket with public access
-    for (const bucketName of requiredBuckets) {
-      if (!existingBucketNames.includes(bucketName)) {
-        try {
-          console.log(`Creating missing bucket: ${bucketName}`);
-          const { error: createError } = await supabase.storage.createBucket(bucketName, {
-            public: true,
-            fileSizeLimit: 52428800, // 50MB
-          });
+    // Skip bucket creation entirely - they should already exist
+    // Just update policies on existing buckets instead
+    const existingBucketNames = existingBuckets?.map(bucket => bucket.name) || [];
+    
+    // Update policies for existing buckets
+    for (const bucketName of existingBucketNames) {
+      try {
+        // Ensure buckets are public
+        const { error: updateError } = await supabase.storage.updateBucket(bucketName, {
+          public: true,
+        });
+        
+        if (updateError) {
+          console.error(`Error updating bucket ${bucketName}:`, updateError);
+        } else {
+          console.log(`✅ Updated permissions for bucket: ${bucketName}`);
           
-          if (createError) {
-            console.error(`Error creating bucket ${bucketName}:`, createError);
-          } else {
-            console.log(`Successfully created bucket: ${bucketName}`);
-            
-            // Set up public bucket policy
+          // Try to update policies - this might fail due to RLS but that's ok
+          try {
             const { error: policyError } = await supabase.storage.from(bucketName).createPolicy('public-read', {
               name: 'public-read',
               definition: {
@@ -42,13 +50,16 @@ export const verifyStorageBuckets = async () => {
               },
             });
             
-            if (policyError) {
+            if (policyError && !policyError.message.includes('already exists')) {
               console.error(`Error setting policy for ${bucketName}:`, policyError);
             }
+          } catch (policyErr) {
+            // Ignore policy errors, these might be restricted by RLS
+            console.warn(`Could not set policy for ${bucketName}, may require admin access`);
           }
-        } catch (e) {
-          console.error(`Exception when creating bucket ${bucketName}:`, e);
         }
+      } catch (e) {
+        console.warn(`Exception when updating bucket ${bucketName}, continuing anyway:`, e);
       }
     }
     
