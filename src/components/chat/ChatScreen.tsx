@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Send, Loader2, FileText, Check, Image, X, Download, FileAudio } from 'lucide-react';
+import { Send, Loader2, FileText, Check, Image, X, Download } from 'lucide-react';
 import { updateUserPresence } from '@/utils/testAuth';
 import { ChatAttachment } from './ChatAttachment';
 import { Button } from '@/components/ui/button';
@@ -11,7 +11,7 @@ import { supabase } from '@/lib/supabase';
 import { ChatHeader } from './ChatHeader';
 import { Textarea } from '../ui/textarea';
 import { ScrollArea } from '../ui/scroll-area';
-import { Card, CardContent, CardHeader, CardTitle, CardFooter, CardDescription } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from '@/components/ui/use-toast';
 import { handleImageLoadError, isLikelyBlockedUrl } from '@/utils/imageUtils';
 import { VoiceRecorder } from './VoiceRecorder'; // Imported VoiceRecorder component
