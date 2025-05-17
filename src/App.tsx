@@ -9,6 +9,7 @@ import HMRHandler from '@/components/HMRHandler';
 import React, { useEffect, useState, lazy, Suspense } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import PageTransition from "@/components/PageTransition";
+import { verifyStorageBuckets } from '@/utils/setupStorage';
 
 
 // Pages
@@ -215,28 +216,13 @@ const App = () => {
   useEffect(() => {
     console.log('App initialized');
 
-    // Verify storage buckets exist
-    import('./utils/setupStorage').then(module => {
-      module.verifyStorageBuckets()
-        .then(success => {
-          setStorageReady(true);
-          console.log('Storage setup completed:', success ? 'Success' : 'Failed');
-        })
-        .catch(err => {
-          console.error('Storage setup error:', err);
-          setStorageReady(true); // Continue anyway
-        });
-    });
-
-    // Optional: Any other app-level initializations can go here
-  }, []);
-
-  useEffect(() => {
     // Initialize storage buckets for attachments and avatars without creating new ones
     const initStorage = async () => {
       try {
         console.log('Checking storage buckets...');
         const result = await verifyStorageBuckets();
+        
+        setStorageReady(true);
         
         if (!result.success) {
           console.warn('Storage bucket verification had issues:', result.error);
@@ -246,11 +232,14 @@ const App = () => {
         }
       } catch (err) {
         console.error('Storage initialization error:', err);
+        setStorageReady(true); // Continue anyway
       }
     };
 
     // Execute but don't block app rendering
     initStorage();
+    
+    // Optional: Any other app-level initializations can go here
   }, []);
 
   return (
