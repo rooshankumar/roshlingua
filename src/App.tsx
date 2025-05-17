@@ -6,7 +6,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from '@vercel/speed-insights/react';
 import HMRHandler from '@/components/HMRHandler';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, lazy, Suspense } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import PageTransition from "@/components/PageTransition";
 
