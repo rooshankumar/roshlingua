@@ -264,7 +264,7 @@ export const ChatAttachment = ({ onAttach }: ChatAttachmentProps) => {
         <Button
           variant="outline"
           size="icon"
-          className="h-[45px] w-[45px] rounded-2xl border-muted-foreground/20"
+          className="h-[45px] w-[45px] rounded-2xl border-muted-foreground/20 hover:bg-purple-100"
           disabled={uploading}
           type="button"
           onClick={() => document.getElementById('fileUpload')?.click()}
@@ -272,7 +272,7 @@ export const ChatAttachment = ({ onAttach }: ChatAttachmentProps) => {
           {uploading ? (
             <Loader2 className="h-5 w-5 animate-spin" />
           ) : (
-            <Paperclip className="h-5 w-5" />
+            <Paperclip className="h-5 w-5 text-purple-600" />
           )}
         </Button>
       </label>

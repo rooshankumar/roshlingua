@@ -78,10 +78,10 @@ export const ChatScreen = ({ conversation }: Props) => {
       void chatContainer.getBoundingClientRect();
 
       // For mobile reliability, use multiple scroll approaches
-      
+
       // 1. Direct scrollTop assignment (most reliable but no animation)
       chatContainer.scrollTop = chatContainer.scrollHeight + 20000;
-      
+
       // 2. Use immediate auto scroll to get to bottom quickly
       chatContainer.scrollTo({
         top: chatContainer.scrollHeight + 20000, // Extra buffer to ensure we reach the bottom
@@ -100,7 +100,7 @@ export const ChatScreen = ({ conversation }: Props) => {
             top: chatContainer.scrollHeight + 20000,
             behavior: 'smooth'
           });
-          
+
           if (messagesEndRef.current) {
             messagesEndRef.current.scrollIntoView({ behavior: 'smooth', block: 'end' });
           }
@@ -245,10 +245,10 @@ export const ChatScreen = ({ conversation }: Props) => {
           console.error('Error unsubscribing from channel:', error);
         }
       }
-      
+
       // Create a unique channel ID to prevent duplicate subscriptions
       const uniqueSubscriptionKey = `messages:${conversation.id}:${Date.now()}`;
-      
+
       try {
         // Set up real-time subscription for new messages
         channelRef = supabase
@@ -317,7 +317,7 @@ export const ChatScreen = ({ conversation }: Props) => {
               }
             }
           );
-          
+
         // Subscribe only if not already subscribed
         channelRef.subscribe((status) => {
           if (!isActive) return;
@@ -325,7 +325,7 @@ export const ChatScreen = ({ conversation }: Props) => {
           console.log(`Chat subscription status for ${uniqueSubscriptionKey}:`, status);
           if (status === 'SUBSCRIBED') {
             console.log('Successfully subscribed to chat messages');
-            
+
             // Update user presence when subscribed
             if (user?.id) {
               // Track presence in the channel
@@ -334,10 +334,10 @@ export const ChatScreen = ({ conversation }: Props) => {
                 online_at: new Date().toISOString(),
                 conversation_id: conversation.id
               });
-              
+
               // Update database status
               updateUserPresence(user.id, true);
-              
+
               // Set up visibility change listener for this specific channel
               const handleVisibilityChange = () => {
                 if (document.visibilityState === 'visible') {
@@ -353,7 +353,7 @@ export const ChatScreen = ({ conversation }: Props) => {
                   updateUserPresence(user.id, false);
                 }
               };
-              
+
               document.addEventListener('visibilitychange', handleVisibilityChange);
             }
           } else if (status === 'CLOSED' || status === 'CHANNEL_ERROR') {
@@ -365,7 +365,7 @@ export const ChatScreen = ({ conversation }: Props) => {
             }
           }
         });
-        
+
         return channelRef;
       } catch (error) {
         console.error('Error setting up realtime subscription:', error);
@@ -393,7 +393,7 @@ export const ChatScreen = ({ conversation }: Props) => {
           if (user?.id) {
             channelRef.untrack();
           }
-          
+
           // Unsubscribe from channel
           channelRef.unsubscribe();
           channelRef = null;
@@ -449,7 +449,7 @@ export const ChatScreen = ({ conversation }: Props) => {
       });
     }
   }, [messages]);
-  
+
   // Special effect that runs specifically when new messages are added
   const messagesCountRef = useRef(messages.length);
   useEffect(() => {
@@ -633,7 +633,7 @@ export const ChatScreen = ({ conversation }: Props) => {
       });
       return updatedMessages;
     });
-    
+
     setNewMessage('');
 
     // Multiple scroll attempts to ensure we catch up with DOM updates
@@ -913,7 +913,7 @@ export const ChatScreen = ({ conversation }: Props) => {
                   // Handle swipe to reply
                   const element = e.currentTarget;
                   const startX = parseInt(element.getAttribute('data-touch-start-x') || '0');
-                  const currentX = e.touches[0].clientX;
+                  const currentX = e.touches[0].clientX;```python
                   const deltaX = currentX - startX;
 
                   // If swiped right far enough (for swipe-to-reply) - 50px threshold
@@ -1018,9 +1018,8 @@ export const ChatScreen = ({ conversation }: Props) => {
                     >
                       <p className="leading-relaxed whitespace-pre-wrap text-[15px]">{message.content || ''}</p>
 
-                      {/* Facebook Messenger-style reactions attached to message */}
-                      {/* Messenger-style reaction with single emoji display */}
-                              <MessageReactions messageId={message.id} existingReactions={message.reactions || {}} />
+                  {/* Messenger-style reaction with single emoji display */}
+                  <MessageReactions messageId={message.id} existingReactions={message.reactions || {}} />
                       {message.attachment_url && (
                         <div className="mt-1 rounded-lg overflow-hidden w-full max-w-full">
                           {message.attachment_url?.match(/\.(jpg|jpeg|png|gif|bmp|webp)$/i) ? (
@@ -1033,7 +1032,7 @@ export const ChatScreen = ({ conversation }: Props) => {
                                   // Expand image inline instead of opening dialog
                                   const img = e.currentTarget;
                                   const container = img.parentElement;
-                                  
+
                                   if (container?.classList.contains('expanded-image')) {
                                     // If already expanded, collapse it
                                     container.classList.remove('expanded-image');
@@ -1044,7 +1043,7 @@ export const ChatScreen = ({ conversation }: Props) => {
                                     container?.classList.add('expanded-image');
                                     img.classList.add('expanded');
                                     container.style.zIndex = '50';
-                                    
+
                                     // Add haptic feedback if available
                                     if ('vibrate' in navigator) {
                                       navigator.vibrate(30);

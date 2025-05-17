@@ -13,18 +13,21 @@
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
   margin-bottom: 0; /* No spacing between consecutive bubbles */
   display: inline-block;
+  padding: 8px 12px;
 }
 
 .message-bubble[data-sender="self"] {
   margin-left: auto;
-  background-color: var(--primary);
-  color: var(--primary-foreground);
+  background-color: #8338EC; /* Purple theme color to match image */
+  color: white;
+  border-radius: 16px 4px 16px 16px;
 }
 
 .message-bubble[data-sender="other"] {
   margin-right: auto;
-  background-color: var(--muted);
-  color: var(--muted-foreground);
+  background-color: #F4F4F8;
+  color: #333;
+  border-radius: 4px 16px 16px 16px;
 }
 
 /* Clear floating elements */
