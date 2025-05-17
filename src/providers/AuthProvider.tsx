@@ -75,6 +75,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               console.log("Creating profile for user:", session.user.id);
               await supabase.from('profiles').insert({
                 id: session.user.id,
+                user_id: session.user.id, // Add user_id field
                 email: session.user.email,
                 created_at: new Date().toISOString(),
                 updated_at: new Date().toISOString(),
@@ -112,6 +113,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                   .from('profiles')
                   .upsert({ 
                     id: currentSession.user.id,
+                    user_id: currentSession.user.id, // Add user_id field
                     email: currentSession.user.email,
                     updated_at: new Date().toISOString(),
                     last_seen: new Date().toISOString(),
