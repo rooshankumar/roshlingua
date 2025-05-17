@@ -36,33 +36,37 @@ const AuthCallback = () => {
           return;
         }
 
-        // Get and validate the PKCE verifier
+        // Get PKCE verifier from storage
         const verifier = getPKCEVerifier();
         console.log("Got verifier:", verifier ? "Yes" : "No", "Length:", verifier?.length);
 
-        if (!verifier || verifier.length < 43) {
-          console.error("Invalid PKCE verifier");
+        if (!verifier) {
+          console.error("No PKCE verifier found");
+          localStorage.removeItem('supabase.auth.token');
+          sessionStorage.removeItem('supabase.auth.token');
           toast({
             variant: "destructive",
             title: "Authentication Error",
-            description: "Security verification failed. Please try again."
+            description: "Security verification failed. Please try signing in again."
           });
           navigate('/auth', { replace: true });
           return;
         }
 
-        // Ensure verifier is properly stored before exchange
-        storePKCEVerifier(verifier);
-
+        // Clean up any existing session data
+        await supabase.auth.signOut();
+        
         // Exchange the code for a session
         const { data, error: sessionError } = await supabase.auth.exchangeCodeForSession(code);
 
         if (sessionError) {
           console.error("Session exchange error:", sessionError);
+          clearPKCEVerifier();
           throw sessionError;
         }
 
         if (!data?.session) {
+          clearPKCEVerifier();
           throw new Error("No session returned");
         }
 
@@ -77,6 +81,11 @@ const AuthCallback = () => {
         navigate('/dashboard', { replace: true });
       } catch (error) {
         console.error("Authentication callback error:", error);
+        // Clear any stale auth data
+        localStorage.removeItem('supabase.auth.token');
+        sessionStorage.removeItem('supabase.auth.token');
+        clearPKCEVerifier();
+        
         toast({
           variant: "destructive",
           title: "Authentication Failed",
