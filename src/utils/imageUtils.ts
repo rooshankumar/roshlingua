@@ -207,19 +207,7 @@ export const handleImageLoadError = (e: React.SyntheticEvent<HTMLImageElement>, 
   }
 };
 
-// Helper function to check if URL might be blocked by client
-export const isLikelyBlockedUrl = (url: string): boolean => {
-  // Common patterns for URLs that might be blocked
-  const patterns = [
-    'googletagmanager.com',
-    'analytics',
-    'tracker',
-    'tracking',
-    'ads'
-  ];
-
-  return patterns.some(pattern => url.toLowerCase().includes(pattern));
-};
+// Note: Using the isLikelyBlockedUrl function defined above
 
 export const compressImage = async (file: File, options = { quality: 0.8, maxWidth: 1200 }): Promise<File> => {
   return new Promise((resolve, reject) => {
