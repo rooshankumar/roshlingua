@@ -316,7 +316,7 @@ const Auth = () => {
               <div className="flex justify-center mb-4">
                 <RoshLinguaLogo size="lg" />
               </div>
-              <CardTitle className="text-2xl text-center">Sign Up</CardTitle>
+              
               <CardDescription className="text-muted-foreground text-center">
                 Start your language learning journey today
               </CardDescription>
