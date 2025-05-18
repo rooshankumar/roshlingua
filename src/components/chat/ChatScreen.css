@@ -436,16 +436,16 @@ img.expanded {
 .chat-content-area {
   flex: 1;
   overflow-y: auto;
-  margin-bottom: 80px;
-  padding: 0.5rem 1rem;
+  margin-bottom: 100px;
+  padding: 1rem;
   -webkit-overflow-scrolling: touch;
   overscroll-behavior: none;
   scroll-behavior: smooth;
   will-change: scroll-position;
   touch-action: pan-y;
   position: relative;
-  height: calc(100vh - 152px);
-  max-height: calc(100vh - 152px);
+  height: calc(100vh - 180px);
+  max-height: calc(100vh - 180px);
   scrollbar-width: thin;
   scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
 }
