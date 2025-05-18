@@ -6,8 +6,6 @@
 }
 
 .message-bubble {
-  position: relative;
-  transition: all 0.2s ease;
   border-radius: 16px;
   max-width: 70%;
   width: auto;
@@ -18,16 +16,15 @@
 }
 
 .message-bubble[data-sender="self"] {
-  background-color: hsl(var(--primary));
-  color: hsl(var(--primary-foreground));
-  border-radius: 16px 16px 4px 16px;
   margin-left: auto;
+  background-color: var(--primary);
+  color: var(--primary-foreground);
 }
 
 .message-bubble[data-sender="other"] {
-  background-color: hsl(var(--muted));
-  border-radius: 16px 16px 16px 4px;
   margin-right: auto;
+  background-color: var(--muted);
+  color: var(--muted-foreground);
 }
 
 /* Clear floating elements */
@@ -123,19 +120,13 @@
 .message-actions-menu {
   position: absolute;
   top: -40px;
-  background-color: hsl(var(--background));
-  border-radius: 20px;
-  padding: 4px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  z-index: 50;
-  transition: all 0.2s ease;
   left: 50%;
-  transform: translateX(-50%) translateY(-100%);
+  transform: translateX(-50%);
+  z-index: 40;
+  transition: opacity 0.2s ease-in-out;
 }
 
 .message-long-press {
-  transform: scale(0.98);
-  opacity: 0.8;
   animation: pulse 0.5s ease-in-out;
 }
 
@@ -183,33 +174,35 @@
 /* Image/media container */
 .attachment-container {
   position: relative;
-  transition: all 0.3s ease;
   display: inline-block;
   max-width: 270px;
   margin: 0 auto;
   border-radius: 0.75rem;
   overflow: hidden;
+  transition: all 0.3s ease;
 }
 
+/* Expanded image container */
 .attachment-container.expanded-image {
   position: fixed;
   top: 0;
   left: 0;
   width: 100vw;
   height: 100vh;
-  background-color: rgba(0, 0, 0, 0.9);
+  max-width: 100vw;
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 100;
+  background-color: rgba(0, 0, 0, 0.85);
   margin: 0;
   padding: 16px;
+  z-index: 100;
   backdrop-filter: blur(8px);
 }
 
 /* Expanded image */
 .attachment-container.expanded-image img {
-  max-width: 90vw;
+  max-width: 95vw;
   max-height: 90vh;
   object-fit: contain;
   border-radius: 8px;
@@ -297,6 +290,27 @@
 }
 
 /* Chat styling */
+.message-bubble {
+  position: relative;
+  padding: 10px 14px;
+  border-radius: 18px;
+  max-width: 75%;
+}
+
+.message-bubble[data-sender="self"] {
+  background-color: hsl(var(--primary));
+  color: hsl(var(--primary-foreground));
+  border-bottom-right-radius: 4px;
+  margin-left: auto;
+}
+
+.message-bubble[data-sender="other"] {
+  background-color: hsl(var(--muted));
+  color: hsl(var(--muted-foreground));
+  border-bottom-left-radius: 4px;
+}
+
+/* Message reactions */
 .message-reactions {
   display: flex;
   flex-wrap: wrap;
@@ -356,6 +370,13 @@
 }
 
 /* Message actions menu positioning */
+.message-actions-menu {
+  position: absolute;
+  top: -50px;
+  transform: translateY(-100%);
+  z-index: 50;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
 
 /* Consecutive Messages */
 .consecutive-group {
@@ -367,13 +388,34 @@
 }
 
 /* Image attachment styling */
+.attachment-container {
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.attachment-container.expanded-image {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  padding: 20px;
+}
+
+.attachment-container.expanded-image img {
+  max-height: 90vh;
+  max-width: 90vw;
+  object-fit: contain;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+}
 
 img.expanded {
   cursor: zoom-out;
   transform: scale(1);
   transition: transform 0.3s ease;
-}
-
-.mobile-safe-bottom {
-  padding-bottom: env(safe-area-inset-bottom, 1rem);
 }
