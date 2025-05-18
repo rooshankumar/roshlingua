@@ -68,7 +68,7 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
     const [nativeLanguageSearch, setNativeLanguageSearch] = useState("");
     const [learningLanguageSearch, setLearningLanguageSearch] = useState("");
     const comboboxRef = useRef<HTMLDivElement>(null);
-    
+
     // Close the dropdown when clicking outside
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
@@ -77,7 +77,7 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
                 setLearningLanguageOpen(false);
             }
         };
-        
+
         document.addEventListener("mousedown", handleClickOutside);
         return () => {
             document.removeEventListener("mousedown", handleClickOutside);
@@ -229,10 +229,10 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
             });
 
             localStorage.setItem("onboarding_completed", "true");
-            
+
             // Call onComplete first, then navigate
             onComplete();
-            
+
             // Navigate after a short delay to ensure state updates
             setTimeout(() => {
                 navigate("/dashboard", { replace: true });
@@ -371,7 +371,7 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
                                             name="date_of_birth"
                                             render={({ field }) => (
                                                 <FormItem>
-                                                    <FormLabel>Date of Birth (Optional</FormLabel>
+                                                    <FormLabel>Date of Birth</FormLabel>
                                                     <FormControl>
                                                         <Input
                                                             type="date"
