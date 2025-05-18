@@ -650,4 +650,3 @@ export const ChatScreen = ({ conversation }: Props) => {
 };
 
 export default ChatScreen;
-```
