@@ -513,11 +513,11 @@ export const ChatScreen = ({ conversation }: Props) => {
             {messages.map((message, index) => (
               <div
                 key={message.id}
-                className={`flex items-start gap-3 ${
+                className={`flex items-start gap-2 mb-4 ${
                   message.sender_id === user?.id ? 'flex-row-reverse' : 'flex-row'
                 }`}
               >
-                <Avatar className="h-8 w-8 flex-shrink-0">
+                <Avatar className="h-8 w-8 flex-shrink-0 mt-1">
                   <AvatarImage src={message.sender?.avatar_url || '/placeholder.svg'} />
                   <AvatarFallback>{message.sender?.full_name?.[0]}</AvatarFallback>
                 </Avatar>
@@ -525,9 +525,15 @@ export const ChatScreen = ({ conversation }: Props) => {
                 <div className={`flex flex-col max-w-[70%] ${
                   message.sender_id === user?.id ? 'items-end' : 'items-start'
                 }`}>
-                  <div className={`rounded-lg p-3 ${
+                  <div className="text-xs text-muted-foreground mb-1">
+                    {message.sender?.full_name || 'Unknown'} • {new Date(message.created_at).toLocaleTimeString([], { 
+                      hour: 'numeric', 
+                      minute: '2-digit' 
+                    })}
+                  </div>
+                  <div className={`rounded-3xl px-4 py-2.5 ${
                     message.sender_id === user?.id
-                      ? 'bg-muted'
+                      ? 'bg-primary text-primary-foreground'
                       : 'bg-muted'
                   }`}>
                     {message.content && (
@@ -537,11 +543,11 @@ export const ChatScreen = ({ conversation }: Props) => {
                     {message.attachment_url && (
                       <div className="mt-2 relative attachment-container">
                         {message.attachment_url.match(/\.(jpg|jpeg|png|gif)$/i) ? (
-                          <div className="relative">
+                          <div className="relative grid grid-cols-2 gap-1">
                             <img
                               src={message.attachment_url}
                               alt={message.attachment_name || "Attachment"}
-                              className="rounded-lg w-full max-w-[260px] md:max-w-[300px] max-h-[350px] object-contain cursor-pointer hover:scale-105 transition-transform duration-200"
+                              className="rounded-xl w-full max-w-[260px] md:max-w-[300px] max-h-[350px] object-cover cursor-pointer hover:scale-105 transition-transform duration-200"
                               onClick={() => {
                                 setImagePreview({
                                   url: message.attachment_url!,
@@ -654,8 +660,8 @@ export const ChatScreen = ({ conversation }: Props) => {
                   handleSend(newMessage);
                 }
               }}
-              placeholder="Type a message..."
-              className="flex-1 min-h-[45px] max-h-[120px] resize-none"
+              placeholder="Send a message..."
+              className="flex-1 min-h-[45px] max-h-[120px] resize-none rounded-full px-4 py-2 bg-muted"
               rows={1}
             />
 
