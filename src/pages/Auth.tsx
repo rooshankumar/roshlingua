@@ -199,9 +199,6 @@ const Auth = () => {
     <div className="flex flex-col items-center justify-center w-full max-w-md mx-auto gap-4">
 
       <Card className="w-full bg-white/60 dark:bg-black/60 backdrop-blur-md border border-white/20 dark:border-white/10 shadow-lg">
-        <div className="flex justify-center pt-6">
-          <RoshLinguaLogo size="lg" />
-        </div>
         <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="login">Login</TabsTrigger>
@@ -211,6 +208,9 @@ const Auth = () => {
         <TabsContent value="login">
           <form onSubmit={handleLogin}>
             <CardHeader className="space-y-2">
+              <div className="flex justify-center mb-4">
+                <RoshLinguaLogo size="lg" />
+              </div>
               <CardTitle className="text-2xl text-center">Welcome Back</CardTitle>
               <CardDescription className="text-muted-foreground text-center">
                 Sign in to continue your language learning journey
@@ -313,6 +313,9 @@ const Auth = () => {
         <TabsContent value="signup">
           <form onSubmit={handleSignup}>
             <CardHeader className="space-y-2">
+              <div className="flex justify-center mb-4">
+                <RoshLinguaLogo size="lg" />
+              </div>
               <CardTitle className="text-2xl text-center">Join RoshLingua</CardTitle>
               <CardDescription className="text-muted-foreground text-center">
                 Start your language learning journey today
