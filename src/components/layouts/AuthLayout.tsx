@@ -29,6 +29,10 @@ const AuthLayout = ({ children }: AuthLayoutProps) => {
 
       {/* Content */}
       <div className="w-full max-w-md relative z-10">
+        <div className="text-center mb-6 text-white">
+          <h1 className="text-3xl font-bold">Welcome back</h1>
+          <p className="text-white/80">Sign in to your account</p>
+        </div>
         <PageTransition>
           {children}
         </PageTransition>
