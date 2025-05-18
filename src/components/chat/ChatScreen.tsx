@@ -210,9 +210,6 @@ export const ChatScreen = ({ conversation }: Props) => {
               .from('messages')
               .select(`
                 *,
-                attachment_url,
-                attachment_name,
-                attachment_thumbnail,
                 sender:profiles!messages_sender_id_fkey(
                   id,
                   user_id,
@@ -285,10 +282,8 @@ export const ChatScreen = ({ conversation }: Props) => {
           is_read: false,
           attachment_url: attachment?.url,
           attachment_name: attachment?.filename,
-          attachment_thumbnail: attachment?.thumbnail,
           created_at: timestamp
-        }])
-        .select('*, sender:profiles!messages_sender_id_fkey(*)');
+        }]);
 
       if (error) throw error;
 
@@ -513,11 +508,11 @@ export const ChatScreen = ({ conversation }: Props) => {
             {messages.map((message, index) => (
               <div
                 key={message.id}
-                className={`flex items-start gap-2 mb-4 ${
+                className={`flex items-start gap-3 ${
                   message.sender_id === user?.id ? 'flex-row-reverse' : 'flex-row'
                 }`}
               >
-                <Avatar className="h-8 w-8 flex-shrink-0 mt-1">
+                <Avatar className="h-8 w-8 flex-shrink-0">
                   <AvatarImage src={message.sender?.avatar_url || '/placeholder.svg'} />
                   <AvatarFallback>{message.sender?.full_name?.[0]}</AvatarFallback>
                 </Avatar>
@@ -525,15 +520,9 @@ export const ChatScreen = ({ conversation }: Props) => {
                 <div className={`flex flex-col max-w-[70%] ${
                   message.sender_id === user?.id ? 'items-end' : 'items-start'
                 }`}>
-                  <div className="text-xs text-muted-foreground mb-1">
-                    {message.sender?.full_name || 'Unknown'} • {new Date(message.created_at).toLocaleTimeString([], { 
-                      hour: 'numeric', 
-                      minute: '2-digit' 
-                    })}
-                  </div>
-                  <div className={`rounded-3xl px-4 py-2.5 ${
-                    message.sender_id === user?.id
-                      ? 'bg-primary text-primary-foreground'
+                  <div className={`rounded-lg p-3 ${
+                    message.sender_id === user?.id 
+                      ? 'bg-primary text-primary-foreground' 
                       : 'bg-muted'
                   }`}>
                     {message.content && (
@@ -541,76 +530,20 @@ export const ChatScreen = ({ conversation }: Props) => {
                     )}
 
                     {message.attachment_url && (
-                      <div className="mt-2 relative attachment-container">
-                        {message.attachment_url.match(/\.(jpg|jpeg|png|gif|webp|avif)$/i) ? (
-                          <div className="relative bg-muted rounded-lg">
-                            <img
-                              src={`${message.attachment_url}?t=${Date.now()}`}
-                              alt={message.attachment_name || "Attachment"}
-                              className="rounded-lg w-full h-auto max-w-[300px] max-h-[300px] object-contain cursor-pointer"
-                              loading="lazy"
-                              crossOrigin="anonymous"
-                              onError={(e) => {
-                                console.error('Image load error for:', message.attachment_url);
-                                handleImageLoadError(e, message.attachment_url);
-                              }}
-                              onClick={() => {
-                                setImagePreview({
-                                  url: message.attachment_url,
-                                  name: message.attachment_name
-                                });
-                                setShowImagePreview(true);
-                              }}
-                            />
-                            <a 
-                              href={message.attachment_url}
-                              download={message.attachment_name || "download"}
-                              className="absolute top-2 right-2 bg-black/60 text-white p-1 rounded-full hover:bg-black/80 transition-colors"
-                              onClick={(e) => e.stopPropagation()}
-                            >
-                              <Download className="h-4 w-4" />
-                            </a>
-                          </div>
-                        ) : message.attachment_url.match(/\.(mp4|webm|ogg)$/i) ? (
-                          <div className="p-2">
-                            <video 
-                              src={message.attachment_url}
-                              controls
-                              autoPlay={false}
-                              preload="metadata"
-                              className="max-w-[260px] md:max-w-[300px] rounded-lg"
-                              controlsList="nodownload"
-                            />
-                          </div>
-                        ) : message.attachment_url.match(/\.(mp3|wav|ogg)$/i) ? (
-                          <div className="p-3">
-                            <p className="text-sm font-medium mb-1">
-                              {message.attachment_name || "Audio file"}
-                            </p>
-                            <audio 
-                              src={message.attachment_url}
-                              controls
-                              preload="metadata"
-                              className="w-full max-w-[260px]"
-                            />
-                          </div>
-                        ) : message.attachment_url.match(/\.pdf$/i) ? (
-                          <div className="p-3">
-                            <p className="text-sm font-medium mb-2">
-                              {message.attachment_name || "PDF document"}
-                            </p>
-                            <iframe
-                              src={message.attachment_url}
-                              className="w-[260px] h-[200px] md:w-[300px] md:h-[250px] rounded-lg border border-border"
-                            />
-                            <a 
-                              href={message.attachment_url}
-                              download
-                              className="text-xs mt-1 underline hover:text-primary transition-colors block text-center"
-                            >
-                              Download PDF
-                            </a>
-                          </div>
+                      <div className="mt-2">
+                        {message.attachment_url.match(/\.(jpg|jpeg|png|gif)$/i) ? (
+                          <img
+                            src={message.attachment_url}
+                            alt="Attachment"
+                            className="rounded-md max-h-48 object-cover cursor-pointer"
+                            onClick={() => {
+                              setImagePreview({
+                                url: message.attachment_url!,
+                                name: message.attachment_name
+                              });
+                              setShowImagePreview(true);
+                            }}
+                          />
                         ) : (
                           <div className="flex items-center gap-2 bg-background/10 rounded p-2">
                             <FileText className="h-4 w-4" />
@@ -665,8 +598,8 @@ export const ChatScreen = ({ conversation }: Props) => {
                   handleSend(newMessage);
                 }
               }}
-              placeholder="Send a message..."
-              className="flex-1 min-h-[45px] max-h-[120px] resize-none rounded-full px-4 py-2 bg-muted"
+              placeholder="Type a message..."
+              className="flex-1 min-h-[45px] max-h-[120px] resize-none"
               rows={1}
             />
 

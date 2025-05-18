@@ -236,21 +236,16 @@
 }
 
 /* Responsive attachments */
-.attachment-container {
-  max-width: 300px;
-  border-radius: 8px;
-  overflow: hidden;
-  display: inline-block;
+@media (max-width: 640px) {
+  .attachment-container {
+    max-width: 220px;
+  }
 }
 
-.attachment-container img {
-  width: 100%;
-  height: auto;
-  max-height: 300px;
-  object-fit: contain;
-  border-radius: 8px;
-  display: block;
-  background: rgba(0, 0, 0, 0.03);
+@media (min-width: 641px) {
+  .attachment-container {
+    max-width: 270px;
+  }
 }
 
 /* Fullscreen image preview */
