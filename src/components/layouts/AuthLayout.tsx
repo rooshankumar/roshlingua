@@ -8,31 +8,26 @@ interface AuthLayoutProps {
   children: ReactNode;
 }
 
-import RoshLinguaLogo from "@/components/RoshLinguaLogo";
-
 const AuthLayout = ({ children }: AuthLayoutProps) => {
   return (
     <div className="min-h-screen relative flex items-center justify-center p-4 overflow-hidden">
-      {/* Logo */}
-      <div className="absolute top-4 left-4 z-20">
-        <RoshLinguaLogo size="lg" darkMode={true} />
-      </div>
-      {/* Brand Background */}
+      {/* Video Background */}
       <div className="absolute inset-0 z-0">
-        <img 
-          src="https://05579550-cab8-4a15-939a-d1ecea38b48a-00-2atevqlq7sjp.sisko.replit.dev/auth"
-          alt="Brand Background"
-          className="absolute inset-0 w-full h-full object-cover opacity-50"
-        />
+        <video 
+          autoPlay 
+          loop={true}
+          muted 
+          playsInline
+          preload="auto"
+          className="absolute inset-0 w-full h-full object-cover"
+        >
+          <source src="/videos/277318_tiny.mp4" type="video/mp4" />
+        </video>
         <div className="absolute inset-0 bg-black/30 backdrop-blur-sm"></div>
       </div>
 
       {/* Content */}
       <div className="w-full max-w-md relative z-10">
-        <div className="text-center mb-6 text-white">
-          <h1 className="text-3xl font-bold">Welcome back</h1>
-          <p className="text-white/80">Sign in to your account</p>
-        </div>
         <PageTransition>
           {children}
         </PageTransition>
