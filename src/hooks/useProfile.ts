@@ -31,7 +31,7 @@ export function useProfile(userId: string) {
             xp_points,
             created_at,
             country,
-            EXTRACT(YEAR FROM age(date_of_birth))::integer as age
+            age
           `)
           .eq('id', userId)
           .single();
