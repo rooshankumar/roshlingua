@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Send, Loader2, FileText, Check, Image, X, Download } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { updateUserPresence } from '@/utils/testAuth';
 import { ChatAttachment } from './ChatAttachment';
 import { Button } from '@/components/ui/button';
