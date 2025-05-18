@@ -11,6 +11,10 @@ interface AuthLayoutProps {
 const AuthLayout = ({ children }: AuthLayoutProps) => {
   return (
     <div className="min-h-screen relative flex items-center justify-center p-4 overflow-hidden">
+      {/* Logo */}
+      <div className="absolute top-4 left-4 z-20">
+        <RoshLinguaLogo size="lg" darkMode={true} />
+      </div>
       {/* Brand Background */}
       <div className="absolute inset-0 z-0">
         <img 
