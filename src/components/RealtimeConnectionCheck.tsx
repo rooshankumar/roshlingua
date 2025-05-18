@@ -258,10 +258,10 @@ export default function RealtimeConnectionCheck() {
             setIsConnected(false);
             setConnectionStatus(status || 'DISCONNECTED');
           }
-        });TED');
+        });
 
-            // Try to reconnect after a delay
-            window.clearTimeout(connectionTimeout);
+        // Try to reconnect after a delay
+        window.clearTimeout(connectionTimeout);
             connectionTimeout = window.setTimeout(() => {
               if (channel) {
                 try {
