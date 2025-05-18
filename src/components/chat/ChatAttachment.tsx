@@ -412,15 +412,6 @@ export const DisplayChatAttachment = ({ url, filename, fileType, fileSize, class
             {fileType.split('/')[1].toUpperCase()} {fileSize && `· ${(fileSize / 1024).toFixed(1)} KB`}
           </p>
         </div>
-        <Button 
-          size="sm" 
-          onClick={handleDownload} 
-          disabled={isDownloading}
-          className="ml-2 shrink-0"
-        >
-          <Download className="h-4 w-4 mr-1" /> 
-          {isDownloading ? 'Downloading...' : 'Download'}
-        </Button>
       </div>
 
       {isImage && (

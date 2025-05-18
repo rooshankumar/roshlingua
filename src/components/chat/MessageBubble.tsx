@@ -117,9 +117,6 @@ export const MessageBubble = ({ message, isCurrentUser, isRead = false, onReacti
                       document.dispatchEvent(clickEvent);
                     }}
                   />
-                  {/* Download button removed */}
-                    {/* Download button removed */}
-                  </a>
                 </>
               )}
             </div>
