@@ -82,26 +82,13 @@ export const ChatScreen = ({ conversation }: Props) => {
       if (maxScroll > 0) {
         chatContainer.style.scrollBehavior = smooth ? 'smooth' : 'auto';
         chatContainer.scrollTop = maxScroll;
-        
-        if (messagesEndRef.current) {
-          messagesEndRef.current.scrollIntoView({
-            behavior: smooth ? 'smooth' : 'auto',
-            block: 'end',
-          });
-        }
       }
     };
 
-    // Immediate scroll
     performScroll();
-
-    // Additional scroll attempts for reliability
-    window.requestAnimationFrame(() => {
-      performScroll();
-      // Handle dynamic content and slow connections
+    // Single delayed scroll for reliability
+    requestAnimationFrame(() => {
       setTimeout(performScroll, 100);
-      setTimeout(performScroll, 300);
-      setTimeout(performScroll, 500);
     });
   };
 
@@ -500,41 +487,21 @@ export const ChatScreen = ({ conversation }: Props) => {
     };
   }, [conversation?.id]);
 
-  // Auto-scroll when messages change or component mounts
+  // Single scroll effect for all message changes
   useEffect(() => {
     if (messages.length > 0) {
-      // Use a sequence of scroll attempts with increasing delays
-      // More aggressive scrolling for new messages
-      [0, 10, 50, 150, 300, 500, 700].forEach(delay => {
-        setTimeout(() => scrollToLatestMessage(delay > 100), delay);
-      });
+      scrollToLatestMessage(!isLoading);
     }
-  }, [messages]);
+  }, [messages, isLoading]);
 
-  // Special effect that runs specifically when new messages are added
+  // Handle new messages
   const messagesCountRef = useRef(messages.length);
   useEffect(() => {
-    // Only scroll if messages increased (new message added)
     if (messages.length > messagesCountRef.current) {
-      // Force immediate and more aggressive scrolling for new messages
-      setTimeout(() => scrollToLatestMessage(false), 0);
-      setTimeout(() => scrollToLatestMessage(false), 50);
-      setTimeout(() => scrollToLatestMessage(false), 100);
-      setTimeout(() => scrollToLatestMessage(true), 200);
+      scrollToLatestMessage(true);
     }
-    // Update the reference count
     messagesCountRef.current = messages.length;
   }, [messages.length]);
-
-  // Always scroll to bottom when chat is first loaded and messages are fetched
-  useEffect(() => {
-    if (!isLoading && messages.length > 0) {
-      // More aggressive scroll attempts to handle initial load
-      [10, 50, 150, 300, 500, 800, 1200].forEach(delay => {
-        setTimeout(() => scrollToLatestMessage(false), delay);
-      });
-    }
-  }, [isLoading, messages.length]);
 
   // Force scroll on window resize events
   useEffect(() => {
