@@ -285,8 +285,10 @@ export const ChatScreen = ({ conversation }: Props) => {
           is_read: false,
           attachment_url: attachment?.url,
           attachment_name: attachment?.filename,
+          attachment_thumbnail: attachment?.thumbnail,
           created_at: timestamp
-        }]);
+        }])
+        .select('*, sender:profiles!messages_sender_id_fkey(*)');
 
       if (error) throw error;
 
