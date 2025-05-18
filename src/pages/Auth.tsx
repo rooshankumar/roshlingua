@@ -9,6 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
+import RoshLinguaLogo from "@/components/RoshLinguaLogo";
 
 const Auth = () => {
   const [activeTab, setActiveTab] = useState<string>("login");
@@ -206,9 +207,12 @@ const Auth = () => {
 
         <TabsContent value="login">
           <form onSubmit={handleLogin}>
-            <CardHeader>
-              <CardTitle className="text-2xl">Welcome to RoshLingua</CardTitle>
-              <CardDescription className="text-muted-foreground">
+            <CardHeader className="space-y-2">
+              <div className="flex justify-center mb-4">
+                <RoshLinguaLogo size="lg" />
+              </div>
+              <CardTitle className="text-2xl text-center">Welcome Back</CardTitle>
+              <CardDescription className="text-muted-foreground text-center">
                 Sign in to continue your language learning journey
               </CardDescription>
             </CardHeader>
