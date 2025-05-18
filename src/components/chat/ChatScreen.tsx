@@ -1154,22 +1154,17 @@ export const ChatScreen = ({ conversation }: Props) => {
                                 alt={message.attachment_name || "Image"}
                                 className="w-full max-h-[270px] object-contain rounded-lg shadow-sm cursor-pointer transition-transform duration-200 hover:scale-[1.02]"
                                 onClick={(e) => {
-                                  // Expand image inline instead of opening dialog
                                   const img = e.currentTarget;
                                   const container = img.parentElement;
 
                                   if (container?.classList.contains('expanded-image')) {
-                                    // If already expanded, collapse it
                                     container.classList.remove('expanded-image');
                                     img.classList.remove('expanded');
                                     container.style.zIndex = '';
                                   } else {
-                                    // Expand the image
                                     container?.classList.add('expanded-image');
                                     img.classList.add('expanded');
                                     container.style.zIndex = '50';
-
-                                    // Add haptic feedback if available
                                     if ('vibrate' in navigator) {
                                       navigator.vibrate(30);
                                     }
@@ -1180,21 +1175,6 @@ export const ChatScreen = ({ conversation }: Props) => {
                                 referrerPolicy="no-referrer"
                                 fetchpriority="high"
                               />
-                              <div 
-                                className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  const messageActions = document.getElementById(`message-actions-${message.id}`);
-                                  if (messageActions) {
-                                    messageActions.classList.toggle('opacity-0');
-                                    messageActions.classList.toggle('pointer-events-none');
-                                    messageActions.classList.toggle('active');
-                                    setActiveReactionMenu(messageActions.classList.contains('active') ? message.id : null);
-                                  }
-                                }}
-                              >
-                                <MessageReactions messageId={message.id} existingReactions={message.reactions || {}} />
-                              </div>
                             </div>
                           ) : message.attachment_url?.match(/\.(mp4|webm|ogg)$/i) ? (
                             <div className="relative group max-w-[270px]">
@@ -1204,105 +1184,13 @@ export const ChatScreen = ({ conversation }: Props) => {
                                 className="w-full rounded-lg max-h-[270px]"
                                 preload="metadata"
                                 playsInline
+                                controlsList="nodownload"
                                 onError={() => {
                                   console.error("Video failed to load:", message.attachment_url);
                                 }}
                               />
                               <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                                 <Video className="h-10 w-10 text-white/80" />
-                              </div>
-                            </div>
-                          ) : message.attachment_url?.match(/\.(mp3|wav|aac)$/i) ? (
-                            <div className="max-w-[270px] bg-muted/20 p-3 rounded-lg">
-                              <div className="flex items-center gap-2 mb-2">
-                                <FileAudio className="h-5 w-5" />
-                                <span className="text-sm font-medium truncate">{message.attachment_name || 'Audio'}</span>
-                              </div>
-                              <audio 
-                                src={message.attachment_url}
-                                controls
-                                className="w-full"
-                                preload="none"
-                                onError={() => {
-                                  console.error("Audio failed to load:", message.attachment_url);
-                                }}
-                              />
-                            </div>
-                          ) : message.attachment_url?.match(/\.(pdf)$/i) ? (
-                            <div className="max-w-[270px] bg-muted/20 p-3 rounded-lg">
-                              <div className="flex items-center gap-2 mb-2">
-                                <FileText className="h-5 w-5" />
-                                <span className="text-sm font-medium truncate">{message.attachment_name || 'PDF Document'}</span>
-                              </div>
-                              <div className="relative w-full h-64 rounded-lg overflow-hidden mb-2">
-                                <iframe 
-                                  src={`${message.attachment_url}#toolbar=0&navpanes=0`} 
-                                  className="w-full h-full border-0" 
-                                  title={message.attachment_name || "PDF Preview"}
-                                />
-                                <div className="absolute inset-0 bg-transparent" 
-                                  onClick={() => window.open(message.attachment_url, '_blank')}></div>
-                              </div>
-                              <div className="flex gap-2">
-                                <Button
-                                  size="sm"
-                                  variant="outline"
-                                  className="flex-1"
-                                  onClick={() => window.open(message.attachment_url, '_blank')}
-                                >
-                                  <FileText className="h-4 w-4 mr-2" /> 
-                                  View
-                                </Button>
-                                <Button
-                                  size="sm"
-                                  variant="outline"
-                                  className="flex-1"
-                                  onClick={() => {
-                                    const a = document.createElement('a');
-                                    a.href = message.attachment_url || '';
-                                    a.download = message.attachment_name || 'document.pdf';
-                                    document.body.appendChild(a);
-                                    a.click();
-                                    document.body.removeChild(a);
-                                  }}
-                                >
-                                  <Download className="h-4 w-4 mr-2" /> 
-                                  Download
-                                </Button>
-                              </div>
-                            </div>
-                          ) : message.attachment_url ? (
-                            <div className="max-w-[270px] bg-muted/20 p-3 rounded-lg flex flex-col">
-                              <div className="flex items-center gap-2 mb-2">
-                                <FileText className="h-5 w-5" />
-                                <span className="text-sm font-medium truncate">{message.attachment_name || 'File'}</span>
-                              </div>
-                              <div className="flex gap-2">
-                                <Button
-                                  size="sm"
-                                  variant="outline"
-                                  className="flex-1"
-                                  onClick={() => {
-                                    const a = document.createElement('a');
-                                    a.href = message.attachment_url || '';
-                                    a.download = message.attachment_name || 'file';
-                                    document.body.appendChild(a);
-                                    a.click();
-                                    document.body.removeChild(a);
-                                  }}
-                                >
-                                  <Download className="h-4 w-4 mr-2" /> 
-                                  Download
-                                </Button>
-                                <Button
-                                  size="sm"
-                                  variant="outline"
-                                  className="flex-1"
-                                  onClick={() => window.open(message.attachment_url, '_blank')}
-                                >
-                                  <FileText className="h-4 w-4 mr-2" /> 
-                                  View
-                                </Button>
                               </div>
                             </div>
                           ) : null}
