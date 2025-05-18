@@ -210,6 +210,9 @@ export const ChatScreen = ({ conversation }: Props) => {
               .from('messages')
               .select(`
                 *,
+                attachment_url,
+                attachment_name,
+                attachment_thumbnail,
                 sender:profiles!messages_sender_id_fkey(
                   id,
                   user_id,
