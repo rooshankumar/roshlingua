@@ -535,20 +535,30 @@ export const ChatScreen = ({ conversation }: Props) => {
                     )}
 
                     {message.attachment_url && (
-                      <div className="mt-2">
+                      <div className="mt-2 relative">
                         {message.attachment_url.match(/\.(jpg|jpeg|png|gif)$/i) ? (
-                          <img
-                            src={message.attachment_url}
-                            alt="Attachment"
-                            className="rounded-md max-h-48 object-cover cursor-pointer"
-                            onClick={() => {
-                              setImagePreview({
-                                url: message.attachment_url!,
-                                name: message.attachment_name
-                              });
-                              setShowImagePreview(true);
-                            }}
-                          />
+                          <div className="relative">
+                            <img
+                              src={message.attachment_url}
+                              alt={message.attachment_name || "Attachment"}
+                              className="rounded-lg max-w-[260px] md:max-w-[300px] max-h-[350px] object-contain cursor-pointer hover:scale-105 transition-transform duration-200"
+                              onClick={() => {
+                                setImagePreview({
+                                  url: message.attachment_url!,
+                                  name: message.attachment_name
+                                });
+                                setShowImagePreview(true);
+                              }}
+                            />
+                            <a 
+                              href={message.attachment_url}
+                              download={message.attachment_name || "download"}
+                              className="absolute top-2 right-2 bg-black/60 text-white p-1 rounded-full hover:bg-black/80 transition-colors"
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              <Download className="h-4 w-4" />
+                            </a>
+                          </div>
                         ) : (
                           <div className="flex items-center gap-2 bg-background/10 rounded p-2">
                             <FileText className="h-4 w-4" />
