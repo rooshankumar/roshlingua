@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/lib/supabase';
-import { getPKCEVerifier, clearPKCEVerifier, storePKCEVerifier } from '@/utils/pkceHelper';
+import { getPKCEVerifier, clearPKCEVerifier } from '@/utils/pkceHelper';
 
 const AuthCallback = () => {
   const navigate = useNavigate();
@@ -36,37 +36,26 @@ const AuthCallback = () => {
           return;
         }
 
-        // Get PKCE verifier from storage
-        const verifier = getPKCEVerifier();
-        console.log("Got verifier:", verifier ? "Yes" : "No", "Length:", verifier?.length);
+        // Clean up any existing auth state
+        await supabase.auth.signOut();
 
+        // Get PKCE verifier
+        const verifier = getPKCEVerifier();
         if (!verifier) {
-          console.error("No PKCE verifier found");
-          localStorage.removeItem('supabase.auth.token');
-          sessionStorage.removeItem('supabase.auth.token');
-          toast({
-            variant: "destructive",
-            title: "Authentication Error",
-            description: "Security verification failed. Please try signing in again."
-          });
-          navigate('/auth', { replace: true });
-          return;
+          throw new Error("No PKCE verifier found");
         }
 
-        // Clean up any existing session data
-        await supabase.auth.signOut();
-        
-        // Exchange the code for a session
+        // Explicitly set verifier before exchange
+        localStorage.setItem('supabase.auth.code_verifier', verifier);
+
+        // Exchange the code for a session with the verifier
         const { data, error: sessionError } = await supabase.auth.exchangeCodeForSession(code);
 
         if (sessionError) {
-          console.error("Session exchange error:", sessionError);
-          clearPKCEVerifier();
           throw sessionError;
         }
 
         if (!data?.session) {
-          clearPKCEVerifier();
           throw new Error("No session returned");
         }
 
@@ -81,6 +70,7 @@ const AuthCallback = () => {
         navigate('/dashboard', { replace: true });
       } catch (error) {
         console.error("Authentication callback error:", error);
+        
         // Clear any stale auth data
         localStorage.removeItem('supabase.auth.token');
         sessionStorage.removeItem('supabase.auth.token');
@@ -100,15 +90,19 @@ const AuthCallback = () => {
     handleCallback();
   }, [navigate, toast]);
 
-  return (
-    <div className="h-screen w-full flex items-center justify-center">
-      <div className="animate-pulse flex flex-col items-center gap-4">
-        <div className="h-12 w-12 rounded-full bg-primary/20"></div>
-        <div className="h-2 w-24 rounded-full bg-primary/20"></div>
-        <p className="text-muted-foreground">Completing authentication...</p>
+  if (isLoading) {
+    return (
+      <div className="h-screen w-full flex items-center justify-center">
+        <div className="animate-pulse flex flex-col items-center gap-4">
+          <div className="h-12 w-12 rounded-full bg-primary/20"></div>
+          <div className="h-2 w-24 rounded-full bg-primary/20"></div>
+          <p className="text-muted-foreground">Completing authentication...</p>
+        </div>
       </div>
-    </div>
-  );
+    );
+  }
+
+  return null;
 };
 
 export default AuthCallback;
