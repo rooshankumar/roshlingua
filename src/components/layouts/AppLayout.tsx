@@ -56,45 +56,38 @@ const AppLayout = ({ children }: AppLayoutProps) => {
   const { user, refreshSubscriptions } = useAuth();
 
 
-  // Monitor connection status app-wide with exponential backoff
+  // Enhanced connection monitoring with auto-recovery
   useEffect(() => {
     const connectionKey = "app_connection_monitor";
     let retryCount = 0;
-    let retryTimeout: NodeJS.Timeout;
+    let reconnectTimer: NodeJS.Timeout;
 
-    const connectWithBackoff = () => {
-      const backoffTime = Math.min(1000 * Math.pow(2, retryCount), 30000); // Max 30 second delay
-
-      const channel = subscriptionManager.subscribe(connectionKey, () =>
-        supabase.channel("global")
-          .on("system", { event: "disconnect" }, (payload) => {
-            console.log("Supabase disconnected, attempting reconnect...");
-            retryCount++;
-            
-            clearTimeout(retryTimeout);
-            retryTimeout = setTimeout(() => {
-              subscriptionManager.unsubscribe(connectionKey);
-              connectWithBackoff();
-            }, backoffTime);
-          })
-          .on("system", { event: "connected" }, () => {
-            console.log("Realtime connection established");
-            retryCount = 0; // Reset retry count on successful connection
-          })
-          .subscribe((status) => {
-            if (status === "SUBSCRIBED") {
-              console.log("Channel subscription active");
-            }
-          })
-      );
-
-      return channel;
-    };
-
-    const channel = connectWithBackoff();
+    const channel = subscriptionManager.subscribe(connectionKey, () =>
+      supabase.channel("global", {
+        config: {
+          broadcast: { self: true },
+          retryAfterTimeout: true,
+          timeout: 30000
+        }
+      })
+      .on("system", { event: "disconnect" }, () => {
+        if (reconnectTimer) clearTimeout(reconnectTimer);
+        
+        reconnectTimer = setTimeout(() => {
+          supabase.realtime.reconnect();
+        }, Math.min(1000 * (retryCount + 1), 5000));
+        
+        retryCount++;
+      })
+      .on("system", { event: "connected" }, () => {
+        retryCount = 0;
+        if (reconnectTimer) clearTimeout(reconnectTimer);
+      })
+      .subscribe()
+    );
 
     return () => {
-      clearTimeout(retryTimeout);
+      if (reconnectTimer) clearTimeout(reconnectTimer);
       subscriptionManager.unsubscribe(connectionKey);
     };
   }, []);

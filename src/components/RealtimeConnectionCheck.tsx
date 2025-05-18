@@ -229,30 +229,36 @@ export default function RealtimeConnectionCheck() {
           }
         }
 
-        // Create a test channel to check connection status
-        const channel = supabase.channel('connection-check', {
-          config: { 
-            broadcast: { self: true },
-            presence: { key: 'online' }
-          }
-        });
-        
-        connectionCheckRef.current = channel;
-        
-        channel.subscribe((status) => {
+        // Create a persistent test channel with auto-reconnect
+      const channel = supabase.channel('connection-check', {
+        config: { 
+          broadcast: { self: true },
+          presence: { key: 'online' },
+          retryAfterTimeout: true,
+          timeout: 30000
+        }
+      });
+      
+      connectionCheckRef.current = channel;
+      
+      channel
+        .on('system', { event: '*' }, () => {
+          supabase.realtime.reconnect();
+        })
+        .subscribe((status) => {
           if (status === 'SUBSCRIBED') {
-            console.log('Realtime connection is healthy');
             setIsConnected(true);
             setConnectionStatus('CONNECTED');
             
-            // Refresh all subscriptions after a successful connection
+            // Only refresh if we were previously disconnected
             if (!isConnected) {
               subscriptionManager.refreshAll();
             }
           } else {
-            console.log('Realtime connection issue:', status);
             setIsConnected(false);
             setConnectionStatus(status || 'DISCONNECTED');
+          }
+        });TED');
 
             // Try to reconnect after a delay
             window.clearTimeout(connectionTimeout);
