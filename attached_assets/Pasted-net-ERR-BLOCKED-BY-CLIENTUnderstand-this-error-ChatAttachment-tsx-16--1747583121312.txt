@@ -1,0 +1,162 @@
+net::ERR_BLOCKED_BY_CLIENTUnderstand this error
+ChatAttachment.tsx:16 
+            
+            
+           GET https://48551c95-2b51-4099-9238-82e5f8f752dd-00-v9ob5ry5j1ht.sisko.replit.dev/src/utils/imageUtils.ts?t=1747583079359 net::ERR_ABORTED 500 (Internal Server Error)Understand this error
+3chunk-ZMLY2J2T.js?v=776b7e89:903 Uncaught TypeError: Failed to fetch dynamically imported module: https://48551c95-2b51-4099-9238-82e5f8f752dd-00-v9ob5ry5j1ht.sisko.replit.dev/src/pages/Chat.tsx?t=1747583079360Understand this error
+chunk-276SZO74.js?v=776b7e89:14032 The above error occurred in one of your React components:
+
+    at Lazy
+    at Suspense
+    at div
+    at MotionComponent (https://48551c95-2b51-4099-9238-82e5f8f752dd-00-v9ob5ry5j1ht.sisko.replit.dev/node_modules/.vite/deps/framer-motion.js?v=776b7e89:4619:40)
+    at PageTransition (https://48551c95-2b51-4099-9238-82e5f8f752dd-00-v9ob5ry5j1ht.sisko.replit.dev/src/components/PageTransition.tsx:12:27)
+    at main
+    at div
+    at AppLayout (https://48551c95-2b51-4099-9238-82e5f8f752dd-00-v9ob5ry5j1ht.sisko.replit.dev/src/components/layouts/AppLayout.tsx:85:22)
+    at ProtectedRoute (https://48551c95-2b51-4099-9238-82e5f8f752dd-00-v9ob5ry5j1ht.sisko.replit.dev/src/components/auth/ProtectedRoute.tsx:15:27)
+    at RenderedRoute (https://48551c95-2b51-4099-9238-82e5f8f752dd-00-v9ob5ry5j1ht.sisko.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=776b7e89:4069:5)
+    at Routes (https://48551c95-2b51-4099-9238-82e5f8f752dd-00-v9ob5ry5j1ht.sisko.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=776b7e89:4508:5)
+    at PresenceChild (https://48551c95-2b51-4099-9238-82e5f8f752dd-00-v9ob5ry5j1ht.sisko.replit.dev/node_modules/.vite/deps/framer-motion.js?v=776b7e89:137:24)
+    at AnimatePresence (https://48551c95-2b51-4099-9238-82e5f8f752dd-00-v9ob5ry5j1ht.sisko.replit.dev/node_modules/.vite/deps/framer-motion.js?v=776b7e89:216:26)
+    at AppRoutes (https://48551c95-2b51-4099-9238-82e5f8f752dd-00-v9ob5ry5j1ht.sisko.replit.dev/src/App.tsx?t=1747583079360:64:33)
+    at AuthProvider (https://48551c95-2b51-4099-9238-82e5f8f752dd-00-v9ob5ry5j1ht.sisko.replit.dev/src/providers/AuthProvider.tsx:24:32)
+    at Router (https://48551c95-2b51-4099-9238-82e5f8f752dd-00-v9ob5ry5j1ht.sisko.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=776b7e89:4451:15)
+    at BrowserRouter (https://48551c95-2b51-4099-9238-82e5f8f752dd-00-v9ob5ry5j1ht.sisko.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=776b7e89:5196:5)
+    at ThemeProvider (https://48551c95-2b51-4099-9238-82e5f8f752dd-00-v9ob5ry5j1ht.sisko.replit.dev/src/components/theme-provider.tsx:17:33)
+    at QueryClientProvider (https://48551c95-2b51-4099-9238-82e5f8f752dd-00-v9ob5ry5j1ht.sisko.replit.dev/node_modules/.vite/deps/@tanstack_react-query.js?v=776b7e89:2794:3)
+    at App (https://48551c95-2b51-4099-9238-82e5f8f752dd-00-v9ob5ry5j1ht.sisko.replit.dev/src/App.tsx?t=1747583079360:707:45)
+
+Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://reactjs.org/link/error-boundaries to learn more about error boundaries.
+logCapturedError @ chunk-276SZO74.js?v=776b7e89:14032
+update.callback @ chunk-276SZO74.js?v=776b7e89:14052
+callCallback @ chunk-276SZO74.js?v=776b7e89:11248
+commitUpdateQueue @ chunk-276SZO74.js?v=776b7e89:11265
+commitLayoutEffectOnFiber @ chunk-276SZO74.js?v=776b7e89:17093
+commitLayoutMountEffects_complete @ chunk-276SZO74.js?v=776b7e89:17980
+commitLayoutEffects_begin @ chunk-276SZO74.js?v=776b7e89:17969
+commitLayoutEffects @ chunk-276SZO74.js?v=776b7e89:17920
+commitRootImpl @ chunk-276SZO74.js?v=776b7e89:19353
+commitRoot @ chunk-276SZO74.js?v=776b7e89:19277
+finishConcurrentRender @ chunk-276SZO74.js?v=776b7e89:18760
+performConcurrentWorkOnRoot @ chunk-276SZO74.js?v=776b7e89:18718
+workLoop @ chunk-276SZO74.js?v=776b7e89:197
+flushWork @ chunk-276SZO74.js?v=776b7e89:176
+performWorkUntilDeadline @ chunk-276SZO74.js?v=776b7e89:384Understand this error
+chunk-276SZO74.js?v=776b7e89:19413 Uncaught TypeError: Failed to fetch dynamically imported module: https://48551c95-2b51-4099-9238-82e5f8f752dd-00-v9ob5ry5j1ht.sisko.replit.dev/src/pages/Chat.tsx?t=1747583079360Understand this error
+client:698 [vite] Internal Server Error
+  × the name `isLikelyBlockedUrl` is defined multiple times
+     ╭─[/home/runner/workspace/src/utils/imageUtils.ts:115:1]
+ 112 │ /**
+ 113 │  * Checks if a URL is likely being blocked by browser extensions or client settings
+ 114 │  */
+ 115 │ export function isLikelyBlockedUrl(url: string): boolean {
+     ·                 ─────────┬────────
+     ·                          ╰── previous definition of `isLikelyBlockedUrl` here
+ 116 │   // Keyword based approach (common ad/tracking domains)
+ 117 │   const blockedDomainKeywords = [
+ 118 │     'googletagmanager',
+ 119 │     'analytics',
+ 120 │     'adservice',
+ 121 │     'googleads',
+ 122 │     'doubleclick',
+ 123 │     'googlesyndication',
+ 124 │     'adsystem',
+ 125 │     'adnxs',
+ 126 │   ];
+ 127 │ 
+ 128 │   return blockedDomainKeywords.some(keyword => url.includes(keyword));
+ 129 │ }
+ 130 │ 
+ 131 │ export const preloadImage = (url: string): Promise<string> => {
+ 132 │   return new Promise((resolve, reject) => {
+ 133 │     if (!url) {
+ 134 │       reject(new Error('No URL provided'));
+ 135 │       return;
+ 136 │     }
+ 137 │ 
+ 138 │     const img = new Image();
+ 139 │     img.onload = () => resolve(url);
+ 140 │     img.onerror = () => reject(new Error(`Failed to load image: ${url}`));
+ 141 │     img.src = url;
+ 142 │   });
+ 143 │ };
+ 144 │ 
+ 145 │ export const handleImageLoadError = (e: React.SyntheticEvent<HTMLImageElement>, imageUrl?: string, fallbackText = 'Image unavailable') => {
+ 146 │   const img = e.currentTarget;
+ 147 │   const parentElement = img.parentElement;
+ 148 │ 
+ 149 │   // Log the error with more details
+ 150 │   console.error('Image load error details:', {
+ 151 │     src: img.src,
+ 152 │     originalUrl: imageUrl,
+ 153 │     element: img,
+ 154 │     error: e
+ 155 │   });
+ 156 │ 
+ 157 │   // Attempt various fixes in sequence
+ 158 │   if (img.src.includes('?')) {
+ 159 │     // Try loading without query parameters first
+ 160 │     const cleanSrc = img.src.split('?')[0];
+ 161 │     console.log('Retrying image load with clean URL:', cleanSrc);
+ 162 │ 
+ 163 │     // Only retry once to avoid infinite loop
+ 164 │     if (!img.dataset.retried) {
+ 165 │       img.dataset.retried = 'true';
+ 166 │       img.src = cleanSrc;
+ 167 │       return; // Don't show fallback yet, trying clean URL first
+ 168 │     }
+ 169 │   }
+ 170 │ 
+ 171 │   // If URL contains supabase.co and we've already tried clean URL
+ 172 │   if ((img.src.includes('supabase.co') || (imageUrl && imageUrl.includes('supabase.co'))) && img.dataset.retried === 'true') {
+ 173 │     // Try adding cache control and random param
+ 174 │     const timestamp = Date.now();
+ 175 │     const cacheBusterUrl = `${img.src.split('?')[0]}?t=${timestamp}&cache=no-store`;
+ 176 │     console.log('Retrying with cache buster:', cacheBusterUrl);
+ 177 │ 
+ 178 │     if (!img.dataset.retriedCache) {
+ 179 │       img.dataset.retriedCache = 'true';
+ 180 │       img.src = cacheBusterUrl;
+ 181 │       return; // Try with cache buster
+ 182 │     }
+ 183 │   }
+ 184 │ 
+ 185 │   // If we get here, the image failed even after retries
+ 186 │   console.error('Image failed after all retries:', img.src);
+ 187 │ 
+ 188 │   // Hide the broken image
+ 189 │   img.style.display = 'none';
+ 190 │ 
+ 191 │   // Add a placeholder div if not already present
+ 192 │   if (!parentElement?.querySelector('.image-error-fallback')) {
+ 193 │     const fallback = document.createElement('div');
+ 194 │     fallback.className = 'image-error-fallback p-4 rounded bg-muted/20 text-center text-sm flex items-center justify-center';
+ 195 │     fallback.style.minHeight = '100px';
+ 196 │     fallback.style.maxWidth = '100%';
+ 197 │     fallback.innerHTML = `
+ 198 │       <div>
+ 199 │         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mx-auto mb-2 opacity-70">
+ 200 │           <circle cx="12" cy="12" r="10"></circle>
+ 201 │           <line x1="8" y1="12" x2="16" y2="12"></line>
+ 202 │         </svg>
+ 203 │         <span>${fallbackText}</span>
+ 204 │       </div>
+ 205 │     `;
+ 206 │     parentElement?.appendChild(fallback);
+ 207 │   }
+ 208 │ };
+ 209 │ 
+ 210 │ // Helper function to check if URL might be blocked by client
+ 211 │ export const isLikelyBlockedUrl = (url: string): boolean => {
+     ·              ─────────┬────────
+     ·                       ╰── `isLikelyBlockedUrl` redefined here
+ 212 │   // Common patterns for URLs that might be blocked
+ 213 │   const patterns = [
+ 214 │     'googletagmanager.com',
+     ╰────
+
+
+handleMessage @ client:698
+(anonymous) @ client:546Understand this error
