@@ -275,12 +275,6 @@ export const ChatAttachment = ({ onAttach }: ChatAttachmentProps) => {
                 >
                   Cancel
                 </Button>
-                <Button 
-                  size="sm" 
-                  onClick={() => document.getElementById('fileUpload')?.click()}
-                >
-                  Change
-                </Button>
               </div>
             )}
           </div>
@@ -373,11 +367,11 @@ export const DisplayChatAttachment = ({ url, filename, fileType, fileSize, class
           'Expires': '0'
         }
       });
-      
+
       if (!response.ok) {
         throw new Error(`Failed to load: ${response.status} ${response.statusText}`);
       }
-      
+
       const blob = await response.blob();
       const newObjectUrl = URL.createObjectURL(blob);
       setObjectUrl(newObjectUrl);

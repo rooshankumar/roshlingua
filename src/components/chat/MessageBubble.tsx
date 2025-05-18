@@ -118,7 +118,7 @@ export const MessageBubble = ({ message, isCurrentUser, isRead = false, onReacti
                     }}
                   />
                   {/* Download button removed */}
-                    <Download className="h-4 w-4" />
+                    {/* Download button removed */}
                   </a>
                 </>
               )}

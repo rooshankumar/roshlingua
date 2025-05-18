@@ -112,7 +112,33 @@ export const base64ToBlob = (base64: string): string => {
 /**
  * Checks if a URL is likely being blocked by browser extensions or client settings
  */
-// First implementation removed to fix duplication error
+export function isLikelyBlockedUrl(url: string): boolean {
+  // Keyword based approach (common ad/tracking domains)
+  const blockedDomainKeywords = [
+    'googletagmanager',
+    'analytics',
+    'adservice',
+    'googleads',
+    'doubleclick',
+    'googlesyndication',
+    'adsystem',
+    'adnxs',
+  ];
+
+  // Also check for common patterns
+  const blockedPatterns = [
+    'googletagmanager.com',
+    'analytics',
+    'ads',
+    'tracking',
+    'pixel',
+    'stat',
+    'beacon'
+  ];
+
+  return blockedDomainKeywords.some(keyword => url.includes(keyword)) || 
+         blockedPatterns.some(pattern => url.includes(pattern));
+}
 
 export const preloadImage = (url: string): Promise<string> => {
   return new Promise((resolve, reject) => {
@@ -193,7 +219,58 @@ export const handleImageLoadError = (e: React.SyntheticEvent<HTMLImageElement>, 
   }
 };
 
-// Note: Using the isLikelyBlockedUrl function defined above
+// generateImageThumbnail function - creates thumbnail for image uploads
+export const generateImageThumbnail = async (file: File): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    try {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          // Create a small thumbnail
+          const canvas = document.createElement('canvas');
+          const MAX_WIDTH = 100;
+          const MAX_HEIGHT = 100;
+          let width = img.width;
+          let height = img.height;
+
+          if (width > height) {
+            if (width > MAX_WIDTH) {
+              height *= MAX_WIDTH / width;
+              width = MAX_WIDTH;
+            }
+          } else {
+            if (height > MAX_HEIGHT) {
+              width *= MAX_HEIGHT / height;
+              height = MAX_HEIGHT;
+            }
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx?.drawImage(img, 0, 0, width, height);
+
+          // Convert to data URL
+          const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
+          resolve(dataUrl);
+        };
+        img.onerror = () => reject(new Error("Failed to create thumbnail"));
+        img.src = e.target?.result as string;
+      };
+      reader.onerror = () => reject(new Error("Failed to read file"));
+      reader.readAsDataURL(file);
+    } catch (err) {
+      reject(err);
+    }
+  });
+};
+
+// Helper function to sanitize URLs that might be blocked
+export const sanitizeUrl = (url: string): string => {
+  // Handle potential tracking or blocked URLs
+  return url;
+};
 
 export const compressImage = async (file: File, options = { quality: 0.8, maxWidth: 1200 }): Promise<File> => {
   return new Promise((resolve, reject) => {

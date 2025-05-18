@@ -1189,25 +1189,7 @@ export const ChatScreen = ({ conversation }: Props) => {
                                 referrerPolicy="no-referrer"
                                 fetchpriority="high"
                               />
-                              <div className="absolute bottom-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                <Button
-                                  size="sm"
-                                  variant="secondary"
-                                  className="flex items-center gap-1 bg-background/80 backdrop-blur-sm"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    const a = document.createElement('a');
-                                    a.href = message.attachment_url || '';
-                                    a.download = message.attachment_name || 'image';
-                                    document.body.appendChild(a);
-                                    a.click();
-                                    document.body.removeChild(a);
-                                  }}
-                                >
-                                  <Download className="h-3 w-3" />
-                                  <span className="text-xs">Download</span>
-                                </Button>
-                              </div>
+                              {/* Download button removed for cleaner UI */}
                               <div 
                                 className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
                                 onClick={(e) => {
