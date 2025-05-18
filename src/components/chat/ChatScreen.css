@@ -440,15 +440,30 @@ img.expanded {
   margin-bottom: 80px;
   padding: 0.5rem 1rem;
   -webkit-overflow-scrolling: touch;
-  overscroll-behavior-y: contain;
+  overscroll-behavior: none;
   scroll-behavior: smooth;
   will-change: scroll-position;
-  touch-action: manipulation;
+  touch-action: pan-y;
+  position: relative;
+  height: calc(100vh - 152px);
+  max-height: calc(100vh - 152px);
   scrollbar-width: thin;
   scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
-  -webkit-tap-highlight-color: transparent;
-  -webkit-momentum-scrolling: touch;
 }
+
+/* Prevent elastic scroll on iOS */
+.chat-content-area::before,
+.chat-content-area::after {
+  content: '';
+  height: 1px;
+  position: absolute;
+  left: 0;
+  right: 0;
+  z-index: -1;
+}
+
+.chat-content-area::before { top: -1px; }
+.chat-content-area::after { bottom: -1px; }
 
 /* Optimize mobile scrolling */
 @media (max-width: 768px) {
