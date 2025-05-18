@@ -150,10 +150,21 @@ export const ChatScreen = ({ conversation }: Props) => {
   useEffect(() => {
     if (!conversation?.id) return;
 
-    let isActive = true;
     let channelRef = null;
+    let isActive = true;
+    let reconnectTimeout: NodeJS.Timeout | null = null;
+    let retryCount = 0;
+    const MAX_RETRIES = 5;
+    const RETRY_DELAY = 2000;
     const subscriptionKey = `messages:${conversation.id}`;
     const PAGE_SIZE = 25;
+
+    const clearReconnectTimeout = () => {
+      if (reconnectTimeout) {
+        clearTimeout(reconnectTimeout);
+        reconnectTimeout = null;
+      }
+    };
 
     // Show loading state only for initial load
     const isInitialLoad = messages.length === 0;
@@ -363,8 +374,21 @@ export const ChatScreen = ({ conversation }: Props) => {
             console.warn('Chat subscription issue:', status);
             // If connection lost, retry fetching messages after a short delay
             if (isActive) {
-              // Don't try to resubscribe here - instead just fetch messages if needed
-              setTimeout(() => fetchMessages(), 3000);
+               // Clear any existing reconnect timeout
+              clearReconnectTimeout();
+
+              // Check if max retries have been exceeded
+              if (retryCount >= MAX_RETRIES) {
+                console.error('Max retries exceeded. Stopping reconnection attempts.');
+                return;
+              }
+              retryCount++;
+
+              // Schedule a reconnection attempt
+              reconnectTimeout = setTimeout(() => {
+                console.log(`Attempting to reconnect (attempt ${retryCount}/${MAX_RETRIES})...`);
+                setupRealtimeSubscription(); // Re-establish the subscription
+              }, RETRY_DELAY);
             }
           }
         });
@@ -384,6 +408,10 @@ export const ChatScreen = ({ conversation }: Props) => {
     return () => {
       console.log(`Cleaning up chat subscription for conversation ${conversation?.id}`);
       isActive = false;
+
+      // Clear the reconnect timeout to prevent further attempts
+      clearReconnectTimeout();
+      retryCount = 0; // Reset retry count
 
       // Set user as offline when leaving the chat
       if (user?.id) {
