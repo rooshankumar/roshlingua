@@ -1,0 +1,58 @@
+ailed to load resource: net::ERR_BLOCKED_BY_CLIENTUnderstand this error
+wqojeesjtgfcftpnzaet.supabase.co/rest/v1/conversation_participants?select=user%3Aprofiles%21conversation_participants_user_id_fkey%28id%2Cuser_id%2Cfull_name%2Cavatar_url%2Clast_seen%29&conversation_id=eq.f74683b7-55ef-41c5-92c8-c827d0e30fd4&user_id=neq.ed1c374e-3823-4ea2-aa28-3999c21d1140:1 
+            
+            
+           Failed to load resource: the server responded with a status of 406 ()Understand this error
+wqojeesjtgfcftpnzaet.supabase.co/rest/v1/messages?select=content%2Ccreated_at&conversation_id=eq.f74683b7-55ef-41c5-92c8-c827d0e30fd4&order=created_at.desc&limit=1:1 
+            
+            
+           Failed to load resource: the server responded with a status of 406 ()Understand this error
+ChatScreen.tsx:1 
+            
+            
+           Failed to load resource: the server responded with a status of 500 (Internal Server Error)Understand this error
+2chunk-ZMLY2J2T.js?v=c557d6db:903 Uncaught TypeError: Failed to fetch dynamically imported module: https://48551c95-2b51-4099-9238-82e5f8f752dd-00-v9ob5ry5j1ht.sisko.replit.dev/src/pages/Chat.tsxUnderstand this error
+chunk-276SZO74.js?v=c557d6db:14032 The above error occurred in the <Offscreen> component:
+
+    at Suspense
+    at div
+    at MotionComponent (https://48551c95-2b51-4099-9238-82e5f8f752dd-00-v9ob5ry5j1ht.sisko.replit.dev/node_modules/.vite/deps/framer-motion.js?v=c557d6db:4619:40)
+    at PageTransition (https://48551c95-2b51-4099-9238-82e5f8f752dd-00-v9ob5ry5j1ht.sisko.replit.dev/src/components/PageTransition.tsx:12:27)
+    at main
+    at div
+    at AppLayout (https://48551c95-2b51-4099-9238-82e5f8f752dd-00-v9ob5ry5j1ht.sisko.replit.dev/src/components/layouts/AppLayout.tsx:85:22)
+    at ProtectedRoute (https://48551c95-2b51-4099-9238-82e5f8f752dd-00-v9ob5ry5j1ht.sisko.replit.dev/src/components/auth/ProtectedRoute.tsx:15:27)
+    at RenderedRoute (https://48551c95-2b51-4099-9238-82e5f8f752dd-00-v9ob5ry5j1ht.sisko.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=c557d6db:4069:5)
+    at Routes (https://48551c95-2b51-4099-9238-82e5f8f752dd-00-v9ob5ry5j1ht.sisko.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=c557d6db:4508:5)
+    at PresenceChild (https://48551c95-2b51-4099-9238-82e5f8f752dd-00-v9ob5ry5j1ht.sisko.replit.dev/node_modules/.vite/deps/framer-motion.js?v=c557d6db:137:24)
+    at AnimatePresence (https://48551c95-2b51-4099-9238-82e5f8f752dd-00-v9ob5ry5j1ht.sisko.replit.dev/node_modules/.vite/deps/framer-motion.js?v=c557d6db:216:26)
+    at AppRoutes (https://48551c95-2b51-4099-9238-82e5f8f752dd-00-v9ob5ry5j1ht.sisko.replit.dev/src/App.tsx:64:33)
+    at AuthProvider (https://48551c95-2b51-4099-9238-82e5f8f752dd-00-v9ob5ry5j1ht.sisko.replit.dev/src/providers/AuthProvider.tsx:24:32)
+    at Router (https://48551c95-2b51-4099-9238-82e5f8f752dd-00-v9ob5ry5j1ht.sisko.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=c557d6db:4451:15)
+    at BrowserRouter (https://48551c95-2b51-4099-9238-82e5f8f752dd-00-v9ob5ry5j1ht.sisko.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=c557d6db:5196:5)
+    at ThemeProvider (https://48551c95-2b51-4099-9238-82e5f8f752dd-00-v9ob5ry5j1ht.sisko.replit.dev/src/components/theme-provider.tsx:17:33)
+    at QueryClientProvider (https://48551c95-2b51-4099-9238-82e5f8f752dd-00-v9ob5ry5j1ht.sisko.replit.dev/node_modules/.vite/deps/@tanstack_react-query.js?v=c557d6db:2794:3)
+    at App (https://48551c95-2b51-4099-9238-82e5f8f752dd-00-v9ob5ry5j1ht.sisko.replit.dev/src/App.tsx:707:45)
+
+Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://reactjs.org/link/error-boundaries to learn more about error boundaries.
+logCapturedError @ chunk-276SZO74.js?v=c557d6db:14032Understand this error
+chunk-276SZO74.js?v=c557d6db:19413 Uncaught TypeError: Failed to fetch dynamically imported module: https://48551c95-2b51-4099-9238-82e5f8f752dd-00-v9ob5ry5j1ht.sisko.replit.dev/src/pages/Chat.tsxUnderstand this error
+client:698 [vite] Internal Server Error
+  × Unexpected token `Card`. Expected jsx identifier
+     ╭─[/home/runner/workspace/src/components/chat/ChatScreen.tsx:935:1]
+ 932 │ 
+ 933 │ 
+ 934 │   return (
+ 935 │     <Card className="fixed inset-0 flex flex-col w-full h-full md:static md:h-[calc(100vh-1rem)] md:max-w-[1200px] md:mx-auto md:my-2 md:rounded-lg border-none shadow-xl overflow-hidden bg-gradient-to-b from-background/95 to-background/90 backdrop-blur-lg" style={{ WebkitOverflowScrolling: 'touch' }}>
+     ·      ────
+ 936 │       <div className="fixed top-0 left-0 right-0 z-40 bg-background/95 backdrop-blur-xl border-b md:relative">
+ 937 │         <ChatHeader conversation={conversation} />
+ 938 │       </div>
+     ╰────
+
+
+Caused by:
+    Syntax Error
+
+handleMessage @ client:698Understand this error
