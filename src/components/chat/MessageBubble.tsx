@@ -117,6 +117,14 @@ export const MessageBubble = ({ message, isCurrentUser, isRead = false, onReacti
                       document.dispatchEvent(clickEvent);
                     }}
                   />
+                  <a 
+                    href={message.attachment_url}
+                    download
+                    className="absolute bottom-2 right-2 bg-black/50 text-white p-1 rounded-md opacity-0 group-hover:opacity-100 transition-opacity"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <Download className="h-4 w-4" />
+                  </a>
                 </>
               )}
             </div>

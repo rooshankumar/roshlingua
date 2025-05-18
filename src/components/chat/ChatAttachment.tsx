@@ -334,7 +334,6 @@ interface ChatAttachmentProps {
 }
 
 export const DisplayChatAttachment = ({ url, filename, fileType, fileSize, className }: ChatAttachmentProps) => {
-  const [isDownloading, setIsDownloading] = useState(false);
   const [objectUrl, setObjectUrl] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -382,27 +381,6 @@ export const DisplayChatAttachment = ({ url, filename, fileType, fileSize, class
     }
   };
 
-  const handleDownload = async () => {
-    setIsDownloading(true);
-    try {
-      // Use existing object URL if available, otherwise fetch
-      if (!objectUrl) {
-        await loadAttachment();
-      }
-
-      const a = document.createElement('a');
-      a.href = objectUrl || url;
-      a.download = filename;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-    } catch (error) {
-      console.error('Error downloading file:', error);
-    } finally {
-      setIsDownloading(false);
-    }
-  };
-
   return (
     <div className={cn("border rounded-lg p-3 max-w-sm", className)}>
       <div className="flex items-center justify-between mb-2">
@@ -412,6 +390,15 @@ export const DisplayChatAttachment = ({ url, filename, fileType, fileSize, class
             {fileType.split('/')[1].toUpperCase()} {fileSize && `· ${(fileSize / 1024).toFixed(1)} KB`}
           </p>
         </div>
+        <a 
+          href={url} 
+          download={filename}
+          target="_blank" 
+          rel="noopener noreferrer"
+          className="text-xs underline hover:text-primary transition-colors ml-2"
+        >
+          Download
+        </a>
       </div>
 
       {isImage && (
