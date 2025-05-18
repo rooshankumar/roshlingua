@@ -43,6 +43,7 @@ import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/lib/supabase";
 import { Label } from "@/components/ui/label"; // Added import
+import RoshLinguaLogo from "@/components/RoshLinguaLogo";
 
 interface OnboardingProps {
     onComplete: () => void;
@@ -289,6 +290,7 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
 
     return (
         <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-gradient-to-b from-background to-secondary relative">
+            <RoshLinguaLogo size="lg" className="mb-8" />
             {isLoading && (
                 <div className="absolute inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center z-50">
                     <div className="flex flex-col items-center gap-4">
