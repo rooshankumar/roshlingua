@@ -427,7 +427,7 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
                                                         <FormControl>
                                                             <Input
                                                                 placeholder="Search or select your native language"
-                                                                value={nativeLanguageSearch}
+                                                                value={field.value || nativeLanguageSearch}
                                                                 onChange={(e) => {
                                                                     // Update both the search state and the input value
                                                                     setNativeLanguageSearch(e.target.value);
@@ -447,7 +447,7 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
                                                             You can select a language or type a custom one
                                                         </FormDescription>
                                                         <FormMessage />
-                                                        <div className="mt-1">
+                                                        <div className="mt-1 absolute w-full bg-background border rounded-md shadow-lg z-10">
                                                             {nativeLanguageOpen && languageOptions
                                                                 .filter((lang) => {
                                                                     if (!lang) return false;
@@ -471,10 +471,10 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
                                                                         key={lang.value}
                                                                         className="w-full text-left hover:bg-accent px-3 py-1 text-sm"
                                                                         onClick={() => {
-                                                                            // Set the display value
-                                                                            setNativeLanguageSearch(lang.label);
-                                                                            // Update the form field value properly
+                                                                            // Update the form field value first
                                                                             field.onChange(lang.value);
+                                                                            // Then update the display value to match selected language
+                                                                            setNativeLanguageSearch(lang.value);
                                                                             // Close the dropdown
                                                                             setNativeLanguageOpen(false);
                                                                         }}
