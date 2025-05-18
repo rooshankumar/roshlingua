@@ -442,12 +442,14 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
                                                             <div className="mt-1">
                                                                 {languageOptions
                                                                     .filter((lang) => {
+                                                                        if (!lang) return false;
+                                                                        if (!nativeLanguageSearch) return true;
+                                                                        
                                                                         const search = nativeLanguageSearch.toLowerCase();
                                                                         const value = lang.value.toLowerCase();
                                                                         const label = lang.label.toLowerCase();
                                                                         const code = lang.code.toLowerCase();
                                                                         
-                                                                        // Show all matching languages when user types first few letters
                                                                         return value.startsWith(search) ||
                                                                                label.startsWith(search) ||
                                                                                code.startsWith(search) ||
