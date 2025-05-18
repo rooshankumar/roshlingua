@@ -445,12 +445,15 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
                                                                         lang.code.toLowerCase().includes(nativeLanguageSearch.toLowerCase())
                                                                     )
                                                                     .map((lang) => (
-                                                                        <div
+                                                                        <button
+                                                                            type="button"
                                                                             key={lang.code}
-                                                                            className={`flex items-center px-2 py-1.5 cursor-pointer rounded-sm hover:bg-accent ${
+                                                                            className={`flex items-center w-full px-2 py-1.5 cursor-pointer rounded-sm hover:bg-accent text-left ${
                                                                                 field.value === lang.value ? "bg-accent" : ""
                                                                             }`}
-                                                                            onClick={() => {
+                                                                            onClick={(e) => {
+                                                                                e.preventDefault();
+                                                                                e.stopPropagation();
                                                                                 field.onChange(lang.value);
                                                                                 setNativeLanguageOpen(false);
                                                                             }}
@@ -460,7 +463,7 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
                                                                             {field.value === lang.value && (
                                                                                 <Check className="ml-auto h-4 w-4" />
                                                                             )}
-                                                                        </div>
+                                                                        </button>
                                                                     ))}
                                                                 {languageOptions.filter((lang) => 
                                                                     lang.label.toLowerCase().includes(nativeLanguageSearch) || 
