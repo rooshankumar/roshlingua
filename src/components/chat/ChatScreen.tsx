@@ -105,11 +105,11 @@ export const ChatScreen = ({ conversation }: Props) => {
     const handleTouchEnd = (e: TouchEvent) => {
       touchEndY = e.changedTouches[0].clientY;
       const diff = touchStartY - touchEndY;
-      
+
       // If scrolled near bottom, snap to bottom
       const isNearBottom = 
         chatContainer.scrollHeight - chatContainer.scrollTop - chatContainer.clientHeight < 100;
-      
+
       if (diff > 0 && isNearBottom) {
         scrollToLatestMessage(true);
       }
@@ -128,7 +128,7 @@ export const ChatScreen = ({ conversation }: Props) => {
   useEffect(() => {
     if (messages.length > 0) {
       scrollToLatestMessage(false);
-      
+
       const handleResize = () => scrollToLatestMessage(false);
       window.addEventListener('resize', handleResize);
       window.addEventListener('orientationchange', handleResize);
@@ -956,8 +956,7 @@ export const ChatScreen = ({ conversation }: Props) => {
                 id={`message-${message.id}`}
                 key={message.id}
                 className={`flex items-start gap-3 animate-slide-up ${
-                  message.sender_id === user?.id ? 'flex-row-reverse' : 'flex-row'
-                } ${index > 0 && messages[index - 1]?.sender_id === message.sender_id ? 'mt-0 consecutive-group' : 'mt-2'}`}
+                  message.sender_id === user?.id ? 'flex-row-reverse' : 'flex-row                } ${index > 0 && messages[index - 1]?.sender_id === message.sender_id ? 'mt-0 consecutive-group' : 'mt-2'}`}
                 style={{
                   animationDelay: `${Math.min(index * 0.05, 0.5)}s`, // Faster animation with a max delay
                   marginBottom: index > 0 && messages[index - 1]?.sender_id === message.sender_id ? '2px' : '3px'
@@ -1110,7 +1109,7 @@ export const ChatScreen = ({ conversation }: Props) => {
                     />
                   </div>
                   {/* Only show sender name if this is the first message from this sender or after a different sender */}
-                  
+
                   <div className="flex items-end gap-2 w-full">
                     <div
                       className={`break-words shadow-sm transition-all duration-300 message-bubble`}
@@ -1184,12 +1183,16 @@ export const ChatScreen = ({ conversation }: Props) => {
                                 className="w-full rounded-lg max-h-[270px]"
                                 preload="metadata"
                                 playsInline
+                                controlsList="nodownload"
+                                poster={message.attachment_thumbnail || ''}
                                 onError={() => {
                                   console.error("Video failed to load:", message.attachment_url);
                                 }}
-                              />
+                              >
+                                Your browser does not support video playback.
+                              </video>
                               <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                                <Video className="h-10 w-10 text-white/80" />
+                                Video className="h-10 w-10 text-white/80" />
                               </div>
                             </div>
                           ) : message.attachment_url?.match(/\.(mp3|wav|aac)$/i) ? (

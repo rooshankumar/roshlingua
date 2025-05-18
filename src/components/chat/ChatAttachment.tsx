@@ -195,7 +195,7 @@ export const ChatAttachment = ({ onAttach }: ChatAttachmentProps) => {
         id="fileUpload"
         style={{ display: 'none' }}
         onChange={handleFileChange}
-        accept="image/*,video/*,audio/*,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-powerpoint,application/vnd.openxmlformats-officedocument.presentationml.presentation,text/plain"
+        accept=".png,.jpg,.jpeg,.gif,.webp,.mp4,.webm,.mov"
       />
 
       {previewUrl && (
