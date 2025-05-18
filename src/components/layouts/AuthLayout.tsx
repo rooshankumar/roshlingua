@@ -8,6 +8,8 @@ interface AuthLayoutProps {
   children: ReactNode;
 }
 
+import RoshLinguaLogo from "@/components/RoshLinguaLogo";
+
 const AuthLayout = ({ children }: AuthLayoutProps) => {
   return (
     <div className="min-h-screen relative flex items-center justify-center p-4 overflow-hidden">
