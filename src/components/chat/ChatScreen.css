@@ -435,7 +435,7 @@ img.expanded {
 
 .chat-content-area {
   flex: 1;
-  overflow-y: auto;
+  overflow-y: scroll;
   margin-top: 72px;
   margin-bottom: 80px;
   padding: 0.5rem 1rem;
@@ -444,6 +444,8 @@ img.expanded {
   scroll-behavior: smooth;
   will-change: scroll-position;
   touch-action: pan-y;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
 }
 
 @media (min-width: 768px) {

@@ -588,20 +588,25 @@
 }
 
 /* Hide scrollbar but keep functionality */
-* {
-  scrollbar-width: none; /* Firefox */
+.chat-content-area::-webkit-scrollbar {
+  width: 8px !important;
+  display: block !important;
 }
 
-*::-webkit-scrollbar {
-  width: 0 !important;
-  height: 0 !important;
+.chat-content-area::-webkit-scrollbar-track {
   background: transparent !important;
-  display: none !important;
+  display: block !important;
 }
 
-*::-webkit-scrollbar-track {
-  background: transparent !important;
-  display: none !important;
+.chat-content-area::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.2) !important;
+  border-radius: 4px !important;
+  display: block !important;
+}
+
+.chat-content-area {
+  scrollbar-width: thin !important;
+  scrollbar-color: rgba(0, 0, 0, 0.2) transparent !important;
 }
 
 *::-webkit-scrollbar-thumb {

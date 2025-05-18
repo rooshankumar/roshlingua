@@ -1083,12 +1083,7 @@ export const ChatScreen = ({ conversation }: Props) => {
                     />
                   </div>
                   {/* Only show sender name if this is the first message from this sender or after a different sender */}
-                  {message.sender_id !== user?.id && 
-                   (index === 0 || messages[index - 1]?.sender_id !== message.sender_id) && (
-                    <span className="text-xs text-muted-foreground ml-1">
-                      {message.sender?.full_name}
-                    </span>
-                  )}
+                  
                   <div className="flex items-end gap-2 w-full">
                     <div
                       className={`break-words shadow-sm transition-all duration-300 message-bubble`}
