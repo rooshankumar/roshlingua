@@ -1193,7 +1193,7 @@ export const ChatScreen = ({ conversation }: Props) => {
                                 Your browser does not support video playback.
                               </video>
                               <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                                Video className="h-10 w-10 text-white/80" />
+                                <Video className="h-10 w-10 text-white/80" />
                               </div>
                             </div>
                           ) : message.attachment_url?.match(/\.(mp3|wav|aac)$/i) ? (
