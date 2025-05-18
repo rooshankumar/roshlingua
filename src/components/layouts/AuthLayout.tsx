@@ -10,17 +10,16 @@ interface AuthLayoutProps {
 
 const AuthLayout = ({ children }: AuthLayoutProps) => {
   return (
-    <div className="min-h-screen relative flex items-center justify-center p-4 overflow-hidden">
+    <div className="min-h-screen relative flex items-center justify-center p-4 overflow-hidden bg-white">
       {/* Logo Background */}
       <div className="absolute inset-0 z-0">
-        <div className="absolute inset-0 flex items-center justify-center opacity-5">
+        <div className="absolute inset-0 flex items-center justify-center">
           <img 
             src="/images/roshlingua-bird.png"
             alt="RoshLingua Background"
-            className="w-[800px] h-[800px] object-contain"
+            className="w-screen h-screen object-contain opacity-[0.03]"
           />
         </div>
-        <div className="absolute inset-0 bg-black/30 backdrop-blur-sm"></div>
       </div>
 
       {/* Content */}
