@@ -236,16 +236,17 @@
 }
 
 /* Responsive attachments */
-@media (max-width: 640px) {
-  .attachment-container {
-    max-width: 220px;
-  }
+.attachment-container {
+  max-width: 200px;
+  border-radius: 8px;
+  overflow: hidden;
 }
 
-@media (min-width: 641px) {
-  .attachment-container {
-    max-width: 270px;
-  }
+.attachment-container img {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+  border-radius: 8px;
 }
 
 /* Fullscreen image preview */
