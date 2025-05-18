@@ -923,7 +923,7 @@ export const ChatScreen = ({ conversation }: Props) => {
 
       {user?.id ? (
         <ScrollArea 
-          className="flex-1 px-4 md:px-6 py-4 overflow-y-auto pr-6 mt-[72px] mb-[80px] md:mt-0 md:mb-0 chat-content-area" 
+          className="flex-1 overflow-y-auto chat-content-area"
           data-scrollbar
           ref={messagesContainerRef}
           onTouchStart={(e) => {

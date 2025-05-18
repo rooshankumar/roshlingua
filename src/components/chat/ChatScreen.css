@@ -436,19 +436,31 @@ img.expanded {
 .chat-content-area {
   flex: 1;
   overflow-y: auto;
-  margin-top: 72px;
-  margin-bottom: 80px;
-  padding: 0.5rem 1rem;
+  overscroll-behavior-y: contain;
   -webkit-overflow-scrolling: touch;
-  overscroll-behavior: none;
   scroll-behavior: smooth;
-  will-change: scroll-position;
   touch-action: pan-y;
   position: relative;
-  height: calc(100vh - 152px);
-  max-height: calc(100vh - 152px);
+  height: 100%;
+  max-height: 100%;
+  padding: 1rem;
   scrollbar-width: thin;
-  scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
+  scrollbar-color: hsl(var(--muted)) transparent;
+}
+
+@supports (-webkit-touch-callout: none) {
+  .chat-content-area {
+    height: -webkit-fill-available;
+  }
+}
+
+@media (max-width: 768px) {
+  .chat-content-area {
+    margin-top: 72px;
+    margin-bottom: 80px;
+    height: calc(100vh - 152px);
+    padding-bottom: 20px;
+  }
 }
 
 /* Prevent elastic scroll on iOS */
