@@ -404,11 +404,12 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
                                                                 className="w-full pr-10"
                                                                 value={field.value}
                                                                 onChange={(e) => {
-                                                                    field.onChange(e.target.value);
-                                                                    const searchTerm = e.target.value.toLowerCase();
-                                                                    setNativeLanguageSearch(searchTerm);
+                                                                    const value = e.target.value;
+                                                                    field.onChange(value);
+                                                                    setNativeLanguageSearch(value);
                                                                 }}
                                                                 onClick={() => setNativeLanguageOpen(true)}
+                                                                onFocus={() => setNativeLanguageOpen(true)}
                                                                 onKeyDown={(e) => {
                                                                     if (e.key === 'Enter') {
                                                                         field.onChange(field.value);
@@ -467,8 +468,12 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
                                                                             onClick={(e) => {
                                                                                 e.preventDefault();
                                                                                 e.stopPropagation();
+                                                                                // Set both input display and form value
+                                                                                setNativeLanguageSearch(lang.value); 
                                                                                 field.onChange(lang.value);
-                                                                                setNativeLanguageOpen(false);
+                                                                                setTimeout(() => {
+                                                                                    setNativeLanguageOpen(false);
+                                                                                }, 100);
                                                                             }}
                                                                         >
                                                                             <span className="mr-2">{lang.label.split(" ")[0]}</span>
@@ -479,13 +484,15 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
                                                                         </button>
                                                                     ))}
                                                                 {languageOptions.filter((lang) => 
-                                                                    lang.label.toLowerCase().includes(nativeLanguageSearch) || 
-                                                                    lang.value.toLowerCase().includes(nativeLanguageSearch)
-                                                                ).length === 0 && (
+                                                                    lang.label.toLowerCase().includes(nativeLanguageSearch.toLowerCase()) || 
+                                                                    lang.value.toLowerCase().includes(nativeLanguageSearch.toLowerCase())
+                                                                ).length === 0 && nativeLanguageSearch.trim() !== "" && (
                                                                     <div 
                                                                         className="flex items-center justify-between px-2 py-2 cursor-pointer rounded-sm hover:bg-accent"
                                                                         onClick={() => {
-                                                                            field.onChange(nativeLanguageSearch);
+                                                                            // Update both form value and display value
+                                                                            const value = nativeLanguageSearch.trim();
+                                                                            field.onChange(value);
                                                                             setNativeLanguageOpen(false);
                                                                         }}
                                                                     >
