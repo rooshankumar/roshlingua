@@ -112,21 +112,7 @@ export const base64ToBlob = (base64: string): string => {
 /**
  * Checks if a URL is likely being blocked by browser extensions or client settings
  */
-export function isLikelyBlockedUrl(url: string): boolean {
-  // Keyword based approach (common ad/tracking domains)
-  const blockedDomainKeywords = [
-    'googletagmanager',
-    'analytics',
-    'adservice',
-    'googleads',
-    'doubleclick',
-    'googlesyndication',
-    'adsystem',
-    'adnxs',
-  ];
-
-  return blockedDomainKeywords.some(keyword => url.includes(keyword));
-}
+// First implementation removed to fix duplication error
 
 export const preloadImage = (url: string): Promise<string> => {
   return new Promise((resolve, reject) => {

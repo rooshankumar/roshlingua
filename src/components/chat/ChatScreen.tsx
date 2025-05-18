@@ -829,14 +829,14 @@ export const ChatScreen = ({ conversation }: Props) => {
       const url = imgSrc.includes('?') ? 
         `${imgSrc}&t=${timestamp}&cache=no-store` : 
         `${imgSrc}?t=${timestamp}&cache=no-store`;
-      
+
       e.currentTarget.src = url;
       console.log("Retrying with cache control:", url);
       // Set a data attribute to track this retry
       e.currentTarget.setAttribute('data-retry-cache', 'true');
       return;
     }
-    
+
     // Second approach: Try loading without any parameters
     if (e.currentTarget.getAttribute('data-retry-cache') === 'true' && imgSrc.includes('?')) {
       const cleanUrl = imgSrc.split('?')[0];
@@ -957,7 +957,8 @@ export const ChatScreen = ({ conversation }: Props) => {
 
 
   return (
-    <Card className="fixed inset-0 flex flex-col w-full h-full md:static md:h-[calc(100vh-1rem)] md:max-w-[1200px] md:mx-auto md:my-2 md:rounded-lg border-none shadow-xl overflow-hidden bg-gradient-to-b from-background/95 to-background/90 backdrop-blur-lg" style={{ WebkitOverflowScrolling: 'touch' }}>
+    <Card className="fixed inset-0 flex flex-col w-full h-full md:static md:h-[calc(100vh-1rem)] md:max-w-[1200px] md:mx-auto md:my-2 md:rounded-lg border-none```text
+ shadow-xl overflow-hidden bg-gradient-to-b from-background/95 to-background/90 backdrop-blur-lg" style={{ WebkitOverflowScrolling: 'touch' }}>
       <div className="fixed top-0 left-0 right-0 z-40 bg-background/95 backdrop-blur-xl border-b md:relative">
         <ChatHeader conversation={conversation} />
       </div>
@@ -1274,33 +1275,7 @@ export const ChatScreen = ({ conversation }: Props) => {
                                 <div className="absolute inset-0 bg-transparent" 
                                   onClick={() => window.open(message.attachment_url, '_blank')}></div>
                               </div>
-                              <div className="flex gap-2">
-                                <Button
-                                  size="sm"
-                                  variant="outline"
-                                  className="flex-1"
-                                  onClick={() => window.open(message.attachment_url, '_blank')}
-                                >
-                                  <FileText className="h-4 w-4 mr-2" /> 
-                                  View
-                                </Button>
-                                <Button
-                                  size="sm"
-                                  variant="outline"
-                                  className="flex-1"
-                                  onClick={() => {
-                                    const a = document.createElement('a');
-                                    a.href = message.attachment_url || '';
-                                    a.download = message.attachment_name || 'document.pdf';
-                                    document.body.appendChild(a);
-                                    a.click();
-                                    document.body.removeChild(a);
-                                  }}
-                                >
-                                  <Download className="h-4 w-4 mr-2" /> 
-                                  Download
-                                </Button>
-                              </div>
+                              {/* Attachment controls removed to simplify UI */}
                             </div>
                           ) : message.attachment_url ? (
                             <div className="max-w-[270px] bg-muted/20 p-3 rounded-lg flex flex-col">
@@ -1308,33 +1283,7 @@ export const ChatScreen = ({ conversation }: Props) => {
                                 <FileText className="h-5 w-5" />
                                 <span className="text-sm font-medium truncate">{message.attachment_name || 'File'}</span>
                               </div>
-                              <div className="flex gap-2">
-                                <Button
-                                  size="sm"
-                                  variant="outline"
-                                  className="flex-1"
-                                  onClick={() => {
-                                    const a = document.createElement('a');
-                                    a.href = message.attachment_url || '';
-                                    a.download = message.attachment_name || 'file';
-                                    document.body.appendChild(a);
-                                    a.click();
-                                    document.body.removeChild(a);
-                                  }}
-                                >
-                                  <Download className="h-4 w-4 mr-2" /> 
-                                  Download
-                                </Button>
-                                <Button
-                                  size="sm"
-                                  variant="outline"
-                                  className="flex-1"
-                                  onClick={() => window.open(message.attachment_url, '_blank')}
-                                >
-                                  <FileText className="h-4 w-4 mr-2" /> 
-                                  View
-                                </Button>
-                              </div>
+                              {/* Attachment controls removed to simplify UI */}
                             </div>
                           ) : null}
                         </div>
