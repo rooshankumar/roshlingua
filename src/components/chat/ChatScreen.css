@@ -451,11 +451,30 @@ img.expanded {
     margin-top: 0;
     margin-bottom: 0;
     padding: 1.5rem;
-    max-height: calc(100vh - 140px);
+    max-height: calc(100vh - 160px);
+    overflow-y: auto;
+    scroll-snap-type: y proximity;
   }
   
   .message-bubble {
     max-width: 65%;
+    scroll-snap-align: end;
+  }
+
+  .chat-content-area::-webkit-scrollbar {
+    width: 8px;
+    background: transparent;
+  }
+
+  .chat-content-area::-webkit-scrollbar-thumb {
+    background-color: hsl(var(--muted));
+    border-radius: 20px;
+    border: 3px solid transparent;
+    background-clip: padding-box;
+  }
+
+  .chat-content-area::-webkit-scrollbar-track {
+    background: transparent;
   }
 }
 

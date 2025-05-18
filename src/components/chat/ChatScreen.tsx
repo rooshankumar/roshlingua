@@ -71,41 +71,24 @@ export const ChatScreen = ({ conversation }: Props) => {
 
 
   const scrollToLatestMessage = (smooth = true) => {
-    // Try both selector methods to ensure we find the right element
     const chatContainer = document.querySelector('[data-scrollbar]');
     if (chatContainer) {
-      // Force layout recalculation to get accurate scroll height
-      void chatContainer.getBoundingClientRect();
+      const behavior = smooth ? 'smooth' : 'auto';
+      const scrollOptions = { 
+        top: chatContainer.scrollHeight,
+        behavior 
+      };
 
-      // For mobile reliability, use multiple scroll approaches
-
-      // 1. Direct scrollTop assignment (most reliable but no animation)
-      chatContainer.scrollTop = chatContainer.scrollHeight + 20000;
-
-      // 2. Use immediate auto scroll to get to bottom quickly
-      chatContainer.scrollTo({
-        top: chatContainer.scrollHeight + 20000, // Extra buffer to ensure we reach the bottom
-        behavior: 'auto'
+      // Immediate scroll
+      chatContainer.scrollTo(scrollOptions);
+      
+      // Ensure scroll with slight delay
+      requestAnimationFrame(() => {
+        chatContainer.scrollTo(scrollOptions);
+        if (messagesEndRef.current) {
+          messagesEndRef.current.scrollIntoView({ behavior, block: 'end' });
+        }
       });
-
-      // 3. Try scrollIntoView if there's a messages end ref
-      if (messagesEndRef.current) {
-        messagesEndRef.current.scrollIntoView({ behavior: 'auto', block: 'end' });
-      }
-
-      // Then follow with a smooth scroll if requested (for visual polish)
-      if (smooth) {
-        setTimeout(() => {
-          chatContainer.scrollTo({
-            top: chatContainer.scrollHeight + 20000,
-            behavior: 'smooth'
-          });
-
-          if (messagesEndRef.current) {
-            messagesEndRef.current.scrollIntoView({ behavior: 'smooth', block: 'end' });
-          }
-        }, 50);
-      }
     }
   };
 
