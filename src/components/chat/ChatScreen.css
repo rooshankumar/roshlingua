@@ -246,9 +246,11 @@
 .attachment-container img {
   width: 100%;
   height: auto;
+  max-height: 300px;
   object-fit: contain;
   border-radius: 8px;
   display: block;
+  background: rgba(0, 0, 0, 0.03);
 }
 
 /* Fullscreen image preview */

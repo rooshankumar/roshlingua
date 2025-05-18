@@ -542,12 +542,12 @@ export const ChatScreen = ({ conversation }: Props) => {
 
                     {message.attachment_url && (
                       <div className="mt-2 relative attachment-container">
-                        {message.attachment_url.match(/\.(jpg|jpeg|png|gif)$/i) ? (
+                        {message.attachment_url.match(/\.(jpg|jpeg|png|gif|webp|avif)$/i) ? (
                           <div className="relative">
                             <img
                               src={message.attachment_url}
                               alt={message.attachment_name || "Attachment"}
-                              className="rounded-lg w-full h-auto max-w-[300px] object-contain cursor-pointer"
+                              className="rounded-lg w-full h-auto max-w-[300px] max-h-[300px] object-contain cursor-pointer"
                               loading="eager"
                               onClick={() => {
                                 setImagePreview({
