@@ -230,51 +230,49 @@ export default function RealtimeConnectionCheck() {
         }
 
         // Create a persistent test channel with auto-reconnect
-      const channel = supabase.channel('connection-check', {
-        config: { 
-          broadcast: { self: true },
-          presence: { key: 'online' },
-          retryAfterTimeout: true,
-          timeout: 30000
-        }
-      });
-      
-      connectionCheckRef.current = channel;
-      
-      channel
-        .on('system', { event: '*' }, () => {
-          supabase.realtime.reconnect();
-        })
-        .subscribe((status) => {
-          if (status === 'SUBSCRIBED') {
-            setIsConnected(true);
-            setConnectionStatus('CONNECTED');
-            
-            // Only refresh if we were previously disconnected
-            if (!isConnected) {
-              subscriptionManager.refreshAll();
-            }
-          } else {
-            setIsConnected(false);
-            setConnectionStatus(status || 'DISCONNECTED');
+        const channel = supabase.channel('connection-check', {
+          config: { 
+            broadcast: { self: true },
+            presence: { key: 'online' },
+            retryAfterTimeout: true,
+            timeout: 30000
           }
         });
+        
+        connectionCheckRef.current = channel;
+        
+        channel
+          .on('system', { event: '*' }, () => {
+            supabase.realtime.reconnect();
+          })
+          .subscribe((status) => {
+            if (status === 'SUBSCRIBED') {
+              setIsConnected(true);
+              setConnectionStatus('CONNECTED');
+              
+              // Only refresh if we were previously disconnected
+              if (!isConnected) {
+                subscriptionManager.refreshAll();
+              }
+            } else {
+              setIsConnected(false);
+              setConnectionStatus(status || 'DISCONNECTED');
+            }
+          });
 
         // Try to reconnect after a delay
         window.clearTimeout(connectionTimeout);
-            connectionTimeout = window.setTimeout(() => {
-              if (channel) {
-                try {
-                  channel.unsubscribe();
-                  connectionCheckRef.current = null;
-                } catch (e) {
-                  console.log('Error unsubscribing from channel', e);
-                }
-                checkConnection(); // Try again
-              }
-            }, 5000);
+        connectionTimeout = window.setTimeout(() => {
+          if (channel) {
+            try {
+              channel.unsubscribe();
+              connectionCheckRef.current = null;
+            } catch (e) {
+              console.log('Error unsubscribing from channel', e);
+            }
+            checkConnection(); // Try again
           }
-        });
+        }, 5000);
       } catch (error) {
         console.error('Error checking connection:', error);
         setIsConnected(false);
