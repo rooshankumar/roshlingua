@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Send, Loader2, FileText, Check, Image, X, Download, FileAudio } from 'lucide-react';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card, CardContent } from '../ui/card';
 import { updateUserPresence } from '@/utils/testAuth';
 import { ChatAttachment } from './ChatAttachment';
 import { Button } from '@/components/ui/button';
@@ -956,7 +956,8 @@ export const ChatScreen = ({ conversation }: Props) => {
                 id={`message-${message.id}`}
                 key={message.id}
                 className={`flex items-start gap-3 animate-slide-up ${
-                  message.sender_id === user?.id ? 'flex-row-reverse' : 'flex-row                } ${index > 0 && messages[index - 1]?.sender_id === message.sender_id ? 'mt-0 consecutive-group' : 'mt-2'}`}
+                  message.sender_id === user?.id ? 'flex-row-reverse' : 'flex-row'
+                } ${index > 0 && messages[index - 1]?.sender_id === message.sender_id ? 'mt-0 consecutive-group' : 'mt-2'}`}
                 style={{
                   animationDelay: `${Math.min(index * 0.05, 0.5)}s`, // Faster animation with a max delay
                   marginBottom: index > 0 && messages[index - 1]?.sender_id === message.sender_id ? '2px' : '3px'
