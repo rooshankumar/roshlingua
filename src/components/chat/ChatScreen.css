@@ -444,8 +444,8 @@ img.expanded {
   will-change: scroll-position;
   touch-action: pan-y;
   position: relative;
-  height: calc(100vh - 120px);
-  max-height: calc(100vh - 120px);
+  height: calc(100vh - 152px);
+  max-height: calc(100vh - 152px);
   scrollbar-width: thin;
   scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
 }
