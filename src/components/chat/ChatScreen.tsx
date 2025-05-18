@@ -429,6 +429,17 @@ export const ChatScreen = ({ conversation }: Props) => {
     };
   }, [conversation?.id, page, markConversationAsRead]);
 
+  // Add scroll position tracking
+  const [userHasScrolled, setUserHasScrolled] = useState(false);
+  const [isNearBottom, setIsNearBottom] = useState(true);
+
+  const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
+    const target = e.target as HTMLDivElement;
+    const isBottom = target.scrollHeight - target.scrollTop - target.clientHeight < 50;
+    setIsNearBottom(isBottom);
+    setUserHasScrolled(true);
+  };
+
   // Add a connection status checker and reconnect mechanism
   useEffect(() => {
     if (!conversation?.id) return;
@@ -479,15 +490,20 @@ export const ChatScreen = ({ conversation }: Props) => {
   useEffect(() => {
     // Only scroll if messages increased (new message added)
     if (messages.length > messagesCountRef.current) {
-      // Force immediate and more aggressive scrolling for new messages
-      setTimeout(() => scrollToLatestMessage(false), 0);
-      setTimeout(() => scrollToLatestMessage(false), 50);
-      setTimeout(() => scrollToLatestMessage(false), 100);
-      setTimeout(() => scrollToLatestMessage(true), 200);
+      // Auto-scroll only if user hasn't scrolled up or is already near bottom
+      if (!userHasScrolled || isNearBottom) {
+        setTimeout(() => scrollToLatestMessage(true), 100);
+      }
     }
     // Update the reference count
     messagesCountRef.current = messages.length;
-  }, [messages.length]);
+  }, [messages.length, userHasScrolled, isNearBottom]);
+
+  // Reset scroll state when conversation changes
+  useEffect(() => {
+    setUserHasScrolled(false);
+    setIsNearBottom(true);
+  }, [conversation?.id]);
 
   // Always scroll to bottom when chat is first loaded and messages are fetched
   useEffect(() => {
@@ -926,6 +942,7 @@ export const ChatScreen = ({ conversation }: Props) => {
           className="flex-1 overflow-y-auto chat-content-area"
           data-scrollbar
           ref={messagesContainerRef}
+          onScroll={handleScroll}
           onTouchStart={(e) => {
             e.currentTarget.style.userSelect = 'none';
           }}
