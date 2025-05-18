@@ -11,18 +11,13 @@ interface AuthLayoutProps {
 const AuthLayout = ({ children }: AuthLayoutProps) => {
   return (
     <div className="min-h-screen relative flex items-center justify-center p-4 overflow-hidden">
-      {/* Video Background */}
+      {/* Brand Background */}
       <div className="absolute inset-0 z-0">
-        <video 
-          autoPlay 
-          loop={true}
-          muted 
-          playsInline
-          preload="auto"
-          className="absolute inset-0 w-full h-full object-cover"
-        >
-          <source src="/videos/277318_tiny.mp4" type="video/mp4" />
-        </video>
+        <img 
+          src="https://05579550-cab8-4a15-939a-d1ecea38b48a-00-2atevqlq7sjp.sisko.replit.dev/auth"
+          alt="Brand Background"
+          className="absolute inset-0 w-full h-full object-cover opacity-50"
+        />
         <div className="absolute inset-0 bg-black/30 backdrop-blur-sm"></div>
       </div>
 
