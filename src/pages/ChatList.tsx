@@ -180,7 +180,6 @@ const ChatList = () => {
       <div className="flex items-center justify-between">
         <div className="flex flex-col space-y-1 mb-6 hidden md:block">
           <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-primary-foreground bg-clip-text text-transparent">Messages</h1>
-          <p className="text-muted-foreground mt-1">Stay connected with your language partners</p>
         </div>
         <Button asChild>
           <Link to="/community" className="gap-2">

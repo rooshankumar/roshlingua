@@ -459,18 +459,28 @@ img.expanded {
   .chat-content-area {
     scrollbar-width: thin;
     scrollbar-color: hsl(var(--muted)) transparent;
+    scroll-behavior: smooth;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
   }
 
   .chat-content-area::-webkit-scrollbar {
-    width: 6px;
+    width: 8px;
   }
 
   .chat-content-area::-webkit-scrollbar-track {
     background: transparent;
+    margin: 4px 0;
   }
 
   .chat-content-area::-webkit-scrollbar-thumb {
     background-color: hsl(var(--muted));
-    border-radius: 3px;
+    border-radius: 4px;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+  }
+
+  .chat-content-area::-webkit-scrollbar-thumb:hover {
+    background-color: hsl(var(--muted) / 0.8);
   }
 }
