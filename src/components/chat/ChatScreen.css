@@ -54,25 +54,38 @@
 /* Desktop-specific improvements */
 @media (min-width: 768px) {
   .message-bubble {
-    max-width: 90%;
+    max-width: 70%;
   }
 
   .message-bubble[data-sender="self"] {
-    background-color: hsl(var(--primary) / 15%);
+    background-color: hsl(var(--primary));
     color: hsl(var(--primary-foreground));
-    border-radius: 1.5rem 0.25rem 1.5rem 1.5rem;
+    border-radius: 16px;
+    border-bottom-right-radius: 4px;
   }
 
   .message-bubble[data-sender="other"] {
-    background-color: hsl(var(--muted) / 80%);
+    background-color: hsl(var(--muted));
     color: hsl(var(--muted-foreground));
-    border-radius: 0.25rem 1.5rem 1.5rem 1.5rem;
+    border-radius: 16px;
+    border-bottom-left-radius: 4px;
   }
 
   /* Better desktop scrolling */
   .chat-scroll-container {
     scrollbar-width: thin;
     scrollbar-color: hsl(var(--muted)) transparent;
+  }
+
+  .chat-content-area {
+    margin-top: 0;
+    margin-bottom: 0;
+    padding: 1rem;
+  }
+
+  .fixed-chat-container {
+    position: relative;
+    height: 100vh;
   }
 
   .chat-scroll-container::-webkit-scrollbar {

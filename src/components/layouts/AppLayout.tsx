@@ -118,7 +118,7 @@ const AppLayout = ({ children }: AppLayoutProps) => {
       <div className="md:block">
         <MainNav />
       </div>
-      <main className={`flex-1 pb-24 md:pb-4 pt-2 sm:pt-4 px-0 sm:px-3 md:px-6 overflow-x-hidden ${location.pathname.includes('/chat/') ? 'md:p-0' : ''}`}>
+      <main className={`flex-1 pb-24 md:pb-0 pt-2 sm:pt-0 px-0 overflow-x-hidden ${location.pathname.includes('/chat/') ? 'md:p-0' : 'sm:px-3 md:px-6'}`}>
         {!location.pathname.includes('/chat/') && (
           <div className="mb-4 px-4 md:px-0">
             <RoshLinguaLogo size="sm" className="md:hidden" />
