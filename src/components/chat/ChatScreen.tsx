@@ -153,6 +153,7 @@ export const ChatScreen = ({ conversation }: Props) => {
     let isActive = true;
     let channelRef = null;
     const subscriptionKey = `messages:${conversation.id}`;
+    const PAGE_SIZE = 25;
 
     // Show loading state only for initial load
     const isInitialLoad = messages.length === 0;
@@ -161,6 +162,8 @@ export const ChatScreen = ({ conversation }: Props) => {
     }
 
     const fetchMessages = async (loadMore = false) => {
+      // Add offset for pagination
+      const offset = loadMore ? messages.length : 0;
       if (!isActive) return;
 
       try {
@@ -587,6 +590,34 @@ export const ChatScreen = ({ conversation }: Props) => {
   const handleSend = async (content?: string, attachment?: { url: string; filename: string; thumbnail?: string }, retryCount = 0) => {
     const messageContent = content || newMessage;
     if ((!messageContent.trim() && !attachment) || !user || !conversation?.id || isSending) return;
+    
+    // Security checks
+    if (messageContent.length > 2000) {
+      toast({
+        variant: "destructive",
+        title: "Message too long",
+        description: "Messages cannot exceed 2000 characters",
+        duration: 3000,
+      });
+      return;
+    }
+
+    // Rate limiting
+    const now = Date.now();
+    const recentMessages = messages.filter(m => 
+      m.sender_id === user.id && 
+      new Date(m.created_at).getTime() > now - 1000
+    );
+    
+    if (recentMessages.length >= 5) {
+      toast({
+        variant: "destructive",
+        title: "Slow down",
+        description: "You're sending messages too quickly",
+        duration: 3000,
+      });
+      return;
+    }
 
     const MAX_RETRIES = 3;
     const RETRY_DELAY = 1000; // 1 second delay between retries
