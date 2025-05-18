@@ -526,8 +526,8 @@ export const ChatScreen = ({ conversation }: Props) => {
                   message.sender_id === user?.id ? 'items-end' : 'items-start'
                 }`}>
                   <div className={`rounded-lg p-3 ${
-                    message.sender_id === user?.id 
-                      ? 'bg-primary text-primary-foreground' 
+                    message.sender_id === user?.id
+                      ? 'bg-muted'
                       : 'bg-muted'
                   }`}>
                     {message.content && (
@@ -650,3 +650,4 @@ export const ChatScreen = ({ conversation }: Props) => {
 };
 
 export default ChatScreen;
+```
