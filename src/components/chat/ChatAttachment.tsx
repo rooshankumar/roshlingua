@@ -103,9 +103,14 @@ export const ChatAttachment = ({ onAttach }: ChatAttachmentProps) => {
       }
 
       console.log("Uploading to bucket 'attachments' with path:", filePath);
+      console.log("File details:", {
+        name: file.name,
+        type: file.type,
+        size: (file.size / 1024).toFixed(2) + "KB"
+      });
 
       // Upload with content-type header to ensure proper MIME type
-      const { error: uploadError } = await supabase.storage
+      const { data: uploadData, error: uploadError } = await supabase.storage
         .from('attachments')
         .upload(filePath, file, {
           contentType: file.type, // Specify the correct MIME type
@@ -115,7 +120,10 @@ export const ChatAttachment = ({ onAttach }: ChatAttachmentProps) => {
 
       if (uploadError) {
         console.error("Upload error:", uploadError);
+        throw uploadError;
       }
+
+      console.log("Upload successful:", uploadData);
 
       if (uploadError) {
         throw uploadError;

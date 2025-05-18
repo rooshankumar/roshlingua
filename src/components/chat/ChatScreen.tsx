@@ -671,8 +671,17 @@ export const ChatScreen = ({ conversation }: Props) => {
       console.log('Sending message with attachment:', {
         url: attachment.url,
         filename: attachment.filename,
-        hasThumbnail: !!attachment.thumbnail
+        hasThumbnail: !!attachment.thumbnail,
+        type: attachment.url?.split('.').pop()?.toLowerCase() || 'unknown'
       });
+    }
+
+    // For image attachments, verify URL is valid and accessible
+    if (attachment && attachment.url?.match(/\.(jpg|jpeg|png|gif|bmp|webp)$/i)) {
+      // Pre-load the image to check if it's accessible
+      const img = new Image();
+      img.src = attachment.url;
+      console.log('Pre-loading image attachment:', attachment.url);
     }
 
     // Add optimistic message
@@ -1155,7 +1164,10 @@ export const ChatScreen = ({ conversation }: Props) => {
                                     }
                                   }
                                 }}
-                                onError={(e) => handleImageLoadError(e, message.attachment_url as string)}
+                                onError={(e) => {
+                                  console.error("Image load error:", message.attachment_url);
+                                  handleImageLoadError(e, message.attachment_url as string);
+                                }}
                                 loading="eager"
                                 referrerPolicy="no-referrer"
                                 fetchpriority="high"

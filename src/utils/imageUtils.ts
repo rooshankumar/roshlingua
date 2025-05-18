@@ -142,47 +142,83 @@ export const preloadImage = (url: string): Promise<string> => {
   });
 };
 
-export const handleImageLoadError = (event: React.SyntheticEvent<HTMLImageElement, Event>, fallbackText = "Image failed to load") => {
-  const img = event.target as HTMLImageElement;
-  const src = img.src;
+export const handleImageLoadError = (e: React.SyntheticEvent<HTMLImageElement>, imageUrl?: string, fallbackText = 'Image unavailable') => {
+  const img = e.currentTarget;
+  const parentElement = img.parentElement;
 
-  console.error(`Image failed to load: ${src}`);
+  // Log the error with more details
+  console.error('Image load error details:', {
+    src: img.src,
+    originalUrl: imageUrl,
+    element: img,
+    error: e
+  });
 
-  // Set the alt text to provide context about the failed image
-  img.alt = fallbackText;
+  // Attempt various fixes in sequence
+  if (img.src.includes('?')) {
+    // Try loading without query parameters first
+    const cleanSrc = img.src.split('?')[0];
+    console.log('Retrying image load with clean URL:', cleanSrc);
 
-  // First, check if this is a Supabase URL
-  if (src.includes('supabase.co/storage')) {
-    // Extract the bucket name for diagnosis
-    const bucketMatch = src.match(/\/public\/([^\/]+)\//);
-    if (bucketMatch && bucketMatch[1]) {
-      const bucketName = bucketMatch[1];
-      console.log(`Bucket name detected in URL: '${bucketName}'`);
-    }
-
-    // Try to load with cache busting if it's a Supabase URL and we haven't already
-    if (!src.includes('t=')) {
-      const timestamp = Date.now();
-      const newSrc = `${src}${src.includes('?') ? '&' : '?'}t=${timestamp}`;
-      console.log(`Retrying with cache busting: ${newSrc}`);
-      img.src = newSrc;
-      return;
+    // Only retry once to avoid infinite loop
+    if (!img.dataset.retried) {
+      img.dataset.retried = 'true';
+      img.src = cleanSrc;
+      return; // Don't show fallback yet, trying clean URL first
     }
   }
 
-  // If we already tried cache busting or it's not a Supabase URL, hide the broken image
+  // If URL contains supabase.co and we've already tried clean URL
+  if ((img.src.includes('supabase.co') || (imageUrl && imageUrl.includes('supabase.co'))) && img.dataset.retried === 'true') {
+    // Try adding cache control and random param
+    const timestamp = Date.now();
+    const cacheBusterUrl = `${img.src.split('?')[0]}?t=${timestamp}&cache=no-store`;
+    console.log('Retrying with cache buster:', cacheBusterUrl);
+
+    if (!img.dataset.retriedCache) {
+      img.dataset.retriedCache = 'true';
+      img.src = cacheBusterUrl;
+      return; // Try with cache buster
+    }
+  }
+
+  // If we get here, the image failed even after retries
+  console.error('Image failed after all retries:', img.src);
+
+  // Hide the broken image
   img.style.display = 'none';
 
-  // Add a helpful fallback element
-  const parent = img.parentNode;
-  if (parent) {
-    const fallbackElement = document.createElement('div');
-    fallbackElement.className = 'p-2 rounded-md text-sm text-center';
-    fallbackElement.innerText = src.includes('supabase.co/storage') ? 
-      'Storage error: Please check if bucket exists in your Supabase project' : 
-      fallbackText;
-    parent.appendChild(fallbackElement);
+  // Add a placeholder div if not already present
+  if (!parentElement?.querySelector('.image-error-fallback')) {
+    const fallback = document.createElement('div');
+    fallback.className = 'image-error-fallback p-4 rounded bg-muted/20 text-center text-sm flex items-center justify-center';
+    fallback.style.minHeight = '100px';
+    fallback.style.maxWidth = '100%';
+    fallback.innerHTML = `
+      <div>
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mx-auto mb-2 opacity-70">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="8" y1="12" x2="16" y2="12"></line>
+        </svg>
+        <span>${fallbackText}</span>
+      </div>
+    `;
+    parentElement?.appendChild(fallback);
   }
+};
+
+// Helper function to check if URL might be blocked by client
+export const isLikelyBlockedUrl = (url: string): boolean => {
+  // Common patterns for URLs that might be blocked
+  const patterns = [
+    'googletagmanager.com',
+    'analytics',
+    'tracker',
+    'tracking',
+    'ads'
+  ];
+
+  return patterns.some(pattern => url.toLowerCase().includes(pattern));
 };
 
 export const compressImage = async (file: File, options = { quality: 0.8, maxWidth: 1200 }): Promise<File> => {
