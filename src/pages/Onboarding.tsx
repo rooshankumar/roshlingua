@@ -397,7 +397,13 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
                                                     <FormControl>
                                                         <Input
                                                             type="date"
-                                                            {...field}
+                                                            value={field.value ? field.value.toISOString().split('T')[0] : ''}
+                                                            onChange={(e) => {
+                                                                field.onChange(e.target.value ? new Date(e.target.value) : undefined);
+                                                            }}
+                                                            onBlur={field.onBlur}
+                                                            name={field.name}
+                                                            ref={field.ref}
                                                             className="col-span-3"
                                                         />
                                                     </FormControl>
