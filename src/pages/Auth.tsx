@@ -138,19 +138,19 @@ const Auth = () => {
   const handleGoogleLogin = async () => {
     try {
       setIsLoading(true);
-      
+
       // Generate PKCE verifier
       const { generateVerifier } = await import('@/utils/pkceHelper');
       const verifier = generateVerifier();
-      
+
       // Store verifier in localStorage
       localStorage.setItem('supabase.auth.code_verifier', verifier);
-      
+
       // Determine correct callback URL based on environment
       const redirectUrl = window.location.hostname.includes('vercel.app') 
         ? 'https://roshlingua.vercel.app/auth/callback'
         : `${window.location.origin}/auth/callback`;
-      
+
       console.log("Using redirect URL:", redirectUrl);
 
       const { data, error } = await supabase.auth.signInWithOAuth({
@@ -207,9 +207,9 @@ const Auth = () => {
         <TabsContent value="login">
           <form onSubmit={handleLogin}>
             <CardHeader>
-              <CardTitle>Welcome back</CardTitle>
-              <CardDescription>
-                Sign in to your account
+              <CardTitle className="text-2xl">Welcome to RoshLingua</CardTitle>
+              <CardDescription className="text-muted-foreground">
+                Sign in to continue your language learning journey
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
