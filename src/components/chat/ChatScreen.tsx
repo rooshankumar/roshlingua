@@ -535,13 +535,13 @@ export const ChatScreen = ({ conversation }: Props) => {
                     )}
 
                     {message.attachment_url && (
-                      <div className="mt-2 relative">
+                      <div className="mt-2 relative attachment-container">
                         {message.attachment_url.match(/\.(jpg|jpeg|png|gif)$/i) ? (
                           <div className="relative">
                             <img
                               src={message.attachment_url}
                               alt={message.attachment_name || "Attachment"}
-                              className="rounded-lg max-w-[260px] md:max-w-[300px] max-h-[350px] object-contain cursor-pointer hover:scale-105 transition-transform duration-200"
+                              className="rounded-lg w-full max-w-[260px] md:max-w-[300px] max-h-[350px] object-contain cursor-pointer hover:scale-105 transition-transform duration-200"
                               onClick={() => {
                                 setImagePreview({
                                   url: message.attachment_url!,
@@ -549,6 +549,7 @@ export const ChatScreen = ({ conversation }: Props) => {
                                 });
                                 setShowImagePreview(true);
                               }}
+                              onError={(e) => handleImageLoadError(e, message.attachment_url)}
                             />
                             <a 
                               href={message.attachment_url}
@@ -557,6 +558,46 @@ export const ChatScreen = ({ conversation }: Props) => {
                               onClick={(e) => e.stopPropagation()}
                             >
                               <Download className="h-4 w-4" />
+                            </a>
+                          </div>
+                        ) : message.attachment_url.match(/\.(mp4|webm|ogg)$/i) ? (
+                          <div className="p-2">
+                            <video 
+                              src={message.attachment_url}
+                              controls
+                              autoPlay={false}
+                              preload="metadata"
+                              className="max-w-[260px] md:max-w-[300px] rounded-lg"
+                              controlsList="nodownload"
+                            />
+                          </div>
+                        ) : message.attachment_url.match(/\.(mp3|wav|ogg)$/i) ? (
+                          <div className="p-3">
+                            <p className="text-sm font-medium mb-1">
+                              {message.attachment_name || "Audio file"}
+                            </p>
+                            <audio 
+                              src={message.attachment_url}
+                              controls
+                              preload="metadata"
+                              className="w-full max-w-[260px]"
+                            />
+                          </div>
+                        ) : message.attachment_url.match(/\.pdf$/i) ? (
+                          <div className="p-3">
+                            <p className="text-sm font-medium mb-2">
+                              {message.attachment_name || "PDF document"}
+                            </p>
+                            <iframe
+                              src={message.attachment_url}
+                              className="w-[260px] h-[200px] md:w-[300px] md:h-[250px] rounded-lg border border-border"
+                            />
+                            <a 
+                              href={message.attachment_url}
+                              download
+                              className="text-xs mt-1 underline hover:text-primary transition-colors block text-center"
+                            >
+                              Download PDF
                             </a>
                           </div>
                         ) : (
