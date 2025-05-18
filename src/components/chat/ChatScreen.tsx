@@ -558,13 +558,6 @@ export const ChatScreen = ({ conversation }: Props) => {
                                 setShowImagePreview(true);
                               }}
                             />
-                                  url: message.attachment_url!,
-                                  name: message.attachment_name
-                                });
-                                setShowImagePreview(true);
-                              }}
-                              onError={(e) => handleImageLoadError(e, message.attachment_url)}
-                            />
                             <a 
                               href={message.attachment_url}
                               download={message.attachment_name || "download"}
