@@ -11,18 +11,15 @@ interface AuthLayoutProps {
 const AuthLayout = ({ children }: AuthLayoutProps) => {
   return (
     <div className="min-h-screen relative flex items-center justify-center p-4 overflow-hidden">
-      {/* Video Background */}
+      {/* Logo Background */}
       <div className="absolute inset-0 z-0">
-        <video 
-          autoPlay 
-          loop={true}
-          muted 
-          playsInline
-          preload="auto"
-          className="absolute inset-0 w-full h-full object-cover"
-        >
-          <source src="/videos/277318_tiny.mp4" type="video/mp4" />
-        </video>
+        <div className="absolute inset-0 flex items-center justify-center opacity-5">
+          <img 
+            src="/images/roshlingua-bird.png"
+            alt="RoshLingua Background"
+            className="w-[800px] h-[800px] object-contain"
+          />
+        </div>
         <div className="absolute inset-0 bg-black/30 backdrop-blur-sm"></div>
       </div>
 
