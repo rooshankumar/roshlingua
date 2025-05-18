@@ -435,7 +435,7 @@ img.expanded {
 
 .chat-content-area {
   flex: 1;
-  overflow-y: scroll;
+  overflow-y: auto;
   margin-top: 72px;
   margin-bottom: 80px;
   padding: 0.5rem 1rem;
@@ -443,9 +443,33 @@ img.expanded {
   overscroll-behavior-y: contain;
   scroll-behavior: smooth;
   will-change: scroll-position;
-  touch-action: pan-y;
+  touch-action: manipulation;
   scrollbar-width: thin;
   scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-momentum-scrolling: touch;
+}
+
+/* Optimize mobile scrolling */
+@media (max-width: 768px) {
+  .chat-content-area {
+    scroll-padding: 20px;
+    padding-bottom: 100px;
+    margin-bottom: 60px;
+  }
+}
+
+/* Better scroll snap behavior */
+.message-bubble {
+  scroll-margin-top: 10px;
+  scroll-margin-bottom: 10px;
+  scroll-snap-align: end;
+}
+
+/* Prevent rubber band effect on iOS */
+.chat-content-area {
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
 }
 
 @media (min-width: 768px) {

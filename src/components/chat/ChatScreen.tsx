@@ -72,25 +72,71 @@ export const ChatScreen = ({ conversation }: Props) => {
 
   const scrollToLatestMessage = (smooth = true) => {
     const chatContainer = document.querySelector('[data-scrollbar]');
-    if (chatContainer) {
-      const behavior = smooth ? 'smooth' : 'auto';
-      const scrollOptions = { 
-        top: chatContainer.scrollHeight,
-        behavior 
-      };
+    if (!chatContainer) return;
 
-      // Immediate scroll
+    const behavior = smooth ? 'smooth' : 'auto';
+    const scrollOptions = { 
+      top: chatContainer.scrollHeight,
+      behavior 
+    };
+
+    // Handle immediate scroll
+    const performScroll = () => {
       chatContainer.scrollTo(scrollOptions);
-      
-      // Ensure scroll with slight delay
-      requestAnimationFrame(() => {
-        chatContainer.scrollTo(scrollOptions);
-        if (messagesEndRef.current) {
-          messagesEndRef.current.scrollIntoView({ behavior, block: 'end' });
-        }
+      messagesEndRef.current?.scrollIntoView({ 
+        behavior, 
+        block: 'end',
+        inline: 'nearest'
       });
-    }
+    };
+
+    // Multiple scroll attempts for better reliability
+    performScroll();
+    
+    // Use RAF for smooth animation frame timing
+    requestAnimationFrame(() => {
+      performScroll();
+      // Additional delayed scroll for slow loading content
+      setTimeout(performScroll, 100);
+    });
+
+    // Final check after all content should be loaded
+    setTimeout(performScroll, 300);
   };
+
+  // Optimize scroll handling for mobile
+  useEffect(() => {
+    const chatContainer = document.querySelector('[data-scrollbar]');
+    if (!chatContainer) return;
+
+    let touchStartY = 0;
+    let touchEndY = 0;
+
+    const handleTouchStart = (e: TouchEvent) => {
+      touchStartY = e.touches[0].clientY;
+    };
+
+    const handleTouchEnd = (e: TouchEvent) => {
+      touchEndY = e.changedTouches[0].clientY;
+      const diff = touchStartY - touchEndY;
+      
+      // If scrolled near bottom, snap to bottom
+      const isNearBottom = 
+        chatContainer.scrollHeight - chatContainer.scrollTop - chatContainer.clientHeight < 100;
+      
+      if (diff > 0 && isNearBottom) {
+        scrollToLatestMessage(true);
+      }
+    };
+
+    chatContainer.addEventListener('touchstart', handleTouchStart);
+    chatContainer.addEventListener('touchend', handleTouchEnd);
+
+    return () => {
+      chatContainer.removeEventListener('touchstart', handleTouchStart);
+      chatContainer.removeEventListener('touchend', handleTouchEnd);
+    };
+  }, []);
 
   // Force scroll to bottom when user enters chat view
   useEffect(() => {
