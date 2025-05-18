@@ -78,10 +78,10 @@ export const ChatScreen = ({ conversation }: Props) => {
       void chatContainer.getBoundingClientRect();
 
       // For mobile reliability, use multiple scroll approaches
-      
+
       // 1. Direct scrollTop assignment (most reliable but no animation)
       chatContainer.scrollTop = chatContainer.scrollHeight + 20000;
-      
+
       // 2. Use immediate auto scroll to get to bottom quickly
       chatContainer.scrollTo({
         top: chatContainer.scrollHeight + 20000, // Extra buffer to ensure we reach the bottom
@@ -100,7 +100,7 @@ export const ChatScreen = ({ conversation }: Props) => {
             top: chatContainer.scrollHeight + 20000,
             behavior: 'smooth'
           });
-          
+
           if (messagesEndRef.current) {
             messagesEndRef.current.scrollIntoView({ behavior: 'smooth', block: 'end' });
           }
@@ -248,10 +248,10 @@ export const ChatScreen = ({ conversation }: Props) => {
           console.error('Error unsubscribing from channel:', error);
         }
       }
-      
+
       // Create a unique channel ID to prevent duplicate subscriptions
       const uniqueSubscriptionKey = `messages:${conversation.id}:${Date.now()}`;
-      
+
       try {
         // Set up real-time subscription for new messages
         channelRef = supabase
@@ -320,7 +320,7 @@ export const ChatScreen = ({ conversation }: Props) => {
               }
             }
           );
-          
+
         // Subscribe only if not already subscribed
         channelRef.subscribe((status) => {
           if (!isActive) return;
@@ -328,7 +328,7 @@ export const ChatScreen = ({ conversation }: Props) => {
           console.log(`Chat subscription status for ${uniqueSubscriptionKey}:`, status);
           if (status === 'SUBSCRIBED') {
             console.log('Successfully subscribed to chat messages');
-            
+
             // Update user presence when subscribed
             if (user?.id) {
               // Track presence in the channel
@@ -337,10 +337,10 @@ export const ChatScreen = ({ conversation }: Props) => {
                 online_at: new Date().toISOString(),
                 conversation_id: conversation.id
               });
-              
+
               // Update database status
               updateUserPresence(user.id, true);
-              
+
               // Set up visibility change listener for this specific channel
               const handleVisibilityChange = () => {
                 if (document.visibilityState === 'visible') {
@@ -356,7 +356,7 @@ export const ChatScreen = ({ conversation }: Props) => {
                   updateUserPresence(user.id, false);
                 }
               };
-              
+
               document.addEventListener('visibilitychange', handleVisibilityChange);
             }
           } else if (status === 'CLOSED' || status === 'CHANNEL_ERROR') {
@@ -368,7 +368,7 @@ export const ChatScreen = ({ conversation }: Props) => {
             }
           }
         });
-        
+
         return channelRef;
       } catch (error) {
         console.error('Error setting up realtime subscription:', error);
@@ -396,7 +396,7 @@ export const ChatScreen = ({ conversation }: Props) => {
           if (user?.id) {
             channelRef.untrack();
           }
-          
+
           // Unsubscribe from channel
           channelRef.unsubscribe();
           channelRef = null;
@@ -452,7 +452,7 @@ export const ChatScreen = ({ conversation }: Props) => {
       });
     }
   }, [messages]);
-  
+
   // Special effect that runs specifically when new messages are added
   const messagesCountRef = useRef(messages.length);
   useEffect(() => {
@@ -590,7 +590,7 @@ export const ChatScreen = ({ conversation }: Props) => {
   const handleSend = async (content?: string, attachment?: { url: string; filename: string; thumbnail?: string }, retryCount = 0) => {
     const messageContent = content || newMessage;
     if ((!messageContent.trim() && !attachment) || !user || !conversation?.id || isSending) return;
-    
+
     // Security checks
     if (messageContent.length > 2000) {
       toast({
@@ -608,7 +608,7 @@ export const ChatScreen = ({ conversation }: Props) => {
       m.sender_id === user.id && 
       new Date(m.created_at).getTime() > now - 1000
     );
-    
+
     if (recentMessages.length >= 5) {
       toast({
         variant: "destructive",
@@ -621,7 +621,7 @@ export const ChatScreen = ({ conversation }: Props) => {
 
     const MAX_RETRIES = 3;
     const RETRY_DELAY = 1000; // 1 second delay between retries
-    
+
     setIsSending(true);
     const tempId = crypto.randomUUID();
     const timestamp = new Date().toISOString();
@@ -670,7 +670,7 @@ export const ChatScreen = ({ conversation }: Props) => {
       });
       return updatedMessages;
     });
-    
+
     setNewMessage('');
 
     // Multiple scroll attempts to ensure we catch up with DOM updates
@@ -695,14 +695,14 @@ export const ChatScreen = ({ conversation }: Props) => {
       if (error) {
         throw error;
       }
-      
+
       sendSuccess = true;
     } catch (error) {
       console.error('Error sending message:', error);
-      
+
       // Remove the optimistic message
       setMessages(prev => prev.filter(msg => msg.id !== tempId));
-      
+
       // Attempt retry if we haven't exceeded max retries
       if (retryCount < MAX_RETRIES) {
         toast({
@@ -710,10 +710,10 @@ export const ChatScreen = ({ conversation }: Props) => {
           description: "Please wait while we retry sending your message",
           duration: 3000,
         });
-        
+
         // Wait before retrying
         await new Promise(resolve => setTimeout(resolve, RETRY_DELAY));
-        
+
         // Retry sending the message
         return handleSend(messageContent, attachment, retryCount + 1);
       } else {
@@ -902,9 +902,15 @@ export const ChatScreen = ({ conversation }: Props) => {
 
       {user?.id ? (
         <ScrollArea 
-          className="flex-1 px-4 md:px-6 py-4 overflow-y-auto pr-6 mt-[72px] mb-[80px] md:mt-0 md:mb-0" 
+          className="flex-1 px-4 md:px-6 py-4 overflow-y-auto pr-6 mt-[72px] mb-[80px] md:mt-0 md:mb-0 chat-content-area" 
           data-scrollbar
           ref={messagesContainerRef}
+          onTouchStart={(e) => {
+            e.currentTarget.style.userSelect = 'none';
+          }}
+          onTouchEnd={(e) => {
+            e.currentTarget.style.userSelect = '';
+          }}
         >
           <div className="space-y-6">
             {messages.map((message, index) => (
@@ -1098,7 +1104,7 @@ export const ChatScreen = ({ conversation }: Props) => {
                                   // Expand image inline instead of opening dialog
                                   const img = e.currentTarget;
                                   const container = img.parentElement;
-                                  
+
                                   if (container?.classList.contains('expanded-image')) {
                                     // If already expanded, collapse it
                                     container.classList.remove('expanded-image');
@@ -1109,7 +1115,7 @@ export const ChatScreen = ({ conversation }: Props) => {
                                     container?.classList.add('expanded-image');
                                     img.classList.add('expanded');
                                     container.style.zIndex = '50';
-                                    
+
                                     // Add haptic feedback if available
                                     if ('vibrate' in navigator) {
                                       navigator.vibrate(30);

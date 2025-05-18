@@ -419,3 +419,45 @@ img.expanded {
   transform: scale(1);
   transition: transform 0.3s ease;
 }
+
+.chat-content-area {
+  flex: 1;
+  overflow-y: auto;
+  margin-top: 72px;
+  margin-bottom: 80px;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
+  scroll-behavior: smooth;
+  will-change: scroll-position;
+  touch-action: pan-y;
+}
+
+/* Improve mobile scrolling */
+@media (max-width: 768px) {
+  .chat-content-area {
+    -webkit-overflow-scrolling: touch;
+    scroll-padding: 20px;
+    padding-bottom: 20px;
+  }
+}
+
+/* Smoother scroll on desktop */
+@media (min-width: 769px) {
+  .chat-content-area {
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--muted)) transparent;
+  }
+
+  .chat-content-area::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .chat-content-area::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .chat-content-area::-webkit-scrollbar-thumb {
+    background-color: hsl(var(--muted));
+    border-radius: 3px;
+  }
+}
