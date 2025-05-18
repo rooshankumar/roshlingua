@@ -207,13 +207,13 @@ const Auth = () => {
 
         <TabsContent value="login">
           <form onSubmit={handleLogin}>
-            <CardHeader className="space-y-4">
+            <CardHeader className="space-y-2">
               <div className="flex justify-center mb-4">
                 <RoshLinguaLogo size="lg" />
               </div>
-              <CardTitle className="text-4xl font-bold text-center">Welcome to RoshLingua!</CardTitle>
-              <CardDescription className="text-xl text-foreground text-center">
-                Learn & connect worldwide
+              <CardTitle className="text-2xl text-center">Welcome Back</CardTitle>
+              <CardDescription className="text-muted-foreground text-center">
+                Sign in to continue your language learning journey
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -316,9 +316,9 @@ const Auth = () => {
               <div className="flex justify-center mb-4">
                 <RoshLinguaLogo size="lg" />
               </div>
-              <CardTitle className="text-4xl font-bold text-center">Welcome to RoshLingua!</CardTitle>
-              <CardDescription className="text-xl text-foreground text-center">
-                Learn & connect worldwide
+              
+              <CardDescription className="text-muted-foreground text-center">
+                Start your language learning journey today
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
