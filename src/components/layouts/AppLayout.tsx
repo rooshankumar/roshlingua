@@ -56,26 +56,45 @@ const AppLayout = ({ children }: AppLayoutProps) => {
   const { user, refreshSubscriptions } = useAuth();
 
 
-  // Monitor connection status app-wide
+  // Monitor connection status app-wide with exponential backoff
   useEffect(() => {
     const connectionKey = "app_connection_monitor";
+    let retryCount = 0;
+    let retryTimeout: NodeJS.Timeout;
 
-    const channel = subscriptionManager.subscribe(connectionKey, () =>
-      supabase.channel("global")
-        .on("system", { event: "disconnect" }, (payload) => {
-          console.log("Supabase disconnected:", payload);
-          setTimeout(() => {
-            console.log("Attempting to reconnect...");
-            subscriptionManager.unsubscribe(connectionKey);
-            subscriptionManager.subscribe(connectionKey, () =>
-              supabase.channel("global-reconnect")
-            );
-          }, 2000);
-        })
-        .subscribe()
-    );
+    const connectWithBackoff = () => {
+      const backoffTime = Math.min(1000 * Math.pow(2, retryCount), 30000); // Max 30 second delay
+
+      const channel = subscriptionManager.subscribe(connectionKey, () =>
+        supabase.channel("global")
+          .on("system", { event: "disconnect" }, (payload) => {
+            console.log("Supabase disconnected, attempting reconnect...");
+            retryCount++;
+            
+            clearTimeout(retryTimeout);
+            retryTimeout = setTimeout(() => {
+              subscriptionManager.unsubscribe(connectionKey);
+              connectWithBackoff();
+            }, backoffTime);
+          })
+          .on("system", { event: "connected" }, () => {
+            console.log("Realtime connection established");
+            retryCount = 0; // Reset retry count on successful connection
+          })
+          .subscribe((status) => {
+            if (status === "SUBSCRIBED") {
+              console.log("Channel subscription active");
+            }
+          })
+      );
+
+      return channel;
+    };
+
+    const channel = connectWithBackoff();
 
     return () => {
+      clearTimeout(retryTimeout);
       subscriptionManager.unsubscribe(connectionKey);
     };
   }, []);
