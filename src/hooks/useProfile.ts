@@ -19,7 +19,6 @@ export function useProfile(userId: string) {
           .select(`
             id,
             full_name,
-            age,
             bio,
             gender,
             native_language,
@@ -28,10 +27,11 @@ export function useProfile(userId: string) {
             streak_count,
             avatar_url,
             likes_count,
-            date_of_birth::text,
+            date_of_birth,
             xp_points,
             created_at,
-            country
+            country,
+            EXTRACT(YEAR FROM age(date_of_birth))::integer as age
           `)
           .eq('id', userId)
           .single();

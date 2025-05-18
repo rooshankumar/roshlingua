@@ -34,10 +34,13 @@ const AvatarImage = React.forwardRef<
 
   return (
     <AvatarPrimitive.Image
+      {...props}
+      onError={(e) => {
+        (e.target as HTMLImageElement).style.display = 'none';
+        (e.target as HTMLImageElement).onerror = null;
+      }}
       ref={ref}
       className={cn("aspect-square h-full w-full object-cover", className)}
-      onError={handleError}
-      {...props}
     />
   );
 })
@@ -46,15 +49,18 @@ AvatarImage.displayName = AvatarPrimitive.Image.displayName
 const AvatarFallback = React.forwardRef<
   React.ElementRef<typeof AvatarPrimitive.Fallback>,
   React.ComponentPropsWithoutRef<typeof AvatarPrimitive.Fallback>
->(({ className, ...props }, ref) => (
+>(({ className, children, ...props }, ref) => (
   <AvatarPrimitive.Fallback
     ref={ref}
     className={cn(
       "flex h-full w-full items-center justify-center rounded-full bg-muted",
       className
     )}
+    delayMs={600}
     {...props}
-  />
+  >
+      {children || (props.src ? props.alt?.charAt(0).toUpperCase() : '?')}
+  </AvatarPrimitive.Fallback>
 ))
 AvatarFallback.displayName = AvatarPrimitive.Fallback.displayName
 
