@@ -441,11 +441,20 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
                                                             </div>
                                                             <div className="mt-1">
                                                                 {languageOptions
-                                                                    .filter((lang) => 
-                                                                        lang.label.toLowerCase().includes(nativeLanguageSearch.toLowerCase()) || 
-                                                                        lang.value.toLowerCase().includes(nativeLanguageSearch.toLowerCase()) ||
-                                                                        lang.code.toLowerCase().includes(nativeLanguageSearch.toLowerCase())
-                                                                    )
+                                                                    .filter((lang) => {
+                                                                        const search = nativeLanguageSearch.toLowerCase();
+                                                                        const value = lang.value.toLowerCase();
+                                                                        const label = lang.label.toLowerCase();
+                                                                        const code = lang.code.toLowerCase();
+                                                                        
+                                                                        // Show all matching languages when user types first few letters
+                                                                        return value.startsWith(search) ||
+                                                                               label.startsWith(search) ||
+                                                                               code.startsWith(search) ||
+                                                                               value.includes(search) ||
+                                                                               label.includes(search) ||
+                                                                               code.includes(search);
+                                                                    })
                                                                     .map((lang) => (
                                                                         <button
                                                                             type="button"
