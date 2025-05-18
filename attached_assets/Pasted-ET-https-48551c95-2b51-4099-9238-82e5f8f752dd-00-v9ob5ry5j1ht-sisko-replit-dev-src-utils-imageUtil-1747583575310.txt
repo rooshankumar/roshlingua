@@ -1,0 +1,273 @@
+ET https://48551c95-2b51-4099-9238-82e5f8f752dd-00-v9ob5ry5j1ht.sisko.replit.dev/src/utils/imageUtils.ts?t=1747583535038 net::ERR_ABORTED 500 (Internal Server Error)Understand this error
+2chunk-ZMLY2J2T.js?v=776b7e89:903 Uncaught TypeError: Failed to fetch dynamically imported module: https://48551c95-2b51-4099-9238-82e5f8f752dd-00-v9ob5ry5j1ht.sisko.replit.dev/src/pages/Chat.tsx?t=1747583535039Understand this error
+chunk-276SZO74.js?v=776b7e89:14032 The above error occurred in one of your React components:
+
+    at Lazy
+    at Suspense
+    at div
+    at MotionComponent (https://48551c95-2b51-4099-9238-82e5f8f752dd-00-v9ob5ry5j1ht.sisko.replit.dev/node_modules/.vite/deps/framer-motion.js?v=776b7e89:4619:40)
+    at PageTransition (https://48551c95-2b51-4099-9238-82e5f8f752dd-00-v9ob5ry5j1ht.sisko.replit.dev/src/components/PageTransition.tsx:12:27)
+    at main
+    at div
+    at AppLayout (https://48551c95-2b51-4099-9238-82e5f8f752dd-00-v9ob5ry5j1ht.sisko.replit.dev/src/components/layouts/AppLayout.tsx:85:22)
+    at ProtectedRoute (https://48551c95-2b51-4099-9238-82e5f8f752dd-00-v9ob5ry5j1ht.sisko.replit.dev/src/components/auth/ProtectedRoute.tsx:15:27)
+    at RenderedRoute (https://48551c95-2b51-4099-9238-82e5f8f752dd-00-v9ob5ry5j1ht.sisko.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=776b7e89:4069:5)
+    at Routes (https://48551c95-2b51-4099-9238-82e5f8f752dd-00-v9ob5ry5j1ht.sisko.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=776b7e89:4508:5)
+    at PresenceChild (https://48551c95-2b51-4099-9238-82e5f8f752dd-00-v9ob5ry5j1ht.sisko.replit.dev/node_modules/.vite/deps/framer-motion.js?v=776b7e89:137:24)
+    at AnimatePresence (https://48551c95-2b51-4099-9238-82e5f8f752dd-00-v9ob5ry5j1ht.sisko.replit.dev/node_modules/.vite/deps/framer-motion.js?v=776b7e89:216:26)
+    at AppRoutes (https://48551c95-2b51-4099-9238-82e5f8f752dd-00-v9ob5ry5j1ht.sisko.replit.dev/src/App.tsx?t=1747583535039:64:33)
+    at AuthProvider (https://48551c95-2b51-4099-9238-82e5f8f752dd-00-v9ob5ry5j1ht.sisko.replit.dev/src/providers/AuthProvider.tsx:24:32)
+    at Router (https://48551c95-2b51-4099-9238-82e5f8f752dd-00-v9ob5ry5j1ht.sisko.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=776b7e89:4451:15)
+    at BrowserRouter (https://48551c95-2b51-4099-9238-82e5f8f752dd-00-v9ob5ry5j1ht.sisko.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=776b7e89:5196:5)
+    at ThemeProvider (https://48551c95-2b51-4099-9238-82e5f8f752dd-00-v9ob5ry5j1ht.sisko.replit.dev/src/components/theme-provider.tsx:17:33)
+    at QueryClientProvider (https://48551c95-2b51-4099-9238-82e5f8f752dd-00-v9ob5ry5j1ht.sisko.replit.dev/node_modules/.vite/deps/@tanstack_react-query.js?v=776b7e89:2794:3)
+    at App (https://48551c95-2b51-4099-9238-82e5f8f752dd-00-v9ob5ry5j1ht.sisko.replit.dev/src/App.tsx?t=1747583535039:707:45)
+
+Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://reactjs.org/link/error-boundaries to learn more about error boundaries.
+logCapturedError @ chunk-276SZO74.js?v=776b7e89:14032
+update.callback @ chunk-276SZO74.js?v=776b7e89:14052
+callCallback @ chunk-276SZO74.js?v=776b7e89:11248
+commitUpdateQueue @ chunk-276SZO74.js?v=776b7e89:11265
+commitLayoutEffectOnFiber @ chunk-276SZO74.js?v=776b7e89:17093
+commitLayoutMountEffects_complete @ chunk-276SZO74.js?v=776b7e89:17980
+commitLayoutEffects_begin @ chunk-276SZO74.js?v=776b7e89:17969
+commitLayoutEffects @ chunk-276SZO74.js?v=776b7e89:17920
+commitRootImpl @ chunk-276SZO74.js?v=776b7e89:19353
+commitRoot @ chunk-276SZO74.js?v=776b7e89:19277
+finishConcurrentRender @ chunk-276SZO74.js?v=776b7e89:18760
+performConcurrentWorkOnRoot @ chunk-276SZO74.js?v=776b7e89:18718
+workLoop @ chunk-276SZO74.js?v=776b7e89:197
+flushWork @ chunk-276SZO74.js?v=776b7e89:176
+performWorkUntilDeadline @ chunk-276SZO74.js?v=776b7e89:384Understand this error
+chunk-276SZO74.js?v=776b7e89:19413 Uncaught TypeError: Failed to fetch dynamically imported module: https://48551c95-2b51-4099-9238-82e5f8f752dd-00-v9ob5ry5j1ht.sisko.replit.dev/src/pages/Chat.tsx?t=1747583535039Understand this error
+client:698 [vite] Internal Server Error
+  × the name `generateImageThumbnail` is defined multiple times
+     ╭─[/home/runner/workspace/src/utils/imageUtils.ts:12:1]
+   9 │  * @param file The original image file
+  10 │  * @returns A promise that resolves to a data URL for preview
+  11 │  */
+  12 │ export async function generateImageThumbnail(file: File, maxWidth = 300, maxHeight = 300): Promise<string> {
+     ·                       ───────────┬──────────
+     ·                                  ╰── previous definition of `generateImageThumbnail` here
+  13 │   return new Promise((resolve, reject) => {
+  14 │     const reader = new FileReader();
+  15 │     reader.onload = function(e) {
+  16 │       if (!e.target?.result) {
+  17 │         reject(new Error('Failed to read file'));
+  18 │         return;
+  19 │       }
+  20 │ 
+  21 │       const img = new Image();
+  22 │       img.src = e.target.result as string;
+  23 │ 
+  24 │       img.onload = function() {
+  25 │         const canvas = document.createElement('canvas');
+  26 │         let width = img.width;
+  27 │         let height = img.height;
+  28 │ 
+  29 │         // Calculate dimensions to maintain aspect ratio
+  30 │         if (width > height) {
+  31 │           if (width > maxWidth) {
+  32 │             height = Math.round(height * maxWidth / width);
+  33 │             width = maxWidth;
+  34 │           }
+  35 │         } else {
+  36 │           if (height > maxHeight) {
+  37 │             width = Math.round(width * maxHeight / height);
+  38 │             height = maxHeight;
+  39 │           }
+  40 │         }
+  41 │ 
+  42 │         canvas.width = width;
+  43 │         canvas.height = height;
+  44 │ 
+  45 │         const ctx = canvas.getContext('2d');
+  46 │         if (!ctx) {
+  47 │           reject(new Error('Failed to get canvas context'));
+  48 │           return;
+  49 │         }
+  50 │ 
+  51 │         ctx.drawImage(img, 0, 0, width, height);
+  52 │ 
+  53 │         // Create thumbnail as data URL
+  54 │         const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+  55 │         resolve(dataUrl);
+  56 │       };
+  57 │ 
+  58 │       img.onerror = function() {
+  59 │         reject(new Error('Failed to load image'));
+  60 │       };
+  61 │     };
+  62 │ 
+  63 │     reader.onerror = function() {
+  64 │       reject(new Error('Failed to read file'));
+  65 │     };
+  66 │ 
+  67 │     reader.readAsDataURL(file);
+  68 │   });
+  69 │ }
+  70 │ 
+  71 │ /**
+  72 │  * Create a blob URL from a base64 string
+  73 │  * @param base64 The base64 string
+  74 │  * @returns A blob URL
+  75 │  */
+  76 │ export const base64ToBlob = (base64: string): string => {
+  77 │   try {
+  78 │     // Extract the MIME type and base64 data
+  79 │     const matches = base64.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/);
+  80 │ 
+  81 │     if (!matches || matches.length !== 3) {
+  82 │       throw new Error('Invalid base64 string');
+  83 │     }
+  84 │ 
+  85 │     const contentType = matches[1];
+  86 │     const base64Data = matches[2];
+  87 │ 
+  88 │     // Convert base64 to binary
+  89 │     const byteCharacters = atob(base64Data);
+  90 │     const byteArrays = [];
+  91 │ 
+  92 │     for (let offset = 0; offset < byteCharacters.length; offset += 512) {
+  93 │       const slice = byteCharacters.slice(offset, offset + 512);
+  94 │ 
+  95 │       const byteNumbers = new Array(slice.length);
+  96 │       for (let i = 0; i < slice.length; i++) {
+  97 │         byteNumbers[i] = slice.charCodeAt(i);
+  98 │       }
+  99 │ 
+ 100 │       const byteArray = new Uint8Array(byteNumbers);
+ 101 │       byteArrays.push(byteArray);
+ 102 │     }
+ 103 │ 
+ 104 │     const blob = new Blob(byteArrays, { type: contentType });
+ 105 │     return URL.createObjectURL(blob);
+ 106 │   } catch (error) {
+ 107 │     console.error('Error converting base64 to blob:', error);
+ 108 │     return '';
+ 109 │   }
+ 110 │ };
+ 111 │ 
+ 112 │ /**
+ 113 │  * Checks if a URL is likely being blocked by browser extensions or client settings
+ 114 │  */
+ 115 │ export function isLikelyBlockedUrl(url: string): boolean {
+ 116 │   // Keyword based approach (common ad/tracking domains)
+ 117 │   const blockedDomainKeywords = [
+ 118 │     'googletagmanager',
+ 119 │     'analytics',
+ 120 │     'adservice',
+ 121 │     'googleads',
+ 122 │     'doubleclick',
+ 123 │     'googlesyndication',
+ 124 │     'adsystem',
+ 125 │     'adnxs',
+ 126 │   ];
+ 127 │ 
+ 128 │   // Also check for common patterns
+ 129 │   const blockedPatterns = [
+ 130 │     'googletagmanager.com',
+ 131 │     'analytics',
+ 132 │     'ads',
+ 133 │     'tracking',
+ 134 │     'pixel',
+ 135 │     'stat',
+ 136 │     'beacon'
+ 137 │   ];
+ 138 │ 
+ 139 │   return blockedDomainKeywords.some(keyword => url.includes(keyword)) || 
+ 140 │          blockedPatterns.some(pattern => url.includes(pattern));
+ 141 │ }
+ 142 │ 
+ 143 │ export const preloadImage = (url: string): Promise<string> => {
+ 144 │   return new Promise((resolve, reject) => {
+ 145 │     if (!url) {
+ 146 │       reject(new Error('No URL provided'));
+ 147 │       return;
+ 148 │     }
+ 149 │ 
+ 150 │     const img = new Image();
+ 151 │     img.onload = () => resolve(url);
+ 152 │     img.onerror = () => reject(new Error(`Failed to load image: ${url}`));
+ 153 │     img.src = url;
+ 154 │   });
+ 155 │ };
+ 156 │ 
+ 157 │ export const handleImageLoadError = (e: React.SyntheticEvent<HTMLImageElement>, imageUrl?: string, fallbackText = 'Image unavailable') => {
+ 158 │   const img = e.currentTarget;
+ 159 │   const parentElement = img.parentElement;
+ 160 │ 
+ 161 │   // Log the error with more details
+ 162 │   console.error('Image load error details:', {
+ 163 │     src: img.src,
+ 164 │     originalUrl: imageUrl,
+ 165 │     element: img,
+ 166 │     error: e
+ 167 │   });
+ 168 │ 
+ 169 │   // Attempt various fixes in sequence
+ 170 │   if (img.src.includes('?')) {
+ 171 │     // Try loading without query parameters first
+ 172 │     const cleanSrc = img.src.split('?')[0];
+ 173 │     console.log('Retrying image load with clean URL:', cleanSrc);
+ 174 │ 
+ 175 │     // Only retry once to avoid infinite loop
+ 176 │     if (!img.dataset.retried) {
+ 177 │       img.dataset.retried = 'true';
+ 178 │       img.src = cleanSrc;
+ 179 │       return; // Don't show fallback yet, trying clean URL first
+ 180 │     }
+ 181 │   }
+ 182 │ 
+ 183 │   // If URL contains supabase.co and we've already tried clean URL
+ 184 │   if ((img.src.includes('supabase.co') || (imageUrl && imageUrl.includes('supabase.co'))) && img.dataset.retried === 'true') {
+ 185 │     // Try adding cache control and random param
+ 186 │     const timestamp = Date.now();
+ 187 │     const cacheBusterUrl = `${img.src.split('?')[0]}?t=${timestamp}&cache=no-store`;
+ 188 │     console.log('Retrying with cache buster:', cacheBusterUrl);
+ 189 │ 
+ 190 │     if (!img.dataset.retriedCache) {
+ 191 │       img.dataset.retriedCache = 'true';
+ 192 │       img.src = cacheBusterUrl;
+ 193 │       return; // Try with cache buster
+ 194 │     }
+ 195 │   }
+ 196 │ 
+ 197 │   // If we get here, the image failed even after retries
+ 198 │   console.error('Image failed after all retries:', img.src);
+ 199 │ 
+ 200 │   // Hide the broken image
+ 201 │   img.style.display = 'none';
+ 202 │ 
+ 203 │   // Add a placeholder div if not already present
+ 204 │   if (!parentElement?.querySelector('.image-error-fallback')) {
+ 205 │     const fallback = document.createElement('div');
+ 206 │     fallback.className = 'image-error-fallback p-4 rounded bg-muted/20 text-center text-sm flex items-center justify-center';
+ 207 │     fallback.style.minHeight = '100px';
+ 208 │     fallback.style.maxWidth = '100%';
+ 209 │     fallback.innerHTML = `
+ 210 │       <div>
+ 211 │         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mx-auto mb-2 opacity-70">
+ 212 │           <circle cx="12" cy="12" r="10"></circle>
+ 213 │           <line x1="8" y1="12" x2="16" y2="12"></line>
+ 214 │         </svg>
+ 215 │         <span>${fallbackText}</span>
+ 216 │       </div>
+ 217 │     `;
+ 218 │     parentElement?.appendChild(fallback);
+ 219 │   }
+ 220 │ };
+ 221 │ 
+ 222 │ // generateImageThumbnail function - creates thumbnail for image uploads
+ 223 │ export const generateImageThumbnail = async (file: File): Promise<string> => {
+     ·              ───────────┬──────────
+     ·                         ╰── `generateImageThumbnail` redefined here
+ 224 │   return new Promise((resolve, reject) => {
+ 225 │     try {
+ 226 │       const reader = new FileReader();
+     ╰────
+
+
+handleMessage @ client:698
+(anonymous) @ client:546Understand this error
