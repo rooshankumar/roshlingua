@@ -313,7 +313,10 @@ const Auth = () => {
         <TabsContent value="signup">
           <form onSubmit={handleSignup}>
             <CardHeader className="space-y-2">
-              <CardTitle className="text-2xl text-center">Create Account</CardTitle>
+              <div className="flex justify-center mb-4">
+                <RoshLinguaLogo size="lg" />
+              </div>
+              <CardTitle className="text-2xl text-center">Join RoshLingua</CardTitle>
               <CardDescription className="text-muted-foreground text-center">
                 Start your language learning journey today
               </CardDescription>
