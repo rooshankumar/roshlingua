@@ -69,6 +69,9 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
     const [nativeLanguageSearch, setNativeLanguageSearch] = useState("");
     const [learningLanguageSearch, setLearningLanguageSearch] = useState("");
     const comboboxRef = useRef<HTMLDivElement>(null);
+    const nativeLanguageRef = useRef<HTMLDivElement>(null);
+    const learningLanguageRef = useRef<HTMLDivElement>(null);
+
 
     // Close the dropdown when clicking outside
     useEffect(() => {
@@ -78,6 +81,23 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
                 setLearningLanguageOpen(false);
             }
         };
+
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, []);
+
+    // Close dropdowns when clicking outside
+    useEffect(() => {
+        function handleClickOutside(event) {
+            if (nativeLanguageRef.current && !nativeLanguageRef.current.contains(event.target)) {
+                setNativeLanguageOpen(false);
+            }
+            if (learningLanguageRef.current && !learningLanguageRef.current.contains(event.target)) {
+                setLearningLanguageOpen(false);
+            }
+        }
 
         document.addEventListener("mousedown", handleClickOutside);
         return () => {
@@ -396,117 +416,69 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
                                         render={({ field }) => (
                                             <FormItem className="flex flex-col">
                                                 <FormLabel>Native Language</FormLabel>
-                                                <div className="relative">
-                                                    <FormControl>
-                                                        <div className="relative">
+                                                <div>
+                                                    <div className="relative" ref={nativeLanguageRef}>
+                                                        <FormControl>
                                                             <Input
                                                                 placeholder="Search or select your native language"
-                                                                className="w-full pr-10"
-                                                                value={field.value}
+                                                                value={nativeLanguageSearch}
                                                                 onChange={(e) => {
-                                                                    const value = e.target.value;
-                                                                    field.onChange(value);
-                                                                    setNativeLanguageSearch(value);
+                                                                    // Update both the search state and the input value
+                                                                    setNativeLanguageSearch(e.target.value);
+                                                                    // This allows for custom language input
+                                                                    field.onChange(e.target.value);
                                                                 }}
-                                                                onClick={() => setNativeLanguageOpen(true)}
                                                                 onFocus={() => setNativeLanguageOpen(true)}
                                                                 onKeyDown={(e) => {
-                                                                    if (e.key === 'Enter') {
-                                                                        field.onChange(field.value);
+                                                                    if(e.key === 'Enter' && nativeLanguageSearch) {
+                                                                        field.onChange(nativeLanguageSearch);
                                                                         setNativeLanguageOpen(false);
                                                                     }
                                                                 }}
                                                             />
-                                                            <Button
-                                                                type="button"
-                                                                variant="ghost"
-                                                                className="absolute right-0 top-0 h-full aspect-square p-0"
-                                                                onClick={() => setNativeLanguageOpen(!nativeLanguageOpen)}
-                                                            >
-                                                                <ChevronsUpDown className="h-4 w-4" />
-                                                            </Button>
-                                                        </div>
-                                                    </FormControl>
-                                                    {nativeLanguageOpen && (
-                                                        <div className="absolute z-50 mt-1 max-h-56 w-full overflow-auto rounded-md border bg-popover p-1 shadow-md">
-                                                            <div className="sticky top-0 bg-popover p-1">
-                                                                <div className="flex items-center border rounded-sm px-2">
-                                                                    <Search className="h-4 w-4 mr-2 opacity-50" />
-                                                                    <Input
-                                                                        placeholder="Search language..."
-                                                                        className="border-0 focus-visible:ring-0 h-8"
-                                                                        value={nativeLanguageSearch}
-                                                                        onChange={(e) => setNativeLanguageSearch(e.target.value.toLowerCase())}
-                                                                    />
-                                                                </div>
-                                                            </div>
-                                                            <div className="mt-1">
-                                                                {languageOptions
-                                                                    .filter((lang) => {
-                                                                        if (!lang) return false;
-                                                                        if (!nativeLanguageSearch) return true;
-                                                                        
-                                                                        const search = nativeLanguageSearch.toLowerCase();
-                                                                        const value = lang.value.toLowerCase();
-                                                                        const label = lang.label.toLowerCase();
-                                                                        const code = lang.code.toLowerCase();
-                                                                        
-                                                                        return value.startsWith(search) ||
-                                                                               label.startsWith(search) ||
-                                                                               code.startsWith(search) ||
-                                                                               value.includes(search) ||
-                                                                               label.includes(search) ||
-                                                                               code.includes(search);
-                                                                    })
-                                                                    .map((lang) => (
-                                                                        <button
-                                                                            type="button"
-                                                                            key={lang.code}
-                                                                            className={`flex items-center w-full px-2 py-1.5 cursor-pointer rounded-sm hover:bg-accent text-left ${
-                                                                                field.value === lang.value ? "bg-accent" : ""
-                                                                            }`}
-                                                                            onClick={(e) => {
-                                                                                e.preventDefault();
-                                                                                e.stopPropagation();
-                                                                                // Set both input display and form value
-                                                                                setNativeLanguageSearch(lang.value); 
-                                                                                field.onChange(lang.value);
-                                                                                setTimeout(() => {
-                                                                                    setNativeLanguageOpen(false);
-                                                                                }, 100);
-                                                                            }}
-                                                                        >
-                                                                            <span className="mr-2">{lang.label.split(" ")[0]}</span>
-                                                                            <span>{lang.value}</span>
-                                                                            {field.value === lang.value && (
-                                                                                <Check className="ml-auto h-4 w-4" />
-                                                                            )}
-                                                                        </button>
-                                                                    ))}
-                                                                {languageOptions.filter((lang) => 
-                                                                    lang.label.toLowerCase().includes(nativeLanguageSearch.toLowerCase()) || 
-                                                                    lang.value.toLowerCase().includes(nativeLanguageSearch.toLowerCase())
-                                                                ).length === 0 && nativeLanguageSearch.trim() !== "" && (
-                                                                    <div 
-                                                                        className="flex items-center justify-between px-2 py-2 cursor-pointer rounded-sm hover:bg-accent"
+                                                        </FormControl>
+                                                        <FormDescription>
+                                                            You can select a language or type a custom one
+                                                        </FormDescription>
+                                                        <FormMessage />
+                                                        <div className="mt-1">
+                                                            {nativeLanguageOpen && languageOptions
+                                                                .filter((lang) => {
+                                                                    if (!lang) return false;
+                                                                    if (!nativeLanguageSearch) return true;
+
+                                                                    const search = nativeLanguageSearch.toLowerCase();
+                                                                    const value = lang.value.toLowerCase();
+                                                                    const label = lang.label.toLowerCase();
+                                                                    const code = lang.code.toLowerCase();
+
+                                                                    return value.startsWith(search) ||
+                                                                           label.startsWith(search) ||
+                                                                           code.startsWith(search) ||
+                                                                           value.includes(search) ||
+                                                                           label.includes(search) ||
+                                                                           code.includes(search);
+                                                                })
+                                                                .map((lang) => (
+                                                                    <button
+                                                                        type="button"
+                                                                        key={lang.value}
+                                                                        className="w-full text-left hover:bg-accent px-3 py-1 text-sm"
                                                                         onClick={() => {
-                                                                            // Update both form value and display value
-                                                                            const value = nativeLanguageSearch.trim();
-                                                                            field.onChange(value);
+                                                                            // Set the display value
+                                                                            setNativeLanguageSearch(lang.label);
+                                                                            // Update the form field value properly
+                                                                            field.onChange(lang.value);
+                                                                            // Close the dropdown
                                                                             setNativeLanguageOpen(false);
                                                                         }}
                                                                     >
-                                                                        <span>Use "{nativeLanguageSearch}"</span>
-                                                                        <Check className="h-4 w-4" />
-                                                                    </div>
-                                                                )}
-                                                            </div>
+                                                                        {lang.label}
+                                                                    </button>
+                                                                ))}
                                                         </div>
-                                                    )}
+                                                    </div>
                                                 </div>
-                                                <FormDescription>
-                                                    You can select a language or type a custom one
-                                                </FormDescription>
                                             </FormItem>
                                         )}
                                     />
