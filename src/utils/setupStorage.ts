@@ -33,6 +33,8 @@ export const verifyStorageBuckets = async () => {
         // Ensure buckets are public
         const { error: updateError } = await supabase.storage.updateBucket(bucketName, {
           public: true,
+          allowedMimeTypes: ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/avif'],
+          fileSizeLimit: 10485760 // 10MB
         });
         
         if (updateError) {

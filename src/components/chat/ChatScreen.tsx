@@ -543,13 +543,17 @@ export const ChatScreen = ({ conversation }: Props) => {
                     {message.attachment_url && (
                       <div className="mt-2 relative attachment-container">
                         {message.attachment_url.match(/\.(jpg|jpeg|png|gif|webp|avif)$/i) ? (
-                          <div className="relative">
+                          <div className="relative bg-muted rounded-lg">
                             <img
-                              src={message.attachment_url}
+                              src={`${message.attachment_url}?t=${Date.now()}`}
                               alt={message.attachment_name || "Attachment"}
                               className="rounded-lg w-full h-auto max-w-[300px] max-h-[300px] object-contain cursor-pointer"
                               loading="lazy"
-                              onError={(e) => handleImageLoadError(e, message.attachment_url)}
+                              crossOrigin="anonymous"
+                              onError={(e) => {
+                                console.error('Image load error for:', message.attachment_url);
+                                handleImageLoadError(e, message.attachment_url);
+                              }}
                               onClick={() => {
                                 setImagePreview({
                                   url: message.attachment_url,

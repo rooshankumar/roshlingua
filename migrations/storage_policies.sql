@@ -2,7 +2,12 @@
 -- Enable RLS for storage
 ALTER TABLE storage.objects ENABLE ROW LEVEL SECURITY;
 
--- Allow authenticated users to upload files
+-- Allow public read access to attachments bucket
+CREATE POLICY "Allow public read access"
+ON storage.objects FOR SELECT
+USING (bucket_id = 'attachments');
+
+-- Allow authenticated uploads
 CREATE POLICY "Allow authenticated uploads"
 ON storage.objects
 FOR INSERT
@@ -24,14 +29,4 @@ USING (
 WITH CHECK (
   bucket_id = 'attachments' AND
   (owner = auth.uid() OR auth.uid() IS NOT NULL)
-);
-
--- Allow authenticated users to read files
-CREATE POLICY "Allow authenticated downloads"
-ON storage.objects
-FOR SELECT
-TO authenticated
-USING (
-  bucket_id = 'attachments' AND
-  auth.uid() IS NOT NULL
 );
