@@ -1,0 +1,87 @@
+iled to load resource: net::ERR_BLOCKED_BY_CLIENTUnderstand this error
+ChatScreen.tsx:472 Chat subscription issue: CLOSED
+(anonymous) @ ChatScreen.tsx:472Understand this error
+wqojeesjtgfcftpnzaet.supabase.co/rest/v1/conversation_participants?select=user%3Aprofiles%21conversation_participants_user_id_fkey%28id%2Cuser_id%2Cfull_name%2Cavatar_url%2Clast_seen%29&conversation_id=eq.f74683b7-55ef-41c5-92c8-c827d0e30fd4&user_id=neq.ed1c374e-3823-4ea2-aa28-3999c21d1140:1 
+            
+            
+           Failed to load resource: the server responded with a status of 406 ()Understand this error
+wqojeesjtgfcftpnzaet.supabase.co/rest/v1/messages?select=content%2Ccreated_at&conversation_id=eq.f74683b7-55ef-41c5-92c8-c827d0e30fd4&order=created_at.desc&limit=1:1 
+            
+            
+           Failed to load resource: the server responded with a status of 406 ()Understand this error
+@supabase_supabase-js.js?v=1b41e62b:2083 Uncaught tried to subscribe multiple times. 'subscribe' can only be called a single time per channel instanceUnderstand this error
+ChatAttachment.tsx:110 
+            
+            
+           POST https://wqojeesjtgfcftpnzaet.supabase.co/storage/v1/object/attachments/1747553047506_405667.png 400 (Bad Request)
+(anonymous) @ @supabase_supabase-js.js?v=1b41e62b:3900
+(anonymous) @ @supabase_supabase-js.js?v=1b41e62b:3921
+fulfilled @ @supabase_supabase-js.js?v=1b41e62b:3873
+Promise.then
+step @ @supabase_supabase-js.js?v=1b41e62b:3886
+(anonymous) @ @supabase_supabase-js.js?v=1b41e62b:3888
+__awaiter6 @ @supabase_supabase-js.js?v=1b41e62b:3870
+(anonymous) @ @supabase_supabase-js.js?v=1b41e62b:3911
+(anonymous) @ @supabase_supabase-js.js?v=1b41e62b:2987
+(anonymous) @ @supabase_supabase-js.js?v=1b41e62b:2987
+(anonymous) @ @supabase_supabase-js.js?v=1b41e62b:3188
+(anonymous) @ @supabase_supabase-js.js?v=1b41e62b:3125
+__awaiter4 @ @supabase_supabase-js.js?v=1b41e62b:3107
+uploadOrUpdate @ @supabase_supabase-js.js?v=1b41e62b:3156
+(anonymous) @ @supabase_supabase-js.js?v=1b41e62b:3215
+(anonymous) @ @supabase_supabase-js.js?v=1b41e62b:3125
+__awaiter4 @ @supabase_supabase-js.js?v=1b41e62b:3107
+upload @ @supabase_supabase-js.js?v=1b41e62b:3214
+handleFileChange @ ChatAttachment.tsx:110
+await in handleFileChange
+callCallback2 @ chunk-276SZO74.js?v=1664666e:3674
+invokeGuardedCallbackDev @ chunk-276SZO74.js?v=1664666e:3699
+invokeGuardedCallback @ chunk-276SZO74.js?v=1664666e:3733
+invokeGuardedCallbackAndCatchFirstError @ chunk-276SZO74.js?v=1664666e:3736
+executeDispatch @ chunk-276SZO74.js?v=1664666e:7014
+processDispatchQueueItemsInOrder @ chunk-276SZO74.js?v=1664666e:7034
+processDispatchQueue @ chunk-276SZO74.js?v=1664666e:7043
+dispatchEventsForPlugins @ chunk-276SZO74.js?v=1664666e:7051
+(anonymous) @ chunk-276SZO74.js?v=1664666e:7174
+batchedUpdates$1 @ chunk-276SZO74.js?v=1664666e:18913
+batchedUpdates @ chunk-276SZO74.js?v=1664666e:3579
+dispatchEventForPluginEventSystem @ chunk-276SZO74.js?v=1664666e:7173
+dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay @ chunk-276SZO74.js?v=1664666e:5478
+dispatchEvent @ chunk-276SZO74.js?v=1664666e:5472
+dispatchDiscreteEvent @ chunk-276SZO74.js?v=1664666e:5449Understand this error
+ChatAttachment.tsx:117 Upload error: {statusCode: '403', error: 'Unauthorized', message: 'new row violates row-level security policy'}error: "Unauthorized"message: "new row violates row-level security policy"statusCode: "403"[[Prototype]]: Object
+handleFileChange @ ChatAttachment.tsx:117
+await in handleFileChange
+callCallback2 @ chunk-276SZO74.js?v=1664666e:3674
+invokeGuardedCallbackDev @ chunk-276SZO74.js?v=1664666e:3699
+invokeGuardedCallback @ chunk-276SZO74.js?v=1664666e:3733
+invokeGuardedCallbackAndCatchFirstError @ chunk-276SZO74.js?v=1664666e:3736
+executeDispatch @ chunk-276SZO74.js?v=1664666e:7014
+processDispatchQueueItemsInOrder @ chunk-276SZO74.js?v=1664666e:7034
+processDispatchQueue @ chunk-276SZO74.js?v=1664666e:7043
+dispatchEventsForPlugins @ chunk-276SZO74.js?v=1664666e:7051
+(anonymous) @ chunk-276SZO74.js?v=1664666e:7174
+batchedUpdates$1 @ chunk-276SZO74.js?v=1664666e:18913
+batchedUpdates @ chunk-276SZO74.js?v=1664666e:3579
+dispatchEventForPluginEventSystem @ chunk-276SZO74.js?v=1664666e:7173
+dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay @ chunk-276SZO74.js?v=1664666e:5478
+dispatchEvent @ chunk-276SZO74.js?v=1664666e:5472
+dispatchDiscreteEvent @ chunk-276SZO74.js?v=1664666e:5449Understand this error
+ChatAttachment.tsx:163 Error uploading file: {statusCode: '403', error: 'Unauthorized', message: 'new row violates row-level security policy'}error: "Unauthorized"message: "new row violates row-level security policy"statusCode: "403"[[Prototype]]: Object
+handleFileChange @ ChatAttachment.tsx:163
+await in handleFileChange
+callCallback2 @ chunk-276SZO74.js?v=1664666e:3674
+invokeGuardedCallbackDev @ chunk-276SZO74.js?v=1664666e:3699
+invokeGuardedCallback @ chunk-276SZO74.js?v=1664666e:3733
+invokeGuardedCallbackAndCatchFirstError @ chunk-276SZO74.js?v=1664666e:3736
+executeDispatch @ chunk-276SZO74.js?v=1664666e:7014
+processDispatchQueueItemsInOrder @ chunk-276SZO74.js?v=1664666e:7034
+processDispatchQueue @ chunk-276SZO74.js?v=1664666e:7043
+dispatchEventsForPlugins @ chunk-276SZO74.js?v=1664666e:7051
+(anonymous) @ chunk-276SZO74.js?v=1664666e:7174
+batchedUpdates$1 @ chunk-276SZO74.js?v=1664666e:18913
+batchedUpdates @ chunk-276SZO74.js?v=1664666e:3579
+dispatchEventForPluginEventSystem @ chunk-276SZO74.js?v=1664666e:7173
+dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay @ chunk-276SZO74.js?v=1664666e:5478
+dispatchEvent @ chunk-276SZO74.js?v=1664666e:5472
+dispatchDiscreteEvent @ chunk-276SZO74.js?v=1664666e:5449Understand this error
