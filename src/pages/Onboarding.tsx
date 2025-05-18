@@ -90,11 +90,12 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
 
     // Close dropdowns when clicking outside
     useEffect(() => {
-        function handleClickOutside(event) {
-            if (nativeLanguageRef.current && !nativeLanguageRef.current.contains(event.target)) {
+        function handleClickOutside(event: MouseEvent) {
+            const target = event.target as Node;
+            if (nativeLanguageRef.current && !nativeLanguageRef.current.contains(target)) {
                 setNativeLanguageOpen(false);
             }
-            if (learningLanguageRef.current && !learningLanguageRef.current.contains(event.target)) {
+            if (learningLanguageRef.current && !learningLanguageRef.current.contains(target)) {
                 setLearningLanguageOpen(false);
             }
         }
@@ -103,7 +104,7 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
         return () => {
             document.removeEventListener("mousedown", handleClickOutside);
         };
-    }, []);
+    }, [nativeLanguageRef, learningLanguageRef]);
     // Define schema for form validation
     const formSchema = z.object({
         full_name: z.string().min(1, "Name is required"),
@@ -430,9 +431,10 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
                                                                 className="w-full pr-10"
                                                                 value={field.value}
                                                                 onChange={(e) => {
-                                                                    field.onChange(e.target.value);
-                                                                    const searchTerm = e.target.value.toLowerCase();
-                                                                    setNativeLanguageSearch(searchTerm);
+                                                                    const searchTerm = e.target.value;
+                                                                    field.onChange(searchTerm);
+                                                                    setNativeLanguageSearch(searchTerm.toLowerCase());
+                                                                    setNativeLanguageOpen(true);
                                                                 }}
                                                                 onClick={() => setNativeLanguageOpen(true)}
                                                                 onKeyDown={(e) => {
