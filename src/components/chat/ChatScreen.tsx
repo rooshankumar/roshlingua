@@ -548,9 +548,16 @@ export const ChatScreen = ({ conversation }: Props) => {
                               src={message.attachment_url}
                               alt={message.attachment_name || "Attachment"}
                               className="rounded-lg w-full h-auto max-w-[300px] max-h-[300px] object-contain cursor-pointer"
-                              loading="eager"
+                              loading="lazy"
+                              onError={(e) => handleImageLoadError(e, message.attachment_url)}
                               onClick={() => {
                                 setImagePreview({
+                                  url: message.attachment_url,
+                                  name: message.attachment_name
+                                });
+                                setShowImagePreview(true);
+                              }}
+                            />
                                   url: message.attachment_url!,
                                   name: message.attachment_name
                                 });
