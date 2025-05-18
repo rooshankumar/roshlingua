@@ -99,13 +99,15 @@ export const MessageBubble = ({ message, isCurrentUser, isRead = false, onReacti
                 <Skeleton className="w-[260px] md:w-[300px] h-[200px] rounded-lg" />
               ) : (
                 <>
-                  <img 
-                    src={message.attachment_url}
+                  <img
+                    src={message.attachment_url && message.attachment_url.includes('?') ? 
+                      message.attachment_url : 
+                      `${message.attachment_url}?t=${Date.now()}&cache=no-store`}
                     alt={message.attachment_name || "Image attachment"}
                     className="max-w-[260px] md:max-w-[300px] max-h-[350px] rounded-lg object-contain cursor-pointer hover:scale-105 transition-transform duration-200"
                     loading="eager"
                     onLoad={() => setImageLoaded(true)}
-                    onError={(e) => handleImageLoadError(e, "Image failed to load")}
+                    onError={(e) => handleImageLoadError(e, message.attachment_url, "Image failed to load")}
                     onClick={(e) => {
                       e.preventDefault();
                       // Set the target of the click event to be handled by parent component

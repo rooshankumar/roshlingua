@@ -227,6 +227,25 @@ export const ChatAttachment = ({ onAttach }: ChatAttachmentProps) => {
                 alt="Preview" 
                 className="max-w-full max-h-[150px] object-contain rounded cursor-pointer" 
                 onClick={() => setShowFullPreview(true)}
+                onError={(e) => {
+                  console.error("Preview image failed to load:", e);
+                  // Add a data attribute to track retries
+                  if (!e.currentTarget.dataset.retried) {
+                    // Try without query parameters if they exist
+                    if (previewUrl && previewUrl.includes('?')) {
+                      const cleanUrl = previewUrl.split('?')[0];
+                      e.currentTarget.src = cleanUrl;
+                      e.currentTarget.dataset.retried = "true";
+                    }
+                  } else {
+                    // Show a fallback after retry fails
+                    e.currentTarget.style.display = 'none';
+                    const fallbackEl = document.createElement('div');
+                    fallbackEl.className = 'bg-muted/20 p-4 rounded text-center';
+                    fallbackEl.innerHTML = '<span>Image preview unavailable</span>';
+                    e.currentTarget.parentElement?.appendChild(fallbackEl);
+                  }
+                }}
               />
             </div>
           )}
@@ -344,7 +363,21 @@ export const DisplayChatAttachment = ({ url, filename, fileType, fileSize, class
   const loadAttachment = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch(url);
+      // Add cache-busting parameter to avoid caching issues
+      const fetchUrl = url.includes('?') ? url : `${url}?t=${Date.now()}`;
+      const response = await fetch(fetchUrl, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+          'Expires': '0'
+        }
+      });
+      
+      if (!response.ok) {
+        throw new Error(`Failed to load: ${response.status} ${response.statusText}`);
+      }
+      
       const blob = await response.blob();
       const newObjectUrl = URL.createObjectURL(blob);
       setObjectUrl(newObjectUrl);

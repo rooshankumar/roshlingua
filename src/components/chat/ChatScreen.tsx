@@ -822,11 +822,27 @@ export const ChatScreen = ({ conversation }: Props) => {
     const imgSrc = originalUrl || e.currentTarget.src;
     console.error('Image failed to load:', imgSrc);
 
-    // Try loading without the cache buster parameter if it exists
-    if (imgSrc.includes('?t=')) {
-      const cleanUrl = imgSrc.split('?t=')[0];
+    // First approach: Add cache control if not already present
+    if (!imgSrc.includes('cache=no-store')) {
+      const timestamp = Date.now();
+      // Add timestamp and cache control
+      const url = imgSrc.includes('?') ? 
+        `${imgSrc}&t=${timestamp}&cache=no-store` : 
+        `${imgSrc}?t=${timestamp}&cache=no-store`;
+      
+      e.currentTarget.src = url;
+      console.log("Retrying with cache control:", url);
+      // Set a data attribute to track this retry
+      e.currentTarget.setAttribute('data-retry-cache', 'true');
+      return;
+    }
+    
+    // Second approach: Try loading without any parameters
+    if (e.currentTarget.getAttribute('data-retry-cache') === 'true' && imgSrc.includes('?')) {
+      const cleanUrl = imgSrc.split('?')[0];
       e.currentTarget.src = cleanUrl;
       console.log("Retrying with clean URL:", cleanUrl);
+      e.currentTarget.setAttribute('data-retry-clean', 'true');
       return;
     }
 
