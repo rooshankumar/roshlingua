@@ -1,0 +1,45 @@
+Using Supabase URL: https://wqojeesjtgfcftpnzaet.supabase.co
+disableSupabaseLogs.ts:23 Full page load detected
+disableSupabaseLogs.ts:23 Initializing auth state...
+disableSupabaseLogs.ts:23 App initialized
+disableSupabaseLogs.ts:23 Checking storage buckets...
+disableSupabaseLogs.ts:23 Checking existing storage buckets...
+disableSupabaseLogs.ts:23 Setting initial session: No session
+disableSupabaseLogs.ts:23 New authentication data detected, clearing old auth state
+disableSupabaseLogs.ts:23 Processing authentication callback...
+disableSupabaseLogs.ts:23 [PKCE] Searching for PKCE verifier in all storage locations...
+disableSupabaseLogs.ts:23 [PKCE] Found verifier in localStorage: YZnicmg8... length: 43
+disableSupabaseLogs.ts:23 [PKCE] Storing verifier: YZnicmg8... length: 43
+disableSupabaseLogs.ts:23 [PKCE] Verifier stored in multiple locations successfully
+disableSupabaseLogs.ts:23 Got verifier: Yes Length: 43
+disableSupabaseLogs.ts:23 [PKCE] Storing verifier: YZnicmg8... length: 43
+disableSupabaseLogs.ts:23 [PKCE] Verifier stored in multiple locations successfully
+disableSupabaseLogs.ts:23 Auth state changed: INITIAL_SESSION No session
+AuthCallback.tsx:61 Session exchange error: AuthApiError: invalid request: both auth code and code verifier should be non-empty
+    at Cg (fetch.js:66:11)
+    at async ij (fetch.js:109:9)
+    at async Q (fetch.js:91:18)
+    at async yj._exchangeCodeForSession (GoTrueClient.js:417:37)
+(anonymous) @ AuthCallback.tsx:61
+await in (anonymous)
+(anonymous) @ AuthCallback.tsx:88
+Xl @ react-dom.production.min.js:243
+Ss @ react-dom.production.min.js:285
+(anonymous) @ react-dom.production.min.js:281
+_ @ scheduler.production.min.js:13
+L @ scheduler.production.min.js:14Understand this error
+AuthCallback.tsx:79 Authentication callback error: AuthApiError: invalid request: both auth code and code verifier should be non-empty
+    at Cg (fetch.js:66:11)
+    at async ij (fetch.js:109:9)
+    at async Q (fetch.js:91:18)
+    at async yj._exchangeCodeForSession (GoTrueClient.js:417:37)
+(anonymous) @ AuthCallback.tsx:79
+await in (anonymous)
+(anonymous) @ AuthCallback.tsx:88
+Xl @ react-dom.production.min.js:243
+Ss @ react-dom.production.min.js:285
+(anonymous) @ react-dom.production.min.js:281
+_ @ scheduler.production.min.js:13
+L @ scheduler.production.min.js:14Understand this error
+disableSupabaseLogs.ts:23 No existing buckets found, which is unusual.
+disableSupabaseLogs.ts:23 Storage buckets verified successfully
