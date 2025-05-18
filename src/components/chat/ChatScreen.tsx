@@ -584,13 +584,19 @@ export const ChatScreen = ({ conversation }: Props) => {
     }
   };
 
-  const handleSend = async (content?: string, attachment?: { url: string; filename: string; thumbnail?: string }) => {
+  const handleSend = async (content?: string, attachment?: { url: string; filename: string; thumbnail?: string }, retryCount = 0) => {
     const messageContent = content || newMessage;
     if ((!messageContent.trim() && !attachment) || !user || !conversation?.id || isSending) return;
 
+    const MAX_RETRIES = 3;
+    const RETRY_DELAY = 1000; // 1 second delay between retries
+    
     setIsSending(true);
     const tempId = crypto.randomUUID();
     const timestamp = new Date().toISOString();
+
+    // Track if the message was successfully sent
+    let sendSuccess = false;
 
     // Log attachment information for debugging
     if (attachment) {
@@ -656,14 +662,42 @@ export const ChatScreen = ({ conversation }: Props) => {
         }]);
 
       if (error) {
-        // Remove the optimistic message on error
-        setMessages(prev => prev.filter(msg => msg.id !== tempId));
         throw error;
       }
+      
+      sendSuccess = true;
     } catch (error) {
       console.error('Error sending message:', error);
+      
+      // Remove the optimistic message
+      setMessages(prev => prev.filter(msg => msg.id !== tempId));
+      
+      // Attempt retry if we haven't exceeded max retries
+      if (retryCount < MAX_RETRIES) {
+        toast({
+          title: `Message sending failed. Retrying... (${retryCount + 1}/${MAX_RETRIES})`,
+          description: "Please wait while we retry sending your message",
+          duration: 3000,
+        });
+        
+        // Wait before retrying
+        await new Promise(resolve => setTimeout(resolve, RETRY_DELAY));
+        
+        // Retry sending the message
+        return handleSend(messageContent, attachment, retryCount + 1);
+      } else {
+        toast({
+          variant: "destructive",
+          title: "Failed to send message",
+          description: "Please check your connection and try again",
+          duration: 5000,
+        });
+      }
     } finally {
-      setIsSending(false);
+      // Only set isSending to false if we're not going to retry
+      if (sendSuccess || retryCount >= MAX_RETRIES) {
+        setIsSending(false);
+      }
     }
   };
 
