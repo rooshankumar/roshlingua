@@ -162,13 +162,7 @@ const ChatPage = () => {
 
   return (
     <div className={isMobile ? "fixed inset-0 z-50 bg-background" : "min-h-screen md:bg-muted/30 max-w-full overflow-hidden"}>
-      <div className="flex flex-col space-y-1 mb-6 hidden md:block">
-        <h1 className="text-2xl font-bold">Messages</h1>
-        <p className="text-muted-foreground">
-          Stay connected with your language partners
-        </p>
-      </div>
-      <ChatScreen conversation={conversation} unreadCount={unreadCount} /> {/* Pass unreadCount to ChatScreen */}
+      <ChatScreen conversation={conversation} unreadCount={unreadCount} />
     </div>
   );
 };
