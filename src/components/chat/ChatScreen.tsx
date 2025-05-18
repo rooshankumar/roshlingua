@@ -954,7 +954,7 @@ export const ChatScreen = ({ conversation }: Props) => {
 
   return (
     <Card className="fixed inset-0 flex flex-col w-full h-full md:static md:h-[calc(100vh-1rem)] md:max-w-[1200px] md:mx-auto md:my-2 md:rounded-lg border-none shadow-xl overflow-hidden bg-gradient-to-b from-background/95 to-background/90 backdrop-blur-lg" style={{ WebkitOverflowScrolling: 'touch' }}>
-      <div className="fixed top-0 left-0 right-0 z-40 bg-background/95 backdrop-blur-xl border-b md:relative">
+      <div className="relative bg-background/95 backdrop-blur-xl border-b">
         <ChatHeader conversation={conversation} />
       </div>
 

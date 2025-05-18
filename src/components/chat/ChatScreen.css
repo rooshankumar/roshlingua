@@ -436,7 +436,6 @@ img.expanded {
 .chat-content-area {
   flex: 1;
   overflow-y: auto;
-  margin-top: 72px;
   margin-bottom: 80px;
   padding: 0.5rem 1rem;
   -webkit-overflow-scrolling: touch;
