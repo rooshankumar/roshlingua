@@ -299,121 +299,43 @@ export const getFileThumbnailUrl = async (file: File): Promise<string> => {
 };
 
 /**
- * Cleans up Supabase storage URLs to fix double slash issues
+ * Simple URL cleaner for Supabase storage URLs
  * @param url The URL to clean
  * @returns A properly formatted URL
  */
 export function cleanSupabaseUrl(url: string | null | undefined): string {
   if (!url) return '';
   
-  // First, strip off any existing query parameters
+  // Strip query parameters
   const baseUrl = url.split('?')[0];
   
-  // Fix double slash in the path (but not http://)
+  // Fix common double slash issues
   let cleanedUrl = baseUrl.replace(/([^:])\/\/+/g, '$1/');
   
-  // Handle specific double-slash pattern in attachments path
+  // Fix specific attachment path issues
   if (cleanedUrl.includes('//attachments/')) {
     cleanedUrl = cleanedUrl.replace('//attachments/', '/attachments/');
   }
   
-  // Special handling for Supabase URLs to prevent CORS issues
-  if (cleanedUrl.includes('supabase.co/storage/v1/object/public')) {
-    // Make sure we don't have any double slashes in the path
-    cleanedUrl = cleanedUrl.replace(/([^:])\/\/+/g, '$1/');
-  }
-  
-  // Add cache-busting parameter and force no-cache
-  const timestamp = Date.now();
-  const finalUrl = `${cleanedUrl}?t=${timestamp}&cache=no-store`;
-  
-  return finalUrl;
-}
-
-/**
- * Creates a URL that's optimized for direct image loading in <img> tags
- */
-export function getImageDisplayUrl(url: string | null | undefined): string {
-  if (!url) return '';
-  
-  const baseUrl = url.split('?')[0];
-  // Fix double slashes but preserve http://
-  const cleanedUrl = baseUrl.replace(/([^:])\/\/+/g, '$1/');
-  
-  // For image tags, add minimal query parameters to avoid caching
+  // Add a basic timestamp to avoid caching
   return `${cleanedUrl}?t=${Date.now()}`;
 }
 
 /**
- * Creates a URL that's optimized for downloading files
+ * Simple function to get a display URL for images
+ */
+export function getImageDisplayUrl(url: string | null | undefined): string {
+  if (!url) return '';
+  return cleanSupabaseUrl(url);
+}
+
+/**
+ * Simple function to get a download URL for files
  */
 export function getFileDownloadUrl(url: string | null | undefined): string {
   if (!url) return '';
-  
-  const baseUrl = url.split('?')[0];
-  const cleanedUrl = baseUrl.replace(/([^:])\/\/+/g, '$1/');
-  
-  // For downloads, add download=true parameter
-  return `${cleanedUrl}?download=true&t=${Date.now()}`;
-}
-
-/**
- * Special URL cleaner for image tags that might be causing CORS or caching issues
- */
-export function getImageSafeUrl(url: string | null | undefined): string {
-  if (!url) return '';
-  
-  // First clean the URL using our standard cleaner
-  const cleanedUrl = cleanSupabaseUrl(url);
-  
-  // For image tags, add additional parameters that help with browser caching issues
-  return cleanedUrl + '&img=1';
-}
-
-/**
- * Enhanced image preloading that tries multiple URL formats
- */
-export function preloadImageWithRetry(url: string | null | undefined): Promise<string> {
-  return new Promise((resolve, reject) => {
-    if (!url) {
-      reject(new Error('No URL provided'));
-      return;
-    }
-    
-    // Try with the cleaned URL first
-    const cleanedUrl = cleanSupabaseUrl(url);
-    
-    const img = new Image();
-    let attempts = 0;
-    const maxAttempts = 3;
-    
-    const tryLoad = (attemptUrl: string) => {
-      attempts++;
-      console.log(`Preload attempt ${attempts}/${maxAttempts} with URL: ${attemptUrl}`);
-      
-      img.onload = () => resolve(attemptUrl);
-      img.onerror = () => {
-        if (attempts >= maxAttempts) {
-          reject(new Error(`Failed to load image after ${maxAttempts} attempts`));
-          return;
-        }
-        
-        // Try different URL formats
-        if (attempts === 1) {
-          // Try without any parameters
-          tryLoad(url.split('?')[0]);
-        } else if (attempts === 2) {
-          // Try with forced no-cache
-          tryLoad(`${url.split('?')[0]}?no-cache=${Date.now()}`);
-        }
-      };
-      
-      img.src = attemptUrl;
-    };
-    
-    // Start the first attempt
-    tryLoad(cleanedUrl);
-  });
+  const cleanUrl = cleanSupabaseUrl(url);
+  return `${cleanUrl}&download=true`;
 }
 
 import { supabase } from '@/lib/supabase';

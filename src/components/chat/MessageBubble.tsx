@@ -93,79 +93,48 @@ export const MessageBubble = ({ message, isCurrentUser, isRead = false, onReacti
             </div>
           )}
           {isImageAttachment && message.attachment_url && (
-  <div className="relative">
+  <div className="relative p-2">
     {isPreloading ? (
-      <Skeleton className="w-[260px] md:w-[300px] h-[200px] rounded-lg" />
-    ) : imageLoadError ? (
-      <div className="w-[260px] md:w-[300px] h-[200px] rounded-lg bg-muted/20 flex flex-col items-center justify-center text-muted-foreground p-4">
-        <FileText className="h-8 w-8 mb-2 opacity-70" />
-        <p className="text-sm">{message.attachment_name || "Image"}</p>
-        <a
-          href={message.attachment_url?.split('?')[0] + `?t=${Date.now()}`}
-          download
-          className="text-xs mt-2 underline hover:text-primary transition-colors"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          View/Download
-        </a>
-      </div>
+      <Skeleton className="w-[240px] h-[180px] rounded-lg" />
     ) : (
-      <>
-        <img
-          src={message.attachment_url ? cleanSupabaseUrl(message.attachment_url) : ''}
-          alt={message.attachment_name || "Image attachment"}
-          className="max-w-[260px] md:max-w-[300px] max-h-[350px] rounded-lg object-contain cursor-pointer hover:scale-105 transition-transform duration-200"
-          loading="eager"
-          referrerPolicy="no-referrer"
-          onLoad={() => setImageLoaded(true)}
-          onError={(e) => {
-            console.error('Error loading image:', e);
-            const imgEl = e.currentTarget;
-
-            // Try with different URL formats
-            if (!imgEl.dataset.retried) {
-              // First retry: Use a clean URL with timestamp
-              const baseUrl = message.attachment_url?.split('?')[0].replace('//attachments/', '/attachments/');
-              const cleanedUrl = `${baseUrl}?t=${Date.now()}`;
-              console.log('Retrying with cleaned URL:', cleanedUrl);
-              imgEl.src = cleanedUrl;
-              imgEl.dataset.retried = 'true';
-            } else if (imgEl.dataset.retried === 'true' && !imgEl.dataset.retriedCache) {
-              // Second retry: Force no-cache
-              const baseUrl = message.attachment_url?.split('?')[0].replace('//attachments/', '/attachments/');
-              const cacheBusterUrl = `${baseUrl}?t=${Date.now()}&cache=no-store`;
-              console.log('Retrying with cache buster:', cacheBusterUrl);
-              imgEl.src = cacheBusterUrl;
-              imgEl.dataset.retriedCache = 'true';
-            } else {
-              // All retries failed
-              setImageLoadError("Failed to load image");
-              console.error('All image load attempts failed for:', message.attachment_url);
-            }
-          }}
-          onClick={(e) => {
-            if (imageLoaded) {
-              e.preventDefault();
-              const cleanUrl = message.attachment_url?.replace('//attachments/', '/attachments/').split('?')[0] + `?t=${Date.now()}`;
-              const clickEvent = new CustomEvent('image-preview', {
-                detail: { url: cleanUrl, name: message.attachment_name }
-              });
-              document.dispatchEvent(clickEvent);
-            }
-          }}
-        />
-        <a
-          href={message.attachment_url?.split('?')[0] + `?t=${Date.now()}`}
-          download={message.attachment_name}
-          className="absolute bottom-2 right-2 bg-black/50 text-white p-1 rounded-md opacity-0 group-hover:opacity-100 transition-opacity"
-          onClick={(e) => e.stopPropagation()}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Download className="h-4 w-4" />
-        </a>
-      </>
+      <div className="flex flex-col">
+        <div className="mb-1 text-xs font-medium">
+          {message.attachment_name || "Image"}
+        </div>
+        <div className="relative border rounded-lg overflow-hidden">
+          <img
+            src={message.attachment_url}
+            alt={message.attachment_name || "Image attachment"}
+            className="max-w-[240px] max-h-[240px] object-contain"
+            loading="lazy"
+            onError={(e) => {
+              console.error('Error loading image');
+              e.currentTarget.style.display = 'none';
+              const parent = e.currentTarget.parentElement;
+              if (parent) {
+                const fallback = document.createElement('div');
+                fallback.className = 'p-4 text-center bg-muted/20';
+                fallback.innerHTML = `
+                  <FileText className="h-6 w-6 mx-auto mb-2" />
+                  <p class="text-sm">Image unavailable</p>
+                  <a href="${message.attachment_url}" class="text-xs underline mt-1 block" target="_blank">View/Download</a>
+                `;
+                parent.appendChild(fallback);
+              }
+            }}
+          />
+          <a
+            href={message.attachment_url}
+            download={message.attachment_name}
+            className="absolute bottom-1 right-1 bg-black/50 text-white p-1 rounded-md"
+            onClick={(e) => e.stopPropagation()}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <Download className="h-4 w-4" />
+          </a>
+        </div>
+      </div>
     )}
   </div>
 )}
