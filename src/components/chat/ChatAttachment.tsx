@@ -87,7 +87,8 @@ export const ChatAttachment = ({ onAttach }: ChatAttachmentProps) => {
       const randomStr = Math.random().toString().substring(2, 8);
       const fileExt = file.name.split('.').pop();
       const fileName = `${timestamp}_${randomStr}.${fileExt}`;
-      const filePath = `${fileName}`;
+      // Don't add any slashes - Supabase will handle the path structure
+      const filePath = fileName;
 
       console.log("Uploading file:", fileName, "Size:", (file.size / 1024).toFixed(2) + "KB");
 
@@ -138,8 +139,14 @@ export const ChatAttachment = ({ onAttach }: ChatAttachmentProps) => {
         throw new Error("Failed to get public URL for uploaded file");
       }
 
+      // Check if URL has a double slash and fix it if needed
+      let cleanedUrl = data.publicUrl;
+      if (cleanedUrl.includes('//attachments/')) {
+        cleanedUrl = cleanedUrl.replace('//attachments/', '/attachments/');
+      }
+
       // Append a timestamp and cache control to the URL to prevent caching issues
-      const publicUrl = `${data.publicUrl}?t=${timestamp}&cache=no-store`;
+      const publicUrl = `${cleanedUrl}?t=${timestamp}&cache=no-store`;
 
       console.log("File uploaded successfully:", publicUrl);
 
