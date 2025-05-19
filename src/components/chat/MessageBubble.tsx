@@ -5,7 +5,6 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'; //
 import { MessageReactions } from './MessageReactions'; // Ensure this path is correct
 import { formatRelativeTime } from '@/utils/chatUtils'; // Ensure this path is correct
 import { Skeleton } from '@/components/ui/skeleton'; // Ensure this path is correct
-import { cleanSupabaseUrl } from '@/utils/imageUtils';
 
 interface MessageBubbleProps {
   message: Message;
@@ -92,35 +91,150 @@ export const MessageBubble = ({ message, isCurrentUser, isRead = false, onReacti
               </div>
             </div>
           )}
-          {/* Display attachment */}
-          {message.attachment_url && (
+          {isImageAttachment && message.attachment_url && (
+  <div className="relative">
+    {isPreloading ? (
+      <Skeleton className="w-[260px] md:w-[300px] h-[200px] rounded-lg" />
+    ) : imageLoadError ? (
+      <div className="w-[260px] md:w-[300px] h-[200px] rounded-lg bg-muted/20 flex flex-col items-center justify-center text-muted-foreground p-4">
+        <FileText className="h-8 w-8 mb-2 opacity-70" />
+        <p className="text-sm">{message.attachment_name || "Image"}</p>
+        <a
+          href={message.attachment_url?.split('?')[0] + `?t=${Date.now()}`}
+          download
+          className="text-xs mt-2 underline hover:text-primary transition-colors"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          View/Download
+        </a>
+      </div>
+    ) : (
+      <>
+        <img
+          src={message.attachment_url?.replace('//attachments/', '/attachments/').split('?')[0] + `?t=${Date.now()}`}
+          alt={message.attachment_name || "Image attachment"}
+          className="max-w-[260px] md:max-w-[300px] max-h-[350px] rounded-lg object-contain cursor-pointer hover:scale-105 transition-transform duration-200"
+          loading="eager"
+          referrerPolicy="no-referrer"
+          onLoad={() => setImageLoaded(true)}
+          onError={(e) => {
+            console.error('Error loading image:', e);
+            const imgEl = e.currentTarget;
+
+            // Try with different URL formats
+            if (!imgEl.dataset.retried) {
+              // First retry: Clean URL of double slashes and query params
+              const cleanedUrl = message.attachment_url?.replace('//attachments/', '/attachments/').split('?')[0] + `?t=${Date.now()}`;
+              console.log('Retrying with cleaned URL:', cleanedUrl);
+              imgEl.src = cleanedUrl;
+              imgEl.dataset.retried = 'true';
+            } else if (imgEl.dataset.retried === 'true' && !imgEl.dataset.retriedCache) {
+              // Second retry: Add cache control headers
+              const cacheBusterUrl = message.attachment_url?.split('?')[0] + `?t=${Date.now()}&cache=no-store`;
+              console.log('Retrying with cache buster:', cacheBusterUrl);
+              imgEl.src = cacheBusterUrl;
+              imgEl.dataset.retriedCache = 'true';
+            } else {
+              // All retries failed
+              setImageLoadError("Failed to load image");
+              console.error('All image load attempts failed for:', message.attachment_url);
+            }
+          }}
+          onClick={(e) => {
+            if (imageLoaded) {
+              e.preventDefault();
+              const cleanUrl = message.attachment_url?.replace('//attachments/', '/attachments/').split('?')[0] + `?t=${Date.now()}`;
+              const clickEvent = new CustomEvent('image-preview', {
+                detail: { url: cleanUrl, name: message.attachment_name }
+              });
+              document.dispatchEvent(clickEvent);
+            }
+          }}
+        />
+        <a
+          href={message.attachment_url?.split('?')[0] + `?t=${Date.now()}`}
+          download={message.attachment_name}
+          className="absolute bottom-2 right-2 bg-black/50 text-white p-1 rounded-md opacity-0 group-hover:opacity-100 transition-opacity"
+          onClick={(e) => e.stopPropagation()}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <Download className="h-4 w-4" />
+        </a>
+      </>
+    )}
+  </div>
+)}
+
+          {/* Video attachment */}
+          {isVideoAttachment && message.attachment_url && (
             <div className="p-2">
-              {message.attachment_url.match(/\.(jpg|jpeg|png|gif|webp)$/i) ? (
-                <div>
-                  <p className="text-xs mb-1">{message.attachment_name || "Image"}</p>
-                  <img
-                    src={message.attachment_url}
-                    alt={message.attachment_name || "Image"}
-                    className="max-w-[240px] max-h-[180px] object-contain rounded"
-                  />
-                </div>
-              ) : (
-                <div className="flex items-center gap-2">
-                  <FileText className="h-5 w-5" />
-                  <div>
-                    <p className="text-sm truncate">{message.attachment_name || "File"}</p>
-                    <a
-                      href={message.attachment_url}
-                      download
-                      className="text-xs underline"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      Download
-                    </a>
-                  </div>
-                </div>
-              )}
+              <video
+                src={message.attachment_url}
+                controls
+                autoPlay={true}
+                preload="auto"
+                className="max-w-[260px] md:max-w-[300px] rounded-lg"
+                controlsList="nodownload"
+              />
+            </div>
+          )}
+
+          {/* Audio attachment */}
+          {isAudioAttachment && message.attachment_url && (
+            <div className="p-3">
+              <p className="text-sm font-medium mb-1">
+                {message.attachment_name || "Audio file"}
+              </p>
+              <audio
+                src={message.attachment_url}
+                controls
+                autoPlay
+                preload="auto"
+                className="w-full max-w-[260px]"
+              />
+            </div>
+          )}
+
+          {/* PDF attachment */}
+          {isPdfAttachment && message.attachment_url && (
+            <div className="p-3">
+              <p className="text-sm font-medium mb-2">
+                {message.attachment_name || "PDF document"}
+              </p>
+              <iframe
+                src={message.attachment_url}
+                className="w-[260px] h-[200px] md:w-[300px] md:h-[250px] rounded-lg border border-border"
+              />
+              <a
+                href={message.attachment_url}
+                download
+                className="text-xs mt-1 underline hover:text-primary transition-colors block text-center"
+              >
+                Download PDF
+              </a>
+            </div>
+          )}
+
+          {/* Other file attachment */}
+          {message.attachment_url && !isImageAttachment && !isVideoAttachment && !isAudioAttachment && !isPdfAttachment && (
+            <div className="flex items-center gap-2 p-3">
+              <div className="bg-background/20 p-2 rounded-full">
+                {getAttachmentIcon()}
+              </div>
+              <div className="flex-1 overflow-hidden">
+                <p className="text-sm font-medium truncate">
+                  {message.attachment_name || "Attachment"}
+                </p>
+                <a
+                  href={message.attachment_url}
+                  download
+                  className="text-xs underline hover:text-primary transition-colors"
+                >
+                  Download
+                </a>
+              </div>
             </div>
           )}
 
