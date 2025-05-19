@@ -1,11 +1,10 @@
 import { useState, useEffect } from 'react';
 import { Smile, Check, MessageCircle, Download, FileText, Image as ImageIcon, Video, FileAudio } from 'lucide-react';
-import { Message } from '@/types/chat';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { MessageReactions } from './MessageReactions';
-import { formatRelativeTime } from '@/utils/chatUtils';
-import { handleImageLoadError, preloadImage } from '@/utils/imageUtils';
-import { Skeleton } from '@/components/ui/skeleton';
+import { Message } from '@/types/chat'; // Ensure this path is correct for your project
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'; // Ensure this path is correct
+import { MessageReactions } from './MessageReactions'; // Ensure this path is correct
+import { formatRelativeTime } from '@/utils/chatUtils'; // Ensure this path is correct
+import { Skeleton } from '@/components/ui/skeleton'; // Ensure this path is correct
 
 interface MessageBubbleProps {
   message: Message;
@@ -14,38 +13,40 @@ interface MessageBubbleProps {
   onReaction?: (emoji: string) => void;
   isLast?: boolean;
   isConsecutive?: boolean;
-  replyToMessage?: Message | null;
+  replyToMessage?: Message | null; // You had this in the interface but didn't use it in the component
 }
 
 export const MessageBubble = ({ message, isCurrentUser, isRead = false, onReaction, isLast = false, isConsecutive = false }: MessageBubbleProps) => {
   const [showReactionPicker, setShowReactionPicker] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
   const [isPreloading, setIsPreloading] = useState(true);
+  const [imageLoadError, setImageLoadError] = useState<string | null>(null);
 
-  // Format time from ISO string to relative time (e.g. "2 hours ago")
   const formattedTime = formatRelativeTime(message.created_at);
 
-  // Check attachment type
   const isImageAttachment = message.attachment_url?.match(/\.(jpg|jpeg|png|gif|webp|avif)$/i);
   const isVideoAttachment = message.attachment_url?.match(/\.(mp4|webm|ogg)$/i);
   const isAudioAttachment = message.attachment_url?.match(/\.(mp3|wav|aac)$/i);
   const isPdfAttachment = message.attachment_url?.match(/\.(pdf)$/i);
 
-  // Preload images immediately on component mount
   useEffect(() => {
     if (isImageAttachment && message.attachment_url) {
       setIsPreloading(true);
-      preloadImage(message.attachment_url)
-        .then(() => {
-          setImageLoaded(true);
-          setIsPreloading(false);
-        })
-        .catch(error => {
-          console.error('Failed to preload image:', error);
-          setIsPreloading(false);
-        });
+      setImageLoadError(null); // Reset error state
+      const img = new Image();
+      img.onload = () => {
+        setImageLoaded(true);
+        setIsPreloading(false);
+      };
+      img.onerror = (error) => {
+        console.error('Failed to load image:', error);
+        setImageLoadError("Failed to load image");
+        setIsPreloading(false);
+      };
+      img.src = message.attachment_url;
     } else {
       setIsPreloading(false);
+      setImageLoadError(null);
     }
   }, [message.attachment_url, isImageAttachment]);
 
@@ -53,7 +54,6 @@ export const MessageBubble = ({ message, isCurrentUser, isRead = false, onReacti
     setShowReactionPicker(!showReactionPicker);
   };
 
-  // Function to get attachment icon based on file type
   const getAttachmentIcon = () => {
     if (isImageAttachment) return <ImageIcon className="h-5 w-5" />;
     if (isVideoAttachment) return <Video className="h-5 w-5" />;
@@ -74,11 +74,10 @@ export const MessageBubble = ({ message, isCurrentUser, isRead = false, onReacti
       )}
 
       <div className={`flex flex-col ${isCurrentUser ? 'items-end' : 'items-start'}`}>
-        <div 
+        <div
           className={`message-bubble ${isCurrentUser ? 'sent bg-primary text-primary-foreground' : 'received bg-muted text-muted-foreground'} rounded-2xl shadow-sm ${message.attachment_url ? 'overflow-hidden' : 'p-1 px-2'} ${isConsecutive ? 'consecutive-message' : ''} inline-block max-w-fit`}
           data-sender={isCurrentUser ? 'self' : 'other'}
         >
-          {/* Reply reference UI */}
           {message.reply_to_id && (
             <div className={`reply-reference ${isCurrentUser ? 'bg-primary-foreground/20' : 'bg-background/50'} p-1.5 mb-1 rounded-lg text-xs border-l-2 ${isCurrentUser ? 'border-primary-foreground/50' : 'border-primary/50'}`}>
               <div className="flex items-center gap-1">
@@ -93,31 +92,35 @@ export const MessageBubble = ({ message, isCurrentUser, isRead = false, onReacti
             </div>
           )}
           {/* Image attachment */}
-          {isImageAttachment && (
+          {isImageAttachment && message.attachment_url && (
             <div className="relative">
               {isPreloading ? (
                 <Skeleton className="w-[260px] md:w-[300px] h-[200px] rounded-lg" />
+              ) : imageLoadError ? (
+                <div className="w-[260px] md:w-[300px] h-[200px] rounded-lg bg-gray-100 flex items-center justify-center text-gray-500">
+                  {imageLoadError}
+                </div>
               ) : (
                 <>
                   <img
-                    src={message.attachment_url && message.attachment_url.includes('?') ? 
-                      message.attachment_url : 
-                      `${message.attachment_url}?t=${Date.now()}&cache=no-store`}
+                    src={message.attachment_url}
                     alt={message.attachment_name || "Image attachment"}
                     className="max-w-[260px] md:max-w-[300px] max-h-[350px] rounded-lg object-contain cursor-pointer hover:scale-105 transition-transform duration-200"
                     loading="eager"
                     onLoad={() => setImageLoaded(true)}
-                    onError={(e) => handleImageLoadError(e, message.attachment_url, "Image failed to load")}
+                    onError={(e) => {
+                      console.error('Error loading image:', e);
+                      setImageLoadError("Failed to load image");
+                    }}
                     onClick={(e) => {
                       e.preventDefault();
-                      // Set the target of the click event to be handled by parent component
-                      const clickEvent = new CustomEvent('image-preview', { 
-                        detail: { url: message.attachment_url, name: message.attachment_name } 
+                      const clickEvent = new CustomEvent('image-preview', {
+                        detail: { url: message.attachment_url, name: message.attachment_name }
                       });
                       document.dispatchEvent(clickEvent);
                     }}
                   />
-                  <a 
+                  <a
                     href={message.attachment_url}
                     download
                     className="absolute bottom-2 right-2 bg-black/50 text-white p-1 rounded-md opacity-0 group-hover:opacity-100 transition-opacity"
@@ -131,9 +134,9 @@ export const MessageBubble = ({ message, isCurrentUser, isRead = false, onReacti
           )}
 
           {/* Video attachment */}
-          {isVideoAttachment && (
+          {isVideoAttachment && message.attachment_url && (
             <div className="p-2">
-              <video 
+              <video
                 src={message.attachment_url}
                 controls
                 autoPlay={true}
@@ -145,12 +148,12 @@ export const MessageBubble = ({ message, isCurrentUser, isRead = false, onReacti
           )}
 
           {/* Audio attachment */}
-          {isAudioAttachment && (
+          {isAudioAttachment && message.attachment_url && (
             <div className="p-3">
               <p className="text-sm font-medium mb-1">
                 {message.attachment_name || "Audio file"}
               </p>
-              <audio 
+              <audio
                 src={message.attachment_url}
                 controls
                 autoPlay
@@ -161,7 +164,7 @@ export const MessageBubble = ({ message, isCurrentUser, isRead = false, onReacti
           )}
 
           {/* PDF attachment */}
-          {isPdfAttachment && (
+          {isPdfAttachment && message.attachment_url && (
             <div className="p-3">
               <p className="text-sm font-medium mb-2">
                 {message.attachment_name || "PDF document"}
@@ -170,7 +173,7 @@ export const MessageBubble = ({ message, isCurrentUser, isRead = false, onReacti
                 src={message.attachment_url}
                 className="w-[260px] h-[200px] md:w-[300px] md:h-[250px] rounded-lg border border-border"
               />
-              <a 
+              <a
                 href={message.attachment_url}
                 download
                 className="text-xs mt-1 underline hover:text-primary transition-colors block text-center"
@@ -190,7 +193,7 @@ export const MessageBubble = ({ message, isCurrentUser, isRead = false, onReacti
                 <p className="text-sm font-medium truncate">
                   {message.attachment_name || "Attachment"}
                 </p>
-                <a 
+                <a
                   href={message.attachment_url}
                   download
                   className="text-xs underline hover:text-primary transition-colors"
@@ -216,7 +219,7 @@ export const MessageBubble = ({ message, isCurrentUser, isRead = false, onReacti
         </div>
       </div>
 
-      {/* Reactions - Using emoji button similar to the reference */}
+      {/* Reactions */}
       <div className="message-actions flex items-center">
         <button
           onClick={toggleReactionPicker}
