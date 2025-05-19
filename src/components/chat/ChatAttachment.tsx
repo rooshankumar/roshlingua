@@ -126,10 +126,6 @@ export const ChatAttachment = ({ onAttach }: ChatAttachmentProps) => {
 
       console.log("Upload successful:", uploadData);
 
-      if (uploadError) {
-        throw uploadError;
-      }
-
       // Get file's public URL
       const { data } = await supabase.storage
         .from('attachments')
@@ -341,6 +337,7 @@ interface ChatAttachmentProps {
 export const DisplayChatAttachment = ({ url, filename, fileType, fileSize, className }: ChatAttachmentProps) => {
   const [objectUrl, setObjectUrl] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
 
   const isImage = fileType.startsWith('image/');
 
@@ -360,10 +357,14 @@ export const DisplayChatAttachment = ({ url, filename, fileType, fileSize, class
 
   const loadAttachment = async () => {
     setIsLoading(true);
+    setLoadError(null);
+    
     try {
-      // Add cache-busting parameter to avoid caching issues
-      const fetchUrl = url.includes('?') ? url : `${url}?t=${Date.now()}`;
-      const response = await fetch(fetchUrl, {
+      // Use the cleaned URL function to avoid double-slash issues
+      const cleanedUrl = cleanSupabaseUrl(url);
+      console.log("Loading attachment with URL:", cleanedUrl);
+      
+      const response = await fetch(cleanedUrl, {
         cache: 'no-store',
         headers: {
           'Cache-Control': 'no-cache, no-store, must-revalidate',
@@ -381,6 +382,23 @@ export const DisplayChatAttachment = ({ url, filename, fileType, fileSize, class
       setObjectUrl(newObjectUrl);
     } catch (error) {
       console.error('Error loading attachment:', error);
+      setLoadError(error instanceof Error ? error.message : 'Failed to load attachment');
+      
+      // Try alternative method if the first attempt fails
+      try {
+        // Try a direct load approach with the image element
+        const img = new Image();
+        img.onload = () => {
+          setObjectUrl(url);
+          setLoadError(null);
+        };
+        img.onerror = () => {
+          console.error('Failed to load image even with fallback method');
+        };
+        img.src = cleanSupabaseUrl(url);
+      } catch (fallbackError) {
+        console.error('Fallback loading method failed:', fallbackError);
+      }
     } finally {
       setIsLoading(false);
     }
@@ -396,7 +414,7 @@ export const DisplayChatAttachment = ({ url, filename, fileType, fileSize, class
           </p>
         </div>
         <a 
-          href={url} 
+          href={cleanSupabaseUrl(url)} 
           download={filename}
           target="_blank" 
           rel="noopener noreferrer"
@@ -410,6 +428,12 @@ export const DisplayChatAttachment = ({ url, filename, fileType, fileSize, class
         <div className="mt-2 relative">
           {isLoading ? (
             <Skeleton className="w-full h-48 rounded-md" />
+          ) : loadError ? (
+            <div className="w-full h-48 rounded-md bg-muted/20 flex flex-col items-center justify-center p-4">
+              <FileText className="h-8 w-8 mb-2 opacity-70" />
+              <p className="text-sm text-center">{filename}</p>
+              <p className="text-xs text-muted-foreground mt-1">Image couldn't be loaded</p>
+            </div>
           ) : (
             objectUrl && (
               <img 
@@ -417,6 +441,11 @@ export const DisplayChatAttachment = ({ url, filename, fileType, fileSize, class
                 alt={filename} 
                 className="rounded-md w-full max-h-96 object-contain" 
                 loading="lazy"
+                onError={(e) => {
+                  console.error("Error loading image in display component");
+                  e.currentTarget.style.display = 'none';
+                  setLoadError("Failed to display image");
+                }}
               />
             )
           )}
