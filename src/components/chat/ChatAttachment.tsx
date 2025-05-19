@@ -3,7 +3,7 @@ import { Paperclip, Image as ImageIcon, FileText, Video, FileAudio, X } from 'lu
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '../ui/button';
 import { Loader2 } from 'lucide-react';
-import { generateImageThumbnail } from '@/utils/imageUtils';
+import { generateImageThumbnail, cleanSupabaseUrl } from '@/utils/imageUtils';
 import { toast } from '@/components/ui/use-toast';
 import { Download } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -141,8 +141,7 @@ export const ChatAttachment = ({ onAttach }: ChatAttachmentProps) => {
 
       console.log("Original public URL:", data.publicUrl);
       
-      // Use the improved cleanSupabaseUrl function from imageUtils
-      import { cleanSupabaseUrl } from '@/utils/imageUtils';
+      // Use the improved cleanSupabaseUrl function
       const publicUrl = cleanSupabaseUrl(data.publicUrl);
       
       console.log("Cleaned public URL:", publicUrl);
