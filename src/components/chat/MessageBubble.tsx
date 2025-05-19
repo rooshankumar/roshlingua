@@ -92,121 +92,35 @@ export const MessageBubble = ({ message, isCurrentUser, isRead = false, onReacti
               </div>
             </div>
           )}
-          {isImageAttachment && message.attachment_url && (
-  <div className="relative p-2">
-    {isPreloading ? (
-      <Skeleton className="w-[240px] h-[180px] rounded-lg" />
-    ) : (
-      <div className="flex flex-col">
-        <div className="mb-1 text-xs font-medium">
-          {message.attachment_name || "Image"}
-        </div>
-        <div className="relative border rounded-lg overflow-hidden">
-          <img
-            src={message.attachment_url}
-            alt={message.attachment_name || "Image attachment"}
-            className="max-w-[240px] max-h-[240px] object-contain"
-            loading="lazy"
-            onError={(e) => {
-              console.error('Error loading image');
-              e.currentTarget.style.display = 'none';
-              const parent = e.currentTarget.parentElement;
-              if (parent) {
-                const fallback = document.createElement('div');
-                fallback.className = 'p-4 text-center bg-muted/20';
-                fallback.innerHTML = `
-                  <FileText className="h-6 w-6 mx-auto mb-2" />
-                  <p class="text-sm">Image unavailable</p>
-                  <a href="${message.attachment_url}" class="text-xs underline mt-1 block" target="_blank">View/Download</a>
-                `;
-                parent.appendChild(fallback);
-              }
-            }}
-          />
-          <a
-            href={message.attachment_url}
-            download={message.attachment_name}
-            className="absolute bottom-1 right-1 bg-black/50 text-white p-1 rounded-md"
-            onClick={(e) => e.stopPropagation()}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Download className="h-4 w-4" />
-          </a>
-        </div>
-      </div>
-    )}
-  </div>
-)}
-
-          {/* Video attachment */}
-          {isVideoAttachment && message.attachment_url && (
+          {/* Display attachment */}
+          {message.attachment_url && (
             <div className="p-2">
-              <video
-                src={message.attachment_url}
-                controls
-                autoPlay={true}
-                preload="auto"
-                className="max-w-[260px] md:max-w-[300px] rounded-lg"
-                controlsList="nodownload"
-              />
-            </div>
-          )}
-
-          {/* Audio attachment */}
-          {isAudioAttachment && message.attachment_url && (
-            <div className="p-3">
-              <p className="text-sm font-medium mb-1">
-                {message.attachment_name || "Audio file"}
-              </p>
-              <audio
-                src={message.attachment_url}
-                controls
-                autoPlay
-                preload="auto"
-                className="w-full max-w-[260px]"
-              />
-            </div>
-          )}
-
-          {/* PDF attachment */}
-          {isPdfAttachment && message.attachment_url && (
-            <div className="p-3">
-              <p className="text-sm font-medium mb-2">
-                {message.attachment_name || "PDF document"}
-              </p>
-              <iframe
-                src={message.attachment_url}
-                className="w-[260px] h-[200px] md:w-[300px] md:h-[250px] rounded-lg border border-border"
-              />
-              <a
-                href={message.attachment_url}
-                download
-                className="text-xs mt-1 underline hover:text-primary transition-colors block text-center"
-              >
-                Download PDF
-              </a>
-            </div>
-          )}
-
-          {/* Other file attachment */}
-          {message.attachment_url && !isImageAttachment && !isVideoAttachment && !isAudioAttachment && !isPdfAttachment && (
-            <div className="flex items-center gap-2 p-3">
-              <div className="bg-background/20 p-2 rounded-full">
-                {getAttachmentIcon()}
-              </div>
-              <div className="flex-1 overflow-hidden">
-                <p className="text-sm font-medium truncate">
-                  {message.attachment_name || "Attachment"}
-                </p>
-                <a
-                  href={message.attachment_url}
-                  download
-                  className="text-xs underline hover:text-primary transition-colors"
-                >
-                  Download
-                </a>
-              </div>
+              {message.attachment_url.match(/\.(jpg|jpeg|png|gif|webp)$/i) ? (
+                <div>
+                  <p className="text-xs mb-1">{message.attachment_name || "Image"}</p>
+                  <img
+                    src={message.attachment_url}
+                    alt={message.attachment_name || "Image"}
+                    className="max-w-[240px] max-h-[180px] object-contain rounded"
+                  />
+                </div>
+              ) : (
+                <div className="flex items-center gap-2">
+                  <FileText className="h-5 w-5" />
+                  <div>
+                    <p className="text-sm truncate">{message.attachment_name || "File"}</p>
+                    <a
+                      href={message.attachment_url}
+                      download
+                      className="text-xs underline"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      Download
+                    </a>
+                  </div>
+                </div>
+              )}
             </div>
           )}
 

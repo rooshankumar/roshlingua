@@ -306,19 +306,8 @@ export const getFileThumbnailUrl = async (file: File): Promise<string> => {
 export function cleanSupabaseUrl(url: string | null | undefined): string {
   if (!url) return '';
   
-  // Strip query parameters
-  const baseUrl = url.split('?')[0];
-  
-  // Fix common double slash issues
-  let cleanedUrl = baseUrl.replace(/([^:])\/\/+/g, '$1/');
-  
-  // Fix specific attachment path issues
-  if (cleanedUrl.includes('//attachments/')) {
-    cleanedUrl = cleanedUrl.replace('//attachments/', '/attachments/');
-  }
-  
-  // Add a basic timestamp to avoid caching
-  return `${cleanedUrl}?t=${Date.now()}`;
+  // Add a timestamp to avoid caching
+  return `${url}?t=${Date.now()}`;
 }
 
 /**
