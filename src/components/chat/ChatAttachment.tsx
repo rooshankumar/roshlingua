@@ -338,6 +338,7 @@ export const DisplayChatAttachment = ({ url, filename, fileType, fileSize, class
   const [objectUrl, setObjectUrl] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
+  const [retryCount, setRetryCount] = useState(0);
 
   const isImage = fileType.startsWith('image/');
 
@@ -345,11 +346,15 @@ export const DisplayChatAttachment = ({ url, filename, fileType, fileSize, class
   useEffect(() => {
     if (isImage) {
       loadAttachment();
+    } else {
+      // For non-images, just set the cleaned URL directly
+      setObjectUrl(cleanSupabaseUrl(url));
+      setIsLoading(false);
     }
 
     return () => {
       // Cleanup the object URL when component unmounts
-      if (objectUrl) {
+      if (objectUrl && objectUrl.startsWith('blob:')) {
         URL.revokeObjectURL(objectUrl);
       }
     };
@@ -361,7 +366,10 @@ export const DisplayChatAttachment = ({ url, filename, fileType, fileSize, class
     
     try {
       // Use the cleaned URL function to avoid double-slash issues
-      const cleanedUrl = cleanSupabaseUrl(url);
+      const timestamp = Date.now();
+      const baseUrl = url.split('?')[0].replace('//attachments/', '/attachments/');
+      const cleanedUrl = `${baseUrl}?t=${timestamp}&cache=no-store`;
+      
       console.log("Loading attachment with URL:", cleanedUrl);
       
       const response = await fetch(cleanedUrl, {
@@ -380,27 +388,23 @@ export const DisplayChatAttachment = ({ url, filename, fileType, fileSize, class
       const blob = await response.blob();
       const newObjectUrl = URL.createObjectURL(blob);
       setObjectUrl(newObjectUrl);
+      setIsLoading(false);
     } catch (error) {
       console.error('Error loading attachment:', error);
-      setLoadError(error instanceof Error ? error.message : 'Failed to load attachment');
       
-      // Try alternative method if the first attempt fails
-      try {
-        // Try a direct load approach with the image element
-        const img = new Image();
-        img.onload = () => {
-          setObjectUrl(url);
-          setLoadError(null);
-        };
-        img.onerror = () => {
-          console.error('Failed to load image even with fallback method');
-        };
-        img.src = cleanSupabaseUrl(url);
-      } catch (fallbackError) {
-        console.error('Fallback loading method failed:', fallbackError);
+      // Try direct approach if fetch failed and we haven't exceeded retry limit
+      if (retryCount < 2) {
+        setRetryCount(prev => prev + 1);
+        const directUrl = `${url.split('?')[0]}?t=${Date.now()}&direct=true`;
+        console.log("Trying direct URL approach:", directUrl);
+        
+        // Set the direct URL
+        setObjectUrl(directUrl);
+        setIsLoading(false);
+      } else {
+        setLoadError('Failed to load attachment');
+        setIsLoading(false);
       }
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -433,22 +437,79 @@ export const DisplayChatAttachment = ({ url, filename, fileType, fileSize, class
               <FileText className="h-8 w-8 mb-2 opacity-70" />
               <p className="text-sm text-center">{filename}</p>
               <p className="text-xs text-muted-foreground mt-1">Image couldn't be loaded</p>
+              <a
+                href={cleanSupabaseUrl(url)}
+                download={filename}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs underline hover:text-primary transition-colors mt-2"
+              >
+                Download Image
+              </a>
             </div>
           ) : (
             objectUrl && (
-              <img 
-                src={objectUrl} 
-                alt={filename} 
-                className="rounded-md w-full max-h-96 object-contain" 
-                loading="lazy"
-                onError={(e) => {
-                  console.error("Error loading image in display component");
-                  e.currentTarget.style.display = 'none';
-                  setLoadError("Failed to display image");
-                }}
-              />
+              <div className="relative">
+                <img 
+                  src={objectUrl} 
+                  alt={filename} 
+                  className="rounded-md w-full max-h-96 object-contain" 
+                  loading="lazy"
+                  onError={(e) => {
+                    console.error("Error loading image in display component");
+                    // If object URL failed, try direct URL
+                    if (objectUrl.startsWith('blob:')) {
+                      console.log("Blob URL failed, trying direct URL");
+                      e.currentTarget.src = cleanSupabaseUrl(url) + "&direct=true";
+                      e.currentTarget.dataset.fallback = "true";
+                    } else if (!e.currentTarget.dataset.fallback) {
+                      // Last attempt with full URL parameters
+                      e.currentTarget.src = url.split('?')[0] + `?t=${Date.now()}&nocache=true`;
+                      e.currentTarget.dataset.fallback = "final";
+                    } else {
+                      // All attempts failed
+                      e.currentTarget.style.display = 'none';
+                      setLoadError("Failed to display image");
+                    }
+                  }}
+                />
+                <div className="absolute bottom-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <a
+                    href={cleanSupabaseUrl(url)}
+                    download={filename}
+                    onClick={(e) => e.stopPropagation()}
+                    className="bg-black/50 text-white p-1.5 rounded-full"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <Download className="h-4 w-4" />
+                  </a>
+                </div>
+              </div>
             )
           )}
+        </div>
+      )}
+      
+      {!isImage && objectUrl && (
+        <div className="mt-2 p-3 bg-muted/10 rounded-md flex items-center gap-3">
+          <div className="bg-primary/10 p-2 rounded-full">
+            {fileType.startsWith('video/') ? <Video className="h-5 w-5" /> : 
+             fileType.startsWith('audio/') ? <FileAudio className="h-5 w-5" /> : 
+             <FileText className="h-5 w-5" />}
+          </div>
+          <div className="flex-1 overflow-hidden">
+            <p className="text-sm font-medium truncate">{filename}</p>
+            <a
+              href={cleanSupabaseUrl(url)}
+              download={filename}
+              target="_blank"
+              rel="noopener noreferrer" 
+              className="text-xs underline hover:text-primary transition-colors"
+            >
+              Download File
+            </a>
+          </div>
         </div>
       )}
     </div>

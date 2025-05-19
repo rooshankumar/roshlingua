@@ -306,28 +306,55 @@ export const getFileThumbnailUrl = async (file: File): Promise<string> => {
 export function cleanSupabaseUrl(url: string | null | undefined): string {
   if (!url) return '';
   
-  console.log("Cleaning URL:", url);
+  // First, strip off any existing query parameters
+  const baseUrl = url.split('?')[0];
   
-  // Fix double slash in the path
-  let cleanedUrl = url;
+  // Fix double slash in the path (but not http://)
+  let cleanedUrl = baseUrl.replace(/([^:])\/\/+/g, '$1/');
   
-  // Handle various double-slash patterns that might appear
+  // Handle specific double-slash pattern in attachments path
   if (cleanedUrl.includes('//attachments/')) {
     cleanedUrl = cleanedUrl.replace('//attachments/', '/attachments/');
-    console.log("Fixed double slash in attachments path:", cleanedUrl);
   }
   
-  // Also handle the case where there might be other patterns
-  cleanedUrl = cleanedUrl.replace(/([^:])\/\/+/g, '$1/');
-  
-  // Remove any existing query parameters for a clean URL
-  const baseUrl = cleanedUrl.split('?')[0];
+  // Special handling for Supabase URLs to prevent CORS issues
+  if (cleanedUrl.includes('supabase.co/storage/v1/object/public')) {
+    // Make sure we don't have any double slashes in the path
+    cleanedUrl = cleanedUrl.replace(/([^:])\/\/+/g, '$1/');
+  }
   
   // Add cache-busting parameter and force no-cache
-  const finalUrl = `${baseUrl}?t=${Date.now()}&cache=no-store`;
-  console.log("Final cleaned URL:", finalUrl);
+  const timestamp = Date.now();
+  const finalUrl = `${cleanedUrl}?t=${timestamp}&cache=no-store`;
   
   return finalUrl;
+}
+
+/**
+ * Creates a URL that's optimized for direct image loading in <img> tags
+ */
+export function getImageDisplayUrl(url: string | null | undefined): string {
+  if (!url) return '';
+  
+  const baseUrl = url.split('?')[0];
+  // Fix double slashes but preserve http://
+  const cleanedUrl = baseUrl.replace(/([^:])\/\/+/g, '$1/');
+  
+  // For image tags, add minimal query parameters to avoid caching
+  return `${cleanedUrl}?t=${Date.now()}`;
+}
+
+/**
+ * Creates a URL that's optimized for downloading files
+ */
+export function getFileDownloadUrl(url: string | null | undefined): string {
+  if (!url) return '';
+  
+  const baseUrl = url.split('?')[0];
+  const cleanedUrl = baseUrl.replace(/([^:])\/\/+/g, '$1/');
+  
+  // For downloads, add download=true parameter
+  return `${cleanedUrl}?download=true&t=${Date.now()}`;
 }
 
 /**

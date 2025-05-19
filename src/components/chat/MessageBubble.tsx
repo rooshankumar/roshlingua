@@ -5,6 +5,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'; //
 import { MessageReactions } from './MessageReactions'; // Ensure this path is correct
 import { formatRelativeTime } from '@/utils/chatUtils'; // Ensure this path is correct
 import { Skeleton } from '@/components/ui/skeleton'; // Ensure this path is correct
+import { cleanSupabaseUrl } from '@/utils/imageUtils';
 
 interface MessageBubbleProps {
   message: Message;
@@ -112,7 +113,7 @@ export const MessageBubble = ({ message, isCurrentUser, isRead = false, onReacti
     ) : (
       <>
         <img
-          src={message.attachment_url?.replace('//attachments/', '/attachments/').split('?')[0] + `?t=${Date.now()}`}
+          src={message.attachment_url ? cleanSupabaseUrl(message.attachment_url) : ''}
           alt={message.attachment_name || "Image attachment"}
           className="max-w-[260px] md:max-w-[300px] max-h-[350px] rounded-lg object-contain cursor-pointer hover:scale-105 transition-transform duration-200"
           loading="eager"
@@ -124,14 +125,16 @@ export const MessageBubble = ({ message, isCurrentUser, isRead = false, onReacti
 
             // Try with different URL formats
             if (!imgEl.dataset.retried) {
-              // First retry: Clean URL of double slashes and query params
-              const cleanedUrl = message.attachment_url?.replace('//attachments/', '/attachments/').split('?')[0] + `?t=${Date.now()}`;
+              // First retry: Use a clean URL with timestamp
+              const baseUrl = message.attachment_url?.split('?')[0].replace('//attachments/', '/attachments/');
+              const cleanedUrl = `${baseUrl}?t=${Date.now()}`;
               console.log('Retrying with cleaned URL:', cleanedUrl);
               imgEl.src = cleanedUrl;
               imgEl.dataset.retried = 'true';
             } else if (imgEl.dataset.retried === 'true' && !imgEl.dataset.retriedCache) {
-              // Second retry: Add cache control headers
-              const cacheBusterUrl = message.attachment_url?.split('?')[0] + `?t=${Date.now()}&cache=no-store`;
+              // Second retry: Force no-cache
+              const baseUrl = message.attachment_url?.split('?')[0].replace('//attachments/', '/attachments/');
+              const cacheBusterUrl = `${baseUrl}?t=${Date.now()}&cache=no-store`;
               console.log('Retrying with cache buster:', cacheBusterUrl);
               imgEl.src = cacheBusterUrl;
               imgEl.dataset.retriedCache = 'true';
