@@ -298,6 +298,28 @@ export const getFileThumbnailUrl = async (file: File): Promise<string> => {
   return '/placeholder.svg';
 };
 
+/**
+ * Cleans up Supabase storage URLs to fix double slash issues
+ * @param url The URL to clean
+ * @returns A properly formatted URL
+ */
+export function cleanSupabaseUrl(url: string | null | undefined): string {
+  if (!url) return '';
+  
+  // Fix double slash in the path
+  let cleanedUrl = url;
+  if (cleanedUrl.includes('//attachments/')) {
+    cleanedUrl = cleanedUrl.replace('//attachments/', '/attachments/');
+  }
+  
+  // Add cache-busting parameter if not present
+  if (!cleanedUrl.includes('?')) {
+    cleanedUrl += `?t=${Date.now()}&cache=no-store`;
+  }
+  
+  return cleanedUrl;
+}
+
 import { supabase } from '@/lib/supabase';
 
 /**

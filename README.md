@@ -104,3 +104,12 @@ Files uploaded through the chat system are stored in Supabase Storage buckets:
 - Images, videos, audio, and documents are supported
 - Thumbnails are generated for images
 - Files are served with optimized caching settings
+- URL handling includes fixes for the double-slash issue that can occur with Supabase Storage paths
+
+### Storage Bucket Configuration
+
+The application uses a Supabase Storage bucket named 'attachments' for storing user-uploaded files. The system:
+1. Validates files for security (size limit: 10MB)
+2. Generates unique filenames to prevent collisions
+3. Sets proper content-type headers for media files
+4. Handles URL path correction for Supabase's double-slash issue

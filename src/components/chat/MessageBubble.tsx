@@ -103,7 +103,7 @@ export const MessageBubble = ({ message, isCurrentUser, isRead = false, onReacti
               ) : (
                 <>
                   <img
-                    src={message.attachment_url}
+                    src={message.attachment_url?.replace('//attachments/', '/attachments/')}
                     alt={message.attachment_name || "Image attachment"}
                     className="max-w-[260px] md:max-w-[300px] max-h-[350px] rounded-lg object-contain cursor-pointer hover:scale-105 transition-transform duration-200"
                     loading="eager"
