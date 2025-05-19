@@ -308,16 +308,20 @@ export function cleanSupabaseUrl(url: string | null | undefined): string {
   
   // Fix double slash in the path
   let cleanedUrl = url;
+  
+  // Handle various double-slash patterns that might appear
   if (cleanedUrl.includes('//attachments/')) {
     cleanedUrl = cleanedUrl.replace('//attachments/', '/attachments/');
   }
   
-  // Add cache-busting parameter if not present
-  if (!cleanedUrl.includes('?')) {
-    cleanedUrl += `?t=${Date.now()}&cache=no-store`;
-  }
+  // Also handle the case where there might be other patterns
+  cleanedUrl = cleanedUrl.replace(/([^:])\/\/+/g, '$1/');
   
-  return cleanedUrl;
+  // Remove any existing query parameters for a clean URL
+  const baseUrl = cleanedUrl.split('?')[0];
+  
+  // Add cache-busting parameter 
+  return `${baseUrl}?t=${Date.now()}&cache=no-store`;
 }
 
 import { supabase } from '@/lib/supabase';

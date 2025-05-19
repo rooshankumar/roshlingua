@@ -874,6 +874,22 @@ export const ChatScreen = ({ conversation }: Props) => {
     }
   };
 
+  // Handle image preview functionality
+  useEffect(() => {
+    const handleImagePreview = (event: CustomEvent) => {
+      const { url, name } = event.detail;
+      // Open the image in a new tab with proper cache control
+      const cleanUrl = url?.replace('//attachments/', '/attachments/').split('?')[0] + `?t=${Date.now()}`;
+      window.open(cleanUrl, '_blank');
+    };
+    
+    document.addEventListener('image-preview', handleImagePreview as EventListener);
+    
+    return () => {
+      document.removeEventListener('image-preview', handleImagePreview as EventListener);
+    };
+  }, []);
+
   useEffect(() => {
     // Subscribe to new messages in this chat
     if (conversation?.id) {

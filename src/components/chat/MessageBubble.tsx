@@ -97,8 +97,16 @@ export const MessageBubble = ({ message, isCurrentUser, isRead = false, onReacti
               {isPreloading ? (
                 <Skeleton className="w-[260px] md:w-[300px] h-[200px] rounded-lg" />
               ) : imageLoadError ? (
-                <div className="w-[260px] md:w-[300px] h-[200px] rounded-lg bg-gray-100 flex items-center justify-center text-gray-500">
-                  {imageLoadError}
+                <div className="w-[260px] md:w-[300px] h-[200px] rounded-lg bg-muted/20 flex flex-col items-center justify-center text-muted-foreground p-4">
+                  <FileText className="h-8 w-8 mb-2 opacity-70" />
+                  <p className="text-sm">{message.attachment_name || "Image"}</p>
+                  <a
+                    href={message.attachment_url}
+                    download
+                    className="text-xs mt-2 underline hover:text-primary transition-colors"
+                  >
+                    View/Download
+                  </a>
                 </div>
               ) : (
                 <>
@@ -110,14 +118,25 @@ export const MessageBubble = ({ message, isCurrentUser, isRead = false, onReacti
                     onLoad={() => setImageLoaded(true)}
                     onError={(e) => {
                       console.error('Error loading image:', e);
-                      setImageLoadError("Failed to load image");
+                      // Try with a cleaned URL first
+                      const imgEl = e.currentTarget;
+                      if (!imgEl.dataset.retried) {
+                        const cleanedUrl = message.attachment_url?.replace('//attachments/', '/attachments/').split('?')[0];
+                        console.log('Retrying with cleaned URL:', cleanedUrl);
+                        imgEl.src = cleanedUrl;
+                        imgEl.dataset.retried = 'true';
+                      } else {
+                        setImageLoadError("Failed to load image");
+                      }
                     }}
                     onClick={(e) => {
-                      e.preventDefault();
-                      const clickEvent = new CustomEvent('image-preview', {
-                        detail: { url: message.attachment_url, name: message.attachment_name }
-                      });
-                      document.dispatchEvent(clickEvent);
+                      if (imageLoaded) {
+                        e.preventDefault();
+                        const clickEvent = new CustomEvent('image-preview', {
+                          detail: { url: message.attachment_url, name: message.attachment_name }
+                        });
+                        document.dispatchEvent(clickEvent);
+                      }
                     }}
                   />
                   <a

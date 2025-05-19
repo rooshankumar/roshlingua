@@ -139,14 +139,13 @@ export const ChatAttachment = ({ onAttach }: ChatAttachmentProps) => {
         throw new Error("Failed to get public URL for uploaded file");
       }
 
-      // Check if URL has a double slash and fix it if needed
-      let cleanedUrl = data.publicUrl;
-      if (cleanedUrl.includes('//attachments/')) {
-        cleanedUrl = cleanedUrl.replace('//attachments/', '/attachments/');
-      }
-
-      // Append a timestamp and cache control to the URL to prevent caching issues
-      const publicUrl = `${cleanedUrl}?t=${timestamp}&cache=no-store`;
+      console.log("Original public URL:", data.publicUrl);
+      
+      // Use the improved cleanSupabaseUrl function from imageUtils
+      import { cleanSupabaseUrl } from '@/utils/imageUtils';
+      const publicUrl = cleanSupabaseUrl(data.publicUrl);
+      
+      console.log("Cleaned public URL:", publicUrl);
 
       console.log("File uploaded successfully:", publicUrl);
 
