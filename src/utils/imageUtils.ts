@@ -5,36 +5,27 @@ import { toast } from '@/components/ui/use-toast';
  */
 
 /**
- * Generate a local thumbnail for image preview
- * @param file The original image file
- * @returns A promise that resolves to a data URL for preview
+ * Generate a local thumbnail for image preview with customizable dimensions
  */
 export async function generateImageThumbnail(file: File, maxWidth = 300, maxHeight = 300): Promise<string> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
-    reader.onload = function(e) {
-      if (!e.target?.result) {
-        reject(new Error('Failed to read file'));
-        return;
-      }
-
+    reader.onload = (e) => {
       const img = new Image();
-      img.src = e.target.result as string;
-
-      img.onload = function() {
+      img.onload = () => {
         const canvas = document.createElement('canvas');
         let width = img.width;
         let height = img.height;
 
-        // Calculate dimensions to maintain aspect ratio
+        // Maintain aspect ratio
         if (width > height) {
           if (width > maxWidth) {
-            height = Math.round(height * maxWidth / width);
+            height = (height * maxWidth) / width;
             width = maxWidth;
           }
         } else {
           if (height > maxHeight) {
-            width = Math.round(width * maxHeight / height);
+            width = (width * maxHeight) / height;
             height = maxHeight;
           }
         }
@@ -49,21 +40,15 @@ export async function generateImageThumbnail(file: File, maxWidth = 300, maxHeig
         }
 
         ctx.drawImage(img, 0, 0, width, height);
-
-        // Create thumbnail as data URL
-        const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
         resolve(dataUrl);
       };
 
-      img.onerror = function() {
-        reject(new Error('Failed to load image'));
-      };
+      img.onerror = () => reject(new Error('Failed to load image'));
+      img.src = e.target?.result as string;
     };
 
-    reader.onerror = function() {
-      reject(new Error('Failed to read file'));
-    };
-
+    reader.onerror = () => reject(new Error('Failed to read file'));
     reader.readAsDataURL(file);
   });
 }
@@ -154,69 +139,48 @@ export const preloadImage = (url: string): Promise<string> => {
   });
 };
 
-export const handleImageLoadError = (e: React.SyntheticEvent<HTMLImageElement>, imageUrl?: string, fallbackText = 'Image unavailable') => {
-  const img = e.currentTarget;
-  const parentElement = img.parentElement;
+/**
+ * Enhanced image error handler that attempts multiple recovery strategies
+ */
+export const handleImageLoadError = (e: React.SyntheticEvent<HTMLImageElement> | HTMLImageElement, originalUrl?: string) => {
+  const imgElement = e instanceof HTMLImageElement ? e : e.currentTarget;
+  const imgSrc = originalUrl || imgElement.src;
+  console.error('Image failed to load:', imgSrc);
 
-  // Log the error with more details
-  console.error('Image load error details:', {
-    src: img.src,
-    originalUrl: imageUrl,
-    element: img,
-    error: e
-  });
+  // Track retry attempts
+  const retryCount = parseInt(imgElement.dataset.retryCount || '0', 10);
+  if (retryCount >= 3) {
+    console.error('Max retries reached for image:', imgSrc);
 
-  // Attempt various fixes in sequence
-  if (img.src.includes('?')) {
-    // Try loading without query parameters first
-    const cleanSrc = img.src.split('?')[0];
-    console.log('Retrying image load with clean URL:', cleanSrc);
+    // Show fallback UI
+    imgElement.style.display = 'none';
+    const fallbackElement = document.createElement('div');
+    fallbackElement.className = 'bg-gray-100 dark:bg-gray-800 p-2 rounded-md text-sm text-center';
+    fallbackElement.innerText = 'Image not available';
+    imgElement.parentNode?.appendChild(fallbackElement);
 
-    // Only retry once to avoid infinite loop
-    if (!img.dataset.retried) {
-      img.dataset.retried = 'true';
-      img.src = cleanSrc;
-      return; // Don't show fallback yet, trying clean URL first
-    }
+    return false;
   }
 
-  // If URL contains supabase.co and we've already tried clean URL
-  if ((img.src.includes('supabase.co') || (imageUrl && imageUrl.includes('supabase.co'))) && img.dataset.retried === 'true') {
-    // Try adding cache control and random param
-    const timestamp = Date.now();
-    const cacheBusterUrl = `${img.src.split('?')[0]}?t=${timestamp}&cache=no-store`;
-    console.log('Retrying with cache buster:', cacheBusterUrl);
+  imgElement.dataset.retryCount = (retryCount + 1).toString();
 
-    if (!img.dataset.retriedCache) {
-      img.dataset.retriedCache = 'true';
-      img.src = cacheBusterUrl;
-      return; // Try with cache buster
-    }
+  // Try different strategies based on retry count
+  switch (retryCount) {
+    case 0:
+      // First retry: Clean URL and add cache buster
+      imgElement.src = `${imgSrc.split('?')[0]}?t=${Date.now()}`;
+      break;
+    case 1:
+      // Second retry: Fix path issues and force no-cache
+      imgElement.src = `${imgSrc.replace('//attachments/', '/attachments/').split('?')[0]}?t=${Date.now()}&cache=no-store`;
+      break;
+    case 2:
+      // Last attempt: Try completely clean URL
+      imgElement.src = imgSrc.split('?')[0];
+      break;
   }
 
-  // If we get here, the image failed even after retries
-  console.error('Image failed after all retries:', img.src);
-
-  // Hide the broken image
-  img.style.display = 'none';
-
-  // Add a placeholder div if not already present
-  if (!parentElement?.querySelector('.image-error-fallback')) {
-    const fallback = document.createElement('div');
-    fallback.className = 'image-error-fallback p-4 rounded bg-muted/20 text-center text-sm flex items-center justify-center';
-    fallback.style.minHeight = '100px';
-    fallback.style.maxWidth = '100%';
-    fallback.innerHTML = `
-      <div>
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mx-auto mb-2 opacity-70">
-          <circle cx="12" cy="12" r="10"></circle>
-          <line x1="8" y1="12" x2="16" y2="12"></line>
-        </svg>
-        <span>${fallbackText}</span>
-      </div>
-    `;
-    parentElement?.appendChild(fallback);
-  }
+  return true;
 };
 
 // Additional utility functions for image handling
@@ -418,83 +382,3 @@ export async function getPublicUrl(bucket: string, path: string): Promise<string
     return '/placeholder.svg';
   }
 }
-
-// Generate thumbnail from an image file
-export const generateImageThumbnail = async (file: File): Promise<string> => {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const img = new Image();
-      img.onload = () => {
-        // Create a canvas with smaller dimensions
-        const canvas = document.createElement('canvas');
-        const MAX_WIDTH = 120;
-        const MAX_HEIGHT = 120;
-        let width = img.width;
-        let height = img.height;
-
-        // Maintain aspect ratio
-        if (width > height) {
-          if (width > MAX_WIDTH) {
-            height *= MAX_WIDTH / width;
-            width = MAX_WIDTH;
-          }
-        } else {
-          if (height > MAX_HEIGHT) {
-            width *= MAX_HEIGHT / height;
-            height = MAX_HEIGHT;
-          }
-        }
-
-        canvas.width = width;
-        canvas.height = height;
-
-        // Draw the image on canvas
-        const ctx = canvas.getContext('2d');
-        ctx?.drawImage(img, 0, 0, width, height);
-
-        // Convert to data URL with reduced quality
-        const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
-        resolve(dataUrl);
-      };
-
-      img.onerror = () => reject(new Error('Failed to load image for thumbnail'));
-      img.src = e.target?.result as string;
-    };
-
-    reader.onerror = () => reject(new Error('Failed to read file'));
-    reader.readAsDataURL(file);
-  });
-};
-
-// Function to handle image load errors with multiple fallback approaches
-export const handleImageLoadError = (imgElement: HTMLImageElement, originalUrl: string) => {
-  console.error('Image failed to load:', originalUrl);
-
-  // Track retry attempts
-  const retryCount = parseInt(imgElement.dataset.retryCount || '0', 10);
-  if (retryCount >= 3) {
-    console.error('Max retries reached for image:', originalUrl);
-    return false;
-  }
-
-  imgElement.dataset.retryCount = (retryCount + 1).toString();
-
-  // Different strategies based on retry count
-  switch (retryCount) {
-    case 0:
-      // First retry: add cache buster
-      imgElement.src = `${originalUrl.split('?')[0]}?t=${Date.now()}`;
-      break;
-    case 1:
-      // Second retry: fix path issues and add no-cache
-      imgElement.src = `${originalUrl.replace('//attachments/', '/attachments/').split('?')[0]}?t=${Date.now()}&cache=no-store`;
-      break;
-    case 2:
-      // Last attempt: try completely clean URL
-      imgElement.src = originalUrl.split('?')[0];
-      break;
-  }
-
-  return true;
-};
