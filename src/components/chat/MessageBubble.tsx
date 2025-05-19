@@ -29,6 +29,13 @@ export const MessageBubble = ({ message, isCurrentUser, isRead = false, onReacti
   const isAudioAttachment = message.attachment_url?.match(/\.(mp3|wav|aac)$/i);
   const isPdfAttachment = message.attachment_url?.match(/\.(pdf)$/i);
 
+  // Clean URL function helper
+  const cleanAttachmentUrl = (url: string) => {
+    if (!url) return '';
+    // Fix double slashes in path and add cache buster
+    return url.replace('//attachments/', '/attachments/').split('?')[0] + `?t=${Date.now()}`;
+  };
+
   useEffect(() => {
     if (isImageAttachment && message.attachment_url) {
       setIsPreloading(true);
@@ -40,8 +47,21 @@ export const MessageBubble = ({ message, isCurrentUser, isRead = false, onReacti
       };
       img.onerror = (error) => {
         console.error('Failed to load image:', error);
-        setImageLoadError("Failed to load image");
-        setIsPreloading(false);
+        // Try with cleaned URL
+        const cleanedUrl = cleanAttachmentUrl(message.attachment_url);
+        console.log('Retrying with cleaned URL:', cleanedUrl);
+        
+        const retryImg = new Image();
+        retryImg.onload = () => {
+          setImageLoaded(true);
+          setIsPreloading(false);
+        };
+        retryImg.onerror = () => {
+          console.error('Failed to load image even with cleaned URL');
+          setImageLoadError("Failed to load image");
+          setIsPreloading(false);
+        };
+        retryImg.src = cleanedUrl;
       };
       img.src = message.attachment_url;
     } else {
@@ -116,13 +136,19 @@ export const MessageBubble = ({ message, isCurrentUser, isRead = false, onReacti
           alt={message.attachment_name || "Image attachment"}
           className="max-w-[260px] md:max-w-[300px] max-h-[350px] rounded-lg object-contain cursor-pointer hover:scale-105 transition-transform duration-200"
           loading="eager"
+          fetchpriority="high"
+          decoding="async"
           referrerPolicy="no-referrer"
-          onLoad={() => setImageLoaded(true)}
+          onLoad={() => {
+            setImageLoaded(true);
+            setIsPreloading(false);
+            console.log('Image loaded successfully:', message.attachment_url);
+          }}
           onError={(e) => {
             console.error('Error loading image:', e);
             const imgEl = e.currentTarget;
 
-            // Try with different URL formats
+            // More aggressive retry strategy
             if (!imgEl.dataset.retried) {
               // First retry: Clean URL of double slashes and query params
               const cleanedUrl = message.attachment_url?.replace('//attachments/', '/attachments/').split('?')[0] + `?t=${Date.now()}`;
@@ -135,6 +161,12 @@ export const MessageBubble = ({ message, isCurrentUser, isRead = false, onReacti
               console.log('Retrying with cache buster:', cacheBusterUrl);
               imgEl.src = cacheBusterUrl;
               imgEl.dataset.retriedCache = 'true';
+            } else if (imgEl.dataset.retriedCache === 'true' && !imgEl.dataset.retriedDirect) {
+              // Third retry: Try direct URL with no transformations
+              const directUrl = message.attachment_url || '';
+              console.log('Retrying with direct URL:', directUrl);
+              imgEl.src = directUrl;
+              imgEl.dataset.retriedDirect = 'true';
             } else {
               // All retries failed
               setImageLoadError("Failed to load image");

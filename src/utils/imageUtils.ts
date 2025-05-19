@@ -303,31 +303,21 @@ export const getFileThumbnailUrl = async (file: File): Promise<string> => {
  * @param url The URL to clean
  * @returns A properly formatted URL
  */
-export function cleanSupabaseUrl(url: string | null | undefined): string {
+export function cleanSupabaseUrl(url: string): string {
   if (!url) return '';
-  
-  console.log("Cleaning URL:", url);
-  
-  // Fix double slash in the path
-  let cleanedUrl = url;
-  
-  // Handle various double-slash patterns that might appear
-  if (cleanedUrl.includes('//attachments/')) {
-    cleanedUrl = cleanedUrl.replace('//attachments/', '/attachments/');
-    console.log("Fixed double slash in attachments path:", cleanedUrl);
+
+  // Fix double slashes in path (common in some Supabase URLs)
+  let cleanedUrl = url.replace('//storage.googleapis.com', '/storage.googleapis.com')
+                      .replace('//attachments/', '/attachments/');
+
+  // Add cache buster if not already present
+  if (!cleanedUrl.includes('t=')) {
+    cleanedUrl = cleanedUrl.includes('?') 
+      ? `${cleanedUrl}&t=${Date.now()}` 
+      : `${cleanedUrl}?t=${Date.now()}`;
   }
-  
-  // Also handle the case where there might be other patterns
-  cleanedUrl = cleanedUrl.replace(/([^:])\/\/+/g, '$1/');
-  
-  // Remove any existing query parameters for a clean URL
-  const baseUrl = cleanedUrl.split('?')[0];
-  
-  // Add cache-busting parameter and force no-cache
-  const finalUrl = `${baseUrl}?t=${Date.now()}&cache=no-store`;
-  console.log("Final cleaned URL:", finalUrl);
-  
-  return finalUrl;
+
+  return cleanedUrl;
 }
 
 /**
@@ -335,10 +325,10 @@ export function cleanSupabaseUrl(url: string | null | undefined): string {
  */
 export function getImageSafeUrl(url: string | null | undefined): string {
   if (!url) return '';
-  
+
   // First clean the URL using our standard cleaner
   const cleanedUrl = cleanSupabaseUrl(url);
-  
+
   // For image tags, add additional parameters that help with browser caching issues
   return cleanedUrl + '&img=1';
 }
@@ -352,25 +342,25 @@ export function preloadImageWithRetry(url: string | null | undefined): Promise<s
       reject(new Error('No URL provided'));
       return;
     }
-    
+
     // Try with the cleaned URL first
     const cleanedUrl = cleanSupabaseUrl(url);
-    
+
     const img = new Image();
     let attempts = 0;
     const maxAttempts = 3;
-    
+
     const tryLoad = (attemptUrl: string) => {
       attempts++;
       console.log(`Preload attempt ${attempts}/${maxAttempts} with URL: ${attemptUrl}`);
-      
+
       img.onload = () => resolve(attemptUrl);
       img.onerror = () => {
         if (attempts >= maxAttempts) {
           reject(new Error(`Failed to load image after ${maxAttempts} attempts`));
           return;
         }
-        
+
         // Try different URL formats
         if (attempts === 1) {
           // Try without any parameters
@@ -380,10 +370,10 @@ export function preloadImageWithRetry(url: string | null | undefined): Promise<s
           tryLoad(`${url.split('?')[0]}?no-cache=${Date.now()}`);
         }
       };
-      
+
       img.src = attemptUrl;
     };
-    
+
     // Start the first attempt
     tryLoad(cleanedUrl);
   });
@@ -428,3 +418,83 @@ export async function getPublicUrl(bucket: string, path: string): Promise<string
     return '/placeholder.svg';
   }
 }
+
+// Generate thumbnail from an image file
+export const generateImageThumbnail = async (file: File): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        // Create a canvas with smaller dimensions
+        const canvas = document.createElement('canvas');
+        const MAX_WIDTH = 120;
+        const MAX_HEIGHT = 120;
+        let width = img.width;
+        let height = img.height;
+
+        // Maintain aspect ratio
+        if (width > height) {
+          if (width > MAX_WIDTH) {
+            height *= MAX_WIDTH / width;
+            width = MAX_WIDTH;
+          }
+        } else {
+          if (height > MAX_HEIGHT) {
+            width *= MAX_HEIGHT / height;
+            height = MAX_HEIGHT;
+          }
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+
+        // Draw the image on canvas
+        const ctx = canvas.getContext('2d');
+        ctx?.drawImage(img, 0, 0, width, height);
+
+        // Convert to data URL with reduced quality
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
+        resolve(dataUrl);
+      };
+
+      img.onerror = () => reject(new Error('Failed to load image for thumbnail'));
+      img.src = e.target?.result as string;
+    };
+
+    reader.onerror = () => reject(new Error('Failed to read file'));
+    reader.readAsDataURL(file);
+  });
+};
+
+// Function to handle image load errors with multiple fallback approaches
+export const handleImageLoadError = (imgElement: HTMLImageElement, originalUrl: string) => {
+  console.error('Image failed to load:', originalUrl);
+
+  // Track retry attempts
+  const retryCount = parseInt(imgElement.dataset.retryCount || '0', 10);
+  if (retryCount >= 3) {
+    console.error('Max retries reached for image:', originalUrl);
+    return false;
+  }
+
+  imgElement.dataset.retryCount = (retryCount + 1).toString();
+
+  // Different strategies based on retry count
+  switch (retryCount) {
+    case 0:
+      // First retry: add cache buster
+      imgElement.src = `${originalUrl.split('?')[0]}?t=${Date.now()}`;
+      break;
+    case 1:
+      // Second retry: fix path issues and add no-cache
+      imgElement.src = `${originalUrl.replace('//attachments/', '/attachments/').split('?')[0]}?t=${Date.now()}&cache=no-store`;
+      break;
+    case 2:
+      // Last attempt: try completely clean URL
+      imgElement.src = originalUrl.split('?')[0];
+      break;
+  }
+
+  return true;
+};
