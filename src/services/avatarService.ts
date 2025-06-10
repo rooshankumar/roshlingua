@@ -16,7 +16,7 @@ export async function uploadAvatar(file: File, userId: string) {
     }
     
     const fileExt = file.name.split('.').pop();
-    const fileName = `${userId}/avatar.${fileExt}`;
+    const fileName = `${userId}/${Date.now()}.${fileExt}`;
 
     console.log('Organizing avatar in user folder:', fileName);
 
