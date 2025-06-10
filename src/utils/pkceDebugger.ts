@@ -47,6 +47,9 @@ export const logPKCEState = () => {
     hasCookieVerifier: !!cookieVerifier,
     hasCode: !!code,
     hasSession: !!session,
+    verifierStatus: 'checked'
+  };
+};
     verifierLength: localVerifier?.length || sessionVerifier?.length || cookieVerifier?.length || 0
   };
 };
@@ -136,6 +139,25 @@ export const emergencyVerifierRecovery = () => {
   if (potentialVerifiers.size > 0) {
     // Prefer keys with "verifier" or "pkce" in the name
     const preferredKeys = Array.from(potentialVerifiers.keys()).filter(
+      key => key.toLowerCase().includes('verifier') || key.toLowerCase().includes('pkce')
+    );
+    
+    const keyToUse = preferredKeys.length > 0 ? preferredKeys[0] : Array.from(potentialVerifiers.keys())[0];
+    const verifierToRestore = potentialVerifiers.get(keyToUse);
+    
+    if (verifierToRestore) {
+      console.log('Attempting to restore verifier from:', keyToUse);
+      localStorage.setItem('supabase.auth.code_verifier', verifierToRestore);
+      console.log('Verifier restored successfully');
+      console.groupEnd();
+      return true;
+    }
+  }
+  
+  console.log('No suitable verifier found for recovery');
+  console.groupEnd();
+  return false;
+};
       key => key.includes('verifier') || key.includes('pkce') || key.includes('code_')
     );
     

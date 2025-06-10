@@ -89,7 +89,7 @@ export const debugAuth = () => {
     c.includes('auth') || 
     c.includes('pkce')
   );
-  console.log('Auth-related cookies:', authCookies);
+  console.log('Auth-related cookies:', authCookies);s);
 
   // Check current URL for auth parameters
   const url = new URL(window.location.href);
@@ -239,5 +239,12 @@ if (typeof window !== 'undefined') {
   window.clearAllAuthData = clearAllAuthData;
   window.diagnoseAuthUrl = diagnoseAuthUrl;
   window.resetAndStartAuth = resetAndStartAuth;
+}r console
+if (typeof window !== 'undefined') {
+  window.debugAuth = debugAuth;
+  window.clearAllAuthData = clearAllAuthData;
+  window.diagnoseAuthUrl = diagnoseAuthUrl;
+  window.resetAndStartAuth = resetAndStartAuth;
   window.debugSupabaseAuth = debugSupabaseAuth;
+}seAuth;
 }

@@ -32,7 +32,7 @@ export const testAuth = async () => {
   console.log('Step 3: Analyzing current URL...');
   const urlDiagnosis = diagnoseAuthUrl();
   console.log('URL contains auth code:', urlDiagnosis.hasCode);
-  console.log('URL contains error:', urlDiagnosis.hasError);
+  console.log('URL contains error:', urlDiagnosis.hasError);r);
 
   // Step 4: Test a sample authenticated request
   console.log('Step 4: Testing authenticated API request...');
@@ -69,6 +69,21 @@ export const testAuth = async () => {
 };
 
 /**
+ * Determines overall authentication status
+ */
+const getOverallStatus = (summary: any) => {
+  if (summary.isAuthenticated && summary.apiAccessWorking) {
+    return 'HEALTHY';
+  } else if (summary.hasAuthCode || summary.hasVerifier) {
+    return 'IN_PROGRESS';
+  } else if (summary.hasAuthError) {
+    return 'ERROR';
+  } else {
+    return 'NOT_AUTHENTICATED';
+  }
+};
+
+/**
  * Performs a test login with clean state
  */
 export const testCleanLogin = async () => {
@@ -77,6 +92,30 @@ export const testCleanLogin = async () => {
   // Step 1: Clear all existing auth data
   console.log('Step 1: Clearing all auth data...');
   clearAllAuthData();
+
+  // Step 2: Generate new PKCE verifier
+  console.log('Step 2: Generating new PKCE verifier...');
+  const verifier = generateVerifier();
+  storePKCEVerifier(verifier);
+
+  // Step 3: Initiate sign in
+  console.log('Step 3: Initiating sign in...');
+  const { error } = await supabase.auth.signInWithOAuth({
+    provider: 'google',
+    options: {
+      redirectTo: `${window.location.origin}/auth/callback`
+    }
+  });
+
+  if (error) {
+    console.error('Sign in error:', error);
+    return { success: false, error };
+  }
+
+  console.log('Sign in initiated successfully');
+  console.groupEnd();
+  return { success: true };
+};ata();
 
   // Step 2: Generate a new verifier
   console.log('Step 2: Generating new PKCE verifier...');
