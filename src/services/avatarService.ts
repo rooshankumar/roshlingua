@@ -66,30 +66,58 @@ export async function uploadAvatar(file: File, userId: string) {
       console.warn('Could not clean up existing files:', cleanupError);
     }
 
-    // Create a new File object with explicit type and name
-    const processedFile = new File([file], fileName.split('/')[1], {
-      type: contentType,
-      lastModified: Date.now()
-    });
+    // Convert to ArrayBuffer and upload with explicit headers
+    const arrayBuffer = await file.arrayBuffer();
 
     console.log('Processed file details:', {
-      name: processedFile.name,
-      type: processedFile.type,
-      size: processedFile.size
+      name: fileName.split('/')[1],
+      type: contentType,
+      size: arrayBuffer.byteLength,
+      originalType: file.type
     });
 
-    // Upload new avatar using the processed File object
+    // Upload new avatar using ArrayBuffer with explicit content type
     const { error: uploadError, data } = await supabase.storage
       .from('avatars')
-      .upload(fileName, processedFile, {
+      .upload(fileName, arrayBuffer, {
         cacheControl: '3600',
         upsert: true,
-        contentType: contentType
+        contentType: contentType,
+        duplex: 'half'
       });
 
     if (uploadError) {
       console.error('Upload error:', uploadError);
-      throw uploadError;
+      console.log('Trying alternative upload method with FormData...');
+      
+      // Fallback: Try with FormData
+      const formData = new FormData();
+      const renamedFile = new File([file], fileName.split('/')[1], {
+        type: contentType
+      });
+      formData.append('file', renamedFile);
+      
+      try {
+        const response = await fetch(`${supabase.supabaseUrl}/storage/v1/object/avatars/${fileName}`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`,
+            'X-Upsert': 'true'
+          },
+          body: formData
+        });
+        
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error('FormData upload failed:', errorText);
+          throw new Error(`Upload failed: ${response.status} ${response.statusText}`);
+        }
+        
+        console.log('FormData upload successful');
+      } catch (formDataError) {
+        console.error('FormData upload also failed:', formDataError);
+        throw uploadError; // Throw original error
+      }
     }
 
     console.log('File uploaded successfully:', data?.path);
