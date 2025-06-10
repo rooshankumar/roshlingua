@@ -15,10 +15,33 @@ export async function uploadAvatar(file: File, userId: string) {
       throw new Error('File must be an image');
     }
     
-    const fileExt = file.name.split('.').pop();
+    const fileExt = file.name.split('.').pop()?.toLowerCase();
     const fileName = `${userId}/${Date.now()}.${fileExt}`;
 
+    // Determine correct MIME type based on file extension
+    let contentType = file.type;
+    if (!contentType || contentType === 'application/octet-stream') {
+      switch (fileExt) {
+        case 'png':
+          contentType = 'image/png';
+          break;
+        case 'jpg':
+        case 'jpeg':
+          contentType = 'image/jpeg';
+          break;
+        case 'gif':
+          contentType = 'image/gif';
+          break;
+        case 'webp':
+          contentType = 'image/webp';
+          break;
+        default:
+          contentType = 'image/png'; // fallback
+      }
+    }
+
     console.log('Organizing avatar in user folder:', fileName);
+    console.log('Using content type:', contentType);
 
     // First, delete any existing avatar files for this user's folder
     try {
@@ -39,7 +62,7 @@ export async function uploadAvatar(file: File, userId: string) {
 
     // Create a new File object to ensure proper formatting
     const processedFile = new File([file], `avatar.${fileExt}`, {
-      type: file.type,
+      type: contentType,
       lastModified: Date.now()
     });
 
@@ -55,7 +78,7 @@ export async function uploadAvatar(file: File, userId: string) {
       .upload(fileName, processedFile, {
         cacheControl: '3600',
         upsert: true,
-        contentType: file.type,
+        contentType: contentType,
         duplex: 'half'
       });
 
