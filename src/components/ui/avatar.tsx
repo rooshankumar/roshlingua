@@ -21,24 +21,52 @@ Avatar.displayName = AvatarPrimitive.Root.displayName
 const AvatarImage = React.forwardRef<
   React.ElementRef<typeof AvatarPrimitive.Image>,
   React.ComponentPropsWithoutRef<typeof AvatarPrimitive.Image>
->(({ className, src, onError, ...props }, ref) => {
-  const handleError = (e: React.SyntheticEvent<HTMLImageElement>) => {
-    console.log('Avatar image failed to load:', src);
-    if (onError) {
-      onError(e);
+>(({ className, src, alt, ...props }, ref) => {
+  const [imgSrc, setImgSrc] = React.useState<string | undefined>(src);
+  const [hasError, setHasError] = React.useState(false);
+  const [retryCount, setRetryCount] = React.useState(0);
+
+  React.useEffect(() => {
+    setImgSrc(src);
+    setHasError(false);
+    setRetryCount(0);
+  }, [src]);
+
+  const handleError = React.useCallback(() => {
+    console.warn('Avatar image failed to load:', imgSrc, 'Retry count:', retryCount);
+
+    if (retryCount < 2 && imgSrc) {
+      // Try with cache busting
+      const separator = imgSrc.includes('?') ? '&' : '?';
+      const retryUrl = `${imgSrc}${separator}retry=${retryCount + 1}&t=${Date.now()}`;
+      setImgSrc(retryUrl);
+      setRetryCount(prev => prev + 1);
+    } else {
+      setHasError(true);
+      setImgSrc(undefined);
     }
-  };
+  }, [imgSrc, retryCount]);
+
+  const handleLoad = React.useCallback(() => {
+    console.log('Avatar image loaded successfully:', imgSrc);
+  }, [imgSrc]);
+
+  if (hasError || !imgSrc) {
+    return null;
+  }
 
   return (
     <AvatarPrimitive.Image
       ref={ref}
       className={cn("aspect-square h-full w-full object-cover", className)}
-      src={src}
+      src={imgSrc}
+      alt={alt}
       onError={handleError}
+      onLoad={handleLoad}
       {...props}
     />
   );
-})
+});
 AvatarImage.displayName = AvatarPrimitive.Image.displayName
 
 const AvatarFallback = React.forwardRef<

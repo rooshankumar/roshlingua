@@ -4,6 +4,16 @@ import { supabase } from '@/lib/supabase';
 export async function uploadAvatar(file: File, userId: string) {
   try {
     console.log('Uploading avatar for user:', userId);
+    console.log('File details:', {
+      name: file.name,
+      type: file.type,
+      size: file.size
+    });
+    
+    // Ensure we have a valid image file
+    if (!file.type.startsWith('image/')) {
+      throw new Error('File must be an image');
+    }
     
     const fileExt = file.name.split('.').pop();
     const fileName = `${userId}/${Date.now()}.${fileExt}`;
@@ -25,13 +35,26 @@ export async function uploadAvatar(file: File, userId: string) {
       console.warn('Could not clean up existing files:', cleanupError);
     }
 
-    // Upload new avatar
+    // Create a new File object to ensure proper formatting
+    const processedFile = new File([file], `avatar.${fileExt}`, {
+      type: file.type,
+      lastModified: Date.now()
+    });
+
+    console.log('Processed file details:', {
+      name: processedFile.name,
+      type: processedFile.type,
+      size: processedFile.size
+    });
+
+    // Upload new avatar with explicit content type
     const { error: uploadError, data } = await supabase.storage
       .from('avatars')
-      .upload(fileName, file, {
+      .upload(fileName, processedFile, {
         cacheControl: '3600',
         upsert: true,
-        contentType: file.type
+        contentType: file.type,
+        duplex: 'half'
       });
 
     if (uploadError) {

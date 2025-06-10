@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
@@ -23,23 +22,29 @@ export function AvatarUpload({ url, onUpload, userId }: AvatarUploadProps) {
       }
 
       const file = event.target.files[0];
-      
+
       // Validate file type
       if (!file.type.startsWith('image/')) {
         throw new Error("Please select an image file.");
       }
 
-      // Validate file size (max 5MB)
-      if (file.size > 5 * 1024 * 1024) {
-        throw new Error("File size must be less than 5MB.");
+      // Validate file size (max 10MB)
+      if (file.size > 10 * 1024 * 1024) {
+        throw new Error("File size must be less than 10MB.");
       }
 
       const result = await uploadAvatarService(file, userId);
 
       onUpload(result.publicUrl);
+
+      // Force a refresh of the profile data
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
+
       toast({
         title: "Success",
-        description: "Avatar updated successfully",
+        description: "Avatar updated successfully! The page will refresh to show your new avatar.",
       });
     } catch (error: any) {
       console.error('Avatar upload error:', error);
