@@ -234,8 +234,22 @@ const Settings = () => {
 
       if (!publicUrl) throw new Error('Failed to get public URL');
 
-      await updateProfile({ ...profile, avatar_url: publicUrl });
-      setLocalProfile({...localProfile, avatar_url: publicUrl});
+      // Update profile in database first
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .update({ avatar_url: publicUrl })
+        .eq('id', user.id);
+
+      if (updateError) throw updateError;
+
+      // Then update local state
+      if (updateProfile) {
+        await updateProfile({ ...profile, avatar_url: publicUrl });
+      }
+      setLocalProfile(prev => ({...prev, avatar_url: publicUrl}));
+
+      // Force a refresh of the profile data
+      await loadUserProfile();
 
       toast({
         title: "Success",
@@ -454,13 +468,23 @@ const Settings = () => {
                 <div className="flex flex-col items-center space-y-4">
                   <div className="relative">
                     <Avatar className="h-32 w-32 ring-4 ring-primary/10">
-                      <AvatarImage src={profile?.avatar_url} alt={profile?.full_name} />
-                      <AvatarFallback className="text-2xl">{profile?.full_name?.charAt(0)}</AvatarFallback>
+                      <AvatarImage 
+                        src={localProfile?.avatar_url || profile?.avatar_url} 
+                        alt={localProfile?.full_name || profile?.full_name}
+                        onError={(e) => {
+                          console.log('Avatar failed to load, using fallback');
+                          e.currentTarget.style.display = 'none';
+                        }}
+                      />
+                      <AvatarFallback className="text-2xl">
+                        {(localProfile?.full_name || profile?.full_name)?.charAt(0)?.toUpperCase() || 'U'}
+                      </AvatarFallback>
                     </Avatar>
                     <Button
                       size="icon"
                       className="absolute bottom-0 right-0 rounded-full h-8 w-8"
                       onClick={() => document.getElementById('avatar')?.click()}
+                      disabled={isLoading}
                     >
                       <Camera className="h-4 w-4" />
                     </Button>
@@ -471,6 +495,7 @@ const Settings = () => {
                     accept="image/*"
                     className="hidden"
                     onChange={handleUploadAvatar}
+                    disabled={isLoading}
                   />
                 </div>
 

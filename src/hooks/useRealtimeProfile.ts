@@ -1,5 +1,4 @@
-
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useToast } from '@/components/ui/use-toast';
 import { Database } from '@/types/supabase';
@@ -68,28 +67,33 @@ export function useRealtimeProfile(userId: string | undefined) {
     };
   }, [userId, toast]);
 
-  const updateProfile = async (updates: Partial<Profile>) => {
+  const updateProfile = useCallback(async (updates: Partial<Profile>) => {
+    if (!userId) return;
+
     try {
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from('profiles')
         .update(updates)
-        .eq('id', userId);
+        .eq('id', userId)
+        .select()
+        .single();
 
       if (error) throw error;
 
-      toast({
-        title: "Success",
-        description: "Profile updated successfully.",
-      });
-    } catch (err) {
-      console.error("Error updating profile:", err);
-      toast({
-        title: "Error",
-        description: "Failed to update profile.",
-        variant: "destructive"
-      });
+      // Update local state with the returned data
+      if (data) {
+        setProfile(data);
+      } else {
+        // Fallback: update local state with the updates
+        setProfile(prev => prev ? { ...prev, ...updates } : null);
+      }
+
+      console.log('Profile updated successfully:', data);
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      throw error;
     }
-  };
+  }, [userId]);
 
   return { profile, updateProfile, setProfile };
 }
