@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/lib/supabase";
-import { uploadAvatar, deleteAvatar } from "@/services/avatarService";
+import { uploadAvatar, deleteAvatar, getUserAvatar } from "@/services/avatarService";
 import { useTheme } from "@/components/theme-provider";
 import { CustomToggle } from "@/components/ui/custom-toggle";
 import { useToast } from "@/hooks/use-toast";
@@ -48,7 +48,8 @@ const Settings = () => {
   const nativeLanguageRef = useRef<HTMLDivElement>(null);
   const learningLanguageRef = useRef<HTMLDivElement>(null);
   const [languageOptions, setLanguageOptions] = useState<any[]>([]);
-  
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(profile?.avatar_url || null);
+
   // Initialize language options safely
   useEffect(() => {
     try {
@@ -385,6 +386,23 @@ const Settings = () => {
     }
   };
 
+  const handleAvatarUpload = async (url: string) => {
+    setAvatarUrl(url);
+    await updateProfile({ avatar_url: url });
+
+    // Refresh avatar from storage to ensure we have the latest
+    if (user?.id) {
+      try {
+        const latestAvatar = await getUserAvatar(user.id);
+        if (latestAvatar) {
+          setAvatarUrl(latestAvatar);
+        }
+      } catch (error) {
+        console.warn('Failed to refresh avatar:', error);
+      }
+    }
+  };
+
 
   useEffect(() => {
     loadUserProfile();
@@ -553,7 +571,7 @@ const Settings = () => {
                         placeholder="DD-MM-YYYY"
                       />
                     </div>
-                    
+
                     <div className="space-y-2">
                       <Label htmlFor="country" className="text-base">Country of Residence</Label>
                       <Input
@@ -612,12 +630,12 @@ const Settings = () => {
                               .filter((lang) => {
                                 if (!lang) return false;
                                 if (!nativeLanguageSearch) return true;
-                                
+
                                 const search = nativeLanguageSearch.toLowerCase();
                                 const name = lang.value ? lang.value.toLowerCase() : '';
                                 const label = lang.label ? lang.label.toLowerCase() : '';
                                 const code = lang.code ? lang.code.toLowerCase() : '';
-                                
+
                                 return name.includes(search) || label.includes(search) || code.includes(search);
                               })
                               .map((lang) => (
@@ -670,12 +688,12 @@ const Settings = () => {
                               .filter((lang) => {
                                 if (!lang) return false;
                                 if (!learningLanguageSearch) return true;
-                                
+
                                 const search = learningLanguageSearch.toLowerCase();
                                 const name = lang.value ? lang.value.toLowerCase() : '';
                                 const label = lang.label ? lang.label.toLowerCase() : '';
                                 const code = lang.code ? lang.code.toLowerCase() : '';
-                                
+
                                 return name.includes(search) || label.includes(search) || code.includes(search);
                               })
                               .map((lang) => (

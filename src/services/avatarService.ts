@@ -16,9 +16,11 @@ export async function uploadAvatar(file: File, userId: string) {
     }
     
     const fileExt = file.name.split('.').pop();
-    const fileName = `${userId}/${Date.now()}.${fileExt}`;
+    const fileName = `${userId}/avatar.${fileExt}`;
 
-    // First, delete any existing avatar files for this user
+    console.log('Organizing avatar in user folder:', fileName);
+
+    // First, delete any existing avatar files for this user's folder
     try {
       const { data: existingFiles } = await supabase.storage
         .from('avatars')
@@ -29,7 +31,7 @@ export async function uploadAvatar(file: File, userId: string) {
         await supabase.storage
           .from('avatars')
           .remove(filesToDelete);
-        console.log('Cleaned up existing avatar files');
+        console.log('Cleaned up existing avatar files for user:', userId);
       }
     } catch (cleanupError) {
       console.warn('Could not clean up existing files:', cleanupError);
@@ -75,15 +77,76 @@ export async function uploadAvatar(file: File, userId: string) {
       throw new Error('Failed to get public URL for uploaded avatar');
     }
 
+    console.log('Generated public URL:', publicUrl);
+
+    // Update the user's profile with the new avatar URL
+    const { error: profileUpdateError } = await supabase
+      .from('profiles')
+      .update({ avatar_url: publicUrl })
+      .eq('id', userId);
+
+    if (profileUpdateError) {
+      console.warn('Failed to update profile with new avatar URL:', profileUpdateError);
+      // Don't throw error as the upload was successful
+    } else {
+      console.log('Updated profile with new avatar URL');
+    }
+
     // Add cache-busting parameter to prevent stale images
-    const publicUrlWithCache = `${publicUrl}?t=${Date.now()}&v=${Math.random()}`;
+    const publicUrlWithCache = `${publicUrl}?t=${Date.now()}`;
     
-    console.log('Generated public URL:', publicUrlWithCache);
+    console.log('Returning avatar URL:', publicUrlWithCache);
 
     return { publicUrl: publicUrlWithCache };
   } catch (error) {
     console.error('Error uploading avatar:', error);
     throw error;
+  }
+}
+
+export async function getUserAvatar(userId: string): Promise<string | null> {
+  try {
+    console.log('Fetching avatar for user:', userId);
+
+    // List files in the user's folder
+    const { data: files, error } = await supabase.storage
+      .from('avatars')
+      .list(userId, {
+        limit: 1,
+        sortBy: { column: 'created_at', order: 'desc' }
+      });
+
+    if (error) {
+      console.error('Error listing user avatar files:', error);
+      return null;
+    }
+
+    if (!files || files.length === 0) {
+      console.log('No avatar found for user:', userId);
+      return null;
+    }
+
+    // Get the most recent avatar file
+    const avatarFile = files[0];
+    const filePath = `${userId}/${avatarFile.name}`;
+
+    // Get public URL
+    const { data } = supabase.storage
+      .from('avatars')
+      .getPublicUrl(filePath);
+
+    if (!data?.publicUrl) {
+      console.log('Failed to get public URL for avatar');
+      return null;
+    }
+
+    const avatarUrl = `${data.publicUrl}?t=${Date.now()}`;
+    console.log('Retrieved user avatar:', avatarUrl);
+
+    return avatarUrl;
+  } catch (error) {
+    console.error('Error fetching user avatar:', error);
+    return null;
   }
 }
 

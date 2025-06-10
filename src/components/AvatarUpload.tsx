@@ -37,14 +37,9 @@ export function AvatarUpload({ url, onUpload, userId }: AvatarUploadProps) {
 
       onUpload(result.publicUrl);
 
-      // Force a refresh of the profile data
-      setTimeout(() => {
-        window.location.reload();
-      }, 1000);
-
       toast({
         title: "Success",
-        description: "Avatar updated successfully! The page will refresh to show your new avatar.",
+        description: "Avatar updated successfully!",
       });
     } catch (error: any) {
       console.error('Avatar upload error:', error);
