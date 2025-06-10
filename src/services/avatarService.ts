@@ -60,26 +60,23 @@ export async function uploadAvatar(file: File, userId: string) {
       console.warn('Could not clean up existing files:', cleanupError);
     }
 
-    // Create a new File object to ensure proper formatting
-    const processedFile = new File([file], `avatar.${fileExt}`, {
-      type: contentType,
-      lastModified: Date.now()
-    });
+    // Convert file to ArrayBuffer and create a proper Blob with explicit MIME type
+    const arrayBuffer = await file.arrayBuffer();
+    const blob = new Blob([arrayBuffer], { type: contentType });
 
     console.log('Processed file details:', {
-      name: processedFile.name,
-      type: processedFile.type,
-      size: processedFile.size
+      name: fileName,
+      type: contentType,
+      size: blob.size
     });
 
-    // Upload new avatar with explicit content type
+    // Upload new avatar with explicit content type using Blob
     const { error: uploadError, data } = await supabase.storage
       .from('avatars')
-      .upload(fileName, processedFile, {
+      .upload(fileName, blob, {
         cacheControl: '3600',
         upsert: true,
-        contentType: contentType,
-        duplex: 'half'
+        contentType: contentType
       });
 
     if (uploadError) {

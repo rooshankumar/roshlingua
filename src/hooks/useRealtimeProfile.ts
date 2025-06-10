@@ -82,10 +82,27 @@ export function useRealtimeProfile(userId: string | undefined) {
 
       // Update local state with the returned data
       if (data) {
+        // Transform the data to ensure avatar_url has cache busting
+        if (data.avatar_url) {
+          // Remove any existing cache busting and add a fresh one
+          const cleanUrl = data.avatar_url.split('?')[0];
+          data.avatar_url = `${cleanUrl}?t=${Date.now()}`;
+        }
         setProfile(data);
       } else {
         // Fallback: update local state with the updates
-        setProfile(prev => prev ? { ...prev, ...updates } : null);
+        setProfile(prev => {
+          if (!prev) return null;
+
+          // Transform the data to ensure avatar_url has cache busting
+          if (prev.avatar_url) {
+            // Remove any existing cache busting and add a fresh one
+            const cleanUrl = prev.avatar_url.split('?')[0];
+            prev.avatar_url = `${cleanUrl}?t=${Date.now()}`;
+          }
+
+          return { ...prev, ...updates };
+        });
       }
 
       console.log('Profile updated successfully:', data);
