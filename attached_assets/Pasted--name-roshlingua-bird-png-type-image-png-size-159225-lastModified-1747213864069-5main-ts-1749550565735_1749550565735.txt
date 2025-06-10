@@ -1,0 +1,118 @@
+{name: 'roshlingua-bird.png', type: 'image/png', size: 159225, lastModified: 1747213864069}
+5main.tsx:22 [SubscriptionManager] No subscriptions to refresh
+main.tsx:22 Cleaned up existing avatar files for user: ed1c374e-3823-4ea2-aa28-3999c21d1140
+main.tsx:22 Processed file details: {name: '1749550543062.png', type: 'image/png', size: 159225}
+3main.tsx:22 [SubscriptionManager] No subscriptions to refresh
+supabase.ts:51 
+            
+            
+           POST https://wqojeesjtgfcftpnzaet.supabase.co/storage/v1/object/avatars/ed1c374e-3823-4ea2-aa28-3999c21d1140/1749550543062.png 400 (Bad Request)
+fetch @ supabase.ts:51
+(anonymous) @ @supabase_supabase-js.js?v=3e87da9d:3900
+(anonymous) @ @supabase_supabase-js.js?v=3e87da9d:3921
+fulfilled @ @supabase_supabase-js.js?v=3e87da9d:3873
+Promise.then
+step @ @supabase_supabase-js.js?v=3e87da9d:3886
+(anonymous) @ @supabase_supabase-js.js?v=3e87da9d:3888
+__awaiter6 @ @supabase_supabase-js.js?v=3e87da9d:3870
+(anonymous) @ @supabase_supabase-js.js?v=3e87da9d:3911
+(anonymous) @ @supabase_supabase-js.js?v=3e87da9d:2987
+(anonymous) @ @supabase_supabase-js.js?v=3e87da9d:2987
+(anonymous) @ @supabase_supabase-js.js?v=3e87da9d:3188
+(anonymous) @ @supabase_supabase-js.js?v=3e87da9d:3125
+__awaiter4 @ @supabase_supabase-js.js?v=3e87da9d:3107
+uploadOrUpdate @ @supabase_supabase-js.js?v=3e87da9d:3156
+(anonymous) @ @supabase_supabase-js.js?v=3e87da9d:3215
+(anonymous) @ @supabase_supabase-js.js?v=3e87da9d:3125
+__awaiter4 @ @supabase_supabase-js.js?v=3e87da9d:3107
+upload @ @supabase_supabase-js.js?v=3e87da9d:3214
+uploadAvatar @ avatarService.ts:84
+await in uploadAvatar
+handleUploadAvatar @ Settings.tsx:234
+await in handleUploadAvatar
+callCallback2 @ chunk-276SZO74.js?v=3e87da9d:3674
+invokeGuardedCallbackDev @ chunk-276SZO74.js?v=3e87da9d:3699
+invokeGuardedCallback @ chunk-276SZO74.js?v=3e87da9d:3733
+invokeGuardedCallbackAndCatchFirstError @ chunk-276SZO74.js?v=3e87da9d:3736
+executeDispatch @ chunk-276SZO74.js?v=3e87da9d:7014
+processDispatchQueueItemsInOrder @ chunk-276SZO74.js?v=3e87da9d:7034
+processDispatchQueue @ chunk-276SZO74.js?v=3e87da9d:7043
+dispatchEventsForPlugins @ chunk-276SZO74.js?v=3e87da9d:7051
+(anonymous) @ chunk-276SZO74.js?v=3e87da9d:7174
+batchedUpdates$1 @ chunk-276SZO74.js?v=3e87da9d:18913
+batchedUpdates @ chunk-276SZO74.js?v=3e87da9d:3579
+dispatchEventForPluginEventSystem @ chunk-276SZO74.js?v=3e87da9d:7173
+dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay @ chunk-276SZO74.js?v=3e87da9d:5478
+dispatchEvent @ chunk-276SZO74.js?v=3e87da9d:5472
+dispatchDiscreteEvent @ chunk-276SZO74.js?v=3e87da9d:5449Understand this error
+avatarService.ts:91 Upload error: {statusCode: '415', error: 'invalid_mime_type', message: 'mime type application/json is not supported'}
+uploadAvatar @ avatarService.ts:91
+await in uploadAvatar
+handleUploadAvatar @ Settings.tsx:234
+await in handleUploadAvatar
+callCallback2 @ chunk-276SZO74.js?v=3e87da9d:3674
+invokeGuardedCallbackDev @ chunk-276SZO74.js?v=3e87da9d:3699
+invokeGuardedCallback @ chunk-276SZO74.js?v=3e87da9d:3733
+invokeGuardedCallbackAndCatchFirstError @ chunk-276SZO74.js?v=3e87da9d:3736
+executeDispatch @ chunk-276SZO74.js?v=3e87da9d:7014
+processDispatchQueueItemsInOrder @ chunk-276SZO74.js?v=3e87da9d:7034
+processDispatchQueue @ chunk-276SZO74.js?v=3e87da9d:7043
+dispatchEventsForPlugins @ chunk-276SZO74.js?v=3e87da9d:7051
+(anonymous) @ chunk-276SZO74.js?v=3e87da9d:7174
+batchedUpdates$1 @ chunk-276SZO74.js?v=3e87da9d:18913
+batchedUpdates @ chunk-276SZO74.js?v=3e87da9d:3579
+dispatchEventForPluginEventSystem @ chunk-276SZO74.js?v=3e87da9d:7173
+dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay @ chunk-276SZO74.js?v=3e87da9d:5478
+dispatchEvent @ chunk-276SZO74.js?v=3e87da9d:5472
+dispatchDiscreteEvent @ chunk-276SZO74.js?v=3e87da9d:5449Understand this error
+avatarService.ts:146 Error uploading avatar: {statusCode: '415', error: 'invalid_mime_type', message: 'mime type application/json is not supported'}
+uploadAvatar @ avatarService.ts:146
+await in uploadAvatar
+handleUploadAvatar @ Settings.tsx:234
+await in handleUploadAvatar
+callCallback2 @ chunk-276SZO74.js?v=3e87da9d:3674
+invokeGuardedCallbackDev @ chunk-276SZO74.js?v=3e87da9d:3699
+invokeGuardedCallback @ chunk-276SZO74.js?v=3e87da9d:3733
+invokeGuardedCallbackAndCatchFirstError @ chunk-276SZO74.js?v=3e87da9d:3736
+executeDispatch @ chunk-276SZO74.js?v=3e87da9d:7014
+processDispatchQueueItemsInOrder @ chunk-276SZO74.js?v=3e87da9d:7034
+processDispatchQueue @ chunk-276SZO74.js?v=3e87da9d:7043
+dispatchEventsForPlugins @ chunk-276SZO74.js?v=3e87da9d:7051
+(anonymous) @ chunk-276SZO74.js?v=3e87da9d:7174
+batchedUpdates$1 @ chunk-276SZO74.js?v=3e87da9d:18913
+batchedUpdates @ chunk-276SZO74.js?v=3e87da9d:3579
+dispatchEventForPluginEventSystem @ chunk-276SZO74.js?v=3e87da9d:7173
+dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay @ chunk-276SZO74.js?v=3e87da9d:5478
+dispatchEvent @ chunk-276SZO74.js?v=3e87da9d:5472
+dispatchDiscreteEvent @ chunk-276SZO74.js?v=3e87da9d:5449Understand this error
+Settings.tsx:260 Error uploading avatar: {statusCode: '415', error: 'invalid_mime_type', message: 'mime type application/json is not supported'}
+handleUploadAvatar @ Settings.tsx:260
+await in handleUploadAvatar
+callCallback2 @ chunk-276SZO74.js?v=3e87da9d:3674
+invokeGuardedCallbackDev @ chunk-276SZO74.js?v=3e87da9d:3699
+invokeGuardedCallback @ chunk-276SZO74.js?v=3e87da9d:3733
+invokeGuardedCallbackAndCatchFirstError @ chunk-276SZO74.js?v=3e87da9d:3736
+executeDispatch @ chunk-276SZO74.js?v=3e87da9d:7014
+processDispatchQueueItemsInOrder @ chunk-276SZO74.js?v=3e87da9d:7034
+processDispatchQueue @ chunk-276SZO74.js?v=3e87da9d:7043
+dispatchEventsForPlugins @ chunk-276SZO74.js?v=3e87da9d:7051
+(anonymous) @ chunk-276SZO74.js?v=3e87da9d:7174
+batchedUpdates$1 @ chunk-276SZO74.js?v=3e87da9d:18913
+batchedUpdates @ chunk-276SZO74.js?v=3e87da9d:3579
+dispatchEventForPluginEventSystem @ chunk-276SZO74.js?v=3e87da9d:7173
+dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay @ chunk-276SZO74.js?v=3e87da9d:5478
+dispatchEvent @ chunk-276SZO74.js?v=3e87da9d:5472
+dispatchDiscreteEvent @ chunk-276SZO74.js?v=3e87da9d:5449Understand this error
+main.tsx:22 Route changed to: /settings
+main.tsx:22 [SubscriptionManager] No subscriptions to refresh
+main.tsx:22 Refreshing subscriptions after page change
+main.tsx:22 Refreshing all real-time subscriptions
+main.tsx:22 [SubscriptionManager] No subscriptions to refresh
+main.tsx:22 [SubscriptionManager] No subscriptions to refresh
+23main.tsx:22 [SubscriptionManager] No subscriptions to refresh
+main.tsx:22 Route changed to: /settings
+main.tsx:22 Refreshing subscriptions after page change
+main.tsx:22 Refreshing all real-time subscriptions
+2main.tsx:22 [SubscriptionManager] No subscriptions to refresh
+main.tsx:22 [SubscriptionManager] No subscriptions to refresh
+14main.tsx:22 [SubscriptionManager] No subscriptions to refresh
