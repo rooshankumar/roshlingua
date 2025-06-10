@@ -42,6 +42,12 @@ export async function uploadAvatar(file: File, userId: string) {
 
     console.log('Organizing avatar in user folder:', fileName);
     console.log('Using content type:', contentType);
+    console.log('Original file details:', {
+      name: file.name,
+      type: file.type,
+      size: file.size,
+      lastModified: file.lastModified
+    });
 
     // First, delete any existing avatar files for this user's folder
     try {
@@ -60,20 +66,22 @@ export async function uploadAvatar(file: File, userId: string) {
       console.warn('Could not clean up existing files:', cleanupError);
     }
 
-    // Convert file to ArrayBuffer and create a proper Blob with explicit MIME type
-    const arrayBuffer = await file.arrayBuffer();
-    const blob = new Blob([arrayBuffer], { type: contentType });
-
-    console.log('Processed file details:', {
-      name: fileName,
+    // Create a new File object with explicit type and name
+    const processedFile = new File([file], fileName.split('/')[1], {
       type: contentType,
-      size: blob.size
+      lastModified: Date.now()
     });
 
-    // Upload new avatar with explicit content type using Blob
+    console.log('Processed file details:', {
+      name: processedFile.name,
+      type: processedFile.type,
+      size: processedFile.size
+    });
+
+    // Upload new avatar using the processed File object
     const { error: uploadError, data } = await supabase.storage
       .from('avatars')
-      .upload(fileName, blob, {
+      .upload(fileName, processedFile, {
         cacheControl: '3600',
         upsert: true,
         contentType: contentType
@@ -85,6 +93,22 @@ export async function uploadAvatar(file: File, userId: string) {
     }
 
     console.log('File uploaded successfully:', data?.path);
+
+    // Verify the uploaded file's metadata
+    try {
+      const { data: fileInfo, error: infoError } = await supabase.storage
+        .from('avatars')
+        .list(userId);
+      
+      if (fileInfo && fileInfo.length > 0) {
+        const uploadedFile = fileInfo.find(f => f.name === fileName.split('/')[1]);
+        if (uploadedFile) {
+          console.log('Uploaded file metadata:', uploadedFile);
+        }
+      }
+    } catch (verifyError) {
+      console.warn('Could not verify upload:', verifyError);
+    }
 
     // Get public URL
     const { data: urlData } = supabase.storage
