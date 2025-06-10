@@ -24,22 +24,22 @@ export async function uploadAvatar(file: File, userId: string) {
     
     const publicUrl = urlData?.publicUrl;
     
-    // Add cache-busting parameter to prevent stale images
-    const publicUrlWithCache = publicUrl ? `${publicUrl}?t=${Date.now()}` : null;
-    
     if (!publicUrl) {
       throw new Error('Failed to get public URL for uploaded avatar');
     }
 
-    // Update profile
+    // Add cache-busting parameter to prevent stale images
+    const publicUrlWithCache = `${publicUrl}?t=${Date.now()}`;
+
+    // Update profile with cache-busted URL
     const { error: updateError } = await supabase
       .from('profiles')
-      .update({ avatar_url: publicUrl })
+      .update({ avatar_url: publicUrlWithCache })
       .eq('id', userId);
 
     if (updateError) throw updateError;
 
-    return { publicUrl };
+    return { publicUrl: publicUrlWithCache };
   } catch (error) {
     console.error('Error uploading avatar:', error);
     throw error;

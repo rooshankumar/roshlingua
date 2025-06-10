@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
-import { supabase } from "@/lib/supabase";
+import { uploadAvatar as uploadAvatarService } from "@/services/avatarService";
 
 interface AvatarUploadProps {
   url: string | null;
@@ -23,37 +23,29 @@ export function AvatarUpload({ url, onUpload, userId }: AvatarUploadProps) {
       }
 
       const file = event.target.files[0];
-      const fileExt = file.name.split(".").pop();
-      const filePath = `${userId}-${Math.random()}.${fileExt}`;
-
-      const { error: uploadError } = await supabase.storage
-        .from("avatars")
-        .upload(filePath, file);
-
-      if (uploadError) {
-        throw uploadError;
-      }
-
-      const { data } = await supabase.storage.from("avatars").getPublicUrl(filePath);
       
-      const { error: updateError } = await supabase
-        .from("profiles")
-        .update({ avatar_url: data.publicUrl })
-        .eq("id", userId);
-
-      if (updateError) {
-        throw updateError;
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        throw new Error("Please select an image file.");
       }
 
-      onUpload(data.publicUrl);
+      // Validate file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        throw new Error("File size must be less than 5MB.");
+      }
+
+      const result = await uploadAvatarService(file, userId);
+
+      onUpload(result.publicUrl);
       toast({
         title: "Success",
         description: "Avatar updated successfully",
       });
-    } catch (error) {
+    } catch (error: any) {
+      console.error('Avatar upload error:', error);
       toast({
         title: "Error",
-        description: "Error uploading avatar",
+        description: error.message || "Error uploading avatar",
         variant: "destructive",
       });
     } finally {

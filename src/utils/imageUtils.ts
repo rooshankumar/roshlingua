@@ -358,16 +358,35 @@ export function validateImageUrl(url: string | null | undefined): Promise<string
     }
 
     // If it's a Supabase storage URL, check if it exists
-    if (url.includes('supabase')) {
+    if (url.includes('supabase') || url.includes('storage')) {
       const img = new Image();
       img.onload = () => resolve(url);
-      img.onerror = () => resolve('/placeholder.svg');
-      img.src = url;
+      img.onerror = () => {
+        console.warn('Failed to load avatar image:', url);
+        resolve('/placeholder.svg');
+      };
+      
+      // Add cache busting if not already present
+      const cacheBustedUrl = url.includes('?') ? url : `${url}?t=${Date.now()}`;
+      img.src = cacheBustedUrl;
     } else {
-      // For external URLs
+      // For external URLs (like Google avatars)
       resolve(url);
     }
   });
+}
+
+/**
+ * Add cache busting parameter to avatar URLs to force refresh
+ */
+export function addCacheBusting(url: string | null): string | null {
+  if (!url) return null;
+  
+  // Remove existing cache busting parameter
+  const cleanUrl = url.split('?')[0];
+  
+  // Add new cache busting parameter
+  return `${cleanUrl}?t=${Date.now()}`;
 }
 
 /**

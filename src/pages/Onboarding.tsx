@@ -276,33 +276,32 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
             setIsLoading(true);
             const { data: { user } } = await supabase.auth.getUser();
             if (!user) throw new Error("User not logged in");
-            const fileExt = file.name.split('.').pop();
-            const filePath = `${user.id}/${Math.random()}.${fileExt}`;
-
-            const { error: uploadError } = await supabase.storage
-                .from('avatars')
-                .upload(filePath, file);
-
-            if (uploadError) {
-                throw uploadError;
+            
+            // Validate file type
+            if (!file.type.startsWith('image/')) {
+                throw new Error("Please select an image file.");
             }
 
-            const { data: { publicUrl } } = supabase.storage
-                .from('avatars')
-                .getPublicUrl(filePath);
+            // Validate file size (max 5MB)
+            if (file.size > 5 * 1024 * 1024) {
+                throw new Error("File size must be less than 5MB.");
+            }
 
-            form.setValue("avatar_url", publicUrl);
+            const { uploadAvatar } = await import('@/services/avatarService');
+            const result = await uploadAvatar(file, user.id);
+
+            form.setValue("avatar_url", result.publicUrl);
 
             toast({
                 title: "Avatar uploaded",
                 description: "Your profile picture has been updated.",
             });
-        } catch (error) {
+        } catch (error: any) {
             console.error('Error uploading avatar:', error);
             toast({
                 variant: "destructive",
                 title: "Upload failed",
-                description: "Could not upload profile picture. Please try again.",
+                description: error.message || "Could not upload profile picture. Please try again.",
             });
         } finally {
             setIsLoading(false);

@@ -32,7 +32,7 @@ export const testAuth = async () => {
   console.log('Step 3: Analyzing current URL...');
   const urlDiagnosis = diagnoseAuthUrl();
   console.log('URL contains auth code:', urlDiagnosis.hasCode);
-  console.log('URL contains error:', urlDiagnosis.hasError);r);
+  console.log('URL contains error:', urlDiagnosis.hasError);
 
   // Step 4: Test a sample authenticated request
   console.log('Step 4: Testing authenticated API request...');
