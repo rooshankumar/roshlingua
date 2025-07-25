@@ -171,7 +171,7 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ conversationId, receiver
       // Mark messages as read
       if (formattedMessages.length > 0) {
         const unreadMessages = formattedMessages.filter(
-          msg => msg.receiver_id === user.id && !msg.is_read
+          msg => (msg.receiver_id === user.id || msg.recipient_id === user.id) && !msg.is_read
         );
 
         if (unreadMessages.length > 0) {
