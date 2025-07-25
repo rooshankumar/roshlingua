@@ -93,7 +93,7 @@ export const MessageBubble = ({ message, isCurrentUser, isRead = false, onReacti
         </Avatar>
       )}
 
-      <div className={`flex flex-col max-w-[70%] ${isCurrentUser ? 'items-end' : 'items-start'}`}></div_dir>
+      <div className={`flex flex-col max-w-[70%] ${isCurrentUser ? 'items-end' : 'items-start'}`}>
         <div
           className={`message-bubble ${isCurrentUser ? 'sent bg-primary text-primary-foreground' : 'received bg-muted text-muted-foreground'} rounded-2xl shadow-sm ${message.attachment_url ? 'overflow-hidden' : 'p-1 px-2'} ${isConsecutive ? 'consecutive-message' : ''} inline-block max-w-fit`}
           data-sender={isCurrentUser ? 'self' : 'other'}
