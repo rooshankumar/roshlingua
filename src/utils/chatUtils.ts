@@ -19,6 +19,19 @@ export const formatLastSeen = (timestamp: string | undefined) => {
   return `Last seen ${formatDistanceToNow(new Date(timestamp))} ago`;
 };
 
+export const formatRelativeTime = (timestamp: string) => {
+  const date = new Date(timestamp);
+  const now = new Date();
+  const diffInMinutes = Math.floor((now.getTime() - date.getTime()) / (1000 * 60));
+  
+  if (diffInMinutes < 1) return 'Just now';
+  if (diffInMinutes < 60) return `${diffInMinutes}m ago`;
+  if (diffInMinutes < 1440) return `${Math.floor(diffInMinutes / 60)}h ago`;
+  if (diffInMinutes < 10080) return `${Math.floor(diffInMinutes / 1440)}d ago`;
+  
+  return format(date, 'MMM d');
+};
+
 export const getOtherParticipant = (conversation: Conversation, currentUserId: string) => {
   return conversation.participants.find(p => p.user_id !== currentUserId) || conversation.participants[0];
 };

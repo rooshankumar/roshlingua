@@ -63,15 +63,12 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ conversationId, receiver
   const isInitialLoadRef = useRef(true);
 
   // Typing status
+  const typingStatus = useTypingStatus(conversationId || `${user?.id}-${receiverId}`);
   const { 
-    typingUsers, 
-    startTyping, 
-    stopTyping 
-  } = useTypingStatus(conversationId || `${user?.id}-${receiverId}`) || { 
-    typingUsers: [], 
-    startTyping: () => {}, 
-    stopTyping: () => {} 
-  };
+    typingUsers = [], 
+    startTyping = () => {}, 
+    stopTyping = () => {} 
+  } = typingStatus || {};
 
   // Optimized scroll to bottom
   const scrollToBottom = useCallback((smooth = false) => {
@@ -575,17 +572,19 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ conversationId, receiver
               <MessageBubble
                 key={message.id}
                 message={message}
-                isOwn={message.sender_id === user?.id}
-                showAvatar={
-                  index === 0 || 
-                  dateMessages[index - 1]?.sender_id !== message.sender_id
+                isCurrentUser={message.sender_id === user?.id}
+                isRead={message.is_read}
+                isLast={index === dateMessages.length - 1}
+                isConsecutive={
+                  index > 0 && 
+                  dateMessages[index - 1]?.sender_id === message.sender_id &&
+                  (new Date(message.created_at).getTime() - 
+                   new Date(dateMessages[index - 1]?.created_at).getTime()) < 300000 // 5 minutes
                 }
-                showTimestamp={
-                  index === dateMessages.length - 1 ||
-                  dateMessages[index + 1]?.sender_id !== message.sender_id ||
-                  (new Date(dateMessages[index + 1]?.created_at).getTime() - 
-                   new Date(message.created_at).getTime()) > 300000 // 5 minutes
-                }
+                onReaction={(emoji) => {
+                  // Handle reactions here if needed
+                  console.log('Reaction:', emoji, 'for message:', message.id);
+                }}
               />
             ))}
           </div>
