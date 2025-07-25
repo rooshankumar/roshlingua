@@ -96,30 +96,6 @@ export const testCleanLogin = async () => {
   // Step 2: Generate new PKCE verifier
   console.log('Step 2: Generating new PKCE verifier...');
   const verifier = generateVerifier();
-  storePKCEVerifier(verifier);
-
-  // Step 3: Initiate sign in
-  console.log('Step 3: Initiating sign in...');
-  const { error } = await supabase.auth.signInWithOAuth({
-    provider: 'google',
-    options: {
-      redirectTo: `${window.location.origin}/auth/callback`
-    }
-  });
-
-  if (error) {
-    console.error('Sign in error:', error);
-    return { success: false, error };
-  }
-
-  console.log('Sign in initiated successfully');
-  console.groupEnd();
-  return { success: true };
-};ata();
-
-  // Step 2: Generate a new verifier
-  console.log('Step 2: Generating new PKCE verifier...');
-  const verifier = generateVerifier();
   console.log('Verifier created:', verifier.substring(0, 8) + '...');
 
   // Step 3: Store the verifier in all locations
