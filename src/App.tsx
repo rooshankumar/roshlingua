@@ -145,6 +145,15 @@ const AppRoutes = () => {
             </AppLayout>
           </ProtectedRoute>
         } />
+            <Route path="/chat/user/:receiverId" element={
+          <ProtectedRoute>
+            <AppLayout>
+              <Suspense fallback={<div className="flex items-center justify-center h-screen">Loading...</div>}>
+                <Chat />
+              </Suspense>
+            </AppLayout>
+          </ProtectedRoute>
+        } />
         <Route path="/settings" element={
           <ProtectedRoute>
             <AppLayout>
@@ -221,9 +230,9 @@ const App = () => {
       try {
         console.log('Checking storage buckets...');
         const result = await verifyStorageBuckets();
-        
+
         setStorageReady(true);
-        
+
         if (!result.success) {
           console.warn('Storage bucket verification had issues:', result.error);
           console.log('App will continue - storage buckets likely exist already');
@@ -238,7 +247,7 @@ const App = () => {
 
     // Execute but don't block app rendering
     initStorage();
-    
+
     // Optional: Any other app-level initializations can go here
   }, []);
 

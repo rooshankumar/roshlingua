@@ -218,13 +218,17 @@ const ChatList = () => {
 
       {filteredConversations.length > 0 && (
         <div className="grid gap-3">
-          {filteredConversations.map((conversation) => (
+          {filteredConversations.map((conversation) => {
+            // Check unread count by participant ID (sender ID for received messages)
+            const unreadCount = unreadCounts[conversation.participant.id] ?? 0;
+            
+            return (
             <Link
               key={conversation.id}
               to={`/chat/${conversation.id}`}
               className="block"
             >
-              <Card className={`hover:bg-muted/50 transition-all duration-200 hover:scale-[1.01] hover:shadow-lg ${(unreadCounts[conversation.id] ?? 0) > 0 ? 'border-destructive/30 new-message-highlight' : ''}`}>
+              <Card className={`hover:bg-muted/50 transition-all duration-200 hover:scale-[1.01] hover:shadow-lg ${unreadCount > 0 ? 'border-destructive/30 new-message-highlight' : ''}`}>
                 <CardContent className="flex items-center p-4">
                   <div className="relative">
                     <Avatar className="h-16 w-16">
@@ -242,9 +246,9 @@ const ChatList = () => {
                         {conversation.participant?.full_name?.substring(0, 2).toUpperCase() || 'AB'}
                       </AvatarFallback>
                     </Avatar>
-                    {(unreadCounts[conversation.id] ?? 0) > 0 && (
+                    {unreadCount > 0 && (
                       <div className="absolute -top-1 -right-1 bg-destructive text-destructive-foreground rounded-full min-w-[20px] h-5 flex items-center justify-center text-xs font-medium px-1 animate-pulse shadow-md border border-background">
-                        {unreadCounts[conversation.id]}
+                        {unreadCount}
                       </div>
                     )}
                     <span className={classNames(
@@ -271,7 +275,7 @@ const ChatList = () => {
                 </CardContent>
               </Card>
             </Link>
-          ))}
+          )})
         </div>
       )}
     </div>

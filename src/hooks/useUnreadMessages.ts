@@ -31,22 +31,24 @@ export const useUnreadMessages = () => {
         .select(`
           id,
           sender_id,
+          receiver_id,
           is_read,
           created_at
         `)
-        .or(`sender_id.neq.${user.id}`)
+        .eq('receiver_id', user.id)
         .eq('is_read', false)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
 
-      // Group by conversation (sender for received messages)
+      // Group by sender (for received messages)
       const counts: UnreadMessageCounts = {};
       let total = 0;
 
       messages?.forEach(message => {
-        const conversationId = message.sender_id;
-        counts[conversationId] = (counts[conversationId] || 0) + 1;
+        // Use sender_id as the conversation identifier for received messages
+        const senderId = message.sender_id;
+        counts[senderId] = (counts[senderId] || 0) + 1;
         total++;
       });
 

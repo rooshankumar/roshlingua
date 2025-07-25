@@ -1,170 +1,63 @@
-import { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { useAuth } from '@/providers/AuthProvider';
-import { Loader2 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { supabase } from '@/lib/supabase';
+import React, { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
 import { ChatScreen } from '@/components/chat/ChatScreen';
-import { useResponsive } from '@/hooks/useResponsive'; // Assumed hook
+import { supabase } from '@/lib/supabase';
+import { useAuth } from '@/hooks/useAuth';
 
-const ChatPage = () => {
-  const { conversationId } = useParams();
+export const Chat: React.FC = () => {
   const { user } = useAuth();
-  const [isLoading, setIsLoading] = useState(true);
-  const [conversation, setConversation] = useState<any>(null);
-  const [unreadCount, setUnreadCount] = useState(0); // Added state for unread count
-  const { deviceSize } = useResponsive();
-  const isMobile = deviceSize === 'xs' || deviceSize === 'sm';
+  const { receiverId, conversationId } = useParams<{ receiverId?: string; conversationId?: string }>();
+  const [actualReceiverId, setActualReceiverId] = useState<string | undefined>(receiverId);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (!user || !conversationId) return;
+    // If we have a conversationId, we need to find the other participant
+    if (conversationId && user && !receiverId) {
+      setLoading(true);
 
-    const loadConversation = async () => {
-      try {
-        const { data: participant, error: participantsError } = await supabase
-          .from('conversation_participants')
-          .select(`
-            user_id,
-            profiles!conversation_participants_user_id_fkey (
-              id,
-              full_name,
-              avatar_url,
-              is_online
-            )
-          `)
-          .eq('conversation_id', conversationId)
-          .neq('user_id', user.id)
-          .maybeSingle();
-
-        if (participantsError) {
-          console.error('Error loading participants:', participantsError);
-          throw participantsError;
-        }
-
-        if (!participant) {
-          console.error('No participant found for conversation:', conversationId);
-          return;
-        }
-
-        const otherParticipant = participant.profiles;
-
-        if (otherParticipant) {
-          // Fetch messages with sender profile info
-          const { data: messages, error: messagesError } = await supabase
-            .from('messages')
-            .select(`
-              *,
-              sender:profiles!messages_sender_id_fkey (
-                id,
-                full_name,
-                avatar_url,
-                is_online
-              )
-            `)
+      const fetchOtherParticipant = async () => {
+        try {
+          const { data: participants, error } = await supabase
+            .from('conversation_participants')
+            .select('user_id')
             .eq('conversation_id', conversationId)
-            .order('created_at', { ascending: true });
+            .neq('user_id', user.id);
 
-          if (messagesError) {
-            console.error('Error fetching messages:', messagesError);
-            throw messagesError;
+          if (error) throw error;
+
+          if (participants && participants.length > 0) {
+            setActualReceiverId(participants[0].user_id);
           }
-
-          // Count unread messages before marking as read.
-          const unreadMessages = messages.filter(msg => !msg.is_read && msg.recipient_id === user.id);
-          setUnreadCount(unreadMessages.length);
-
-          // Mark messages as read
-          const { error: readError } = await supabase
-            .from('messages')
-            .update({ is_read: true })
-            .eq('conversation_id', conversationId)
-            .eq('recipient_id', user.id)
-            .eq('is_read', false);
-
-          if (readError) {
-            console.error('Error marking messages as read:', readError);
-          }
-
-          setConversation({
-            id: conversationId,
-            messages: messages || [],
-            participant: {
-              id: otherParticipant.id,
-              full_name: otherParticipant.full_name || 'Unknown User',
-              avatar_url: otherParticipant.avatar_url || '/placeholder.svg',
-              is_online: otherParticipant.is_online,
-            }
-          });
+        } catch (error) {
+          console.error('Error fetching conversation participants:', error);
+        } finally {
+          setLoading(false);
         }
-      } catch (error) {
-        console.error('Error loading conversation:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
+      };
 
-    loadConversation();
-  }, [user, conversationId]);
+      fetchOtherParticipant();
+    } else if (receiverId) {
+      setActualReceiverId(receiverId);
+    }
+  }, [conversationId, receiverId, user]);
 
-  if (!user) {
+  if (loading) {
     return (
-      <div className="h-screen flex items-center justify-center">
-        <p className="text-muted-foreground">Please log in to access chat</p>
+      <div className="flex items-center justify-center h-full">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
       </div>
     );
   }
 
-  if (isLoading) {
+  if (!actualReceiverId) {
     return (
-      <div className="h-screen flex items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      <div className="flex items-center justify-center h-full">
+        <p className="text-muted-foreground">Please select a conversation</p>
       </div>
     );
   }
 
-  if (!conversation) {
-    const createNewConversation = async () => {
-      try {
-        const { data: participant, error: participantError } = await supabase
-          .from('conversations')
-          .insert([{
-            created_by: user.id,
-            last_message_at: new Date().toISOString()
-          }])
-          .select()
-          .single();
-
-        if (participantError) throw participantError;
-
-        // Add participants
-        const { error: participantsError } = await supabase
-          .from('conversation_participants')
-          .insert([
-            { conversation_id: participant.id, user_id: user.id }
-          ]);
-
-        if (participantsError) throw participantsError;
-
-        // Navigate to the new conversation
-        window.location.href = `/chat/${participant.id}`;
-      } catch (error) {
-        console.error('Error creating conversation:', error);
-      }
-    };
-
-    return (
-      <div className="h-screen flex flex-col items-center justify-center gap-4">
-        <p className="text-muted-foreground">No conversation found</p>
-        <Button onClick={createNewConversation}>Start New Conversation</Button>
-      </div>
-    );
-  }
-
-  return (
-    <div className={isMobile ? "fixed inset-0 z-50 bg-background" : "min-h-screen md:bg-muted/30 max-w-full overflow-hidden"}>
-      <ChatScreen conversation={conversation} unreadCount={unreadCount} />
-    </div>
-  );
+  return <ChatScreen receiverId={actualReceiverId} conversationId={conversationId} />;
 };
 
-export default ChatPage;
+export default Chat;
