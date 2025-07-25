@@ -1,0 +1,35 @@
+Refreshing subscriptions after page change
+main.tsx:22 Refreshing all real-time subscriptions
+2main.tsx:22 [SubscriptionManager] Skipping refresh, last global refresh was too recent
+main.tsx:22 Unsubscribing from real-time updates
+main.tsx:22 [SubscriptionManager] Unsubscribing from community_profiles
+main.tsx:22 Checking all achievements for user: ed1c374e-3823-4ea2-aa28-3999c21d1140
+main.tsx:22 [SubscriptionManager] No subscriptions to refresh
+main.tsx:22 🔔 Setting up unread messages subscription for user: ed1c374e-3823-4ea2-aa28-3999c21d1140
+main.tsx:22 🔔 Unread messages subscription status: CLOSED
+main.tsx:22 [SubscriptionManager] No subscriptions to refresh
+main.tsx:22 🔔 Unread messages subscription status: SUBSCRIBED
+main.tsx:22 ✅ Unread messages real-time connected
+main.tsx:22 [SubscriptionManager] No subscriptions to refresh
+ChatList.tsx:150 Error fetching conversations: {code: '42703', details: null, hint: null, message: 'column messages.recipient_id does not exist'}
+fetchConversations @ ChatList.tsx:150
+await in fetchConversations
+(anonymous) @ ChatList.tsx:156
+commitHookEffectListMount @ chunk-276SZO74.js?v=4572e6dc:16915
+commitPassiveMountOnFiber @ chunk-276SZO74.js?v=4572e6dc:18156
+commitPassiveMountEffects_complete @ chunk-276SZO74.js?v=4572e6dc:18129
+commitPassiveMountEffects_begin @ chunk-276SZO74.js?v=4572e6dc:18119
+commitPassiveMountEffects @ chunk-276SZO74.js?v=4572e6dc:18109
+flushPassiveEffectsImpl @ chunk-276SZO74.js?v=4572e6dc:19490
+flushPassiveEffects @ chunk-276SZO74.js?v=4572e6dc:19447
+(anonymous) @ chunk-276SZO74.js?v=4572e6dc:19328
+workLoop @ chunk-276SZO74.js?v=4572e6dc:197
+flushWork @ chunk-276SZO74.js?v=4572e6dc:176
+performWorkUntilDeadline @ chunk-276SZO74.js?v=4572e6dc:384Understand this error
+3main.tsx:22 [SubscriptionManager] No subscriptions to refresh
+main.tsx:22 📊 Unread message counts updated: {counts: {…}, total: 15}
+3main.tsx:22 [SubscriptionManager] No subscriptions to refresh
+main.tsx:22 Current stats: {streak: 1, xp: 10, conversations: 8, messages: 53}
+main.tsx:22 Current unlocked achievements: (6) ['first-chat', 'streak-3', 'conversations-5', 'winter-2024', 'streak-7', 'messages-50']
+main.tsx:22 Finished checking achievements
+77main.tsx:22 [SubscriptionManager] No subscriptions to refresh

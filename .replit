@@ -2,7 +2,7 @@ modules = ["nodejs-20", "web"]
 run = "npm run dev"
 
 [nix]
-channel = "stable-24_05"
+channel = "stable-25_05"
 
 [deployment]
 run = ["sh", "-c", "npm run dev"]
@@ -10,6 +10,7 @@ run = ["sh", "-c", "npm run dev"]
 [[ports]]
 localPort = 5173
 externalPort = 80
+exposeLocalhost = true
 
 [workflows]
 runButton = "Run App"
