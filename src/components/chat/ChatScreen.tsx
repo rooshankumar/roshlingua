@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/hooks/useAuth';
@@ -54,7 +53,7 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ conversationId, receiver
   const [receiverProfile, setReceiverProfile] = useState<any>(null);
   const [newMessageCount, setNewMessageCount] = useState(0);
   const [isScrolledToBottom, setIsScrolledToBottom] = useState(true);
-  
+
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const channelRef = useRef<RealtimeChannel | null>(null);
@@ -83,12 +82,12 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ conversationId, receiver
   // Check if user is scrolled to bottom
   const handleScroll = useCallback(() => {
     if (!messagesContainerRef.current) return;
-    
+
     const { scrollTop, scrollHeight, clientHeight } = messagesContainerRef.current;
     const isAtBottom = scrollHeight - scrollTop - clientHeight < 100;
-    
+
     setIsScrolledToBottom(isAtBottom);
-    
+
     if (isAtBottom) {
       setNewMessageCount(0);
     }
@@ -97,7 +96,7 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ conversationId, receiver
   // Fetch receiver profile
   const fetchReceiverProfile = useCallback(async () => {
     if (!receiverId) return;
-    
+
     try {
       const { data, error } = await supabase
         .from('profiles')
@@ -160,12 +159,12 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ conversationId, receiver
       if (error) throw error;
 
       const formattedMessages = (messageData || []).reverse();
-      
+
       if (loadMore) {
         setMessages(prev => [...formattedMessages, ...prev]);
       } else {
         setMessages(formattedMessages);
-        
+
         // Auto-scroll on initial load or if at bottom
         if (isInitialLoadRef.current || isScrolledToBottom) {
           setTimeout(() => scrollToBottom(false), 100);
@@ -200,7 +199,7 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ conversationId, receiver
     if (!user || !receiverId || channelRef.current) return;
 
     const channelName = `messages:${[user.id, receiverId].sort().join('-')}`;
-    
+
     channelRef.current = supabase
       .channel(channelName)
       .on(
@@ -213,7 +212,7 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ conversationId, receiver
         },
         async (payload) => {
           console.log('📨 New message received:', payload.new);
-          
+
           // Fetch the complete message with relations
           const { data: newMessage, error } = await supabase
             .from('messages')
@@ -242,16 +241,16 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ conversationId, receiver
               if (prev.some(msg => msg.id === newMessage.id)) {
                 return prev;
               }
-              
+
               const updated = [...prev, newMessage];
-              
+
               // Auto-scroll if at bottom or if it's user's own message
               if (isScrolledToBottom || newMessage.sender_id === user.id) {
                 setTimeout(() => scrollToBottom(true), 100);
               } else {
                 // Show new message indicator
                 setNewMessageCount(count => count + 1);
-                
+
                 // Play notification sound for received messages
                 if (newMessage.sender_id !== user.id) {
                   try {
@@ -261,7 +260,7 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ conversationId, receiver
                   } catch (e) {
                     console.log('Could not play notification sound');
                   }
-                  
+
                   // Show browser notification if supported
                   if ('Notification' in window && Notification.permission === 'granted') {
                     new Notification(`New message from ${newMessage.sender?.full_name}`, {
@@ -272,7 +271,7 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ conversationId, receiver
                   }
                 }
               }
-              
+
               return updated;
             });
 
@@ -313,7 +312,7 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ conversationId, receiver
         },
         async (payload) => {
           console.log('👍 New reaction:', payload.new);
-          
+
           // Fetch the reaction with user info
           const { data: reaction, error } = await supabase
             .from('message_reactions')
@@ -342,7 +341,7 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ conversationId, receiver
       )
       .subscribe((status) => {
         console.log('🔄 Chat subscription status:', status);
-        
+
         if (status === 'SUBSCRIBED') {
           console.log('✅ Chat real-time connected');
         } else if (status === 'CHANNEL_ERROR') {
@@ -384,7 +383,7 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ conversationId, receiver
       if (error) throw error;
 
       console.log('✅ Message sent successfully:', data);
-      
+
       // Stop typing indicator
       stopTyping();
 
@@ -436,7 +435,7 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ conversationId, receiver
   // Group messages by date for better UX
   const groupedMessages = useMemo(() => {
     const groups: { [key: string]: Message[] } = {};
-    
+
     messages.forEach(message => {
       const date = format(new Date(message.created_at), 'yyyy-MM-dd');
       if (!groups[date]) {
@@ -444,7 +443,7 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ conversationId, receiver
       }
       groups[date].push(message);
     });
-    
+
     return groups;
   }, [messages]);
 
@@ -494,7 +493,7 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ conversationId, receiver
                 {format(new Date(date), 'MMMM d, yyyy')}
               </div>
             </div>
-            
+
             {/* Messages for this date */}
             {dateMessages.map((message, index) => (
               <MessageBubble

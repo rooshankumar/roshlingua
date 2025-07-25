@@ -1,11 +1,40 @@
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/providers/AuthProvider';
 import { Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/lib/supabase';
 import { ChatScreen } from '@/components/chat/ChatScreen';
 import { useResponsive } from '@/hooks/useResponsive'; // Assumed hook
+import {
+  Alert,
+  AlertCircle,
+  AlertDescription,
+} from "@/components/ui/alert"
+import { ErrorBoundary } from 'react-error-boundary';
+
+// Error Boundary Component
+const ChatErrorBoundary = ({ children, onRetry }: { children: React.ReactNode; onRetry: () => void }) => {
+  return (
+    <ErrorBoundary
+      fallback={
+        <div className="flex flex-col items-center justify-center h-screen p-4">
+          <Alert className="max-w-md">
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>
+              Something went wrong loading the chat. Please try again.
+            </AlertDescription>
+          </Alert>
+          <Button onClick={onRetry} className="mt-4">
+            Retry
+          </Button>
+        </div>
+      }
+    >
+      {children}
+    </ErrorBoundary>
+  );
+};
 
 const ChatPage = () => {
   const { conversationId } = useParams();

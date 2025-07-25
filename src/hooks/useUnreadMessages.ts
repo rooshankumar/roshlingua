@@ -17,7 +17,7 @@ export const useUnreadMessages = () => {
 
   // Fetch initial unread counts
   const fetchUnreadCounts = useCallback(async () => {
-    if (!user) {
+    if (!user?.id) {
       setUnreadCounts({});
       setTotalUnread(0);
       setLoading(false);
@@ -63,7 +63,7 @@ export const useUnreadMessages = () => {
 
   // Mark messages as read for a specific conversation
   const markAsRead = useCallback(async (conversationId: string) => {
-    if (!user) return;
+    if (!user?.id || !conversationId) return;
 
     try {
       const { error } = await supabase
@@ -94,7 +94,7 @@ export const useUnreadMessages = () => {
 
   // Set up real-time subscription for unread messages
   useEffect(() => {
-    if (!user) {
+    if (!user?.id) {
       setChannel(null);
       return;
     }
