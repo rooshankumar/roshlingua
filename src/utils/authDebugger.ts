@@ -239,12 +239,14 @@ if (typeof window !== 'undefined') {
   window.clearAllAuthData = clearAllAuthData;
   window.diagnoseAuthUrl = diagnoseAuthUrl;
   window.resetAndStartAuth = resetAndStartAuth;
-}r console
+}
+
+// Export these functions to the global window object for easy debugging
+// from browser console
 if (typeof window !== 'undefined') {
   window.debugAuth = debugAuth;
   window.clearAllAuthData = clearAllAuthData;
   window.diagnoseAuthUrl = diagnoseAuthUrl;
   window.resetAndStartAuth = resetAndStartAuth;
   window.debugSupabaseAuth = debugSupabaseAuth;
-}seAuth;
 }
