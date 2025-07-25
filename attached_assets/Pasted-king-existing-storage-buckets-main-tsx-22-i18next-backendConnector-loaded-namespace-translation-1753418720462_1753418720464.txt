@@ -1,0 +1,93 @@
+king existing storage buckets...
+main.tsx:22 i18next::backendConnector: loaded namespace translation for language en {navigation: {…}, auth: {…}, settings: {…}}
+main.tsx:22 i18next: languageChanged en
+main.tsx:22 i18next: initialized {debug: true, initAsync: true, ns: Array(1), defaultNS: Array(1), fallbackLng: Array(1), …}
+main.tsx:22 Setting initial session: Session exists
+main.tsx:22 Checking profile for user: ed1c374e-3823-4ea2-aa28-3999c21d1140
+main.tsx:22 Updating last_seen for user: ed1c374e-3823-4ea2-aa28-3999c21d1140
+main.tsx:22 No existing buckets found, which is unusual.
+main.tsx:22 Storage buckets verified successfully
+main.tsx:22 Checking onboarding status for user: ed1c374e-3823-4ea2-aa28-3999c21d1140
+main.tsx:22 Auth state changed: INITIAL_SESSION Session exists
+main.tsx:22 Checking onboarding status for user: ed1c374e-3823-4ea2-aa28-3999c21d1140
+main.tsx:22 Onboarding status: Completed
+main.tsx:22 Performing periodic refresh of all subscriptions
+main.tsx:22 [SubscriptionManager] No subscriptions to refresh
+main.tsx:22 Refreshing all real-time subscriptions
+main.tsx:22 Navigation detected, checking connection health
+main.tsx:22 [SubscriptionManager] No subscriptions to refresh
+main.tsx:22 [SubscriptionManager] Subscribing to app_connection_monitor
+main.tsx:22 Route changed to: /chat/80713ad5-ab4f-42d9-882c-54ac4aedbe5a
+main.tsx:22 🔔 Setting up unread messages subscription for user: ed1c374e-3823-4ea2-aa28-3999c21d1140
+main.tsx:22 Onboarding status: Completed
+chunk-276SZO74.js?v=4572e6dc:14032 The above error occurred in one of your React components:
+
+    at Lazy
+    at Suspense
+    at div
+    at MotionComponent (https://96d48d6a-9be4-45f5-bfcb-f0ddc60aa328-00-e1sdnptumb4.pike.replit.dev/node_modules/.vite/deps/framer-motion.js?v=4572e6dc:4619:40)
+    at PageTransition (https://96d48d6a-9be4-45f5-bfcb-f0ddc60aa328-00-e1sdnptumb4.pike.replit.dev/src/components/PageTransition.tsx:12:27)
+    at main
+    at div
+    at AppLayout (https://96d48d6a-9be4-45f5-bfcb-f0ddc60aa328-00-e1sdnptumb4.pike.replit.dev/src/components/layouts/AppLayout.tsx?t=1753417788657:85:22)
+    at ProtectedRoute (https://96d48d6a-9be4-45f5-bfcb-f0ddc60aa328-00-e1sdnptumb4.pike.replit.dev/src/components/auth/ProtectedRoute.tsx:15:27)
+    at RenderedRoute (https://96d48d6a-9be4-45f5-bfcb-f0ddc60aa328-00-e1sdnptumb4.pike.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=4572e6dc:4069:5)
+    at Routes (https://96d48d6a-9be4-45f5-bfcb-f0ddc60aa328-00-e1sdnptumb4.pike.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=4572e6dc:4508:5)
+    at PresenceChild (https://96d48d6a-9be4-45f5-bfcb-f0ddc60aa328-00-e1sdnptumb4.pike.replit.dev/node_modules/.vite/deps/framer-motion.js?v=4572e6dc:137:24)
+    at AnimatePresence (https://96d48d6a-9be4-45f5-bfcb-f0ddc60aa328-00-e1sdnptumb4.pike.replit.dev/node_modules/.vite/deps/framer-motion.js?v=4572e6dc:216:26)
+    at AppRoutes (https://96d48d6a-9be4-45f5-bfcb-f0ddc60aa328-00-e1sdnptumb4.pike.replit.dev/src/App.tsx?t=1753418689539:64:33)
+    at AuthProvider (https://96d48d6a-9be4-45f5-bfcb-f0ddc60aa328-00-e1sdnptumb4.pike.replit.dev/src/providers/AuthProvider.tsx:24:32)
+    at Router (https://96d48d6a-9be4-45f5-bfcb-f0ddc60aa328-00-e1sdnptumb4.pike.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=4572e6dc:4451:15)
+    at BrowserRouter (https://96d48d6a-9be4-45f5-bfcb-f0ddc60aa328-00-e1sdnptumb4.pike.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=4572e6dc:5196:5)
+    at ThemeProvider (https://96d48d6a-9be4-45f5-bfcb-f0ddc60aa328-00-e1sdnptumb4.pike.replit.dev/src/components/theme-provider.tsx:17:33)
+    at QueryClientProvider (https://96d48d6a-9be4-45f5-bfcb-f0ddc60aa328-00-e1sdnptumb4.pike.replit.dev/node_modules/.vite/deps/@tanstack_react-query.js?v=4572e6dc:2794:3)
+    at App (https://96d48d6a-9be4-45f5-bfcb-f0ddc60aa328-00-e1sdnptumb4.pike.replit.dev/src/App.tsx?t=1753418689539:745:45)
+
+Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://reactjs.org/link/error-boundaries to learn more about error boundaries.
+logCapturedError @ chunk-276SZO74.js?v=4572e6dc:14032
+update.callback @ chunk-276SZO74.js?v=4572e6dc:14052
+callCallback @ chunk-276SZO74.js?v=4572e6dc:11248
+commitUpdateQueue @ chunk-276SZO74.js?v=4572e6dc:11265
+commitLayoutEffectOnFiber @ chunk-276SZO74.js?v=4572e6dc:17093
+commitLayoutMountEffects_complete @ chunk-276SZO74.js?v=4572e6dc:17980
+commitLayoutEffects_begin @ chunk-276SZO74.js?v=4572e6dc:17969
+commitLayoutEffects @ chunk-276SZO74.js?v=4572e6dc:17920
+commitRootImpl @ chunk-276SZO74.js?v=4572e6dc:19353
+commitRoot @ chunk-276SZO74.js?v=4572e6dc:19277
+finishConcurrentRender @ chunk-276SZO74.js?v=4572e6dc:18760
+performConcurrentWorkOnRoot @ chunk-276SZO74.js?v=4572e6dc:18718
+workLoop @ chunk-276SZO74.js?v=4572e6dc:197
+flushWork @ chunk-276SZO74.js?v=4572e6dc:176
+performWorkUntilDeadline @ chunk-276SZO74.js?v=4572e6dc:384Understand this error
+main.tsx:22 [SubscriptionManager] Unsubscribing from app_connection_monitor
+main.tsx:22 🧹 Cleaning up unread messages subscription
+main.tsx:22 🔔 Unread messages subscription status: CLOSED
+main.tsx:22 🔔 Unread messages subscription status: CLOSED
+client:698 [vite] Internal Server Error
+  × Unexpected token `div`. Expected jsx identifier
+    ╭─[/home/runner/workspace/src/components/chat/MessageBubble.tsx:86:1]
+ 83 │   };
+ 84 │ 
+ 85 │   return (
+ 86 │     <div className={`group flex items-end gap-2 mb-2 ${isCurrentUser ? 'justify-end flex-row-reverse' : 'justify-start'}`}>
+    ·      ───
+ 87 │       {!isCurrentUser && (
+ 88 │         <Avatar className="h-8 w-8 flex-shrink-0">
+ 89 │           <AvatarImage src={message.sender?.avatar_url || "/placeholder.svg"} alt={message.sender?.full_name || "User"} />
+    ╰────
+
+
+Caused by:
+    Syntax Error
+
+handleMessage @ client:698
+(anonymous) @ client:546Understand this error
+main.tsx:22 📊 Unread message counts updated: {counts: {…}, total: 0}
+main.tsx:22 Refreshing subscriptions after page change
+main.tsx:22 Refreshing all real-time subscriptions
+main.tsx:22 [SubscriptionManager] Page became visible, checking subscriptions
+main.tsx:22 [SubscriptionManager] No subscriptions to refresh
+main.tsx:22 Auth state changed: SIGNED_IN Session exists
+main.tsx:22 User signed in, updating profile
+main.tsx:22 [SubscriptionManager] No subscriptions to refresh
