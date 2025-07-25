@@ -223,7 +223,8 @@ const Community = () => {
             gender,
             xp
           `)
-          .neq('id', currentUser?.id);
+          .neq('id', currentUser?.id)
+          .eq('onboarding_completed', true);
 
         if (error) {
           console.error("Error fetching users:", error);
@@ -426,7 +427,8 @@ const Community = () => {
             gender,
             xp
           `)
-          .neq('id', currentUser?.id);
+          .neq('id', currentUser?.id)
+          .eq('onboarding_completed', true);
 
         if (error) {
           console.error("Error fetching users:", error);
@@ -886,7 +888,8 @@ const Community = () => {
                         id, full_name, native_language, learning_language, proficiency_level, bio, 
                         avatar_url, streak_count, likes_count, date_of_birth, age, is_online, username, last_seen, gender, xp
                       `)
-                      .neq('id', currentUser?.id);
+                      .neq('id', currentUser?.id)
+                      .eq('onboarding_completed', true);
                     if (error) {
                       console.error("Error fetching users:", error);
                       return;
