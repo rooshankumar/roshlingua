@@ -396,7 +396,7 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ conversationId, receiver
         description: "Please try again."
       });
     }
-  }, [user, receiverId, stopTyping]);
+  }, [user, receiverId, stopTyping, conversationId]);
 
   // Create conversation if missing
   const createConversationIfNeeded = useCallback(async () => {
@@ -461,7 +461,7 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ conversationId, receiver
     if (user && receiverId) {
       setLoading(true);
       setError(null);
-      
+
       const initializeChat = async () => {
         const currentConvId = await createConversationIfNeeded();
         await fetchReceiverProfile();

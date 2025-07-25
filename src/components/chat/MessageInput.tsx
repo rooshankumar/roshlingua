@@ -39,7 +39,9 @@ export const MessageInput: React.FC<MessageInputProps> = ({
 
   // Handle typing indicators
   const handleTypingStart = useCallback(() => {
-    onStartTyping();
+    if (typeof onStartTyping === 'function') {
+      onStartTyping();
+    }
     
     // Clear existing timeout
     if (typingTimeoutRef.current) {
@@ -48,7 +50,9 @@ export const MessageInput: React.FC<MessageInputProps> = ({
     
     // Set new timeout to stop typing indicator
     typingTimeoutRef.current = setTimeout(() => {
-      onStopTyping();
+      if (typeof onStopTyping === 'function') {
+        onStopTyping();
+      }
     }, 3000);
   }, [onStartTyping, onStopTyping]);
 
@@ -57,7 +61,9 @@ export const MessageInput: React.FC<MessageInputProps> = ({
       clearTimeout(typingTimeoutRef.current);
       typingTimeoutRef.current = null;
     }
-    onStopTyping();
+    if (typeof onStopTyping === 'function') {
+      onStopTyping();
+    }
   }, [onStopTyping]);
 
   // Handle message change
