@@ -25,17 +25,16 @@ export const useUnreadMessages = () => {
     }
 
     try {
-      // Get unread message counts grouped by conversation
+      // Get unread message counts - using the correct column names based on your schema
       const { data: messages, error } = await supabase
         .from('messages')
         .select(`
           id,
           sender_id,
-          receiver_id,
           is_read,
           created_at
         `)
-        .eq('receiver_id', user.id)
+        .or(`sender_id.neq.${user.id}`)
         .eq('is_read', false)
         .order('created_at', { ascending: false });
 
@@ -109,20 +108,22 @@ export const useUnreadMessages = () => {
         {
           event: 'INSERT',
           schema: 'public',
-          table: 'messages',
-          filter: `receiver_id=eq.${user.id}`
+          table: 'messages'
         },
         (payload) => {
           console.log('📨 New message received (unread tracker):', payload.new);
           
-          const senderId = payload.new.sender_id;
-          
-          setUnreadCounts(prev => ({
-            ...prev,
-            [senderId]: (prev[senderId] || 0) + 1
-          }));
-          
-          setTotalUnread(prev => prev + 1);
+          // Only count messages that are not from the current user
+          if (payload.new.sender_id !== user.id) {
+            const senderId = payload.new.sender_id;
+            
+            setUnreadCounts(prev => ({
+              ...prev,
+              [senderId]: (prev[senderId] || 0) + 1
+            }));
+            
+            setTotalUnread(prev => prev + 1);
+          }
 
           // Show browser notification if permission granted
           if ('Notification' in window && Notification.permission === 'granted') {
@@ -159,12 +160,11 @@ export const useUnreadMessages = () => {
         {
           event: 'UPDATE',
           schema: 'public',
-          table: 'messages',
-          filter: `receiver_id=eq.${user.id}`
+          table: 'messages'
         },
         (payload) => {
-          // Handle message read status updates
-          if (payload.new.is_read && !payload.old.is_read) {
+          // Handle message read status updates - only for messages not from current user
+          if (payload.new.is_read && !payload.old.is_read && payload.new.sender_id !== user.id) {
             console.log('📖 Message marked as read:', payload.new.id);
             
             const senderId = payload.new.sender_id;
@@ -235,6 +235,7 @@ export const useUnreadMessages = () => {
     totalUnread,
     loading,
     markAsRead,
-    refresh: fetchUnreadCounts
+    refresh: fetchUnreadCounts,
+    refreshUnreadCounts: fetchUnreadCounts
   };
 };
