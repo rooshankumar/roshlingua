@@ -27,9 +27,10 @@ interface Props {
   };
   messages?: any[];
   onScrollToMessage?: (messageId: string) => void;
+  onRefresh?: () => void;
 }
 
-export const ChatHeader = ({ conversation, messages = [], onScrollToMessage }: Props) => {
+export const ChatHeader = ({ conversation, messages = [], onScrollToMessage, onRefresh }: Props) => {
   const navigate = useNavigate();
   const participant = conversation?.participant;
 

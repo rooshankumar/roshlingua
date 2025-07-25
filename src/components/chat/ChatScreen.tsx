@@ -17,6 +17,8 @@ interface Message {
   content: string;
   sender_id: string;
   receiver_id: string;
+  recipient_id?: string;
+  conversation_id?: string;
   created_at: string;
   message_type: 'text' | 'image' | 'file' | 'audio';
   file_url?: string;
@@ -65,7 +67,11 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ conversationId, receiver
     typingUsers, 
     startTyping, 
     stopTyping 
-  } = useTypingStatus(conversationId || `${user?.id}-${receiverId}`);
+  } = useTypingStatus(conversationId || `${user?.id}-${receiverId}`) || { 
+    typingUsers: [], 
+    startTyping: () => {}, 
+    stopTyping: () => {} 
+  };
 
   // Optimized scroll to bottom
   const scrollToBottom = useCallback((smooth = false) => {
@@ -123,6 +129,8 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ conversationId, receiver
           content,
           sender_id,
           receiver_id,
+          recipient_id,
+          conversation_id,
           created_at,
           message_type,
           file_url,
@@ -359,6 +367,8 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ conversationId, receiver
         content: content.trim(),
         sender_id: user.id,
         receiver_id: receiverId,
+        recipient_id: receiverId,
+        conversation_id: conversationId,
         message_type: messageType,
         file_url: fileUrl,
         file_name: fileName,
@@ -388,14 +398,78 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ conversationId, receiver
     }
   }, [user, receiverId, stopTyping]);
 
+  // Create conversation if missing
+  const createConversationIfNeeded = useCallback(async () => {
+    if (!conversationId && user && receiverId) {
+      try {
+        // Check if conversation already exists
+        const { data: existingConv, error: convError } = await supabase
+          .from('conversation_participants')
+          .select('conversation_id')
+          .in('user_id', [user.id, receiverId])
+          .limit(2);
+
+        if (convError) throw convError;
+
+        // Group by conversation_id and find one with both users
+        const conversationCounts: { [key: string]: number } = {};
+        existingConv?.forEach(conv => {
+          conversationCounts[conv.conversation_id] = (conversationCounts[conv.conversation_id] || 0) + 1;
+        });
+
+        const existingConversationId = Object.keys(conversationCounts).find(
+          convId => conversationCounts[convId] === 2
+        );
+
+        if (existingConversationId) {
+          // Use existing conversation
+          window.history.replaceState(null, '', `/chat/${existingConversationId}`);
+          return existingConversationId;
+        } else {
+          // Create new conversation
+          const { data: newConv, error: createError } = await supabase
+            .from('conversations')
+            .insert([{ created_by: user.id }])
+            .select()
+            .single();
+
+          if (createError) throw createError;
+
+          // Add participants
+          const { error: participantError } = await supabase
+            .from('conversation_participants')
+            .insert([
+              { conversation_id: newConv.id, user_id: user.id },
+              { conversation_id: newConv.id, user_id: receiverId }
+            ]);
+
+          if (participantError) throw participantError;
+
+          window.history.replaceState(null, '', `/chat/${newConv.id}`);
+          return newConv.id;
+        }
+      } catch (err) {
+        console.error('Error creating conversation:', err);
+        return null;
+      }
+    }
+    return conversationId;
+  }, [conversationId, user, receiverId]);
+
   // Initialize chat
   useEffect(() => {
     if (user && receiverId) {
       setLoading(true);
       setError(null);
-      fetchReceiverProfile();
-      fetchMessages();
-      setupRealtimeSubscription();
+      
+      const initializeChat = async () => {
+        const currentConvId = await createConversationIfNeeded();
+        await fetchReceiverProfile();
+        await fetchMessages();
+        setupRealtimeSubscription();
+      };
+
+      initializeChat();
     }
 
     return () => {
@@ -404,7 +478,7 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ conversationId, receiver
         channelRef.current = null;
       }
     };
-  }, [user, receiverId, fetchReceiverProfile, fetchMessages, setupRealtimeSubscription]);
+  }, [user, receiverId, createConversationIfNeeded, fetchReceiverProfile, fetchMessages, setupRealtimeSubscription]);
 
   // Cleanup on unmount
   useEffect(() => {
@@ -466,7 +540,18 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ conversationId, receiver
     <div className="flex flex-col h-full bg-background">
       {/* Chat Header */}
       <ChatHeader 
-        receiverProfile={receiverProfile}
+        conversation={{
+          id: conversationId || '',
+          participant: {
+            id: receiverProfile?.id || receiverId || '',
+            email: receiverProfile?.email || '',
+            full_name: receiverProfile?.full_name || 'Unknown User',
+            avatar_url: receiverProfile?.avatar_url || '/placeholder.svg',
+            is_online: receiverProfile?.is_online,
+            last_seen: receiverProfile?.last_seen
+          }
+        }}
+        messages={messages}
         onRefresh={() => fetchMessages()}
       />
 
