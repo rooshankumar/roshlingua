@@ -49,7 +49,7 @@ const ChatList = () => {
         const { data: unreadMessagesData, error: messagesError } = await supabase
           .from('messages')
           .select('conversation_id')
-          .eq('recipient_id', user.id)
+          .eq('receiver_id', user.id)
           .eq('is_read', false);
 
         if (messagesError) throw messagesError;

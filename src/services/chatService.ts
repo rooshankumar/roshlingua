@@ -287,7 +287,7 @@ export const markMessagesAsRead = async (conversationId: string, userId: string)
     .from('messages')
     .update({ is_read: true })
     .eq('conversation_id', conversationId)
-    .eq('recipient_id', userId)
+    .eq('receiver_id', userId)
     .eq('is_read', false);
 
   if (error) {
