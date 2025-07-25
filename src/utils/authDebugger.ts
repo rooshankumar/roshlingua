@@ -89,7 +89,7 @@ export const debugAuth = () => {
     c.includes('auth') || 
     c.includes('pkce')
   );
-  console.log('Auth-related cookies:', authCookies);s);
+  console.log('Auth-related cookies:', authCookies);
 
   // Check current URL for auth parameters
   const url = new URL(window.location.href);
