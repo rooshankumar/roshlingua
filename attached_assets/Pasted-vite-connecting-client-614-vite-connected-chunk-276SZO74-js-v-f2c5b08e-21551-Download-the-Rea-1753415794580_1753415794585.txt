@@ -1,0 +1,283 @@
+vite] connecting...
+client:614 [vite] connected.
+chunk-276SZO74.js?v=f2c5b08e:21551 Download the React DevTools for a better development experience: https://reactjs.org/link/react-devtools
+supabase.ts:12 Using Supabase URL: https://wqojeesjtgfcftpnzaet.supabase.co
+main.tsx:22 Full page load detected
+main.tsx:22 Initializing auth state...
+main.tsx:22 App initialized
+main.tsx:22 Checking storage buckets...
+main.tsx:22 Checking existing storage buckets...
+main.tsx:22 i18next::backendConnector: loaded namespace translation for language en {navigation: {…}, auth: {…}, settings: {…}}
+main.tsx:22 i18next: languageChanged en
+main.tsx:22 i18next: initialized {debug: true, initAsync: true, ns: Array(1), defaultNS: Array(1), fallbackLng: Array(1), …}
+main.tsx:22 Setting initial session: No session
+main.tsx:22 Auth state changed: INITIAL_SESSION No session
+main.tsx:22 No existing buckets found, which is unusual.
+main.tsx:22 Storage buckets verified successfully
+main.tsx:22 Auth state changed: SIGNED_IN Session exists
+main.tsx:22 User signed in, updating profile
+main.tsx:22 Checking onboarding status for user: ed1c374e-3823-4ea2-aa28-3999c21d1140
+main.tsx:22 Onboarding status: Completed
+main.tsx:22 Performing periodic refresh of all subscriptions
+main.tsx:22 [SubscriptionManager] No subscriptions to refresh
+main.tsx:22 Refreshing all real-time subscriptions
+main.tsx:22 Navigation detected, checking connection health
+main.tsx:22 [SubscriptionManager] No subscriptions to refresh
+main.tsx:22 [SubscriptionManager] Subscribing to app_connection_monitor
+main.tsx:22 Route changed to: /dashboard
+main.tsx:22 Refreshing subscriptions after page change
+main.tsx:22 Refreshing all real-time subscriptions
+main.tsx:22 🔔 Setting up unread messages subscription for user: ed1c374e-3823-4ea2-aa28-3999c21d1140
+main.tsx:22 [SubscriptionManager] Refreshing all 1 subscriptions
+main.tsx:22 Achievement points calculation: 10
+main.tsx:22 Unlocked achievements: []
+main.tsx:22 [SubscriptionManager] Finished refreshing all subscriptions
+main.tsx:22 Fetching user data for dashboard...
+main.tsx:22 Checking all achievements for user: ed1c374e-3823-4ea2-aa28-3999c21d1140
+main.tsx:22 Dashboard XP breakdown: {baseXP: 0, achievementPoints: 0, totalXP: 0}
+main.tsx:22 [SubscriptionManager] Refreshing subscription app_connection_monitor
+useUnreadMessages.ts:59 ❌ Error fetching unread counts: {code: '42703', details: null, hint: null, message: 'column messages.receiver_id does not exist'}
+(anonymous) @ useUnreadMessages.ts:59
+await in (anonymous)
+(anonymous) @ useUnreadMessages.ts:212
+commitHookEffectListMount @ chunk-276SZO74.js?v=f2c5b08e:16915
+commitPassiveMountOnFiber @ chunk-276SZO74.js?v=f2c5b08e:18156
+commitPassiveMountEffects_complete @ chunk-276SZO74.js?v=f2c5b08e:18129
+commitPassiveMountEffects_begin @ chunk-276SZO74.js?v=f2c5b08e:18119
+commitPassiveMountEffects @ chunk-276SZO74.js?v=f2c5b08e:18109
+flushPassiveEffectsImpl @ chunk-276SZO74.js?v=f2c5b08e:19490
+flushPassiveEffects @ chunk-276SZO74.js?v=f2c5b08e:19447
+(anonymous) @ chunk-276SZO74.js?v=f2c5b08e:19328
+workLoop @ chunk-276SZO74.js?v=f2c5b08e:197
+flushWork @ chunk-276SZO74.js?v=f2c5b08e:176
+performWorkUntilDeadline @ chunk-276SZO74.js?v=f2c5b08e:384Understand this error
+main.tsx:22 [SubscriptionManager] No subscriptions to refresh
+main.tsx:22 🔔 Unread messages subscription status: SUBSCRIBED
+main.tsx:22 ✅ Unread messages real-time connected
+main.tsx:22 Presence channel status: SUBSCRIBED
+main.tsx:22 Presence sync - online users: []
+main.tsx:22 [SubscriptionManager] No subscriptions to refresh
+main.tsx:22 Achievement points calculation: 1050
+main.tsx:22 Unlocked achievements: (6) [{…}, {…}, {…}, {…}, {…}, {…}]
+4main.tsx:22 [SubscriptionManager] No subscriptions to refresh
+main.tsx:22 Profile data fetch result: Success
+main.tsx:22 Setting user stats with profile data
+main.tsx:22 Checking all achievements for user: ed1c374e-3823-4ea2-aa28-3999c21d1140
+main.tsx:22 Dashboard XP breakdown: {baseXP: 10, achievementPoints: 1040, totalXP: 1050}
+main.tsx:22 [SubscriptionManager] No subscriptions to refresh
+main.tsx:22 User presence updated: online
+main.tsx:22 [SubscriptionManager] No subscriptions to refresh
+main.tsx:22 User joined: [{…}]
+main.tsx:22 Presence sync - online users: ['ed1c374e-3823-4ea2-aa28-3999c21d1140']
+3main.tsx:22 [SubscriptionManager] No subscriptions to refresh
+main.tsx:22 Current stats: {streak: 1, xp: 10, conversations: 8, messages: 53}
+main.tsx:22 Current unlocked achievements: (6) ['first-chat', 'streak-3', 'conversations-5', 'winter-2024', 'streak-7', 'messages-50']
+main.tsx:22 Finished checking achievements
+2main.tsx:22 [SubscriptionManager] No subscriptions to refresh
+main.tsx:22 Current stats: {streak: 1, xp: 10, conversations: 8, messages: 53}
+main.tsx:22 Current unlocked achievements: (6) ['first-chat', 'streak-3', 'conversations-5', 'winter-2024', 'streak-7', 'messages-50']
+main.tsx:22 Finished checking achievements
+4main.tsx:22 [SubscriptionManager] No subscriptions to refresh
+main.tsx:22 🔔 Notification permission: default
+2main.tsx:22 [SubscriptionManager] No subscriptions to refresh
+main.tsx:22 Navigation detected, checking connection health
+main.tsx:22 [SubscriptionManager] No subscriptions to refresh
+main.tsx:22 Route changed to: /chat
+main.tsx:22 [SubscriptionManager] No subscriptions to refresh
+main.tsx:22 Refreshing subscriptions after page change
+main.tsx:22 Refreshing all real-time subscriptions
+main.tsx:22 [SubscriptionManager] No subscriptions to refresh
+main.tsx:22 [SubscriptionManager] No subscriptions to refresh
+main.tsx:22 [SubscriptionManager] No subscriptions to refresh
+main.tsx:22 Presence channel status: CLOSED
+ChatList.tsx:150 Error fetching conversations: TypeError: refreshUnreadCounts is not a function
+    at fetchConversations (ChatList.tsx:46:9)
+    at ChatList.tsx:156:5
+    at commitHookEffectListMount (chunk-276SZO74.js?v=f2c5b08e:16915:34)
+    at commitPassiveMountOnFiber (chunk-276SZO74.js?v=f2c5b08e:18156:19)
+    at commitPassiveMountEffects_complete (chunk-276SZO74.js?v=f2c5b08e:18129:17)
+    at commitPassiveMountEffects_begin (chunk-276SZO74.js?v=f2c5b08e:18119:15)
+    at commitPassiveMountEffects (chunk-276SZO74.js?v=f2c5b08e:18109:11)
+    at flushPassiveEffectsImpl (chunk-276SZO74.js?v=f2c5b08e:19490:11)
+    at flushPassiveEffects (chunk-276SZO74.js?v=f2c5b08e:19447:22)
+    at chunk-276SZO74.js?v=f2c5b08e:19328:17
+fetchConversations @ ChatList.tsx:150
+(anonymous) @ ChatList.tsx:156
+commitHookEffectListMount @ chunk-276SZO74.js?v=f2c5b08e:16915
+commitPassiveMountOnFiber @ chunk-276SZO74.js?v=f2c5b08e:18156
+commitPassiveMountEffects_complete @ chunk-276SZO74.js?v=f2c5b08e:18129
+commitPassiveMountEffects_begin @ chunk-276SZO74.js?v=f2c5b08e:18119
+commitPassiveMountEffects @ chunk-276SZO74.js?v=f2c5b08e:18109
+flushPassiveEffectsImpl @ chunk-276SZO74.js?v=f2c5b08e:19490
+flushPassiveEffects @ chunk-276SZO74.js?v=f2c5b08e:19447
+(anonymous) @ chunk-276SZO74.js?v=f2c5b08e:19328
+workLoop @ chunk-276SZO74.js?v=f2c5b08e:197
+flushWork @ chunk-276SZO74.js?v=f2c5b08e:176
+performWorkUntilDeadline @ chunk-276SZO74.js?v=f2c5b08e:384Understand this error
+main.tsx:22 Checking all achievements for user: ed1c374e-3823-4ea2-aa28-3999c21d1140
+3main.tsx:22 [SubscriptionManager] No subscriptions to refresh
+main.tsx:22 🔔 Setting up unread messages subscription for user: ed1c374e-3823-4ea2-aa28-3999c21d1140
+main.tsx:22 🔔 Unread messages subscription status: CLOSED
+main.tsx:22 [SubscriptionManager] No subscriptions to refresh
+main.tsx:22 🔔 Unread messages subscription status: SUBSCRIBED
+main.tsx:22 ✅ Unread messages real-time connected
+main.tsx:22 [SubscriptionManager] No subscriptions to refresh
+main.tsx:22 User presence updated: offline
+useUnreadMessages.ts:59 ❌ Error fetching unread counts: {code: '42703', details: null, hint: null, message: 'column messages.receiver_id does not exist'}
+(anonymous) @ useUnreadMessages.ts:59
+await in (anonymous)
+(anonymous) @ useUnreadMessages.ts:212
+commitHookEffectListMount @ chunk-276SZO74.js?v=f2c5b08e:16915
+commitPassiveMountOnFiber @ chunk-276SZO74.js?v=f2c5b08e:18156
+commitPassiveMountEffects_complete @ chunk-276SZO74.js?v=f2c5b08e:18129
+commitPassiveMountEffects_begin @ chunk-276SZO74.js?v=f2c5b08e:18119
+commitPassiveMountEffects @ chunk-276SZO74.js?v=f2c5b08e:18109
+flushPassiveEffectsImpl @ chunk-276SZO74.js?v=f2c5b08e:19490
+flushPassiveEffects @ chunk-276SZO74.js?v=f2c5b08e:19447
+(anonymous) @ chunk-276SZO74.js?v=f2c5b08e:19328
+workLoop @ chunk-276SZO74.js?v=f2c5b08e:197
+flushWork @ chunk-276SZO74.js?v=f2c5b08e:176
+performWorkUntilDeadline @ chunk-276SZO74.js?v=f2c5b08e:384Understand this error
+4main.tsx:22 [SubscriptionManager] No subscriptions to refresh
+main.tsx:22 Current stats: {streak: 1, xp: 10, conversations: 8, messages: 53}
+main.tsx:22 Current unlocked achievements: (6) ['first-chat', 'streak-3', 'conversations-5', 'winter-2024', 'streak-7', 'messages-50']
+main.tsx:22 Finished checking achievements
+7main.tsx:22 [SubscriptionManager] No subscriptions to refresh
+main.tsx:22 🔔 Notification permission: granted
+42main.tsx:22 [SubscriptionManager] No subscriptions to refresh
+main.tsx:22 Navigation detected, checking connection health
+main.tsx:22 [SubscriptionManager] No subscriptions to refresh
+main.tsx:22 Route changed to: /community
+main.tsx:22 [SubscriptionManager] No subscriptions to refresh
+main.tsx:22 Refreshing subscriptions after page change
+main.tsx:22 Refreshing all real-time subscriptions
+main.tsx:22 [SubscriptionManager] No subscriptions to refresh
+main.tsx:22 [SubscriptionManager] No subscriptions to refresh
+3main.tsx:22 [SubscriptionManager] No subscriptions to refresh
+main.tsx:22 🧹 Cleaning up unread messages subscription
+main.tsx:22 🔔 Unread messages subscription status: CLOSED
+main.tsx:22 🔔 Unread messages subscription status: CLOSED
+main.tsx:22 [SubscriptionManager] Subscribing to community_profiles
+main.tsx:22 Community page mounted or navigated to
+5main.tsx:22 [SubscriptionManager] Skipping refresh, last global refresh was too recent
+main.tsx:22 Fetched users: 14
+chunk-276SZO74.js?v=f2c5b08e:521 Warning: Received NaN for the `children` attribute. If this is expected, cast the value to a string.
+    at span
+    at div
+    at div
+    at div
+    at div
+    at div
+    at div
+    at div
+    at _c8 (https://98206926-7b23-484a-94f1-4918f38493ac-00-183gwdpip02hr.pike.replit.dev/src/components/ui/card.tsx:56:61)
+    at div
+    at _c (https://98206926-7b23-484a-94f1-4918f38493ac-00-183gwdpip02hr.pike.replit.dev/src/components/ui/card.tsx:12:53)
+    at div
+    at div
+    at Community (https://98206926-7b23-484a-94f1-4918f38493ac-00-183gwdpip02hr.pike.replit.dev/src/pages/Community.tsx:34:31)
+    at Suspense
+    at div
+    at MotionComponent (https://98206926-7b23-484a-94f1-4918f38493ac-00-183gwdpip02hr.pike.replit.dev/node_modules/.vite/deps/framer-motion.js?v=f2c5b08e:4619:40)
+    at PageTransition (https://98206926-7b23-484a-94f1-4918f38493ac-00-183gwdpip02hr.pike.replit.dev/src/components/PageTransition.tsx:12:27)
+    at main
+    at div
+    at AppLayout (https://98206926-7b23-484a-94f1-4918f38493ac-00-183gwdpip02hr.pike.replit.dev/src/components/layouts/AppLayout.tsx:85:22)
+    at ProtectedRoute (https://98206926-7b23-484a-94f1-4918f38493ac-00-183gwdpip02hr.pike.replit.dev/src/components/auth/ProtectedRoute.tsx:15:27)
+    at RenderedRoute (https://98206926-7b23-484a-94f1-4918f38493ac-00-183gwdpip02hr.pike.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=f2c5b08e:4069:5)
+    at Routes (https://98206926-7b23-484a-94f1-4918f38493ac-00-183gwdpip02hr.pike.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=f2c5b08e:4508:5)
+    at PresenceChild (https://98206926-7b23-484a-94f1-4918f38493ac-00-183gwdpip02hr.pike.replit.dev/node_modules/.vite/deps/framer-motion.js?v=f2c5b08e:137:24)
+    at AnimatePresence (https://98206926-7b23-484a-94f1-4918f38493ac-00-183gwdpip02hr.pike.replit.dev/node_modules/.vite/deps/framer-motion.js?v=f2c5b08e:216:26)
+    at AppRoutes (https://98206926-7b23-484a-94f1-4918f38493ac-00-183gwdpip02hr.pike.replit.dev/src/App.tsx:64:33)
+    at AuthProvider (https://98206926-7b23-484a-94f1-4918f38493ac-00-183gwdpip02hr.pike.replit.dev/src/providers/AuthProvider.tsx:24:32)
+    at Router (https://98206926-7b23-484a-94f1-4918f38493ac-00-183gwdpip02hr.pike.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=f2c5b08e:4451:15)
+    at BrowserRouter (https://98206926-7b23-484a-94f1-4918f38493ac-00-183gwdpip02hr.pike.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=f2c5b08e:5196:5)
+    at ThemeProvider (https://98206926-7b23-484a-94f1-4918f38493ac-00-183gwdpip02hr.pike.replit.dev/src/components/theme-provider.tsx:17:33)
+    at QueryClientProvider (https://98206926-7b23-484a-94f1-4918f38493ac-00-183gwdpip02hr.pike.replit.dev/node_modules/.vite/deps/@tanstack_react-query.js?v=f2c5b08e:2794:3)
+    at App (https://98206926-7b23-484a-94f1-4918f38493ac-00-183gwdpip02hr.pike.replit.dev/src/App.tsx:707:45)
+printWarning @ chunk-276SZO74.js?v=f2c5b08e:521
+error @ chunk-276SZO74.js?v=f2c5b08e:505
+validateProperty$1 @ chunk-276SZO74.js?v=f2c5b08e:3413
+warnUnknownProperties @ chunk-276SZO74.js?v=f2c5b08e:3459
+validateProperties$2 @ chunk-276SZO74.js?v=f2c5b08e:3478
+validatePropertiesInDevelopment @ chunk-276SZO74.js?v=f2c5b08e:7346
+setInitialProperties @ chunk-276SZO74.js?v=f2c5b08e:7535
+finalizeInitialChildren @ chunk-276SZO74.js?v=f2c5b08e:8345
+completeWork @ chunk-276SZO74.js?v=f2c5b08e:16293
+completeUnitOfWork @ chunk-276SZO74.js?v=f2c5b08e:19224
+performUnitOfWork @ chunk-276SZO74.js?v=f2c5b08e:19206
+workLoopSync @ chunk-276SZO74.js?v=f2c5b08e:19137
+renderRootSync @ chunk-276SZO74.js?v=f2c5b08e:19116
+performConcurrentWorkOnRoot @ chunk-276SZO74.js?v=f2c5b08e:18678
+workLoop @ chunk-276SZO74.js?v=f2c5b08e:197
+flushWork @ chunk-276SZO74.js?v=f2c5b08e:176
+performWorkUntilDeadline @ chunk-276SZO74.js?v=f2c5b08e:384Understand this error
+main.tsx:22 [SubscriptionManager] Skipping refresh, last global refresh was too recent
+main.tsx:22 Avatar image loaded successfully: https://lh3.googleusercontent.com/a/ACg8ocJV_Awn80Pc9rmu-Jj3xMgBJfEd2DLZQppwrJYferUPszQ4eFkR=s96-c
+main.tsx:22 Avatar image loaded successfully: https://wqojeesjtgfcftpnzaet.supabase.co/storage/v1/object/public/avatars/f8cb6b39-4c91-4992-a0f0-ed4cef0e48de/0.6428147068913505.png
+main.tsx:22 Avatar image loaded successfully: https://wqojeesjtgfcftpnzaet.supabase.co/storage/v1/object/public/avatars/3bbbaf4b-e8b0-41ce-9818-964b3656b1ef/1745409087308.jpg
+main.tsx:22 Fetched users: 14
+9main.tsx:22 [SubscriptionManager] Skipping refresh, last global refresh was too recent
+main.tsx:22 Navigation detected, checking connection health
+main.tsx:22 [SubscriptionManager] Skipping refresh, last global refresh was too recent
+main.tsx:22 Route changed to: /profile/b875a86f-c582-4283-b43c-8b11036ceaf6
+main.tsx:22 [SubscriptionManager] Skipping refresh, last global refresh was too recent
+main.tsx:22 Refreshing subscriptions after page change
+main.tsx:22 Refreshing all real-time subscriptions
+main.tsx:22 [SubscriptionManager] Skipping refresh, last global refresh was too recent
+main.tsx:22 Unsubscribing from real-time updates
+main.tsx:22 [SubscriptionManager] Unsubscribing from community_profiles
+main.tsx:22 [SubscriptionManager] No subscriptions to refresh
+main.tsx:22 [SubscriptionManager] No subscriptions to refresh
+2main.tsx:22 [SubscriptionManager] No subscriptions to refresh
+main.tsx:22 Profile loaded with streak: 1
+12main.tsx:22 [SubscriptionManager] No subscriptions to refresh
+main.tsx:22 Navigation detected, checking connection health
+main.tsx:22 [SubscriptionManager] No subscriptions to refresh
+main.tsx:22 Route changed to: /chat/80713ad5-ab4f-42d9-882c-54ac4aedbe5a
+main.tsx:22 Refreshing subscriptions after page change
+main.tsx:22 Refreshing all real-time subscriptions
+2main.tsx:22 [SubscriptionManager] No subscriptions to refresh
+main.tsx:22 [SubscriptionManager] No subscriptions to refresh
+chunk-276SZO74.js?v=f2c5b08e:14032 The above error occurred in the <Offscreen> component:
+
+    at Suspense
+    at div
+    at MotionComponent (https://98206926-7b23-484a-94f1-4918f38493ac-00-183gwdpip02hr.pike.replit.dev/node_modules/.vite/deps/framer-motion.js?v=f2c5b08e:4619:40)
+    at PageTransition (https://98206926-7b23-484a-94f1-4918f38493ac-00-183gwdpip02hr.pike.replit.dev/src/components/PageTransition.tsx:12:27)
+    at main
+    at div
+    at AppLayout (https://98206926-7b23-484a-94f1-4918f38493ac-00-183gwdpip02hr.pike.replit.dev/src/components/layouts/AppLayout.tsx:85:22)
+    at ProtectedRoute (https://98206926-7b23-484a-94f1-4918f38493ac-00-183gwdpip02hr.pike.replit.dev/src/components/auth/ProtectedRoute.tsx:15:27)
+    at RenderedRoute (https://98206926-7b23-484a-94f1-4918f38493ac-00-183gwdpip02hr.pike.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=f2c5b08e:4069:5)
+    at Routes (https://98206926-7b23-484a-94f1-4918f38493ac-00-183gwdpip02hr.pike.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=f2c5b08e:4508:5)
+    at PresenceChild (https://98206926-7b23-484a-94f1-4918f38493ac-00-183gwdpip02hr.pike.replit.dev/node_modules/.vite/deps/framer-motion.js?v=f2c5b08e:137:24)
+    at AnimatePresence (https://98206926-7b23-484a-94f1-4918f38493ac-00-183gwdpip02hr.pike.replit.dev/node_modules/.vite/deps/framer-motion.js?v=f2c5b08e:216:26)
+    at AppRoutes (https://98206926-7b23-484a-94f1-4918f38493ac-00-183gwdpip02hr.pike.replit.dev/src/App.tsx:64:33)
+    at AuthProvider (https://98206926-7b23-484a-94f1-4918f38493ac-00-183gwdpip02hr.pike.replit.dev/src/providers/AuthProvider.tsx:24:32)
+    at Router (https://98206926-7b23-484a-94f1-4918f38493ac-00-183gwdpip02hr.pike.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=f2c5b08e:4451:15)
+    at BrowserRouter (https://98206926-7b23-484a-94f1-4918f38493ac-00-183gwdpip02hr.pike.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=f2c5b08e:5196:5)
+    at ThemeProvider (https://98206926-7b23-484a-94f1-4918f38493ac-00-183gwdpip02hr.pike.replit.dev/src/components/theme-provider.tsx:17:33)
+    at QueryClientProvider (https://98206926-7b23-484a-94f1-4918f38493ac-00-183gwdpip02hr.pike.replit.dev/node_modules/.vite/deps/@tanstack_react-query.js?v=f2c5b08e:2794:3)
+    at App (https://98206926-7b23-484a-94f1-4918f38493ac-00-183gwdpip02hr.pike.replit.dev/src/App.tsx:707:45)
+
+Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://reactjs.org/link/error-boundaries to learn more about error boundaries.
+logCapturedError @ chunk-276SZO74.js?v=f2c5b08e:14032
+update.callback @ chunk-276SZO74.js?v=f2c5b08e:14052
+callCallback @ chunk-276SZO74.js?v=f2c5b08e:11248
+commitUpdateQueue @ chunk-276SZO74.js?v=f2c5b08e:11265
+commitLayoutEffectOnFiber @ chunk-276SZO74.js?v=f2c5b08e:17093
+commitLayoutMountEffects_complete @ chunk-276SZO74.js?v=f2c5b08e:17980
+commitLayoutEffects_begin @ chunk-276SZO74.js?v=f2c5b08e:17969
+commitLayoutEffects @ chunk-276SZO74.js?v=f2c5b08e:17920
+commitRootImpl @ chunk-276SZO74.js?v=f2c5b08e:19353
+commitRoot @ chunk-276SZO74.js?v=f2c5b08e:19277
+finishConcurrentRender @ chunk-276SZO74.js?v=f2c5b08e:18760
+performConcurrentWorkOnRoot @ chunk-276SZO74.js?v=f2c5b08e:18718
+workLoop @ chunk-276SZO74.js?v=f2c5b08e:197
+flushWork @ chunk-276SZO74.js?v=f2c5b08e:176
+performWorkUntilDeadline @ chunk-276SZO74.js?v=f2c5b08e:384Understand this error
+main.tsx:22 🧹 Cleaning up unread messages subscription
+main.tsx:22 🔔 Unread messages subscription status: CLOSED
+main.tsx:22 🔔 Unread messages subscription status: CLOSED
