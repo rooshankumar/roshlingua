@@ -139,11 +139,7 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ conversationId, receiver
             emoji,
             user:profiles(full_name)
           ),
-          reply_to:messages!messages_reply_to_fkey(
-            id,
-            content,
-            sender:profiles!messages_sender_id_fkey(full_name)
-          )
+          reply_to_id
         `)
         .or(`and(sender_id.eq.${user.id},receiver_id.eq.${receiverId}),and(sender_id.eq.${receiverId},receiver_id.eq.${user.id})`)
         .order('created_at', { ascending: false })
@@ -225,12 +221,7 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ conversationId, receiver
               message_type,
               file_url,
               file_name,
-              is_read,
-              sender:profiles!messages_sender_id_fkey(
-                id,
-                full_name,
-                avatar_url
-              )
+              is_read
             `)
             .eq('id', payload.new.id)
             .single();

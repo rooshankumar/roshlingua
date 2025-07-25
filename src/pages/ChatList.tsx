@@ -1,16 +1,16 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { MessageCircle, Loader2, Search, Plus } from 'lucide-react';
+import { Search, MessageCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Input } from '@/components/ui/input';
 import { useAuth } from '@/providers/AuthProvider';
 import { supabase } from '@/lib/supabase';
-import { formatDistanceToNow } from 'date-fns';
 import classNames from 'classnames';
 import { useUnreadMessages } from '@/hooks/useUnreadMessages';
 import { checkAllAchievements } from '@/utils/achievementTrigger';
+import { formatDistanceToNow } from 'date-fns';
 
 interface ChatPreview {
   id: string;
@@ -36,6 +36,7 @@ const ChatList = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const { unreadCounts, refreshUnreadCounts } = useUnreadMessages(user?.id);
+  const [unreadMessages, setUnreadMessages] = useState<any[]>([]);
 
   useEffect(() => {
     if (!user) return;
@@ -215,13 +216,51 @@ const ChatList = () => {
           </CardContent>
         </Card>
       )}
+      {unreadCounts.total > 0 && (
+        <div className="mb-4 p-4 bg-primary/10 rounded-lg border border-primary/20">
+          <h3 className="font-medium text-primary mb-2">
+            Unread Messages ({unreadCounts.total})
+          </h3>
+          <div className="space-y-2">
+            {unreadMessages.slice(0, 5).map((msg, index) => (
+              <div 
+                key={`${msg.sender_id}-${index}`}
+                className="flex items-center gap-3 p-2 bg-background/50 rounded cursor-pointer hover:bg-background/80 transition-colors"
+                onClick={() => navigate(`/chat?userId=${msg.sender_id}`)}
+              >
+                <img 
+                  src={msg.sender?.avatar_url || '/placeholder.svg'} 
+                  alt={msg.sender?.full_name}
+                  className="w-8 h-8 rounded-full object-cover"
+                />
+                <div className="flex-1 min-w-0">
+                  <p className="font-medium text-sm truncate">
+                    {msg.sender?.full_name || 'Unknown User'}
+                  </p>
+                  <p className="text-xs text-muted-foreground truncate">
+                    {msg.content.length > 50 ? `${msg.content.substring(0, 50)}...` : msg.content}
+                  </p>
+                </div>
+                <span className="text-xs text-muted-foreground">
+                  {formatDistanceToNow(new Date(msg.created_at), { addSuffix: true })}
+                </span>
+              </div>
+            ))}
+            {unreadMessages.length > 5 && (
+              <p className="text-xs text-muted-foreground text-center pt-2">
+                +{unreadMessages.length - 5} more unread messages
+              </p>
+            )}
+          </div>
+        </div>
+      )}
 
       {filteredConversations.length > 0 && (
         <div className="grid gap-3">
           {filteredConversations.map((conversation) => {
             // Check unread count by participant ID (sender ID for received messages)
             const unreadCount = unreadCounts[conversation.participant.id] ?? 0;
-            
+
             return (
             <Link
               key={conversation.id}
