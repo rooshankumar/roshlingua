@@ -69,17 +69,21 @@ export const testAuth = async () => {
 };
 
 /**
- * Determines overall authentication status
+ * Get a human-readable assessment of auth state
  */
 const getOverallStatus = (summary: any) => {
   if (summary.isAuthenticated && summary.apiAccessWorking) {
-    return 'HEALTHY';
-  } else if (summary.hasAuthCode || summary.hasVerifier) {
-    return 'IN_PROGRESS';
+    return '✅ Authentication working correctly';
+  } else if (summary.isAuthenticated && !summary.apiAccessWorking) {
+    return '⚠️ Authenticated but API access failing - possible token issue';
+  } else if (summary.hasAuthCode && !summary.isAuthenticated) {
+    return '❌ Auth code present but not authenticated - PKCE verification likely failed';
   } else if (summary.hasAuthError) {
-    return 'ERROR';
+    return '❌ Authentication error detected in URL';
+  } else if (!summary.storageMechanismsIntact) {
+    return '⚠️ Storage inconsistency detected - PKCE state may be corrupted';
   } else {
-    return 'NOT_AUTHENTICATED';
+    return '📝 Not authenticated, but no specific issues detected';
   }
 };
 
@@ -126,24 +130,7 @@ export const testCleanLogin = async () => {
   };
 };
 
-/**
- * Get a human-readable assessment of auth state
- */
-const getOverallStatus = (summary: any) => {
-  if (summary.isAuthenticated && summary.apiAccessWorking) {
-    return '✅ Authentication working correctly';
-  } else if (summary.isAuthenticated && !summary.apiAccessWorking) {
-    return '⚠️ Authenticated but API access failing - possible token issue';
-  } else if (summary.hasAuthCode && !summary.isAuthenticated) {
-    return '❌ Auth code present but not authenticated - PKCE verification likely failed';
-  } else if (summary.hasAuthError) {
-    return '❌ Authentication error detected in URL';
-  } else if (!summary.storageMechanismsIntact) {
-    return '⚠️ Storage inconsistency detected - PKCE state may be corrupted';
-  } else {
-    return '📝 Not authenticated, but no specific issues detected';
-  }
-};
+
 
 // Export as default and named exports for flexibility
 export default testAuth;
