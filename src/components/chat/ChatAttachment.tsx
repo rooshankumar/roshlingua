@@ -1,445 +1,248 @@
 import { useState, useEffect } from 'react';
-import { Paperclip, Image as ImageIcon, FileText, Video, FileAudio, X } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
-import { Button } from '../ui/button';
-import { Loader2 } from 'lucide-react';
-import { generateImageThumbnail, cleanSupabaseUrl } from '@/utils/imageUtils';
-import { toast } from '@/components/ui/use-toast';
-import { Download } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { Skeleton } from '@/components/ui/skeleton';
-import { Progress } from '@/components/ui/progress';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
-
+import { Download, FileText, Image as ImageIcon, Video, Music, Archive, ExternalLink } from 'lucide-react';
+import { supabase } from '@/lib/supabase';
 
 interface ChatAttachmentProps {
-  onAttach: (url: string, filename: string, thumbnail?: string) => void;
+  fileUrl: string;
+  fileName: string;
+  messageType?: 'image' | 'file' | 'video' | 'audio';
 }
 
-export const ChatAttachment = ({ onAttach }: ChatAttachmentProps) => {
-  const [uploading, setUploading] = useState(false);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  const [uploadProgress, setUploadProgress] = useState(0);
-  const [fileName, setFileName] = useState('');
-  const [fileType, setFileType] = useState('');
-  const [showFullPreview, setShowFullPreview] = useState(false);
+export const ChatAttachment: React.FC<ChatAttachmentProps> = ({
+  fileUrl,
+  fileName,
+  messageType
+}) => {
+  const [imageLoaded, setImageLoaded] = useState(false);
+  const [imageError, setImageError] = useState(false);
+  const [signedUrl, setSignedUrl] = useState<string | null>(null);
 
-  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    try {
-      if (!event.target.files || event.target.files.length === 0) {
-        throw new Error("You must select a file to upload.");
-      }
-
-      const file = event.target.files[0];
-      setFileName(file.name);
-      setFileType(file.type);
-
-      // Validate file size (10MB max)
-      if (file.size > 10 * 1024 * 1024) {
-        throw new Error("File size exceeds 10MB limit.");
-      }
-
-      // Generate preview for images
-      if (file.type.startsWith('image/')) {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          setPreviewUrl(e.target?.result as string);
-        };
-        reader.readAsDataURL(file);
-      } else if (file.type.startsWith('video/')) {
-        setPreviewUrl(null); // No preview for videos
-      }
-
-      setUploading(true);
-      setUploadProgress(0);
-
-      // Simulate upload progress
-      const progressInterval = setInterval(() => {
-        setUploadProgress(prev => {
-          if (prev >= 95) {
-            clearInterval(progressInterval);
-            return 95;
-          }
-          return prev + 5;
-        });
-      }, 100);
-
-      // Generate a thumbnail if it's an image (for preview)
-      let thumbnailDataUrl: string | undefined;
-      if (file.type.startsWith('image/')) {
-        try {
-          thumbnailDataUrl = await generateImageThumbnail(file);
-          console.log("Generated thumbnail preview");
-        } catch (err) {
-          console.warn("Failed to generate thumbnail:", err);
-          // Continue without thumbnail
-        }
-      }
-
-      // Create a more unique filename with timestamp
-      const timestamp = new Date().getTime();
-      const randomStr = Math.random().toString().substring(2, 8);
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${timestamp}_${randomStr}.${fileExt}`;
-      // Don't add any slashes - Supabase will handle the path structure
-      const filePath = fileName;
-
-      console.log("Uploading file:", fileName, "Size:", (file.size / 1024).toFixed(2) + "KB");
-
-      try {
-        // Skip bucket listing - we know attachments bucket exists
-        const attachmentsBucket = 'attachments';
-
-        // We know the attachments bucket exists based on your JSON data
-        console.log('Using existing attachments bucket');
-      } catch (bucketError) {
-        console.error("Bucket setup error:", bucketError);
-        // Continue with upload attempt anyway
-      }
-
-      console.log("Uploading to bucket 'attachments' with path:", filePath);
-      console.log("File details:", {
-        name: file.name,
-        type: file.type,
-        size: (file.size / 1024).toFixed(2) + "KB"
-      });
-
-      // Upload with content-type header to ensure proper MIME type
-      const { data: uploadData, error: uploadError } = await supabase.storage
-        .from('attachments')
-        .upload(filePath, file, {
-          contentType: file.type, // Specify the correct MIME type
-          cacheControl: '3600', // 1 hour cache
-          upsert: true // Overwrite if exists
-        });
-
-      if (uploadError) {
-        console.error("Upload error:", uploadError);
-        throw uploadError;
-      }
-
-      console.log("Upload successful:", uploadData);
-
-      // Get file's public URL
-      const { data } = await supabase.storage
-        .from('attachments')
-        .getPublicUrl(filePath);
-
-      if (!data || !data.publicUrl) {
-        throw new Error("Failed to get public URL for uploaded file");
-      }
-
-      console.log("Public URL:", data.publicUrl);
-      
-      const publicUrl = data.publicUrl;
-
-      console.log("File uploaded successfully:", publicUrl);
-
-      // Complete the progress animation
-      clearInterval(progressInterval);
-      setUploadProgress(100);
-
-      // Show success message
-      toast({
-        title: "File uploaded",
-        description: "Your file was uploaded successfully",
-        variant: "default"
-      });
-
-      // Pass the thumbnail along with the URL and filename
-      onAttach(publicUrl, file.name, thumbnailDataUrl);
-
-      // Reset the input after successful upload
-      event.target.value = '';
-
-      // Keep the preview visible briefly so user can see success
-      setTimeout(() => {
-        setPreviewUrl(null);
-        setUploadProgress(0);
-        setUploading(false);
-      }, 2000);
-
-    } catch (error) {
-      console.error('Error uploading file:', error);
-      setUploadProgress(0);
-      setPreviewUrl(null);
-      toast({
-        title: "Upload failed",
-        description: error instanceof Error ? error.message : 'Unknown error',
-        variant: "destructive"
-      });
-      setUploading(false);
-    }
-  };
-
-  // Get icon based on file type
-  const getFileIcon = () => {
-    if (fileType.startsWith('image/')) return <ImageIcon className="h-5 w-5" />;
-    if (fileType.startsWith('video/')) return <Video className="h-5 w-5" />;
-    return <FileText className="h-5 w-5" />;
-  };
-
-  const cancelUpload = () => {
-    setUploading(false);
-    setPreviewUrl(null);
-    setUploadProgress(0);
-  };
-
-  return (
-    <div className="relative">
-      {previewUrl && <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40" onClick={cancelUpload}></div>}
-      <input
-        type="file"
-        id="fileUpload"
-        style={{ display: 'none' }}
-        onChange={handleFileChange}
-        accept="image/*,video/*"
-      />
-
-      {previewUrl && (
-        <div className="fixed bottom-[80px] left-0 right-0 mx-auto border rounded-lg p-2 shadow-xl animate-in fade-in-0 zoom-in-95 duration-200 w-[95%] max-w-[400px] z-50 bg-background">
-          <div className="flex justify-between items-center mb-1">
-            <span className="text-xs font-medium truncate max-w-[250px]">{fileName}</span>
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              className="h-6 w-6 p-0" 
-              onClick={cancelUpload}
-            >
-              <X className="h-3 w-3" />
-            </Button>
-          </div>
-
-          {fileType.startsWith('image/') && (
-            <div className="flex justify-center">
-              <img 
-                src={previewUrl} 
-                alt="Preview" 
-                className="max-w-full max-h-[150px] object-contain rounded cursor-pointer" 
-                onClick={() => setShowFullPreview(true)}
-                onError={(e) => {
-                  console.error("Preview image failed to load:", e);
-                  // Add a data attribute to track retries
-                  if (!e.currentTarget.dataset.retried) {
-                    // Try without query parameters if they exist
-                    if (previewUrl && previewUrl.includes('?')) {
-                      const cleanUrl = previewUrl.split('?')[0];
-                      e.currentTarget.src = cleanUrl;
-                      e.currentTarget.dataset.retried = "true";
-                    }
-                  } else {
-                    // Show a fallback after retry fails
-                    e.currentTarget.style.display = 'none';
-                    const fallbackEl = document.createElement('div');
-                    fallbackEl.className = 'bg-muted/20 p-4 rounded text-center';
-                    fallbackEl.innerHTML = '<span>Image preview unavailable</span>';
-                    e.currentTarget.parentElement?.appendChild(fallbackEl);
-                  }
-                }}
-              />
-            </div>
-          )}
-
-          {!fileType.startsWith('image/') && (
-            <div className="h-16 flex items-center justify-center rounded">
-              {getFileIcon()}
-              <span className="ml-2 text-xs">{fileType.split('/')[1].toUpperCase()}</span>
-            </div>
-          )}
-
-          <div className="mt-3">
-            {uploading && (
-              <>
-                <Progress value={uploadProgress} className="h-2" />
-                <span className="text-xs text-muted-foreground mt-2 block text-center">
-                  {uploadProgress < 100 ? 'Uploading...' : 'Complete!'}
-                </span>
-              </>
-            )}
-            {!uploading && (
-              <div className="flex justify-end gap-2 mt-2">
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  onClick={cancelUpload}
-                >
-                  Cancel
-                </Button>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
-
-      <label htmlFor="fileUpload">
-        <Button
-          variant="outline"
-          size="icon"
-          className="h-[45px] w-[45px] rounded-2xl border-muted-foreground/20"
-          disabled={uploading}
-          type="button"
-          onClick={() => document.getElementById('fileUpload')?.click()}
-        >
-          {uploading ? (
-            <Loader2 className="h-5 w-5 animate-spin" />
-          ) : (
-            <Paperclip className="h-5 w-5" />
-          )}
-        </Button>
-      </label>
-
-      {/* Full preview dialog */}
-      <Dialog open={showFullPreview} onOpenChange={setShowFullPreview}>
-        <DialogContent className="sm:max-w-[90vw] max-h-[90vh] overflow-auto p-0">
-          <div className="relative w-full h-full flex items-center justify-center bg-black">
-            <Button
-              onClick={() => setShowFullPreview(false)}
-              variant="ghost"
-              size="icon"
-              className="absolute top-2 right-2 text-white hover:bg-white/20 z-50"
-            >
-              <X className="h-5 w-5" />
-            </Button>
-            {previewUrl && (
-              <img 
-                src={previewUrl} 
-                alt={fileName} 
-                className="max-w-full max-h-[85vh] object-contain" 
-              />
-            )}
-          </div>
-        </DialogContent>
-      </Dialog>
-    </div>
-  );
-};
-
-
-interface ChatAttachmentProps {
-  url: string;
-  filename: string;
-  fileType: string;
-  fileSize?: number;
-  className?: string;
-}
-
-export const DisplayChatAttachment = ({ url, filename, fileType, fileSize, className }: ChatAttachmentProps) => {
-  const [objectUrl, setObjectUrl] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [loadError, setLoadError] = useState<string | null>(null);
-
-  const isImage = fileType.startsWith('image/');
-
-  // Auto-load the file if it's an image
+  // Get signed URL for the file
   useEffect(() => {
-    if (isImage) {
-      loadAttachment();
-    }
+    const getSignedUrl = async () => {
+      try {
+        if (fileUrl.startsWith('http')) {
+          setSignedUrl(fileUrl);
+          return;
+        }
 
-    return () => {
-      // Cleanup the object URL when component unmounts
-      if (objectUrl) {
-        URL.revokeObjectURL(objectUrl);
+        const { data, error } = await supabase.storage
+          .from('chat-attachments')
+          .createSignedUrl(fileUrl, 3600); // 1 hour expiry
+
+        if (error) throw error;
+        setSignedUrl(data.signedUrl);
+      } catch (error) {
+        console.error('Error getting signed URL:', error);
+        setSignedUrl(fileUrl); // Fallback to original URL
       }
     };
-  }, [url, isImage]);
 
-  const loadAttachment = async () => {
-    setIsLoading(true);
-    setLoadError(null);
-    
+    getSignedUrl();
+  }, [fileUrl]);
+
+  // Get file extension
+  const getFileExtension = (filename: string) => {
+    return filename.split('.').pop()?.toLowerCase() || '';
+  };
+
+  // Check if file is an image
+  const isImage = (filename: string) => {
+    const imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'];
+    const ext = getFileExtension(filename);
+    return imageExtensions.includes(ext) || messageType === 'image';
+  };
+
+  // Check if file is a video
+  const isVideo = (filename: string) => {
+    const videoExtensions = ['mp4', 'avi', 'mov', 'webm', 'mkv'];
+    const ext = getFileExtension(filename);
+    return videoExtensions.includes(ext) || messageType === 'video';
+  };
+
+  // Get file icon
+  const getFileIcon = (filename: string) => {
+    const ext = getFileExtension(filename);
+
+    if (isImage(filename)) return ImageIcon;
+    if (isVideo(filename)) return Video;
+    if (['mp3', 'wav', 'ogg', 'aac'].includes(ext)) return Music;
+    if (['zip', 'rar', '7z', 'tar'].includes(ext)) return Archive;
+
+    return FileText;
+  };
+
+  // Handle download
+  const handleDownload = async () => {
     try {
-      // Use the cleaned URL function to avoid double-slash issues
-      const cleanedUrl = cleanSupabaseUrl(url);
-      console.log("Loading attachment with URL:", cleanedUrl);
-      
-      const response = await fetch(cleanedUrl, {
-        cache: 'no-store',
-        headers: {
-          'Cache-Control': 'no-cache, no-store, must-revalidate',
-          'Pragma': 'no-cache',
-          'Expires': '0'
-        }
-      });
+      if (!signedUrl) return;
 
-      if (!response.ok) {
-        throw new Error(`Failed to load: ${response.status} ${response.statusText}`);
-      }
-
+      const response = await fetch(signedUrl);
       const blob = await response.blob();
-      const newObjectUrl = URL.createObjectURL(blob);
-      setObjectUrl(newObjectUrl);
+
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = fileName;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
     } catch (error) {
-      console.error('Error loading attachment:', error);
-      setLoadError(error instanceof Error ? error.message : 'Failed to load attachment');
-      
-      // Try alternative method if the first attempt fails
-      try {
-        // Try a direct load approach with the image element
-        const img = new Image();
-        img.onload = () => {
-          setObjectUrl(url);
-          setLoadError(null);
-        };
-        img.onerror = () => {
-          console.error('Failed to load image even with fallback method');
-        };
-        img.src = cleanSupabaseUrl(url);
-      } catch (fallbackError) {
-        console.error('Fallback loading method failed:', fallbackError);
+      console.error('Download error:', error);
+      // Fallback: open in new tab
+      if (signedUrl) {
+        window.open(signedUrl, '_blank');
       }
-    } finally {
-      setIsLoading(false);
     }
   };
 
-  return (
-    <div className={cn("border rounded-lg p-3 max-w-sm", className)}>
-      <div className="flex items-center justify-between mb-2">
-        <div className="truncate flex-1">
-          <p className="font-medium truncate">{filename}</p>
-          <p className="text-xs text-muted-foreground">
-            {fileType.split('/')[1].toUpperCase()} {fileSize && `· ${(fileSize / 1024).toFixed(1)} KB`}
-          </p>
-        </div>
-        <a 
-          href={cleanSupabaseUrl(url)} 
-          download={filename}
-          target="_blank" 
-          rel="noopener noreferrer"
-          className="text-xs underline hover:text-primary transition-colors ml-2"
-        >
-          Download
-        </a>
-      </div>
+  // Handle image click to open in modal or new tab
+  const handleImageClick = () => {
+    if (signedUrl) {
+      window.open(signedUrl, '_blank');
+    }
+  };
 
-      {isImage && (
-        <div className="mt-2 relative">
-          {isLoading ? (
-            <Skeleton className="w-full h-48 rounded-md" />
-          ) : loadError ? (
-            <div className="w-full h-48 rounded-md bg-muted/20 flex flex-col items-center justify-center p-4">
-              <FileText className="h-8 w-8 mb-2 opacity-70" />
-              <p className="text-sm text-center">{filename}</p>
-              <p className="text-xs text-muted-foreground mt-1">Image couldn't be loaded</p>
-            </div>
-          ) : (
-            objectUrl && (
-              <img 
-                src={objectUrl} 
-                alt={filename} 
-                className="rounded-md w-full max-h-96 object-contain" 
-                loading="lazy"
-                onError={(e) => {
-                  console.error("Error loading image in display component");
-                  e.currentTarget.style.display = 'none';
-                  setLoadError("Failed to display image");
-                }}
-              />
-            )
-          )}
+  if (!signedUrl) {
+    return (
+      <div className="flex items-center gap-3 p-3 bg-muted rounded-lg max-w-xs animate-pulse">
+        <div className="w-8 h-8 bg-muted-foreground/20 rounded" />
+        <div className="flex-1">
+          <div className="h-4 bg-muted-foreground/20 rounded mb-1" />
+          <div className="h-3 bg-muted-foreground/20 rounded w-2/3" />
         </div>
-      )}
+      </div>
+    );
+  }
+
+  // If it's an image, show image preview
+  if (isImage(fileName)) {
+    return (
+      <div className="relative max-w-sm rounded-xl overflow-hidden bg-muted shadow-sm border">
+        {!imageLoaded && !imageError && (
+          <div className="w-full h-48 bg-muted animate-pulse flex items-center justify-center">
+            <ImageIcon className="w-8 h-8 text-muted-foreground" />
+          </div>
+        )}
+
+        {!imageError && (
+          <img
+            src={signedUrl}
+            alt={fileName}
+            className={`w-full h-auto max-h-96 object-cover cursor-pointer transition-all duration-300 hover:scale-105 ${
+              imageLoaded ? 'opacity-100' : 'opacity-0 absolute'
+            }`}
+            onLoad={() => setImageLoaded(true)}
+            onError={() => {
+              setImageError(true);
+              setImageLoaded(false);
+            }}
+            onClick={handleImageClick}
+            loading="lazy"
+          />
+        )}
+
+        {imageError && (
+          <div className="w-full h-48 bg-muted flex flex-col items-center justify-center p-4">
+            <ImageIcon className="w-8 h-8 text-muted-foreground mb-2" />
+            <p className="text-sm text-muted-foreground text-center mb-2">{fileName}</p>
+            <div className="flex gap-2">
+              <button
+                onClick={handleDownload}
+                className="px-3 py-1 text-xs bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors"
+              >
+                Download
+              </button>
+              <button
+                onClick={() => window.open(signedUrl, '_blank')}
+                className="px-3 py-1 text-xs bg-secondary text-secondary-foreground rounded-md hover:bg-secondary/90 transition-colors"
+              >
+                Open
+              </button>
+            </div>
+          </div>
+        )}
+
+        {imageLoaded && (
+          <div className="absolute top-2 right-2 flex gap-1 opacity-0 hover:opacity-100 transition-opacity">
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                handleImageClick();
+              }}
+              className="p-1.5 bg-black/60 text-white rounded-full hover:bg-black/80 transition-colors"
+              title="Open in new tab"
+            >
+              <ExternalLink className="w-3 h-3" />
+            </button>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                handleDownload();
+              }}
+              className="p-1.5 bg-black/60 text-white rounded-full hover:bg-black/80 transition-colors"
+              title="Download"
+            >
+              <Download className="w-3 h-3" />
+            </button>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  // For videos
+  if (isVideo(fileName)) {
+    return (
+      <div className="max-w-sm rounded-xl overflow-hidden bg-muted shadow-sm border">
+        <video
+          src={signedUrl}
+          controls
+          className="w-full h-auto max-h-96"
+          preload="metadata"
+          poster=""
+        >
+          Your browser does not support the video tag.
+        </video>
+        <div className="p-3 flex items-center justify-between">
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-medium truncate">{fileName}</p>
+            <p className="text-xs text-muted-foreground">Video file</p>
+          </div>
+          <button
+            onClick={handleDownload}
+            className="p-2 text-muted-foreground hover:text-foreground hover:bg-background rounded-md transition-colors"
+            title="Download"
+          >
+            <Download className="w-4 h-4" />
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // For other files
+  const FileIcon = getFileIcon(fileName);
+
+  return (
+    <div className="flex items-center gap-3 p-3 bg-muted rounded-xl max-w-xs border shadow-sm hover:shadow-md transition-shadow">
+      <div className="p-2 bg-primary/10 rounded-lg">
+        <FileIcon className="w-6 h-6 text-primary flex-shrink-0" />
+      </div>
+      <div className="flex-1 min-w-0">
+        <p className="text-sm font-medium truncate">{fileName}</p>
+        <p className="text-xs text-muted-foreground">
+          {getFileExtension(fileName).toUpperCase()} file
+        </p>
+      </div>
+      <button
+        onClick={handleDownload}
+        className="p-2 text-muted-foreground hover:text-foreground hover:bg-background rounded-md transition-colors"
+        title="Download"
+      >
+        <Download className="w-4 h-4" />
+      </button>
     </div>
   );
 };

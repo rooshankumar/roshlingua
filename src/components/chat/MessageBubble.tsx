@@ -72,7 +72,7 @@ export const MessageBubble = ({ message, isCurrentUser, isRead = false, onReacti
     setShowReactionPicker(!showReactionPicker);
   };
 
-  
+
 
   return (
     <div className={`group flex items-end gap-2 mb-2 ${isCurrentUser ? 'justify-end' : 'justify-start'}`}>
