@@ -212,75 +212,87 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ conversationId, receiver
         {
           event: 'INSERT',
           schema: 'public',
-          table: 'messages',
-          filter: `or(and(sender_id.eq.${user.id},receiver_id.eq.${receiverId}),and(sender_id.eq.${receiverId},receiver_id.eq.${user.id}))`
+          table: 'messages'
         },
         async (payload) => {
-          console.log('📨 New message received:', payload.new);
+          const newMessageData = payload.new as any;
+          console.log('📨 New message received:', newMessageData);
 
-          // Fetch the complete message with relations
-          const { data: newMessage, error } = await supabase
-            .from('messages')
-            .select(`
-              id,
-              content,
-              sender_id,
-              receiver_id,
-              created_at,
-              message_type,
-              file_url,
-              file_name,
-              is_read
-            `)
-            .eq('id', payload.new.id)
-            .single();
+          // Only process messages for this conversation
+          if ((newMessageData.sender_id === user.id && newMessageData.receiver_id === receiverId) ||
+              (newMessageData.sender_id === receiverId && newMessageData.receiver_id === user.id)) {
+            
+            // Fetch the complete message with relations
+            const { data: newMessage, error } = await supabase
+              .from('messages')
+              .select(`
+                id,
+                content,
+                sender_id,
+                receiver_id,
+                recipient_id,
+                conversation_id,
+                created_at,
+                message_type,
+                file_url,
+                file_name,
+                is_read,
+                sender:profiles!messages_sender_id_fkey(
+                  id,
+                  full_name,
+                  avatar_url
+                )
+              `)
+              .eq('id', newMessageData.id)
+              .single();
 
-          if (!error && newMessage) {
-            setMessages(prev => {
-              // Prevent duplicates
-              if (prev.some(msg => msg.id === newMessage.id)) {
-                return prev;
-              }
+            if (!error && newMessage) {
+              setMessages(prev => {
+                // Prevent duplicates
+                if (prev.some(msg => msg.id === newMessage.id)) {
+                  return prev;
+                }
 
-              const updated = [...prev, newMessage];
+                const updated = [...prev, newMessage];
 
-              // Auto-scroll if should auto-scroll or if it's user's own message
-              if (shouldAutoScroll || newMessage.sender_id === user.id) {
-                setTimeout(() => scrollToBottom(true), 100);
-              } else {
-                // Show new message indicator
-                setNewMessageCount(count => count + 1);
+                // Auto-scroll if should auto-scroll or if it's user's own message
+                if (shouldAutoScroll || newMessage.sender_id === user.id) {
+                  setTimeout(() => scrollToBottom(true), 100);
+                } else {
+                  // Show new message indicator
+                  setNewMessageCount(count => count + 1);
 
-                // Play notification sound for received messages
-                if (newMessage.sender_id !== user.id) {
-                  try {
-                    const audio = new Audio('/notification.mp3');
-                    audio.volume = 0.3;
-                    audio.play().catch(() => {}); // Ignore if audio fails
-                  } catch (e) {
-                    console.log('Could not play notification sound');
-                  }
+                  // Play notification sound for received messages
+                  if (newMessage.sender_id !== user.id) {
+                    try {
+                      const audio = new Audio('/notification.mp3');
+                      audio.volume = 0.3;
+                      audio.play().catch(() => {}); // Ignore if audio fails
+                    } catch (e) {
+                      console.log('Could not play notification sound');
+                    }
 
-                  // Show browser notification if supported
-                  if ('Notification' in window && Notification.permission === 'granted') {
-                    new Notification(`New message from ${newMessage.sender?.full_name}`, {
-                      body: newMessage.content.substring(0, 100),
-                      icon: newMessage.sender?.avatar_url,
-                      tag: 'chat-message'
-                    });
+                    // Show browser notification if supported
+                    if ('Notification' in window && Notification.permission === 'granted') {
+                      new Notification(`New message from ${newMessage.sender?.full_name}`, {
+                        body: newMessage.content.substring(0, 100),
+                        icon: newMessage.sender?.avatar_url,
+                        tag: 'chat-message'
+                      });
+                    }
                   }
                 }
+
+                return updated;
+              });
+
+              // Mark as read if user is active and scrolled to bottom
+              if (newMessage.receiver_id === user.id && isScrolledToBottom && document.visibilityState === 'visible') {
+                await supabase
+                  .from('messages')
+                  .update({ is_read: true })
+                  .eq('id', newMessage.id);
               }
-
-              return updated;
-            });
-
-            // Mark as read if user is active and scrolled to bottom
-            if (newMessage.receiver_id === user.id && isScrolledToBottom && document.visibilityState === 'visible') {
-              await supabase
-                .from('messages')
-                .update({ is_read: true })
-                .eq('id', newMessage.id);
             }
           }
         }

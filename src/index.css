@@ -814,16 +814,26 @@
     animation: message-pop 0.3s ease-out;
   }
 
+  .message-bubble[data-sender="self"] {
+    @apply ml-auto;
+  }
+
+  .message-bubble[data-sender="other"] {
+    @apply mr-auto;
+  }
+
   .message-bubble:after {
     content: '';
     @apply absolute top-0 w-3 h-3;
   }
 
-  .message-bubble.sent:after {
+  .message-bubble.sent:after,
+  .message-bubble[data-sender="self"]:after {
     @apply right-0 transform translate-x-2 -translate-y-0.5 rotate-45 bg-primary;
   }
 
-  .message-bubble.received:after {
+  .message-bubble.received:after,
+  .message-bubble[data-sender="other"]:after {
     @apply left-0 transform -translate-x-2 -translate-y-0.5 rotate-45 bg-muted;
   }
 

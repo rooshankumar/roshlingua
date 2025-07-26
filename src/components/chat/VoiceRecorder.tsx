@@ -82,30 +82,44 @@ export const VoiceRecorder = ({ onComplete }: VoiceRecorderProps) => {
       // Convert the audioURL to a File object
       const response = await fetch(audioURL);
       const blob = await response.blob();
-      const fileName = `voice-${Date.now()}.webm`;
+      const timestamp = Date.now();
+      const fileName = `audio-${timestamp}.webm`;
+      
+      // Create unique file path with user context
+      const { data: { user } } = await supabase.auth.getUser();
+      const filePath = user ? `${user.id}/${fileName}` : `anonymous/${fileName}`;
+      
       const file = new File([blob], fileName, { type: 'audio/webm' });
       
-      // Upload to Supabase storage
-      const filePath = `${crypto.randomUUID()}-${fileName}`;
-      const { error: uploadError } = await supabase.storage
-        .from('voice_messages')
-        .upload(filePath, file);
+      // Upload to Supabase storage using the correct bucket name
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from('voice-messages')
+        .upload(filePath, file, {
+          cacheControl: '3600',
+          upsert: false
+        });
         
-      if (uploadError) throw uploadError;
+      if (uploadError) {
+        console.error('Upload error:', uploadError);
+        throw new Error(`Upload failed: ${uploadError.message}`);
+      }
       
       // Get the public URL
-      const { data } = await supabase.storage
-        .from('voice_messages')
+      const { data: urlData } = await supabase.storage
+        .from('voice-messages')
         .getPublicUrl(filePath);
         
-      if (data && data.publicUrl) {
-        onComplete(data.publicUrl);
+      if (urlData && urlData.publicUrl) {
+        console.log('Voice message uploaded successfully:', urlData.publicUrl);
+        onComplete(urlData.publicUrl);
         cancelRecording();
       } else {
         throw new Error('Failed to get public URL');
       }
     } catch (error) {
       console.error('Error uploading voice message:', error);
+      // Show user-friendly error message
+      alert('Failed to upload voice message. Please try again.');
     } finally {
       setIsUploading(false);
     }
