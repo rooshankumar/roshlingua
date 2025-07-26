@@ -315,7 +315,8 @@ const ChatList = () => {
                 </CardContent>
               </Card>
             </Link>
-          )})
+          );
+          })}
         </div>
       )}
     </div>
