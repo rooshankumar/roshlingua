@@ -135,12 +135,9 @@ export const ChatAttachment = ({ onAttach }: ChatAttachmentProps) => {
         throw new Error("Failed to get public URL for uploaded file");
       }
 
-      console.log("Original public URL:", data.publicUrl);
+      console.log("Public URL:", data.publicUrl);
       
-      // Use the improved cleanSupabaseUrl function
-      const publicUrl = cleanSupabaseUrl(data.publicUrl);
-      
-      console.log("Cleaned public URL:", publicUrl);
+      const publicUrl = data.publicUrl;
 
       console.log("File uploaded successfully:", publicUrl);
 

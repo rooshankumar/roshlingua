@@ -50,7 +50,7 @@ export const MessageBubble = ({ message, isCurrentUser, isRead = false, onReacti
         // Try with cleaned URL
         const cleanedUrl = cleanAttachmentUrl(message.attachment_url);
         console.log('Retrying with cleaned URL:', cleanedUrl);
-        
+
         const retryImg = new Image();
         retryImg.onload = () => {
           setImageLoaded(true);
@@ -115,93 +115,63 @@ export const MessageBubble = ({ message, isCurrentUser, isRead = false, onReacti
               </div>
             </div>
           )}
+          {/* Image attachment */}
           {isImageAttachment && message.attachment_url && (
-  <div className="relative">
-    {isPreloading ? (
-      <Skeleton className="w-[260px] md:w-[300px] h-[200px] rounded-lg" />
-    ) : imageLoadError ? (
-      <div className="w-[260px] md:w-[300px] h-[200px] rounded-lg bg-muted/20 flex flex-col items-center justify-center text-muted-foreground p-4">
-        <FileText className="h-8 w-8 mb-2 opacity-70" />
-        <p className="text-sm">{message.attachment_name || "Image"}</p>
-        <a
-          href={message.attachment_url?.split('?')[0] + `?t=${Date.now()}`}
-          download
-          className="text-xs mt-2 underline hover:text-primary transition-colors"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          View/Download
-        </a>
-      </div>
-    ) : (
-      <>
-        <img
-          src={message.attachment_url?.replace('//attachments/', '/attachments/').split('?')[0] + `?t=${Date.now()}`}
-          alt={message.attachment_name || "Image attachment"}
-          className="max-w-[260px] md:max-w-[300px] max-h-[350px] rounded-lg object-contain cursor-pointer hover:scale-105 transition-transform duration-200"
-          loading="eager"
-          fetchpriority="high"
-          decoding="async"
-          referrerPolicy="no-referrer"
-          onLoad={() => {
-            setImageLoaded(true);
-            setIsPreloading(false);
-            console.log('Image loaded successfully:', message.attachment_url);
-          }}
-          onError={(e) => {
-            console.error('Error loading image:', e);
-            const imgEl = e.currentTarget;
-
-            // More aggressive retry strategy
-            if (!imgEl.dataset.retried) {
-              // First retry: Clean URL of double slashes and query params
-              const cleanedUrl = message.attachment_url?.replace('//attachments/', '/attachments/').split('?')[0] + `?t=${Date.now()}`;
-              console.log('Retrying with cleaned URL:', cleanedUrl);
-              imgEl.src = cleanedUrl;
-              imgEl.dataset.retried = 'true';
-            } else if (imgEl.dataset.retried === 'true' && !imgEl.dataset.retriedCache) {
-              // Second retry: Add cache control headers
-              const cacheBusterUrl = message.attachment_url?.split('?')[0] + `?t=${Date.now()}&cache=no-store`;
-              console.log('Retrying with cache buster:', cacheBusterUrl);
-              imgEl.src = cacheBusterUrl;
-              imgEl.dataset.retriedCache = 'true';
-            } else if (imgEl.dataset.retriedCache === 'true' && !imgEl.dataset.retriedDirect) {
-              // Third retry: Try direct URL with no transformations
-              const directUrl = message.attachment_url || '';
-              console.log('Retrying with direct URL:', directUrl);
-              imgEl.src = directUrl;
-              imgEl.dataset.retriedDirect = 'true';
-            } else {
-              // All retries failed
-              setImageLoadError("Failed to load image");
-              console.error('All image load attempts failed for:', message.attachment_url);
-            }
-          }}
-          onClick={(e) => {
-            if (imageLoaded) {
-              e.preventDefault();
-              const cleanUrl = message.attachment_url?.replace('//attachments/', '/attachments/').split('?')[0] + `?t=${Date.now()}`;
-              const clickEvent = new CustomEvent('image-preview', {
-                detail: { url: cleanUrl, name: message.attachment_name }
-              });
-              document.dispatchEvent(clickEvent);
-            }
-          }}
-        />
-        <a
-          href={message.attachment_url?.split('?')[0] + `?t=${Date.now()}`}
-          download={message.attachment_name}
-          className="absolute bottom-2 right-2 bg-black/50 text-white p-1 rounded-md opacity-0 group-hover:opacity-100 transition-opacity"
-          onClick={(e) => e.stopPropagation()}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Download className="h-4 w-4" />
-        </a>
-      </>
-    )}
-  </div>
-)}
+            <div className="relative">
+              {isPreloading ? (
+                <Skeleton className="w-[260px] md:w-[300px] h-[200px] rounded-lg" />
+              ) : (
+                <>
+                  <img
+                    src={message.attachment_url}
+                    alt={message.attachment_name || "Image attachment"}
+                    className="max-w-[260px] md:max-w-[300px] max-h-[350px] rounded-lg object-contain cursor-pointer hover:scale-105 transition-transform duration-200"
+                    loading="eager"
+                    onLoad={() => {
+                      setImageLoaded(true);
+                      setIsPreloading(false);
+                      setImageLoadError(null);
+                      console.log('Image loaded successfully:', message.attachment_url);
+                    }}
+                    onError={(e) => {
+                      console.error('Error loading image:', message.attachment_url);
+                      setImageLoadError("Failed to load image");
+                      setIsPreloading(false);
+                    }}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      window.open(message.attachment_url, '_blank');
+                    }}
+                  />
+                  {imageLoadError && (
+                    <div className="absolute inset-0 w-[260px] md:w-[300px] h-[200px] rounded-lg bg-muted/20 flex flex-col items-center justify-center text-muted-foreground p-4">
+                      <FileText className="h-8 w-8 mb-2 opacity-70" />
+                      <p className="text-sm">{message.attachment_name || "Image"}</p>
+                      <a
+                        href={message.attachment_url}
+                        download={message.attachment_name}
+                        className="text-xs mt-2 underline hover:text-primary transition-colors"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        Download
+                      </a>
+                    </div>
+                  )}
+                  <a
+                    href={message.attachment_url}
+                    download={message.attachment_name}
+                    className="absolute bottom-2 right-2 bg-black/50 text-white p-1 rounded-md opacity-0 group-hover:opacity-100 transition-opacity"
+                    onClick={(e) => e.stopPropagation()}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <Download className="h-4 w-4" />
+                  </a>
+                </>
+              )}
+            </div>
+          )}
 
           {/* Video attachment */}
           {isVideoAttachment && message.attachment_url && (
