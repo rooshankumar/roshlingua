@@ -973,7 +973,7 @@
     html { font-size: 15px; }
     h1 { @apply text-3xl; }
     h2 { @apply text-2xl; }
-    h3 { @apply text-xl; }
+    h3 { @apply text-lg; }
   }
 
   @media (min-width: 768px) {
@@ -1366,4 +1366,44 @@ html {
 
 .auth-card:hover {
   transform: translateY(-2px);
+}
+
+/* Chat message bubbles */
+.message-bubble {
+  position: relative;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+/* Attachment preview styles */
+.message-bubble img {
+  transition: all 0.2s ease;
+}
+
+.message-bubble video {
+  background: #000;
+}
+
+.message-bubble audio {
+  filter: brightness(0.9);
+}
+
+.message-bubble audio::-webkit-media-controls-panel {
+  background-color: transparent;
+}
+
+/* File attachment hover effects */
+.message-bubble .file-attachment:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+/* Dark mode adjustments for attachments */
+@media (prefers-color-scheme: dark) {
+  .message-bubble audio {
+    filter: brightness(1.1);
+  }
+
+  .message-bubble .file-attachment:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+  }
 }
