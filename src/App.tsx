@@ -38,6 +38,7 @@ import AppLayout from "./components/layouts/AppLayout";
 import AuthLayout from "./components/layouts/AuthLayout";
 import { RealtimeStatus } from './components/RealtimeStatus';
 import RealtimeConnectionCheck from './components/RealtimeConnectionCheck';
+import ErrorBoundary from '@/components/ErrorBoundary';
 
 
 const queryClient = new QueryClient();
@@ -256,11 +257,13 @@ const App = () => {
       <ThemeProvider defaultTheme="dark" storageKey="ui-theme">
         <BrowserRouter>
           <AuthProvider>
-            <AppRoutes />
+            <ErrorBoundary>
+              <HMRHandler />
+              <Analytics debug={false} />
+              <SpeedInsights debug={false} />
+              <AppRoutes />
+            </ErrorBoundary>
             <Toaster />
-            <HMRHandler /> {/* Added HMR handler */}
-            <Analytics debug={false} />
-            <SpeedInsights debug={false} />
           </AuthProvider>
         </BrowserRouter>
       </ThemeProvider>

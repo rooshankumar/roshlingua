@@ -515,6 +515,17 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ conversationId, receiver
     return groups;
   }, [messages]);
 
+  // Auto-scroll behavior
+  useEffect(() => {
+    try {
+      if (shouldAutoScroll && messagesEndRef.current) {
+        messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+      }
+    } catch (error) {
+      console.warn('Error during auto-scroll:', error);
+    }
+  }, [messages, shouldAutoScroll]);
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-full">
@@ -635,5 +646,25 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ conversationId, receiver
     </div>
   );
 };
+
+function formatMessageDate(dateString: string | undefined): string {
+  if (!dateString) return '';
+
+  const date = new Date(dateString);
+  const today = new Date();
+
+  if (date.toDateString() === today.toDateString()) {
+    return 'Today';
+  }
+
+  const yesterday = new Date(today);
+  yesterday.setDate(today.getDate() - 1);
+
+  if (date.toDateString() === yesterday.toDateString()) {
+    return 'Yesterday';
+  }
+
+  return format(date, 'MMMM d, yyyy');
+}
 
 export default ChatScreen;
