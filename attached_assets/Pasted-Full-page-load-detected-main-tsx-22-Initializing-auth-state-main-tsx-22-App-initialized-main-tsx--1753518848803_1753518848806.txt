@@ -1,0 +1,80 @@
+Full page load detected
+main.tsx:22 Initializing auth state...
+main.tsx:22 App initialized
+main.tsx:22 Checking storage buckets...
+main.tsx:22 Checking existing storage buckets...
+main.tsx:22 i18next::backendConnector: loaded namespace translation for language en {navigation: {…}, auth: {…}, settings: {…}}
+main.tsx:22 i18next: languageChanged en
+main.tsx:22 i18next: initialized {debug: true, initAsync: true, ns: Array(1), defaultNS: Array(1), fallbackLng: Array(1), …}
+main.tsx:22 Setting initial session: Session exists
+main.tsx:22 Checking profile for user: ed1c374e-3823-4ea2-aa28-3999c21d1140
+main.tsx:22 Updating last_seen for user: ed1c374e-3823-4ea2-aa28-3999c21d1140
+main.tsx:22 No existing buckets found, which is unusual.
+main.tsx:22 Storage buckets verified successfully
+main.tsx:22 Checking onboarding status for user: ed1c374e-3823-4ea2-aa28-3999c21d1140
+main.tsx:22 Auth state changed: INITIAL_SESSION Session exists
+main.tsx:22 Checking onboarding status for user: ed1c374e-3823-4ea2-aa28-3999c21d1140
+main.tsx:22 Onboarding status: Completed
+main.tsx:22 Performing periodic refresh of all subscriptions
+main.tsx:22 [SubscriptionManager] No subscriptions to refresh
+main.tsx:22 Refreshing all real-time subscriptions
+main.tsx:22 Navigation detected, checking connection health
+main.tsx:22 [SubscriptionManager] No subscriptions to refresh
+main.tsx:22 [SubscriptionManager] Subscribing to app_connection_monitor
+main.tsx:22 Route changed to: /chat/142dd432-0a59-483f-9a7a-44578617b540
+main.tsx:22 🔔 Setting up unread messages subscription for user: ed1c374e-3823-4ea2-aa28-3999c21d1140
+main.tsx:22 Refreshing subscriptions after page change
+main.tsx:22 Refreshing all real-time subscriptions
+main.tsx:22 Onboarding status: Completed
+main.tsx:22 [SubscriptionManager] Refreshing all 1 subscriptions
+main.tsx:22 📊 Unread message counts updated: {counts: {…}, total: 0}
+main.tsx:22 [SubscriptionManager] Finished refreshing all subscriptions
+main.tsx:22 [SubscriptionManager] Refreshing subscription app_connection_monitor
+main.tsx:22 [SubscriptionManager] No subscriptions to refresh
+main.tsx:22 🔔 Unread messages subscription status: SUBSCRIBED
+main.tsx:22 ✅ Unread messages real-time connected
+chunk-276SZO74.js?v=777a8f78:14032 The above error occurred in the <ChatScreen> component:
+
+    at ChatScreen (https://933c69ae-673d-4de3-997a-57e799dd5235-00-3853ayhucfgsx.sisko.replit.dev/src/components/chat/ChatScreen.tsx?t=1753518817679:22:30)
+    at Chat (https://933c69ae-673d-4de3-997a-57e799dd5235-00-3853ayhucfgsx.sisko.replit.dev/src/pages/Chat.tsx?t=1753518817679:18:22)
+    at Suspense
+    at div
+    at MotionComponent (https://933c69ae-673d-4de3-997a-57e799dd5235-00-3853ayhucfgsx.sisko.replit.dev/node_modules/.vite/deps/framer-motion.js?v=777a8f78:4619:40)
+    at PageTransition (https://933c69ae-673d-4de3-997a-57e799dd5235-00-3853ayhucfgsx.sisko.replit.dev/src/components/PageTransition.tsx:12:27)
+    at main
+    at div
+    at AppLayout (https://933c69ae-673d-4de3-997a-57e799dd5235-00-3853ayhucfgsx.sisko.replit.dev/src/components/layouts/AppLayout.tsx:85:22)
+    at ProtectedRoute (https://933c69ae-673d-4de3-997a-57e799dd5235-00-3853ayhucfgsx.sisko.replit.dev/src/components/auth/ProtectedRoute.tsx:15:27)
+    at RenderedRoute (https://933c69ae-673d-4de3-997a-57e799dd5235-00-3853ayhucfgsx.sisko.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=777a8f78:4069:5)
+    at Routes (https://933c69ae-673d-4de3-997a-57e799dd5235-00-3853ayhucfgsx.sisko.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=777a8f78:4508:5)
+    at PresenceChild (https://933c69ae-673d-4de3-997a-57e799dd5235-00-3853ayhucfgsx.sisko.replit.dev/node_modules/.vite/deps/framer-motion.js?v=777a8f78:137:24)
+    at AnimatePresence (https://933c69ae-673d-4de3-997a-57e799dd5235-00-3853ayhucfgsx.sisko.replit.dev/node_modules/.vite/deps/framer-motion.js?v=777a8f78:216:26)
+    at AppRoutes (https://933c69ae-673d-4de3-997a-57e799dd5235-00-3853ayhucfgsx.sisko.replit.dev/src/App.tsx?t=1753518817679:64:33)
+    at AuthProvider (https://933c69ae-673d-4de3-997a-57e799dd5235-00-3853ayhucfgsx.sisko.replit.dev/src/providers/AuthProvider.tsx:24:32)
+    at Router (https://933c69ae-673d-4de3-997a-57e799dd5235-00-3853ayhucfgsx.sisko.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=777a8f78:4451:15)
+    at BrowserRouter (https://933c69ae-673d-4de3-997a-57e799dd5235-00-3853ayhucfgsx.sisko.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=777a8f78:5196:5)
+    at ThemeProvider (https://933c69ae-673d-4de3-997a-57e799dd5235-00-3853ayhucfgsx.sisko.replit.dev/src/components/theme-provider.tsx:17:33)
+    at QueryClientProvider (https://933c69ae-673d-4de3-997a-57e799dd5235-00-3853ayhucfgsx.sisko.replit.dev/node_modules/.vite/deps/@tanstack_react-query.js?v=777a8f78:2794:3)
+    at App (https://933c69ae-673d-4de3-997a-57e799dd5235-00-3853ayhucfgsx.sisko.replit.dev/src/App.tsx?t=1753518817679:745:45)
+
+Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://reactjs.org/link/error-boundaries to learn more about error boundaries.
+logCapturedError @ chunk-276SZO74.js?v=777a8f78:14032
+update.callback @ chunk-276SZO74.js?v=777a8f78:14052
+callCallback @ chunk-276SZO74.js?v=777a8f78:11248
+commitUpdateQueue @ chunk-276SZO74.js?v=777a8f78:11265
+commitLayoutEffectOnFiber @ chunk-276SZO74.js?v=777a8f78:17093
+commitLayoutMountEffects_complete @ chunk-276SZO74.js?v=777a8f78:17980
+commitLayoutEffects_begin @ chunk-276SZO74.js?v=777a8f78:17969
+commitLayoutEffects @ chunk-276SZO74.js?v=777a8f78:17920
+commitRootImpl @ chunk-276SZO74.js?v=777a8f78:19353
+commitRoot @ chunk-276SZO74.js?v=777a8f78:19277
+finishConcurrentRender @ chunk-276SZO74.js?v=777a8f78:18760
+performConcurrentWorkOnRoot @ chunk-276SZO74.js?v=777a8f78:18718
+workLoop @ chunk-276SZO74.js?v=777a8f78:197
+flushWork @ chunk-276SZO74.js?v=777a8f78:176
+performWorkUntilDeadline @ chunk-276SZO74.js?v=777a8f78:384Understand this error
+main.tsx:22 🧹 Cleaning up unread messages subscription
+main.tsx:22 🔔 Unread messages subscription status: CLOSED
+main.tsx:22 🔔 Unread messages subscription status: CLOSED
+main.tsx:22 🔄 Chat subscription status: CLOSED
