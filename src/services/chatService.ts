@@ -19,12 +19,24 @@ export const subscribeToMessages = async (conversationId: string, onMessage: (me
         table: 'messages',
         filter: `conversation_id=eq.${conversationId}`
       },
-      payload => {
+      async payload => {
         const message = payload.new as Message;
         console.log("New Message Received:", message);
-        // Only trigger notification if message is from another user
-        if (message.sender_id !== (supabase.auth.getUser())?.data?.user?.id) {
-          onMessage(message);
+        
+        // Get current user ID
+        const { data: { user } } = await supabase.auth.getUser();
+        const currentUserId = user?.id;
+        
+        // Always trigger the callback to update the UI
+        onMessage(message);
+        
+        // Mark as read if it's not from the current user
+        if (message.sender_id !== currentUserId) {
+          console.log("Marking message as read:", message.id);
+          await supabase
+            .from('messages')
+            .update({ is_read: true })
+            .eq('id', message.id);
         }
       }
     )

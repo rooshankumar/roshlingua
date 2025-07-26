@@ -212,7 +212,7 @@ export const MessageInput: React.FC<MessageInputProps> = ({
         ref={fileInputRef}
         type="file"
         className="hidden"
-        accept="image/*,video/*,.pdf,.doc,.docx,.txt"
+        accept="image/*,video/*"
         onChange={handleFileUpload}
         disabled={disabled || isUploading}
       />

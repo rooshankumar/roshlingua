@@ -47,13 +47,7 @@ export const ChatAttachment = ({ onAttach }: ChatAttachmentProps) => {
         };
         reader.readAsDataURL(file);
       } else if (file.type.startsWith('video/')) {
-        setPreviewUrl('/icons/video-placeholder.png'); // Use a generic video icon as placeholder
-      } else if (file.type.startsWith('audio/')) {
-        setPreviewUrl('/icons/audio-placeholder.png'); // Use a generic audio icon as placeholder
-      } else if (file.type === 'application/pdf') {
-        setPreviewUrl('/icons/pdf-placeholder.png'); // Use a generic PDF icon as placeholder
-      } else {
-        setPreviewUrl('/icons/file-placeholder.png'); // Generic file icon
+        setPreviewUrl(null); // No preview for videos
       }
 
       setUploading(true);
@@ -182,8 +176,6 @@ export const ChatAttachment = ({ onAttach }: ChatAttachmentProps) => {
   const getFileIcon = () => {
     if (fileType.startsWith('image/')) return <ImageIcon className="h-5 w-5" />;
     if (fileType.startsWith('video/')) return <Video className="h-5 w-5" />;
-    if (fileType.startsWith('audio/')) return <FileAudio className="h-5 w-5" />;
-    if (fileType === 'application/pdf') return <FileText className="h-5 w-5" />;
     return <FileText className="h-5 w-5" />;
   };
 
@@ -201,7 +193,7 @@ export const ChatAttachment = ({ onAttach }: ChatAttachmentProps) => {
         id="fileUpload"
         style={{ display: 'none' }}
         onChange={handleFileChange}
-        accept=".png,.jpg,.jpeg,.gif,.webp,.mp4,.webm,.mov"
+        accept="image/*,video/*"
       />
 
       {previewUrl && (

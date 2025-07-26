@@ -1383,27 +1383,3 @@ html {
 .message-bubble video {
   background: #000;
 }
-
-.message-bubble audio {
-  filter: brightness(0.9);
-}
-
-.message-bubble audio::-webkit-media-controls-panel {
-  background-color: transparent;
-}
-
-/* File attachment hover effects */
-.message-bubble .file-attachment:hover {
-  background-color: rgba(0, 0, 0, 0.05);
-}
-
-/* Dark mode adjustments for attachments */
-@media (prefers-color-scheme: dark) {
-  .message-bubble audio {
-    filter: brightness(1.1);
-  }
-
-  .message-bubble .file-attachment:hover {
-    background-color: rgba(255, 255, 255, 0.05);
-  }
-}
