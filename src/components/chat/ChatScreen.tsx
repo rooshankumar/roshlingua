@@ -221,7 +221,7 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ conversationId, receiver
           // Only process messages for this conversation
           if ((newMessageData.sender_id === user.id && newMessageData.receiver_id === receiverId) ||
               (newMessageData.sender_id === receiverId && newMessageData.receiver_id === user.id)) {
-            
+
             // Fetch the complete message with relations
             const { data: newMessage, error } = await supabase
               .from('messages')
@@ -537,6 +537,95 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ conversationId, receiver
       console.warn('Error during auto-scroll:', error);
     }
   }, [messages, shouldAutoScroll]);
+
+  const sendMessage = async (content: string, attachmentUrl?: string, attachmentName?: string, replyToId?: string) => {
+    if (!conversationId || (!content.trim() && !attachmentUrl)) return;
+
+    const tempId = `temp-${Date.now()}`;
+    const newMessage = {
+      id: tempId,
+      content: content.trim(),
+      sender_id: user?.id,
+      sender: {
+        id: user?.id || '',
+        email: user?.email || '',
+        full_name: user?.user_metadata?.full_name || user?.email || 'You',
+        avatar_url: user?.user_metadata?.avatar_url || ''
+      },
+      created_at: new Date().toISOString(),
+      conversation_id: conversationId,
+      file_url: attachmentUrl,
+      file_name: attachmentName,
+      reply_to_id: replyToId,
+      reply_to: replyToId ? messages.find(m => m.id === replyToId) : null,
+      is_sending: true
+    };
+
+    // Add message optimistically and scroll immediately
+    setMessages(prev => [...prev, newMessage]);
+
+    // Force scroll to bottom immediately
+    requestAnimationFrame(() => {
+      scrollToBottom();
+    });
+
+    try {
+      const { data, error } = await supabase
+        .from('messages')
+        .insert({
+          content: content.trim(),
+          conversation_id: conversationId,
+          sender_id: user?.id,
+          file_url: attachmentUrl,
+          file_name: attachmentName,
+          reply_to_id: replyToId
+        })
+        .select(`
+          id,
+          content,
+          sender_id,
+          receiver_id,
+          recipient_id,
+          conversation_id,
+          created_at,
+          message_type,
+          file_url,
+          file_name,
+          is_read,
+          sender:profiles!messages_sender_id_fkey(
+            id,
+            full_name,
+            avatar_url
+          ),
+          reactions:message_reactions(
+            id,
+            user_id,
+            emoji,
+            user:profiles(full_name)
+          ),
+          reply_to_id
+        `)
+        .single();
+
+      if (error) throw error;
+
+      // Replace temporary message with real one
+      setMessages(prev => 
+        prev.map(msg => 
+          msg.id === tempId ? { ...data, sender: data.sender, is_sending: false } : msg
+        )
+      );
+
+    } catch (error) {
+      console.error('Error sending message:', error);
+      // Mark message as failed instead of removing
+      setMessages(prev => 
+        prev.map(msg => 
+          msg.id === tempId ? { ...msg, is_sending: false, send_failed: true } : msg
+        )
+      );
+    }
+  };
 
   if (loading) {
     return (

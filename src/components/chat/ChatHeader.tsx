@@ -56,8 +56,8 @@ export const ChatHeader = ({ conversation, messages = [], onScrollToMessage, onR
           <Button variant="ghost" size="icon" className="md:hidden mobile-touch-target" onClick={() => navigate(-1)}>
             <ChevronLeft className="h-5 w-5" />
           </Button>
-          <div className="relative">
-            <Avatar className="h-10 w-10 md:h-12 md:w-12 ring-2 ring-primary">
+          <div className="relative cursor-pointer" onClick={() => navigate(`/profile/${participant?.id}`)}>
+            <Avatar className="h-10 w-10 md:h-12 md:w-12 ring-2 ring-primary hover:ring-primary/80 transition-all">
               <AvatarImage src={participant?.avatar_url || '/placeholder.svg'} alt={participant?.full_name || 'User'} />
               <AvatarFallback>{participant?.full_name?.substring(0, 2).toUpperCase() || '?'}</AvatarFallback>
             </Avatar>

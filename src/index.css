@@ -598,6 +598,30 @@
   display: block !important;
 }
 
+/* Message sending states */
+.message-sending {
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+.message-failed {
+  opacity: 0.5;
+  border: 1px solid #ef4444;
+}
+
+/* Better message bubble alignment */
+.message-bubble[data-sender="self"] {
+  margin-left: auto;
+  background: hsl(var(--primary));
+  color: hsl(var(--primary-foreground));
+}
+
+.message-bubble[data-sender="other"] {
+  margin-right: auto;
+  background: hsl(var(--muted));
+  color: hsl(var(--muted-foreground));
+}
+
 .chat-content-area::-webkit-scrollbar-thumb {
   background: rgba(0, 0, 0, 0.2) !important;
   border-radius: 4px !important;

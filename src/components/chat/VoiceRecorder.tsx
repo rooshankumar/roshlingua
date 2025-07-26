@@ -1,4 +1,3 @@
-
 import { useState, useRef, useEffect } from 'react';
 import { Mic, Square, Send, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -13,11 +12,11 @@ export const VoiceRecorder = ({ onComplete }: VoiceRecorderProps) => {
   const [recordingTime, setRecordingTime] = useState(0);
   const [audioURL, setAudioURL] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
-  
+
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
-  
+
   useEffect(() => {
     return () => {
       if (timerRef.current) {
@@ -25,27 +24,27 @@ export const VoiceRecorder = ({ onComplete }: VoiceRecorderProps) => {
       }
     };
   }, []);
-  
+
   const startRecording = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       mediaRecorderRef.current = new MediaRecorder(stream);
       audioChunksRef.current = [];
-      
+
       mediaRecorderRef.current.ondataavailable = (e) => {
         audioChunksRef.current.push(e.data);
       };
-      
+
       mediaRecorderRef.current.onstop = () => {
         const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
         const url = URL.createObjectURL(audioBlob);
         setAudioURL(url);
       };
-      
+
       mediaRecorderRef.current.start();
       setIsRecording(true);
       setRecordingTime(0);
-      
+
       timerRef.current = setInterval(() => {
         setRecordingTime((prev) => prev + 1);
       }, 1000);
@@ -53,7 +52,7 @@ export const VoiceRecorder = ({ onComplete }: VoiceRecorderProps) => {
       console.error('Error accessing microphone:', err);
     }
   };
-  
+
   const stopRecording = () => {
     if (mediaRecorderRef.current && isRecording) {
       mediaRecorderRef.current.stop();
@@ -61,36 +60,36 @@ export const VoiceRecorder = ({ onComplete }: VoiceRecorderProps) => {
       if (timerRef.current) {
         clearInterval(timerRef.current);
       }
-      
+
       // Stop all audio tracks
       mediaRecorderRef.current.stream.getTracks().forEach(track => track.stop());
     }
   };
-  
+
   const cancelRecording = () => {
     stopRecording();
     setAudioURL(null);
     setRecordingTime(0);
   };
-  
+
   const uploadVoiceMessage = async () => {
     if (!audioURL) return;
-    
+
     setIsUploading(true);
-    
+
     try {
       // Convert the audioURL to a File object
       const response = await fetch(audioURL);
       const blob = await response.blob();
       const timestamp = Date.now();
       const fileName = `audio-${timestamp}.webm`;
-      
+
       // Create unique file path with user context
       const { data: { user } } = await supabase.auth.getUser();
       const filePath = user ? `${user.id}/${fileName}` : `anonymous/${fileName}`;
-      
+
       const file = new File([blob], fileName, { type: 'audio/webm' });
-      
+
       // Upload to Supabase storage using the correct bucket name
       const { data: uploadData, error: uploadError } = await supabase.storage
         .from('voice-messages')
@@ -98,20 +97,24 @@ export const VoiceRecorder = ({ onComplete }: VoiceRecorderProps) => {
           cacheControl: '3600',
           upsert: false
         });
-        
+
       if (uploadError) {
         console.error('Upload error:', uploadError);
         throw new Error(`Upload failed: ${uploadError.message}`);
       }
-      
+
       // Get the public URL
       const { data: urlData } = await supabase.storage
         .from('voice-messages')
         .getPublicUrl(filePath);
-        
+
       if (urlData && urlData.publicUrl) {
         console.log('Voice message uploaded successfully:', urlData.publicUrl);
-        onComplete(urlData.publicUrl);
+
+        // Call onComplete callback if it exists
+        if (onComplete && typeof onComplete === 'function') {
+          onComplete(urlData.publicUrl);
+        }
         cancelRecording();
       } else {
         throw new Error('Failed to get public URL');
@@ -124,13 +127,13 @@ export const VoiceRecorder = ({ onComplete }: VoiceRecorderProps) => {
       setIsUploading(false);
     }
   };
-  
+
   const formatTime = (seconds: number) => {
     const minutes = Math.floor(seconds / 60);
     const remainingSeconds = seconds % 60;
     return `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
   };
-  
+
   return (
     <div className="flex items-center gap-2">
       {!isRecording && !audioURL ? (

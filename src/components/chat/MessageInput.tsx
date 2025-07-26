@@ -171,6 +171,10 @@ export const MessageInput: React.FC<MessageInputProps> = ({
     try {
       // Handle voice message upload logic here
       await onSend(`🎤 Voice message (${Math.round(duration)}s)`, 'audio');
+
+       // Voice message sent successfully - onComplete functionality
+       console.log('Voice message sent');
+
     } catch (error) {
       console.error('Error sending voice message:', error);
     } finally {

@@ -291,17 +291,7 @@ export const MessageBubble = ({ message, isCurrentUser, isRead = false, onReacti
         </div>
       </div>
 
-      {/* Reactions */}
-      <div className="message-actions flex items-center">
-        <button
-          onClick={toggleReactionPicker}
-          className="text-muted-foreground/70 hover:text-muted-foreground p-1 rounded-full"
-          aria-label="React to message"
-        >
-          <span className="text-lg">😊</span>
-        </button>
-      </div>
-
+      {/* Show reactions picker only on long press or right click */}
       {showReactionPicker && (
         <MessageReactions onSelect={(emoji) => {
           if (onReaction) onReaction(emoji);
