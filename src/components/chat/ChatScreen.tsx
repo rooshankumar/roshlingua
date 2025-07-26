@@ -55,6 +55,7 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ conversationId, receiver
   const [receiverProfile, setReceiverProfile] = useState<any>(null);
   const [newMessageCount, setNewMessageCount] = useState(0);
   const [isScrolledToBottom, setIsScrolledToBottom] = useState(true);
+  const [shouldAutoScroll, setShouldAutoScroll] = useState(true);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
@@ -87,12 +88,15 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ conversationId, receiver
     if (!messagesContainerRef.current) return;
 
     const { scrollTop, scrollHeight, clientHeight } = messagesContainerRef.current;
-    const isAtBottom = scrollHeight - scrollTop - clientHeight < 100;
+    const isAtBottom = scrollHeight - scrollTop - clientHeight < 50;
 
     setIsScrolledToBottom(isAtBottom);
 
     if (isAtBottom) {
       setNewMessageCount(0);
+      setShouldAutoScroll(true);
+    } else {
+      setShouldAutoScroll(false);
     }
   }, []);
 
@@ -240,8 +244,8 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ conversationId, receiver
 
               const updated = [...prev, newMessage];
 
-              // Auto-scroll if at bottom or if it's user's own message
-              if (isScrolledToBottom || newMessage.sender_id === user.id) {
+              // Auto-scroll if should auto-scroll or if it's user's own message
+              if (shouldAutoScroll || newMessage.sender_id === user.id) {
                 setTimeout(() => scrollToBottom(true), 100);
               } else {
                 // Show new message indicator
@@ -356,7 +360,7 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ conversationId, receiver
   }, [user, receiverId, isScrolledToBottom, scrollToBottom]);
 
   // Handle sending messages
-  const handleSendMessage = useCallback(async (content: string, messageType: 'text' | 'image' | 'file' | 'audio' = 'text', fileUrl?: string, fileName?: string) => {
+  const handleSendMessage = useCallback(async (content: string, messageType: 'text' | 'image' | 'file' | 'audio' = 'text', fileUrl?: string, fileName?: string): Promise<void> => {
     if (!user || !receiverId || !content.trim()) return;
 
     try {
@@ -392,6 +396,7 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ conversationId, receiver
         title: "Failed to send message",
         description: "Please try again."
       });
+      throw err; // Re-throw to let MessageInput handle the error state
     }
   }, [user, receiverId, stopTyping, conversationId]);
 
@@ -499,11 +504,12 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ conversationId, receiver
     const groups: { [key: string]: Message[] } = {};
 
     messages.forEach(message => {
-      const date = format(new Date(message.created_at), 'yyyy-MM-dd');
-      if (!groups[date]) {
-        groups[date] = [];
+      const messageDate = new Date(message.created_at);
+      const dateKey = format(messageDate, 'yyyy-MM-dd');
+      if (!groups[dateKey]) {
+        groups[dateKey] = [];
       }
-      groups[date].push(message);
+      groups[dateKey].push(message);
     });
 
     return groups;
@@ -563,7 +569,7 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ conversationId, receiver
             {/* Date separator */}
             <div className="flex items-center justify-center my-4">
               <div className="bg-muted px-3 py-1 rounded-full text-xs text-muted-foreground">
-                {format(new Date(date), 'MMMM d, yyyy')}
+                {formatMessageDate(dateMessages[0]?.created_at)}
               </div>
             </div>
 
@@ -600,13 +606,16 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ conversationId, receiver
       </div>
 
       {/* New Messages Badge */}
-      {!isScrolledToBottom && newMessageCount > 0 && (
-        <div className="absolute bottom-20 left-1/2 transform -translate-x-1/2 z-10">
+      {!shouldAutoScroll && newMessageCount > 0 && (
+        <div className="absolute bottom-24 right-4 z-10">
           <button
-            onClick={() => scrollToBottom(true)}
-            className="bg-primary text-white px-4 py-2 rounded-full shadow-lg hover:bg-primary/90 transition-colors flex items-center gap-2"
+            onClick={() => {
+              scrollToBottom(true);
+              setShouldAutoScroll(true);
+            }}
+            className="bg-primary text-white px-3 py-2 rounded-full shadow-lg hover:bg-primary/90 transition-all duration-200 flex items-center gap-2 text-sm"
           >
-            <span>{newMessageCount} new message{newMessageCount > 1 ? 's' : ''}</span>
+            <span>{newMessageCount} new</span>
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
             </svg>

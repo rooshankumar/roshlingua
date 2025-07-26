@@ -272,8 +272,10 @@ export const MessageBubble = ({ message, isCurrentUser, isRead = false, onReacti
 
           {/* Message content */}
           {message.content && (
-            <div className={message.attachment_url ? 'p-3 pt-2' : ''}>
-              {message.content}
+            <div className={`${message.attachment_url ? 'p-3 pt-2' : ''} whitespace-pre-wrap break-words leading-relaxed`}>
+              <span className="inline-flex items-center flex-wrap gap-1">
+                {message.content}
+              </span>
             </div>
           )}
         </div>

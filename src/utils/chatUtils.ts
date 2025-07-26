@@ -11,7 +11,12 @@ export const formatMessageDate = (timestamp: string) => {
   const date = new Date(timestamp);
   if (isToday(date)) return 'Today';
   if (isYesterday(date)) return 'Yesterday';
-  return format(date, 'MMM d, yyyy');
+  return format(date, 'MMMM d, yyyy');
+};
+
+export const getDateKey = (timestamp: string) => {
+  const date = new Date(timestamp);
+  return format(date, 'yyyy-MM-dd');
 };
 
 export const formatLastSeen = (timestamp: string | undefined) => {

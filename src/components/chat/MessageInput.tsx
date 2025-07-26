@@ -1,13 +1,12 @@
-
 import React, { useState, useRef, useCallback, useEffect } from 'react';
+import { Send, Paperclip, Mic, MicOff, Smile, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { Send, Paperclip, Mic, MicOff } from 'lucide-react';
 import { VoiceRecorder } from './VoiceRecorder';
 import { useAuth } from '@/hooks/useAuth';
 
 interface MessageInputProps {
-  onSend: (content: string, messageType?: 'text' | 'image' | 'file' | 'audio', fileUrl?: string, fileName?: string) => void;
+  onSend: (content: string, messageType?: 'text' | 'image' | 'file' | 'audio', fileUrl?: string, fileName?: string) => Promise<void>;
   onStartTyping: () => void;
   onStopTyping: () => void;
   receiverId?: string;
@@ -25,15 +24,34 @@ export const MessageInput: React.FC<MessageInputProps> = ({
   const [message, setMessage] = useState('');
   const [isRecording, setIsRecording] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+  const [isSending, setIsSending] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const lastSentMessage = useRef<string>('');
+  const sendTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Auto-resize textarea
+  // Auto-resize textarea with better mobile handling
   const adjustTextareaHeight = useCallback(() => {
     if (textareaRef.current) {
+      // Store scroll position to prevent jumping
+      //const container = textareaRef.current.closest('.chat-content-area');
+      //const scrollTop = container?.scrollTop || 0;
+
       textareaRef.current.style.height = 'auto';
-      textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, 120)}px`;
+      const scrollHeight = textareaRef.current.scrollHeight;
+      const maxHeight = window.innerWidth < 768 ? 100 : 120; // Smaller max height on mobile
+
+      if (scrollHeight <= maxHeight) {
+        textareaRef.current.style.height = `${scrollHeight}px`;
+      } else {
+        textareaRef.current.style.height = `${maxHeight}px`;
+      }
+
+      // Restore scroll position
+      //if (container) {
+      //container.scrollTop = scrollTop;
+      //}
     }
   }, []);
 
@@ -42,12 +60,12 @@ export const MessageInput: React.FC<MessageInputProps> = ({
     if (typeof onStartTyping === 'function') {
       onStartTyping();
     }
-    
+
     // Clear existing timeout
     if (typingTimeoutRef.current) {
       clearTimeout(typingTimeoutRef.current);
     }
-    
+
     // Set new timeout to stop typing indicator
     typingTimeoutRef.current = setTimeout(() => {
       if (typeof onStopTyping === 'function') {
@@ -83,21 +101,40 @@ export const MessageInput: React.FC<MessageInputProps> = ({
   // Handle send message
   const handleSend = useCallback(async () => {
     const trimmedMessage = message.trim();
-    if (!trimmedMessage || disabled || !user || !receiverId) return;
+    if (!trimmedMessage || disabled || !user || !receiverId || isSending) return;
+
+    // Prevent duplicate messages
+    if (trimmedMessage === lastSentMessage.current) return;
+
+    // Clear any pending send timeout
+    if (sendTimeoutRef.current) {
+      clearTimeout(sendTimeoutRef.current);
+      sendTimeoutRef.current = null;
+    }
+
+    setIsSending(true);
+    lastSentMessage.current = trimmedMessage;
 
     try {
       await onSend(trimmedMessage);
       setMessage('');
       handleTypingStop();
-      
+
       // Reset textarea height
       if (textareaRef.current) {
         textareaRef.current.style.height = 'auto';
       }
+
+      // Reset duplicate check after successful send
+      setTimeout(() => {
+        lastSentMessage.current = '';
+      }, 1000);
     } catch (error) {
       console.error('Error sending message:', error);
+    } finally {
+      setIsSending(false);
     }
-  }, [message, disabled, user, receiverId, onSend, handleTypingStop]);
+  }, [message, disabled, user, receiverId, onSend, handleTypingStop, isSending]);
 
   // Handle key press
   const handleKeyPress = useCallback((e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -146,6 +183,9 @@ export const MessageInput: React.FC<MessageInputProps> = ({
     return () => {
       if (typingTimeoutRef.current) {
         clearTimeout(typingTimeoutRef.current);
+      }
+      if (sendTimeoutRef.current) {
+        clearTimeout(sendTimeoutRef.current);
       }
     };
   }, []);
@@ -196,6 +236,10 @@ export const MessageInput: React.FC<MessageInputProps> = ({
           className="min-h-[44px] max-h-[120px] resize-none pr-12"
           disabled={disabled}
           rows={1}
+          style={{
+            scrollbarWidth: 'thin',
+            scrollbarColor: 'rgba(255, 255, 255, 0.2) transparent'
+          }}
         />
       </div>
 
@@ -209,10 +253,14 @@ export const MessageInput: React.FC<MessageInputProps> = ({
         <Button
           type="button"
           onClick={handleSend}
-          disabled={disabled || isUploading}
+          disabled={disabled || isUploading || isSending}
           className="shrink-0"
         >
-          <Send className="w-4 h-4" />
+          {isSending ? (
+            <Loader2 className="w-4 h-4 animate-spin" />
+          ) : (
+            <Send className="w-4 h-4" />
+          )}
         </Button>
       ) : (
         <Button
