@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Check, MessageCircle, Download, Image as ImageIcon, Video } from 'lucide-react';
 import { Message } from '@/types/chat';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+
 import { MessageReactions } from './MessageReactions';
 import { formatRelativeTime } from '@/utils/chatUtils';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -76,18 +76,6 @@ export const MessageBubble = ({ message, isCurrentUser, isRead = false, onReacti
 
   return (
     <div className={`group flex items-end gap-2 mb-2 ${isCurrentUser ? 'justify-end' : 'justify-start'}`}>
-      {!isCurrentUser && !isConsecutive && (
-        <Avatar className="h-8 w-8 flex-shrink-0">
-          <AvatarImage src={message.sender?.avatar_url || "/placeholder.svg"} alt={message.sender?.full_name || "User"} />
-          <AvatarFallback>
-            {message.sender?.full_name?.charAt(0) || message.sender?.email?.charAt(0) || "U"}
-          </AvatarFallback>
-        </Avatar>
-      )}
-
-      {!isCurrentUser && isConsecutive && (
-        <div className="h-8 w-8 flex-shrink-0"></div>
-      )}
 
       <div className={`flex flex-col max-w-[70%] ${isCurrentUser ? 'items-end' : 'items-start'}`}>
         <div

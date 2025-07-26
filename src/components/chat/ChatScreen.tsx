@@ -209,16 +209,10 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ conversationId, receiver
       channelRef.current = null;
     }
 
-    const channelName = `messages:${[user.id, receiverId].sort().join('-')}`;
-    console.log('🔄 Setting up real-time subscription:', channelName);
+    const channelName = `chat_${user.id}_${receiverId}`;
 
     channelRef.current = supabase
-      .channel(channelName, {
-        config: {
-          broadcast: { self: true },
-          presence: { key: 'online' }
-        }
-      })
+      .channel(channelName)
       .on(
         'postgres_changes',
         {
@@ -229,7 +223,6 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ conversationId, receiver
         },
         async (payload) => {
           const newMessageData = payload.new as any;
-          console.log('📨 New message received:', newMessageData);
 
           // Fetch the complete message with relations
           const { data: newMessage, error } = await supabase
@@ -257,21 +250,17 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ conversationId, receiver
 
           if (!error && newMessage) {
             setMessages(prev => {
-              // Prevent duplicates
               const exists = prev.some(msg => msg.id === newMessage.id);
               if (exists) return prev;
 
               const updated = [...prev, newMessage];
-              console.log('✅ Message added to UI');
 
-              // Force UI update and scroll
-              requestAnimationFrame(() => {
-                if (newMessage.sender_id === user.id || shouldAutoScroll) {
-                  scrollToBottom(true);
-                } else {
-                  setNewMessageCount(count => count + 1);
-                }
-              });
+              // Auto-scroll for own messages or if at bottom
+              if (newMessage.sender_id === user.id || shouldAutoScroll) {
+                setTimeout(() => scrollToBottom(true), 100);
+              } else {
+                setNewMessageCount(count => count + 1);
+              }
 
               return updated;
             });
@@ -286,77 +275,7 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ conversationId, receiver
           }
         }
       )
-      .on(
-        'postgres_changes',
-        {
-          event: 'UPDATE',
-          schema: 'public',
-          table: 'messages'
-        },
-        (payload) => {
-          console.log('📝 Message updated:', payload.new);
-          setMessages(prev => 
-            prev.map(msg => 
-              msg.id === payload.new.id 
-                ? { ...msg, ...payload.new }
-                : msg
-            )
-          );
-        }
-      )
-      .on(
-        'postgres_changes',
-        {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'message_reactions'
-        },
-        async (payload) => {
-          console.log('👍 New reaction:', payload.new);
-
-          // Fetch the reaction with user info
-          const { data: reaction, error } = await supabase
-            .from('message_reactions')
-            .select(`
-              id,
-              message_id,
-              user_id,
-              emoji,
-              user:profiles(full_name)
-            `)
-            .eq('id', payload.new.id)
-            .single();
-
-          if (!error && reaction) {
-            setMessages(prev => 
-              prev.map(msg => {
-                if (msg.id === reaction.message_id) {
-                  const updatedReactions = [...(msg.reactions || []), reaction];
-                  return { ...msg, reactions: updatedReactions };
-                }
-                return msg;
-              })
-            );
-          }
-        }
-      )
-      .subscribe((status) => {
-        console.log('🔄 Chat subscription status:', status);
-
-        if (status === 'SUBSCRIBED') {
-          console.log('✅ Chat real-time connected');
-          setError(null);
-        } else if (status === 'CHANNEL_ERROR' || status === 'CLOSED') {
-          console.error('❌ Chat subscription error:', status);
-          setError('Connection lost. Reconnecting...');
-          
-          // Retry connection after a delay
-          setTimeout(() => {
-            console.log('🔄 Retrying subscription...');
-            setupRealtimeSubscription();
-          }, 2000);
-        }
-      });
+      .subscribe();
 
   }, [user, receiverId, shouldAutoScroll, scrollToBottom]);
 
@@ -462,14 +381,13 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ conversationId, receiver
   // Initialize chat
   useEffect(() => {
     if (user && receiverId) {
-      console.log('🚀 Initializing chat for:', receiverId);
       setLoading(true);
       setError(null);
-      setMessages([]); // Clear existing messages
+      setMessages([]);
 
       const initializeChat = async () => {
         try {
-          const currentConvId = await createConversationIfNeeded();
+          await createConversationIfNeeded();
           await fetchReceiverProfile();
           await fetchMessages();
           setupRealtimeSubscription();
@@ -484,29 +402,11 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ conversationId, receiver
 
     return () => {
       if (channelRef.current) {
-        console.log('🧹 Cleaning up chat subscription');
         channelRef.current.unsubscribe();
         channelRef.current = null;
       }
     };
-  }, [user?.id, receiverId]); // Simplified dependencies
-
-  // Cleanup on unmount
-  useEffect(() => {
-    return () => {
-      if (channelRef.current) {
-        channelRef.current.unsubscribe();
-        channelRef.current = null;
-      }
-    };
-  }, []);
-
-  // Request notification permission
-  useEffect(() => {
-    if ('Notification' in window && Notification.permission === 'default') {
-      Notification.requestPermission();
-    }
-  }, []);
+  }, [user?.id, receiverId]);
 
   // Group messages by date for better UX
   const groupedMessages = useMemo(() => {
@@ -526,34 +426,10 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ conversationId, receiver
 
   // Auto-scroll behavior
   useEffect(() => {
-    try {
-      if (shouldAutoScroll && messagesEndRef.current) {
-        messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
-      }
-    } catch (error) {
-      console.warn('Error during auto-scroll:', error);
+    if (shouldAutoScroll && messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
     }
   }, [messages, shouldAutoScroll]);
-
-  // Periodic refresh for reliability
-  useEffect(() => {
-    if (!user || !receiverId) return;
-
-    const refreshInterval = setInterval(() => {
-      // Only refresh if no recent activity
-      const lastMessage = messages[messages.length - 1];
-      const timeSinceLastMessage = lastMessage 
-        ? Date.now() - new Date(lastMessage.created_at).getTime()
-        : Infinity;
-
-      if (timeSinceLastMessage > 30000) { // 30 seconds
-        console.log('🔄 Periodic refresh of messages');
-        fetchMessages();
-      }
-    }, 30000); // Every 30 seconds
-
-    return () => clearInterval(refreshInterval);
-  }, [user, receiverId, messages, fetchMessages]);
 
   const sendMessage = async (content: string, attachmentUrl?: string, attachmentName?: string, replyToId?: string) => {
     if (!user || !receiverId || (!content.trim() && !attachmentUrl)) return;

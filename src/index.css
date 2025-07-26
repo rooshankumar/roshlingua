@@ -839,11 +839,11 @@
   }
 
   .message-bubble[data-sender="self"] {
-    @apply ml-auto;
+    @apply bg-primary text-primary-foreground ml-auto max-w-[75%];
   }
 
   .message-bubble[data-sender="other"] {
-    @apply mr-auto;
+    @apply bg-muted text-muted-foreground mr-auto max-w-[75%];
   }
 
   .message-bubble:after {
@@ -939,7 +939,7 @@
     position: relative;
     flex-shrink: 0;
     border-top: 1px solid hsl(var(--border));
-    background: hsl(var(--background) / 95%);
+    background: hsl(var(--background)/ 95%);
     backdrop-filter: blur(12px);
   }}
 

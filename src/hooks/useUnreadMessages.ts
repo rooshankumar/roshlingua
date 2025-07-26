@@ -94,66 +94,32 @@ export const useUnreadMessages = () => {
     }
   }, [user]);
 
-  // Set up real-time subscription for unread messages
+  // Set up real-time subscription for unread messages (only when not in a chat)
   useEffect(() => {
-    if (!user?.id) {
-      setChannel(null);
-      return;
-    }
+    if (!user?.id) return;
 
-    console.log('🔔 Setting up unread messages subscription for user:', user.id);
+    // Only set up global unread subscription if we're not in a specific chat
+    const isInChat = window.location.pathname.includes('/chat/');
+    if (isInChat) return;
 
     const newChannel = supabase
-      .channel('unread_messages')
+      .channel(`unread_${user.id}`)
       .on(
         'postgres_changes',
         {
           event: 'INSERT',
           schema: 'public',
-          table: 'messages'
+          table: 'messages',
+          filter: `receiver_id.eq.${user.id}`
         },
         (payload) => {
-          console.log('📨 New message received (unread tracker):', payload.new);
-          
-          // Only count messages that are not from the current user
           if (payload.new.sender_id !== user.id) {
             const senderId = payload.new.sender_id;
-            
             setUnreadCounts(prev => ({
               ...prev,
               [senderId]: (prev[senderId] || 0) + 1
             }));
-            
             setTotalUnread(prev => prev + 1);
-          }
-
-          // Show browser notification if permission granted
-          if ('Notification' in window && Notification.permission === 'granted') {
-            // Fetch sender info for notification
-            supabase
-              .from('profiles')
-              .select('full_name, avatar_url')
-              .eq('id', senderId)
-              .single()
-              .then(({ data: sender }) => {
-                if (sender) {
-                  new Notification(`New message from ${sender.full_name}`, {
-                    body: payload.new.content?.substring(0, 50) + '...',
-                    icon: sender.avatar_url || '/icons/chat-icon.png',
-                    tag: `message-${senderId}`,
-                    requireInteraction: false
-                  });
-                }
-              });
-          }
-
-          // Play notification sound
-          try {
-            const audio = new Audio('/notification.mp3');
-            audio.volume = 0.2;
-            audio.play().catch(() => {}); // Silent fail if audio can't play
-          } catch (e) {
-            // Silent fail
           }
         }
       )
@@ -162,15 +128,12 @@ export const useUnreadMessages = () => {
         {
           event: 'UPDATE',
           schema: 'public',
-          table: 'messages'
+          table: 'messages',
+          filter: `receiver_id.eq.${user.id}`
         },
         (payload) => {
-          // Handle message read status updates - only for messages not from current user
-          if (payload.new.is_read && !payload.old.is_read && payload.new.sender_id !== user.id) {
-            console.log('📖 Message marked as read:', payload.new.id);
-            
+          if (payload.new.is_read && !payload.old.is_read) {
             const senderId = payload.new.sender_id;
-            
             setUnreadCounts(prev => {
               const newCounts = { ...prev };
               if (newCounts[senderId] > 0) {
@@ -181,33 +144,18 @@ export const useUnreadMessages = () => {
               }
               return newCounts;
             });
-            
             setTotalUnread(prev => Math.max(0, prev - 1));
           }
         }
       )
-      .subscribe((status) => {
-        console.log('🔔 Unread messages subscription status:', status);
-        
-        if (status === 'SUBSCRIBED') {
-          console.log('✅ Unread messages real-time connected');
-        } else if (status === 'CHANNEL_ERROR') {
-          console.error('❌ Unread messages subscription error');
-          // Retry after delay
-          setTimeout(() => {
-            fetchUnreadCounts();
-          }, 3000);
-        }
-      });
+      .subscribe();
 
     setChannel(newChannel);
 
-    // Cleanup function
     return () => {
-      console.log('🧹 Cleaning up unread messages subscription');
       newChannel.unsubscribe();
     };
-  }, [user, fetchUnreadCounts]);
+  }, [user?.id]);
 
   // Initial fetch
   useEffect(() => {
