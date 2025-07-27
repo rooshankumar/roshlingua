@@ -1,132 +1,60 @@
-
-import { createClient } from '@supabase/supabase-js';
-import { Database } from './database.types';
+import { createClient, SupabaseClient } from '@supabase/supabase-js';
+import { Database } from '@/integrations/supabase/types';
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
-if (!supabaseUrl || !supabaseAnonKey) {
+if (!supabaseUrl || !supabaseKey) {
   throw new Error('Missing Supabase environment variables');
 }
 
-console.log('Using Supabase URL:', supabaseUrl);
-
-// Enhanced Supabase client with retry logic and timeout handling
-export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
+// Create a single Supabase client instance with optimized real-time settings
+export const supabase: SupabaseClient<Database> = createClient(supabaseUrl, supabaseKey, {
   auth: {
-    autoRefreshToken: true,
     persistSession: true,
+    autoRefreshToken: true,
     detectSessionInUrl: true,
-    flowType: 'pkce'
+    storageKey: 'roshlingua-auth',
+    storage: window?.localStorage
   },
   realtime: {
     params: {
       eventsPerSecond: 10
-    }
+    },
+    heartbeatIntervalMs: 30000,
+    reconnectAfterMs: (tries: number) => Math.min(tries * 1000, 10000),
+    timeout: 20000
   },
   global: {
     headers: {
-      'x-client-info': 'roshlingua-chat-app'
+      'x-application-name': 'roshlingua-chat'
     }
   }
 });
 
-// Enhanced error handler with retry logic
-const withRetry = async <T>(
-  operation: () => Promise<T>, 
-  maxRetries = 3, 
-  delay = 1000
+// Enhanced retry utility with exponential backoff
+export const withRetry = async <T>(
+  fn: () => Promise<T>,
+  maxRetries: number = 3,
+  baseDelay: number = 1000
 ): Promise<T> => {
-  let lastError: any;
-  
+  let lastError: Error;
+
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 second timeout
-      
-      const result = await operation();
-      clearTimeout(timeoutId);
-      return result;
-    } catch (error: any) {
-      lastError = error;
-      
-      // Don't retry on auth errors or client errors
-      if (error?.code && (error.code.startsWith('4') || error.code === 'PGRST')) {
-        throw error;
-      }
-      
-      // Don't retry on abort errors unless it's a timeout
-      if (error?.name === 'AbortError' && !error?.message?.includes('timeout')) {
-        console.warn(`Operation aborted on attempt ${attempt}:`, error);
-        if (attempt === maxRetries) throw error;
-      }
-      
-      console.warn(`Attempt ${attempt} failed:`, error?.message || error);
-      
+      return await fn();
+    } catch (error) {
+      lastError = error as Error;
+      console.warn(`Attempt ${attempt} failed:`, error);
+
       if (attempt < maxRetries) {
-        const waitTime = delay * Math.pow(2, attempt - 1); // Exponential backoff
-        console.log(`Retrying in ${waitTime}ms...`);
-        await new Promise(resolve => setTimeout(resolve, waitTime));
+        const delay = baseDelay * Math.pow(2, attempt - 1);
+        await new Promise(resolve => setTimeout(resolve, delay));
       }
     }
   }
-  
-  throw lastError;
-};
 
-// Enhanced query wrapper
-export const executeQuery = async <T>(queryFn: () => Promise<T>): Promise<T> => {
-  return withRetry(queryFn, 3, 1000);
-};
-
-// Google OAuth sign-in with enhanced error handling
-export const signInWithGoogle = async () => {
-  try {
-    console.log('🔐 Initiating Google sign-in...');
-    
-    const result = await withRetry(async () => {
-      const { data, error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
-          queryParams: {
-            access_type: 'offline',
-            prompt: 'select_account'
-          }
-        }
-      });
-      
-      if (error) throw error;
-      return { data, error };
-    });
-    
-    console.log('✅ Google sign-in initiated successfully');
-    return result;
-  } catch (error) {
-    console.error('❌ Google sign-in failed:', error);
-    throw error;
-  }
-};
-
-// Enhanced sign out
-export const signOut = async () => {
-  try {
-    console.log('🔓 Signing out...');
-    
-    await withRetry(async () => {
-      const { error } = await supabase.auth.signOut({ scope: 'global' });
-      if (error) throw error;
-    });
-    
-    // Clear any cached data
-    localStorage.removeItem('supabase.auth.token');
-    sessionStorage.clear();
-    
-    console.log('✅ Signed out successfully');
-  } catch (error) {
-    console.error('❌ Sign out failed:', error);
-    throw error;
-  }
+  throw lastError!;
 };
 
 // Connection health check
@@ -135,7 +63,7 @@ export const checkConnection = async (): Promise<boolean> => {
     const { data, error } = await withRetry(async () => {
       return await supabase.from('profiles').select('id').limit(1);
     }, 2, 500);
-    
+
     return !error;
   } catch (error) {
     console.error('Connection check failed:', error);

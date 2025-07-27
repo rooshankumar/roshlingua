@@ -9,7 +9,6 @@ import { ChatHeader } from './ChatHeader';
 import { TypingIndicator } from './TypingIndicator';
 import { useTypingStatus } from '@/hooks/useTypingStatus';
 import { RealtimeChannel } from '@supabase/supabase-js';
-import { MessageReactions } from './MessageReactions';
 import { format } from 'date-fns';
 import './ChatScreen.css';
 
@@ -59,12 +58,15 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ conversationId, receiver
   const [newMessageCount, setNewMessageCount] = useState(0);
   const [isScrolledToBottom, setIsScrolledToBottom] = useState(true);
   const [shouldAutoScroll, setShouldAutoScroll] = useState(true);
+  const [connectionStatus, setConnectionStatus] = useState<'connecting' | 'connected' | 'disconnected'>('connecting');
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const channelRef = useRef<RealtimeChannel | null>(null);
   const lastMessageIdRef = useRef<string | null>(null);
   const isInitialLoadRef = useRef(true);
+  const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const subscriptionAttempts = useRef(0);
 
   // Typing status
   const typingStatus = useTypingStatus(conversationId || `${user?.id}-${receiverId}`);
@@ -121,11 +123,13 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ conversationId, receiver
     }
   }, [receiverId]);
 
-  // Optimized message fetching with pagination
+  // Fetch messages with better error handling
   const fetchMessages = useCallback(async (loadMore = false) => {
     if (!user || !receiverId) return;
 
     try {
+      console.log('🔄 Fetching messages...', { userId: user.id, receiverId, loadMore });
+
       const query = supabase
         .from('messages')
         .select(`
@@ -166,9 +170,13 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ conversationId, receiver
 
       const { data: messageData, error } = await query;
 
-      if (error) throw error;
+      if (error) {
+        console.error('❌ Error fetching messages:', error);
+        throw error;
+      }
 
       const formattedMessages = (messageData || []).reverse();
+      console.log('✅ Messages fetched:', formattedMessages.length);
 
       if (loadMore) {
         setMessages(prev => [...formattedMessages, ...prev]);
@@ -200,168 +208,216 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ conversationId, receiver
       }
 
     } catch (err) {
-      console.error('Error fetching messages:', err);
+      console.error('❌ Error fetching messages:', err);
       setError('Failed to load messages');
     } finally {
       setLoading(false);
     }
   }, [user, receiverId, messages.length, isScrolledToBottom, scrollToBottom]);
 
-  // Real-time subscription setup
+  // Enhanced real-time subscription with better reconnection logic
   const setupRealtimeSubscription = useCallback(() => {
     if (!user || !receiverId) {
       console.log('❌ Cannot set up subscription - missing user or receiverId:', { userId: user?.id, receiverId });
       return;
     }
 
+    // Clear any existing reconnection timeout
+    if (reconnectTimeoutRef.current) {
+      clearTimeout(reconnectTimeoutRef.current);
+      reconnectTimeoutRef.current = null;
+    }
+
     // Clean up existing subscription
     if (channelRef.current) {
       console.log('🔄 Cleaning up existing subscription');
-      channelRef.current.unsubscribe();
+      try {
+        channelRef.current.unsubscribe();
+      } catch (error) {
+        console.warn('Error cleaning up subscription:', error);
+      }
       channelRef.current = null;
     }
 
-    const channelName = `messages_${user.id}_${receiverId}`;
-    console.log('🚀 Setting up real-time subscription:', channelName);
+    const channelName = `messages_${Math.min(parseInt(user.id), parseInt(receiverId))}_${Math.max(parseInt(user.id), parseInt(receiverId))}`;
+    console.log('🚀 Setting up real-time subscription:', channelName, 'Attempt:', subscriptionAttempts.current + 1);
 
-    // Create a more robust subscription with better error handling
-    channelRef.current = supabase
+    setConnectionStatus('connecting');
+
+    // Create channel with enhanced configuration
+    const channel = supabase
       .channel(channelName, {
         config: {
           broadcast: { self: false },
-          presence: { key: user.id }
-        }
-      })
-      .on(
-        'postgres_changes',
-        {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'messages',
-          filter: `or(and(sender_id.eq.${user.id},receiver_id.eq.${receiverId}),and(sender_id.eq.${receiverId},receiver_id.eq.${user.id}))`
-        },
-        async (payload) => {
-          console.log('📨 New message received via real-time:', payload);
-          
-          try {
-            const newMessageData = payload.new as any;
-
-            // Validate message data
-            if (!newMessageData || !newMessageData.id) {
-              console.warn('⚠️ Invalid message data received:', newMessageData);
-              return;
+          presence: { key: user.id },
+          postgres_changes: [
+            {
+              event: 'INSERT',
+              schema: 'public',
+              table: 'messages',
+              filter: `or(and(sender_id.eq.${user.id},receiver_id.eq.${receiverId}),and(sender_id.eq.${receiverId},receiver_id.eq.${user.id}))`
             }
-
-            // Create message object
-            const newMessage = {
-              id: newMessageData.id,
-              content: newMessageData.content || '',
-              sender_id: newMessageData.sender_id,
-              receiver_id: newMessageData.receiver_id,
-              recipient_id: newMessageData.recipient_id,
-              conversation_id: newMessageData.conversation_id,
-              created_at: newMessageData.created_at,
-              message_type: newMessageData.message_type || 'text',
-              file_url: newMessageData.file_url,
-              file_name: newMessageData.file_name,
-              attachment_url: newMessageData.attachment_url,
-              attachment_name: newMessageData.attachment_name,
-              is_read: newMessageData.is_read || false,
-              sender: null,
-              reactions: [],
-              reply_to: null
-            };
-
-            // Fetch sender profile if it's not current user
-            if (newMessage.sender_id !== user.id) {
-              try {
-                const { data: senderProfile } = await supabase
-                  .from('profiles')
-                  .select('id, full_name, avatar_url')
-                  .eq('id', newMessage.sender_id)
-                  .single();
-                
-                if (senderProfile) {
-                  newMessage.sender = senderProfile;
-                }
-              } catch (error) {
-                console.warn('Could not fetch sender profile:', error);
-                newMessage.sender = {
-                  id: newMessage.sender_id,
-                  full_name: 'Unknown User',
-                  avatar_url: ''
-                };
-              }
-            } else {
-              // Use current user info
-              newMessage.sender = {
-                id: user.id,
-                full_name: user.user_metadata?.full_name || user.email || 'You',
-                avatar_url: user.user_metadata?.avatar_url || ''
-              };
-            }
-
-            // Add message to state with duplicate check
-            setMessages(prev => {
-              const exists = prev.some(msg => msg.id === newMessage.id);
-              if (exists) {
-                console.log('⚠️ Message already exists, skipping:', newMessage.id);
-                return prev;
-              }
-
-              console.log('✅ Adding new message to state:', newMessage.id);
-              const updated = [...prev, newMessage];
-
-              // Auto-scroll for own messages or if at bottom
-              if (newMessage.sender_id === user.id || shouldAutoScroll) {
-                setTimeout(() => scrollToBottom(true), 100);
-              } else {
-                setNewMessageCount(count => count + 1);
-              }
-
-              return updated;
-            });
-
-            // Mark as read if receiving
-            if (newMessage.receiver_id === user.id && !newMessage.is_read) {
-              try {
-                await supabase
-                  .from('messages')
-                  .update({ is_read: true })
-                  .eq('id', newMessage.id);
-              } catch (error) {
-                console.warn('Could not mark message as read:', error);
-              }
-            }
-
-          } catch (error) {
-            console.error('❌ Error processing new message:', error);
-          }
-        }
-      )
-      .subscribe((status) => {
-        console.log('📡 Real-time subscription status:', status);
-        if (status === 'SUBSCRIBED') {
-          console.log('✅ Successfully subscribed to real-time messages');
-        } else if (status === 'CHANNEL_ERROR') {
-          console.error('❌ Channel subscription error, retrying...');
-          // Retry after a delay with exponential backoff
-          setTimeout(() => {
-            if (user && receiverId) {
-              setupRealtimeSubscription();
-            }
-          }, 3000);
-        } else if (status === 'TIMED_OUT') {
-          console.error('❌ Channel subscription timed out, retrying...');
-          setTimeout(() => {
-            if (user && receiverId) {
-              setupRealtimeSubscription();
-            }
-          }, 5000);
-        } else if (status === 'CLOSED') {
-          console.warn('⚠️ Channel subscription closed');
+          ]
         }
       });
+
+    channelRef.current = channel;
+
+    // Handle new messages
+    channel.on(
+      'postgres_changes',
+      {
+        event: 'INSERT',
+        schema: 'public',
+        table: 'messages'
+      },
+      async (payload) => {
+        console.log('📨 New message received via real-time:', payload);
+
+        try {
+          const newMessageData = payload.new as any;
+
+          if (!newMessageData || !newMessageData.id) {
+            console.warn('⚠️ Invalid message data received:', newMessageData);
+            return;
+          }
+
+          // Skip if message doesn't belong to this conversation
+          const isRelevant = (
+            (newMessageData.sender_id === user.id && newMessageData.receiver_id === receiverId) ||
+            (newMessageData.sender_id === receiverId && newMessageData.receiver_id === user.id)
+          );
+
+          if (!isRelevant) {
+            console.log('📍 Message not relevant to current conversation, skipping');
+            return;
+          }
+
+          // Create message object with sender info
+          const newMessage: Message = {
+            id: newMessageData.id,
+            content: newMessageData.content || '',
+            sender_id: newMessageData.sender_id,
+            receiver_id: newMessageData.receiver_id,
+            recipient_id: newMessageData.recipient_id,
+            conversation_id: newMessageData.conversation_id,
+            created_at: newMessageData.created_at,
+            message_type: newMessageData.message_type || 'text',
+            file_url: newMessageData.file_url,
+            file_name: newMessageData.file_name,
+            attachment_url: newMessageData.attachment_url,
+            attachment_name: newMessageData.attachment_name,
+            is_read: newMessageData.is_read || false,
+            sender: null,
+            reactions: [],
+            reply_to: null
+          };
+
+          // Fetch sender profile if needed
+          if (newMessage.sender_id !== user.id) {
+            try {
+              const { data: senderProfile } = await supabase
+                .from('profiles')
+                .select('id, full_name, avatar_url')
+                .eq('id', newMessage.sender_id)
+                .single();
+              
+              if (senderProfile) {
+                newMessage.sender = senderProfile;
+              }
+            } catch (error) {
+              console.warn('Could not fetch sender profile:', error);
+              newMessage.sender = {
+                id: newMessage.sender_id,
+                full_name: 'Unknown User',
+                avatar_url: ''
+              };
+            }
+          } else {
+            newMessage.sender = {
+              id: user.id,
+              full_name: user.user_metadata?.full_name || user.email || 'You',
+              avatar_url: user.user_metadata?.avatar_url || ''
+            };
+          }
+
+          // Add message to state with duplicate check
+          setMessages(prev => {
+            const exists = prev.some(msg => msg.id === newMessage.id);
+            if (exists) {
+              console.log('⚠️ Message already exists, skipping:', newMessage.id);
+              return prev;
+            }
+
+            console.log('✅ Adding new message to state:', newMessage.id);
+            const updated = [...prev, newMessage];
+
+            // Auto-scroll for own messages or if at bottom
+            if (newMessage.sender_id === user.id || shouldAutoScroll) {
+              setTimeout(() => scrollToBottom(true), 100);
+            } else {
+              setNewMessageCount(count => count + 1);
+            }
+
+            return updated;
+          });
+
+          // Mark as read if receiving
+          if (newMessage.receiver_id === user.id && !newMessage.is_read) {
+            try {
+              await supabase
+                .from('messages')
+                .update({ is_read: true })
+                .eq('id', newMessage.id);
+            } catch (error) {
+              console.warn('Could not mark message as read:', error);
+            }
+          }
+
+        } catch (error) {
+          console.error('❌ Error processing new message:', error);
+        }
+      }
+    );
+
+    // Subscribe with status handling
+    channel.subscribe((status) => {
+      console.log('📡 Real-time subscription status:', status);
+      
+      if (status === 'SUBSCRIBED') {
+        console.log('✅ Successfully subscribed to real-time messages');
+        setConnectionStatus('connected');
+        subscriptionAttempts.current = 0; // Reset attempts on success
+      } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
+        console.error('❌ Channel subscription failed:', status);
+        setConnectionStatus('disconnected');
+        
+        subscriptionAttempts.current++;
+        
+        // Exponential backoff for reconnection
+        const delay = Math.min(1000 * Math.pow(2, subscriptionAttempts.current), 30000);
+        console.log(`🔄 Retrying subscription in ${delay}ms (attempt ${subscriptionAttempts.current})`);
+        
+        reconnectTimeoutRef.current = setTimeout(() => {
+          if (user && receiverId && subscriptionAttempts.current < 5) {
+            setupRealtimeSubscription();
+          } else {
+            console.error('❌ Max subscription attempts reached');
+            toast({
+              variant: "destructive",
+              title: "Connection Lost",
+              description: "Unable to receive real-time messages. Please refresh the page."
+            });
+          }
+        }, delay);
+        
+      } else if (status === 'CLOSED') {
+        console.warn('⚠️ Channel subscription closed');
+        setConnectionStatus('disconnected');
+      } else {
+        setConnectionStatus('connecting');
+      }
+    });
 
   }, [user, receiverId, shouldAutoScroll, scrollToBottom]);
 
@@ -402,67 +458,9 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ conversationId, receiver
         title: "Failed to send message",
         description: "Please try again."
       });
-      throw err; // Re-throw to let MessageInput handle the error state
+      throw err;
     }
   }, [user, receiverId, stopTyping, conversationId]);
-
-  // Create conversation if missing
-  const createConversationIfNeeded = useCallback(async () => {
-    if (!conversationId && user && receiverId) {
-      try {
-        // Check if conversation already exists
-        const { data: existingConv, error: convError } = await supabase
-          .from('conversation_participants')
-          .select('conversation_id')
-          .in('user_id', [user.id, receiverId])
-          .limit(2);
-
-        if (convError) throw convError;
-
-        // Group by conversation_id and find one with both users
-        const conversationCounts: { [key: string]: number } = {};
-        existingConv?.forEach(conv => {
-          conversationCounts[conv.conversation_id] = (conversationCounts[conv.conversation_id] || 0) + 1;
-        });
-
-        const existingConversationId = Object.keys(conversationCounts).find(
-          convId => conversationCounts[convId] === 2
-        );
-
-        if (existingConversationId) {
-          // Use existing conversation
-          window.history.replaceState(null, '', `/chat/${existingConversationId}`);
-          return existingConversationId;
-        } else {
-          // Create new conversation
-          const { data: newConv, error: createError } = await supabase
-            .from('conversations')
-            .insert([{ created_by: user.id }])
-            .select()
-            .single();
-
-          if (createError) throw createError;
-
-          // Add participants
-          const { error: participantError } = await supabase
-            .from('conversation_participants')
-            .insert([
-              { conversation_id: newConv.id, user_id: user.id },
-              { conversation_id: newConv.id, user_id: receiverId }
-            ]);
-
-          if (participantError) throw participantError;
-
-          window.history.replaceState(null, '', `/chat/${newConv.id}`);
-          return newConv.id;
-        }
-      } catch (err) {
-        console.error('Error creating conversation:', err);
-        return null;
-      }
-    }
-    return conversationId;
-  }, [conversationId, user, receiverId]);
 
   // Initialize chat
   useEffect(() => {
@@ -485,14 +483,11 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ conversationId, receiver
     setError(null);
     setMessages([]);
     isInitialLoadRef.current = true;
+    subscriptionAttempts.current = 0;
 
     const initializeChat = async () => {
       try {
         console.log('🔄 Starting chat initialization...');
-        
-        // Initialize conversation
-        await createConversationIfNeeded();
-        console.log('✅ Conversation ready');
         
         // Fetch receiver profile
         await fetchReceiverProfile();
@@ -502,7 +497,7 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ conversationId, receiver
         await fetchMessages();
         console.log('✅ Messages loaded');
         
-        // Set up real-time subscription after a short delay
+        // Set up real-time subscription with a delay to ensure everything is ready
         setTimeout(() => {
           console.log('🔄 Setting up real-time subscription...');
           setupRealtimeSubscription();
@@ -521,11 +516,21 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ conversationId, receiver
     // Cleanup function
     return () => {
       console.log('🧹 Cleaning up chat subscriptions and timers');
+      
+      if (reconnectTimeoutRef.current) {
+        clearTimeout(reconnectTimeoutRef.current);
+        reconnectTimeoutRef.current = null;
+      }
+      
       if (channelRef.current) {
-        channelRef.current.unsubscribe();
+        try {
+          channelRef.current.unsubscribe();
+        } catch (error) {
+          console.warn('Error cleaning up channel:', error);
+        }
         channelRef.current = null;
       }
-      // Clear any pending timeouts
+      
       if (typingStatus?.stopTyping) {
         typingStatus.stopTyping();
       }
@@ -548,21 +553,11 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ conversationId, receiver
     return groups;
   }, [messages]);
 
-  // Auto-scroll behavior - scroll to bottom when new messages arrive from other users
-  useEffect(() => {
-    if (messages.length > 0 && !isInitialLoadRef.current) {
-      const lastMessage = messages[messages.length - 1];
-      // Only auto-scroll if we're near the bottom or it's our own message
-      if (shouldAutoScroll || lastMessage?.sender_id === user?.id) {
-        setTimeout(() => scrollToBottom(true), 100);
-      }
-    }
-  }, [messages.length, shouldAutoScroll, user?.id, scrollToBottom]);
-
+  // Send message function for MessageInput
   const sendMessage = async (content: string, attachmentUrl?: string, attachmentName?: string, replyToId?: string) => {
     if (!user || !receiverId || (!content.trim() && !attachmentUrl)) return;
 
-    // Determine message type based on file extension or MIME type
+    // Determine message type based on file extension
     let messageType: 'text' | 'image' | 'file' | 'video' | 'audio' = 'text';
     if (attachmentUrl && attachmentName) {
       const fileExt = attachmentName.split('.').pop()?.toLowerCase();
@@ -599,29 +594,12 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ conversationId, receiver
           attachment_name: attachmentName,
           reply_to_id: replyToId
         })
-        .select(`
-          id,
-          content,
-          sender_id,
-          receiver_id,
-          recipient_id,
-          conversation_id,
-          created_at,
-          message_type,
-          file_url,
-          file_name,
-          attachment_url,
-          attachment_name,
-          is_read
-        `)
+        .select()
         .single();
 
       if (error) throw error;
 
       console.log('✅ Message sent successfully:', data);
-
-      // Don't add to local state - let real-time subscription handle it
-      // This prevents duplicates and ensures consistency
 
       // Force scroll for sent messages
       setTimeout(() => scrollToBottom(true), 100);
@@ -639,7 +617,10 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ conversationId, receiver
   if (loading) {
     return (
       <div className="flex items-center justify-center h-full">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-2"></div>
+          <p className="text-sm text-muted-foreground">Loading messages...</p>
+        </div>
       </div>
     );
   }
@@ -650,7 +631,11 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ conversationId, receiver
         <div className="text-center">
           <p className="text-red-500 mb-2">{error}</p>
           <button 
-            onClick={() => fetchMessages()}
+            onClick={() => {
+              setError(null);
+              setLoading(true);
+              fetchMessages();
+            }}
             className="px-4 py-2 bg-primary text-white rounded hover:bg-primary/90"
           >
             Retry
@@ -679,6 +664,13 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ conversationId, receiver
           messages={messages}
           onRefresh={() => fetchMessages()}
         />
+        
+        {/* Connection Status Indicator */}
+        {connectionStatus !== 'connected' && (
+          <div className="px-4 py-1 bg-yellow-100 border-b border-yellow-200 text-xs text-yellow-800 text-center">
+            {connectionStatus === 'connecting' ? '🔄 Connecting...' : '⚠️ Disconnected - Messages may not appear in real-time'}
+          </div>
+        )}
       </div>
 
       {/* Messages Container - Scrollable */}
@@ -712,7 +704,6 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ conversationId, receiver
                      new Date(dateMessages[index - 1]?.created_at).getTime()) < 300000 // 5 minutes
                   }
                   onReaction={(emoji) => {
-                    // Handle reactions here if needed
                     console.log('Reaction:', emoji, 'for message:', message.id);
                   }}
                 />
@@ -751,7 +742,7 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ conversationId, receiver
       {/* Message Input - Fixed */}
       <div className="fixed-chat-footer">
         <MessageInput
-          onSend={handleSendMessage}
+          onSend={sendMessage}
           onStartTyping={startTyping}
           onStopTyping={stopTyping}
           receiverId={receiverId}
