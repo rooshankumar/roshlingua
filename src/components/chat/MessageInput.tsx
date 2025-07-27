@@ -101,25 +101,35 @@ export const MessageInput: React.FC<MessageInputProps> = ({
   // Handle send message
   const handleSend = useCallback(async () => {
     const trimmedMessage = message.trim();
-    if (!trimmedMessage || disabled || !user || !receiverId || isSending) return;
-
-    // Prevent duplicate messages
-    if (trimmedMessage === lastSentMessage.current) return;
-
-    // Clear any pending send timeout
-    if (sendTimeoutRef.current) {
-      clearTimeout(sendTimeoutRef.current);
-      sendTimeoutRef.current = null;
+    if (!trimmedMessage || disabled || !user || !receiverId || isSending) {
+      console.log('❌ Cannot send message:', { 
+        hasMessage: !!trimmedMessage, 
+        disabled, 
+        hasUser: !!user, 
+        hasReceiver: !!receiverId, 
+        isSending 
+      });
+      return;
     }
 
+    // Prevent duplicate messages with timestamp check
+    const now = Date.now();
+    const messageKey = `${trimmedMessage}_${now}`;
+    if (trimmedMessage === lastSentMessage.current && (now - (sendTimeoutRef.current as any || 0)) < 2000) {
+      console.log('⚠️ Preventing duplicate message send');
+      return;
+    }
+
+    console.log('📤 Sending message:', trimmedMessage);
     setIsSending(true);
     lastSentMessage.current = trimmedMessage;
+    sendTimeoutRef.current = now as any;
 
     try {
       // Call the onSend handler with proper parameters
-      await onSend(
-        trimmedMessage
-      );
+      await onSend(trimmedMessage);
+      
+      console.log('✅ Message sent successfully');
       setMessage('');
       handleTypingStop();
 
@@ -131,9 +141,11 @@ export const MessageInput: React.FC<MessageInputProps> = ({
       // Reset duplicate check after successful send
       setTimeout(() => {
         lastSentMessage.current = '';
-      }, 1000);
+        sendTimeoutRef.current = null;
+      }, 2000);
     } catch (error) {
-      console.error('Error sending message:', error);
+      console.error('❌ Error sending message:', error);
+      // Don't clear the message on error so user can retry
     } finally {
       setIsSending(false);
     }
