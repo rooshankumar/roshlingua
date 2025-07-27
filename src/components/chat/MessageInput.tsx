@@ -6,7 +6,7 @@ import { VoiceRecorder } from './VoiceRecorder';
 import { useAuth } from '@/hooks/useAuth';
 
 interface MessageInputProps {
-  onSend: (content: string, messageType?: 'text' | 'image' | 'file' | 'audio', fileUrl?: string, fileName?: string) => Promise<void>;
+  onSend: (content: string, fileUrl?: string, fileName?: string) => Promise<void>;
   onStartTyping: () => void;
   onStopTyping: () => void;
   receiverId?: string;
@@ -116,7 +116,10 @@ export const MessageInput: React.FC<MessageInputProps> = ({
     lastSentMessage.current = trimmedMessage;
 
     try {
-      await onSend(trimmedMessage);
+      // Call the onSend handler with proper parameters
+      await onSend(
+        trimmedMessage
+      );
       setMessage('');
       handleTypingStop();
 
@@ -153,7 +156,7 @@ export const MessageInput: React.FC<MessageInputProps> = ({
     try {
       // Handle file upload logic here
       // For now, just send the file name as text
-      await onSend(`📎 ${file.name}`, 'file');
+      await onSend(`📎 ${file.name}`, file.name);
     } catch (error) {
       console.error('Error uploading file:', error);
     } finally {
@@ -170,7 +173,7 @@ export const MessageInput: React.FC<MessageInputProps> = ({
 
     try {
       // Handle voice message upload logic here
-      await onSend(`🎤 Voice message (${Math.round(duration)}s)`, 'audio');
+      await onSend(`🎤 Voice message (${Math.round(duration)}s)`);
 
        // Voice message sent successfully - onComplete functionality
        console.log('Voice message sent');
