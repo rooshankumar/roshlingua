@@ -23,7 +23,7 @@ export const MessageInput: React.FC<MessageInputProps> = ({
   const { user } = useAuth();
   const [message, setMessage] = useState('');
   const [isRecording, setIsRecording] = useState(false);
-  const [isUploading, setIsUploading] = useState(false);
+  const [isUploading, setIsUploading] = useState(isUploading);
   const [isSending, setIsSending] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -128,7 +128,7 @@ export const MessageInput: React.FC<MessageInputProps> = ({
     try {
       // Call the onSend handler with proper parameters
       await onSend(trimmedMessage);
-      
+
       console.log('✅ Message sent successfully');
       setMessage('');
       handleTypingStop();
