@@ -434,6 +434,25 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ conversationId, receiver
   const sendMessage = async (content: string, attachmentUrl?: string, attachmentName?: string, replyToId?: string) => {
     if (!user || !receiverId || (!content.trim() && !attachmentUrl)) return;
 
+    // Determine message type based on file extension or MIME type
+    let messageType: 'text' | 'image' | 'file' | 'video' | 'audio' = 'text';
+    if (attachmentUrl && attachmentName) {
+      const fileExt = attachmentName.split('.').pop()?.toLowerCase();
+      const imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'];
+      const videoExtensions = ['mp4', 'avi', 'mov', 'webm', 'mkv'];
+      const audioExtensions = ['mp3', 'wav', 'ogg', 'aac'];
+      
+      if (imageExtensions.includes(fileExt || '')) {
+        messageType = 'image';
+      } else if (videoExtensions.includes(fileExt || '')) {
+        messageType = 'video';
+      } else if (audioExtensions.includes(fileExt || '')) {
+        messageType = 'audio';
+      } else {
+        messageType = 'file';
+      }
+    }
+
     const tempId = `temp-${Date.now()}`;
     const newMessage = {
       id: tempId,
@@ -447,7 +466,7 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ conversationId, receiver
         avatar_url: user.user_metadata?.avatar_url || ''
       },
       created_at: new Date().toISOString(),
-      message_type: attachmentUrl ? (attachmentUrl.includes('image') ? 'image' : 'file') : 'text',
+      message_type: messageType,
       file_url: attachmentUrl,
       file_name: attachmentName,
       is_read: false,
@@ -471,7 +490,7 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ conversationId, receiver
           receiver_id: receiverId,
           recipient_id: receiverId,
           conversation_id: conversationId,
-          message_type: newMessage.message_type,
+          message_type: messageType,
           file_url: attachmentUrl,
           file_name: attachmentName,
           reply_to_id: replyToId

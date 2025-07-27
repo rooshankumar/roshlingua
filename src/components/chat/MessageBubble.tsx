@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
-import { Check, MessageCircle, Download, Image as ImageIcon, Video } from 'lucide-react';
+import { Check, MessageCircle, Download, Image as ImageIcon, Video, FileText } from 'lucide-react';
 import { Message } from '@/types/chat';
 
 import { MessageReactions } from './MessageReactions';
 import { formatRelativeTime } from '@/utils/chatUtils';
 import { Skeleton } from '@/components/ui/skeleton';
+import { ChatAttachment } from './ChatAttachment'; // Import ChatAttachment
 
 interface MessageBubbleProps {
   message: Message;
@@ -26,6 +27,8 @@ export const MessageBubble = ({ message, isCurrentUser, isRead = false, onReacti
 
   const isImageAttachment = message.attachment_url?.match(/\.(jpg|jpeg|png|gif|webp)$/i);
   const isVideoAttachment = message.attachment_url?.match(/\.(mp4|webm|mov)$/i);
+  const attachmentUrl = message.attachment_url;
+  const attachmentName = message.attachment_name;
 
   // Clean URL function helper
   const cleanAttachmentUrl = (url: string) => {
@@ -95,46 +98,14 @@ export const MessageBubble = ({ message, isCurrentUser, isRead = false, onReacti
               </div>
             </div>
           )}
-          {/* Image attachment */}
-          {isImageAttachment && message.attachment_url && (
-            <div className="relative overflow-hidden rounded-lg mb-2">
-              {isPreloading ? (
-                <Skeleton className="w-[250px] h-[180px] rounded-lg" />
-              ) : imageLoadError ? (
-                <div className="w-[250px] h-[120px] rounded-lg bg-muted/30 flex flex-col items-center justify-center text-muted-foreground p-4">
-                  <ImageIcon className="h-6 w-6 mb-1 opacity-70" />
-                  <p className="text-xs font-medium">{message.attachment_name || "Image"}</p>
-                  <p className="text-xs opacity-70">Failed to load</p>
-                </div>
-              ) : (
-                <img
-                  src={message.attachment_url}
-                  alt={message.attachment_name || "Image"}
-                  className="max-w-[250px] max-h-[250px] rounded-lg object-cover cursor-pointer"
-                  loading="lazy"
-                  onLoad={() => {
-                    setImageLoaded(true);
-                    setIsPreloading(false);
-                    setImageLoadError(null);
-                  }}
-                  onError={() => {
-                    setImageLoadError("Failed to load image");
-                    setIsPreloading(false);
-                  }}
-                  onClick={() => window.open(message.attachment_url, '_blank')}
-                />
-              )}
-            </div>
-          )}
 
-          {/* Video attachment */}
-          {isVideoAttachment && message.attachment_url && (
-            <div className="relative rounded-lg overflow-hidden mb-2">
-              <video
-                src={message.attachment_url}
-                controls
-                preload="metadata"
-                className="max-w-[250px] max-h-[250px] rounded-lg"
+          {/* Attachments */}
+          {attachmentUrl && (
+            <div className="mb-2">
+              <ChatAttachment
+                fileUrl={attachmentUrl}
+                fileName={attachmentName || "Attachment"}
+                messageType={message.message_type}
               />
             </div>
           )}
