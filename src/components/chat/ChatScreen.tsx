@@ -174,10 +174,13 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ conversationId, receiver
       } else {
         setMessages(formattedMessages);
 
-        // Auto-scroll on initial load or if at bottom
-        if (isInitialLoadRef.current || isScrolledToBottom) {
-          setTimeout(() => scrollToBottom(false), 100);
+        // Always auto-scroll on initial load
+        if (isInitialLoadRef.current) {
+          setTimeout(() => scrollToBottom(false), 200);
           isInitialLoadRef.current = false;
+          setShouldAutoScroll(true);
+        } else if (isScrolledToBottom) {
+          setTimeout(() => scrollToBottom(false), 100);
         }
       }
 
@@ -447,7 +450,7 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ conversationId, receiver
       const imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'];
       const videoExtensions = ['mp4', 'avi', 'mov', 'webm', 'mkv'];
       const audioExtensions = ['mp3', 'wav', 'ogg', 'aac'];
-      
+
       if (imageExtensions.includes(fileExt || '')) {
         messageType = 'image';
       } else if (videoExtensions.includes(fileExt || '')) {

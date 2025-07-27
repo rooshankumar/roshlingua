@@ -79,7 +79,7 @@
   animation: shimmer 2s infinite;
 }
 
-/* Fixed chat layout for mobile */
+/* Fixed chat layout for all devices */
 .fixed-chat-container {
   position: fixed;
   top: 0;
@@ -89,6 +89,7 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  background: hsl(var(--background));
 }
 
 .fixed-chat-header {
@@ -146,9 +147,10 @@
 .chat-content-area {
   flex: 1;
   overflow-y: auto;
-  margin-top: 72px; /* Match header height */
-  margin-bottom: 80px; /* Match footer height */
+  margin-top: 80px; /* Match header height */
+  margin-bottom: 90px; /* Match footer height */
   -webkit-overflow-scrolling: touch;
+  padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 
 /* Larger touch targets on mobile */
