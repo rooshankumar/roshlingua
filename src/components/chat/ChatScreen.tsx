@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/hooks/useAuth';
@@ -176,11 +177,11 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ conversationId, receiver
 
         // Always auto-scroll on initial load
         if (isInitialLoadRef.current) {
-          setTimeout(() => scrollToBottom(false), 200);
+          setTimeout(() => scrollToBottom(false), 100);
           isInitialLoadRef.current = false;
           setShouldAutoScroll(true);
         } else if (isScrolledToBottom) {
-          setTimeout(() => scrollToBottom(false), 100);
+          setTimeout(() => scrollToBottom(false), 50);
         }
       }
 
@@ -266,7 +267,7 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ conversationId, receiver
 
               // Auto-scroll for own messages or if at bottom
               if (newMessage.sender_id === user.id || shouldAutoScroll) {
-                setTimeout(() => scrollToBottom(true), 100);
+                setTimeout(() => scrollToBottom(true), 50);
               } else {
                 setNewMessageCount(count => count + 1);
               }
@@ -433,12 +434,13 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ conversationId, receiver
     return groups;
   }, [messages]);
 
-  // Auto-scroll behavior
+  // Auto-scroll behavior - scroll to bottom when new messages arrive
   useEffect(() => {
-    if (shouldAutoScroll && messagesEndRef.current) {
-      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    if (messages.length > 0) {
+      // Auto-scroll for new messages
+      setTimeout(() => scrollToBottom(true), 100);
     }
-  }, [messages, shouldAutoScroll]);
+  }, [messages.length, scrollToBottom]);
 
   const sendMessage = async (content: string, attachmentUrl?: string, attachmentName?: string, replyToId?: string) => {
     if (!user || !receiverId || (!content.trim() && !attachmentUrl)) return;
@@ -487,8 +489,8 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ conversationId, receiver
     // Add message optimistically
     setMessages(prev => {
       const updated = [...prev, newMessage];
-      // Force scroll immediately
-      setTimeout(() => scrollToBottom(false), 50);
+      // Force scroll immediately for sent messages
+      setTimeout(() => scrollToBottom(false), 10);
       return updated;
     });
 
@@ -577,69 +579,73 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ conversationId, receiver
   }
 
   return (
-    <div className="flex flex-col h-full bg-background">
-      {/* Chat Header */}
-      <ChatHeader 
-        conversation={{
-          id: conversationId || '',
-          participant: {
-            id: receiverProfile?.id || receiverId || '',
-            email: receiverProfile?.email || '',
-            full_name: receiverProfile?.full_name || 'Unknown User',
-            avatar_url: receiverProfile?.avatar_url || '/placeholder.svg',
-            is_online: receiverProfile?.is_online,
-            last_seen: receiverProfile?.last_seen
-          }
-        }}
-        messages={messages}
-        onRefresh={() => fetchMessages()}
-      />
+    <div className="fixed-chat-container">
+      {/* Chat Header - Fixed */}
+      <div className="fixed-chat-header">
+        <ChatHeader 
+          conversation={{
+            id: conversationId || '',
+            participant: {
+              id: receiverProfile?.id || receiverId || '',
+              email: receiverProfile?.email || '',
+              full_name: receiverProfile?.full_name || 'Unknown User',
+              avatar_url: receiverProfile?.avatar_url || '/placeholder.svg',
+              is_online: receiverProfile?.is_online,
+              last_seen: receiverProfile?.last_seen
+            }
+          }}
+          messages={messages}
+          onRefresh={() => fetchMessages()}
+        />
+      </div>
 
-      {/* Messages Container */}
+      {/* Messages Container - Scrollable */}
       <div 
         ref={messagesContainerRef}
-        className="flex-1 overflow-y-auto px-4 py-2 space-y-4"
+        className="chat-content-area"
         onScroll={handleScroll}
       >
-        {Object.entries(groupedMessages).map(([date, dateMessages]) => (
-          <div key={date}>
-            {/* Date separator */}
-            <div className="flex items-center justify-center my-4">
-              <div className="bg-muted px-3 py-1 rounded-full text-xs text-muted-foreground">
-                {formatMessageDate(dateMessages[0]?.created_at)}
+        <div className="p-4 space-y-4">
+          {Object.entries(groupedMessages).map(([date, dateMessages]) => (
+            <div key={date}>
+              {/* Date separator */}
+              <div className="flex items-center justify-center my-4">
+                <div className="bg-muted px-3 py-1 rounded-full text-xs text-muted-foreground">
+                  {formatMessageDate(dateMessages[0]?.created_at)}
+                </div>
               </div>
+
+              {/* Messages for this date */}
+              {dateMessages.map((message, index) => (
+                <MessageBubble
+                  key={message.id}
+                  message={message}
+                  isCurrentUser={message.sender_id === user?.id}
+                  isRead={message.is_read}
+                  isLast={index === dateMessages.length - 1}
+                  isConsecutive={
+                    index > 0 && 
+                    dateMessages[index - 1]?.sender_id === message.sender_id &&
+                    (new Date(message.created_at).getTime() - 
+                     new Date(dateMessages[index - 1]?.created_at).getTime()) < 300000 // 5 minutes
+                  }
+                  onReaction={(emoji) => {
+                    // Handle reactions here if needed
+                    console.log('Reaction:', emoji, 'for message:', message.id);
+                  }}
+                />
+              ))}
             </div>
+          ))}
 
-            {/* Messages for this date */}
-            {dateMessages.map((message, index) => (
-              <MessageBubble
-                key={message.id}
-                message={message}
-                isCurrentUser={message.sender_id === user?.id}
-                isRead={message.is_read}
-                isLast={index === dateMessages.length - 1}
-                isConsecutive={
-                  index > 0 && 
-                  dateMessages[index - 1]?.sender_id === message.sender_id &&
-                  (new Date(message.created_at).getTime() - 
-                   new Date(dateMessages[index - 1]?.created_at).getTime()) < 300000 // 5 minutes
-                }
-                onReaction={(emoji) => {
-                  // Handle reactions here if needed
-                  console.log('Reaction:', emoji, 'for message:', message.id);
-                }}
-              />
-            ))}
-          </div>
-        ))}
+          {/* Typing Indicator */}
+          {typingUsers.length > 0 && (
+            <TypingIndicator users={typingUsers} />
+          )}
 
-        {/* Typing Indicator */}
-        {typingUsers.length > 0 && (
-          <TypingIndicator users={typingUsers} />
-        )}
-
-        {/* Scroll anchor */}
-        <div ref={messagesEndRef} />
+          {/* Scroll anchor */}
+          <div ref={messagesEndRef} />
+        </div>
       </div>
 
       {/* New Messages Badge */}
@@ -660,8 +666,8 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ conversationId, receiver
         </div>
       )}
 
-      {/* Message Input */}
-      <div className="border-t bg-background p-4">
+      {/* Message Input - Fixed */}
+      <div className="fixed-chat-footer">
         <MessageInput
           onSend={handleSendMessage}
           onStartTyping={startTyping}

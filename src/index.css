@@ -1,3 +1,4 @@
+
 @keyframes shimmer {
   0% { transform: translateX(-100%); }
   100% { transform: translateX(100%); }
@@ -79,7 +80,7 @@
   animation: shimmer 2s infinite;
 }
 
-/* Fixed chat layout for all devices */
+/* Responsive fixed chat layout */
 .fixed-chat-container {
   position: fixed;
   top: 0;
@@ -90,10 +91,90 @@
   flex-direction: column;
   overflow: hidden;
   background: hsl(var(--background));
+  height: 100vh;
+  height: 100dvh; /* Dynamic viewport height for mobile */
 }
 
 .fixed-chat-header {
   position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 40;
+  backdrop-filter: blur(16px);
+  background: hsl(var(--background) / 0.95);
+  border-bottom: 1px solid hsl(var(--border));
+  height: 70px;
+}
+
+.fixed-chat-footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 40;
+  backdrop-filter: blur(16px);
+  background: hsl(var(--background) / 0.95);
+  border-top: 1px solid hsl(var(--border));
+  padding: 16px;
+  padding-bottom: max(env(safe-area-inset-bottom, 0px), 16px);
+  min-height: 80px;
+}
+
+.chat-content-area {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  margin-top: 70px; /* Match header height */
+  margin-bottom: 80px; /* Match footer height */
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  width: 100%;
+}
+
+/* Mobile optimizations */
+@media (max-width: 768px) {
+  .fixed-chat-header {
+    height: 60px;
+  }
+  
+  .fixed-chat-footer {
+    min-height: 70px;
+    padding: 12px;
+    padding-bottom: max(env(safe-area-inset-bottom, 0px), 12px);
+  }
+  
+  .chat-content-area {
+    margin-top: 60px;
+    margin-bottom: 70px;
+  }
+  
+  .message-actions-menu button {
+    min-height: 36px;
+    min-width: 36px;
+  }
+
+  /* Smaller emoji reaction menu for mobile */
+  .emoji-reaction-menu {
+    transform: scale(0.9);
+    transform-origin: center top;
+  }
+
+  /* Ensure iOS-like overscroll behavior */
+  .chat-content-area {
+    overscroll-behavior-y: contain;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Message reactions sizing */
+  .message-reaction-btn {
+    height: 26px !important;
+    padding: 0 6px !important;
+    font-size: 12px !important;
+  }
+}
 
 /* Reply reference styling */
 .reply-reference {
@@ -126,113 +207,6 @@
 .message-bubble[data-sender="other"] .reply-reference {
   opacity: 0.9;
 }
-
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 40;
-  backdrop-filter: blur(16px);
-}
-
-.fixed-chat-footer {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  z-index: 40;
-  backdrop-filter: blur(16px);
-  padding-bottom: max(env(safe-area-inset-bottom, 0px), 8px);
-}
-
-.chat-content-area {
-  flex: 1;
-  overflow-y: auto;
-  margin-top: 80px; /* Match header height */
-  margin-bottom: 90px; /* Match footer height */
-  -webkit-overflow-scrolling: touch;
-  padding-bottom: env(safe-area-inset-bottom, 0px);
-}
-
-/* Larger touch targets on mobile */
-@media (max-width: 768px) {
-  .message-actions-menu button {
-    min-height: 36px;
-    min-width: 36px;
-  }
-
-  /* Smaller emoji reaction menu for mobile */
-  .emoji-reaction-menu {
-    transform: scale(0.9);
-
-/* Filter dialog responsive styles */
-@media (max-width: 640px) {
-  .DialogContent {
-    width: 90% !important;
-    max-height: 80vh !important;
-    margin: 0 auto !important;
-  }
-
-  .DialogOverlay {
-    background-color: rgba(0, 0, 0, 0.6) !important;
-  }
-}
-
-@media (min-width: 1024px) {
-  .DialogContent {
-    max-width: 400px !important;
-  }
-}
-
-/* Filter dialog with more balanced aspect ratio */
-.filter-dialog {
-  aspect-ratio: 4/5;
-  height: auto !important;
-  max-height: 600px !important;
-  min-height: 400px !important;
-}
-
-/* Make inner content of filter scroll on small screens */
-.filter-dialog-content {
-  max-height: calc(100% - 120px);
-  overflow-y: auto;
-  padding-right: 4px;
-}
-
-.filter-dialog-content::-webkit-scrollbar {
-  width: 4px;
-}
-
-/* Compact filter dialog elements */
-.filter-dialog .space-y-3 {
-  margin-bottom: 0.75rem;
-}
-
-.filter-dialog label, 
-.filter-dialog .text-sm {
-  font-size: 0.75rem;
-}
-
-.filter-dialog h3 {
-  font-size: 0.875rem;
-}
-
-.filter-dialog-content > div:not(:last-child) {
-  padding-bottom: 0.5rem;
-}
-
-    transform-origin: center top;
-  }
-
-  /* Ensure iOS-like overscroll behavior */
-  .chat-content-area {
-    overscroll-behavior-y: contain;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-  }
-
-  /* Message reactions sizing */
-  .message-reaction-btn {
-    height: 26px !important;
 
 /* WhatsApp-style reactions */
 .messenger-reactions-display {
@@ -435,12 +409,6 @@
   border-color: rgba(239, 68, 68, 0.4) !important;
 }
 
-    padding: 0 6px !important;
-    font-size: 12px !important;
-  }
-}
-
-
 @keyframes typing-dot {
   0%, 100% { opacity: 0.4; transform: translateY(0); }
   50% { opacity: 1; transform: translateY(-2px); }
@@ -591,7 +559,7 @@
 
 /* Hide scrollbar but keep functionality */
 .chat-content-area::-webkit-scrollbar {
-  width: 8px !important;
+  width: 6px !important;
   display: block !important;
 }
 
@@ -600,34 +568,14 @@
   display: block !important;
 }
 
-/* Message sending states */
-.message-sending {
-  opacity: 0.7;
-  pointer-events: none;
-}
-
-.message-failed {
-  opacity: 0.5;
-  border: 1px solid #ef4444;
-}
-
-/* Better message bubble alignment */
-.message-bubble[data-sender="self"] {
-  margin-left: auto;
-  background: hsl(var(--primary));
-  color: hsl(var(--primary-foreground));
-}
-
-.message-bubble[data-sender="other"] {
-  margin-right: auto;
-  background: hsl(var(--muted));
-  color: hsl(var(--muted-foreground));
-}
-
 .chat-content-area::-webkit-scrollbar-thumb {
   background: rgba(0, 0, 0, 0.2) !important;
   border-radius: 4px !important;
   display: block !important;
+}
+
+.chat-content-area::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.3) !important;
 }
 
 .chat-content-area {
@@ -646,39 +594,6 @@
 }
 
 @keyframes fb-message-pop {
-
-/* Notification styles for better touch areas */
-.mobile-touch-target {
-  padding: 6px;
-  margin: -6px;
-}
-
-@media (max-width: 768px) {
-  .mobile-touch-target {
-    padding: 8px;
-    margin: -8px;
-  }
-}
-
-/* Improved accessibility for interactive elements */
-@media (hover: none) {
-  .mobile-touch-target:active {
-    background-color: rgba(0, 0, 0, 0.05);
-    border-radius: 9999px;
-  }
-
-  /* On touch devices, we'll handle emoji via the long-press menu */
-  .message-reactions .emoji-button {
-    display: none;
-  }
-}
-
-/* Make touch targets larger for mobile */
-.touch-device .mobile-touch-target {
-  min-height: 44px;
-  min-width: 44px;
-}
-
   0% {
     opacity: 0;
     transform: scale(0.9) translateY(10px);
@@ -702,7 +617,6 @@
 .typing-indicator {
   animation: bounce 1s infinite;
 }
-
 
 /* Better mobile navigation */
 .mobile-chat-view {
