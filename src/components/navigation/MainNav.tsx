@@ -106,7 +106,7 @@ export function MainNav() {
   const isChatDetailRoute = location.pathname.match(/^\/chat\/[0-9a-f-]+$/);
 
   return (
-    <nav className="hidden lg:flex sticky top-0 flex-col space-y-2 p-4 min-h-screen bg-background text-foreground backdrop-blur-lg border-r">
+    <nav className="hidden md:flex sticky top-0 flex-col space-y-2 p-4 min-h-screen bg-background text-foreground backdrop-blur-lg border-r">
       <div className="mb-8 px-3">
         <RoshLinguaLogo 
           size="md" 

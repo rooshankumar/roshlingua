@@ -101,12 +101,13 @@ export const MessageBubble = ({ message, isCurrentUser, isRead = false, onReacti
           )}
 
           {/* Attachments */}
-          {attachmentUrl && (
-            <div className="mb-2">
+          {(message.file_url || message.attachment_url) && (
+            <div className="mt-2">
               <ChatAttachment
-                fileUrl={attachmentUrl}
-                fileName={attachmentName || "Attachment"}
-                messageType={message.message_type}
+                url={message.file_url || message.attachment_url || ''}
+                fileName={message.file_name || message.attachment_name}
+                fileType={message.message_type === 'text' ? undefined : message.message_type}
+                size="md"
               />
             </div>
           )}

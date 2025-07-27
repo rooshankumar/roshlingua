@@ -95,6 +95,13 @@
   height: 100dvh; /* Dynamic viewport height for mobile */
 }
 
+/* Desktop layout with sidebar */
+@media (min-width: 768px) {
+  .fixed-chat-container {
+    left: 256px; /* Sidebar width */
+  }
+}
+
 .fixed-chat-header {
   position: fixed;
   top: 0;
@@ -105,6 +112,13 @@
   background: hsl(var(--background) / 0.95);
   border-bottom: 1px solid hsl(var(--border));
   height: 70px;
+}
+
+/* Desktop layout with sidebar */
+@media (min-width: 768px) {
+  .fixed-chat-header {
+    left: 256px; /* Sidebar width */
+  }
 }
 
 .fixed-chat-footer {
@@ -119,6 +133,13 @@
   padding: 16px;
   padding-bottom: max(env(safe-area-inset-bottom, 0px), 16px);
   min-height: 80px;
+}
+
+/* Desktop layout with sidebar */
+@media (min-width: 768px) {
+  .fixed-chat-footer {
+    left: 256px; /* Sidebar width */
+  }
 }
 
 .chat-content-area {

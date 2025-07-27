@@ -115,7 +115,7 @@ const AppLayout = ({ children }: AppLayoutProps) => {
         </div>
       )}
 
-      <div className="md:block">
+      <div className="md:flex md:w-64 md:flex-col">
         <MainNav />
       </div>
       <main className={`flex-1 pb-24 md:pb-0 pt-2 sm:pt-0 px-0 overflow-x-hidden ${location.pathname.includes('/chat/') ? 'md:p-0' : 'sm:px-3 md:px-6'}`}>
