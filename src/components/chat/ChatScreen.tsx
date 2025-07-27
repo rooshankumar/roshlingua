@@ -20,9 +20,11 @@ interface Message {
   recipient_id?: string;
   conversation_id?: string;
   created_at: string;
-  message_type: 'text' | 'image' | 'file' | 'audio';
+  message_type: 'text' | 'image' | 'file' | 'audio' | 'video';
   file_url?: string;
   file_name?: string;
+  attachment_url?: string;
+  attachment_name?: string;
   is_read: boolean;
   sender?: {
     id: string;
@@ -136,6 +138,8 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ conversationId, receiver
           message_type,
           file_url,
           file_name,
+          attachment_url,
+          attachment_name,
           is_read,
           sender:profiles!messages_sender_id_fkey(
             id,
@@ -238,6 +242,8 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ conversationId, receiver
               message_type,
               file_url,
               file_name,
+              attachment_url,
+              attachment_name,
               is_read,
               sender:profiles!messages_sender_id_fkey(
                 id,
@@ -469,6 +475,8 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ conversationId, receiver
       message_type: messageType,
       file_url: attachmentUrl,
       file_name: attachmentName,
+      attachment_url: attachmentUrl,
+      attachment_name: attachmentName,
       is_read: false,
       is_sending: true
     };
@@ -493,6 +501,8 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ conversationId, receiver
           message_type: messageType,
           file_url: attachmentUrl,
           file_name: attachmentName,
+          attachment_url: attachmentUrl,
+          attachment_name: attachmentName,
           reply_to_id: replyToId
         })
         .select(`
@@ -506,6 +516,8 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ conversationId, receiver
           message_type,
           file_url,
           file_name,
+          attachment_url,
+          attachment_name,
           is_read,
           sender:profiles!messages_sender_id_fkey(
             id,

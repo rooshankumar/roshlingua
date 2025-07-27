@@ -13,24 +13,37 @@ export interface User {
 export interface Message {
   id: string;
   content: string;
-  conversation_id: string;
   sender_id: string;
+  receiver_id?: string;
+  recipient_id?: string;
+  conversation_id?: string;
+  created_at: string;
+  updated_at?: string;
+  message_type: 'text' | 'image' | 'file' | 'audio' | 'video';
+  file_url?: string;
+  file_name?: string;
+  attachment_url?: string;
+  attachment_name?: string;
+  is_read: boolean;
+  reply_to_id?: string;
   sender?: {
     id: string;
-    email?: string;
-    full_name?: string;
+    full_name: string;
     avatar_url?: string;
-    last_seen?: string;
   };
-  is_read: boolean;
-  is_delivered?: boolean;
-  attachment_url?: string | null;
-  attachment_name?: string | null;
-  attachment_thumbnail?: string | null;
-  created_at: string;
-  reactions?: Record<string, string[]>;
-  reply_to_id?: string | null;
-  reply_to?: Message | null;
+  receiver?: {
+    id: string;
+    full_name: string;
+    avatar_url?: string;
+  };
+  reply_to?: {
+    id: string;
+    content: string;
+    sender: {
+      full_name: string;
+    };
+  };
+  reactions?: MessageReaction[];
 }
 
 export interface Conversation {

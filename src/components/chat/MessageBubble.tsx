@@ -25,10 +25,11 @@ export const MessageBubble = ({ message, isCurrentUser, isRead = false, onReacti
 
   const formattedTime = formatRelativeTime(message.created_at);
 
-  const isImageAttachment = message.attachment_url?.match(/\.(jpg|jpeg|png|gif|webp)$/i);
-  const isVideoAttachment = message.attachment_url?.match(/\.(mp4|webm|mov)$/i);
-  const attachmentUrl = message.attachment_url;
-  const attachmentName = message.attachment_name;
+  // Handle both attachment_url and file_url for backward compatibility
+  const attachmentUrl = message.attachment_url || message.file_url;
+  const attachmentName = message.attachment_name || message.file_name;
+  const isImageAttachment = attachmentUrl?.match(/\.(jpg|jpeg|png|gif|webp)$/i);
+  const isVideoAttachment = attachmentUrl?.match(/\.(mp4|webm|mov)$/i);
 
   // Clean URL function helper
   const cleanAttachmentUrl = (url: string) => {
@@ -38,7 +39,7 @@ export const MessageBubble = ({ message, isCurrentUser, isRead = false, onReacti
   };
 
   useEffect(() => {
-    if (isImageAttachment && message.attachment_url) {
+    if (isImageAttachment && attachmentUrl) {
       setIsPreloading(true);
       setImageLoadError(null); // Reset error state
       const img = new Image();
@@ -49,7 +50,7 @@ export const MessageBubble = ({ message, isCurrentUser, isRead = false, onReacti
       img.onerror = (error) => {
         console.error('Failed to load image:', error);
         // Try with cleaned URL
-        const cleanedUrl = cleanAttachmentUrl(message.attachment_url);
+        const cleanedUrl = cleanAttachmentUrl(attachmentUrl);
         console.log('Retrying with cleaned URL:', cleanedUrl);
 
         const retryImg = new Image();
@@ -64,12 +65,12 @@ export const MessageBubble = ({ message, isCurrentUser, isRead = false, onReacti
         };
         retryImg.src = cleanedUrl;
       };
-      img.src = message.attachment_url;
+      img.src = attachmentUrl;
     } else {
       setIsPreloading(false);
       setImageLoadError(null);
     }
-  }, [message.attachment_url, isImageAttachment]);
+  }, [attachmentUrl, isImageAttachment]);
 
   const toggleReactionPicker = () => {
     setShowReactionPicker(!showReactionPicker);
@@ -82,7 +83,7 @@ export const MessageBubble = ({ message, isCurrentUser, isRead = false, onReacti
 
       <div className={`flex flex-col max-w-[70%] ${isCurrentUser ? 'items-end' : 'items-start'}`}>
         <div
-          className={`message-bubble ${isCurrentUser ? 'sent bg-primary text-primary-foreground' : 'received bg-muted text-muted-foreground'} rounded-2xl shadow-sm ${message.attachment_url && (isImageAttachment || isVideoAttachment) ? 'overflow-hidden p-2' : message.attachment_url ? 'p-2' : 'p-1 px-2'} ${isConsecutive ? 'consecutive-message' : ''} inline-block max-w-fit`}
+          className={`message-bubble ${isCurrentUser ? 'sent bg-primary text-primary-foreground' : 'received bg-muted text-muted-foreground'} rounded-2xl shadow-sm ${attachmentUrl && (isImageAttachment || isVideoAttachment) ? 'overflow-hidden p-2' : attachmentUrl ? 'p-2' : 'p-1 px-2'} ${isConsecutive ? 'consecutive-message' : ''} inline-block max-w-fit`}
           data-sender={isCurrentUser ? 'self' : 'other'}
         >
           {message.reply_to_id && (
@@ -112,7 +113,7 @@ export const MessageBubble = ({ message, isCurrentUser, isRead = false, onReacti
 
           {/* Message content */}
           {message.content && (
-            <div className={`${message.attachment_url ? 'p-3 pt-2' : ''} whitespace-pre-wrap break-words leading-relaxed`}>
+            <div className={`${attachmentUrl ? 'p-3 pt-2' : ''} whitespace-pre-wrap break-words leading-relaxed`}>
               <span className="inline-flex items-center flex-wrap gap-1">
                 {message.content}
               </span>
