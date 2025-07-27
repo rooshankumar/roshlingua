@@ -1,63 +1,63 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { useParams } from 'react-router-dom';
 import { ChatScreen } from '@/components/chat/ChatScreen';
-import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/hooks/useAuth';
 
-export const Chat: React.FC = () => {
-  const { user } = useAuth();
-  const { receiverId, conversationId } = useParams<{ receiverId?: string; conversationId?: string }>();
-  const [actualReceiverId, setActualReceiverId] = useState<string | undefined>(receiverId);
-  const [loading, setLoading] = useState(false);
+const Chat: React.FC = () => {
+  const { id } = useParams<{ id: string }>();
+  const { user, loading } = useAuth();
 
-  useEffect(() => {
-    // If we have a conversationId, we need to find the other participant
-    if (conversationId && user && !receiverId) {
-      setLoading(true);
-
-      const fetchOtherParticipant = async () => {
-        try {
-          const { data: participants, error } = await supabase
-            .from('conversation_participants')
-            .select('user_id')
-            .eq('conversation_id', conversationId)
-            .neq('user_id', user.id);
-
-          if (error) throw error;
-
-          if (participants && participants.length > 0) {
-            setActualReceiverId(participants[0].user_id);
-          }
-        } catch (error) {
-          console.error('Error fetching conversation participants:', error);
-        } finally {
-          setLoading(false);
-        }
-      };
-
-      fetchOtherParticipant();
-    } else if (receiverId) {
-      setActualReceiverId(receiverId);
-    }
-  }, [conversationId, receiverId, user]);
+  console.log('📱 Chat page - Auth status:', { 
+    hasUser: !!user, 
+    loading, 
+    userId: user?.id,
+    receiverId: id 
+  });
 
   if (loading) {
     return (
       <div className="flex items-center justify-center h-full">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-2"></div>
+          <p className="text-sm text-muted-foreground">Loading...</p>
+        </div>
       </div>
     );
   }
 
-  if (!actualReceiverId) {
+  if (!user) {
     return (
       <div className="flex items-center justify-center h-full">
-        <p className="text-muted-foreground">Please select a conversation</p>
+        <div className="text-center space-y-4">
+          <h2 className="text-xl font-semibold text-red-600">Authentication Required</h2>
+          <p className="text-muted-foreground">Please log in to access the chat</p>
+          <button 
+            onClick={() => window.location.href = '/auth'} 
+            className="px-4 py-2 bg-primary text-white rounded hover:bg-primary/90"
+          >
+            Go to Login
+          </button>
+        </div>
       </div>
     );
   }
 
-  return <ChatScreen receiverId={actualReceiverId} conversationId={conversationId} />;
+  if (!id) {
+    return (
+      <div className="flex items-center justify-center h-full">
+        <div className="text-center">
+          <h2 className="text-xl font-semibold">No Chat Selected</h2>
+          <p className="text-muted-foreground">Please select a conversation from the chat list</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="h-full">
+      <ChatScreen receiverId={id} />
+    </div>
+  );
 };
 
 export default Chat;

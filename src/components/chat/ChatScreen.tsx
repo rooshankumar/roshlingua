@@ -434,16 +434,23 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ conversationId, receiver
 
   // Initialize chat
   useEffect(() => {
+    console.log('🔍 ChatScreen useEffect - Auth check:', { 
+      hasUser: !!user, 
+      userId: user?.id, 
+      receiverId,
+      userEmail: user?.email 
+    });
+
     if (!user) {
       console.log('❌ No authenticated user, cannot initialize chat');
-      setError('Please log in to continue');
+      setError('Please log in to access chat');
       setLoading(false);
       return;
     }
 
     if (!receiverId) {
       console.log('❌ No receiver ID provided');
-      setError('Invalid conversation');
+      setError('Invalid conversation - no receiver specified');
       setLoading(false);
       return;
     }
@@ -596,7 +603,14 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ conversationId, receiver
       <div className="flex items-center justify-center h-full">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-2"></div>
-          <p className="text-sm text-muted-foreground">Loading messages...</p>
+          <p className="text-sm text-muted-foreground">
+            {!user ? 'Checking authentication...' : 'Loading messages...'}
+          </p>
+          {!user && (
+            <p className="text-xs text-yellow-600 mt-2">
+              Please ensure you are logged in
+            </p>
+          )}
         </div>
       </div>
     );
