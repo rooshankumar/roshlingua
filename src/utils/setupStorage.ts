@@ -19,18 +19,6 @@ export const verifyStorageBuckets = async () => {
     // Log existing buckets
     if (existingBuckets && existingBuckets.length > 0) {
       console.log('Found existing buckets:', existingBuckets.map(b => b.name).join(', '));
-      
-      // Check for required buckets
-      const requiredBuckets = ['attachments', 'avatars', 'voice-messages'];
-      const missingBuckets = requiredBuckets.filter(bucket => 
-        !existingBuckets.some(b => b.name === bucket)
-      );
-      
-      if (missingBuckets.length > 0) {
-        console.warn('Missing required buckets:', missingBuckets.join(', '));
-      } else {
-        console.log('✅ All required storage buckets are available');
-      }
     } else {
       console.log('No existing buckets found, which is unusual.');
     }

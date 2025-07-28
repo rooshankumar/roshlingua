@@ -59,13 +59,11 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ conversationId, receiver
   const [isScrolledToBottom, setIsScrolledToBottom] = useState(true);
   const [shouldAutoScroll, setShouldAutoScroll] = useState(true);
   const [connectionStatus, setConnectionStatus] = useState<'connecting' | 'connected' | 'disconnected'>('connecting');
-  const [isUserScrolling, setIsUserScrolling] = useState(false);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const isInitialLoadRef = useRef(true);
   const lastMessageIdRef = useRef<string | null>(null);
-  const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Typing status
   const typingStatus = useTypingStatus(conversationId || `${user?.id}-${receiverId}`);
@@ -93,19 +91,6 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ conversationId, receiver
 
     const { scrollTop, scrollHeight, clientHeight } = messagesContainerRef.current;
     const isAtBottom = scrollHeight - scrollTop - clientHeight < 50;
-
-    // Detect user scrolling
-    setIsUserScrolling(true);
-
-    // Clear existing timeout
-    if (scrollTimeoutRef.current) {
-      clearTimeout(scrollTimeoutRef.current);
-    }
-
-    // Reset user scrolling flag after a delay
-    scrollTimeoutRef.current = setTimeout(() => {
-      setIsUserScrolling(false);
-    }, 1000);
 
     // Only update state if there's a change to prevent unnecessary re-renders
     setIsScrolledToBottom(prev => {
@@ -289,12 +274,10 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ conversationId, receiver
             console.log('Adding new message to state');
             const updated = [...prev, newMessage];
 
-            // Auto-scroll logic: only scroll if user isn't actively scrolling
-            // and either it's their own message or they're at the bottom
-            if (!isUserScrolling && (newMessage.sender_id === user.id || (isScrolledToBottom && shouldAutoScroll))) {
+            // Auto-scroll for own messages or if at bottom
+            if (newMessage.sender_id === user.id || isScrolledToBottom) {
               setTimeout(() => scrollToBottom(true), 50);
-            } else if (newMessage.sender_id !== user.id) {
-              // Show new message badge for received messages when not auto-scrolling
+            } else {
               setNewMessageCount(count => count + 1);
             }
 
@@ -323,7 +306,7 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ conversationId, receiver
         } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
           setConnectionStatus('disconnected');
           console.error('❌ Subscription failed:', status);
-
+          
           // Auto-retry connection after delay
           setTimeout(() => {
             if (user && receiverId) {
@@ -343,13 +326,13 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ conversationId, receiver
   }, [user?.id, receiverId]); // Simplified dependencies
 
   // Send message with optimistic UI update
-  const sendMessage = useCallback(async (content: string, fileUrl?: string, fileName?: string) => {
-    if (!user || !receiverId || (!content.trim() && !fileUrl)) return;
+  const sendMessage = useCallback(async (content: string, attachmentUrl?: string, attachmentName?: string, replyToId?: string) => {
+    if (!user || !receiverId || (!content.trim() && !attachmentUrl)) return;
 
     // Determine message type
     let messageType: 'text' | 'image' | 'file' | 'video' | 'audio' = 'text';
-    if (fileUrl && fileName) {
-      const fileExt = fileName.split('.').pop()?.toLowerCase();
+    if (attachmentUrl && attachmentName) {
+      const fileExt = attachmentName.split('.').pop()?.toLowerCase();
       const imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'];
       const videoExtensions = ['mp4', 'avi', 'mov', 'webm', 'mkv'];
       const audioExtensions = ['mp3', 'wav', 'ogg', 'aac'];
@@ -376,10 +359,10 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ conversationId, receiver
       conversation_id: conversationId || '',
       created_at: new Date().toISOString(),
       message_type: messageType,
-      file_url: fileUrl,
-      file_name: fileName,
-      attachment_url: fileUrl,
-      attachment_name: fileName,
+      file_url: attachmentUrl,
+      file_name: attachmentName,
+      attachment_url: attachmentUrl,
+      attachment_name: attachmentName,
       is_read: false,
       sender: {
         id: user.id,
@@ -392,11 +375,7 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ conversationId, receiver
 
     // Add optimistic message immediately
     setMessages(prev => [...prev, optimisticMessage]);
-
-    // Only auto-scroll if user isn't actively scrolling
-    if (!isUserScrolling) {
-      scrollToBottom(true);
-    }
+    scrollToBottom(true);
 
     try {
       console.log('📤 Sending message:', { content: content.trim(), messageType });
@@ -410,10 +389,11 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ conversationId, receiver
           recipient_id: receiverId,
           conversation_id: conversationId,
           message_type: messageType,
-          file_url: fileUrl,
-          file_name: fileName,
-          attachment_url: fileUrl,
-          attachment_name: fileName,
+          file_url: attachmentUrl,
+          file_name: attachmentName,
+          attachment_url: attachmentUrl,
+          attachment_name: attachmentName,
+          reply_to_id: replyToId,
           is_read: false
         })
         .select()
@@ -432,17 +412,17 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ conversationId, receiver
 
     } catch (error) {
       console.error('❌ Error sending message:', error);
-
+      
       // Remove optimistic message on error
       setMessages(prev => prev.filter(msg => msg.id !== tempId));
-
+      
       toast({
         variant: "destructive",
         title: "Failed to send message",
         description: "Please try again."
       });
     }
-  }, [user, receiverId, conversationId, scrollToBottom, stopTyping, isUserScrolling]);
+  }, [user, receiverId, conversationId, scrollToBottom, stopTyping]);
 
   // Initialize chat - only when user or receiverId changes
   useEffect(() => {
@@ -488,11 +468,6 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ conversationId, receiver
 
       if (typingStatus?.stopTyping) {
         typingStatus.stopTyping();
-      }
-
-      // Clear scroll timeout
-      if (scrollTimeoutRef.current) {
-        clearTimeout(scrollTimeoutRef.current);
       }
     };
   }, [user?.id, receiverId]); // Remove function dependencies to prevent re-initialization

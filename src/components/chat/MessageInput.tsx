@@ -1,12 +1,9 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import React, { useState, useRef, useCallback, useEffect } from 'react';
+import { Send, Paperclip, Mic, MicOff, Smile, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { Send, Paperclip, Mic, MicOff, Image, X } from 'lucide-react';
 import { VoiceRecorder } from './VoiceRecorder';
 import { useAuth } from '@/hooks/useAuth';
-import { supabase } from '@/lib/supabase';
-import { toast } from '@/hooks/use-toast';
-import ChatAttachment from './ChatAttachment';
 
 interface MessageInputProps {
   onSend: (content: string, fileUrl?: string, fileName?: string) => Promise<void>;
@@ -131,7 +128,7 @@ export const MessageInput: React.FC<MessageInputProps> = ({
     try {
       // Call the onSend handler with proper parameters
       await onSend(trimmedMessage);
-
+      
       console.log('✅ Message sent successfully');
       setMessage('');
       handleTypingStop();
