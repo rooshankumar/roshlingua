@@ -86,13 +86,13 @@ class SubscriptionManager {
     return Array.from(this.subscriptions.keys());
   }
 
-  // Clean up old subscriptions (older than 30 minutes)
+  // Clean up old subscriptions (older than 2 hours to prevent active chat disruption)
   cleanupStale(): void {
     const now = Date.now();
-    const thirtyMinutes = 30 * 60 * 1000;
+    const twoHours = 2 * 60 * 60 * 1000; // 2 hours instead of 30 minutes
 
     this.subscriptions.forEach((subscription, key) => {
-      if (now - subscription.createdAt > thirtyMinutes) {
+      if (now - subscription.createdAt > twoHours) {
         console.log('[SubscriptionManager] Cleaning up stale subscription:', key);
         this.unsubscribe(key);
       }
@@ -112,16 +112,24 @@ class SubscriptionManager {
 // Create singleton
 const subscriptionManager = new SubscriptionManager();
 
-// Cleanup on page unload
+// Only cleanup on actual page unload, not visibility changes
 if (typeof window !== 'undefined') {
+  // Only cleanup when page is actually being unloaded
   window.addEventListener('beforeunload', () => {
     subscriptionManager.cleanup();
   });
 
-  // Clean up stale subscriptions periodically
+  // Don't cleanup on visibility change - this was causing the chat issues
+  // Instead, just log visibility changes for debugging
+  document.addEventListener('visibilitychange', () => {
+    const isVisible = document.visibilityState === 'visible';
+    console.log(`[SubscriptionManager] Page became ${isVisible ? 'visible' : 'hidden'}, current subscriptions:`, subscriptionManager.getSubscriptionCount());
+  });
+
+  // Clean up truly stale subscriptions (older than 2 hours instead of 30 minutes)
   setInterval(() => {
     subscriptionManager.cleanupStale();
-  }, 5 * 60 * 1000); // Every 5 minutes
+  }, 10 * 60 * 1000); // Every 10 minutes, but with longer stale threshold
 }
 
 export default subscriptionManager;

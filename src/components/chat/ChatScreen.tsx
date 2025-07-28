@@ -194,7 +194,7 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ conversationId, receiver
     }
   }, [user, receiverId, shouldAutoScroll, scrollToBottom]);
 
-  // Setup realtime subscription
+  // Setup realtime subscription with stable reference
   const setupRealtimeSubscription = useCallback(() => {
     if (!user || !receiverId) return;
 
@@ -204,7 +204,13 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ conversationId, receiver
     setConnectionStatus('connecting');
 
     const channel = supabase
-      .channel(subscriptionKey)
+      .channel(subscriptionKey, {
+        config: {
+          presence: {
+            key: user.id,
+          },
+        },
+      })
       .on(
         'postgres_changes',
         {
@@ -217,14 +223,6 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ conversationId, receiver
           console.log('📨 New message received:', payload.new);
 
           const newMessageData = payload.new as any;
-
-          // Skip if already exists
-          if (lastMessageIdRef.current === newMessageData.id) {
-            console.log('⚠️ Duplicate message detected, skipping');
-            return;
-          }
-
-          lastMessageIdRef.current = newMessageData.id;
 
           // Create message object
           const newMessage: Message = {
@@ -250,6 +248,11 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ conversationId, receiver
               };
             } catch (error) {
               console.warn('Could not fetch sender profile:', error);
+              newMessage.sender = {
+                id: newMessage.sender_id,
+                full_name: 'Unknown User',
+                avatar_url: ''
+              };
             }
           } else {
             newMessage.sender = {
@@ -259,15 +262,20 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ conversationId, receiver
             };
           }
 
-          // Add to messages
+          // Add to messages - remove duplicate check that was too strict
           setMessages(prev => {
-            const exists = prev.some(msg => msg.id === newMessage.id);
-            if (exists) return prev;
+            // Check if message already exists by ID
+            const exists = prev.find(msg => msg.id === newMessage.id);
+            if (exists) {
+              console.log('Message already exists, skipping');
+              return prev;
+            }
 
+            console.log('Adding new message to state');
             const updated = [...prev, newMessage];
 
             // Auto-scroll for own messages or if at bottom
-            if (newMessage.sender_id === user.id || shouldAutoScroll) {
+            if (newMessage.sender_id === user.id || isScrolledToBottom) {
               setTimeout(() => scrollToBottom(true), 50);
             } else {
               setNewMessageCount(count => count + 1);
@@ -298,6 +306,14 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ conversationId, receiver
         } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
           setConnectionStatus('disconnected');
           console.error('❌ Subscription failed:', status);
+          
+          // Auto-retry connection after delay
+          setTimeout(() => {
+            if (user && receiverId) {
+              console.log('🔄 Retrying subscription...');
+              setupRealtimeSubscription();
+            }
+          }, 5000);
         } else if (status === 'CLOSED') {
           setConnectionStatus('disconnected');
           console.warn('⚠️ Subscription closed');
@@ -307,9 +323,9 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ conversationId, receiver
     // Register with subscription manager
     subscriptionManager.subscribe(subscriptionKey, channel);
 
-  }, [user, receiverId, shouldAutoScroll, scrollToBottom]);
+  }, [user?.id, receiverId]); // Simplified dependencies
 
-  // Send message
+  // Send message with optimistic UI update
   const sendMessage = useCallback(async (content: string, attachmentUrl?: string, attachmentName?: string, replyToId?: string) => {
     if (!user || !receiverId || (!content.trim() && !attachmentUrl)) return;
 
@@ -331,6 +347,35 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ conversationId, receiver
         messageType = 'file';
       }
     }
+
+    // Create optimistic message for immediate UI update
+    const tempId = `temp_${Date.now()}`;
+    const optimisticMessage: Message = {
+      id: tempId,
+      content: content.trim(),
+      sender_id: user.id,
+      receiver_id: receiverId,
+      recipient_id: receiverId,
+      conversation_id: conversationId || '',
+      created_at: new Date().toISOString(),
+      message_type: messageType,
+      file_url: attachmentUrl,
+      file_name: attachmentName,
+      attachment_url: attachmentUrl,
+      attachment_name: attachmentName,
+      is_read: false,
+      sender: {
+        id: user.id,
+        full_name: user.user_metadata?.full_name || user.email || 'You',
+        avatar_url: user.user_metadata?.avatar_url || ''
+      },
+      reactions: [],
+      reply_to: undefined
+    };
+
+    // Add optimistic message immediately
+    setMessages(prev => [...prev, optimisticMessage]);
+    scrollToBottom(true);
 
     try {
       console.log('📤 Sending message:', { content: content.trim(), messageType });
@@ -356,18 +401,28 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ conversationId, receiver
 
       if (error) throw error;
 
-      console.log('✅ Message sent successfully');
+      console.log('✅ Message sent successfully:', data);
+
+      // Replace optimistic message with real one
+      setMessages(prev => prev.map(msg => 
+        msg.id === tempId ? { ...optimisticMessage, id: data.id } : msg
+      ));
+
       stopTyping();
 
     } catch (error) {
       console.error('❌ Error sending message:', error);
+      
+      // Remove optimistic message on error
+      setMessages(prev => prev.filter(msg => msg.id !== tempId));
+      
       toast({
         variant: "destructive",
         title: "Failed to send message",
         description: "Please try again."
       });
     }
-  }, [user, receiverId, conversationId, stopTyping]);
+  }, [user, receiverId, conversationId, scrollToBottom, stopTyping]);
 
   // Initialize chat - only when user or receiverId changes
   useEffect(() => {
