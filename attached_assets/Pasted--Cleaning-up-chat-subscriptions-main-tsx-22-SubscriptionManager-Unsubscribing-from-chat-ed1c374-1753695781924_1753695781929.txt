@@ -1,0 +1,70 @@
+🧹 Cleaning up chat subscriptions
+main.tsx:22 [SubscriptionManager] Unsubscribing from: chat_ed1c374e-3823-4ea2-aa28-3999c21d1140_314be0b4-0c4f-4212-9441-d615c543f940
+main.tsx:22 📡 Subscription status: CLOSED
+ChatScreen.tsx:319 ⚠️ Subscription closed
+(anonymous) @ ChatScreen.tsx:319
+(anonymous) @ @supabase_supabase-js.js?v=cdf1158e:2087
+(anonymous) @ @supabase_supabase-js.js?v=cdf1158e:2338
+_trigger @ @supabase_supabase-js.js?v=cdf1158e:2323
+onClose @ @supabase_supabase-js.js?v=cdf1158e:2228
+(anonymous) @ @supabase_supabase-js.js?v=cdf1158e:2235
+(anonymous) @ @supabase_supabase-js.js?v=cdf1158e:1770
+_matchReceive @ @supabase_supabase-js.js?v=cdf1158e:1770
+callback @ @supabase_supabase-js.js?v=cdf1158e:1744
+(anonymous) @ @supabase_supabase-js.js?v=cdf1158e:2338
+_trigger @ @supabase_supabase-js.js?v=cdf1158e:2323
+trigger @ @supabase_supabase-js.js?v=cdf1158e:1753
+(anonymous) @ @supabase_supabase-js.js?v=cdf1158e:2245
+unsubscribe @ @supabase_supabase-js.js?v=cdf1158e:2232
+unsubscribe @ subscriptionManager.ts:39
+(anonymous) @ ChatScreen.tsx:467
+safelyCallDestroy @ chunk-276SZO74.js?v=d1881984:16748
+commitHookEffectListUnmount @ chunk-276SZO74.js?v=d1881984:16875
+commitPassiveUnmountInsideDeletedTreeOnFiber @ chunk-276SZO74.js?v=d1881984:18283
+commitPassiveUnmountEffectsInsideOfDeletedTree_begin @ chunk-276SZO74.js?v=d1881984:18245
+commitPassiveUnmountEffects_begin @ chunk-276SZO74.js?v=d1881984:18181
+commitPassiveUnmountEffects @ chunk-276SZO74.js?v=d1881984:18169
+flushPassiveEffectsImpl @ chunk-276SZO74.js?v=d1881984:19489
+flushPassiveEffects @ chunk-276SZO74.js?v=d1881984:19447
+commitRootImpl @ chunk-276SZO74.js?v=d1881984:19416
+commitRoot @ chunk-276SZO74.js?v=d1881984:19277
+performSyncWorkOnRoot @ chunk-276SZO74.js?v=d1881984:18895
+flushSyncCallbacks @ chunk-276SZO74.js?v=d1881984:9119
+(anonymous) @ chunk-276SZO74.js?v=d1881984:18627Understand this warning
+main.tsx:22 [SubscriptionManager] Successfully unsubscribed from: chat_ed1c374e-3823-4ea2-aa28-3999c21d1140_314be0b4-0c4f-4212-9441-d615c543f940
+ChatList.tsx:152 Error fetching conversations: TypeError: refreshUnreadCounts is not a function
+    at fetchConversations (ChatList.tsx:48:9)
+    at ChatList.tsx:158:5
+    at commitHookEffectListMount (chunk-276SZO74.js?v=d1881984:16915:34)
+    at commitPassiveMountOnFiber (chunk-276SZO74.js?v=d1881984:18156:19)
+    at commitPassiveMountEffects_complete (chunk-276SZO74.js?v=d1881984:18129:17)
+    at commitPassiveMountEffects_begin (chunk-276SZO74.js?v=d1881984:18119:15)
+    at commitPassiveMountEffects (chunk-276SZO74.js?v=d1881984:18109:11)
+    at flushPassiveEffectsImpl (chunk-276SZO74.js?v=d1881984:19490:11)
+    at flushPassiveEffects (chunk-276SZO74.js?v=d1881984:19447:22)
+    at commitRootImpl (chunk-276SZO74.js?v=d1881984:19416:13)
+fetchConversations @ ChatList.tsx:152
+(anonymous) @ ChatList.tsx:158
+commitHookEffectListMount @ chunk-276SZO74.js?v=d1881984:16915
+commitPassiveMountOnFiber @ chunk-276SZO74.js?v=d1881984:18156
+commitPassiveMountEffects_complete @ chunk-276SZO74.js?v=d1881984:18129
+commitPassiveMountEffects_begin @ chunk-276SZO74.js?v=d1881984:18119
+commitPassiveMountEffects @ chunk-276SZO74.js?v=d1881984:18109
+flushPassiveEffectsImpl @ chunk-276SZO74.js?v=d1881984:19490
+flushPassiveEffects @ chunk-276SZO74.js?v=d1881984:19447
+commitRootImpl @ chunk-276SZO74.js?v=d1881984:19416
+commitRoot @ chunk-276SZO74.js?v=d1881984:19277
+performSyncWorkOnRoot @ chunk-276SZO74.js?v=d1881984:18895
+flushSyncCallbacks @ chunk-276SZO74.js?v=d1881984:9119
+(anonymous) @ chunk-276SZO74.js?v=d1881984:18627Understand this error
+main.tsx:22 Checking all achievements for user: ed1c374e-3823-4ea2-aa28-3999c21d1140
+main.tsx:22 Route changed to: /chat
+main.tsx:22 [SubscriptionManager] Registering subscription: unread_ed1c374e-3823-4ea2-aa28-3999c21d1140
+main.tsx:22 [SubscriptionManager] Active subscriptions: 2
+main.tsx:22 Refreshing subscriptions after page change
+main.tsx:22 Refreshing all real-time subscriptions
+main.tsx:22 📊 Unread counts updated: {counts: {…}, total: 2}
+main.tsx:22 📡 Unread messages subscription status: SUBSCRIBED
+main.tsx:22 Current stats: {streak: 4, xp: 10, conversations: 9, messages: 93}
+main.tsx:22 Current unlocked achievements: (6) ['first-chat', 'streak-3', 'conversations-5', 'winter-2024', 'streak-7', 'messages-50']
+main.tsx:22 Finished checking achievements
