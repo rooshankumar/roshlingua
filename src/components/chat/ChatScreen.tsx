@@ -59,11 +59,13 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ conversationId, receiver
   const [isScrolledToBottom, setIsScrolledToBottom] = useState(true);
   const [shouldAutoScroll, setShouldAutoScroll] = useState(true);
   const [connectionStatus, setConnectionStatus] = useState<'connecting' | 'connected' | 'disconnected'>('connecting');
+  const [isUserScrolling, setIsUserScrolling] = useState(false);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const isInitialLoadRef = useRef(true);
   const lastMessageIdRef = useRef<string | null>(null);
+  const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Typing status
   const typingStatus = useTypingStatus(conversationId || `${user?.id}-${receiverId}`);
@@ -91,6 +93,19 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ conversationId, receiver
 
     const { scrollTop, scrollHeight, clientHeight } = messagesContainerRef.current;
     const isAtBottom = scrollHeight - scrollTop - clientHeight < 50;
+
+    // Detect user scrolling
+    setIsUserScrolling(true);
+    
+    // Clear existing timeout
+    if (scrollTimeoutRef.current) {
+      clearTimeout(scrollTimeoutRef.current);
+    }
+    
+    // Reset user scrolling flag after a delay
+    scrollTimeoutRef.current = setTimeout(() => {
+      setIsUserScrolling(false);
+    }, 1000);
 
     // Only update state if there's a change to prevent unnecessary re-renders
     setIsScrolledToBottom(prev => {
@@ -274,10 +289,12 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ conversationId, receiver
             console.log('Adding new message to state');
             const updated = [...prev, newMessage];
 
-            // Auto-scroll for own messages or if at bottom
-            if (newMessage.sender_id === user.id || isScrolledToBottom) {
+            // Auto-scroll logic: only scroll if user isn't actively scrolling
+            // and either it's their own message or they're at the bottom
+            if (!isUserScrolling && (newMessage.sender_id === user.id || (isScrolledToBottom && shouldAutoScroll))) {
               setTimeout(() => scrollToBottom(true), 50);
-            } else {
+            } else if (newMessage.sender_id !== user.id) {
+              // Show new message badge for received messages when not auto-scrolling
               setNewMessageCount(count => count + 1);
             }
 
@@ -375,7 +392,11 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ conversationId, receiver
 
     // Add optimistic message immediately
     setMessages(prev => [...prev, optimisticMessage]);
-    scrollToBottom(true);
+    
+    // Only auto-scroll if user isn't actively scrolling
+    if (!isUserScrolling) {
+      scrollToBottom(true);
+    }
 
     try {
       console.log('📤 Sending message:', { content: content.trim(), messageType });
@@ -468,6 +489,11 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ conversationId, receiver
 
       if (typingStatus?.stopTyping) {
         typingStatus.stopTyping();
+      }
+
+      // Clear scroll timeout
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current);
       }
     };
   }, [user?.id, receiverId]); // Remove function dependencies to prevent re-initialization

@@ -163,6 +163,6 @@ export const useUnreadMessages = () => {
     totalUnread,
     loading,
     markAsRead,
-    refresh: fetchUnreadCountseadCounts
+    refresh: fetchUnreadCounts
   };
 };
