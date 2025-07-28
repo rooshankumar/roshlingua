@@ -19,9 +19,7 @@ class SubscriptionManager {
   private isCleaningUp: boolean = false;
 
   // Store a subscription for later cleanup
-  subscribe(key: string, channelFactory: () => RealtimeChannel): RealtimeChannel;
-  subscribe(key: string, channel: RealtimeChannel): void;
-  subscribe(key: string, channelOrFactory: RealtimeChannel | (() => RealtimeChannel)): RealtimeChannel | void {
+  subscribe(key: string, channel: RealtimeChannel): void {
     console.log('[SubscriptionManager]', `Registering subscription: ${key}`);
 
     // If there's an existing subscription with this key, unsubscribe first
@@ -29,24 +27,11 @@ class SubscriptionManager {
       this.unsubscribe(key);
     }
 
-    let channel: RealtimeChannel;
-    
-    if (typeof channelOrFactory === 'function') {
-      channel = channelOrFactory();
-      this.subscriptions.set(key, {
-        key,
-        channel,
-        lastRefreshed: Date.now()
-      });
-      return channel;
-    } else {
-      channel = channelOrFactory;
-      this.subscriptions.set(key, {
-        key,
-        channel,
-        lastRefreshed: Date.now()
-      });
-    }
+    this.subscriptions.set(key, {
+      key,
+      channel,
+      lastRefreshed: Date.now()
+    });
   }
 
   // Remove a specific subscription

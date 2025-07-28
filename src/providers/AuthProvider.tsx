@@ -367,12 +367,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               console.error('Error getting profile data:', selectError);
               return;
             }
-
+            
             // Use existing values or defaults
             const learning_language = data?.learning_language || 'en';
             const native_language = data?.native_language || 'en';
             const proficiency_level = data?.proficiency_level || 'beginner';
-
+            
             // Update with all required fields
             supabase
               .from('profiles')
@@ -446,75 +446,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   //     },
   //     []
   // );
-  useEffect(() => {
-    console.log('🔄 Initializing auth state...');
-
-    // Get initial session with better debugging
-    supabase.auth.getSession().then(({ data: { session }, error }) => {
-      console.log('🔍 Initial session check:', {
-        hasSession: !!session,
-        hasUser: !!session?.user,
-        userEmail: session?.user?.email,
-        sessionExpiry: session?.expires_at ? new Date(session.expires_at * 1000).toISOString() : 'N/A'
-      });
-
-      if (error) {
-        console.error('❌ Error getting initial session:', error);
-        setUser(null);
-        setIsLoading(false);
-        return;
-      }
-
-      // Check if session is expired
-      if (session && session.expires_at) {
-        const isExpired = (session.expires_at * 1000) < Date.now();
-        if (isExpired) {
-          console.warn('⚠️ Session is expired, clearing auth state');
-          setUser(null);
-          setIsLoading(false);
-          return;
-        }
-      }
-
-      setUser(session?.user ?? null);
-      setIsLoading(false);
-    });
-  }, []);
-
-
   const handleAuthStateChange = useCallback(
     async (event: any, session: Session | null) => {
-      console.log('🔄 Auth state changed:', {
-        event,
-        hasSession: !!session,
-        hasUser: !!session?.user,
-        userEmail: session?.user?.email,
-        timestamp: new Date().toISOString()
-      });
+      console.log('Auth state changed:', event, session ? 'User logged in' : 'No session');
 
-      // Handle different auth events
-      switch (event) {
-        case 'SIGNED_IN':
-          console.log('✅ User signed in successfully');
-          break;
-        case 'SIGNED_OUT':
-          console.log('👋 User signed out');
-          break;
-        case 'TOKEN_REFRESHED':
-          console.log('🔄 Token refreshed');
-          break;
-        case 'USER_UPDATED':
-          console.log('👤 User updated');
-          break;
-        case 'PASSWORD_RECOVERY':
-          console.log('🔐 Password recovery');
-          break;
-        default:
-          console.log('📝 Auth event:', event);
+      if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+        if (session?.user) {
+          setUser(session.user);
+          setIsLoading(false);
+        }
+      } else if (event === 'SIGNED_OUT') {
+        setUser(null);
+        setIsLoading(false);
+      } else if (event === 'USER_UPDATED') {
+        if (session?.user) {
+          setUser(session.user);
+        }
+      } else if (event === 'INITIAL_SESSION') {
+        setIsLoading(false);
       }
-
-      setUser(session?.user ?? null);
-      setIsLoading(false);
     },
     []
   );
