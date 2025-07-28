@@ -36,7 +36,7 @@ const ChatList = () => {
   const [conversations, setConversations] = useState<ChatPreview[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
-  const { unreadCounts, refreshUnreadCounts } = useUnreadMessages(user?.id);
+  const { unreadCounts, refresh: refreshUnreadCounts } = useUnreadMessages(user?.id);
   const [unreadMessages, setUnreadMessages] = useState<any[]>([]);
 
   useEffect(() => {
