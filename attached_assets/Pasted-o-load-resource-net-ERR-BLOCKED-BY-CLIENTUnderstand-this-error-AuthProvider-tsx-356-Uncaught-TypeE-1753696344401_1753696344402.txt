@@ -1,0 +1,56 @@
+o load resource: net::ERR_BLOCKED_BY_CLIENTUnderstand this error
+AuthProvider.tsx:356 Uncaught TypeError: subscriptionManager.refreshAll is not a function
+    at AuthProvider.tsx:356:27Understand this error
+2MessageInput.tsx:38 Uncaught ReferenceError: useCallback is not defined
+    at MessageInput (MessageInput.tsx:38:32)
+    at renderWithHooks (chunk-276SZO74.js?v=d1881984:11548:26)
+    at mountIndeterminateComponent (chunk-276SZO74.js?v=d1881984:14926:21)
+    at beginWork (chunk-276SZO74.js?v=d1881984:15914:22)
+    at HTMLUnknownElement.callCallback2 (chunk-276SZO74.js?v=d1881984:3674:22)
+    at Object.invokeGuardedCallbackDev (chunk-276SZO74.js?v=d1881984:3699:24)
+    at invokeGuardedCallback (chunk-276SZO74.js?v=d1881984:3733:39)
+    at beginWork$1 (chunk-276SZO74.js?v=d1881984:19765:15)
+    at performUnitOfWork (chunk-276SZO74.js?v=d1881984:19198:20)
+    at workLoopSync (chunk-276SZO74.js?v=d1881984:19137:13)Understand this error
+chunk-276SZO74.js?v=d1881984:14032 The above error occurred in the <MessageInput> component:
+
+    at MessageInput (https://0b73b56f-5c04-4ef5-ac9f-d29a041365ab-00-y35rsmszs1oh.sisko.replit.dev/src/components/chat/MessageInput.tsx?t=1753696220454:17:32)
+    at div
+    at div
+    at ChatScreen (https://0b73b56f-5c04-4ef5-ac9f-d29a041365ab-00-y35rsmszs1oh.sisko.replit.dev/src/components/chat/ChatScreen.tsx?t=1753696315586:23:30)
+    at Chat (https://0b73b56f-5c04-4ef5-ac9f-d29a041365ab-00-y35rsmszs1oh.sisko.replit.dev/src/pages/Chat.tsx?t=1753696315586:18:22)
+    at Suspense
+    at div
+    at MotionComponent (https://0b73b56f-5c04-4ef5-ac9f-d29a041365ab-00-y35rsmszs1oh.sisko.replit.dev/node_modules/.vite/deps/framer-motion.js?v=05d8bbbc:4619:40)
+    at PageTransition (https://0b73b56f-5c04-4ef5-ac9f-d29a041365ab-00-y35rsmszs1oh.sisko.replit.dev/src/components/PageTransition.tsx:12:27)
+    at main
+    at div
+    at AppLayout (https://0b73b56f-5c04-4ef5-ac9f-d29a041365ab-00-y35rsmszs1oh.sisko.replit.dev/src/components/layouts/AppLayout.tsx?t=1753696007802:85:22)
+    at ProtectedRoute (https://0b73b56f-5c04-4ef5-ac9f-d29a041365ab-00-y35rsmszs1oh.sisko.replit.dev/src/components/auth/ProtectedRoute.tsx?t=1753695722853:15:27)
+    at RenderedRoute (https://0b73b56f-5c04-4ef5-ac9f-d29a041365ab-00-y35rsmszs1oh.sisko.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=cdf1158e:4069:5)
+    at Routes (https://0b73b56f-5c04-4ef5-ac9f-d29a041365ab-00-y35rsmszs1oh.sisko.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=cdf1158e:4508:5)
+    at PresenceChild (https://0b73b56f-5c04-4ef5-ac9f-d29a041365ab-00-y35rsmszs1oh.sisko.replit.dev/node_modules/.vite/deps/framer-motion.js?v=05d8bbbc:137:24)
+    at AnimatePresence (https://0b73b56f-5c04-4ef5-ac9f-d29a041365ab-00-y35rsmszs1oh.sisko.replit.dev/node_modules/.vite/deps/framer-motion.js?v=05d8bbbc:216:26)
+    at AppRoutes (https://0b73b56f-5c04-4ef5-ac9f-d29a041365ab-00-y35rsmszs1oh.sisko.replit.dev/src/App.tsx?t=1753696315586:65:33)
+    at ErrorBoundary (https://0b73b56f-5c04-4ef5-ac9f-d29a041365ab-00-y35rsmszs1oh.sisko.replit.dev/src/components/ErrorBoundary.tsx:172:5)
+    at AuthProvider (https://0b73b56f-5c04-4ef5-ac9f-d29a041365ab-00-y35rsmszs1oh.sisko.replit.dev/src/providers/AuthProvider.tsx?t=1753695722853:24:32)
+    at Router (https://0b73b56f-5c04-4ef5-ac9f-d29a041365ab-00-y35rsmszs1oh.sisko.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=cdf1158e:4451:15)
+    at BrowserRouter (https://0b73b56f-5c04-4ef5-ac9f-d29a041365ab-00-y35rsmszs1oh.sisko.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=cdf1158e:5196:5)
+    at ThemeProvider (https://0b73b56f-5c04-4ef5-ac9f-d29a041365ab-00-y35rsmszs1oh.sisko.replit.dev/src/components/theme-provider.tsx:17:33)
+    at QueryClientProvider (https://0b73b56f-5c04-4ef5-ac9f-d29a041365ab-00-y35rsmszs1oh.sisko.replit.dev/node_modules/.vite/deps/@tanstack_react-query.js?v=e22c7aa3:2794:3)
+    at App (https://0b73b56f-5c04-4ef5-ac9f-d29a041365ab-00-y35rsmszs1oh.sisko.replit.dev/src/App.tsx?t=1753696315586:746:45)
+
+React will try to recreate this component tree from scratch using the error boundary you provided, ErrorBoundary.
+logCapturedError @ chunk-276SZO74.js?v=d1881984:14032Understand this error
+ErrorBoundary.tsx:28 ErrorBoundary caught an error: ReferenceError: useCallback is not defined
+    at MessageInput (MessageInput.tsx:38:32)
+    at renderWithHooks (chunk-276SZO74.js?v=d1881984:11548:26)
+    at mountIndeterminateComponent (chunk-276SZO74.js?v=d1881984:14926:21)
+    at beginWork (chunk-276SZO74.js?v=d1881984:15914:22)
+    at beginWork$1 (chunk-276SZO74.js?v=d1881984:19753:22)
+    at performUnitOfWork (chunk-276SZO74.js?v=d1881984:19198:20)
+    at workLoopSync (chunk-276SZO74.js?v=d1881984:19137:13)
+    at renderRootSync (chunk-276SZO74.js?v=d1881984:19116:15)
+    at recoverFromConcurrentError (chunk-276SZO74.js?v=d1881984:18736:28)
+    at performConcurrentWorkOnRoot (chunk-276SZO74.js?v=d1881984:18684:30) Object
+componentDidCatch @ ErrorBoundary.tsx:28Understand this error
