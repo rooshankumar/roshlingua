@@ -1,4 +1,3 @@
-
 import { RealtimeChannel } from '@supabase/supabase-js';
 
 interface Subscription {
@@ -106,6 +105,36 @@ class SubscriptionManager {
       key,
       age: now - subscription.createdAt
     }));
+  }
+
+  // Refresh all subscriptions
+  refreshAll() {
+    console.log('[SubscriptionManager] Refreshing all subscriptions');
+    const subscriptionKeys = Array.from(this.subscriptions.keys());
+
+    if (subscriptionKeys.length === 0) {
+      console.log('[SubscriptionManager] No subscriptions to refresh');
+      return;
+    }
+
+    // Store current subscriptions
+    const currentSubscriptions = new Map(this.subscriptions);
+
+    // Clear current subscriptions
+    this.subscriptions.clear();
+
+    // Unsubscribe from all current channels
+    currentSubscriptions.forEach((subscription, key) => {
+      try {
+        if (subscription.channel && typeof subscription.channel.unsubscribe === 'function') {
+          subscription.channel.unsubscribe();
+        }
+      } catch (error) {
+        console.warn('[SubscriptionManager] Error unsubscribing during refresh:', error);
+      }
+    });
+
+    console.log(`[SubscriptionManager] Refreshed ${subscriptionKeys.length} subscriptions`);
   }
 }
 
