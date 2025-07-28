@@ -343,13 +343,13 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ conversationId, receiver
   }, [user?.id, receiverId]); // Simplified dependencies
 
   // Send message with optimistic UI update
-  const sendMessage = useCallback(async (content: string, messageType: 'text' | 'image' | 'file' | 'audio' | 'video' = 'text', fileName?: string) => {
-    if (!user || !receiverId || (!content.trim() && !attachmentUrl)) return;
+  const sendMessage = useCallback(async (content: string, fileUrl?: string, fileName?: string) => {
+    if (!user || !receiverId || (!content.trim() && !fileUrl)) return;
 
     // Determine message type
     let messageType: 'text' | 'image' | 'file' | 'video' | 'audio' = 'text';
-    if (attachmentUrl && attachmentName) {
-      const fileExt = attachmentName.split('.').pop()?.toLowerCase();
+    if (fileUrl && fileName) {
+      const fileExt = fileName.split('.').pop()?.toLowerCase();
       const imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'];
       const videoExtensions = ['mp4', 'avi', 'mov', 'webm', 'mkv'];
       const audioExtensions = ['mp3', 'wav', 'ogg', 'aac'];
@@ -376,10 +376,10 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ conversationId, receiver
       conversation_id: conversationId || '',
       created_at: new Date().toISOString(),
       message_type: messageType,
-      file_url: attachmentUrl,
-      file_name: attachmentName,
-      attachment_url: attachmentUrl,
-      attachment_name: attachmentName,
+      file_url: fileUrl,
+      file_name: fileName,
+      attachment_url: fileUrl,
+      attachment_name: fileName,
       is_read: false,
       sender: {
         id: user.id,
@@ -410,11 +410,10 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ conversationId, receiver
           recipient_id: receiverId,
           conversation_id: conversationId,
           message_type: messageType,
-          file_url: attachmentUrl,
-          file_name: attachmentName,
-          attachment_url: attachmentUrl,
-          attachment_name: attachmentName,
-          reply_to_id: replyToId,
+          file_url: fileUrl,
+          file_name: fileName,
+          attachment_url: fileUrl,
+          attachment_name: fileName,
           is_read: false
         })
         .select()
@@ -443,7 +442,7 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ conversationId, receiver
         description: "Please try again."
       });
     }
-  }, [user, receiverId, conversationId, scrollToBottom, stopTyping]);
+  }, [user, receiverId, conversationId, scrollToBottom, stopTyping, isUserScrolling]);
 
   // Initialize chat - only when user or receiverId changes
   useEffect(() => {
