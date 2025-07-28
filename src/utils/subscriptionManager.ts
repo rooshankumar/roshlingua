@@ -34,7 +34,10 @@ class SubscriptionManager {
     if (subscription) {
       try {
         console.log('[SubscriptionManager] Unsubscribing from:', key);
-        subscription.channel.unsubscribe();
+        // Check if channel has unsubscribe method and is not already closed
+        if (subscription.channel && typeof subscription.channel.unsubscribe === 'function') {
+          subscription.channel.unsubscribe();
+        }
         this.subscriptions.delete(key);
         console.log('[SubscriptionManager] Successfully unsubscribed from:', key);
         return true;

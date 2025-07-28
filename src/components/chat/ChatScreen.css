@@ -1,9 +1,11 @@
 
 /* Optimized CSS for smooth chat experience */
 .chat-content-area {
-  scroll-behavior: smooth;
+  scroll-behavior: auto; /* Use auto for better performance during active scrolling */
   overscroll-behavior: contain;
   -webkit-overflow-scrolling: touch;
+  will-change: scroll-position;
+  transform: translateZ(0); /* Force hardware acceleration */
 }
 
 /* Reduce animations for better performance */

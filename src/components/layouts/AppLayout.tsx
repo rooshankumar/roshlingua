@@ -94,7 +94,12 @@ const AppLayout = ({ children }: AppLayoutProps) => {
 
   // Track scrolling positions and handle route changes
   useEffect(() => {
-    window.scrollTo(0, 0);
+    // Don't refresh subscriptions if we're in a chat route to prevent interruptions
+    const isChatRoute = location.pathname.startsWith('/chat/');
+    
+    if (!isChatRoute) {
+      window.scrollTo(0, 0);
+    }
 
     if (user?.id) {
       console.log('Route changed to:', location.pathname);

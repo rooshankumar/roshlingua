@@ -85,21 +85,26 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ conversationId, receiver
     }
   }, []);
 
-  // Handle scroll
+  // Handle scroll - throttled to prevent too frequent updates
   const handleScroll = useCallback(() => {
     if (!messagesContainerRef.current) return;
 
     const { scrollTop, scrollHeight, clientHeight } = messagesContainerRef.current;
     const isAtBottom = scrollHeight - scrollTop - clientHeight < 50;
 
-    setIsScrolledToBottom(isAtBottom);
-
-    if (isAtBottom) {
-      setNewMessageCount(0);
-      setShouldAutoScroll(true);
-    } else {
-      setShouldAutoScroll(false);
-    }
+    // Only update state if there's a change to prevent unnecessary re-renders
+    setIsScrolledToBottom(prev => {
+      if (prev !== isAtBottom) {
+        if (isAtBottom) {
+          setNewMessageCount(0);
+          setShouldAutoScroll(true);
+        } else {
+          setShouldAutoScroll(false);
+        }
+        return isAtBottom;
+      }
+      return prev;
+    });
   }, []);
 
   // Fetch receiver profile
@@ -364,7 +369,7 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ conversationId, receiver
     }
   }, [user, receiverId, conversationId, stopTyping]);
 
-  // Initialize chat
+  // Initialize chat - only when user or receiverId changes
   useEffect(() => {
     if (!user || !receiverId) {
       setError('Invalid conversation');
@@ -410,7 +415,7 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ conversationId, receiver
         typingStatus.stopTyping();
       }
     };
-  }, [user?.id, receiverId, fetchReceiverProfile, fetchMessages, setupRealtimeSubscription, typingStatus?.stopTyping]);
+  }, [user?.id, receiverId]); // Remove function dependencies to prevent re-initialization
 
   // Group messages by date
   const groupedMessages = useMemo(() => {
@@ -492,6 +497,7 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ conversationId, receiver
         ref={messagesContainerRef}
         className="chat-content-area"
         onScroll={handleScroll}
+        style={{ scrollBehavior: 'smooth' }}
       >
         <div className="p-4 space-y-4">
           {Object.entries(groupedMessages).map(([date, dateMessages]) => (
