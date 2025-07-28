@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from './useAuth';
@@ -15,7 +14,7 @@ export const useUnreadMessages = () => {
   const [loading, setLoading] = useState(true);
   const [channel, setChannel] = useState<RealtimeChannel | null>(null);
 
-  // Fetch initial unread counts
+  // Fetch unread counts
   const fetchUnreadCounts = useCallback(async () => {
     if (!user?.id) {
       setUnreadCounts({});
@@ -25,28 +24,19 @@ export const useUnreadMessages = () => {
     }
 
     try {
-      // Get unread message counts - using the correct column names based on your schema
       const { data: messages, error } = await supabase
         .from('messages')
-        .select(`
-          id,
-          sender_id,
-          receiver_id,
-          is_read,
-          created_at
-        `)
+        .select('id, sender_id, receiver_id, is_read')
         .eq('receiver_id', user.id)
-        .eq('is_read', false)
-        .order('created_at', { ascending: false });
+        .eq('is_read', false);
 
       if (error) throw error;
 
-      // Group by sender (for received messages)
+      // Group by sender
       const counts: UnreadMessageCounts = {};
       let total = 0;
 
       messages?.forEach(message => {
-        // Use sender_id as the conversation identifier for received messages
         const senderId = message.sender_id;
         counts[senderId] = (counts[senderId] || 0) + 1;
         total++;
@@ -54,8 +44,8 @@ export const useUnreadMessages = () => {
 
       setUnreadCounts(counts);
       setTotalUnread(total);
-      
-      console.log('📊 Unread message counts updated:', { counts, total });
+
+      console.log('📊 Unread counts updated:', { counts, total });
     } catch (error) {
       console.error('❌ Error fetching unread counts:', error);
     } finally {
@@ -63,7 +53,7 @@ export const useUnreadMessages = () => {
     }
   }, [user]);
 
-  // Mark messages as read for a specific conversation
+  // Mark messages as read
   const markAsRead = useCallback(async (conversationId: string) => {
     if (!user?.id || !conversationId) return;
 
@@ -82,25 +72,24 @@ export const useUnreadMessages = () => {
         const newCounts = { ...prev };
         const countToReduce = newCounts[conversationId] || 0;
         delete newCounts[conversationId];
-        
+
         setTotalUnread(prevTotal => Math.max(0, prevTotal - countToReduce));
-        
+
         return newCounts;
       });
 
-      console.log('✅ Messages marked as read for conversation:', conversationId);
+      console.log('✅ Messages marked as read for:', conversationId);
     } catch (error) {
       console.error('❌ Error marking messages as read:', error);
     }
   }, [user]);
 
-  // Set up real-time subscription for unread messages (only when not in a chat)
+  // Set up real-time subscription
   useEffect(() => {
     if (!user?.id) return;
 
-    // Only set up global unread subscription if we're not in a specific chat
-    const isInChat = window.location.pathname.includes('/chat/');
-    if (isInChat) return;
+    // Skip if in chat (handled by ChatScreen)
+    if (window.location.pathname.includes('/chat/')) return;
 
     const newChannel = supabase
       .channel(`unread_${user.id}`)
@@ -162,30 +151,11 @@ export const useUnreadMessages = () => {
     fetchUnreadCounts();
   }, [fetchUnreadCounts]);
 
-  // Request notification permission on mount
-  useEffect(() => {
-    if ('Notification' in window && Notification.permission === 'default') {
-      Notification.requestPermission().then(permission => {
-        console.log('🔔 Notification permission:', permission);
-      });
-    }
-  }, []);
-
-  // Cleanup on unmount
-  useEffect(() => {
-    return () => {
-      if (channel) {
-        channel.unsubscribe();
-      }
-    };
-  }, [channel]);
-
   return {
     unreadCounts,
     totalUnread,
     loading,
     markAsRead,
-    refresh: fetchUnreadCounts,
-    refreshUnreadCounts: fetchUnreadCounts
+    refresh: fetchUnreadCounts
   };
 };

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/hooks/useAuth';
@@ -124,11 +123,11 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ conversationId, receiver
   }, [receiverId]);
 
   // Fetch messages with better error handling
-  const fetchMessages = useCallback(async (loadMore = false) => {
+  const fetchMessages = useCallback(async () => {
     if (!user || !receiverId) return;
 
     try {
-      console.log('🔄 Fetching messages...', { userId: user.id, receiverId, loadMore });
+      console.log('🔄 Fetching messages...', { userId: user.id, receiverId });
 
       const query = supabase
         .from('messages')
@@ -160,13 +159,8 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ conversationId, receiver
           reply_to_id
         `)
         .or(`and(sender_id.eq.${user.id},receiver_id.eq.${receiverId}),and(sender_id.eq.${receiverId},receiver_id.eq.${user.id})`)
-        .order('created_at', { ascending: false })
-        .limit(50);
-
-      if (loadMore && messages.length > 0) {
-        const oldestMessage = messages[messages.length - 1];
-        query.lt('created_at', oldestMessage.created_at);
-      }
+        .order('created_at', { ascending: true }) // Changed to ascending for initial load
+        .limit(100); // Reduced limit for performance
 
       const { data: messageData, error } = await query;
 
@@ -175,23 +169,20 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ conversationId, receiver
         throw error;
       }
 
-      const formattedMessages = (messageData || []).reverse();
+      const formattedMessages = (messageData || []);
       console.log('✅ Messages fetched:', formattedMessages.length);
 
-      if (loadMore) {
-        setMessages(prev => [...formattedMessages, ...prev]);
-      } else {
-        setMessages(formattedMessages);
+      setMessages(formattedMessages);
 
-        // Always auto-scroll on initial load
-        if (isInitialLoadRef.current) {
-          setTimeout(() => scrollToBottom(false), 100);
-          isInitialLoadRef.current = false;
-          setShouldAutoScroll(true);
-        } else if (isScrolledToBottom) {
-          setTimeout(() => scrollToBottom(false), 50);
-        }
+      // Always auto-scroll on initial load
+      if (isInitialLoadRef.current) {
+        setTimeout(() => scrollToBottom(false), 100);
+        isInitialLoadRef.current = false;
+        setShouldAutoScroll(true);
+      } else if (isScrolledToBottom) {
+        setTimeout(() => scrollToBottom(false), 50);
       }
+
 
       // Mark messages as read
       if (formattedMessages.length > 0) {
@@ -213,19 +204,13 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ conversationId, receiver
     } finally {
       setLoading(false);
     }
-  }, [user, receiverId, messages.length, isScrolledToBottom, scrollToBottom]);
+  }, [user, receiverId, isScrolledToBottom, scrollToBottom]);
 
   // Enhanced real-time subscription with better reconnection logic
   const setupRealtimeSubscription = useCallback(() => {
     if (!user || !receiverId) {
       console.log('❌ Cannot set up subscription - missing user or receiverId:', { userId: user?.id, receiverId });
       return;
-    }
-
-    // Clear any existing reconnection timeout
-    if (reconnectTimeoutRef.current) {
-      clearTimeout(reconnectTimeoutRef.current);
-      reconnectTimeoutRef.current = null;
     }
 
     // Clean up existing subscription
@@ -240,185 +225,168 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ conversationId, receiver
     }
 
     const channelName = `messages_${Math.min(parseInt(user.id), parseInt(receiverId))}_${Math.max(parseInt(user.id), parseInt(receiverId))}`;
-    console.log('🚀 Setting up real-time subscription:', channelName, 'Attempt:', subscriptionAttempts.current + 1);
+    console.log('🚀 Setting up real-time subscription:', channelName);
 
     setConnectionStatus('connecting');
 
     // Create channel with enhanced configuration
     const channel = supabase
-      .channel(channelName, {
-        config: {
-          broadcast: { self: false },
-          presence: { key: user.id },
-          postgres_changes: [
-            {
-              event: 'INSERT',
-              schema: 'public',
-              table: 'messages',
-              filter: `or(and(sender_id.eq.${user.id},receiver_id.eq.${receiverId}),and(sender_id.eq.${receiverId},receiver_id.eq.${user.id}))`
+      .channel(channelName)
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'messages',
+          filter: `or(and(sender_id.eq.${user.id},receiver_id.eq.${receiverId}),and(sender_id.eq.${receiverId},receiver_id.eq.${user.id}))`
+        },
+        async (payload) => {
+          console.log('📨 New message received via real-time:', payload);
+
+          try {
+            const newMessageData = payload.new as any;
+
+            if (!newMessageData || !newMessageData.id) {
+              console.warn('⚠️ Invalid message data received:', newMessageData);
+              return;
             }
-          ]
+
+            // Skip if message doesn't belong to this conversation
+            const isRelevant = (
+              (newMessageData.sender_id === user.id && newMessageData.receiver_id === receiverId) ||
+              (newMessageData.sender_id === receiverId && newMessageData.receiver_id === user.id)
+            );
+
+            if (!isRelevant) {
+              console.log('📍 Message not relevant to current conversation, skipping');
+              return;
+            }
+
+            // Create message object with sender info
+            const newMessage: Message = {
+              id: newMessageData.id,
+              content: newMessageData.content || '',
+              sender_id: newMessageData.sender_id,
+              receiver_id: newMessageData.receiver_id,
+              recipient_id: newMessageData.recipient_id,
+              conversation_id: newMessageData.conversation_id,
+              created_at: newMessageData.created_at,
+              message_type: newMessageData.message_type || 'text',
+              file_url: newMessageData.file_url,
+              file_name: newMessageData.file_name,
+              attachment_url: newMessageData.attachment_url,
+              attachment_name: newMessageData.attachment_name,
+              is_read: newMessageData.is_read || false,
+              sender: null,
+              reactions: [],
+              reply_to: null
+            };
+
+            // Fetch sender profile if needed
+            if (newMessage.sender_id !== user.id) {
+              try {
+                const { data: senderProfile } = await supabase
+                  .from('profiles')
+                  .select('id, full_name, avatar_url')
+                  .eq('id', newMessage.sender_id)
+                  .single();
+                
+                if (senderProfile) {
+                  newMessage.sender = senderProfile;
+                }
+              } catch (error) {
+                console.warn('Could not fetch sender profile:', error);
+                newMessage.sender = {
+                  id: newMessage.sender_id,
+                  full_name: 'Unknown User',
+                  avatar_url: ''
+                };
+              }
+            } else {
+              newMessage.sender = {
+                id: user.id,
+                full_name: user.user_metadata?.full_name || user.email || 'You',
+                avatar_url: user.user_metadata?.avatar_url || ''
+              };
+            }
+
+            // Add message to state with duplicate check
+            setMessages(prev => {
+              const exists = prev.some(msg => msg.id === newMessage.id);
+              if (exists) {
+                console.log('⚠️ Message already exists, skipping:', newMessage.id);
+                return prev;
+              }
+
+              console.log('✅ Adding new message to state:', newMessage.id);
+              const updated = [...prev, newMessage];
+
+              // Auto-scroll for own messages or if at bottom
+              if (newMessage.sender_id === user.id || shouldAutoScroll) {
+                setTimeout(() => scrollToBottom(true), 100);
+              } else {
+                setNewMessageCount(count => count + 1);
+              }
+
+              return updated;
+            });
+
+            // Mark as read if receiving
+            if (newMessage.receiver_id === user.id && !newMessage.is_read) {
+              try {
+                await supabase
+                  .from('messages')
+                  .update({ is_read: true })
+                  .eq('id', newMessage.id);
+              } catch (error) {
+                console.warn('Could not mark message as read:', error);
+              }
+            }
+
+          } catch (error) {
+            console.error('❌ Error processing new message:', error);
+          }
+        }
+      )
+      .subscribe((status) => {
+        console.log('📡 Real-time subscription status:', status);
+        
+        if (status === 'SUBSCRIBED') {
+          console.log('✅ Successfully subscribed to real-time messages');
+          setConnectionStatus('connected');
+          subscriptionAttempts.current = 0; // Reset attempts on success
+        } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
+          console.error('❌ Channel subscription failed:', status);
+          setConnectionStatus('disconnected');
+          
+          subscriptionAttempts.current++;
+          
+          // Exponential backoff for reconnection
+          const delay = Math.min(1000 * Math.pow(2, subscriptionAttempts.current), 30000);
+          console.log(`🔄 Retrying subscription in ${delay}ms (attempt ${subscriptionAttempts.current})`);
+          
+          reconnectTimeoutRef.current = setTimeout(() => {
+            if (user && receiverId && subscriptionAttempts.current < 5) {
+              setupRealtimeSubscription();
+            } else {
+              console.error('❌ Max subscription attempts reached');
+              toast({
+                variant: "destructive",
+                title: "Connection Lost",
+                description: "Unable to receive real-time messages. Please refresh the page."
+              });
+            }
+          }, delay);
+          
+        } else if (status === 'CLOSED') {
+          console.warn('⚠️ Channel subscription closed');
+          setConnectionStatus('disconnected');
+        } else {
+          setConnectionStatus('connecting');
         }
       });
 
     channelRef.current = channel;
-
-    // Handle new messages
-    channel.on(
-      'postgres_changes',
-      {
-        event: 'INSERT',
-        schema: 'public',
-        table: 'messages'
-      },
-      async (payload) => {
-        console.log('📨 New message received via real-time:', payload);
-
-        try {
-          const newMessageData = payload.new as any;
-
-          if (!newMessageData || !newMessageData.id) {
-            console.warn('⚠️ Invalid message data received:', newMessageData);
-            return;
-          }
-
-          // Skip if message doesn't belong to this conversation
-          const isRelevant = (
-            (newMessageData.sender_id === user.id && newMessageData.receiver_id === receiverId) ||
-            (newMessageData.sender_id === receiverId && newMessageData.receiver_id === user.id)
-          );
-
-          if (!isRelevant) {
-            console.log('📍 Message not relevant to current conversation, skipping');
-            return;
-          }
-
-          // Create message object with sender info
-          const newMessage: Message = {
-            id: newMessageData.id,
-            content: newMessageData.content || '',
-            sender_id: newMessageData.sender_id,
-            receiver_id: newMessageData.receiver_id,
-            recipient_id: newMessageData.recipient_id,
-            conversation_id: newMessageData.conversation_id,
-            created_at: newMessageData.created_at,
-            message_type: newMessageData.message_type || 'text',
-            file_url: newMessageData.file_url,
-            file_name: newMessageData.file_name,
-            attachment_url: newMessageData.attachment_url,
-            attachment_name: newMessageData.attachment_name,
-            is_read: newMessageData.is_read || false,
-            sender: null,
-            reactions: [],
-            reply_to: null
-          };
-
-          // Fetch sender profile if needed
-          if (newMessage.sender_id !== user.id) {
-            try {
-              const { data: senderProfile } = await supabase
-                .from('profiles')
-                .select('id, full_name, avatar_url')
-                .eq('id', newMessage.sender_id)
-                .single();
-              
-              if (senderProfile) {
-                newMessage.sender = senderProfile;
-              }
-            } catch (error) {
-              console.warn('Could not fetch sender profile:', error);
-              newMessage.sender = {
-                id: newMessage.sender_id,
-                full_name: 'Unknown User',
-                avatar_url: ''
-              };
-            }
-          } else {
-            newMessage.sender = {
-              id: user.id,
-              full_name: user.user_metadata?.full_name || user.email || 'You',
-              avatar_url: user.user_metadata?.avatar_url || ''
-            };
-          }
-
-          // Add message to state with duplicate check
-          setMessages(prev => {
-            const exists = prev.some(msg => msg.id === newMessage.id);
-            if (exists) {
-              console.log('⚠️ Message already exists, skipping:', newMessage.id);
-              return prev;
-            }
-
-            console.log('✅ Adding new message to state:', newMessage.id);
-            const updated = [...prev, newMessage];
-
-            // Auto-scroll for own messages or if at bottom
-            if (newMessage.sender_id === user.id || shouldAutoScroll) {
-              setTimeout(() => scrollToBottom(true), 100);
-            } else {
-              setNewMessageCount(count => count + 1);
-            }
-
-            return updated;
-          });
-
-          // Mark as read if receiving
-          if (newMessage.receiver_id === user.id && !newMessage.is_read) {
-            try {
-              await supabase
-                .from('messages')
-                .update({ is_read: true })
-                .eq('id', newMessage.id);
-            } catch (error) {
-              console.warn('Could not mark message as read:', error);
-            }
-          }
-
-        } catch (error) {
-          console.error('❌ Error processing new message:', error);
-        }
-      }
-    );
-
-    // Subscribe with status handling
-    channel.subscribe((status) => {
-      console.log('📡 Real-time subscription status:', status);
-      
-      if (status === 'SUBSCRIBED') {
-        console.log('✅ Successfully subscribed to real-time messages');
-        setConnectionStatus('connected');
-        subscriptionAttempts.current = 0; // Reset attempts on success
-      } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
-        console.error('❌ Channel subscription failed:', status);
-        setConnectionStatus('disconnected');
-        
-        subscriptionAttempts.current++;
-        
-        // Exponential backoff for reconnection
-        const delay = Math.min(1000 * Math.pow(2, subscriptionAttempts.current), 30000);
-        console.log(`🔄 Retrying subscription in ${delay}ms (attempt ${subscriptionAttempts.current})`);
-        
-        reconnectTimeoutRef.current = setTimeout(() => {
-          if (user && receiverId && subscriptionAttempts.current < 5) {
-            setupRealtimeSubscription();
-          } else {
-            console.error('❌ Max subscription attempts reached');
-            toast({
-              variant: "destructive",
-              title: "Connection Lost",
-              description: "Unable to receive real-time messages. Please refresh the page."
-            });
-          }
-        }, delay);
-        
-      } else if (status === 'CLOSED') {
-        console.warn('⚠️ Channel subscription closed');
-        setConnectionStatus('disconnected');
-      } else {
-        setConnectionStatus('connecting');
-      }
-    });
-
   }, [user, receiverId, shouldAutoScroll, scrollToBottom]);
 
   // Handle sending messages
@@ -535,7 +503,7 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ conversationId, receiver
         typingStatus.stopTyping();
       }
     };
-  }, [user?.id, receiverId]);
+  }, [user?.id, receiverId, scrollToBottom, setupRealtimeSubscription, typingStatus?.stopTyping, fetchMessages, fetchReceiverProfile]);
 
   // Group messages by date for better UX
   const groupedMessages = useMemo(() => {
@@ -554,7 +522,7 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ conversationId, receiver
   }, [messages]);
 
   // Send message function for MessageInput
-  const sendMessage = async (content: string, attachmentUrl?: string, attachmentName?: string, replyToId?: string) => {
+  const sendMessage = useCallback(async (content: string, attachmentUrl?: string, attachmentName?: string, replyToId?: string) => {
     if (!user || !receiverId || (!content.trim() && !attachmentUrl)) return;
 
     // Determine message type based on file extension
@@ -612,7 +580,7 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ conversationId, receiver
         description: "Please try again."
       });
     }
-  };
+  }, [user, receiverId, stopTyping, conversationId, scrollToBottom]);
 
   if (loading) {
     return (
