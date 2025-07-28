@@ -1,0 +1,82 @@
+[vite] connected.
+chunk-276SZO74.js?v=d1881984:21551 Download the React DevTools for a better development experience: https://reactjs.org/link/react-devtools
+main.tsx:22 HMR detected, preserving application state
+main.tsx:22 Initializing auth state...
+main.tsx:22 App initialized
+main.tsx:22 Checking storage buckets...
+main.tsx:22 Checking existing storage buckets...
+main.tsx:22 i18next::backendConnector: loaded namespace translation for language en {navigation: {…}, auth: {…}, settings: {…}}
+main.tsx:22 i18next: languageChanged en
+main.tsx:22 i18next: initialized {debug: true, initAsync: true, ns: Array(1), defaultNS: Array(1), fallbackLng: Array(1), …}
+main.tsx:22 Setting initial session: Session exists
+main.tsx:22 Checking profile for user: ed1c374e-3823-4ea2-aa28-3999c21d1140
+main.tsx:22 Updating last_seen for user: ed1c374e-3823-4ea2-aa28-3999c21d1140
+main.tsx:22 No existing buckets found, which is unusual.
+main.tsx:22 Storage buckets verified successfully
+main.tsx:22 Checking onboarding status for user: ed1c374e-3823-4ea2-aa28-3999c21d1140
+main.tsx:22 Auth state changed: INITIAL_SESSION Session exists
+main.tsx:22 Checking onboarding status for user: ed1c374e-3823-4ea2-aa28-3999c21d1140
+main.tsx:22 Onboarding status: Completed
+chunk-276SZO74.js?v=d1881984:14032 The above error occurred in the <MainNav> component:
+
+    at MainNav (https://0b73b56f-5c04-4ef5-ac9f-d29a041365ab-00-y35rsmszs1oh.sisko.replit.dev/src/components/navigation/MainNav.tsx?t=1753695879121:87:22)
+    at div
+    at div
+    at AppLayout (https://0b73b56f-5c04-4ef5-ac9f-d29a041365ab-00-y35rsmszs1oh.sisko.replit.dev/src/components/layouts/AppLayout.tsx?t=1753695879121:85:22)
+    at ProtectedRoute (https://0b73b56f-5c04-4ef5-ac9f-d29a041365ab-00-y35rsmszs1oh.sisko.replit.dev/src/components/auth/ProtectedRoute.tsx?t=1753695722853:15:27)
+    at RenderedRoute (https://0b73b56f-5c04-4ef5-ac9f-d29a041365ab-00-y35rsmszs1oh.sisko.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=cdf1158e:4069:5)
+    at Routes (https://0b73b56f-5c04-4ef5-ac9f-d29a041365ab-00-y35rsmszs1oh.sisko.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=cdf1158e:4508:5)
+    at PresenceChild (https://0b73b56f-5c04-4ef5-ac9f-d29a041365ab-00-y35rsmszs1oh.sisko.replit.dev/node_modules/.vite/deps/framer-motion.js?v=05d8bbbc:137:24)
+    at AnimatePresence (https://0b73b56f-5c04-4ef5-ac9f-d29a041365ab-00-y35rsmszs1oh.sisko.replit.dev/node_modules/.vite/deps/framer-motion.js?v=05d8bbbc:216:26)
+    at AppRoutes (https://0b73b56f-5c04-4ef5-ac9f-d29a041365ab-00-y35rsmszs1oh.sisko.replit.dev/src/App.tsx?t=1753695879870:65:33)
+    at ErrorBoundary (https://0b73b56f-5c04-4ef5-ac9f-d29a041365ab-00-y35rsmszs1oh.sisko.replit.dev/src/components/ErrorBoundary.tsx:172:5)
+    at AuthProvider (https://0b73b56f-5c04-4ef5-ac9f-d29a041365ab-00-y35rsmszs1oh.sisko.replit.dev/src/providers/AuthProvider.tsx?t=1753695722853:24:32)
+    at Router (https://0b73b56f-5c04-4ef5-ac9f-d29a041365ab-00-y35rsmszs1oh.sisko.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=cdf1158e:4451:15)
+    at BrowserRouter (https://0b73b56f-5c04-4ef5-ac9f-d29a041365ab-00-y35rsmszs1oh.sisko.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=cdf1158e:5196:5)
+    at ThemeProvider (https://0b73b56f-5c04-4ef5-ac9f-d29a041365ab-00-y35rsmszs1oh.sisko.replit.dev/src/components/theme-provider.tsx:17:33)
+    at QueryClientProvider (https://0b73b56f-5c04-4ef5-ac9f-d29a041365ab-00-y35rsmszs1oh.sisko.replit.dev/node_modules/.vite/deps/@tanstack_react-query.js?v=e22c7aa3:2794:3)
+    at App (https://0b73b56f-5c04-4ef5-ac9f-d29a041365ab-00-y35rsmszs1oh.sisko.replit.dev/src/App.tsx?t=1753695879870:746:45)
+
+React will try to recreate this component tree from scratch using the error boundary you provided, ErrorBoundary.
+logCapturedError @ chunk-276SZO74.js?v=d1881984:14032
+callback @ chunk-276SZO74.js?v=d1881984:14078
+callCallback @ chunk-276SZO74.js?v=d1881984:11248
+commitUpdateQueue @ chunk-276SZO74.js?v=d1881984:11265
+commitLayoutEffectOnFiber @ chunk-276SZO74.js?v=d1881984:17075
+commitLayoutMountEffects_complete @ chunk-276SZO74.js?v=d1881984:17980
+commitLayoutEffects_begin @ chunk-276SZO74.js?v=d1881984:17969
+commitLayoutEffects @ chunk-276SZO74.js?v=d1881984:17920
+commitRootImpl @ chunk-276SZO74.js?v=d1881984:19353
+commitRoot @ chunk-276SZO74.js?v=d1881984:19277
+finishConcurrentRender @ chunk-276SZO74.js?v=d1881984:18760
+performConcurrentWorkOnRoot @ chunk-276SZO74.js?v=d1881984:18718
+workLoop @ chunk-276SZO74.js?v=d1881984:197
+flushWork @ chunk-276SZO74.js?v=d1881984:176
+performWorkUntilDeadline @ chunk-276SZO74.js?v=d1881984:384Understand this error
+ErrorBoundary.tsx:28 ErrorBoundary caught an error: ReferenceError: fetchUnreadCountseadCounts is not defined
+    at useUnreadMessages (useUnreadMessages.ts:166:14)
+    at MainNav (MainNav.tsx:55:28)
+    at renderWithHooks (chunk-276SZO74.js?v=d1881984:11548:26)
+    at mountIndeterminateComponent (chunk-276SZO74.js?v=d1881984:14926:21)
+    at beginWork (chunk-276SZO74.js?v=d1881984:15914:22)
+    at beginWork$1 (chunk-276SZO74.js?v=d1881984:19753:22)
+    at performUnitOfWork (chunk-276SZO74.js?v=d1881984:19198:20)
+    at workLoopSync (chunk-276SZO74.js?v=d1881984:19137:13)
+    at renderRootSync (chunk-276SZO74.js?v=d1881984:19116:15)
+    at recoverFromConcurrentError (chunk-276SZO74.js?v=d1881984:18736:28) {componentStack: '\n    at MainNav (https://0b73b56f-5c04-4ef5-ac9f-d…ko.replit.dev/src/App.tsx?t=1753695879870:746:45)'}
+componentDidCatch @ ErrorBoundary.tsx:28
+callback @ chunk-276SZO74.js?v=d1881984:14084
+callCallback @ chunk-276SZO74.js?v=d1881984:11248
+commitUpdateQueue @ chunk-276SZO74.js?v=d1881984:11265
+commitLayoutEffectOnFiber @ chunk-276SZO74.js?v=d1881984:17075
+commitLayoutMountEffects_complete @ chunk-276SZO74.js?v=d1881984:17980
+commitLayoutEffects_begin @ chunk-276SZO74.js?v=d1881984:17969
+commitLayoutEffects @ chunk-276SZO74.js?v=d1881984:17920
+commitRootImpl @ chunk-276SZO74.js?v=d1881984:19353
+commitRoot @ chunk-276SZO74.js?v=d1881984:19277
+finishConcurrentRender @ chunk-276SZO74.js?v=d1881984:18760
+performConcurrentWorkOnRoot @ chunk-276SZO74.js?v=d1881984:18718
+workLoop @ chunk-276SZO74.js?v=d1881984:197
+flushWork @ chunk-276SZO74.js?v=d1881984:176
+performWorkUntilDeadline @ chunk-276SZO74.js?v=d1881984:384Understand this error
+main.tsx:22 Onboarding status: Completed
