@@ -96,12 +96,12 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ conversationId, receiver
 
     // Detect user scrolling
     setIsUserScrolling(true);
-    
+
     // Clear existing timeout
     if (scrollTimeoutRef.current) {
       clearTimeout(scrollTimeoutRef.current);
     }
-    
+
     // Reset user scrolling flag after a delay
     scrollTimeoutRef.current = setTimeout(() => {
       setIsUserScrolling(false);
@@ -323,7 +323,7 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ conversationId, receiver
         } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
           setConnectionStatus('disconnected');
           console.error('❌ Subscription failed:', status);
-          
+
           // Auto-retry connection after delay
           setTimeout(() => {
             if (user && receiverId) {
@@ -343,7 +343,7 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ conversationId, receiver
   }, [user?.id, receiverId]); // Simplified dependencies
 
   // Send message with optimistic UI update
-  const sendMessage = useCallback(async (content: string, attachmentUrl?: string, attachmentName?: string, replyToId?: string) => {
+  const sendMessage = useCallback(async (content: string, messageType: 'text' | 'image' | 'file' | 'audio' | 'video' = 'text', fileName?: string) => {
     if (!user || !receiverId || (!content.trim() && !attachmentUrl)) return;
 
     // Determine message type
@@ -392,7 +392,7 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ conversationId, receiver
 
     // Add optimistic message immediately
     setMessages(prev => [...prev, optimisticMessage]);
-    
+
     // Only auto-scroll if user isn't actively scrolling
     if (!isUserScrolling) {
       scrollToBottom(true);
@@ -433,10 +433,10 @@ export const ChatScreen: React.FC<ChatScreenProps> = ({ conversationId, receiver
 
     } catch (error) {
       console.error('❌ Error sending message:', error);
-      
+
       // Remove optimistic message on error
       setMessages(prev => prev.filter(msg => msg.id !== tempId));
-      
+
       toast({
         variant: "destructive",
         title: "Failed to send message",
