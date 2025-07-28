@@ -1,7 +1,8 @@
+
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from './useAuth';
-import { RealtimeChannel } from '@supabase/supabase-js';
+import subscriptionManager from '@/utils/subscriptionManager';
 
 interface UnreadMessageCounts {
   [conversationId: string]: number;
@@ -12,7 +13,6 @@ export const useUnreadMessages = () => {
   const [unreadCounts, setUnreadCounts] = useState<UnreadMessageCounts>({});
   const [totalUnread, setTotalUnread] = useState(0);
   const [loading, setLoading] = useState(true);
-  const [channel, setChannel] = useState<RealtimeChannel | null>(null);
 
   // Fetch unread counts
   const fetchUnreadCounts = useCallback(async () => {
@@ -91,8 +91,10 @@ export const useUnreadMessages = () => {
     // Skip if in chat (handled by ChatScreen)
     if (window.location.pathname.includes('/chat/')) return;
 
-    const newChannel = supabase
-      .channel(`unread_${user.id}`)
+    const subscriptionKey = `unread_${user.id}`;
+
+    const channel = supabase
+      .channel(subscriptionKey)
       .on(
         'postgres_changes',
         {
@@ -109,6 +111,7 @@ export const useUnreadMessages = () => {
               [senderId]: (prev[senderId] || 0) + 1
             }));
             setTotalUnread(prev => prev + 1);
+            console.log('📨 New unread message from:', senderId);
           }
         }
       )
@@ -134,15 +137,19 @@ export const useUnreadMessages = () => {
               return newCounts;
             });
             setTotalUnread(prev => Math.max(0, prev - 1));
+            console.log('✅ Message marked as read from:', senderId);
           }
         }
       )
-      .subscribe();
+      .subscribe((status) => {
+        console.log('📡 Unread messages subscription status:', status);
+      });
 
-    setChannel(newChannel);
+    // Register with subscription manager
+    subscriptionManager.subscribe(subscriptionKey, channel);
 
     return () => {
-      newChannel.unsubscribe();
+      subscriptionManager.unsubscribe(subscriptionKey);
     };
   }, [user?.id]);
 
