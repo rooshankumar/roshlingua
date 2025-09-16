@@ -125,7 +125,6 @@ const Dashboard = () => {
               avatar_url: user.user_metadata?.avatar_url,
               created_at: new Date().toISOString(),
               updated_at: new Date().toISOString(),
-              onboarding_completed: false,
               streak_count: 0,
               xp_points: 0,
               progress_percentage: 0

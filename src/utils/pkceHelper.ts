@@ -19,6 +19,17 @@ export const generateVerifier = () => {
   return verifier;
 };
 
+// Generate a code challenge from a verifier using S256 and base64-url encoding
+export const createCodeChallenge = async (verifier: string): Promise<string> => {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(verifier);
+  const digest = await window.crypto.subtle.digest('SHA-256', data);
+  const bytes = new Uint8Array(digest);
+  let str = '';
+  bytes.forEach((b) => (str += String.fromCharCode(b)));
+  return btoa(str).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+};
+
 // Store PKCE verifier in multiple storage locations for redundancy
 export const storePKCEVerifier = (verifier: string) => {
   if (!verifier) {
@@ -102,10 +113,11 @@ export const storePKCEVerifier = (verifier: string) => {
     try {
       let verifierInput = document.getElementById('pkce-verifier-store');
       if (!verifierInput) {
-        verifierInput = document.createElement('input');
-        verifierInput.type = 'hidden';
-        verifierInput.id = 'pkce-verifier-store';
-        document.body.appendChild(verifierInput);
+        const newInput = document.createElement('input') as HTMLInputElement;
+        newInput.type = 'hidden';
+        newInput.id = 'pkce-verifier-store';
+        document.body.appendChild(newInput);
+        verifierInput = newInput;
       }
       (verifierInput as HTMLInputElement).value = verifier;
     } catch (e) {
@@ -374,38 +386,23 @@ export const exchangeAuthCode = async (code: string) => {
     return { data: { session: null }, error: new Error('Missing auth code') };
   }
 
-  // Get verifier before exchange
+  // Ensure verifier exists in storage; Supabase SDK will use it automatically
   const verifier = getPKCEVerifier();
-
   if (!verifier) {
     console.error('[PKCE] Critical: Missing code verifier for auth exchange');
-    return { data: { session: null }, error: new Error('Missing code verifier') };
+  } else {
+    console.log('[PKCE] Using verifier with length:', verifier.length, 'Verifier:', verifier.substring(0, 10) + '...');
   }
-
-  console.log('[PKCE] Using verifier with length:', verifier.length, 'Verifier:', verifier.substring(0, 10) + '...'); // Added log
 
   try {
     // Explicitly set the verifier in localStorage again to ensure it's available
-    localStorage.setItem('supabase.auth.code_verifier', verifier);
+    if (verifier) localStorage.setItem('supabase.auth.code_verifier', verifier);
 
-    // Perform the code exchange with the code and verifier
-    const result = await supabase.auth.exchangeCodeForSession(code, verifier); // ADD THE VERIFIER HERE
+    // Perform the code exchange (Supabase reads verifier from storage)
+    const result = await supabase.auth.exchangeCodeForSession(code);
 
     if (result.error) {
       console.error('[PKCE] Code exchange failed:', result.error);
-
-      // If the standard exchange fails, try a manual approach
-      console.log('[PKCE] Attempting manual code exchange...');
-
-      // This will manually construct the request if the standard one fails
-      const manualResult = await supabase.auth.updateSession({
-        refresh_token: code, // Try using the code as a refresh token as fallback
-      });
-
-      if (!manualResult.error) {
-        console.log('[PKCE] Manual exchange succeeded');
-        return manualResult;
-      }
     }
 
     return result;

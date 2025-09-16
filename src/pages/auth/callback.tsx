@@ -228,51 +228,52 @@ const Callback = () => {
         console.log("Successfully authenticated!");
         clearPKCEVerifier(); // Clear verifier after successful authentication
 
-        // Check for existing profile
+        // After successful session, update last_seen and route based on onboarding_status
         try {
-          // Add Accept header to avoid 406 errors
-          const { data: profile, error: profileError } = await supabase
-            .from('profiles')
-            .select('onboarding_completed')
-            .eq('id', data.session.user.id)
-            .single();
-
-          if (profileError && profileError.code !== 'PGRST116') {
-            console.error("Error fetching profile:", profileError);
-            throw profileError;
-          }
-
-          // Create profile if needed
-          if (!profile) {
-            console.log("Creating new profile for user");
-            await supabase.from('profiles').insert({
-              id: data.session.user.id,
-              email: data.session.user.email,
-              created_at: new Date().toISOString(),
-              updated_at: new Date().toISOString(),
-              last_seen: new Date().toISOString(),
-              onboarding_completed: false
-            });
-
-            navigate('/onboarding', { replace: true });
-            return;
-          }
-
-          // Update last seen timestamp
+          // Update last_seen
           await supabase
             .from('profiles')
             .update({ last_seen: new Date().toISOString() })
             .eq('id', data.session.user.id);
 
-          // Redirect based on onboarding status
-          if (profile.onboarding_completed) {
-            navigate('/dashboard', { replace: true });
-          } else {
-            navigate('/onboarding', { replace: true });
+          // Upsert name/avatar from provider metadata (non-null only)
+          const u = data.session.user;
+          const fullName = (u.user_metadata?.full_name) || (u.user_metadata?.name) || null;
+          const avatar = (u.user_metadata?.picture) || (u.user_metadata?.avatar_url) || null;
+          const upsertPayload: any = { id: u.id, email: u.email, updated_at: new Date().toISOString() };
+          if (fullName) { upsertPayload.display_name = fullName; upsertPayload.full_name = fullName; }
+          if (avatar) { upsertPayload.avatar_url = avatar; }
+          if (fullName || avatar) {
+            await supabase.from('profiles').upsert(upsertPayload, { onConflict: 'id' });
           }
-        } catch (profileError) {
-          console.error("Error handling profile:", profileError);
-          // Still redirect to dashboard as authentication succeeded
+
+          // If avatar is external, mirror it into Supabase Storage for reliability
+          try {
+            const avatar = (u.user_metadata?.picture) || (u.user_metadata?.avatar_url) || null;
+            if (avatar && avatar.startsWith('http') && !avatar.includes('/storage/v1/object/public/avatars/')) {
+              const res = await fetch(avatar);
+              if (res.ok) {
+                const blob = await res.blob();
+                const mime = res.headers.get('content-type') || blob.type || 'image/jpeg';
+                const ext = mime.includes('png') ? 'png' : mime.includes('webp') ? 'webp' : mime.includes('gif') ? 'gif' : 'jpg';
+                const path = `${u.id}/provider_${Date.now()}.${ext}`;
+                const { error: upErr } = await supabase.storage.from('avatars').upload(path, blob, { contentType: mime, upsert: true });
+                if (!upErr) {
+                  const { data: pub } = await supabase.storage.from('avatars').getPublicUrl(path);
+                  if (pub?.publicUrl) {
+                    await supabase.from('profiles').update({ avatar_url: pub.publicUrl, updated_at: new Date().toISOString() }).eq('id', u.id);
+                  }
+                }
+              }
+            }
+          } catch (e) {
+            console.warn('Avatar mirroring skipped:', e);
+          }
+
+          // Route (onboarding optional: send to dashboard)
+          navigate('/dashboard', { replace: true });
+        } catch (routeError) {
+          console.error("Post-auth routing error:", routeError);
           navigate('/dashboard', { replace: true });
         }
       } catch (error: any) {

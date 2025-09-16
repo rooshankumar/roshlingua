@@ -107,9 +107,12 @@ const Settings = () => {
         if (updateEmailError) throw updateEmailError;
       }
 
-      // First ensure required fields are set
+      // Language preferences are optional; warn but do not block save
       if (!localProfile.learning_language || !localProfile.native_language || !localProfile.proficiency_level) {
-        throw new Error("Please select your language preferences before saving");
+        toast({
+          title: "Missing language preferences",
+          description: "You can set your native, learning language and level later.",
+        });
       }
 
       if (!currentUser?.id) {
@@ -118,7 +121,6 @@ const Settings = () => {
 
       const profileData = {
         id: currentUser.id,
-        user_id: currentUser.id,
         avatar_url: localProfile.avatar_url || null,
         bio: localBio || '',
         full_name: localProfile.full_name || '',
@@ -147,26 +149,7 @@ const Settings = () => {
         throw secondProfileError;
       }
 
-      // Then update via RPC with rate limiting
-      const { data: userProfile, error: rpcError } = await supabase.rpc('update_user_profile', {
-        p_user_id: currentUser.id,
-        p_full_name: profileData.full_name,
-        p_email: currentUser.email,
-        p_avatar_url: profileData.avatar_url,
-        p_bio: profileData.bio,
-        p_gender: profileData.gender,
-        p_date_of_birth: profileData.date_of_birth,
-        p_country: profileData.country,
-        p_native_language: profileData.native_language,
-        p_learning_language: profileData.learning_language,
-        p_proficiency_level: profileData.proficiency_level,
-        p_streak_count: profileData.streak_count || 0
-      });
-
-      if (rpcError) {
-        console.error("Error updating user profile via RPC:", rpcError);
-        throw rpcError;
-      }
+      // No RPC needed; realtime will broadcast the upserted change
 
       // Then update local state and show success
       if (updateProfile) {

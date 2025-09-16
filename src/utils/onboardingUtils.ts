@@ -7,51 +7,50 @@ export const checkOnboardingStatus = async (userId: string) => {
 
     console.log("Checking onboarding status for user:", userId);
     
-    // First, check if the profile exists
+    // Check onboarding_status row
     const { data, error } = await supabase
-      .from('profiles')
-      .select('onboarding_completed')
-      .eq('id', userId)
+      .from('onboarding_status')
+      .select('is_complete')
+      .eq('user_id', userId)
       .single();
 
     if (error) {
       console.error("Error fetching onboarding status:", error);
-      
-      // If we got a 404/not found error, the profile might not exist yet
+      // If we got a 404/not found error, the row might not exist yet
       if (error.code === 'PGRST116') {
-        console.log("Profile not found, creating a new profile entry");
+        console.log("Onboarding row not found, creating a new onboarding_status entry");
         
         try {
-          // Create a placeholder profile to ensure onboarding works
+          // Create a placeholder onboarding_status row to ensure flow works
           const { error: createError } = await supabase
-            .from('profiles')
+            .from('onboarding_status')
             .insert({
-              id: userId,
-              onboarding_completed: false,
+              user_id: userId,
+              is_complete: false,
               created_at: new Date().toISOString(),
               updated_at: new Date().toISOString()
             });
             
           if (createError) {
-            console.error("Error creating profile:", createError);
+            console.error("Error creating onboarding_status:", createError);
             return { isComplete: false, error: createError };
           }
           
-          // Verify profile was created
-          const { data: newProfile, error: verifyError } = await supabase
-            .from('profiles')
-            .select('onboarding_completed')
-            .eq('id', userId)
+          // Verify row was created
+          const { data: newRow, error: verifyError } = await supabase
+            .from('onboarding_status')
+            .select('is_complete')
+            .eq('user_id', userId)
             .single();
             
           if (verifyError) {
-            console.error("Error verifying new profile:", verifyError);
+            console.error("Error verifying new onboarding_status:", verifyError);
             return { isComplete: false, error: verifyError };
           }
           
-          return { isComplete: newProfile?.onboarding_completed || false };
+          return { isComplete: newRow?.is_complete || false };
         } catch (err) {
-          console.error("Error in profile creation process:", err);
+          console.error("Error in onboarding_status creation process:", err);
           return { isComplete: false, error: err };
         }
       }
@@ -59,9 +58,9 @@ export const checkOnboardingStatus = async (userId: string) => {
       return { isComplete: false, error };
     }
 
-    console.log("Onboarding status retrieved:", data?.onboarding_completed);
+    console.log("Onboarding status retrieved:", data?.is_complete);
     return { 
-      isComplete: data?.onboarding_completed || false
+      isComplete: data?.is_complete || false
     };
   } catch (err) {
     console.error("Onboarding check error:", err);
@@ -72,12 +71,12 @@ export const checkOnboardingStatus = async (userId: string) => {
 export const updateOnboardingStatus = async (userId: string, isComplete: boolean) => {
   try {
     const { error } = await supabase
-      .from('profiles')
-      .update({
-        onboarding_completed: isComplete,
+      .from('onboarding_status')
+      .upsert({
+        user_id: userId,
+        is_complete: isComplete,
         updated_at: new Date().toISOString()
-      })
-      .eq('id', userId);
+      }, { onConflict: 'user_id' });
 
     if (error) {
       console.error("Error updating onboarding status:", error);

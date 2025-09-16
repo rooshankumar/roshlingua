@@ -77,10 +77,7 @@ const AuthCodeHandler = () => {
               // Set the session manually using the token from the hash
               const { data, error } = await supabase.auth.setSession({
                 access_token: accessToken,
-                refresh_token: refreshToken || '',
-                expires_in: expiresIn ? parseInt(expiresIn) : 3600,
-                expires_at: expiresAt ? parseInt(expiresAt) : Math.floor(Date.now() / 1000) + 3600,
-                token_type: tokenType || 'bearer',
+                refresh_token: refreshToken || ''
               });
 
               if (error) {
@@ -285,17 +282,16 @@ const AuthCodeHandler = () => {
           let profileError;
           
           try {
-            // Set explicit Accept header to avoid 406 errors
+            // Check onboarding_status instead of profiles.onboarding_completed
             const { data, error } = await supabase
-              .from('profiles')
-              .select('onboarding_completed')
-              .eq('id', user.id)
+              .from('onboarding_status')
+              .select('is_complete')
+              .eq('user_id', user.id)
               .single();
-              
             profileData = data;
             profileError = error;
           } catch (err) {
-            console.error("Exception fetching profile:", err);
+            console.error("Exception fetching onboarding status:", err);
             profileError = err;
           }
 
@@ -305,10 +301,10 @@ const AuthCodeHandler = () => {
             }
 
             // If profile not found, create one with retry logic
-            console.log("Creating new profile for user:", user.id);
+            console.log("Ensuring onboarding_status row exists for user:", user.id);
             const userMetadata = user.user_metadata || {};
-            
-            // Try profile creation with retry
+
+            // Try onboarding_status creation with retry
             let insertError;
             let retryCount = 0;
             const maxRetries = 3;
@@ -316,22 +312,17 @@ const AuthCodeHandler = () => {
             while (retryCount < maxRetries) {
               try {
                 const { error } = await supabase
-                  .from('profiles')
+                  .from('onboarding_status')
                   .upsert({
-                    id: user.id,
-                    email: user.email,
-                    full_name: userMetadata.full_name || userMetadata.name,
-                    avatar_url: userMetadata.avatar_url || userMetadata.picture,
-                    created_at: new Date().toISOString(),
-                    updated_at: new Date().toISOString(),
-                    onboarding_completed: false
-                  }, { 
-                    onConflict: 'id',
-                    returning: 'minimal' // Reduce response size
+                    user_id: user.id,
+                    is_complete: false,
+                    updated_at: new Date().toISOString()
+                  }, {
+                    onConflict: 'user_id'
                   });
                   
                 if (!error) {
-                  // Profile created successfully
+                  // Row ensured successfully
                   insertError = null;
                   break;
                 }
@@ -365,9 +356,9 @@ const AuthCodeHandler = () => {
 
           // If profile exists, proceed with normal flow
           if (profileData) {
-            console.log("Profile found, redirecting based on onboarding status");
+            console.log("Onboarding status found, redirecting accordingly");
             if (isMounted) {
-              navigate(profileData.onboarding_completed ? '/dashboard' : '/onboarding', { replace: true });
+              navigate(profileData.is_complete ? '/dashboard' : '/onboarding', { replace: true });
             }
             return;
           }

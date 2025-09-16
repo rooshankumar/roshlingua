@@ -24,39 +24,36 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
 
       console.log("Checking onboarding status for user:", user.id);
       try {
-        // Try multiple times to get or create the profile with exponential backoff
-        let profileData = null;
+        // Try to get onboarding status with exponential backoff
+        let onboardingData: { is_complete: boolean } | null = null;
         let retryCount = 0;
         const maxRetries = 3;
         
         while (retryCount < maxRetries) {
           try {
             const { data, error } = await supabase
-              .from('profiles')
-              .select('onboarding_completed')
-              .eq('id', user.id)
+              .from('onboarding_status')
+              .select('is_complete')
+              .eq('user_id', user.id)
               .single();
               
             if (error) {
-              // If profile not found, create a default one
+              // If row not found, create a default onboarding_status
               if (error.code === 'PGRST116') {
-                console.log(`Profile not found (attempt ${retryCount + 1}), creating a new profile`);
+                console.log(`Onboarding status not found (attempt ${retryCount + 1}), creating a new onboarding_status`);
                 
-                // Create a new profile
+                // Create a new onboarding_status row
                 const { error: createError } = await supabase
-                  .from('profiles')
+                  .from('onboarding_status')
                   .insert({
-                    id: user.id,
-                    email: user.email,
-                    onboarding_completed: false,
+                    user_id: user.id,
+                    is_complete: false,
                     created_at: new Date().toISOString(),
-                    updated_at: new Date().toISOString(),
-                    last_seen: new Date().toISOString(),
-                    is_online: true
+                    updated_at: new Date().toISOString()
                   });
                   
                 if (createError) {
-                  console.error(`Error creating profile (attempt ${retryCount + 1}):`, createError);
+                  console.error(`Error creating onboarding_status (attempt ${retryCount + 1}):`, createError);
                   retryCount++;
                   
                   // Add exponential backoff delay
@@ -66,13 +63,13 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
                 
                 // After creating, fetch again
                 const { data: newData, error: newError } = await supabase
-                  .from('profiles')
-                  .select('onboarding_completed')
-                  .eq('id', user.id)
+                  .from('onboarding_status')
+                  .select('is_complete')
+                  .eq('user_id', user.id)
                   .single();
                   
                 if (newError) {
-                  console.error(`Error fetching new profile (attempt ${retryCount + 1}):`, newError);
+                  console.error(`Error fetching new onboarding_status (attempt ${retryCount + 1}):`, newError);
                   retryCount++;
                   
                   // Add exponential backoff delay
@@ -80,7 +77,7 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
                   continue;
                 }
                 
-                profileData = newData;
+                onboardingData = newData as any;
                 break;
               } else {
                 console.error(`Error checking onboarding status (attempt ${retryCount + 1}):`, error);
@@ -91,7 +88,7 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
                 continue;
               }
             } else {
-              profileData = data;
+              onboardingData = data as any;
               break;
             }
           } catch (innerError) {
@@ -103,8 +100,8 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
           }
         }
         
-        if (profileData) {
-          const isCompleted = profileData.onboarding_completed || false;
+        if (onboardingData) {
+          const isCompleted = onboardingData.is_complete || false;
           console.log("Onboarding status:", isCompleted ? "Completed" : "Not completed");
           setHasCompletedOnboarding(isCompleted);
         } else {
@@ -141,14 +138,10 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
     return <Navigate to="/auth" state={{ from: location.pathname }} replace />;
   }
 
-  // Only handle redirects when not checking onboarding status
+  // Optional onboarding: do not block access if not completed.
+  // If user has completed onboarding and is on the onboarding page, redirect them to dashboard.
   if (!isCheckingOnboarding) {
     const isOnOnboardingPage = location.pathname === "/onboarding";
-    
-    if (!hasCompletedOnboarding && !isOnOnboardingPage) {
-      return <Navigate to="/onboarding" replace />;
-    }
-
     if (hasCompletedOnboarding && isOnOnboardingPage) {
       return <Navigate to="/dashboard" replace />;
     }

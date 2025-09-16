@@ -228,7 +228,6 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
                     bio: formData.bio,
                     avatar_url: formData.avatar_url,
                     full_name: formData.full_name,
-                    onboarding_completed: true,
                     updated_at: new Date().toISOString()
                 }, {
                     onConflict: 'id'
@@ -245,12 +244,30 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
                 return;
             }
 
+            // Mark onboarding as complete
+            const { error: onboardingError } = await supabase
+                .from('onboarding_status')
+                .upsert({
+                    user_id: user.id,
+                    is_complete: true,
+                    updated_at: new Date().toISOString()
+                }, { onConflict: 'user_id' });
+
+            if (onboardingError) {
+                console.error('Error updating onboarding status:', onboardingError);
+                toast({
+                    variant: "destructive",
+                    title: "Error",
+                    description: "Failed to mark onboarding as complete. Please try again.",
+                });
+                setIsLoading(false);
+                return;
+            }
+
             toast({
                 title: "Welcome!",
                 description: "Your profile has been successfully set up.",
             });
-
-            localStorage.setItem("onboarding_completed", "true");
 
             // Call onComplete first, then navigate
             onComplete();

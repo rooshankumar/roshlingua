@@ -33,12 +33,11 @@ export function useCommunityUsers() {
           is_online
         `)
         .neq('id', currentUser?.id)
-        .eq('onboarding_completed', true)
         .order('created_at', { ascending: false })
         .limit(100); // Add a reasonable limit to improve performance
 
       if (error) throw error;
-      setUsers(data || []);
+      setUsers((data as unknown as User[]) || []);
       console.log(`Fetched ${data?.length || 0} users at ${timestamp}`);
     } catch (err) {
       console.error('Error fetching users:', err);
@@ -123,11 +122,10 @@ export function useCommunityUsers() {
           is_online
         `)
         .neq('id', currentUser?.id)
-        .eq('onboarding_completed', true)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      setUsers(data || []);
+      setUsers((data as unknown as User[]) || []);
     } catch (err) {
       console.error('Error refreshing users:', err);
       setError(err.message);

@@ -57,42 +57,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           setSession(session);
           setUser(session?.user ?? null);
 
-          // If session exists, ensure profile exists
+          // If session exists, optionally update activity and check onboarding separately in routes
           if (session?.user) {
-            console.log("Checking profile for user:", session.user.id);
-            const { data: profileData, error: profileCheckError } = await supabase
+            // Update last_seen (profile is created by DB trigger)
+            console.log("Updating last_seen for user:", session.user.id);
+            await supabase
               .from('profiles')
-              .select('id, onboarding_completed')
-              .eq('id', session.user.id)
-              .single();
-
-            if (profileCheckError && profileCheckError.code !== 'PGRST116') {
-              console.error("Profile check error:", profileCheckError);
-            }
-
-            // Create profile if it doesn't exist
-            if (!profileData) {
-              console.log("Creating profile for user:", session.user.id);
-              await supabase.from('profiles').insert({
-                id: session.user.id,
-                user_id: session.user.id, // Add user_id field
-                email: session.user.email,
-                created_at: new Date().toISOString(),
-                updated_at: new Date().toISOString(),
-                last_seen: new Date().toISOString(),
-                onboarding_completed: false,
-                learning_language: 'en', // Default to English
-                native_language: 'en',   // Default to English
-                proficiency_level: 'beginner' // Default to beginner
-              });
-            } else {
-              // Update last_seen
-              console.log("Updating last_seen for user:", session.user.id);
-              await supabase
-                .from('profiles')
-                .update({ last_seen: new Date().toISOString() })
-                .eq('id', session.user.id);
-            }
+              .update({ last_seen: new Date().toISOString() })
+              .eq('id', session.user.id);
           }
         }
 
@@ -107,29 +79,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             }
 
             if (event === 'SIGNED_IN' && currentSession) {
+              // Touch last_seen only; onboarding is managed via onboarding_status table
               try {
-                console.log("User signed in, updating profile");
-                const { error: profileError } = await supabase
+                await supabase
                   .from('profiles')
-                  .upsert({ 
-                    id: currentSession.user.id,
-                    user_id: currentSession.user.id, // Add user_id field
-                    email: currentSession.user.email,
-                    updated_at: new Date().toISOString(),
-                    last_seen: new Date().toISOString(),
-                    learning_language: 'en', // Default to English
-                    native_language: 'en',   // Default to English
-                    proficiency_level: 'beginner' // Default to beginner
-                  }, { onConflict: 'id' });
-
-                if (profileError) {
-                  console.error("Error updating profile on sign in:", profileError);
-                  throw profileError;
-                }
+                  .update({ last_seen: new Date().toISOString(), updated_at: new Date().toISOString() })
+                  .eq('id', currentSession.user.id);
               } catch (err) {
-                console.error("Error updating profile:", err);
+                console.error("Error updating last_seen on sign in:", err);
               }
             }
+
           }
         );
 

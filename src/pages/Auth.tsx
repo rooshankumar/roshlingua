@@ -28,14 +28,14 @@ const Auth = () => {
     const checkSession = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (session?.user) {
-        // Check if profile exists and onboarding is completed
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('onboarding_completed')
-          .eq('id', session.user.id)
+        // Check if onboarding is completed via onboarding_status
+        const { data: onboarding } = await supabase
+          .from('onboarding_status')
+          .select('is_complete')
+          .eq('user_id', session.user.id)
           .single();
 
-        navigate(profile?.onboarding_completed ? '/dashboard' : '/onboarding', { replace: true });
+        navigate(onboarding?.is_complete ? '/dashboard' : '/onboarding', { replace: true });
       }
     };
 
@@ -54,13 +54,13 @@ const Auth = () => {
 
       if (error) throw error;
 
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('onboarding_completed')
-        .eq('id', data.user.id)
+      const { data: onboarding } = await supabase
+        .from('onboarding_status')
+        .select('is_complete')
+        .eq('user_id', data.user.id)
         .single();
 
-      navigate(profile?.onboarding_completed ? '/dashboard' : '/onboarding', { replace: true });
+      navigate(onboarding?.is_complete ? '/dashboard' : '/onboarding', { replace: true });
     } catch (error: any) {
       toast({
         variant: "destructive",
@@ -102,22 +102,6 @@ const Auth = () => {
       if (signUpError) throw signUpError;
       if (!data?.user) throw new Error("Signup failed - no user returned");
 
-      // Create initial profile
-      const { error: profileError } = await supabase
-        .from('profiles')
-        .insert([
-          {
-            id: data.user.id,
-            email: email,
-            updated_at: new Date().toISOString()
-          }
-        ]);
-
-      if (profileError) {
-        console.error("Profile creation error:", profileError);
-        throw new Error("Failed to create user profile");
-      }
-
       toast({
         title: "Success",
         description: "Please check your email to verify your account."
@@ -140,12 +124,7 @@ const Auth = () => {
     try {
       setIsLoading(true);
 
-      // Generate PKCE verifier
-      const { generateVerifier } = await import('@/utils/pkceHelper');
-      const verifier = generateVerifier();
-
-      // Store verifier in localStorage
-      localStorage.setItem('supabase.auth.code_verifier', verifier);
+      // Let Supabase manage PKCE automatically
 
       // Determine correct callback URL based on environment
       const redirectUrl = window.location.hostname.includes('vercel.app') 
@@ -159,11 +138,11 @@ const Auth = () => {
         options: {
           redirectTo: redirectUrl,
           skipBrowserRedirect: false,
+          flowType: 'pkce',
           queryParams: {
             access_type: 'offline',
             prompt: 'consent',
-            code_challenge_method: 'S256',
-            code_challenge: verifier
+            // PKCE params will be handled by Supabase SDK
           }
         }
       });

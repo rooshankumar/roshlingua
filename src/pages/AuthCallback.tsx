@@ -1,9 +1,7 @@
-
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/lib/supabase';
-import { getPKCEVerifier, clearPKCEVerifier } from '@/utils/pkceHelper';
 
 const AuthCallback = () => {
   const navigate = useNavigate();
@@ -36,19 +34,7 @@ const AuthCallback = () => {
           return;
         }
 
-        // Clean up any existing auth state
-        await supabase.auth.signOut();
-
-        // Get PKCE verifier
-        const verifier = getPKCEVerifier();
-        if (!verifier) {
-          throw new Error("No PKCE verifier found");
-        }
-
-        // Explicitly set verifier before exchange
-        localStorage.setItem('supabase.auth.code_verifier', verifier);
-
-        // Exchange the code for a session with the verifier
+        // Exchange the code for a session; Supabase SDK reads PKCE verifier from storage
         const { data, error: sessionError } = await supabase.auth.exchangeCodeForSession(code);
 
         if (sessionError) {
@@ -59,8 +45,49 @@ const AuthCallback = () => {
           throw new Error("No session returned");
         }
 
-        // Clear PKCE verifier after successful exchange
-        clearPKCEVerifier();
+        // PKCE verifier will expire naturally; no need to clear immediately here
+
+        // Ensure profile is updated with provider metadata if needed
+        const user = data.session.user;
+        const fullName = (user.user_metadata?.full_name) || (user.user_metadata?.name) || null;
+        const avatar = (user.user_metadata?.picture) || (user.user_metadata?.avatar_url) || null;
+
+        // Upsert minimal profile fields (only non-null values)
+        const upsertPayload: any = {
+          id: user.id,
+          email: user.email,
+          updated_at: new Date().toISOString()
+        };
+        if (fullName) {
+          upsertPayload.display_name = fullName;
+          upsertPayload.full_name = fullName;
+        }
+        if (avatar) {
+          upsertPayload.avatar_url = avatar;
+        }
+        await supabase.from('profiles').upsert(upsertPayload, { onConflict: 'id' });
+
+        // If avatar is external, mirror it into Supabase Storage for reliability
+        try {
+          if (avatar && avatar.startsWith('http') && !avatar.includes('/storage/v1/object/public/avatars/')) {
+            const res = await fetch(avatar);
+            if (res.ok) {
+              const blob = await res.blob();
+              const mime = res.headers.get('content-type') || blob.type || 'image/jpeg';
+              const ext = mime.includes('png') ? 'png' : mime.includes('webp') ? 'webp' : mime.includes('gif') ? 'gif' : 'jpg';
+              const path = `${user.id}/provider_${Date.now()}.${ext}`;
+              const { error: upErr } = await supabase.storage.from('avatars').upload(path, blob, { contentType: mime, upsert: true });
+              if (!upErr) {
+                const { data: pub } = await supabase.storage.from('avatars').getPublicUrl(path);
+                if (pub?.publicUrl) {
+                  await supabase.from('profiles').update({ avatar_url: pub.publicUrl, updated_at: new Date().toISOString() }).eq('id', user.id);
+                }
+              }
+            }
+          }
+        } catch (e) {
+          console.warn('Avatar mirroring skipped:', e);
+        }
 
         // Successful authentication
         toast({
@@ -74,7 +101,6 @@ const AuthCallback = () => {
         // Clear any stale auth data
         localStorage.removeItem('supabase.auth.token');
         sessionStorage.removeItem('supabase.auth.token');
-        clearPKCEVerifier();
         
         toast({
           variant: "destructive",
