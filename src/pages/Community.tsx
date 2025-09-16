@@ -219,8 +219,7 @@ const Community = () => {
             is_online,
             username,
             last_seen,
-            gender,
-            xp
+            gender
           `)
           .neq('id', currentUser?.id);
 
@@ -230,7 +229,7 @@ const Community = () => {
         }
 
         // Use data directly from users table with defaults
-        const usersWithDefaults = (data || []).map(user => ({
+        const usersWithDefaults = ((data || []) as any[]).map(user => ({
           ...user,
           username: user.username || user.full_name,
           full_name: user.full_name || 'Anonymous User',
@@ -244,7 +243,7 @@ const Community = () => {
           likes_count: user.likes_count || 0,
           age: user.date_of_birth ? Math.floor((new Date().getTime() - new Date(user.date_of_birth).getTime()) / (365.25 * 24 * 60 * 60 * 1000)) : null,
           gender: user.gender || null, // Added gender default
-          xp: user.xp || 0, // Added xp default
+          xp: (user as any).xp ?? (user as any).xp_points ?? 0, // Added xp default with fallback to xp_points
         }));
 
         // Check for actual online status - consider a user offline if last_seen is more than 5 minutes ago
@@ -289,81 +288,83 @@ const Community = () => {
     const subscriptionKey = 'community_profiles';
 
     const setupRealtimeSubscription = () => {
-      return subscriptionManager.subscribe(subscriptionKey, () => {
-        console.log('Setting up community profiles subscription');
-        return supabase
-          .channel('public:profiles:changes')
-          .on('postgres_changes',
-            {
-              event: '*',
-              schema: 'public',
-              table: 'profiles'
-            },
-            payload => {
-              console.log('Real-time profile update received:', payload);
+      console.log('Setting up community profiles subscription');
+      const channel = supabase
+        .channel('public:profiles:changes')
+        .on('postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: 'profiles'
+          },
+          payload => {
+            console.log('Real-time profile update received:', payload);
 
-              // Update the specific user in the state rather than re-fetching all users
-              if (payload.new && payload.eventType) {
-                setUsers(prevUsers => {
-                  let updatedUsers = [...prevUsers];
+            // Update the specific user in the state rather than re-fetching all users
+            if (payload.new && payload.eventType) {
+              setUsers(prevUsers => {
+                let updatedUsers = [...prevUsers];
 
-                  // For INSERT event, add the new user if they're not already in the list
-                  if (payload.eventType === 'INSERT' && !prevUsers.some(u => u.id === payload.new.id)) {
-                    // Don't add the current user to the list
-                    const isCurrentUser = payload.new.id === user?.id;
-                    if (!isCurrentUser) {
-                      // Add defaults for new user
-                      const newUser = {
-                        ...payload.new,
-                        username: payload.new.username || payload.new.full_name || 'Anonymous User',
-                        full_name: payload.new.full_name || 'Anonymous User',
-                        avatar_url: payload.new.avatar_url || '/placeholder.svg',
-                        bio: payload.new.bio || 'No bio available',
-                        native_language: payload.new.native_language || 'English',
-                        learning_language: payload.new.learning_language || 'Spanish',
-                        proficiency_level: payload.new.proficiency_level || 'beginner',
-                        is_online: payload.new.is_online || false,
-                        streak_count: payload.new.streak_count || 1,
-                        likes_count: payload.new.likes_count || 0,
-                        gender: payload.new.gender || null, // Added gender default for new users
-                        xp: payload.new.xp || 0, // Added xp default for new users
-                      };
-                      updatedUsers = [...updatedUsers, newUser as User];
+                // For INSERT event, add the new user if they're not already in the list
+                if (payload.eventType === 'INSERT' && !prevUsers.some(u => u.id === payload.new.id)) {
+                  // Don't add the current user to the list
+                  const isCurrentUser = payload.new.id === user?.id;
+                  if (!isCurrentUser) {
+                    // Add defaults for new user
+                    const newUser = {
+                      ...payload.new,
+                      username: payload.new.username || payload.new.full_name || 'Anonymous User',
+                      full_name: payload.new.full_name || 'Anonymous User',
+                      avatar_url: payload.new.avatar_url || '/placeholder.svg',
+                      bio: payload.new.bio || 'No bio available',
+                      native_language: payload.new.native_language || 'English',
+                      learning_language: payload.new.learning_language || 'Spanish',
+                      proficiency_level: payload.new.proficiency_level || 'beginner',
+                      is_online: payload.new.is_online || false,
+                      streak_count: payload.new.streak_count || 1,
+                      likes_count: payload.new.likes_count || 0,
+                      gender: payload.new.gender || null, // Added gender default for new users
+                      xp: (payload.new as any).xp ?? (payload.new as any).xp_points ?? 0, // Added xp default for new users
+                    };
+                    updatedUsers = [...updatedUsers, newUser as User];
+                  }
+                }
+
+                // For UPDATE event, update the existing user
+                else if (payload.eventType === 'UPDATE') {
+                  updatedUsers = prevUsers.map(u => {
+                    if (u.id === payload.new.id) {
+                      console.log('Updating user:', u.full_name, '→', payload.new.full_name);
+                      return { ...u, ...payload.new };
                     }
-                  }
+                    return u;
+                  });
+                }
 
-                  // For UPDATE event, update the existing user
-                  else if (payload.eventType === 'UPDATE') {
-                    updatedUsers = prevUsers.map(u => {
-                      if (u.id === payload.new.id) {
-                        console.log('Updating user:', u.full_name, '→', payload.new.full_name);
-                        return { ...u, ...payload.new };
-                      }
-                      return u;
-                    });
-                  }
+                // For DELETE event, remove the user
+                else if (payload.eventType === 'DELETE' && payload.old) {
+                  updatedUsers = prevUsers.filter(u => u.id !== payload.old.id);
+                }
 
-                  // For DELETE event, remove the user
-                  else if (payload.eventType === 'DELETE' && payload.old) {
-                    updatedUsers = prevUsers.filter(u => u.id !== payload.old.id);
-                  }
-
-                  return updatedUsers;
-                });
-              }
+                return updatedUsers;
+              });
             }
-          )
-          .subscribe((status) => {
-            console.log('Community real-time subscription status:', status);
-            if (status === 'SUBSCRIBED') {
-              console.log('Successfully subscribed to real-time updates');
-            } else if (status !== 'SUBSCRIBED') {
-              console.warn('Real-time subscription issue:', status);
-              // Try to reconnect if needed
-              setTimeout(() => fetchUsers(), 3000);
-            }
-          });
-      });
+          }
+        )
+        .subscribe((status) => {
+          console.log('Community real-time subscription status:', status);
+          const statusStr = String(status);
+          if (statusStr === 'SUBSCRIBED') {
+            console.log('Successfully subscribed to real-time updates');
+          } else if (statusStr !== 'SUBSCRIBED') {
+            console.warn('Real-time subscription issue:', status);
+            // Try to reconnect if needed
+            setTimeout(() => fetchUsers(), 3000);
+          }
+        });
+
+      subscriptionManager.subscribe(subscriptionKey, channel);
+      return channel;
     };
 
     // Initial data fetch
@@ -422,7 +423,7 @@ const Community = () => {
             username,
             last_seen,
             gender,
-            xp
+            
           `)
           .neq('id', currentUser?.id);
 
@@ -432,7 +433,7 @@ const Community = () => {
         }
 
         // Use data directly from users table with defaults
-        const usersWithDefaults = (data || []).map(user => ({
+        const usersWithDefaults = ((data || []) as any[]).map(user => ({
           ...user,
           username: user.username || user.full_name,
           full_name: user.full_name || 'Anonymous User',
@@ -446,7 +447,7 @@ const Community = () => {
           likes_count: user.likes_count || 0,
           age: user.date_of_birth ? Math.floor((new Date().getTime() - new Date(user.date_of_birth).getTime()) / (365.25 * 24 * 60 * 60 * 1000)) : null,
           gender: user.gender || null, // Added gender default
-          xp: user.xp || 0, // Added xp default
+          xp: (user as any).xp ?? (user as any).xp_points ?? 0, // Added xp default with fallback to xp_points
         }));
 
         // Check for actual online status - consider a user offline if last_seen is more than 5 minutes ago
@@ -882,14 +883,14 @@ const Community = () => {
                       .from('profiles')
                       .select(`
                         id, full_name, native_language, learning_language, proficiency_level, bio, 
-                        avatar_url, streak_count, likes_count, date_of_birth, is_online, username, last_seen, gender, xp
+                        avatar_url, streak_count, likes_count, date_of_birth, is_online, username, last_seen, gender
                       `)
                       .neq('id', currentUser?.id);
                     if (error) {
                       console.error("Error fetching users:", error);
                       return;
                     }
-                    const usersWithDefaults = (data || []).map(user => ({
+                    const usersWithDefaults = ((data || []) as any[]).map(user => ({
                       ...user,
                       username: user.username || user.full_name,
                       full_name: user.full_name || 'Anonymous User',
@@ -903,7 +904,7 @@ const Community = () => {
                       likes_count: user.likes_count || 0,
                       age: user.date_of_birth ? Math.floor((new Date().getTime() - new Date(user.date_of_birth).getTime()) / (365.25 * 24 * 60 * 60 * 1000)) : null,
                       gender: user.gender || null, // Added gender default
-                      xp: user.xp || 0, // Added xp default
+                      xp: (user as any).xp ?? (user as any).xp_points ?? 0, // Added xp default with fallback to xp_points
                     }));
                     // Check for actual online status - consider a user offline if last_seen is more than 5 minutes ago
                     const now = new Date().getTime();
